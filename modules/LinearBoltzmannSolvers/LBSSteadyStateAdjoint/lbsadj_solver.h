@@ -32,7 +32,8 @@ public:
   explicit SteadyStateAdjointSolver(const std::string& solver_name);
 
   void SetAdjointSource(lbs::LBSGroupset& groupset,
-                        std::vector<double>&  destination_q,
+                        std::vector<double>& destination_q,
+                        const std::vector<double>& phi,
                         lbs::SourceFlags source_flags);
 
   double ComputeInnerProduct();

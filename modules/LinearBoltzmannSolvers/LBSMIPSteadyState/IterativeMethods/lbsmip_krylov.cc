@@ -139,7 +139,7 @@ bool lbs::MIPSteadyStateSolver::Krylov(LBSGroupset& groupset,
 
   //SetSource for RHS
   auto init_q_moments_local = q_moments_local_;
-  set_source_function(groupset, q_moments_local_, rhs_src_scope);
+  set_source_function(groupset, q_moments_local_, PhiOldLocal(), rhs_src_scope);
 
   auto& mip_solver = *gs_mip_solvers_[groupset.id];
 

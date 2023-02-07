@@ -22,5 +22,5 @@ void lbs::SteadyStateSolver::Initialize()
   // Initialize source func
   using namespace std::placeholders;
   active_set_source_function_ =
-    std::bind(&SteadyStateSolver::SetSource, this, _1, _2, _3);
+    std::bind(&SteadyStateSolver::SetSource, this, _1, _2, _3, _4);
 }

@@ -74,9 +74,10 @@ inline SourceFlags operator|(const SourceFlags f1,
 }
 
 class LBSGroupset;
-typedef std::function<void(LBSGroupset&          groupset,
-                           std::vector<double>&  destination_q,
-                           SourceFlags           source_flags)>
+typedef std::function<void(LBSGroupset&               groupset,
+                           std::vector<double>&       destination_q,
+                           const std::vector<double>& phi,
+                           SourceFlags                source_flags)>
                       SetSourceFunction;
 
 /**Struct for storing LBS options_.*/

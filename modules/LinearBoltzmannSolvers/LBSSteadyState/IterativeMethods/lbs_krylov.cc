@@ -21,12 +21,13 @@
 
 //###################################################################
 /**Solves a groupset using a general Krylov method.*/
-bool lbs::SteadyStateSolver::Krylov(LBSGroupset& groupset,
-                                    MainSweepScheduler& sweep_scheduler,
-                                    SourceFlags lhs_src_scope,
-                                    SourceFlags rhs_src_scope,
-                                    const SetSourceFunction& set_source_function,
-                                    bool log_info /* = true*/)
+bool lbs::SteadyStateSolver::
+  Krylov(LBSGroupset& groupset,
+         chi_mesh::sweep_management::SweepScheduler& sweep_scheduler,
+         SourceFlags lhs_src_scope,
+         SourceFlags rhs_src_scope,
+         const SetSourceFunction& set_source_function,
+         bool log_info /* = true*/)
 {
   constexpr bool WITH_DELAYED_PSI = true;
 
@@ -158,7 +159,7 @@ bool lbs::SteadyStateSolver::Krylov(LBSGroupset& groupset,
 
   //SetSource for RHS
   auto init_q_moments_local = q_moments_local_;
-  set_source_function(groupset, q_moments_local_, rhs_src_scope);
+  set_source_function(groupset, q_moments_local_, PhiOldLocal(), rhs_src_scope);
 
   //Tool the sweep chunk
   auto& sweep_chunk = sweep_scheduler.GetSweepChunk();
@@ -224,7 +225,8 @@ bool lbs::SteadyStateSolver::Krylov(LBSGroupset& groupset,
   sweep_chunk.SetSurfaceSourceActiveFlag(rhs_src_scope & APPLY_FIXED_SOURCES);
 
   q_moments_local_ = init_q_moments_local;
-  set_source_function(groupset, q_moments_local_, lhs_src_scope | rhs_src_scope);
+  set_source_function(groupset, q_moments_local_,
+                      PhiOldLocal(),lhs_src_scope | rhs_src_scope);
 
   sweep_chunk.ZeroDestinationPhi();
   sweep_scheduler.Sweep();

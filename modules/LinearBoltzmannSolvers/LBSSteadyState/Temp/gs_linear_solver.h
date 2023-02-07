@@ -18,6 +18,7 @@ class SteadyStateSolver;
 
 typedef std::function<void(lbs::LBSGroupset&,
                            std::vector<double>&,
+                           const std::vector<double>&,
                            int)> SetSourceFunction;
 
 namespace lbs
@@ -34,15 +35,19 @@ protected:
   const int rhs_src_scope_;
 
   std::vector<double> saved_q_moments_local_;
-  bool log_info = true;
+  bool log_info_ = true;
 
 public:
+  typedef chi_math::LinearSolverContext<MatType,VecType> LinSolveContext;
+  typedef std::shared_ptr<LinSolveContext> LinSolveContextPtr;
   GSLinearSolver(SteadyStateSolver& lbs_solver,
                  LBSGroupset& groupset,
                  const std::string iterative_method,
                  const SetSourceFunction& set_source_function,
-                 int lhs_scope, int rhs_scope) :
-    chi_math::LinearSolver<MatType, VecType, SolverType>(iterative_method),
+                 int lhs_scope, int rhs_scope,
+                 LinSolveContextPtr& context_ptr) :
+    chi_math::LinearSolver<MatType, VecType, SolverType>(iterative_method,
+                                                         context_ptr),
     lbs_solver_(lbs_solver),
     groupset_(groupset),
     set_source_function_(set_source_function),
@@ -50,14 +55,15 @@ public:
     rhs_src_scope_(rhs_scope)
   {}
 //  virtual void Setup();
-  void PreSetupCallback() override;
+  void PreSetupCallback() override; //TODO: Customize for solver spec
 //  virtual void SetOptions();
-  void SetSolverContext() override;
+  void SetSolverContext() override;   //TODO: Customize for solver spec
   void SetConvergenceTest() override;
 //  virtual void SetMonitor();
 //  virtual void SetPreconditioner();
 
-  virtual void SetSystemMatrix();
+  virtual void SetSystemSize() override;
+  virtual void SetSystem() override;
 //  virtual void PostSetupCallback();
 
 //  virtual void Solve();

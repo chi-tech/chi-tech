@@ -15,6 +15,8 @@ int LinearSolverMatrixAction(Mat matrix, Vec vector, Vec action)
 
   context->MatrixAction(matrix, vector, //inputs
                         action);        //output
+
+  return 0;
 }
 
 }//namespace chi_math

@@ -9,6 +9,7 @@
 void lbs::SteadyStateAdjointSolver::
   SetAdjointSource(lbs::LBSGroupset &groupset,
                    std::vector<double> &destination_q,
+                   const std::vector<double>& phi,
                    lbs::SourceFlags source_flags)
 {
   chi::log.LogEvent(source_event_tag_, chi_objects::ChiLog::EventType::EVENT_BEGIN);
@@ -67,13 +68,13 @@ void lbs::SteadyStateAdjointSolver::
           if (moment_avail and apply_ags_scatter_src)
             for (const auto& [_, gp, sigma_sm] : S[ell].Row(g))
               if (gp < gs_i or gp > gs_f)
-                rhs += sigma_sm * phi_old_local_[uk_map + gp];
+                rhs += sigma_sm * phi[uk_map + gp];
 
           //==================== Within groupset
           if (moment_avail and apply_wgs_scatter_src)
             for (const auto& [_, gp, sigma_sm] : S[ell].Row(g))
               if (gp >= gs_i and gp <= gs_f)
-                rhs += sigma_sm * phi_old_local_[uk_map + gp];
+                rhs += sigma_sm * phi[uk_map + gp];
 
           //============================== Apply fission sources
           const bool fission_avail = xs.is_fissionable and ell == 0;
@@ -85,14 +86,14 @@ void lbs::SteadyStateAdjointSolver::
             for (size_t gp = first_grp; gp <= last_grp; ++gp)
               if (gp < gs_i or gp > gs_f)
               {
-                rhs += prod[gp] * phi_old_local_[uk_map + gp];
+                rhs += prod[gp] * phi[uk_map + gp];
 
                 if (options_.use_precursors)
                   for (const auto& precursor: xs.precursors)
                     rhs += precursor.emission_spectrum[g] *
                            precursor.fractional_yield *
                            xs.nu_delayed_sigma_f[gp] *
-                           phi_old_local_[uk_map + gp];
+                           phi[uk_map + gp];
               }
           }
 
@@ -102,14 +103,14 @@ void lbs::SteadyStateAdjointSolver::
             const auto& prod = xs.production_matrix[g];
             for (size_t gp = gs_i; gp <= gs_f; ++gp)
             {
-              rhs += prod[gp] * phi_old_local_[uk_map + gp];
+              rhs += prod[gp] * phi[uk_map + gp];
 
               if (options_.use_precursors)
                 for (const auto& precursor: xs.precursors)
                   rhs += precursor.emission_spectrum[g] *
                          precursor.fractional_yield *
                          xs.nu_delayed_sigma_f[gp] *
-                         phi_old_local_[uk_map + gp];
+                         phi[uk_map + gp];
             }
           }
 

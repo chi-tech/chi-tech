@@ -30,7 +30,9 @@ int lbs::MIPMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Av)
   //============================================= Setting the source using
   //                                              updated phi_old
   context->q_moments_local.assign(context->q_moments_local.size(), 0.0);
-  set_source_function(groupset, context->q_moments_local, lhs_source_scope);
+  set_source_function(groupset, context->q_moments_local,
+                      solver.PhiOldLocal(),
+                      lhs_source_scope);
 
   //================================================== Setup GS vectors
   const size_t num_gs_local_dofs = solver.LocalNodeCount()*groupset.groups.size();

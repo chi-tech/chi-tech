@@ -4,26 +4,19 @@
 
 namespace chi_math
 {
-template<>
-void LinearSolver<Mat, Vec, KSP>::PreSetupCallback();
+template<> void LinearSolver<Mat, Vec, KSP>::PreSetupCallback();
 
-template<>
-void LinearSolver<Mat, Vec, KSP>::SetOptions();
+template<> void LinearSolver<Mat, Vec, KSP>::SetOptions();
 
-template<>
-void LinearSolver<Mat, Vec, KSP>::SetSolverContext();
+template<> void LinearSolver<Mat, Vec, KSP>::SetSolverContext();
 
-template<>
-void LinearSolver<Mat, Vec, KSP>::SetConvergenceTest();
+template<> void LinearSolver<Mat, Vec, KSP>::SetConvergenceTest();
 
-template<>
-void LinearSolver<Mat, Vec, KSP>::SetMonitor();
+template<> void LinearSolver<Mat, Vec, KSP>::SetMonitor();
 
-template<>
-void LinearSolver<Mat, Vec, KSP>::SetPreconditioner();
+template<> void LinearSolver<Mat, Vec, KSP>::SetPreconditioner();
 
-template<>
-void LinearSolver<Mat, Vec, KSP>::PostSetupCallback();
+template<> void LinearSolver<Mat, Vec, KSP>::PostSetupCallback();
 
 template<>
 void LinearSolver<Mat, Vec, KSP>::Setup()
@@ -55,7 +48,8 @@ void LinearSolver<Mat, Vec, KSP>::Setup()
 
   this->SetPreconditioner();
 
-  this->SetSystemMatrix();
+  this->SetSystemSize();
+  this->SetSystem();
 
   this->PostSetupCallback();
 }

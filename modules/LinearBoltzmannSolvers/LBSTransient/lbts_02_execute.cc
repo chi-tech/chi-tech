@@ -47,7 +47,7 @@ void lbs::TransientSolver::Step()
   {
     //======================================== Setup sweep chunk
     auto sweep_chunk = SetTransientSweepChunk(groupset);
-    MainSweepScheduler sweep_scheduler(
+    chi_mesh::sweep_management::SweepScheduler sweep_scheduler(
       sweep_namespace::SchedulingAlgorithm::DEPTH_OF_GRAPH,
       groupset.angle_agg,
       *sweep_chunk);

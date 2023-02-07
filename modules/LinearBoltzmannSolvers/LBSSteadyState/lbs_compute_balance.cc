@@ -6,8 +6,6 @@
 #include "chi_log.h"
 #include "LBSSteadyState/Groupset/lbs_groupset.h"
 
-;
-
 #include <iomanip>
 
 //###################################################################
@@ -42,6 +40,7 @@ void lbs::SteadyStateSolver::ComputeBalance()
   {
     q_moments_local_.assign(q_moments_local_.size(), 0.0);
     SetSource(groupset, q_moments_local_,
+              PhiOldLocal(),
               APPLY_FIXED_SOURCES | APPLY_AGS_FISSION_SOURCES |
               APPLY_WGS_FISSION_SOURCES);
     GSScopedCopyPrimarySTLvectors(groupset, q_moments_local_, mat_src);
@@ -161,13 +160,13 @@ void lbs::SteadyStateSolver::ComputeBalance()
 
   chi::log.Log() << "Balance table:\n"
     << std::setprecision(5) << std::scientific
-    << " Absorption rate          = " << globl_absorption               << "\n"
-    << " Production rate          = " << globl_production               << "\n"
-    << " In-flow rate             = " << globl_in_flow                  << "\n"
-    << " Out-flow rate            = " << globl_out_flow                 << "\n"
-    << " Integrated scalar flux   = " << globl_gain                     << "\n"
-    << " Net Gain/Loss            = " << globl_balance                  << "\n"
-    << " Net Gain/Loss normalized = " << globl_balance/globl_gain       << "\n";
+    << " Absorption rate              = " << globl_absorption               << "\n"
+    << " Production rate              = " << globl_production               << "\n"
+    << " In-flow rate                 = " << globl_in_flow                  << "\n"
+    << " Out-flow rate                = " << globl_out_flow                 << "\n"
+    << " Net Gain (In-flow + sources) = " << globl_gain                     << "\n"
+    << " Net Balance                  = " << globl_balance                  << "\n"
+    << " (Net Balance)/(Net Gain)     = " << globl_balance/globl_gain       << "\n";
 
   chi::log.Log() << "\n********** Done computing balance\n";
 

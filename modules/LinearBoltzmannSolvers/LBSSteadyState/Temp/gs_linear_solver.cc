@@ -17,7 +17,6 @@
 
 #define sc_double static_cast<double>
 #define sc_int64_t static_cast<int64_t>
-#define WITH_DELAYED_PSI true
 
 namespace lbs
 {
@@ -25,7 +24,7 @@ namespace lbs
 template<>
 void GSLinearSolver<Mat, Vec, KSP>::PreSetupCallback()
 {
-  if (log_info)
+  if (log_info_)
   {
     std::string method_name;
     switch (groupset_.iterative_method)
@@ -59,7 +58,8 @@ void GSLinearSolver<Mat, Vec, KSP>::SetSolverContext()
     lbs_solver_,
     set_source_function_,
     lhs_src_scope_,
-    rhs_src_scope_);
+    rhs_src_scope_,
+    /*with_delayed_psi=*/true);
 
   KSPSetApplicationContext(solver_, &(*context_ptr_));
 }
@@ -71,48 +71,30 @@ void GSLinearSolver<Mat, Vec, KSP>::SetConvergenceTest()
 }
 
 template<>
-void GSLinearSolver<Mat, Vec, KSP>::SetSystemMatrix()
+void GSLinearSolver<Mat, Vec, KSP>::SetSystemSize()
 {
-  const size_t local_node_count = lbs_solver_.LocalNodeCount();
-  const size_t globl_node_count = lbs_solver_.GlobalNodeCount();
-  const size_t num_moments      = lbs_solver_.NumMoments();
+  auto gs_context_ptr =
+    std::dynamic_pointer_cast<GSContext<Mat,Vec>>(context_ptr_);
+  const auto sizes = gs_context_ptr->SystemSize();
 
-  const size_t groupset_numgrps = groupset_.groups.size();
-  const auto num_delayed_psi_info = groupset_.angle_agg.GetNumDelayedAngularDOFs();
-  const size_t local_size = local_node_count * num_moments * groupset_numgrps +
-                            num_delayed_psi_info.first;
-  const size_t globl_size = globl_node_count * num_moments * groupset_numgrps +
-                            num_delayed_psi_info.second;
-  const size_t num_angles = groupset_.quadrature->abscissae.size();
-  const size_t num_psi_global = globl_node_count *
-                                num_angles *
-                                groupset_.groups.size();
-  const size_t num_delayed_psi_globl = num_delayed_psi_info.second;
+  num_local_dofs_ = sizes.first;
+  num_globl_dofs_ = sizes.second;
+}
 
-  if (log_info)
-  {
-    chi::log.Log()
-      << "Total number of angular unknowns: "
-      << num_psi_global
-      << "\n"
-      << "Number of lagged angular unknowns: "
-      << num_delayed_psi_globl << "("
-      << std::setprecision(2)
-      << sc_double(num_delayed_psi_globl)*100 / sc_double(num_psi_global)
-      << "%)";
-  }
-
-  x_ = chi_math::PETScUtils::CreateVector(sc_int64_t(local_size),
-                                          sc_int64_t(globl_size));
+template<>
+void GSLinearSolver<Mat, Vec, KSP>::SetSystem()
+{
+  x_ = chi_math::PETScUtils::CreateVector(sc_int64_t(num_local_dofs_),
+                                          sc_int64_t(num_globl_dofs_));
 
   VecSet(x_,0.0);
   VecDuplicate(x_,&b_);
 
   //============================================= Create the matrix-shell
-  MatCreateShell(PETSC_COMM_WORLD,sc_int64_t(local_size),
-                                  sc_int64_t(local_size),
-                                  sc_int64_t(globl_size),
-                                  sc_int64_t(globl_size),
+  MatCreateShell(PETSC_COMM_WORLD,sc_int64_t(num_local_dofs_),
+                                  sc_int64_t(num_local_dofs_),
+                                  sc_int64_t(num_globl_dofs_),
+                                  sc_int64_t(num_globl_dofs_),
                                   &(*context_ptr_),&A_);
 
   //============================================= Set the action-operator
@@ -126,25 +108,30 @@ void GSLinearSolver<Mat, Vec, KSP>::SetSystemMatrix()
 template<>
 void GSLinearSolver<Mat, Vec, KSP>::SetRHS()
 {
-  if (log_info)
+  if (log_info_)
   {
     chi::log.Log() << chi::program_timer.GetTimeString() << " Computing b";
   }
 
   //SetSource for RHS
   saved_q_moments_local_ = lbs_solver_.QMomentsLocal();
-  set_source_function_(groupset_, lbs_solver_.QMomentsLocal(), rhs_src_scope_);
+  set_source_function_(groupset_,
+                       lbs_solver_.QMomentsLocal(),
+                       lbs_solver_.PhiOldLocal(),
+                       rhs_src_scope_);
 
   //=================================================== Apply transport operator
   auto gs_context = std::dynamic_pointer_cast<GSContext<Mat,Vec>>(context_ptr_);
-  gs_context->ApplyInverseTransportOperator();
+  gs_context->ApplyInverseTransportOperator(rhs_src_scope_);
 
   //=================================================== Assemble PETSc vector
+  auto gs_context_ptr =
+    std::dynamic_pointer_cast<GSContext<Mat,Vec>>(context_ptr_);
   lbs_solver_.
-  SetGSPETScVecFromPrimarySTLvector(groupset_,
-                                    b_,
-                                    lbs_solver_.PhiNewLocal(),
-                                    WITH_DELAYED_PSI);
+    SetGSPETScVecFromPrimarySTLvector(groupset_,
+                                      b_,
+                                      lbs_solver_.PhiNewLocal(),
+                                      gs_context_ptr->with_delayed_psi_);
 
   //============================================= Compute RHS norm
   VecNorm(b_, NORM_2, &context_ptr_->rhs_norm_);
@@ -172,7 +159,7 @@ template<> void GSLinearSolver<Mat, Vec, KSP>::SetInitialGuess()
   if (init_guess_norm > 1.0e-10)
   {
     KSPSetInitialGuessNonzero(solver_, PETSC_TRUE);
-    if (log_info) chi::log.Log() << "Using phi_old as initial guess.";
+    if (log_info_) chi::log.Log() << "Using phi_old as initial guess.";
   }
 }
 

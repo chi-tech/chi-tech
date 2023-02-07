@@ -15,7 +15,7 @@
 /**Solves a groupset using classic richardson.*/
 bool lbs::SteadyStateSolver::
 ClassicRichardson(LBSGroupset& groupset,
-                  MainSweepScheduler& sweep_scheduler,
+                  chi_mesh::sweep_management::SweepScheduler& sweep_scheduler,
                   SourceFlags source_flags,
                   const SetSourceFunction& set_source_function,
                   bool log_info /* = true*/)
@@ -68,7 +68,7 @@ ClassicRichardson(LBSGroupset& groupset,
   for (int k = 0; k < groupset.max_iterations; ++k)
   {
     q_moments_local_ = init_q_moments_local;
-    set_source_function(groupset, q_moments_local_, source_flags);
+    set_source_function(groupset, q_moments_local_, PhiOldLocal(), source_flags);
 
     sweep_chunk.ZeroFluxDataStructures();
     sweep_scheduler.Sweep();

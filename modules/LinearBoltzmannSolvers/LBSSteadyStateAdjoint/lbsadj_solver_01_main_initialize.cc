@@ -65,6 +65,6 @@ void lbs::SteadyStateAdjointSolver::Initialize()
   //================================================== Initialize source func
   using namespace std::placeholders;
   active_set_source_function_ =
-    std::bind(&SteadyStateAdjointSolver::SetAdjointSource, this, _1, _2, _3);
+    std::bind(&SteadyStateAdjointSolver::SetAdjointSource, this, _1, _2, _3, _4);
 
 }

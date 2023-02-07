@@ -17,7 +17,7 @@
 
 namespace sweep_namespace = chi_mesh::sweep_management;
 typedef sweep_namespace::SweepChunk SweepChunk;
-typedef sweep_namespace::SweepScheduler MainSweepScheduler;
+//typedef sweep_namespace::SweepScheduler MainSweepScheduler;
 
 namespace lbs
 {
@@ -222,7 +222,8 @@ public:
 
   //Iterative Operations
   void SetSource(LBSGroupset& groupset,
-                 std::vector<double>&  destination_q,
+                 std::vector<double>& destination_q,
+                 const std::vector<double>& phi,
                  SourceFlags source_flags);
 protected:
   double ComputePiecewiseChange(LBSGroupset& groupset);
@@ -233,12 +234,12 @@ public:
 protected:
   //Iterative Methods
   bool ClassicRichardson(LBSGroupset& groupset,
-                         MainSweepScheduler& sweep_scheduler,
+                         chi_mesh::sweep_management::SweepScheduler& sweep_scheduler,
                          SourceFlags source_flags,
                          const SetSourceFunction& set_source_function,
                          bool log_info = true);
   bool Krylov(LBSGroupset& groupset,
-              MainSweepScheduler& sweep_scheduler,
+              chi_mesh::sweep_management::SweepScheduler& sweep_scheduler,
               SourceFlags lhs_src_scope,
               SourceFlags rhs_src_scope,
               const SetSourceFunction& set_source_function,

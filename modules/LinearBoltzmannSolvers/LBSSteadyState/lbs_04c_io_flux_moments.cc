@@ -2,10 +2,6 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
-
-#include "chi_mpi.h"
-
 
 #include <fstream>
 #include <cstring>
@@ -24,6 +20,7 @@ std::vector<double> lbs::SteadyStateSolver::
   {
     SetSource(groupset,
               source_moments,
+              PhiOldLocal(),
               APPLY_AGS_SCATTER_SOURCES | APPLY_WGS_SCATTER_SOURCES |
               APPLY_AGS_FISSION_SOURCES | APPLY_WGS_FISSION_SOURCES);
   }

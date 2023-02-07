@@ -43,14 +43,22 @@ public:
   }tolerance_options_;
 
 public:
-  explicit LinearSolver(const std::string& iterative_method) :
+  explicit
+  LinearSolver(const std::string& iterative_method,
+               std::shared_ptr<LinearSolverContext<MatType,VecType>>& context_ptr) :
     solver_name_(iterative_method),
-    iterative_method_(iterative_method) {}
+    iterative_method_(iterative_method),
+    context_ptr_(context_ptr)
+    {}
 
-  explicit LinearSolver(std::string  solver_name,
-                        std::string  iterative_method) :
+  explicit
+  LinearSolver(std::string  solver_name,
+               std::string  iterative_method,
+               std::shared_ptr<LinearSolverContext<MatType,VecType>>& context_ptr) :
     solver_name_(std::move(solver_name)),
-    iterative_method_(std::move(iterative_method)) {}
+    iterative_method_(std::move(iterative_method)),
+    context_ptr_(context_ptr)
+    {}
 
   virtual void Setup();
   virtual void PreSetupCallback();
@@ -60,7 +68,8 @@ public:
   virtual void SetMonitor();
   virtual void SetPreconditioner();
 
-  virtual void SetSystemMatrix() = 0; //TODO: Rename to SetSystem
+  virtual void SetSystemSize() = 0;
+  virtual void SetSystem() = 0;
   virtual void PostSetupCallback();
 
   virtual void Solve();

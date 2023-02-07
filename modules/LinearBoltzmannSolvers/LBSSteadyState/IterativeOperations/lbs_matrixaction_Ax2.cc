@@ -29,7 +29,10 @@ int lbs::MatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Av)
   //============================================= Setting the source using
   //                                              updated phi_old
   context->q_moments_local.assign(context->q_moments_local.size(), 0.0);
-  set_source_function(groupset, context->q_moments_local, lhs_source_scope);
+  set_source_function(groupset,
+                      context->q_moments_local,
+                      solver.PhiOldLocal(),
+                      lhs_source_scope);
 
   //============================================= Sweeping the new source
   sweep_chunk.ZeroFluxDataStructures();

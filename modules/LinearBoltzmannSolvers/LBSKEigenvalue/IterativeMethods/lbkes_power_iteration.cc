@@ -63,6 +63,7 @@ void KEigenvalueSolver::PowerIteration()
       //======================================== Precompute the fission source
       q_moments_local_.assign(q_moments_local_.size(), 0.0);
       SetSource(groupset, q_moments_local_,
+                PhiOldLocal(),
                 APPLY_AGS_FISSION_SOURCES |
                 APPLY_WGS_FISSION_SOURCES);
 

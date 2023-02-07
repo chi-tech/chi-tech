@@ -58,7 +58,7 @@ void lbs::SteadyStateSolver::SolveGroupset(LBSGroupset& groupset)
   //================================================== Setting up required
   //                                                   sweep chunks
   auto sweep_chunk = SetSweepChunk(groupset);
-  MainSweepScheduler sweep_scheduler(
+  chi_mesh::sweep_management::SweepScheduler sweep_scheduler(
     sweep_namespace::SchedulingAlgorithm::DEPTH_OF_GRAPH,
     groupset.angle_agg,
     *sweep_chunk);
