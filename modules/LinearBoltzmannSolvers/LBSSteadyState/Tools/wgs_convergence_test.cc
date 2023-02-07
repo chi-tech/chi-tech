@@ -1,6 +1,6 @@
-#include "gs_convergence_test.h"
+#include "wgs_convergence_test.h"
 
-#include "gs_context.h"
+#include "wgs_context.h"
 #include "LinearBoltzmannSolvers/LBSSteadyState/Groupset/lbs_groupset.h"
 
 #include "chi_runtime.h"
@@ -19,7 +19,7 @@ PetscErrorCode GSConvergenceTest(KSP ksp, PetscInt n, PetscReal rnorm,
                                  KSPConvergedReason* convergedReason, void*)
 {
   //======================================== Get data context
-  GSContext<Mat, Vec, KSP>* context;
+  WGSContext<Mat, Vec, KSP>* context;
   KSPGetApplicationContext(ksp,&context);
 
   //======================================== Set rhs norm

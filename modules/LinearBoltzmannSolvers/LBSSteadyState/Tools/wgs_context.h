@@ -1,5 +1,5 @@
-#ifndef CHITECH_GS_CONTEXT_H
-#define CHITECH_GS_CONTEXT_H
+#ifndef CHITECH_WGS_CONTEXT_H
+#define CHITECH_WGS_CONTEXT_H
 
 #include "ChiMath/LinearSolver/linear_solver_context.h"
 
@@ -22,24 +22,24 @@ namespace lbs
 {
 
 template<class MatType, class VecType, class SolverType>
-struct GSContext : public chi_math::LinearSolverContext<MatType, VecType>
+struct WGSContext : public chi_math::LinearSolverContext<MatType, VecType>
 {
-  LBSGroupset& groupset_;
   SteadyStateSolver& lbs_solver_;
+  LBSGroupset& groupset_;
   const SetSourceFunction& set_source_function_;
   const int lhs_src_scope_;
   const int rhs_src_scope_;
   const bool with_delayed_psi_ = false;
   bool log_info_ = true;
 
-  GSContext(LBSGroupset& groupset,
-            SteadyStateSolver& lbs_solver,
-            const SetSourceFunction& set_source_function,
-            int lhs_scope, int rhs_scope,
-            bool with_delayed_psi,
-            bool log_info) :
-            groupset_(groupset),
+  WGSContext(SteadyStateSolver& lbs_solver,
+             LBSGroupset& groupset,
+             const SetSourceFunction& set_source_function,
+             int lhs_scope, int rhs_scope,
+             bool with_delayed_psi,
+             bool log_info) :
             lbs_solver_(lbs_solver),
+            groupset_(groupset),
             set_source_function_(set_source_function),
             lhs_src_scope_(lhs_scope),
             rhs_src_scope_(rhs_scope),
@@ -72,4 +72,4 @@ struct GSContext : public chi_math::LinearSolverContext<MatType, VecType>
 
 }//namespace lbs
 
-#endif //CHITECH_GS_CONTEXT_H
+#endif //CHITECH_WGS_CONTEXT_H

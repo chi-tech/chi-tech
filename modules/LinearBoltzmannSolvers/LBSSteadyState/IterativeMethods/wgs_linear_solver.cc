@@ -1,6 +1,6 @@
-#include "gs_linear_solver.h"
+#include "wgs_linear_solver.h"
 
-#include "gs_convergence_test.h"
+#include "LinearBoltzmannSolvers/LBSSteadyState/Tools/wgs_convergence_test.h"
 
 #include "LinearBoltzmannSolvers/LBSSteadyState/lbs_linear_boltzmann_solver.h"
 #include "ChiMath/PETScUtils/petsc_utils.h"
@@ -19,13 +19,13 @@
 #define sc_int64_t static_cast<int64_t>
 
 #define GetGSContextPtr(x) \
-        std::dynamic_pointer_cast<GSContext<Mat,Vec,KSP>>(x)
+        std::dynamic_pointer_cast<WGSContext<Mat,Vec,KSP>>(x)
 
 namespace lbs
 {
 
 template<>
-void GSLinearSolver<Mat, Vec, KSP>::PreSetupCallback()
+void WGSLinearSolver<Mat, Vec, KSP>::PreSetupCallback()
 {
   auto gs_context_ptr = GetGSContextPtr(context_ptr_);
 
@@ -33,20 +33,20 @@ void GSLinearSolver<Mat, Vec, KSP>::PreSetupCallback()
 }
 
 template<>
-void GSLinearSolver<Mat, Vec, KSP>::SetSolverContext()
+void WGSLinearSolver<Mat, Vec, KSP>::SetSolverContext()
 {
   KSPSetApplicationContext(solver_, &(*context_ptr_));
 }
 
 template<>
-void GSLinearSolver<Mat, Vec, KSP>::SetConvergenceTest()
+void WGSLinearSolver<Mat, Vec, KSP>::SetConvergenceTest()
 {
   KSPSetConvergenceTest(solver_, &GSConvergenceTest, nullptr, nullptr);
 }
 
 
 template<>
-void GSLinearSolver<Mat, Vec, KSP>::SetSystemSize()
+void WGSLinearSolver<Mat, Vec, KSP>::SetSystemSize()
 {
   auto gs_context_ptr = GetGSContextPtr(context_ptr_);
   const auto sizes = gs_context_ptr->SystemSize();
@@ -56,7 +56,7 @@ void GSLinearSolver<Mat, Vec, KSP>::SetSystemSize()
 }
 
 template<>
-void GSLinearSolver<Mat, Vec, KSP>::SetSystem()
+void WGSLinearSolver<Mat, Vec, KSP>::SetSystem()
 {
   x_ = chi_math::PETScUtils::CreateVector(sc_int64_t(num_local_dofs_),
                                           sc_int64_t(num_globl_dofs_));
@@ -81,7 +81,7 @@ void GSLinearSolver<Mat, Vec, KSP>::SetSystem()
 }
 
 template<>
-void GSLinearSolver<Mat, Vec, KSP>::SetPreconditioner()
+void WGSLinearSolver<Mat, Vec, KSP>::SetPreconditioner()
 {
   auto gs_context_ptr = GetGSContextPtr(context_ptr_);
 
@@ -89,7 +89,7 @@ void GSLinearSolver<Mat, Vec, KSP>::SetPreconditioner()
 }
 
 template<>
-void GSLinearSolver<Mat, Vec, KSP>::PostSetupCallback()
+void WGSLinearSolver<Mat, Vec, KSP>::PostSetupCallback()
 {
   auto gs_context_ptr = GetGSContextPtr(context_ptr_);
 
@@ -97,7 +97,7 @@ void GSLinearSolver<Mat, Vec, KSP>::PostSetupCallback()
 }
 
 template<>
-void GSLinearSolver<Mat, Vec, KSP>::PreSolveCallback()
+void WGSLinearSolver<Mat, Vec, KSP>::PreSolveCallback()
 {
   auto gs_context_ptr = GetGSContextPtr(context_ptr_);
 
@@ -105,7 +105,7 @@ void GSLinearSolver<Mat, Vec, KSP>::PreSolveCallback()
 }
 
 template<>
-void GSLinearSolver<Mat, Vec, KSP>::SetRHS()
+void WGSLinearSolver<Mat, Vec, KSP>::SetRHS()
 {
   auto gs_context_ptr = GetGSContextPtr(context_ptr_);
 
@@ -149,7 +149,7 @@ void GSLinearSolver<Mat, Vec, KSP>::SetRHS()
 /**Sets the initial guess for a gs solver. If the initial guess's norm
  * is large enough the initial guess will be used, otherwise it is assumed
  * zero.*/
-template<> void GSLinearSolver<Mat, Vec, KSP>::SetInitialGuess()
+template<> void WGSLinearSolver<Mat, Vec, KSP>::SetInitialGuess()
 {
   auto gs_context_ptr = GetGSContextPtr(context_ptr_);
 
@@ -171,7 +171,7 @@ template<> void GSLinearSolver<Mat, Vec, KSP>::SetInitialGuess()
 }
 
 /**For this callback we simply restore the q_moments_local vector.*/
-template<> void GSLinearSolver<Mat, Vec, KSP>::PostSolveCallback()
+template<> void WGSLinearSolver<Mat, Vec, KSP>::PostSolveCallback()
 {
   //============================================= Get convergence reason
   KSPConvergedReason reason;

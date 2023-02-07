@@ -1,11 +1,11 @@
-#ifndef CHITECH_GSLINSOLVEBASE_H
-#define CHITECH_GSLINSOLVEBASE_H
+#ifndef CHITECH_WGSLINSOLVEBASE_H
+#define CHITECH_WGSLINSOLVEBASE_H
 
-#include "gs_context.h"
+#include "LinearBoltzmannSolvers/LBSSteadyState/Tools/wgs_context.h"
 
 #include "ChiMath/LinearSolver/linear_solver.h"
 #include "LinearBoltzmannSolvers/LBSSteadyState/lbs_linear_boltzmann_solver.h"
-#include "LinearBoltzmannSolvers/LBSSteadyState/Temp/gs_context.h"
+#include "LinearBoltzmannSolvers/LBSSteadyState/Tools/wgs_context.h"
 
 #include <memory>
 #include <vector>
@@ -13,33 +13,25 @@
 
 namespace lbs
 {
-class LBSGroupset;
-class SteadyStateSolver;
 
-}
-
-typedef std::function<void(lbs::LBSGroupset&,
-                           std::vector<double>&,
-                           const std::vector<double>&,
-                           int)> SetSourceFunction;
-
-namespace lbs
-{
-
+//################################################################### Class def
+/**Linear Solver specialization for Within GroupSet (WGS) solves.*/
 template<class MatType, class VecType, class SolverType>
-class GSLinearSolver : public chi_math::LinearSolver<MatType, VecType, SolverType>
+class WGSLinearSolver : public
+                        chi_math::LinearSolver<MatType,VecType,SolverType>
 {
 protected:
   std::vector<double> saved_q_moments_local_;
 
 public:
-  typedef chi_math::LinearSolverContext<MatType,VecType> LinSolveContext;
-  typedef std::shared_ptr<LinSolveContext> LinSolveContextPtr;
-  typedef std::shared_ptr<GSContext<MatType,VecType,SolverType>> GSContextPtr;
-  GSLinearSolver(const std::string iterative_method,
-                 GSContextPtr gs_context_ptr) :
+  typedef std::shared_ptr<WGSContext<MatType,VecType,SolverType>> GSContextPtr;
+
+  /**Constructor.
+   * \param gs_context_ptr Context Pointer to abstract context.*/
+  explicit WGSLinearSolver(GSContextPtr gs_context_ptr) :
     chi_math::LinearSolver<MatType,VecType,SolverType>
-      (iterative_method, gs_context_ptr)
+      (IterativeMethodPETScName(gs_context_ptr->groupset_.iterative_method),
+       gs_context_ptr)
   {
     auto& groupset = gs_context_ptr->groupset_;
     auto& solver_tol_options = this->ToleranceOptions();
@@ -48,7 +40,7 @@ public:
     solver_tol_options.gmres_restart_interval = groupset.gmres_restart_intvl;
   }
 
-public:
+protected:
 //  virtual void Setup();
   void PreSetupCallback() override;         //Customized via context
 //  virtual void SetOptions();
@@ -72,4 +64,4 @@ public:
 
 }//namespace lbs
 
-#endif //CHITECH_GSLINSOLVEBASE_H
+#endif //CHITECH_WGSLINSOLVEBASE_H

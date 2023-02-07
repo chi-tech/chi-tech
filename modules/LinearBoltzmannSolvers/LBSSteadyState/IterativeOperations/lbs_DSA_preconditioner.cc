@@ -60,7 +60,7 @@ int lbs::WGDSA_TGDSA_PreConditionerMult(PC pc, Vec phi_input, Vec pc_output)
   return 0;
 }
 
-#include "LinearBoltzmannSolvers/LBSSteadyState/Temp/gs_context.h"
+#include "LinearBoltzmannSolvers/LBSSteadyState/Tools/wgs_context.h"
 //###################################################################
 /**Applies WGDSA or TGDSA to the given input vector.*/
 int lbs::WGDSA_TGDSA_PreConditionerMult2(PC pc, Vec phi_input, Vec pc_output)
@@ -69,7 +69,7 @@ int lbs::WGDSA_TGDSA_PreConditionerMult2(PC pc, Vec phi_input, Vec pc_output)
   KSPDataContext* context;
   PCShellGetContext(pc,&context);
 
-  auto gs_context_ptr = (lbs::GSContext<Mat,Vec,KSP>*)(context);
+  auto gs_context_ptr = (lbs::WGSContext<Mat,Vec,KSP>*)(context);
 
   //Shorten some names
   lbs::SteadyStateSolver& solver = gs_context_ptr->lbs_solver_;

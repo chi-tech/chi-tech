@@ -1,4 +1,4 @@
-#include "sweep_gs_context.h"
+#include "sweep_wgs_context.h"
 
 #include <petscksp.h>
 
@@ -17,7 +17,7 @@ namespace lbs
 {
 
 template<>
-void SweepGSContext<Mat, Vec, KSP>::PreSetupCallback()
+void SweepWGSContext<Mat, Vec, KSP>::PreSetupCallback()
 {
   if (log_info_)
   {
@@ -44,7 +44,7 @@ void SweepGSContext<Mat, Vec, KSP>::PreSetupCallback()
 }
 
 template<>
-void SweepGSContext<Mat, Vec, KSP>::SetPreconditioner(KSP& solver)
+void SweepWGSContext<Mat, Vec, KSP>::SetPreconditioner(KSP& solver)
 {
   auto& ksp = solver;
 
@@ -63,7 +63,7 @@ void SweepGSContext<Mat, Vec, KSP>::SetPreconditioner(KSP& solver)
 }
 
 template<>
-std::pair<int64_t, int64_t> SweepGSContext<Mat, Vec, KSP>::SystemSize()
+std::pair<int64_t, int64_t> SweepWGSContext<Mat, Vec, KSP>::SystemSize()
 {
   const size_t local_node_count = lbs_solver_.LocalNodeCount();
   const size_t globl_node_count = lbs_solver_.GlobalNodeCount();
@@ -99,7 +99,7 @@ std::pair<int64_t, int64_t> SweepGSContext<Mat, Vec, KSP>::SystemSize()
 }
 
 template<>
-void SweepGSContext<Mat, Vec, KSP>::ApplyInverseTransportOperator(int scope)
+void SweepWGSContext<Mat, Vec, KSP>::ApplyInverseTransportOperator(int scope)
 {
   const bool use_surface_source_flag =
     (scope & APPLY_FIXED_SOURCES) and
@@ -118,7 +118,7 @@ void SweepGSContext<Mat, Vec, KSP>::ApplyInverseTransportOperator(int scope)
 }
 
 template<>
-void SweepGSContext<Mat, Vec, KSP>::PostSolveCallback()
+void SweepWGSContext<Mat, Vec, KSP>::PostSolveCallback()
 {
   auto& sweep_chunk = sweep_scheduler_.GetSweepChunk();
 

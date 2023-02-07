@@ -1,5 +1,5 @@
-#ifndef CHITECH_GS_CONVERGENCE_TEST_H
-#define CHITECH_GS_CONVERGENCE_TEST_H
+#ifndef CHITECH_WGS_CONVERGENCE_TEST_H
+#define CHITECH_WGS_CONVERGENCE_TEST_H
 
 #include <petscksp.h>
 
@@ -12,4 +12,4 @@ PetscErrorCode GSConvergenceTest(
 
 }//namespace lbs
 
-#endif //CHITECH_GS_CONVERGENCE_TEST_H
+#endif //CHITECH_WGS_CONVERGENCE_TEST_H

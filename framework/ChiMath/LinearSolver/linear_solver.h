@@ -68,6 +68,7 @@ public:
   }
 
   virtual void Setup();
+protected:
   virtual void PreSetupCallback();
   virtual void SetOptions();
   virtual void SetSolverContext();
@@ -79,7 +80,9 @@ public:
   virtual void SetSystem() = 0;
   virtual void PostSetupCallback();
 
+public:
   virtual void Solve();
+protected:
   virtual void PreSolveCallback();
   virtual void SetRHS() = 0;
   virtual void SetInitialGuess() = 0;

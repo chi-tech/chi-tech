@@ -13,8 +13,8 @@
 
 #include <iomanip>
 
-#include "Temp/sweep_gs_context.h"
-#include "Temp/gs_linear_solver.h"
+#include "LinearBoltzmannSolvers/LBSSteadyState/IterativeOperations/sweep_wgs_context.h"
+#include "LinearBoltzmannSolvers/LBSSteadyState/IterativeMethods/wgs_linear_solver.h"
 
 //###################################################################
 /**Execute the solver.*/
@@ -127,9 +127,8 @@ void lbs::SteadyStateSolver::SolveGroupset(LBSGroupset& groupset)
            groupset.iterative_method == IterativeMethod::KRYLOV_GMRES or
            groupset.iterative_method == IterativeMethod::KRYLOV_BICGSTAB)
   {
-    auto gs_context_ptr = std::make_shared<SweepGSContext<Mat, Vec, KSP>>(
-      groupset,
-      *this,
+    auto gs_context_ptr = std::make_shared<SweepWGSContext<Mat, Vec, KSP>>(
+      *this, groupset,
       active_set_source_function_,
       APPLY_WGS_SCATTER_SOURCES | APPLY_WGS_FISSION_SOURCES,  //lhs_scope
       APPLY_FIXED_SOURCES | APPLY_AGS_SCATTER_SOURCES |
@@ -138,10 +137,7 @@ void lbs::SteadyStateSolver::SolveGroupset(LBSGroupset& groupset)
       options_.verbose_inner_iterations,
       sweep_chunk);
 
-    GSLinearSolver<Mat,Vec,KSP> solver(
-      IterativeMethodPETScName(groupset.iterative_method),
-      gs_context_ptr);
-
+    WGSLinearSolver<Mat,Vec,KSP> solver(gs_context_ptr);
     solver.Setup();
     solver.Solve();
   }

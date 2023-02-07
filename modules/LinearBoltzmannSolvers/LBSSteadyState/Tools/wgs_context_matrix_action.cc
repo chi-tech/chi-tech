@@ -1,4 +1,4 @@
-#include "gs_context.h"
+#include "wgs_context.h"
 
 #include "LinearBoltzmannSolvers/LBSSteadyState/lbs_linear_boltzmann_solver.h"
 
@@ -8,11 +8,11 @@ namespace lbs
 {
 
 template<>
-int GSContext<Mat, Vec, KSP>::MatrixAction(Mat& matrix,
-                                      Vec& action_vector,
-                                      Vec& action)
+int WGSContext<Mat, Vec, KSP>::MatrixAction(Mat& matrix,
+                                            Vec& action_vector,
+                                            Vec& action)
 {
-  GSContext* gs_context_ptr;
+  WGSContext* gs_context_ptr;
   MatShellGetContext(matrix, &gs_context_ptr);
 
   //Shorten some names
