@@ -31,7 +31,6 @@ protected:
   int64_t num_local_dofs_ = 0;
   int64_t num_globl_dofs_ = 0;
 
-public:
   struct ToleranceOptions
   {
     double residual_relative_   = 1.0e-50;
@@ -43,9 +42,12 @@ public:
   }tolerance_options_;
 
 public:
+  typedef LinearSolverContext<MatType,VecType> LinSolveContext;
+  typedef std::shared_ptr<LinSolveContext> LinSolveContextPtr;
+
   explicit
   LinearSolver(const std::string& iterative_method,
-               std::shared_ptr<LinearSolverContext<MatType,VecType>>& context_ptr) :
+               LinSolveContextPtr context_ptr) :
     solver_name_(iterative_method),
     iterative_method_(iterative_method),
     context_ptr_(context_ptr)
@@ -54,11 +56,16 @@ public:
   explicit
   LinearSolver(std::string  solver_name,
                std::string  iterative_method,
-               std::shared_ptr<LinearSolverContext<MatType,VecType>>& context_ptr) :
+               LinSolveContextPtr context_ptr) :
     solver_name_(std::move(solver_name)),
     iterative_method_(std::move(iterative_method)),
     context_ptr_(context_ptr)
     {}
+
+  ToleranceOptions& ToleranceOptions()
+  {
+    return tolerance_options_;
+  }
 
   virtual void Setup();
   virtual void PreSetupCallback();

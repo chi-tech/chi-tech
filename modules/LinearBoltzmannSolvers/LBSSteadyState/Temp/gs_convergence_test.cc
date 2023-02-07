@@ -19,7 +19,7 @@ PetscErrorCode GSConvergenceTest(KSP ksp, PetscInt n, PetscReal rnorm,
                                  KSPConvergedReason* convergedReason, void*)
 {
   //======================================== Get data context
-  GSContext<Mat, Vec>* context;
+  GSContext<Mat, Vec, KSP>* context;
   KSPGetApplicationContext(ksp,&context);
 
   //======================================== Set rhs norm
@@ -74,7 +74,7 @@ PetscErrorCode GSConvergenceTest(KSP ksp, PetscInt n, PetscReal rnorm,
   }
 
 //  if (context->solver.Options().verbose_inner_iterations)
-//    chi::log.Log() << iter_info.str() << std::endl;
+    chi::log.Log() << iter_info.str() << std::endl;
 
   return KSP_CONVERGED_ITERATING;
 }

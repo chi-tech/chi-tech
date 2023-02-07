@@ -18,49 +18,23 @@
 #define sc_double static_cast<double>
 #define sc_int64_t static_cast<int64_t>
 
+#define GetGSContextPtr(x) \
+        std::dynamic_pointer_cast<GSContext<Mat,Vec,KSP>>(x)
+
 namespace lbs
 {
 
 template<>
 void GSLinearSolver<Mat, Vec, KSP>::PreSetupCallback()
 {
-  if (log_info_)
-  {
-    std::string method_name;
-    switch (groupset_.iterative_method)
-    {
-      case IterativeMethod::KRYLOV_RICHARDSON:
-        method_name = "KRYLOV_RICHARDSON"; break;
-      case IterativeMethod::KRYLOV_GMRES:
-        method_name = "KRYLOV_GMRES"; break;
-      case IterativeMethod::KRYLOV_BICGSTAB:
-        method_name = "KRYLOV_BICGSTAB"; break;
-      default: method_name = "KRYLOV_GMRES";
-    }
-    chi::log.Log()
-      << "\n\n";
-    chi::log.Log()
-      << "********** Solving groupset " << groupset_.id
-      << " with " << method_name << ".\n\n";
-    chi::log.Log()
-      << "Quadrature number of angles: "
-      << groupset_.quadrature->abscissae.size() << "\n"
-      << "Groups " << groupset_.groups.front().id << " "
-      << groupset_.groups.back().id << "\n\n";
-  }
+  auto gs_context_ptr = GetGSContextPtr(context_ptr_);
+
+  gs_context_ptr->PreSetupCallback();
 }
 
 template<>
 void GSLinearSolver<Mat, Vec, KSP>::SetSolverContext()
 {
-  context_ptr_ = std::make_shared<GSContext<Mat,Vec>>(
-    groupset_,
-    lbs_solver_,
-    set_source_function_,
-    lhs_src_scope_,
-    rhs_src_scope_,
-    /*with_delayed_psi=*/true);
-
   KSPSetApplicationContext(solver_, &(*context_ptr_));
 }
 
@@ -70,11 +44,11 @@ void GSLinearSolver<Mat, Vec, KSP>::SetConvergenceTest()
   KSPSetConvergenceTest(solver_, &GSConvergenceTest, nullptr, nullptr);
 }
 
+
 template<>
 void GSLinearSolver<Mat, Vec, KSP>::SetSystemSize()
 {
-  auto gs_context_ptr =
-    std::dynamic_pointer_cast<GSContext<Mat,Vec>>(context_ptr_);
+  auto gs_context_ptr = GetGSContextPtr(context_ptr_);
   const auto sizes = gs_context_ptr->SystemSize();
 
   num_local_dofs_ = sizes.first;
@@ -103,34 +77,60 @@ void GSLinearSolver<Mat, Vec, KSP>::SetSystem()
 
   //============================================= Set solver operators
   KSPSetOperators(solver_, A_, A_);
+  KSPSetUp(solver_);
+}
+
+template<>
+void GSLinearSolver<Mat, Vec, KSP>::SetPreconditioner()
+{
+  auto gs_context_ptr = GetGSContextPtr(context_ptr_);
+
+  gs_context_ptr->SetPreconditioner(solver_);
+}
+
+template<>
+void GSLinearSolver<Mat, Vec, KSP>::PostSetupCallback()
+{
+  auto gs_context_ptr = GetGSContextPtr(context_ptr_);
+
+  gs_context_ptr->PostSetupCallback();
+}
+
+template<>
+void GSLinearSolver<Mat, Vec, KSP>::PreSolveCallback()
+{
+  auto gs_context_ptr = GetGSContextPtr(context_ptr_);
+
+  gs_context_ptr->PreSolveCallback();
 }
 
 template<>
 void GSLinearSolver<Mat, Vec, KSP>::SetRHS()
 {
-  if (log_info_)
-  {
+  auto gs_context_ptr = GetGSContextPtr(context_ptr_);
+
+  auto& groupset   = gs_context_ptr->groupset_;
+  auto& lbs_solver = gs_context_ptr->lbs_solver_;
+
+  if (gs_context_ptr->log_info_)
     chi::log.Log() << chi::program_timer.GetTimeString() << " Computing b";
-  }
 
   //SetSource for RHS
-  saved_q_moments_local_ = lbs_solver_.QMomentsLocal();
-  set_source_function_(groupset_,
-                       lbs_solver_.QMomentsLocal(),
-                       lbs_solver_.PhiOldLocal(),
-                       rhs_src_scope_);
+  saved_q_moments_local_ = lbs_solver.QMomentsLocal();
+  const int scope = gs_context_ptr->rhs_src_scope_;
+  gs_context_ptr->set_source_function_(groupset,
+                                       lbs_solver.QMomentsLocal(),
+                                       lbs_solver.PhiOldLocal(),
+                                       scope);
 
   //=================================================== Apply transport operator
-  auto gs_context = std::dynamic_pointer_cast<GSContext<Mat,Vec>>(context_ptr_);
-  gs_context->ApplyInverseTransportOperator(rhs_src_scope_);
+  gs_context_ptr->ApplyInverseTransportOperator(scope);
 
   //=================================================== Assemble PETSc vector
-  auto gs_context_ptr =
-    std::dynamic_pointer_cast<GSContext<Mat,Vec>>(context_ptr_);
-  lbs_solver_.
-    SetGSPETScVecFromPrimarySTLvector(groupset_,
+  lbs_solver.
+    SetGSPETScVecFromPrimarySTLvector(groupset,
                                       b_,
-                                      lbs_solver_.PhiNewLocal(),
+                                      lbs_solver.PhiNewLocal(),
                                       gs_context_ptr->with_delayed_psi_);
 
   //============================================= Compute RHS norm
@@ -143,6 +143,7 @@ void GSLinearSolver<Mat, Vec, KSP>::SetRHS()
   VecDuplicate(b_, &temp_vec);
   PCApply(pc, b_, temp_vec);
   VecNorm(temp_vec, NORM_2, &context_ptr_->rhs_preconditioned_norm_);
+  VecDestroy(&temp_vec);
 }
 
 /**Sets the initial guess for a gs solver. If the initial guess's norm
@@ -150,8 +151,13 @@ void GSLinearSolver<Mat, Vec, KSP>::SetRHS()
  * zero.*/
 template<> void GSLinearSolver<Mat, Vec, KSP>::SetInitialGuess()
 {
-  lbs_solver_.
-  SetGSPETScVecFromPrimarySTLvector(groupset_, x_, lbs_solver_.PhiOldLocal());
+  auto gs_context_ptr = GetGSContextPtr(context_ptr_);
+
+  auto& groupset   = gs_context_ptr->groupset_;
+  auto& lbs_solver = gs_context_ptr->lbs_solver_;
+
+  lbs_solver.
+  SetGSPETScVecFromPrimarySTLvector(groupset, x_, lbs_solver.PhiOldLocal());
 
   double init_guess_norm = 0.0;
   VecNorm(x_,NORM_2,&init_guess_norm);
@@ -159,14 +165,45 @@ template<> void GSLinearSolver<Mat, Vec, KSP>::SetInitialGuess()
   if (init_guess_norm > 1.0e-10)
   {
     KSPSetInitialGuessNonzero(solver_, PETSC_TRUE);
-    if (log_info_) chi::log.Log() << "Using phi_old as initial guess.";
+    if (gs_context_ptr->log_info_)
+      chi::log.Log() << "Using phi_old as initial guess.";
   }
 }
 
 /**For this callback we simply restore the q_moments_local vector.*/
 template<> void GSLinearSolver<Mat, Vec, KSP>::PostSolveCallback()
 {
-  lbs_solver_.QMomentsLocal() = saved_q_moments_local_;
+  //============================================= Get convergence reason
+  KSPConvergedReason reason;
+  KSPGetConvergedReason(solver_,&reason);
+  if (reason != KSP_CONVERGED_RTOL)
+    chi::log.Log0Warning()
+      << "Krylov solver failed. "
+      << "Reason: " << chi_physics::GetPETScConvergedReasonstring(reason);
+
+  //============================================= Copy x to local solution
+  auto gs_context_ptr = GetGSContextPtr(context_ptr_);
+
+  auto& groupset   = gs_context_ptr->groupset_;
+  auto& lbs_solver = gs_context_ptr->lbs_solver_;
+
+  auto& phi_new_local = lbs_solver.PhiNewLocal();
+  auto& phi_old_local = lbs_solver.PhiOldLocal();
+
+  const bool with_delayed_psi = gs_context_ptr->with_delayed_psi_;
+
+  lbs_solver.
+    SetPrimarySTLvectorFromGSPETScVec(groupset, x_,
+                                      phi_new_local, with_delayed_psi);
+  lbs_solver.
+    SetPrimarySTLvectorFromGSPETScVec(groupset, x_,
+                                      phi_old_local, with_delayed_psi);
+
+  //============================================= Restore saved q_moms
+  lbs_solver.QMomentsLocal() = saved_q_moments_local_;
+
+  //============================================= Context specific callback
+  gs_context_ptr->PostSolveCallback();
 }
 }//namespace lbs
 

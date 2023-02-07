@@ -265,10 +265,9 @@ public:
                                      const std::vector<double>& x_src,
                                      std::vector<double>& y,
                                      bool with_delayed_psi=false);
-protected:
+public:
   //compute_balance
   void ZeroOutflowBalanceVars(LBSGroupset& groupset);
-public:
   void ComputeBalance();
 
 protected:

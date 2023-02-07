@@ -113,8 +113,8 @@ void KEigenvalueSolver::PowerIteration()
       k_iter_info
           << chi::program_timer.GetTimeString() << " "
           << "  Iteration " << std::setw(5) << nit
-          << "  k_eff " << std::setw(10) << k_eff
-          << "  k_eff change " << std::setw(10) << k_eff_change
+          << "  k_eff " << std::setw(11) << std::setprecision(7) << k_eff
+          << "  k_eff change " << std::setw(12) << k_eff_change
           << "  reactivity " << std::setw(10) << reactivity * 1e5;
       if (converged) k_iter_info << " CONVERGED\n";
 

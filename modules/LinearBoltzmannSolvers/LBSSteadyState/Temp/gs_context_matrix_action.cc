@@ -8,7 +8,7 @@ namespace lbs
 {
 
 template<>
-int GSContext<Mat, Vec>::MatrixAction(Mat& matrix,
+int GSContext<Mat, Vec, KSP>::MatrixAction(Mat& matrix,
                                       Vec& action_vector,
                                       Vec& action)
 {
@@ -20,7 +20,8 @@ int GSContext<Mat, Vec>::MatrixAction(Mat& matrix,
   LBSGroupset& groupset              = gs_context_ptr->groupset_;
   const auto& delayed_psi_flag       = gs_context_ptr->with_delayed_psi_;
 
-  //============================================= Copy krylov action_vector into local
+  //============================================= Copy krylov action_vector
+  //                                              into local
   lbs_solver.SetPrimarySTLvectorFromGSPETScVec(groupset,
                                                action_vector,
                                                lbs_solver.PhiOldLocal(),

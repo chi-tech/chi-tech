@@ -4,6 +4,8 @@
 #include "gs_context.h"
 
 #include "ChiMath/LinearSolver/linear_solver.h"
+#include "LinearBoltzmannSolvers/LBSSteadyState/lbs_linear_boltzmann_solver.h"
+#include "LinearBoltzmannSolvers/LBSSteadyState/Temp/gs_context.h"
 
 #include <memory>
 #include <vector>
@@ -28,49 +30,44 @@ template<class MatType, class VecType, class SolverType>
 class GSLinearSolver : public chi_math::LinearSolver<MatType, VecType, SolverType>
 {
 protected:
-  SteadyStateSolver& lbs_solver_;
-  LBSGroupset& groupset_;
-  const SetSourceFunction& set_source_function_;
-  const int lhs_src_scope_;
-  const int rhs_src_scope_;
-
   std::vector<double> saved_q_moments_local_;
-  bool log_info_ = true;
 
 public:
   typedef chi_math::LinearSolverContext<MatType,VecType> LinSolveContext;
   typedef std::shared_ptr<LinSolveContext> LinSolveContextPtr;
-  GSLinearSolver(SteadyStateSolver& lbs_solver,
-                 LBSGroupset& groupset,
-                 const std::string iterative_method,
-                 const SetSourceFunction& set_source_function,
-                 int lhs_scope, int rhs_scope,
-                 LinSolveContextPtr& context_ptr) :
-    chi_math::LinearSolver<MatType, VecType, SolverType>(iterative_method,
-                                                         context_ptr),
-    lbs_solver_(lbs_solver),
-    groupset_(groupset),
-    set_source_function_(set_source_function),
-    lhs_src_scope_(lhs_scope),
-    rhs_src_scope_(rhs_scope)
-  {}
-//  virtual void Setup();
-  void PreSetupCallback() override; //TODO: Customize for solver spec
-//  virtual void SetOptions();
-  void SetSolverContext() override;   //TODO: Customize for solver spec
-  void SetConvergenceTest() override;
-//  virtual void SetMonitor();
-//  virtual void SetPreconditioner();
+  typedef std::shared_ptr<GSContext<MatType,VecType,SolverType>> GSContextPtr;
+  GSLinearSolver(const std::string iterative_method,
+                 GSContextPtr gs_context_ptr) :
+    chi_math::LinearSolver<MatType,VecType,SolverType>
+      (iterative_method, gs_context_ptr)
+  {
+    auto& groupset = gs_context_ptr->groupset_;
+    auto& solver_tol_options = this->ToleranceOptions();
+    solver_tol_options.residual_absolute_  = groupset.residual_tolerance;
+    solver_tol_options.maximum_iterations_ = groupset.max_iterations;
+    solver_tol_options.gmres_restart_interval = groupset.gmres_restart_intvl;
+  }
 
-  virtual void SetSystemSize() override;
-  virtual void SetSystem() override;
-//  virtual void PostSetupCallback();
+public:
+//  virtual void Setup();
+  void PreSetupCallback() override;         //Customized via context
+//  virtual void SetOptions();
+  void SetSolverContext() override;         //Generic
+  void SetConvergenceTest() override;       //Generic
+//  virtual void SetMonitor();
+
+  virtual void SetSystemSize() override;    //Customized via context
+  virtual void SetSystem() override;        //Generic
+
+  void SetPreconditioner() override;        //Customized via context
+
+  void PostSetupCallback() override;        //Customized via context
 
 //  virtual void Solve();
-//  virtual void PreSolveCallback();
-  void SetRHS() override;
-  void SetInitialGuess() override;
-  void PostSolveCallback() override;
+  void PreSolveCallback() override;         //Customized via context
+  void SetRHS() override;                   //Generic + with context elements
+  void SetInitialGuess() override;          //Generic
+  void PostSolveCallback() override;        //Generic + with context elements
 };
 
 }//namespace lbs

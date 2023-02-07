@@ -138,6 +138,8 @@ bool lbs::SteadyStateSolver::
     KSPGMRESSetBreakdownTolerance(ksp, 1.0e6);
   }
 
+  KSPSetUp(ksp);
+
   PC pc;
   KSPGetPC(ksp, &pc);
 
@@ -184,7 +186,6 @@ bool lbs::SteadyStateSolver::
 
   //=================================================== Retool for GMRES
   sweep_chunk.SetSurfaceSourceActiveFlag(lhs_src_scope & APPLY_FIXED_SOURCES);
-  sweep_chunk.SetDestinationPhi(phi_new_local_);
 
   double phi_old_norm=0.0;
   VecNorm(phi_new,NORM_2,&phi_old_norm);

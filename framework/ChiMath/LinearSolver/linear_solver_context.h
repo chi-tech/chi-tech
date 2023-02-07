@@ -20,6 +20,8 @@ namespace chi_math
 
     virtual int MatrixAction(MatType& matrix, VecType& vector, VecType& action)
     {return 0;}
+
+    virtual ~LinearSolverContext() = default;
   };
 }//namespace chi_math
 

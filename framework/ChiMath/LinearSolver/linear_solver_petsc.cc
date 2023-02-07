@@ -18,6 +18,10 @@ template<> void LinearSolver<Mat, Vec, KSP>::SetPreconditioner();
 
 template<> void LinearSolver<Mat, Vec, KSP>::PostSetupCallback();
 
+template<> void LinearSolver<Mat, Vec, KSP>::PreSolveCallback();
+
+template<> void LinearSolver<Mat, Vec, KSP>::PostSolveCallback();
+
 template<>
 void LinearSolver<Mat, Vec, KSP>::Setup()
 {
@@ -46,10 +50,10 @@ void LinearSolver<Mat, Vec, KSP>::Setup()
   this->SetConvergenceTest();
   this->SetMonitor();
 
-  this->SetPreconditioner();
-
   this->SetSystemSize();
   this->SetSystem();
+
+  this->SetPreconditioner();
 
   this->PostSetupCallback();
 }
@@ -90,10 +94,12 @@ void LinearSolver<Mat, Vec, KSP>::PostSetupCallback()
 template<>
 void LinearSolver<Mat, Vec, KSP>::Solve()
 {
+  this->PreSolveCallback();
   this->SetRHS();
   this->SetInitialGuess();
 
   KSPSolve(solver_, b_, x_);
+  this->PostSolveCallback();
 }
 
 template<>

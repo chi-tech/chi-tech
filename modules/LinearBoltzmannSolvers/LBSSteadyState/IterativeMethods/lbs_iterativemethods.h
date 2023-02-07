@@ -1,6 +1,8 @@
 #ifndef LBS_ITERATIVE_METHODS_H
 #define LBS_ITERATIVE_METHODS_H
 
+#include <string>
+
 namespace lbs
 {
   enum class IterativeMethod : int
@@ -17,6 +19,25 @@ namespace lbs
     KRYLOV_BICGSTAB          = 9, ///< BiCGStab iterative algorithm
     KRYLOV_BICGSTAB_CYCLES   = 10,///< BiCGStab with Cycles support
   };
+
+  inline std::string IterativeMethodPETScName(IterativeMethod it_method)
+  {
+    switch (it_method)
+    {
+      case IterativeMethod::NONE:                     return "preonly";
+      case IterativeMethod::CLASSICRICHARDSON:
+      case IterativeMethod::CLASSICRICHARDSON_CYCLES:
+      case IterativeMethod::KRYLOV_RICHARDSON:
+      case IterativeMethod::KRYLOV_RICHARDSON_CYCLES: return "richardson";
+      case IterativeMethod::GMRES:
+      case IterativeMethod::GMRES_CYCLES:
+      case IterativeMethod::KRYLOV_GMRES:
+      case IterativeMethod::KRYLOV_GMRES_CYCLES:      return "gmres";
+      case IterativeMethod::KRYLOV_BICGSTAB:
+      case IterativeMethod::KRYLOV_BICGSTAB_CYCLES:   return "bcgs";
+    }
+    return "";
+  }
 }
 
 #endif
