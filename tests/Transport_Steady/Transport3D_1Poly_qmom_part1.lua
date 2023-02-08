@@ -101,7 +101,7 @@ chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
 if (master_export == nil) then
     --chiLBSGroupsetSetEnableSweepLog(phys1,cur_gs,true)
 end
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,1)
+chiLBSGroupsetSetMaxIterations(phys1,cur_gs,0)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
 
 --############################################### Set boundary conditions

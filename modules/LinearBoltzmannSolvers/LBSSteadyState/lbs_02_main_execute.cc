@@ -58,13 +58,8 @@ void lbs::SteadyStateSolver::SolveGroupset(LBSGroupset& groupset)
   q_moments_local_.assign(q_moments_local_.size(), 0.0);
   auto sweep_chunk = SetSweepChunk(groupset);
 
-  if (groupset.iterative_method == IterativeMethod::CLASSICRICHARDSON or
-      groupset.iterative_method == IterativeMethod::KRYLOV_RICHARDSON or
-      groupset.iterative_method == IterativeMethod::KRYLOV_GMRES or
-      groupset.iterative_method == IterativeMethod::KRYLOV_BICGSTAB)
-  {
-    auto sweep_wgs_context_ptr =
-      std::make_shared<SweepWGSContext<Mat, Vec, KSP>>(
+  auto sweep_wgs_context_ptr =
+    std::make_shared<SweepWGSContext<Mat, Vec, KSP>>(
       *this, groupset,
       active_set_source_function_,
       APPLY_WGS_SCATTER_SOURCES | APPLY_WGS_FISSION_SOURCES,  //lhs_scope
@@ -74,10 +69,9 @@ void lbs::SteadyStateSolver::SolveGroupset(LBSGroupset& groupset)
       options_.verbose_inner_iterations,
       sweep_chunk);
 
-    WGSLinearSolver<Mat,Vec,KSP> solver(sweep_wgs_context_ptr);
-    solver.Setup();
-    solver.Solve();
-  }
+  WGSLinearSolver<Mat,Vec,KSP> solver(sweep_wgs_context_ptr);
+  solver.Setup();
+  solver.Solve();
 
   if (options_.write_restart_data)
     WriteRestartData(options_.write_restart_folder_name,

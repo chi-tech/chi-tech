@@ -73,7 +73,7 @@ PetscErrorCode GSConvergenceTest(KSP ksp, PetscInt n, PetscReal rnorm,
     iter_info << " CONVERGED\n";
   }
 
-//  if (context->solver.Options().verbose_inner_iterations)
+  if (context->log_info_)
     chi::log.Log() << iter_info.str() << std::endl;
 
   return KSP_CONVERGED_ITERATING;

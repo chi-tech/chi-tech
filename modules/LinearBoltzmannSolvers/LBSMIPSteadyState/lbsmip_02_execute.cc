@@ -46,25 +46,19 @@ void lbs::MIPSteadyStateSolver::SolveGroupset(LBSGroupset& groupset)
 
   q_moments_local_.assign(q_moments_local_.size(), 0.0);
 
-  if (groupset.iterative_method == IterativeMethod::CLASSICRICHARDSON or
-      groupset.iterative_method == IterativeMethod::KRYLOV_RICHARDSON or
-      groupset.iterative_method == IterativeMethod::KRYLOV_GMRES or
-      groupset.iterative_method == IterativeMethod::KRYLOV_BICGSTAB)
-  {
-    auto mip_wgs_context_ptr =
-      std::make_shared<MIPWGSContext<Mat, Vec, KSP>>(
-        *this, groupset,
-        active_set_source_function_,
-        APPLY_WGS_SCATTER_SOURCES | APPLY_WGS_FISSION_SOURCES |
-        SUPPRESS_WG_SCATTER,                                    //lhs_scope
-        APPLY_FIXED_SOURCES | APPLY_AGS_SCATTER_SOURCES |
-        APPLY_AGS_FISSION_SOURCES,                             //rhs_scope
-        options_.verbose_inner_iterations);
+  auto mip_wgs_context_ptr =
+    std::make_shared<MIPWGSContext<Mat, Vec, KSP>>(
+      *this, groupset,
+      active_set_source_function_,
+      APPLY_WGS_SCATTER_SOURCES | APPLY_WGS_FISSION_SOURCES |
+      SUPPRESS_WG_SCATTER,                                    //lhs_scope
+      APPLY_FIXED_SOURCES | APPLY_AGS_SCATTER_SOURCES |
+      APPLY_AGS_FISSION_SOURCES,                             //rhs_scope
+      options_.verbose_inner_iterations);
 
-    WGSLinearSolver<Mat,Vec,KSP> solver(mip_wgs_context_ptr);
-    solver.Setup();
-    solver.Solve();
-  }
+  WGSLinearSolver<Mat,Vec,KSP> solver(mip_wgs_context_ptr);
+  solver.Setup();
+  solver.Solve();
 
   if (options_.write_restart_data)
     WriteRestartData(options_.write_restart_folder_name,
