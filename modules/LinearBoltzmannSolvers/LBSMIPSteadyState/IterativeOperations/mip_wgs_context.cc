@@ -49,7 +49,7 @@ void MIPWGSContext<Mat, Vec, KSP>::SetPreconditioner(KSP& solver)
   PC pc;
   KSPGetPC(ksp, &pc);
 
-  if (groupset_.apply_wgdsa or groupset_.apply_tgdsa)
+  if (groupset_.apply_tgdsa)
   {
     PCSetType(pc, PCSHELL);
     PCShellSetApply(pc, (PCShellPtr) MIP_TGDSA_PreConditionerMult);

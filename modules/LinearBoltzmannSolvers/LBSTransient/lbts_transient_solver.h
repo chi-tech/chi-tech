@@ -75,7 +75,7 @@ public:
   //precursors
   void StepPrecursors();
 
-  ~TransientSolver() override;
+  virtual ~TransientSolver() override;
 };
 
 }//namespace lbs

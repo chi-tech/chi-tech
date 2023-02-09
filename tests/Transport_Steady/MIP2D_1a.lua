@@ -1,6 +1,9 @@
 -- 2D Transport test with Vacuum and Incident-isotropic BC.
 -- SDM: PWLD
 -- Test: Max-value=0.50758 and 2.52527e-04
+-- div 5
+--[0]  Max-value1=9.62800
+--[0]  Max-value2=5.99168e-02
 num_procs = 4
 
 
@@ -19,8 +22,8 @@ end
 chiMeshHandlerCreate()
 
 mesh={}
-N=50
-L=200
+N=50/5
+L=200/5
 xmin = -L/2
 dx = L/N
 for i=1,(N+1) do
@@ -50,9 +53,9 @@ chiPhysicsMaterialAddProperty(materials[2],ISOTROPIC_MG_SOURCE)
 
 num_groups = 168
 chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,
-        CHI_XSFILE,"tests/Transport_Steady/xs_3_170.cxs")
+        CHI_XSFILE,"tests/Transport_Steady/xs_graphite_pure.cxs")
 chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,
-        CHI_XSFILE,"tests/Transport_Steady/xs_3_170.cxs")
+        CHI_XSFILE,"tests/Transport_Steady/xs_graphite_pure.cxs")
 
 --chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,SIMPLEXS0,num_groups,0.1)
 --chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,SIMPLEXS0,num_groups,0.1)

@@ -8,6 +8,18 @@ lbs::SteadyStateSolver::SteadyStateSolver(const std::string& in_text_name) :
   chi_physics::Solver(in_text_name)
 {}
 
+/**Destructor for LBS*/
+lbs::SteadyStateSolver::~SteadyStateSolver()
+{
+  for (auto& groupset : groupsets_)
+  {
+    CleanUpWGDSA(groupset);
+    CleanUpTGDSA(groupset);
+
+    ResetSweepOrderings(groupset);
+  }
+}
+
 /**Returns the time at which the last restart was written.*/
 double lbs::SteadyStateSolver::LastRestartWrite() const
 {return last_restart_write_;}

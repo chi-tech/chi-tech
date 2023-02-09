@@ -9,8 +9,8 @@
 
 namespace lbs
 {
-class LBSGroupset;
-class SteadyStateSolver;
+  class LBSGroupset;
+  class SteadyStateSolver;
 }
 
 typedef std::function<void(lbs::LBSGroupset&,

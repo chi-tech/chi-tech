@@ -33,12 +33,6 @@ void WGSLinearSolver<Mat, Vec, KSP>::PreSetupCallback()
 }
 
 template<>
-void WGSLinearSolver<Mat, Vec, KSP>::SetSolverContext()
-{
-  KSPSetApplicationContext(solver_, &(*context_ptr_));
-}
-
-template<>
 void WGSLinearSolver<Mat, Vec, KSP>::SetConvergenceTest()
 {
   KSPSetConvergenceTest(solver_, &GSConvergenceTest, nullptr, nullptr);
@@ -58,6 +52,8 @@ void WGSLinearSolver<Mat, Vec, KSP>::SetSystemSize()
 template<>
 void WGSLinearSolver<Mat, Vec, KSP>::SetSystem()
 {
+  if (IsSystemSet()) return;
+
   x_ = chi_math::PETScUtils::CreateVector(sc_int64_t(num_local_dofs_),
                                           sc_int64_t(num_globl_dofs_));
 
@@ -83,6 +79,7 @@ void WGSLinearSolver<Mat, Vec, KSP>::SetSystem()
 template<>
 void WGSLinearSolver<Mat, Vec, KSP>::SetPreconditioner()
 {
+  if (IsSystemSet()) return;
   auto gs_context_ptr = GetGSContextPtr(context_ptr_);
 
   gs_context_ptr->SetPreconditioner(solver_);

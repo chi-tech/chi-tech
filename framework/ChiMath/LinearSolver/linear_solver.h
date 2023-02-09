@@ -28,6 +28,10 @@ protected:
   VecType x_;
   SolverType solver_;
 
+private:
+  bool system_set_ = false;
+
+protected:
   int64_t num_local_dofs_ = 0;
   int64_t num_globl_dofs_ = 0;
 
@@ -40,6 +44,9 @@ protected:
     int    gmres_restart_interval = 100;
     double gmres_breakdown_tolerance = 1.0e6;
   }tolerance_options_;
+
+protected:
+  bool IsSystemSet() const {return system_set_;}
 
 public:
   typedef LinearSolverContext<MatType,VecType> LinSolveContext;
@@ -67,7 +74,11 @@ public:
     return tolerance_options_;
   }
 
-  virtual void Setup();
+  std::shared_ptr<LinearSolverContext<MatType,VecType>> GetContext()
+  {
+    return context_ptr_;
+  }
+
 protected:
   virtual void PreSetupCallback();
   virtual void SetOptions();
@@ -79,14 +90,16 @@ protected:
   virtual void SetSystemSize() = 0;
   virtual void SetSystem() = 0;
   virtual void PostSetupCallback();
-
 public:
-  virtual void Solve();
+  virtual void Setup();
+
 protected:
   virtual void PreSolveCallback();
   virtual void SetRHS() = 0;
   virtual void SetInitialGuess() = 0;
   virtual void PostSolveCallback();
+public:
+  virtual void Solve();
 };
 
 }//namespace chi_math

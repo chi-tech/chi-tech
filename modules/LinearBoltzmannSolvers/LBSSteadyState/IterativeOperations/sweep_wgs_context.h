@@ -12,6 +12,7 @@ namespace lbs
 template<class MatType, class VecType, class SolverType>
 struct SweepWGSContext : public WGSContext<MatType,VecType,SolverType>
 {
+  std::shared_ptr<chi_mesh::sweep_management::SweepChunk> sweep_chunk_;
   chi_mesh::sweep_management::SweepScheduler sweep_scheduler_;
 
   SweepWGSContext(SteadyStateSolver& lbs_solver,
@@ -20,7 +21,7 @@ struct SweepWGSContext : public WGSContext<MatType,VecType,SolverType>
                   int lhs_scope, int rhs_scope,
                   bool with_delayed_psi,
                   bool log_info,
-                  std::shared_ptr<chi_mesh::sweep_management::SweepChunk>&
+                  std::shared_ptr<chi_mesh::sweep_management::SweepChunk>
                    sweep_chunk) :
     WGSContext<MatType, VecType, SolverType>(lbs_solver,
                                              groupset,
@@ -28,10 +29,11 @@ struct SweepWGSContext : public WGSContext<MatType,VecType,SolverType>
                                              lhs_scope, rhs_scope,
                                              with_delayed_psi,
                                              log_info),
+    sweep_chunk_(std::move(sweep_chunk)),
     sweep_scheduler_(
       chi_mesh::sweep_management::SchedulingAlgorithm::DEPTH_OF_GRAPH,
       groupset.angle_agg,
-      *sweep_chunk)
+      *sweep_chunk_)
   {}
 
   void PreSetupCallback() override;

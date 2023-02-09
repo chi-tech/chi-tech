@@ -5,6 +5,7 @@
 
 #include "LBSSteadyState/Groupset/lbs_groupset.h"
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "ChiMath/LinearSolver/linear_solver.h"
 #include "lbs_structs.h"
 #include "ChiMesh/SweepUtilities/sweep_namespace.h"
 #include "ChiMesh/SweepUtilities/SweepBoundary/sweep_boundaries.h"
@@ -15,9 +16,16 @@
 
 #include <petscksp.h>
 
+namespace lbs
+{
+  template<class MatType, class VecType, class SolverType>
+  class AGSLinearSolver;
+  template<class MatType, class VecType, class SolverType>
+  class WGSLinearSolver;
+}
+
 namespace sweep_namespace = chi_mesh::sweep_management;
 typedef sweep_namespace::SweepChunk SweepChunk;
-//typedef sweep_namespace::SweepScheduler MainSweepScheduler;
 
 namespace lbs
 {
@@ -27,6 +35,9 @@ class SteadyStateSolver : public chi_physics::Solver
 {
 protected:
   typedef chi_mesh::sweep_management::CellFaceNodalMapping CellFaceNodalMapping;
+  typedef std::shared_ptr<AGSLinearSolver<Mat,Vec,KSP>> AGSLinSolverPtr;
+  typedef std::shared_ptr<chi_math::LinearSolver<Mat,Vec,KSP>> LinSolvePtr;
+
   size_t source_event_tag_=0;
   double last_restart_write_=0.0;
 
@@ -65,10 +76,14 @@ protected:
 
   SetSourceFunction active_set_source_function_;
 
+  std::vector<AGSLinSolverPtr> ags_solvers_;
+  std::vector<LinSolvePtr>     wgs_solvers_;
+  AGSLinSolverPtr              primary_ags_solver_;
+
  public:
   //00
   explicit SteadyStateSolver(const std::string& in_text_name);
-  ~SteadyStateSolver() override =default;
+  ~SteadyStateSolver() override;
 
   SteadyStateSolver (const SteadyStateSolver&) = delete;
   SteadyStateSolver& operator= (const SteadyStateSolver&) = delete;
@@ -131,7 +146,10 @@ protected:
 public:
   //01i
   void InitializePointSources();
-
+protected:
+  //01j
+  void InitializeSolverSchemes();
+  virtual void InitializeWGSSolvers();
 
 
 
@@ -139,8 +157,9 @@ public:
 public:
   //02
   void Execute() override;
-protected:
+public:
   virtual void SolveGroupset(LBSGroupset& groupset);
+protected:
 
   //03a
   void ComputeSweepOrderings(LBSGroupset& groupset) const;
@@ -265,6 +284,13 @@ public:
                                      const std::vector<double>& x_src,
                                      std::vector<double>& y,
                                      bool with_delayed_psi=false);
+  void SetGroupScopedPETScVecFromPrimarySTLvector(int first_group_id,
+                                                  int last_group_id, Vec x,
+                                                  const std::vector<double>& y);
+  void SetPrimarySTLvectorFromGroupScopedPETScVec(
+    int first_group_id,
+    int last_group_id, Vec x_src,
+    std::vector<double>& y);
 public:
   //compute_balance
   void ZeroOutflowBalanceVars(LBSGroupset& groupset);

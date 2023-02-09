@@ -51,20 +51,6 @@ void lbs::TransientSolver::Initialize()
     chi::log.Log() << TextName() << buff;
   }
 
-  //================================================== Initialize groupsets_ for
-  //                                                   sweeping
-  chi::log.Log() << "Initializing groupset sweeping data" << TextName() << ".";
-  for (auto& groupset : groupsets_)
-  {
-    ComputeSweepOrderings(groupset);
-    InitFluxDataStructures(groupset);
-
-    InitWGDSA(groupset);
-    InitTGDSA(groupset);
-  }
-
-  chi::log.Log() << "Done initializing " << TextName() << ".";
-
   //================================================== Initialize source func
   using namespace std::placeholders;
   active_set_source_function_ =

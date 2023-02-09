@@ -73,7 +73,7 @@ void lbs::LBSGroupset::BuildSubsets()
     for (const auto& info : grp_subset_infos)
     {
       chi::log.Log()
-        << "Groupset subset " << ss << " "
+        << "Groupset " << id << " has group-subset " << ss << " "
       << info.ss_begin << "->" << info.ss_end;
       ++ss;
     }

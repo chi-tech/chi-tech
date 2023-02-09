@@ -182,3 +182,78 @@ void lbs::SteadyStateSolver::
     groupset.angle_agg.SetDelayedPsiNew2Old();
 
 }
+
+
+//###################################################################
+/**Assembles a vector for a given group span from a source vector.*/
+void lbs::SteadyStateSolver::
+  SetGroupScopedPETScVecFromPrimarySTLvector(int first_group_id,
+                                             int last_group_id, Vec x,
+                                             const std::vector<double>& y)
+{
+  double* x_ref;
+  VecGetArray(x,&x_ref);
+
+  int gsi = first_group_id;
+  int gsf = last_group_id;
+  int gss = gsf-gsi+1;
+
+  int index = -1;
+  for (const auto& cell : grid_ptr_->local_cells)
+  {
+    auto& transport_view = cell_transport_views_[cell.local_id];
+
+    for (int i=0; i < cell.vertex_ids.size(); i++)
+    {
+      for (int m=0; m < num_moments_; m++)
+      {
+        size_t mapping = transport_view.MapDOF(i,m,gsi);
+        for (int g=0; g<gss; g++)
+        {
+          index++;
+          x_ref[index] = y[mapping+g]; //Offset on purpose
+        }//for g
+      }//for moment
+    }//for dof
+  }//for cell
+
+  VecRestoreArray(x,&x_ref);
+}
+
+
+//###################################################################
+/**Assembles a vector for a given groupset from a source vector.*/
+void lbs::SteadyStateSolver::
+  SetPrimarySTLvectorFromGroupScopedPETScVec(
+    int first_group_id,
+    int last_group_id, Vec x_src,
+    std::vector<double>& y)
+{
+  const double* x_ref;
+  VecGetArrayRead(x_src,&x_ref);
+
+  int gsi = first_group_id;
+  int gsf = last_group_id;
+  int gss = gsf-gsi+1;
+
+  int index = -1;
+  for (const auto& cell : grid_ptr_->local_cells)
+  {
+    auto& transport_view = cell_transport_views_[cell.local_id];
+
+    for (int i=0; i < cell.vertex_ids.size(); i++)
+    {
+      for (int m=0; m < num_moments_; m++)
+      {
+        size_t mapping = transport_view.MapDOF(i,m,gsi);
+        for (int g=0; g<gss; g++)
+        {
+          index++;
+          y[mapping+g] = x_ref[index];
+        }//for g
+      }//for moment
+    }//for dof
+  }//for cell
+
+  VecRestoreArrayRead(x_src,&x_ref);
+}

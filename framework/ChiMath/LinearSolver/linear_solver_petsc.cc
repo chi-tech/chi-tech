@@ -4,27 +4,43 @@
 
 namespace chi_math
 {
-template<> void LinearSolver<Mat, Vec, KSP>::PreSetupCallback();
+template<>
+void LinearSolver<Mat, Vec, KSP>::PreSetupCallback()
+{}
 
-template<> void LinearSolver<Mat, Vec, KSP>::SetOptions();
+template<>
+void LinearSolver<Mat, Vec, KSP>::SetOptions()
+{}
 
-template<> void LinearSolver<Mat, Vec, KSP>::SetSolverContext();
+template<>
+void LinearSolver<Mat, Vec, KSP>::SetSolverContext()
+{
+  KSPSetApplicationContext(solver_, &(*context_ptr_));
+}
 
-template<> void LinearSolver<Mat, Vec, KSP>::SetConvergenceTest();
+template<>
+void LinearSolver<Mat, Vec, KSP>::SetConvergenceTest()
+{
+  KSPSetConvergenceTest(solver_, &KSPConvergedDefault, nullptr, nullptr);
+}
 
-template<> void LinearSolver<Mat, Vec, KSP>::SetMonitor();
+template<>
+void LinearSolver<Mat, Vec, KSP>::SetMonitor()
+{}
 
-template<> void LinearSolver<Mat, Vec, KSP>::SetPreconditioner();
+template<>
+void LinearSolver<Mat, Vec, KSP>::SetPreconditioner()
+{}
 
-template<> void LinearSolver<Mat, Vec, KSP>::PostSetupCallback();
+template<>
+void LinearSolver<Mat, Vec, KSP>::PostSetupCallback()
+{}
 
-template<> void LinearSolver<Mat, Vec, KSP>::PreSolveCallback();
-
-template<> void LinearSolver<Mat, Vec, KSP>::PostSolveCallback();
 
 template<>
 void LinearSolver<Mat, Vec, KSP>::Setup()
 {
+  if (IsSystemSet()) return;
   this->PreSetupCallback();
 
   KSPCreate(PETSC_COMM_WORLD, &solver_);
@@ -56,39 +72,16 @@ void LinearSolver<Mat, Vec, KSP>::Setup()
   this->SetPreconditioner();
 
   this->PostSetupCallback();
+  system_set_ = true;
 }
 
+
 template<>
-void LinearSolver<Mat, Vec, KSP>::PreSetupCallback()
+void LinearSolver<Mat, Vec, KSP>::PreSolveCallback()
 {}
 
 template<>
-void LinearSolver<Mat, Vec, KSP>::SetOptions()
-{}
-
-template<>
-void LinearSolver<Mat, Vec, KSP>::SetSolverContext()
-{
-  context_ptr_ = std::make_shared<LinearSolverContext<Mat,Vec>>();
-  KSPSetApplicationContext(solver_, &(*context_ptr_));
-}
-
-template<>
-void LinearSolver<Mat, Vec, KSP>::SetConvergenceTest()
-{
-  KSPSetConvergenceTest(solver_, &KSPConvergedDefault, nullptr, nullptr);
-}
-
-template<>
-void LinearSolver<Mat, Vec, KSP>::SetMonitor()
-{}
-
-template<>
-void LinearSolver<Mat, Vec, KSP>::SetPreconditioner()
-{}
-
-template<>
-void LinearSolver<Mat, Vec, KSP>::PostSetupCallback()
+void LinearSolver<Mat, Vec, KSP>::PostSolveCallback()
 {}
 
 template<>
@@ -101,14 +94,5 @@ void LinearSolver<Mat, Vec, KSP>::Solve()
   KSPSolve(solver_, b_, x_);
   this->PostSolveCallback();
 }
-
-template<>
-void LinearSolver<Mat, Vec, KSP>::PreSolveCallback()
-{}
-
-template<>
-void LinearSolver<Mat, Vec, KSP>::PostSolveCallback()
-{}
-
 
 }//namespace chi_math

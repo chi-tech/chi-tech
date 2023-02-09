@@ -1,6 +1,9 @@
 -- 2D Transport test with Vacuum and Incident-isotropic BC.
 -- SDM: PWLD
 -- Test: Max-value=0.50758 and 2.52527e-04
+-- div 5
+--[0]  Max-value1=9.30554
+--[0]  Max-value2=3.67948e-02
 num_procs = 4
 
 
@@ -19,8 +22,8 @@ end
 chiMeshHandlerCreate()
 
 mesh={}
-N=50
-L=200
+N=50/5
+L=200/5
 xmin = -L/2
 dx = L/N
 for i=1,(N+1) do
@@ -50,9 +53,9 @@ chiPhysicsMaterialAddProperty(materials[2],ISOTROPIC_MG_SOURCE)
 
 num_groups = 168
 chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,
-        CHI_XSFILE,"tests/Transport_Steady/xs_3_170.cxs")
+        CHI_XSFILE,"tests/Transport_Steady/xs_graphite_pure.cxs")
 chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,
-        CHI_XSFILE,"tests/Transport_Steady/xs_3_170.cxs")
+        CHI_XSFILE,"tests/Transport_Steady/xs_graphite_pure.cxs")
 
 --chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,SIMPLEXS0,num_groups,0.1)
 --chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,SIMPLEXS0,num_groups,0.1)
@@ -78,7 +81,7 @@ end
 pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 1)
 chiOptimizeAngularQuadratureForPolarSymmetry(pqaud, 4.0*math.pi)
 
-function MakeGroupset(from, to)
+function MakeGroupset(from, to, withTG)
     gs = chiLBSCreateGroupset(phys1)
     cur_gs = gs
     chiLBSGroupsetAddGroups(phys1,cur_gs,from,to)
@@ -89,29 +92,26 @@ function MakeGroupset(from, to)
     chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
     chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
     chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
-    chiLBSGroupsetSetWGDSA(phys1,cur_gs,1000,1.0e-8,false," ")
+    chiLBSGroupsetSetWGDSA(phys1,cur_gs,1000,1.0e-4,false," ")
+    --if withTG~= nil then
+    --    chiLBSGroupsetSetTGDSA(phys1,cur_gs,1000,1.0e-8,false," ")
+    --end
 end
 
-MakeGroupset(0,9)
-MakeGroupset(10,19)
-MakeGroupset(20,29)
-MakeGroupset(30,39)
-MakeGroupset(40,49)
-MakeGroupset(50,59)
-MakeGroupset(60,62)
+initg = 0
+limit = 62
+incr = 1
+for g=initg,limit,incr do
+    MakeGroupset(g,math.min(limit,g+incr-1))
+end
 
-gs1 = chiLBSCreateGroupset(phys1)
-cur_gs = gs1
-chiLBSGroupsetAddGroups(phys1,cur_gs,63,167)
-chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
-chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
-chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,2)
-chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
-chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
-chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
-chiLBSGroupsetSetWGDSA(phys1,cur_gs,1000,1.0e-8,false," ")
-chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
+initg = 63
+limit = 167
+incr = 1
+for g=initg,limit,incr do
+    MakeGroupset(g,math.min(limit,g+incr-1), true)
+end
+
 
 --############################################### Set boundary conditions
 bsrc={}
@@ -125,7 +125,7 @@ bsrc[1] = 1.0/4.0/math.pi
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 chiLBSSetProperty(phys1,SCATTERING_ORDER,1)
 
---chiLBSSetProperty(phys1, VERBOSE_INNER_ITERATIONS, false)
+chiLBSSetProperty(phys1, VERBOSE_INNER_ITERATIONS, false)
 
 --############################################### Initialize and Execute Solver
 chiSolverInitialize(phys1)
@@ -169,10 +169,10 @@ maxval = chiFFInterpolationGetValue(curffi)
 chiLog(LOG_0,string.format("Max-value2=%.5e", maxval))
 
 --############################################### Exports
-if master_export == nil then
-    chiFFInterpolationExportPython(slice2)
-    chiExportMultiFieldFunctionToVTK(fflist, "MIPPhi")
-end
+--if master_export == nil then
+--    chiFFInterpolationExportPython(slice2)
+--    chiExportMultiFieldFunctionToVTK(fflist, "MIPPhi")
+--end
 
 --############################################### Plots
 --if (chi_location_id == 0 and master_export == nil) then
