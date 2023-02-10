@@ -16,9 +16,7 @@ public:
   explicit MIPSteadyStateSolver(const std::string& in_text_name);
   //01
   void Initialize() override;
-  //02
-  void Execute() override;
-  void SolveGroupset(LBSGroupset& groupset) override;
+  void InitializeWGSSolvers() override;
 };
 }//namespace lbs
 

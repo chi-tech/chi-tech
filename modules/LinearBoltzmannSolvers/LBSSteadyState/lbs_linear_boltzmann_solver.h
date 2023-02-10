@@ -157,8 +157,7 @@ protected:
 public:
   //02
   void Execute() override;
-public:
-  virtual void SolveGroupset(LBSGroupset& groupset);
+
 protected:
 
   //03a

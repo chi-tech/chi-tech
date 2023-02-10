@@ -3,6 +3,11 @@
 #include "LBSSteadyState/IterativeOperations/sweep_wgs_context.h"
 #include "LBSSteadyState/IterativeMethods/wgs_linear_solver.h"
 
+#include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
+namespace sweep_namespace = chi_mesh::sweep_management;
+typedef sweep_namespace::SweepScheduler MainSweepScheduler;
+typedef sweep_namespace::SchedulingAlgorithm SchedulingAlgorithm;
+
 #include "chi_runtime.h"
 #include "chi_log.h"
 
@@ -30,14 +35,14 @@ void KEigenvalueSolver::PowerIteration()
   double k_eff_change = 1.0;
 
   //================================================== Initialize groupsets_
-  for (auto& groupset : groupsets_)
-  {
-    ComputeSweepOrderings(groupset);
-    InitFluxDataStructures(groupset);
-
-    InitWGDSA(groupset);
-    InitTGDSA(groupset);
-  }
+//  for (auto& groupset : groupsets_)
+//  {
+//    ComputeSweepOrderings(groupset);
+//    InitFluxDataStructures(groupset);
+//
+//    InitWGDSA(groupset);
+//    InitTGDSA(groupset);
+//  }
 
   //================================================== Start power iterations
   int nit = 0;
@@ -76,6 +81,17 @@ void KEigenvalueSolver::PowerIteration()
       solver.Setup();
       solver.Solve();
 
+//      auto sweep_chunk_ptr = SetSweepChunk(groupset);
+//      MainSweepScheduler sweep_scheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
+//                                         groupset.angle_agg,
+//                                         *sweep_chunk_ptr);
+//
+//      Krylov(groupset, sweep_scheduler,
+//             APPLY_WGS_SCATTER_SOURCES,
+//             APPLY_AGS_SCATTER_SOURCES,
+//             active_set_source_function_,
+//             options_.verbose_inner_iterations);
+
       MPI_Barrier(MPI_COMM_WORLD);
     }//for groupset
 
@@ -112,13 +128,13 @@ void KEigenvalueSolver::PowerIteration()
   }//for k iterations
 
   //================================================== Cleanup groupsets_
-  for (auto& groupset : groupsets_)
-  {
-    CleanUpWGDSA(groupset);
-    CleanUpTGDSA(groupset);
-
-    ResetSweepOrderings(groupset);
-  }
+//  for (auto& groupset : groupsets_)
+//  {
+//    CleanUpWGDSA(groupset);
+//    CleanUpTGDSA(groupset);
+//
+//    ResetSweepOrderings(groupset);
+//  }
 
   //================================================== Print summary
   chi::log.Log() << "\n";

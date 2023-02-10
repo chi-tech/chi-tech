@@ -1,13 +1,19 @@
 #include "lbsmip_steady_solver.h"
 
 #include "LBSSteadyState/Acceleration/diffusion_mip.h"
+#include "IterativeOperations/mip_wgs_context.h"
+#include "LBSSteadyState/IterativeMethods/wgs_linear_solver.h"
 
 /**Initializing.*/
 void lbs::MIPSteadyStateSolver::Initialize()
 {
   options_.scattering_order = 0; //overwrite any setting otherwise
   SteadyStateSolver::Initialize();
+}
 
+/**Initializes Within-GroupSet solvers.*/
+void lbs::MIPSteadyStateSolver::InitializeWGSSolvers()
+{
   //============================================= Initialize groupset solvers
   gs_mip_solvers_.assign(groupsets_.size(), nullptr);
   const size_t num_groupsets = groupsets_.size();
@@ -84,4 +90,25 @@ void lbs::MIPSteadyStateSolver::Initialize()
 
     gs_mip_solvers_[gs] = solver;
   }//for groupset
+
+  wgs_solvers_.clear(); //this is required
+  for (auto& groupset : groupsets_)
+  {
+
+    auto mip_wgs_context_ptr =
+    std::make_shared<MIPWGSContext<Mat, Vec, KSP>>(
+      *this, groupset,
+        active_set_source_function_,
+        APPLY_WGS_SCATTER_SOURCES | APPLY_WGS_FISSION_SOURCES |
+        SUPPRESS_WG_SCATTER,                                    //lhs_scope
+        APPLY_FIXED_SOURCES | APPLY_AGS_SCATTER_SOURCES |
+        APPLY_AGS_FISSION_SOURCES,                             //rhs_scope
+        options_.verbose_inner_iterations);
+
+    auto wgs_solver =
+      std::make_shared<WGSLinearSolver<Mat,Vec,KSP>>(mip_wgs_context_ptr);
+
+    wgs_solvers_.push_back(wgs_solver);
+  }//for groupset
+
 }

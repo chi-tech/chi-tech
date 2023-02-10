@@ -105,7 +105,7 @@ chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
 chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
 chiLBSGroupsetSetWGDSA(phys1,cur_gs,1000,1.0e-8,false," ")
---chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
+chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
 
 --############################################### Set boundary conditions
 bsrc={}
