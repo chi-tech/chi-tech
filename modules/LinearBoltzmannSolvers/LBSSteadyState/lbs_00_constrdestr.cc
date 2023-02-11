@@ -5,7 +5,7 @@
 //###################################################################
 /**Constructor for LBS*/
 lbs::SteadyStateSolver::SteadyStateSolver(const std::string& in_text_name) :
-  chi_physics::Solver(in_text_name)
+  lbs::LBSSolver(in_text_name)
 {}
 
 /**Destructor for LBS*/

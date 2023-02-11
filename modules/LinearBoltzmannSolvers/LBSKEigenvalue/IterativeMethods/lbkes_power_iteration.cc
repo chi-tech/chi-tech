@@ -81,17 +81,6 @@ void KEigenvalueSolver::PowerIteration()
       solver.Setup();
       solver.Solve();
 
-//      auto sweep_chunk_ptr = SetSweepChunk(groupset);
-//      MainSweepScheduler sweep_scheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
-//                                         groupset.angle_agg,
-//                                         *sweep_chunk_ptr);
-//
-//      Krylov(groupset, sweep_scheduler,
-//             APPLY_WGS_SCATTER_SOURCES,
-//             APPLY_AGS_SCATTER_SOURCES,
-//             active_set_source_function_,
-//             options_.verbose_inner_iterations);
-
       MPI_Barrier(MPI_COMM_WORLD);
     }//for groupset
 

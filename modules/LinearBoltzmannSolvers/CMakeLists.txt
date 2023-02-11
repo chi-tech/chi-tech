@@ -1,3 +1,4 @@
+add_subdirectory("LBSSolver")
 add_subdirectory("LBSSteadyState")
 add_subdirectory("LBSKEigenvalue")
 add_subdirectory("LBSTransient")
