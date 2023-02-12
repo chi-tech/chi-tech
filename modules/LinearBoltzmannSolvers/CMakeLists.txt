@@ -1,5 +1,5 @@
-add_subdirectory("LBSSolver")
-add_subdirectory("LBSSteadyState")
+add_subdirectory("A_LBSSolver")
+add_subdirectory("B_LBSSteadyState")
 add_subdirectory("LBSKEigenvalue")
 add_subdirectory("LBSTransient")
 add_subdirectory("LBSSteadyStateAdjoint")

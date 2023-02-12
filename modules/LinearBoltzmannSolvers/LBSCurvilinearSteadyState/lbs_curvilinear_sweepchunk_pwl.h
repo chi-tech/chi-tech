@@ -1,8 +1,8 @@
 #ifndef LBS_CURVILINEAR_SWEEPCHUNK_PWL_H
 #define LBS_CURVILINEAR_SWEEPCHUNK_PWL_H
 
-#include "LBSSteadyState/SweepChunks/lbs_sweepchunk_pwl.h"
-#include "LBSSteadyState/Groupset/lbs_groupset.h"
+#include "B_LBSSteadyState/SweepChunks/lbs_sweepchunk_pwl.h"
+#include "B_LBSSteadyState/Groupset/lbs_groupset.h"
 
 
 

@@ -1,7 +1,7 @@
 #include "lbts_transient_solver.h"
 
-#include "LBSSteadyState/IterativeOperations/sweep_wgs_context.h"
-#include "LBSSteadyState/IterativeMethods/wgs_linear_solver.h"
+#include "B_LBSSteadyState/IterativeOperations/sweep_wgs_context.h"
+#include "B_LBSSteadyState/IterativeMethods/wgs_linear_solver.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

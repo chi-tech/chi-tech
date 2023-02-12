@@ -7,8 +7,8 @@
 
 #include "ChiMesh/SweepUtilities/sweepchunk_base.h"
 
-#include "LBSSteadyState/lbs_linear_boltzmann_solver.h"
-#include "LBSSteadyState/Groupset/lbs_groupset.h"
+#include "B_LBSSteadyState/lbs_linear_boltzmann_solver.h"
+#include "B_LBSSteadyState/Groupset/lbs_groupset.h"
 
 typedef std::map<int,std::shared_ptr<chi_physics::TransportCrossSections>> TCrossSections;
 

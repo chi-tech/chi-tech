@@ -256,7 +256,7 @@ std::pair<size_t,size_t> chi_mesh::sweep_management::AngleAggregation::
 //###################################################################
 /** Assembles angular unknowns into the reference vector. */
 void chi_mesh::sweep_management::AngleAggregation::
-  AppendDelayedAngularDOFsToArray(int &index, double* x_ref)
+  AppendNewDelayedAngularDOFsToArray(int &index, double* x_ref)
 {
   //======================================== Opposing reflecting bndries
   for (auto& [bid, bndry] : sim_boundaries)
@@ -286,6 +286,43 @@ void chi_mesh::sweep_management::AngleAggregation::
   for (auto& as_group : angle_set_groups)
     for (auto& angle_set : as_group.angle_sets)
       for (auto& loc_vector : angle_set->delayed_prelocI_outgoing_psi)
+        for (auto val : loc_vector)
+        {index++; x_ref[index] = val;}
+}
+
+//###################################################################
+/** Assembles angular unknowns into the reference vector. */
+void chi_mesh::sweep_management::AngleAggregation::
+AppendOldDelayedAngularDOFsToArray(int &index, double* x_ref)
+{
+  //======================================== Opposing reflecting bndries
+  for (auto& [bid, bndry] : sim_boundaries)
+  {
+    if (bndry->IsReflecting())
+    {
+      auto& rbndry = (BoundaryReflecting&)(*bndry);
+
+      if (rbndry.opposing_reflected)
+        for (auto& angle : rbndry.hetero_boundary_flux_old)
+          for (auto& cellvec : angle)
+            for (auto& facevec : cellvec)
+              for (auto& dofvec : facevec)
+                for (auto val : dofvec)
+                {index++; x_ref[index] = val;}
+
+    }//if reflecting
+  }//for bndry
+
+  //======================================== Intra-cell cycles
+  for (auto& as_group : angle_set_groups)
+    for (auto& angle_set : as_group.angle_sets)
+      for (auto val : angle_set->delayed_local_psi_old)
+      {index++; x_ref[index] = val;}
+
+  //======================================== Inter location cycles
+  for (auto& as_group : angle_set_groups)
+    for (auto& angle_set : as_group.angle_sets)
+      for (auto& loc_vector : angle_set->delayed_prelocI_outgoing_psi_old)
         for (auto val : loc_vector)
         {index++; x_ref[index] = val;}
 }

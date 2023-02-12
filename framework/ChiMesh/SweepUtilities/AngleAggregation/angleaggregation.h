@@ -55,7 +55,8 @@ public:
   void InitializeReflectingBCs();
 
   std::pair<size_t,size_t> GetNumDelayedAngularDOFs();
-  void AppendDelayedAngularDOFsToArray(int& index, double* x_ref);
+  void AppendNewDelayedAngularDOFsToArray(int& index, double* x_ref);
+  void AppendOldDelayedAngularDOFsToArray(int& index, double* x_ref);
   void SetDelayedAngularDOFsFromArray(int& index, const double* x_ref);
   std::vector<double> GetDelayedAngularDOFsAsSTLVector();
   void SetDelayedAngularDOFsFromSTLVector(const std::vector<double>& stl_vector);

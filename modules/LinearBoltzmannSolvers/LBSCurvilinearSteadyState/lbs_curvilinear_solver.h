@@ -1,8 +1,8 @@
 #ifndef LBS_CURVILINEAR_SOLVER_H
 #define LBS_CURVILINEAR_SOLVER_H
 
-#include "LBSSteadyState/lbs_linear_boltzmann_solver.h"
-#include "LBSSteadyState/Groupset/lbs_groupset.h"
+#include "B_LBSSteadyState/lbs_linear_boltzmann_solver.h"
+#include "B_LBSSteadyState/Groupset/lbs_groupset.h"
 
 
 namespace lbs_curvilinear

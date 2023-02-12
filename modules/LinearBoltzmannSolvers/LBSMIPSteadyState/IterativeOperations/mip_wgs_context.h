@@ -1,7 +1,7 @@
 #ifndef CHITECH_MIP_WGS_CONTEXT_H
 #define CHITECH_MIP_WGS_CONTEXT_H
 
-#include "LinearBoltzmannSolvers/LBSSteadyState/Tools/wgs_context.h"
+#include "A_LBSSolver/Tools/wgs_context.h"
 
 namespace lbs
 {

@@ -3,11 +3,11 @@
 
 #include <utility>
 
-#include "LBSSteadyState/lbs_linear_boltzmann_solver.h"
+#include "B_LBSSteadyState/lbs_linear_boltzmann_solver.h"
 #include "ChiMath/chi_math.h"
 
 #include "LBSSteadyStateAdjoint/ResponseFunction/lbs_adj_response_function.h"
-#include "LBSSteadyState/Groupset/lbs_groupset.h"
+#include "B_LBSSteadyState/Groupset/lbs_groupset.h"
 
 namespace lbs
 {

@@ -5,7 +5,7 @@
 #include "LBSMIPSteadyState/lbsmip_steady_solver.h"
 #include "LBSMIPSteadyState/IterativeOperations/lbsmip_shell_operations.h"
 
-#include "LBSSteadyState/Acceleration/diffusion_mip.h"
+#include "A_LBSSolver/Acceleration/diffusion_mip.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -87,14 +87,16 @@ void MIPWGSContext<Mat, Vec, KSP>::ApplyInverseTransportOperator(int scope)
   lbsmip_solver.
     SetGSSTLvectorFromPrimarySTLvector(groupset_,
                                        gs_q_moments_local_,
-                                       lbsmip_solver.QMomentsLocal());
+                                       lbsmip_solver.QMomentsLocal(),
+                                       false);
 
   mip_solver.Assemble_b(gs_q_moments_local_);
   mip_solver.Solve(gs_phi_new_local_);
 
   lbsmip_solver.
     SetPrimarySTLvectorFromGSSTLvector(groupset_, gs_phi_new_local_,
-                                       lbsmip_solver.PhiNewLocal());
+                                       lbsmip_solver.PhiNewLocal(),
+                                       false);
 }
 
 template<>
@@ -102,7 +104,8 @@ void MIPWGSContext<Mat, Vec, KSP>::PostSolveCallback()
 {
   lbs_solver_.GSScopedCopyPrimarySTLvectors(groupset_,
                                             lbs_solver_.PhiNewLocal(),
-                                            lbs_solver_.PhiOldLocal());
+                                            lbs_solver_.PhiOldLocal(),
+                                            false);
 }
 
 }//namespace lbs

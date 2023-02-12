@@ -1,6 +1,6 @@
 #include "LBSTransient/lbts_transient_solver.h"
 
-#include "LBSSteadyState/Groupset/lbs_groupset.h"
+#include "B_LBSSteadyState/Groupset/lbs_groupset.h"
 
 #include "chi_log.h"
 #include "ChiTimer/chi_timer.h"

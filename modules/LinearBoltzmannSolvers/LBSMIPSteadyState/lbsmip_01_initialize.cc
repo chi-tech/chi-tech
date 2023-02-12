@@ -1,8 +1,8 @@
 #include "lbsmip_steady_solver.h"
 
-#include "LBSSteadyState/Acceleration/diffusion_mip.h"
+#include "A_LBSSolver/Acceleration/diffusion_mip.h"
 #include "IterativeOperations/mip_wgs_context.h"
-#include "LBSSteadyState/IterativeMethods/wgs_linear_solver.h"
+#include "B_LBSSteadyState/IterativeMethods/wgs_linear_solver.h"
 
 /**Initializing.*/
 void lbs::MIPSteadyStateSolver::Initialize()

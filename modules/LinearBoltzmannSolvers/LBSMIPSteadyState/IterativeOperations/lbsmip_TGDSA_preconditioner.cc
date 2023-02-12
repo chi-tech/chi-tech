@@ -1,8 +1,8 @@
 #include "lbsmip_shell_operations.h"
 
-#include "LBSSteadyState/lbs_linear_boltzmann_solver.h"
-#include "LBSSteadyState/Acceleration/diffusion_mip.h"
-#include "LBSSteadyState/Tools/wgs_context.h"
+#include "B_LBSSteadyState/lbs_linear_boltzmann_solver.h"
+#include "A_LBSSolver/Acceleration/diffusion_mip.h"
+#include "A_LBSSolver/Tools/wgs_context.h"
 
 //###################################################################
 /**Applies TGDSA to the given input vector.*/

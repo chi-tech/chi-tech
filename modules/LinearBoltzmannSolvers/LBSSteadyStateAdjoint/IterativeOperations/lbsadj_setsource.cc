@@ -4,7 +4,7 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-#include "LBSSteadyState/Groupset/lbs_groupset.h"
+#include "B_LBSSteadyState/Groupset/lbs_groupset.h"
 
 void lbs::SteadyStateAdjointSolver::
   SetAdjointSource(lbs::LBSGroupset &groupset,

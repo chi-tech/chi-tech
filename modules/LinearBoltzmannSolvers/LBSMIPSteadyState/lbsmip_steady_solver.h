@@ -1,7 +1,7 @@
 #ifndef CHITECH_LBSMIP_STEADY_SOLVER_H
 #define CHITECH_LBSMIP_STEADY_SOLVER_H
 
-#include "LBSSteadyState/lbs_linear_boltzmann_solver.h"
+#include "B_LBSSteadyState/lbs_linear_boltzmann_solver.h"
 
 namespace lbs
 {

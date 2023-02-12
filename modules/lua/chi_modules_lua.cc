@@ -1,6 +1,6 @@
 #include "chi_modules_lua.h"
 
-#include "LBSSteadyState/lua/lbs_lua_utils.h"
+#include "B_LBSSteadyState/lua/lbs_lua_utils.h"
 #include "DiffusionSolver/lua/diffusion_lua.h"
 #include "LBSCurvilinearSteadyState/lua/lbs_curvilinear_solver_lua.h"
 #include "LBSKEigenvalue/lua/lbkes_lua_utils.h"

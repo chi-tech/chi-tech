@@ -1,7 +1,7 @@
 #include "LBSCurvilinearSteadyState/lbs_curvilinear_sweepchunk_pwl.h"
 
 #include "ChiMath/Quadratures/curvilinear_angular_quadrature.h"
-#include "LBSSteadyState/Groupset/lbs_groupset.h"
+#include "B_LBSSteadyState/Groupset/lbs_groupset.h"
 
 lbs_curvilinear::SweepChunkPWL::
   SweepChunkPWL(std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,

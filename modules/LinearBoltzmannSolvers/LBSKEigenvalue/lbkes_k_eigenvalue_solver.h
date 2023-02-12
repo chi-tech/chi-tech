@@ -1,7 +1,7 @@
 #ifndef LBKES_K_EIGENVALUE_SOLVER_H
 #define LBKES_K_EIGENVALUE_SOLVER_H
 
-#include "LBSSteadyState/lbs_linear_boltzmann_solver.h"
+#include "B_LBSSteadyState/lbs_linear_boltzmann_solver.h"
 #include "ChiMath/UnknownManager/unknown_manager.h"
 
 #include <string>
