@@ -53,7 +53,7 @@ Start adding source files.
 from the lua console (i.e., the input file)
     - ```create_solver.cc```, the solver itself
     - ```setBCproperty.cc```, the BC conditions
-    - ```lua_utils.h```, the header
+    - ```disc_ord_steady_state_lua_utils.h```, the header
 - the main code file, ```testIP.cc```, needs to register the lua functions
 
 Later, when the code gets folded into the main chi-tech, a few changes will need to take place. We describe those later.
@@ -80,7 +80,7 @@ computation. This file is actually the lua wrapper, same functionality as above.
 When bringing the code into the main chi-tech repository,
 the following changes need to happen:
 - The folder ```DFEMDIffusionSolver``` gets placed in
-  ```modules``` and the ```lua_utils.h``` in that subfolder
+  ```modules``` and the ```disc_ord_steady_state_lua_utils.h``` in that subfolder
   receives an update: we add ```RegisterLuaEntities()``` inside a namespace
 - We add
     - this line ```#include "DFEMDiffusion/lua/ip_lua_utils.h" ```

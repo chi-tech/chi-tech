@@ -1,6 +1,4 @@
-#include "lbs_lua_utils.h"
-
-#include "chi_runtime.h"
+#include "lbs_disc_ord_ss_lua_utils.h"
 
 #define LUA_FMACRO1(x) lua_register(L, #x, x)
 #define LUA_CMACRO1(x,y) \
@@ -18,7 +16,7 @@
         lua_settable(L,-3); \
         lua_pop(L,1)
 
-void lbs::lua_utils::RegisterLuaEntities(lua_State *L)
+void lbs::disc_ord_steady_state_lua_utils::RegisterLuaEntities(lua_State *L)
 {
   LUA_FMACRO1(chiLBSCreateSolver);
 
@@ -112,24 +110,24 @@ void lbs::lua_utils::RegisterLuaEntities(lua_State *L)
   LUA_FMACRO1(chiLBSInitializeMaterials);
 
   //=================================== Groupset manipulation
-  LUA_CTABLE1(LBSGroupset);
-  LUA_FMACRO1(chiLBSCreateGroup);
-  LUA_FMACRO1(chiLBSCreateGroupset);
-  LUA_FMACRO1(chiLBSGroupsetAddGroups);
-  LUA_FMACRO1(chiLBSGroupsetSetQuadrature);
-  LUA_FMACRO1(chiLBSGroupsetSetAngleAggregationType);
-  LUA_CADDCONST_VALUE_TO_TABLE1(ANGLE_AGG_SINGLE,   1,LBSGroupset);
-  LUA_CADDCONST_VALUE_TO_TABLE1(ANGLE_AGG_POLAR,    2,LBSGroupset);
-  LUA_CADDCONST_VALUE_TO_TABLE1(ANGLE_AGG_AZIMUTHAL,3,LBSGroupset);
-  LUA_FMACRO1(chiLBSGroupsetSetAngleAggDiv);
-  LUA_FMACRO1(chiLBSGroupsetSetGroupSubsets);
-  LUA_FMACRO1(chiLBSGroupsetSetIterativeMethod);
-  LUA_FMACRO1(chiLBSGroupsetSetResidualTolerance);
-  LUA_FMACRO1(chiLBSGroupsetSetMaxIterations);
-  LUA_FMACRO1(chiLBSGroupsetSetGMRESRestartIntvl);
-  LUA_FMACRO1(chiLBSGroupsetSetEnableSweepLog);
-  LUA_FMACRO1(chiLBSGroupsetSetWGDSA);
-  LUA_FMACRO1(chiLBSGroupsetSetTGDSA);
+//  LUA_CTABLE1(LBSGroupset);
+//  LUA_FMACRO1(chiLBSCreateGroup);
+//  LUA_FMACRO1(chiLBSCreateGroupset);
+//  LUA_FMACRO1(chiLBSGroupsetAddGroups);
+//  LUA_FMACRO1(chiLBSGroupsetSetQuadrature);
+//  LUA_FMACRO1(chiLBSGroupsetSetAngleAggregationType);
+//  LUA_CADDCONST_VALUE_TO_TABLE1(ANGLE_AGG_SINGLE,   1,LBSGroupset);
+//  LUA_CADDCONST_VALUE_TO_TABLE1(ANGLE_AGG_POLAR,    2,LBSGroupset);
+//  LUA_CADDCONST_VALUE_TO_TABLE1(ANGLE_AGG_AZIMUTHAL,3,LBSGroupset);
+//  LUA_FMACRO1(chiLBSGroupsetSetAngleAggDiv);
+//  LUA_FMACRO1(chiLBSGroupsetSetGroupSubsets);
+//  LUA_FMACRO1(chiLBSGroupsetSetIterativeMethod);
+//  LUA_FMACRO1(chiLBSGroupsetSetResidualTolerance);
+//  LUA_FMACRO1(chiLBSGroupsetSetMaxIterations);
+//  LUA_FMACRO1(chiLBSGroupsetSetGMRESRestartIntvl);
+//  LUA_FMACRO1(chiLBSGroupsetSetEnableSweepLog);
+//  LUA_FMACRO1(chiLBSGroupsetSetWGDSA);
+//  LUA_FMACRO1(chiLBSGroupsetSetTGDSA);
 
   //=================================== Point source
   LUA_FMACRO1(chiLBSAddPointSource);

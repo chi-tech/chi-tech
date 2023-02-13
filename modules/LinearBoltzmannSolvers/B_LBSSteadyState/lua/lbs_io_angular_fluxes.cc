@@ -1,9 +1,8 @@
-#include "ChiLua/chi_lua.h"
-#include "lbs_lua_utils.h"
+#include "B_LBSSteadyState/lbs_linear_boltzmann_solver.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-#include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
+#include "A_LBSSolver/Groupset/lbs_groupset.h"
 
 //###################################################################
 /**Writes the angular fluxes of a LBS groupset to file.

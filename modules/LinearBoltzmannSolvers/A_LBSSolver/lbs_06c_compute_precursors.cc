@@ -1,4 +1,4 @@
-#include "lbs_linear_boltzmann_solver.h"
+#include "A_LBSSolver/lbs_solver.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
@@ -7,7 +7,7 @@
 
 //###################################################################
 /**Compute the steady state delayed neutron precursor concentrations.*/
-void lbs::SteadyStateSolver::ComputePrecursors()
+void lbs::LBSSolver::ComputePrecursors()
 {
   auto fe =
       std::dynamic_pointer_cast<chi_math::SpatialDiscretization_FE>(discretization_);

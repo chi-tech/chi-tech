@@ -1,11 +1,11 @@
-#include "B_LBSSteadyState/lbs_linear_boltzmann_solver.h"
+#include "A_LBSSolver/lbs_solver.h"
 
 using namespace lbs;
 
 //###################################################################
 /**Compute the total fission production in the problem.
 \author Zachary Hardy.*/
-double SteadyStateSolver::ComputeFissionProduction(const std::vector<double>& phi)
+double LBSSolver::ComputeFissionProduction(const std::vector<double>& phi)
 {
   const int first_grp = groups_.front().id;
   const int last_grp = groups_.back().id;
@@ -67,7 +67,7 @@ double SteadyStateSolver::ComputeFissionProduction(const std::vector<double>& ph
 \return the_rate The fission rate as a double.
 
 \author Zachary Hardy.*/
-double SteadyStateSolver::ComputeFissionRate(const bool previous)
+double LBSSolver::ComputeFissionRate(const bool previous)
 {
   const int first_grp = groups_.front().id;
   const int last_grp = groups_.back().id;

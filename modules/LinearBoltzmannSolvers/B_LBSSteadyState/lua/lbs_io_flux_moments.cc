@@ -1,8 +1,6 @@
-#include "ChiLua/chi_lua.h"
-
 #include "B_LBSSteadyState/lbs_linear_boltzmann_solver.h"
 
-#include "lbs_lua_utils.h"
+#include "lbs_disc_ord_ss_lua_utils.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

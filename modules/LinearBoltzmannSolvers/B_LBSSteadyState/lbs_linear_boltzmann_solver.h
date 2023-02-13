@@ -98,16 +98,9 @@ protected:
 //  void UpdateFieldFunctions();
 
   //Iterative Operations
-  void SetSource(LBSGroupset& groupset,
-                 std::vector<double>& destination_q,
-                 const std::vector<double>& phi,
-                 SourceFlags source_flags);
 protected:
-  double ComputePiecewiseChange(LBSGroupset& groupset);
   virtual std::shared_ptr<SweepChunk> SetSweepChunk(LBSGroupset& groupset);
-  double ComputeFissionProduction(const std::vector<double>& phi);
-public:
-  virtual double ComputeFissionRate(bool previous);
+
 protected:
   //Iterative Methods
   //Vector assembly
@@ -127,9 +120,7 @@ public:
   void ZeroOutflowBalanceVars(LBSGroupset& groupset);
   void ComputeBalance();
 
-protected:
-  //precursors
-  void ComputePrecursors();
+
 };
 
 }

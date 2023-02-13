@@ -3,7 +3,7 @@
 #include <petscksp.h>
 
 #include "LinearBoltzmannSolvers/B_LBSSteadyState/lbs_linear_boltzmann_solver.h"
-#include "LinearBoltzmannSolvers/A_LBSSolver/IterativeOperations/lbs_shell_operations.h"
+#include "LinearBoltzmannSolvers/A_LBSSolver/Preconditioning/lbs_shell_operations.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

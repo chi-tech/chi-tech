@@ -1,6 +1,4 @@
-#include "B_LBSSteadyState/lbs_linear_boltzmann_solver.h"
-
-#include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
+#include "A_LBSSolver/lbs_solver.h"
 
 #include "chi_log.h"
 #include "ChiTimer/chi_timer.h"
@@ -16,7 +14,7 @@
  *        and across/within-groups_ fission.
  *
  * */
-void lbs::SteadyStateSolver::
+void lbs::LBSSolver::
   SetSource(LBSGroupset& groupset,
             std::vector<double>& destination_q,
             const std::vector<double>& phi,

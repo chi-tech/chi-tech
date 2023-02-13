@@ -1,7 +1,4 @@
-#include "ChiLua/chi_lua.h"
-#include "lbs_lua_utils.h"
-
-#include "chi_runtime.h"
+#include "B_LBSSteadyState/lbs_linear_boltzmann_solver.h"
 
 //###################################################################
 /**Obtains a list of field functions from the transport solver.

@@ -3,7 +3,7 @@
 
 #include "ChiPhysics/SolverBase/chi_solver.h"
 
-#include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
+#include "A_LBSSolver/Groupset/lbs_groupset.h"
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "ChiMath/LinearSolver/linear_solver.h"
 #include "lbs_structs.h"
@@ -11,8 +11,6 @@
 #include "ChiMesh/SweepUtilities/SweepBoundary/sweep_boundaries.h"
 
 #include "A_LBSSolver/PointSource/lbs_point_source.h"
-#include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_group.h"
-#include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
 #include <petscksp.h>
 
@@ -207,7 +205,24 @@ public:
   //05a
   void UpdateFieldFunctions();
 
-  //Vector assembly
+  //06a
+  void SetSource(LBSGroupset& groupset,
+                 std::vector<double>& destination_q,
+                 const std::vector<double>& phi,
+                 SourceFlags source_flags);
+
+  //06b
+protected:
+  double ComputeFissionProduction(const std::vector<double>& phi);
+public:
+  virtual double ComputeFissionRate(bool previous);
+
+  //06c
+protected:
+  void ComputePrecursors();
+
+  //07 Vector assembly
+public:
   virtual void SetGSPETScVecFromPrimarySTLvector(LBSGroupset& groupset, Vec x,
                                                  PhiSTLOption which_phi);
 
@@ -231,6 +246,8 @@ public:
     int first_group_id,
     int last_group_id, Vec x_src,
     std::vector<double>& y);
+
+
 };
 
 
