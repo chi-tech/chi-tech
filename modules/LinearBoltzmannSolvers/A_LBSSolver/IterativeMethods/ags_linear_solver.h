@@ -20,7 +20,10 @@ public:
   typedef std::shared_ptr<AGSContext<MatType,VecType,SolverType>> AGSContextPtr;
 
   /**Constructor.
-   * \param gs_context_ptr Context Pointer to abstract context.*/
+   * \param iterative_method string Across Groupset iterative method.
+   * \param ags_context_ptr Pointer Pointer to the context to use.
+   * \param groupspan_first_id int First group index.
+   * \param groupspan_last_id int Last group index.*/
   explicit AGSLinearSolver(std::string iterative_method,
                            AGSContextPtr ags_context_ptr,
                            int groupspan_first_id,
@@ -30,6 +33,8 @@ public:
     groupspan_first_id_(groupspan_first_id),
     groupspan_last_id_(groupspan_last_id)
   {}
+
+  virtual ~AGSLinearSolver() = default;
 
   int GroupSpanFirstID() const {return groupspan_first_id_;}
   int GroupSpanLastID() const {return groupspan_last_id_;}

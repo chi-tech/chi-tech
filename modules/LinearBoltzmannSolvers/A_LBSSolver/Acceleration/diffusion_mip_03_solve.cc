@@ -76,7 +76,7 @@ void lbs::acceleration::DiffusionMIPSolver::Solve(std::vector<double>& solution)
 //###################################################################
 /**Solves the system and stores the local solution in the vector provide.
  *
- * \param solution Vector in to which the solution will be parsed.*/
+ * \param petsc_solution Vector in to which the solution will be parsed.*/
 void lbs::acceleration::DiffusionMIPSolver::Solve(Vec petsc_solution)
 {
   const std::string fname = "lbs::acceleration::DiffusionMIPSolver::Solve";

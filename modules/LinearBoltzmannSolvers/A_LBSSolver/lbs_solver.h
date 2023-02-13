@@ -142,6 +142,10 @@ protected:
 public:
   //01i
   void InitializePointSources();
+protected:
+  //01j
+  virtual void InitializeSolverSchemes();
+  virtual void InitializeWGSSolvers() {};
 
 //03d
   void InitWGDSA(LBSGroupset& groupset);

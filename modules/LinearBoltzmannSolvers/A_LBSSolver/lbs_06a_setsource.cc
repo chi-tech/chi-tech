@@ -8,6 +8,7 @@
  *
  * \param groupset The groupset the under consideration.
  * \param destination_q A vector to contribute the source to.
+ * \param phi The primary STL vector to operate on.
  * \param source_flags Flags for adding specific terms into the
  *        destination vector. Available flags are for applying
  *        the material source, across/within-group scattering,

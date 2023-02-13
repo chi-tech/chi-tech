@@ -1,6 +1,6 @@
 #include "wgs_context.h"
 
-#include "LinearBoltzmannSolvers/B_LBSSteadyState/lbs_linear_boltzmann_solver.h"
+#include "A_LBSSolver/lbs_solver.h"
 
 #include <petscksp.h>
 

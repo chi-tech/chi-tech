@@ -1,8 +1,8 @@
 #include "wgs_linear_solver.h"
 
 #include "A_LBSSolver/Tools/wgs_convergence_test.h"
+#include "A_LBSSolver/lbs_solver.h"
 
-#include "LinearBoltzmannSolvers/B_LBSSteadyState/lbs_linear_boltzmann_solver.h"
 #include "ChiMath/PETScUtils/petsc_utils.h"
 #include "ChiMath/LinearSolver/linear_matrix_action_Ax.h"
 

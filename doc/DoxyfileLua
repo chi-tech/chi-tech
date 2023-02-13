@@ -120,47 +120,11 @@ FILE_PATTERNS          =
 RECURSIVE              = YES
 
 EXCLUDE                = "framework/ChiLua/"
-EXCLUDE               += "framework/ChiMPI/lua"
-EXCLUDE               += "framework/ChiLog/lua"
 EXCLUDE               += "framework/LuaTest"
-
-EXCLUDE               += "framework/ChiMath/Quadratures/lua"
-EXCLUDE               += "framework/ChiMath/Quadratures/LegendrePoly/lua"
-EXCLUDE               += "framework/ChiMath/Quadratures/SLDFESQ/lua"
-
-EXCLUDE               += "framework/ChiMesh/DomainDecomposition/lua"
-EXCLUDE               += "framework/ChiMesh/FieldFunctionInterpolation/lua"
-EXCLUDE               += "framework/ChiMesh/LineMesh/lua"
-EXCLUDE               += "framework/ChiMesh/LogicalVolume/lua"
-EXCLUDE               += "framework/ChiMesh/lua"
-EXCLUDE               += "framework/ChiMesh/MeshCutting/lua"
-EXCLUDE               += "framework/ChiMesh/MeshHandler/lua"
-EXCLUDE               += "framework/ChiMesh/OrthoGrids/lua"
-EXCLUDE               += "framework/ChiMesh/Region/lua"
-EXCLUDE               += "framework/ChiMesh/SurfaceMesh/lua"
-EXCLUDE               += "framework/ChiMesh/SurfaceMesher/lua"
-EXCLUDE               += "framework/ChiMesh/UnpartitionedMesh/lua"
-EXCLUDE               += "framework/ChiMesh/VolumeMesher/lua"
-
-EXCLUDE               += "framework/ChiPhysics/lua"
-EXCLUDE               += "framework/ChiPhysics/FieldFunction/lua"
-EXCLUDE               += "framework/ChiPhysics/PhysicsMaterial/transportxsections/lua"
-
-EXCLUDE               += "modules/DiffusionSolver/lua"
-EXCLUDE               += "modules/CFEMDiffusion/lua"
-EXCLUDE               += "modules/DFEMDiffusion/lua"
-EXCLUDE               += "modules/FVDiffusion/lua"
-EXCLUDE               += "modules/MGDiffusion/lua"
-
-EXCLUDE               += "modules/LinearBoltzmannSolvers/LBSCurvilinearSteadyState/lua"
-EXCLUDE               += "modules/LinearBoltzmannSolvers/LBSKEigenvalue/lua"
-EXCLUDE               += "modules/LinearBoltzmannSolvers/LBSMIPSteadyState/lua"
-EXCLUDE               += "modules/LinearBoltzmannSolvers/LBSSteadyState/lua"
-EXCLUDE               += "modules/LinearBoltzmannSolvers/LBSSteadyStateAdjoint/lua"
-EXCLUDE               += "modules/LinearBoltzmannSolvers/LBSTransient/lua"
 
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = "*.py"
+EXCLUDE_PATTERNS      += */lua/*
 EXCLUDE_SYMBOLS        =
 EXAMPLE_PATH           = "doc/PAGES"
 EXAMPLE_PATTERNS       =
