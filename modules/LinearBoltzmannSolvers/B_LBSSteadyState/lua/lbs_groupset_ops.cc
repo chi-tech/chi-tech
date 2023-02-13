@@ -3,8 +3,8 @@
 
 #include "ChiMath/Quadratures/angular_product_quadrature.h"
 
-#include "B_LBSSteadyState/Groupset/lbs_group.h"
-#include "B_LBSSteadyState/Groupset/lbs_groupset.h"
+#include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_group.h"
+#include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

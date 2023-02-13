@@ -5,21 +5,29 @@
 
 namespace lbs
 {
+  class MIPSteadyStateSolver;
+}
+
+namespace lbs
+{
 
 template<class MatType, class VecType, class SolverType>
 struct MIPWGSContext : public WGSContext<MatType,VecType,SolverType>
 {
-  MIPWGSContext(SteadyStateSolver& lbs_solver,
+  MIPSteadyStateSolver& lbs_mip_ss_solver_;
+
+  MIPWGSContext(MIPSteadyStateSolver& lbs_mip_ss_solver,
                 LBSGroupset& groupset,
                 const SetSourceFunction& set_source_function,
                 int lhs_scope, int rhs_scope,
                 bool log_info) :
-    WGSContext<MatType, VecType, SolverType>(lbs_solver,
+    WGSContext<MatType, VecType, SolverType>(lbs_mip_ss_solver,
                                              groupset,
                                              set_source_function,
                                              lhs_scope, rhs_scope,
                                              false,
-                                             log_info)
+                                             log_info),
+    lbs_mip_ss_solver_(lbs_mip_ss_solver)
   {}
 
   void PreSetupCallback() override;

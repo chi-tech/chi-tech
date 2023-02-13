@@ -68,45 +68,8 @@ protected:
   //03b
   void InitFluxDataStructures(LBSGroupset& groupset);
 
-  //03d
-  void InitWGDSA(LBSGroupset& groupset);
-public:
-  void ExecuteWGDSA(LBSGroupset& groupset,
-                    const std::vector<double>& ref_phi_old,
-                    std::vector<double>& ref_phi_new);
-  void AssembleWGDSADeltaPhiVector(const LBSGroupset& groupset,
-                                   const std::vector<double>& ref_phi_old,
-                                   const std::vector<double>& ref_phi_new,
-                                   std::vector<double>& delta_phi_local);
 
-  void AssembleWGDSADeltaPhiVector(const LBSGroupset& groupset,
-                                   const std::vector<double>& phi_in,
-                                   std::vector<double>& delta_phi_local);
-
-  void DisAssembleWGDSADeltaPhiVector(const LBSGroupset& groupset,
-                                      const std::vector<double>& delta_phi_local,
-                                      std::vector<double>& ref_phi_new);
 protected:
-  static void CleanUpWGDSA(LBSGroupset& groupset);
-
-  //03e
-  void InitTGDSA(LBSGroupset& groupset);
-public:
-  void ExecuteTGDSA(LBSGroupset& groupset,
-                    const std::vector<double>& ref_phi_old,
-                    std::vector<double>& ref_phi_new);
-  void AssembleTGDSADeltaPhiVector(const LBSGroupset& groupset,
-                                   const std::vector<double>& ref_phi_old,
-                                   const std::vector<double>& ref_phi_new,
-                                   std::vector<double>& delta_phi_local);
-  void AssembleTGDSADeltaPhiVector(const LBSGroupset& groupset,
-                                   const std::vector<double>& phi_in,
-                                   std::vector<double>& delta_phi_local);
-  void DisAssembleTGDSADeltaPhiVector(const LBSGroupset& groupset,
-                                      const std::vector<double>& delta_phi_local,
-                                      std::vector<double>& ref_phi_new);
-protected:
-  static void CleanUpTGDSA(LBSGroupset& groupset);
   //03f
   void ResetSweepOrderings(LBSGroupset& groupset);
 
@@ -147,42 +110,18 @@ public:
   virtual double ComputeFissionRate(bool previous);
 protected:
   //Iterative Methods
-//  bool Krylov(LBSGroupset& groupset,
-//              chi_mesh::sweep_management::SweepScheduler& sweep_scheduler,
-//              SourceFlags lhs_src_scope,
-//              SourceFlags rhs_src_scope,
-//              const SetSourceFunction& set_source_function,
-//              bool log_info = true);
-
   //Vector assembly
 public:
   void SetGSPETScVecFromPrimarySTLvector(LBSGroupset& groupset, Vec x,
-                                         const std::vector<double>& y,
-                                         bool with_delayed_psi) override;
-  void SetGSPETScVecFromPrimarySTLvector(LBSGroupset& groupset, Vec x,
                                          PhiSTLOption which_phi) override;
-  void SetGSSTLvectorFromPrimarySTLvector(LBSGroupset& groupset,
-                                          std::vector<double>& x,
-                                          const std::vector<double>& y,
-                                          bool with_delayed_psi) override;
+
   void SetPrimarySTLvectorFromGSPETScVec(LBSGroupset& groupset, Vec x_src,
-                                         std::vector<double>& y,
-                                         bool with_delayed_psi) override;
-  void SetPrimarySTLvectorFromGSSTLvector(LBSGroupset& groupset,
-                                          const std::vector<double>& x_src,
-                                          std::vector<double>& y,
-                                          bool with_delayed_psi) override;
+                                         PhiSTLOption which_phi) override;
+
   void GSScopedCopyPrimarySTLvectors(LBSGroupset& groupset,
-                                     const std::vector<double>& x_src,
-                                     std::vector<double>& y,
-                                     bool with_delayed_psi) override;
-//  void SetGroupScopedPETScVecFromPrimarySTLvector(int first_group_id,
-//                                                  int last_group_id, Vec x,
-//                                                  const std::vector<double>& y);
-//  void SetPrimarySTLvectorFromGroupScopedPETScVec(
-//    int first_group_id,
-//    int last_group_id, Vec x_src,
-//    std::vector<double>& y);
+                                     PhiSTLOption from_which_phi,
+                                     PhiSTLOption to_which_phi) override;
+
 public:
   //compute_balance
   void ZeroOutflowBalanceVars(LBSGroupset& groupset);

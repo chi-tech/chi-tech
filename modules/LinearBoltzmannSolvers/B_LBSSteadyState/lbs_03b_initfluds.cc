@@ -16,7 +16,7 @@
 #include <iomanip>
 
 #include "ChiTimer/chi_timer.h"
-#include "B_LBSSteadyState/Groupset/lbs_groupset.h"
+#include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
 //###################################################################
 /**Initializes fluds data structures.*/

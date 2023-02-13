@@ -3,8 +3,8 @@
 #include <petscksp.h>
 
 #include "LBSMIPSteadyState/lbsmip_steady_solver.h"
-#include "LBSMIPSteadyState/IterativeOperations/lbsmip_shell_operations.h"
-
+#include "A_LBSSolver/lbs_solver.h"
+#include "A_LBSSolver/IterativeOperations/lbs_shell_operations.h"
 #include "A_LBSSolver/Acceleration/diffusion_mip.h"
 
 #include "chi_runtime.h"
@@ -77,35 +77,34 @@ std::pair<int64_t, int64_t> MIPWGSContext<Mat, Vec, KSP>::SystemSize()
 template<>
 void MIPWGSContext<Mat, Vec, KSP>::ApplyInverseTransportOperator(int scope)
 {
-  auto& lbsmip_solver = dynamic_cast<MIPSteadyStateSolver&>(lbs_solver_);
 
-  auto& mip_solver = *lbsmip_solver.gs_mip_solvers_[groupset_.id];
+  auto& mip_solver = *lbs_mip_ss_solver_.gs_mip_solvers_[groupset_.id];
 
-  std::vector<double> gs_q_moments_local_(SystemSize().first, 0.0);
-  auto gs_phi_new_local_ = gs_q_moments_local_;
+  lbs_solver_.PhiNewLocal() = lbs_solver_.QMomentsLocal();
 
-  lbsmip_solver.
-    SetGSSTLvectorFromPrimarySTLvector(groupset_,
-                                       gs_q_moments_local_,
-                                       lbsmip_solver.QMomentsLocal(),
-                                       false);
+  Vec work_vector;
+  VecDuplicate(mip_solver.RHS(), &work_vector);
 
-  mip_solver.Assemble_b(gs_q_moments_local_);
-  mip_solver.Solve(gs_phi_new_local_);
+  lbs_solver_.SetGSPETScVecFromPrimarySTLvector(groupset_,
+                                                work_vector,
+                                                PhiSTLOption::PHI_NEW);
 
-  lbsmip_solver.
-    SetPrimarySTLvectorFromGSSTLvector(groupset_, gs_phi_new_local_,
-                                       lbsmip_solver.PhiNewLocal(),
-                                       false);
+  mip_solver.Assemble_b(work_vector);
+  mip_solver.Solve(work_vector);
+
+  lbs_solver_.SetPrimarySTLvectorFromGSPETScVec(groupset_,
+                                                work_vector,
+                                                PhiSTLOption::PHI_NEW);
+
+  VecDestroy(&work_vector);
 }
 
 template<>
 void MIPWGSContext<Mat, Vec, KSP>::PostSolveCallback()
 {
   lbs_solver_.GSScopedCopyPrimarySTLvectors(groupset_,
-                                            lbs_solver_.PhiNewLocal(),
-                                            lbs_solver_.PhiOldLocal(),
-                                            false);
+                                            PhiSTLOption::PHI_NEW,
+                                            PhiSTLOption::PHI_OLD);
 }
 
 }//namespace lbs

@@ -109,6 +109,7 @@ public:
                      MapMatID2XS map_mat_id_2_xs,
                      const std::vector<UnitCellMatrices>& unit_cell_matrices,
                      bool verbose=false);
+  const Vec& RHS() const;
   //00a
   void Initialize();
 
@@ -121,9 +122,11 @@ public:
   void AssembleAand_b(const std::vector<double>& q_vector);
   //01d
   void Assemble_b(const std::vector<double>& q_vector);
+  void Assemble_b(Vec petsc_q_vector);
 
   //02
   void Solve(std::vector<double>& solution);
+  void Solve(Vec petsc_solution);
   //05
   double HPerpendicular(const chi_mesh::Cell& cell, unsigned int f);
 

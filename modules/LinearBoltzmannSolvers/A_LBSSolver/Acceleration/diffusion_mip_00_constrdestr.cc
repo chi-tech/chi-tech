@@ -47,3 +47,8 @@ lbs::acceleration::DiffusionMIPSolver::~DiffusionMIPSolver()
   VecDestroy(&m_rhs);
   KSPDestroy(&m_ksp);
 }
+
+const Vec& lbs::acceleration::DiffusionMIPSolver::RHS() const
+{
+  return m_rhs;
+}

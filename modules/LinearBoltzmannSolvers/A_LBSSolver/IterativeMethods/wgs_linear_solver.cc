@@ -124,11 +124,9 @@ void WGSLinearSolver<Mat, Vec, KSP>::SetRHS()
   gs_context_ptr->ApplyInverseTransportOperator(scope);
 
   //=================================================== Assemble PETSc vector
-  lbs_solver.
-    SetGSPETScVecFromPrimarySTLvector(groupset,
-                                      b_,
-                                      lbs_solver.PhiNewLocal(),
-                                      gs_context_ptr->with_delayed_psi_);
+  lbs_solver.SetGSPETScVecFromPrimarySTLvector(groupset,
+                                               b_,
+                                               PhiSTLOption::PHI_NEW);
 
   //============================================= Compute RHS norm
   VecNorm(b_, NORM_2, &context_ptr_->rhs_norm_);
@@ -154,13 +152,11 @@ template<> void WGSLinearSolver<Mat, Vec, KSP>::SetInitialGuess()
   auto& lbs_solver = gs_context_ptr->lbs_solver_;
 
   lbs_solver.
-  SetGSPETScVecFromPrimarySTLvector(groupset,
-                                    x_,
-                                    lbs_solver.PhiOldLocal(),
-                                    false);
+  SetGSPETScVecFromPrimarySTLvector(groupset, x_, PhiSTLOption::PHI_OLD);
 
   double init_guess_norm = 0.0;
   VecNorm(x_,NORM_2,&init_guess_norm);
+    chi::log.Log() << "NORM2="<<init_guess_norm;
 
   if (init_guess_norm > 1.0e-10)
   {
@@ -187,17 +183,8 @@ template<> void WGSLinearSolver<Mat, Vec, KSP>::PostSolveCallback()
   auto& groupset   = gs_context_ptr->groupset_;
   auto& lbs_solver = gs_context_ptr->lbs_solver_;
 
-  auto& phi_new_local = lbs_solver.PhiNewLocal();
-  auto& phi_old_local = lbs_solver.PhiOldLocal();
-
-  const bool with_delayed_psi = gs_context_ptr->with_delayed_psi_;
-
-  lbs_solver.
-    SetPrimarySTLvectorFromGSPETScVec(groupset, x_,
-                                      phi_new_local, with_delayed_psi);
-  lbs_solver.
-    SetPrimarySTLvectorFromGSPETScVec(groupset, x_,
-                                      phi_old_local, with_delayed_psi);
+  lbs_solver.SetPrimarySTLvectorFromGSPETScVec(groupset, x_, PhiSTLOption::PHI_NEW);
+  lbs_solver.SetPrimarySTLvectorFromGSPETScVec(groupset, x_, PhiSTLOption::PHI_OLD);
 
   //============================================= Restore saved q_moms
   lbs_solver.QMomentsLocal() = saved_q_moments_local_;

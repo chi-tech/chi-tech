@@ -10,7 +10,7 @@ typedef chi_mesh::sweep_management::AngleSet TAngleSet;
 typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 
 #include "ChiConsole/chi_console.h"
-#include "B_LBSSteadyState/Groupset/lbs_groupset.h"
+#include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
 
 #include <iomanip>

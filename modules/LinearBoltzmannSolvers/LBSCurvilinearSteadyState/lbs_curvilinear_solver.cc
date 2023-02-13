@@ -11,7 +11,7 @@
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 #include "A_LBSSolver/lbs_structs.h"
 #include "LBSCurvilinearSteadyState/lbs_curvilinear_sweepchunk_pwl.h"
-#include "B_LBSSteadyState/Groupset/lbs_groupset.h"
+#include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
 typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
 

@@ -2,7 +2,7 @@
 #define LBS_CURVILINEAR_SWEEPCHUNK_PWL_H
 
 #include "B_LBSSteadyState/SweepChunks/lbs_sweepchunk_pwl.h"
-#include "B_LBSSteadyState/Groupset/lbs_groupset.h"
+#include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
 
 

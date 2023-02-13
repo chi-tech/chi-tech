@@ -1,6 +1,6 @@
 #include "B_LBSSteadyState/lbs_linear_boltzmann_solver.h"
 #include "B_LBSSteadyState/SweepChunks/lbs_sweepchunk_pwl.h"
-#include "B_LBSSteadyState/Groupset/lbs_groupset.h"
+#include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
 
 typedef chi_mesh::sweep_management::SweepChunk SweepChunk;

@@ -1,7 +1,7 @@
 #include "wgs_convergence_test.h"
 
 #include "wgs_context.h"
-#include "LinearBoltzmannSolvers/B_LBSSteadyState/Groupset/lbs_groupset.h"
+#include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

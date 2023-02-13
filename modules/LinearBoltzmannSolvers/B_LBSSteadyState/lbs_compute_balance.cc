@@ -4,7 +4,7 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-#include "B_LBSSteadyState/Groupset/lbs_groupset.h"
+#include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
 #include <iomanip>
 
@@ -43,7 +43,7 @@ void lbs::SteadyStateSolver::ComputeBalance()
               PhiOldLocal(),
               APPLY_FIXED_SOURCES | APPLY_AGS_FISSION_SOURCES |
               APPLY_WGS_FISSION_SOURCES);
-    GSScopedCopyPrimarySTLvectors(groupset, q_moments_local_, mat_src, false);
+    LBSSolver::GSScopedCopyPrimarySTLvectors(groupset,q_moments_local_,mat_src);
   }
 
   //======================================== Initialize diffusion params

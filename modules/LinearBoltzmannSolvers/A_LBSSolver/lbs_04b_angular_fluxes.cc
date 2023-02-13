@@ -5,7 +5,7 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 #include "chi_mpi.h"
-#include "B_LBSSteadyState/Groupset/lbs_groupset.h"
+#include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
 
 #include <fstream>

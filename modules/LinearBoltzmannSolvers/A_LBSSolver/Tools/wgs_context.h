@@ -10,7 +10,7 @@
 namespace lbs
 {
   class LBSGroupset;
-  class SteadyStateSolver;
+  class LBSSolver;
 }
 
 typedef std::function<void(lbs::LBSGroupset&,
@@ -24,7 +24,7 @@ namespace lbs
 template<class MatType, class VecType, class SolverType>
 struct WGSContext : public chi_math::LinearSolverContext<MatType, VecType>
 {
-  SteadyStateSolver& lbs_solver_;
+  LBSSolver& lbs_solver_;
   LBSGroupset& groupset_;
   const SetSourceFunction& set_source_function_;
   const int lhs_src_scope_;
@@ -32,7 +32,7 @@ struct WGSContext : public chi_math::LinearSolverContext<MatType, VecType>
   const bool with_delayed_psi_ = false;
   bool log_info_ = true;
 
-  WGSContext(SteadyStateSolver& lbs_solver,
+  WGSContext(LBSSolver& lbs_solver,
              LBSGroupset& groupset,
              const SetSourceFunction& set_source_function,
              int lhs_scope, int rhs_scope,

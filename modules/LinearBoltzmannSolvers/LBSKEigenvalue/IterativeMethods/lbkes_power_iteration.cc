@@ -1,7 +1,7 @@
 #include "../lbkes_k_eigenvalue_solver.h"
 
 #include "B_LBSSteadyState/IterativeOperations/sweep_wgs_context.h"
-#include "B_LBSSteadyState/IterativeMethods/wgs_linear_solver.h"
+#include "LinearBoltzmannSolvers/A_LBSSolver/IterativeMethods/wgs_linear_solver.h"
 
 #include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 namespace sweep_namespace = chi_mesh::sweep_management;

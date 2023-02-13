@@ -2,7 +2,7 @@
 
 #include "A_LBSSolver/IterativeMethods/ags_linear_solver.h"
 #include "IterativeOperations/sweep_wgs_context.h"
-#include "IterativeMethods/wgs_linear_solver.h"
+#include "LinearBoltzmannSolvers/A_LBSSolver/IterativeMethods/wgs_linear_solver.h"
 
 #include "ChiMPI/chi_mpi.h"
 #include "chi_log.h"

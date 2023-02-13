@@ -5,9 +5,8 @@
 
 namespace lbs
 {
-int MatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Av);
 int WGDSA_TGDSA_PreConditionerMult(PC pc, Vec phi_input, Vec pc_output);
-int WGDSA_TGDSA_PreConditionerMult2(PC pc, Vec phi_input, Vec pc_output);
+int MIP_TGDSA_PreConditionerMult(PC pc, Vec phi_input, Vec pc_output);
 }//namespace lbs
 
 #endif //CHITECH_LBS_SHELL_OPERATIONS_H

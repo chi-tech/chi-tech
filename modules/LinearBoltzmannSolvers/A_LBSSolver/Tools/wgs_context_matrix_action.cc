@@ -16,16 +16,19 @@ int WGSContext<Mat, Vec, KSP>::MatrixAction(Mat& matrix,
   MatShellGetContext(matrix, &gs_context_ptr);
 
   //Shorten some names
-  lbs::SteadyStateSolver& lbs_solver = gs_context_ptr->lbs_solver_;
+  lbs::LBSSolver& lbs_solver = gs_context_ptr->lbs_solver_;
   LBSGroupset& groupset              = gs_context_ptr->groupset_;
   const auto& delayed_psi_flag       = gs_context_ptr->with_delayed_psi_;
 
   //============================================= Copy krylov action_vector
   //                                              into local
+//  lbs_solver.SetPrimarySTLvectorFromGSPETScVec(groupset,
+//                                               action_vector,
+//                                               lbs_solver.PhiOldLocal(),
+//                                               delayed_psi_flag);
   lbs_solver.SetPrimarySTLvectorFromGSPETScVec(groupset,
                                                action_vector,
-                                               lbs_solver.PhiOldLocal(),
-                                               delayed_psi_flag);
+                                               PhiSTLOption::PHI_OLD);
 
   //============================================= Setting the source using
   //                                              updated phi_old
@@ -43,10 +46,13 @@ int WGSContext<Mat, Vec, KSP>::MatrixAction(Mat& matrix,
   // We copy the STL data to the operating vector
   // petsc_phi_delta first because it's already sized.
   // pc_output is not necessarily initialized yet.
+//  lbs_solver.SetGSPETScVecFromPrimarySTLvector(groupset,
+//                                               action,
+//                                               lbs_solver_.PhiNewLocal(),
+//                                               delayed_psi_flag);
   lbs_solver.SetGSPETScVecFromPrimarySTLvector(groupset,
                                                action,
-                                               lbs_solver_.PhiNewLocal(),
-                                               delayed_psi_flag);
+                                               PhiSTLOption::PHI_NEW);
 
   //============================================= Computing action
   // A  = [I - DLinvMS]

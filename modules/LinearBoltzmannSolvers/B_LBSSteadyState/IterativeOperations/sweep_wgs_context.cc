@@ -3,7 +3,7 @@
 #include <petscksp.h>
 
 #include "LinearBoltzmannSolvers/B_LBSSteadyState/lbs_linear_boltzmann_solver.h"
-#include "B_LBSSteadyState/IterativeOperations/lbs_shell_operations.h"
+#include "LinearBoltzmannSolvers/A_LBSSolver/IterativeOperations/lbs_shell_operations.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -54,7 +54,7 @@ void SweepWGSContext<Mat, Vec, KSP>::SetPreconditioner(KSP& solver)
   if (groupset_.apply_wgdsa or groupset_.apply_tgdsa)
   {
     PCSetType(pc, PCSHELL);
-    PCShellSetApply(pc, (PCShellPtr) WGDSA_TGDSA_PreConditionerMult2);
+    PCShellSetApply(pc, (PCShellPtr) WGDSA_TGDSA_PreConditionerMult);
     PCShellSetContext(pc, &(*this));
   }
 
@@ -125,7 +125,7 @@ void SweepWGSContext<Mat, Vec, KSP>::PostSolveCallback()
   //================================================== Perform final sweep
   //                                                   with converged phi and
   //                                                   delayed psi dofs
-  lbs_solver_.ZeroOutflowBalanceVars(groupset_);
+  lbs_ss_solver_.ZeroOutflowBalanceVars(groupset_);
 
   sweep_chunk.SetDestinationPhi(lbs_solver_.PhiNewLocal());
   sweep_chunk.SetSurfaceSourceActiveFlag(rhs_src_scope_ & APPLY_FIXED_SOURCES);
@@ -138,9 +138,8 @@ void SweepWGSContext<Mat, Vec, KSP>::PostSolveCallback()
   sweep_scheduler_.Sweep();
 
   lbs_solver_.GSScopedCopyPrimarySTLvectors(groupset_,
-                                            lbs_solver_.PhiNewLocal(),
-                                            lbs_solver_.PhiOldLocal(),
-                                            true);
+                                            PhiSTLOption::PHI_NEW,
+                                            PhiSTLOption::PHI_OLD);
 }
 
 }//namespace lbs

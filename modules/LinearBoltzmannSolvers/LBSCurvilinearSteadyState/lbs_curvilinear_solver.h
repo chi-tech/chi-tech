@@ -2,7 +2,7 @@
 #define LBS_CURVILINEAR_SOLVER_H
 
 #include "B_LBSSteadyState/lbs_linear_boltzmann_solver.h"
-#include "B_LBSSteadyState/Groupset/lbs_groupset.h"
+#include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
 
 namespace lbs_curvilinear

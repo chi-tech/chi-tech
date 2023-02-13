@@ -1,6 +1,6 @@
-#include "lbsmip_shell_operations.h"
+#include "lbs_shell_operations.h"
 
-#include "B_LBSSteadyState/lbs_linear_boltzmann_solver.h"
+#include "A_LBSSolver/lbs_solver.h"
 #include "A_LBSSolver/Acceleration/diffusion_mip.h"
 #include "A_LBSSolver/Tools/wgs_context.h"
 
@@ -8,21 +8,19 @@
 /**Applies TGDSA to the given input vector.*/
 int lbs::MIP_TGDSA_PreConditionerMult(PC pc, Vec phi_input, Vec pc_output)
 {
-  constexpr bool NO_DELAYED_PSI = false;
   void* context;
   PCShellGetContext(pc,&context);
 
   auto gs_context_ptr = (lbs::WGSContext<Mat,Vec,KSP>*)(context);
 
   //Shorten some names
-  lbs::SteadyStateSolver& solver = gs_context_ptr->lbs_solver_;
+  lbs::LBSSolver& solver = gs_context_ptr->lbs_solver_;
   LBSGroupset& groupset  = gs_context_ptr->groupset_;
-  auto& petsc_phi_delta = pc_output;
 
   //============================================= Copy PETSc vector to STL
   auto& phi_delta = gs_context_ptr->lbs_solver_.PhiNewLocal();
-  solver.SetPrimarySTLvectorFromGSPETScVec(groupset, phi_input, phi_delta,
-                                           NO_DELAYED_PSI);
+  solver.SetPrimarySTLvectorFromGSPETScVec(groupset, phi_input,
+                                           PhiSTLOption::PHI_NEW);
 
   //============================================= Apply TGDSA
   if (groupset.apply_tgdsa)
@@ -37,14 +35,9 @@ int lbs::MIP_TGDSA_PreConditionerMult(PC pc, Vec phi_input, Vec pc_output)
   }
 
   //============================================= Copy STL vector to PETSc Vec
-  // We copy the STL data to the operating vector
-  // petsc_phi_delta first because it's already sized.
-  // pc_output is not necessarily initialized yet.
-  solver.SetGSPETScVecFromPrimarySTLvector(groupset, petsc_phi_delta, phi_delta,
-                                           NO_DELAYED_PSI);
-
-  //============================================= Return result
-  VecCopy(petsc_phi_delta, pc_output);
+  solver.SetGSPETScVecFromPrimarySTLvector(groupset,
+                                           pc_output,
+                                           PhiSTLOption::PHI_NEW);
 
   return 0;
 }

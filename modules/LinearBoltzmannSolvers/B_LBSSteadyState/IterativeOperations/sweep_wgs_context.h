@@ -4,7 +4,12 @@
 #include "A_LBSSolver/Tools/wgs_context.h"
 
 #include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
-#include "LinearBoltzmannSolvers/B_LBSSteadyState/Groupset/lbs_groupset.h"
+#include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
+
+namespace lbs
+{
+  class SteadyStateSolver;
+}
 
 namespace lbs
 {
@@ -14,6 +19,8 @@ struct SweepWGSContext : public WGSContext<MatType,VecType,SolverType>
 {
   std::shared_ptr<chi_mesh::sweep_management::SweepChunk> sweep_chunk_;
   chi_mesh::sweep_management::SweepScheduler sweep_scheduler_;
+
+  SteadyStateSolver& lbs_ss_solver_;
 
   SweepWGSContext(SteadyStateSolver& lbs_solver,
                   LBSGroupset& groupset,
@@ -33,7 +40,8 @@ struct SweepWGSContext : public WGSContext<MatType,VecType,SolverType>
     sweep_scheduler_(
       chi_mesh::sweep_management::SchedulingAlgorithm::DEPTH_OF_GRAPH,
       groupset.angle_agg,
-      *sweep_chunk_)
+      *sweep_chunk_),
+    lbs_ss_solver_(lbs_solver)
   {}
 
   void PreSetupCallback() override;

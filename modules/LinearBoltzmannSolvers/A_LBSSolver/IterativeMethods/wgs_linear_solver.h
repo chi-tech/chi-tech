@@ -4,7 +4,6 @@
 #include "ChiMath/LinearSolver/linear_solver.h"
 
 #include "A_LBSSolver/Tools/wgs_context.h"
-#include "B_LBSSteadyState/lbs_linear_boltzmann_solver.h"
 #include "A_LBSSolver/Tools/wgs_context.h"
 
 #include <memory>

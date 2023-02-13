@@ -7,7 +7,7 @@
 #include "ChiMath/chi_math.h"
 
 #include "LBSSteadyStateAdjoint/ResponseFunction/lbs_adj_response_function.h"
-#include "B_LBSSteadyState/Groupset/lbs_groupset.h"
+#include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
 namespace lbs
 {

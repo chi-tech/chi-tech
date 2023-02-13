@@ -2,7 +2,7 @@
 
 #include "A_LBSSolver/Acceleration/diffusion_mip.h"
 #include "IterativeOperations/mip_wgs_context.h"
-#include "B_LBSSteadyState/IterativeMethods/wgs_linear_solver.h"
+#include "LinearBoltzmannSolvers/A_LBSSolver/IterativeMethods/wgs_linear_solver.h"
 
 /**Initializing.*/
 void lbs::MIPSteadyStateSolver::Initialize()
