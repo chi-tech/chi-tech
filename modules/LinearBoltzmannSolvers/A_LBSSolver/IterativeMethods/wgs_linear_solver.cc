@@ -156,7 +156,6 @@ template<> void WGSLinearSolver<Mat, Vec, KSP>::SetInitialGuess()
 
   double init_guess_norm = 0.0;
   VecNorm(x_,NORM_2,&init_guess_norm);
-    chi::log.Log() << "NORM2="<<init_guess_norm;
 
   if (init_guess_norm > 1.0e-10)
   {
