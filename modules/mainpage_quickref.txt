@@ -1,11 +1,9 @@
 include: modules/LinearBoltzmannSolvers/A_LBSSolver/lua/mainpage_quickref.txt
-include: modules/LinearBoltzmannSolvers/B_LBSSteadyState/lua/mainpage_quickref.txt
-include: modules/LinearBoltzmannSolvers/LBSCurvilinearSteadyState/lua/mainpage_quickref.txt
-include: modules/LinearBoltzmannSolvers/LBSKEigenvalue/lua/mainpage_quickref.txt
-
-include: modules/LinearBoltzmannSolvers/LBSSteadyStateAdjoint/lua/mainpage_quickref.txt
-
-include: modules/LinearBoltzmannSolvers/LBSTransient/lua/mainpage_quickref.txt
+include: modules/LinearBoltzmannSolvers/B_DO_SteadyState/lua/mainpage_quickref.txt
+include: modules/LinearBoltzmannSolvers/C_DO_KEigenvalue/lua/mainpage_quickref.txt
+include: modules/LinearBoltzmannSolvers/C_DO_RZ_SteadyState/lua/mainpage_quickref.txt
+include: modules/LinearBoltzmannSolvers/C_DO_SteadyState_Adjoint/lua/mainpage_quickref.txt
+include: modules/LinearBoltzmannSolvers/D_DO_Transient/lua/mainpage_quickref.txt
 
 include: modules/DiffusionSolver/lua/mainpage_quickref.txt
 

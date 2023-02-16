@@ -1,4 +1,4 @@
-#include "lbs_DO_steady_state.h"
+#include "lbsmip_steady_solver.h"
 
 #include "A_LBSSolver/IterativeMethods/ags_linear_solver.h"
 
@@ -6,7 +6,7 @@
 
 //###################################################################
 /**Execute the solver.*/
-void lbs::DiscOrdSteadyStateSolver::Execute()
+void lbs::MIPSteadyStateSolver::Execute()
 {
   primary_ags_solver_->Setup();
   primary_ags_solver_->Solve();

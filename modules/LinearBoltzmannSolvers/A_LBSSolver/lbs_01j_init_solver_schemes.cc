@@ -16,15 +16,19 @@ void lbs::LBSSolver::InitializeSolverSchemes()
    * solvers have been created for this solver.*/
   if (ags_solvers_.empty())
   {
-    auto ags_context = std::make_shared<AGSContext<Mat,Vec,KSP>>(
-      *this, wgs_solvers_);
+    //=========================================== Default AGS scheme
+    if (options_.ags_scheme.empty())
+    {
+      auto ags_context = std::make_shared<AGSContext<Mat,Vec,KSP>>(
+        *this, wgs_solvers_);
 
-    auto ags_solver = std::make_shared<AGSLinearSolver<Mat,Vec,KSP>>(
-      "richardson", ags_context,groupsets_.front().id, groupsets_.back().id);
-    ags_solver->ToleranceOptions().maximum_iterations_ = 1;
+      auto ags_solver = std::make_shared<AGSLinearSolver<Mat,Vec,KSP>>(
+        "richardson", ags_context,groupsets_.front().id, groupsets_.back().id);
+      ags_solver->ToleranceOptions().maximum_iterations_ = 1;
 
-    ags_solvers_.push_back(ags_solver);
+      ags_solvers_.push_back(ags_solver);
 
-    primary_ags_solver_ = ags_solvers_.front();
+      primary_ags_solver_ = ags_solvers_.front();
+    }
   }//if ags_solvers.empty()
 }

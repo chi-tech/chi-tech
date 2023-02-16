@@ -70,7 +70,7 @@ void lbs::LBSSolver::
 
         size_t uk_map = transport_view.MapDOF(i, m, 0); //unknown map
 
-        //============================= Loop over groupset groups_
+        //============================= Loop over groupset groups
         for (size_t g = gs_i; g <= gs_f; ++g)
         {
           double rhs = 0.0;

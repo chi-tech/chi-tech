@@ -16,6 +16,7 @@ class AGSLinearSolver : public
 protected:
   int groupspan_first_id_ = 0;
   int groupspan_last_id_ = 0;
+  bool verbose_ = false;
 public:
   typedef std::shared_ptr<AGSContext<MatType,VecType,SolverType>> AGSContextPtr;
 
@@ -27,17 +28,21 @@ public:
   explicit AGSLinearSolver(std::string iterative_method,
                            AGSContextPtr ags_context_ptr,
                            int groupspan_first_id,
-                           int groupspan_last_id) :
+                           int groupspan_last_id,
+                           bool verbose = true) :
     chi_math::LinearSolver<MatType,VecType,SolverType>
       (std::move(iterative_method),ags_context_ptr),
     groupspan_first_id_(groupspan_first_id),
-    groupspan_last_id_(groupspan_last_id)
+    groupspan_last_id_(groupspan_last_id),
+    verbose_(verbose)
   {}
 
   virtual ~AGSLinearSolver() = default;
 
   int GroupSpanFirstID() const {return groupspan_first_id_;}
   int GroupSpanLastID() const {return groupspan_last_id_;}
+  bool IsVerbose() const {return verbose_;}
+  void SetVerbosity(bool verbose_y_n) {verbose_ = verbose_y_n;}
 
 protected:
   /*void PreSetupCallback() override;  */   //Customized via context

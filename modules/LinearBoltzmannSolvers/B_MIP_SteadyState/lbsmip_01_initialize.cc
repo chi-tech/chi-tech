@@ -9,11 +9,24 @@ void lbs::MIPSteadyStateSolver::Initialize()
 {
   options_.scattering_order = 0; //overwrite any setting otherwise
   LBSSolver::Initialize();
+
+  // Initialize source func
+  using namespace std::placeholders;
+  active_set_source_function_ =
+    std::bind(&LBSSolver::SetSource, this, _1, _2, _3, _4);
+
+  //================================================== Initialize groupsets_
+  //                                                   preconditioning
+  for (auto& groupset : groupsets_)
+    InitTGDSA(groupset);
+
+  LBSSolver::InitializeSolverSchemes();
 }
 
 /**Initializes Within-GroupSet solvers.*/
 void lbs::MIPSteadyStateSolver::InitializeWGSSolvers()
 {
+  std::cout<<"InitializeWGSSolvers" << std::endl;
   //============================================= Initialize groupset solvers
   gs_mip_solvers_.assign(groupsets_.size(), nullptr);
   const size_t num_groupsets = groupsets_.size();

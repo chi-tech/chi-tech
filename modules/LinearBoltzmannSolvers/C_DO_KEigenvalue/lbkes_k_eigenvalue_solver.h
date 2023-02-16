@@ -28,6 +28,10 @@ public:
   explicit DiscOrdKEigenvalueSolver(const std::string& in_text_name) :
     lbs::DiscOrdSteadyStateSolver(in_text_name) {}
 
+protected:
+  void InitializeWGSSolvers() override;
+
+public:
   void Execute() override;
 
   // IterativeMethods

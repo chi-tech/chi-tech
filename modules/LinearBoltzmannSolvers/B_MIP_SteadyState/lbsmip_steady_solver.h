@@ -14,9 +14,11 @@ public:
 public:
   //00
   explicit MIPSteadyStateSolver(const std::string& in_text_name);
+  ~MIPSteadyStateSolver() override;
   //01
   void Initialize() override;
   void InitializeWGSSolvers() override;
+  void Execute() override;
 };
 }//namespace lbs
 

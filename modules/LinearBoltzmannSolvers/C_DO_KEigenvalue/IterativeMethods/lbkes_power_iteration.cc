@@ -1,12 +1,6 @@
 #include "../lbkes_k_eigenvalue_solver.h"
 
-#include "B_DO_SteadyState/IterativeOperations/sweep_wgs_context.h"
-#include "LinearBoltzmannSolvers/A_LBSSolver/IterativeMethods/wgs_linear_solver.h"
-
-#include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
-namespace sweep_namespace = chi_mesh::sweep_management;
-typedef sweep_namespace::SweepScheduler MainSweepScheduler;
-typedef sweep_namespace::SchedulingAlgorithm SchedulingAlgorithm;
+#include "A_LBSSolver/IterativeMethods/ags_linear_solver.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -35,44 +29,23 @@ void DiscOrdKEigenvalueSolver::PowerIteration()
   double k_eff_change = 1.0;
 
   //================================================== Start power iterations
+  primary_ags_solver_->SetVerbosity(options_.verbose_outer_iterations);
   int nit = 0;
   bool converged = false;
   while (nit < max_iterations)
   {
-    MPI_Barrier(MPI_COMM_WORLD);
     // Divide phi_old by k_eff (phi_old gives better init-quess for GMRES)
     for (auto& phi : phi_old_local_) phi /= k_eff;
 
-    //============================================= Loop over groupsets_
+    q_moments_local_.assign(q_moments_local_.size(), 0.0);
     for (auto& groupset : groupsets_)
-    {
-      //======================================== Precompute the fission source
-      q_moments_local_.assign(q_moments_local_.size(), 0.0);
       SetSource(groupset, q_moments_local_,
                 PhiOldLocal(),
                 APPLY_AGS_FISSION_SOURCES |
                 APPLY_WGS_FISSION_SOURCES);
 
-      //======================================== Converge the scattering source
-      //                                         with a fixed fission source
-      auto sweep_chunk = SetSweepChunk(groupset);
-
-      auto sweep_wgs_context_ptr =
-        std::make_shared<SweepWGSContext<Mat, Vec, KSP>>(
-          *this, groupset,
-          active_set_source_function_,
-          APPLY_WGS_SCATTER_SOURCES ,  //lhs_scope
-          APPLY_AGS_SCATTER_SOURCES,   //rhs_scope
-          true/*with_delayed_psi*/,
-          options_.verbose_inner_iterations,
-          sweep_chunk);
-
-      WGSLinearSolver<Mat,Vec,KSP> solver(sweep_wgs_context_ptr);
-      solver.Setup();
-      solver.Solve();
-
-      MPI_Barrier(MPI_COMM_WORLD);
-    }//for groupset
+    primary_ags_solver_->Setup();
+    primary_ags_solver_->Solve();
 
     //======================================== Recompute k-eigenvalue
     double F_new = ComputeFissionProduction(phi_new_local_);

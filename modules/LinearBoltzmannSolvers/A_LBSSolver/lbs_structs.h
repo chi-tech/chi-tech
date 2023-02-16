@@ -86,6 +86,8 @@ typedef std::function<void(LBSGroupset&               groupset,
                            SourceFlags                source_flags)>
                       SetSourceFunction;
 
+class AGSSchemeEntry;
+
 /**Struct for storing LBS options_.*/
 struct Options
 {
@@ -114,6 +116,8 @@ struct Options
   bool verbose_outer_iterations = true;
 
   Options() = default;
+
+  std::vector<AGSSchemeEntry> ags_scheme;
 };
 
 
@@ -194,6 +198,38 @@ struct UnitCellMatrices
   std::vector<MatDbl>  face_M_matrices;
   std::vector<MatVec3> face_G_matrices;
   std::vector<VecDbl>  face_Si_vectors;
+};
+
+enum class AGSSchemeEntryType
+{
+  GROUPSET_ID = 1,
+  SCHEME      = 2
+};
+
+class AGSSchemeEntry
+{
+private:
+  const AGSSchemeEntryType type_;
+  const int groupset_id_ = 0;
+  const std::string scheme_name_;
+  std::vector<AGSSchemeEntry> scheme_entries_;
+public:
+  explicit
+  AGSSchemeEntry(int groupset_id) :
+    type_(AGSSchemeEntryType::GROUPSET_ID),
+    groupset_id_(groupset_id)
+  {}
+
+  explicit
+  AGSSchemeEntry(const std::string& scheme) :
+    type_(AGSSchemeEntryType::SCHEME),
+    scheme_name_(scheme)
+  {}
+
+  AGSSchemeEntryType Type() const {return type_;}
+  int GroupsetID() const {return groupset_id_;}
+
+  std::vector<AGSSchemeEntry>& SchemeEntries() {return scheme_entries_;}
 };
 
 }//namespace lbs

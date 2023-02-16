@@ -69,7 +69,9 @@ void AGSLinearSolver<Mat,Vec,KSP>::SetRHS()
 
 template<>
 void AGSLinearSolver<Mat,Vec,KSP>::SetInitialGuess()
-{}
+{
+
+}
 
 template<>
 void AGSLinearSolver<Mat,Vec,KSP>::Solve()
@@ -86,8 +88,6 @@ void AGSLinearSolver<Mat,Vec,KSP>::Solve()
 
   for (int iter=0; iter < tolerance_options_.maximum_iterations_; ++iter)
   {
-    const size_t num_local_dofs = lbs_solver.QMomentsLocal().size();
-    lbs_solver.QMomentsLocal().assign(num_local_dofs,0.0);
     lbs_solver.SetGroupScopedPETScVecFromPrimarySTLvector(gid_i,gid_f,x_old,phi);
 
     for (auto& solver : ags_context_ptr->sub_solvers_list_)
@@ -103,10 +103,11 @@ void AGSLinearSolver<Mat,Vec,KSP>::Solve()
     PetscReal sol_norm;VecNorm(x_, NORM_2, &sol_norm);
 
 
-    chi::log.Log()
-    << "********** AGS solver iteration " << std::setw(3) << iter << " "
-    << " Relative change " << std::setw(10) << std::setprecision(4)
-    << error_norm/sol_norm;
+    if (verbose_)
+      chi::log.Log()
+      << "********** AGS solver iteration " << std::setw(3) << iter << " "
+      << " Relative change " << std::setw(10) << std::setprecision(4)
+      << error_norm/sol_norm;
 
     if (error_norm < tolerance_options_.residual_absolute_)
       break;

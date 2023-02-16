@@ -2,13 +2,9 @@
 
 #include "chi_log.h"
 
-#include <iomanip>
-
-using namespace lbs;
-
 //###################################################################
 /**Execute a k-eigenvalue linear boltzmann solver.*/
-void DiscOrdKEigenvalueSolver::Execute()
+void lbs::DiscOrdKEigenvalueSolver::Execute()
 {
   //======================================== Solve the k-eigenvalue problem
   PowerIteration();

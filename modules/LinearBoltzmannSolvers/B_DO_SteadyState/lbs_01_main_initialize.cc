@@ -16,11 +16,10 @@ void lbs::DiscOrdSteadyStateSolver::Initialize()
   // Initialize source func
   using namespace std::placeholders;
   active_set_source_function_ =
-    std::bind(&DiscOrdSteadyStateSolver::SetSource, this, _1, _2, _3, _4);
+    std::bind(&LBSSolver::SetSource, this, _1, _2, _3, _4);
 
   //================================================== Initialize groupsets_ for
   //                                                   sweeping
-  chi::log.Log() << "Initializing groupset sweeping data" << TextName() << ".";
   for (auto& groupset : groupsets_)
   {
     ComputeSweepOrderings(groupset);
@@ -33,29 +32,6 @@ void lbs::DiscOrdSteadyStateSolver::Initialize()
   InitializeSolverSchemes();           //j
   source_event_tag_ = chi::log.GetRepeatingEventTag("Set Source");
 }
-
-//void lbs::DiscOrdSteadyStateSolver::InitializeSolverSchemes()
-//{
-//  chi::log.Log() << "Initializing Solver schemes";
-//
-//  InitializeWGSSolvers();
-//
-//  /*This default behavior covers the situation when no Across-GroupSet (AGS)
-//   * solvers have been created for this solver.*/
-//  if (ags_solvers_.empty())
-//  {
-//    auto ags_context = std::make_shared<AGSContext<Mat,Vec,KSP>>(
-//      *this, wgs_solvers_);
-//
-//    auto ags_solver = std::make_shared<AGSLinearSolver<Mat,Vec,KSP>>(
-//      "richardson", ags_context,groupsets_.front().id, groupsets_.back().id);
-//    ags_solver->ToleranceOptions().maximum_iterations_ = 1;
-//
-//    ags_solvers_.push_back(ags_solver);
-//
-//    primary_ags_solver_ = ags_solvers_.front();
-//  }//if ags_solvers.empty()
-//}
 
 /**Initializes Within-GroupSet solvers.*/
 void lbs::DiscOrdSteadyStateSolver::InitializeWGSSolvers()

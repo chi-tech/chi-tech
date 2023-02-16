@@ -1,5 +1,5 @@
-dofile("mesh.lua")
-dofile("materials.lua") --num_groups assigned here
+dofile("tests/BigTests/QBlock/mesh.lua")
+dofile("tests/BigTests/QBlock/materials.lua") --num_groups assigned here
 
 --############################################### Setup Physics
 phys1 = chiLBKESCreateSolver()
@@ -11,7 +11,6 @@ for g=1,num_groups do
 end
 
 --========== ProdQuad
-
 pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,4, 4)
 chiOptimizeAngularQuadratureForPolarSymmetry(pqaud, 4.0*math.pi)
 
@@ -52,4 +51,6 @@ chiSolverExecute(phys1)
 
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 
-chiExportMultiFieldFunctionToVTK(fflist,"solutions/Flux")
+chiExportMultiFieldFunctionToVTK(fflist,"tests/BigTests/QBlock/solutions/Flux")
+
+-- Reference value k_eff = 0.5969127
