@@ -1,6 +1,5 @@
 #include "lbs_solver.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 #include "ChiPhysics/FieldFunction/fieldfunction.h"
 
 #include "chi_runtime.h"
@@ -84,8 +83,9 @@ void lbs::LBSSolver::InitializeParrays()
   const chi_mesh::Vector3 jhat(0.0, 1.0, 0.0);
   const chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
 
-  auto pwl =
-      std::dynamic_pointer_cast<chi_math::SpatialDiscretization_FE>(discretization_);
+//  auto pwl =
+//      std::dynamic_pointer_cast<chi_math::SpatialDiscretization_FE>(discretization_);
+//  auto& sdm = *discretization_;
 
   cell_transport_views_.clear();
   cell_transport_views_.reserve(grid_ptr_->local_cells.size());
@@ -96,9 +96,9 @@ void lbs::LBSSolver::InitializeParrays()
 
     //compute cell volumes
     double cell_volume = 0.0;
-    auto& fe_values = pwl->GetUnitIntegrals(cell);
-    for (size_t i = 0; i < fe_values.NumNodes(); ++i)
-      cell_volume += fe_values.IntV_shapeI(i);
+    const auto& IntV_shapeI = unit_cell_matrices_[cell.local_id].Vi_vectors;
+    for (size_t i = 0; i < num_nodes; ++i)
+      cell_volume += IntV_shapeI[i];
 
     size_t cell_phi_address = block_MG_counter;
 

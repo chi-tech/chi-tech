@@ -11,16 +11,13 @@ namespace lbs_curvilinear
   class SweepChunkPWL;
 }
 
-
 /** A sweep-chunk in point-symmetric and axial-symmetric
  *  curvilinear coordinates. */
 class lbs_curvilinear::SweepChunkPWL : public lbs::SweepChunkPWL
 {
 //  Attributes
 private:
-  /** Spatial discretisation of secondary cell view (spatial discretisation
-   *  of primary cell view managed by the base class). */
-  chi_math::SpatialDiscretization_PWLD& grid_fe_view_secondary;
+  const std::vector<lbs::UnitCellMatrices>& secondary_unit_cell_matrices_;
   /** Unknown manager. */
   chi_math::UnknownManager unknown_manager;
   /** Sweeping dependency angular intensity (for each polar level). */
@@ -34,8 +31,9 @@ private:
 public:
   /** Constructor. */
   SweepChunkPWL(std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,
-                chi_math::SpatialDiscretization_PWLD& discretization_primary,
-                chi_math::SpatialDiscretization_PWLD& discretization_secondary,
+                chi_math::SpatialDiscretization& discretization_primary,
+                const std::vector<lbs::UnitCellMatrices>& unit_cell_matrices,
+                const std::vector<lbs::UnitCellMatrices>& secondary_unit_cell_matrices,
                 std::vector<lbs::CellLBSView>& cell_transport_views,
                 std::vector<double>& destination_phi,
                 std::vector<double>& destination_psi,

@@ -27,10 +27,33 @@ void lbs::LBSSolver::ComputeUnitIntegrals()
   chi::log.Log() << "Computing unit integrals.\n";
   const auto& sdm = *discretization_;
 
-  const size_t num_local_cells = grid_ptr_->local_cells.size();
-  unit_cell_matrices_.resize(num_local_cells);
+  //======================================== Define spatial weighting functions
+  struct SpatialWeightFunction //SWF
+  {
+    virtual double operator()(const chi_mesh::Vector3& pt) const
+    { return 1.0; }
+  };
 
-  for (const auto& cell : grid_ptr_->local_cells)
+  struct SphericalSWF : public SpatialWeightFunction
+  {
+    double operator()(const chi_mesh::Vector3& pt) const override
+    { return pt[2]*pt[2]; }
+  };
+
+  struct CylindricalSWF : public SpatialWeightFunction
+  {
+    double operator()(const chi_mesh::Vector3& pt) const override
+    { return pt[0]; }
+  };
+
+  auto swf_ptr = std::make_shared<SpatialWeightFunction>();
+  if (options_.geometry_type == lbs::GeometryType::ONED_SPHERICAL)
+    swf_ptr = std::make_shared<SphericalSWF>();
+  if (options_.geometry_type == lbs::GeometryType::TWOD_CYLINDRICAL)
+    swf_ptr = std::make_shared<CylindricalSWF>();
+
+  auto ComputeCellUnitIntegrals = [&sdm](const chi_mesh::Cell& cell,
+                                         const SpatialWeightFunction& swf)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t cell_num_faces = cell.faces.size();
@@ -54,16 +77,19 @@ void lbs::LBSSolver::ComputeUnitIntegrals()
         for (const auto& qp : vol_qp_data.QuadraturePointIndices())
         {
           IntV_gradshapeI_gradshapeJ[i][j]
-            += vol_qp_data.ShapeGrad(i, qp).Dot(vol_qp_data.ShapeGrad(j, qp)) *
+            += swf(vol_qp_data.QPointXYZ(qp)) *
+               vol_qp_data.ShapeGrad(i, qp).Dot(vol_qp_data.ShapeGrad(j, qp)) *
                vol_qp_data.JxW(qp);  //K-matrix
 
           IntV_shapeI_gradshapeJ[i][j]
-            += vol_qp_data.ShapeValue(i, qp) *
+            += swf(vol_qp_data.QPointXYZ(qp)) *
+               vol_qp_data.ShapeValue(i, qp) *
                vol_qp_data.ShapeGrad(j, qp) *
                vol_qp_data.JxW(qp);  //G-matrix
 
           IntV_shapeI_shapeJ[i][j]
-            += vol_qp_data.ShapeValue(i, qp) *
+            += swf(vol_qp_data.QPointXYZ(qp)) *
+               vol_qp_data.ShapeValue(i, qp) *
                vol_qp_data.ShapeValue(j, qp) *
                vol_qp_data.JxW(qp);  //M-matrix
         }// for qp
@@ -72,10 +98,10 @@ void lbs::LBSSolver::ComputeUnitIntegrals()
       for (const auto& qp : vol_qp_data.QuadraturePointIndices())
       {
         IntV_shapeI[i]
-          += vol_qp_data.ShapeValue(i, qp) * vol_qp_data.JxW(qp);
+          += swf(vol_qp_data.QPointXYZ(qp)) *
+             vol_qp_data.ShapeValue(i, qp) * vol_qp_data.JxW(qp);
       }// for qp
     }//for i
-
 
     //  surface integrals
     for (size_t f = 0; f < cell_num_faces; ++f)
@@ -92,11 +118,13 @@ void lbs::LBSSolver::ComputeUnitIntegrals()
           for (const auto& qp : faces_qp_data.QuadraturePointIndices())
           {
             IntS_shapeI_shapeJ[f][i][j]
-              += faces_qp_data.ShapeValue(i, qp) *
+              += swf(faces_qp_data.QPointXYZ(qp)) *
+                 faces_qp_data.ShapeValue(i, qp) *
                  faces_qp_data.ShapeValue(j, qp) *
                  faces_qp_data.JxW(qp);
             IntS_shapeI_gradshapeJ[f][i][j]
-              += faces_qp_data.ShapeValue(i, qp) *
+              += swf(faces_qp_data.QPointXYZ(qp)) *
+                 faces_qp_data.ShapeValue(i, qp) *
                  faces_qp_data.ShapeGrad(j, qp) *
                  faces_qp_data.JxW(qp);
           }// for qp
@@ -105,12 +133,13 @@ void lbs::LBSSolver::ComputeUnitIntegrals()
         for (const auto& qp : faces_qp_data.QuadraturePointIndices())
         {
           IntS_shapeI[f][i]
-            += faces_qp_data.ShapeValue(i, qp) * faces_qp_data.JxW(qp);
+            += swf(faces_qp_data.QPointXYZ(qp)) *
+               faces_qp_data.ShapeValue(i, qp) * faces_qp_data.JxW(qp);
         }// for qp
       }//for i
     }//for f
 
-    unit_cell_matrices_[cell.local_id] =
+    return
       UnitCellMatrices{IntV_gradshapeI_gradshapeJ, //K-matrix
                        IntV_shapeI_gradshapeJ,     //G-matrix
                        IntV_shapeI_shapeJ,         //M-matrix
@@ -119,8 +148,18 @@ void lbs::LBSSolver::ComputeUnitIntegrals()
                        IntS_shapeI_shapeJ,         //face M-matrices
                        IntS_shapeI_gradshapeJ,     //face G-matrices
                        IntS_shapeI};               //face Si-vectors
-  }//for cell
+  };
 
+  const size_t num_local_cells = grid_ptr_->local_cells.size();
+  unit_cell_matrices_.resize(num_local_cells);
+
+  for (const auto& cell : grid_ptr_->local_cells)
+    unit_cell_matrices_[cell.local_id] = ComputeCellUnitIntegrals(cell,*swf_ptr);
+
+  const auto ghost_ids = grid_ptr_->cells.GetGhostGlobalIDs();
+  for (uint64_t ghost_id : ghost_ids)
+    unit_ghost_cell_matrices_[ghost_id] =
+      ComputeCellUnitIntegrals(grid_ptr_->cells[ghost_id],*swf_ptr);
 
   MPI_Barrier(MPI_COMM_WORLD);
   chi::log.Log()

@@ -5,8 +5,9 @@
 
 lbs_curvilinear::SweepChunkPWL::
   SweepChunkPWL(std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,
-                chi_math::SpatialDiscretization_PWLD& discretization_primary,
-                chi_math::SpatialDiscretization_PWLD& discretization_secondary,
+                chi_math::SpatialDiscretization& discretization_primary,
+                const std::vector<lbs::UnitCellMatrices>& unit_cell_matrices,
+                const std::vector<lbs::UnitCellMatrices>& secondary_unit_cell_matrices,
                 std::vector<lbs::CellLBSView>& cell_transport_views,
                 std::vector<double>& destination_phi,
                 std::vector<double>& destination_psi,
@@ -18,6 +19,7 @@ lbs_curvilinear::SweepChunkPWL::
   : lbs::SweepChunkPWL(
                      std::move(grid_ptr),
                      discretization_primary,
+                     unit_cell_matrices,
                      cell_transport_views,
                      destination_phi,
                      destination_psi,
@@ -26,7 +28,7 @@ lbs_curvilinear::SweepChunkPWL::
                      in_xsections,
                      in_num_moms,
                      in_max_num_cell_dofs)
-  , grid_fe_view_secondary(discretization_secondary)
+  , secondary_unit_cell_matrices_(secondary_unit_cell_matrices)
   , unknown_manager()
   , psi_sweep()
   , normal_vector_boundary()
@@ -100,22 +102,22 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
   {
     const int cell_local_id = spds->spls.item_id[spls_index];
     const auto& cell = grid_view->local_cells[cell_local_id];
-    const auto& fe_intgrl_values = grid_fe_view.GetUnitIntegrals(cell);
-    const auto& fe_intgrl_values_secondary = grid_fe_view_secondary.GetUnitIntegrals(cell);
     const auto num_faces = cell.faces.size();
-    const int num_nodes = static_cast<int>(fe_intgrl_values.NumNodes());
+    const auto& cell_mapping = grid_fe_view.GetCellMapping(cell);
+    const auto& fe_intgrl_values = unit_cell_matrices_[cell_local_id];
+    const auto& fe_intgrl_values_secondary = secondary_unit_cell_matrices_[cell_local_id];
+    const int num_nodes = static_cast<int>(cell_mapping.NumNodes());
     auto& transport_view = grid_transport_view[cell.local_id];
     const auto& sigma_tg = transport_view.XS().sigma_t;
     std::vector<bool> face_incident_flags(num_faces, false);
     std::vector<double> face_mu_values(num_faces, 0.0);
 
     //=================================================== Get Cell matrices
-    const auto& G      = fe_intgrl_values.GetIntV_shapeI_gradshapeJ();
-    const auto& M      = fe_intgrl_values.GetIntV_shapeI_shapeJ();
-    const auto& M_surf = fe_intgrl_values.GetIntS_shapeI_shapeJ();
+    const auto& G      = fe_intgrl_values.G_matrix;
+    const auto& M      = fe_intgrl_values.M_matrix;
+    const auto& M_surf = fe_intgrl_values.face_M_matrices;
 
-    const auto& Maux   = fe_intgrl_values_secondary.GetIntV_shapeI_shapeJ();
-
+    const auto& Maux   = fe_intgrl_values_secondary.M_matrix;
 
     //=================================================== Loop over angles in set
     const int ni_deploc_face_counter = deploc_face_counter;
@@ -173,10 +175,10 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
             in_face_counter++;
             for (int fi = 0; fi < num_face_indices; ++fi)
             {
-              const int i = fe_intgrl_values.FaceDofMapping(f,fi);
+              const int i = cell_mapping.MapFaceNode(f,fi);
               for (int fj = 0; fj < num_face_indices; ++fj)
               {
-                const int j = fe_intgrl_values.FaceDofMapping(f,fj);
+                const int j = cell_mapping.MapFaceNode(f,fj);
                 const double *psi = fluds->UpwindPsi(spls_index,in_face_counter,fj,0,angle_set_index);
                 const double mu_Nij = -mu * M_surf[f][i][j];
                 Amat[i][j] += mu_Nij;
@@ -190,10 +192,10 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
             preloc_face_counter++;
             for (int fi = 0; fi < num_face_indices; ++fi)
             {
-              const int i = fe_intgrl_values.FaceDofMapping(f,fi);
+              const int i = cell_mapping.MapFaceNode(f,fi);
               for (int fj = 0; fj < num_face_indices; ++fj)
               {
-                const int j = fe_intgrl_values.FaceDofMapping(f,fj);
+                const int j = cell_mapping.MapFaceNode(f,fj);
                 const double *psi = fluds->NLUpwindPsi(preloc_face_counter,fj,0,angle_set_index);
                 const double mu_Nij = -mu * M_surf[f][i][j];
                 Amat[i][j] += mu_Nij;
@@ -221,10 +223,10 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
               const uint64_t bndry_index = face.neighbor_id;
               for (int fi = 0; fi < num_face_indices; ++fi)
               {
-                const int i = fe_intgrl_values.FaceDofMapping(f,fi);
+                const int i = cell_mapping.MapFaceNode(f,fi);
                 for (int fj = 0; fj < num_face_indices; ++fj)
                 {
-                  const int j = fe_intgrl_values.FaceDofMapping(f,fj);
+                  const int j = cell_mapping.MapFaceNode(f,fj);
                   const double *psi = angle_set->PsiBndry(bndry_index,
                                                           angle_num,
                                                           cell.local_id,
@@ -322,7 +324,7 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
         {
           for (int fi = 0; fi < num_face_indices; ++fi)
           {
-            const int i = fe_intgrl_values.FaceDofMapping(f,fi);
+            const int i = cell_mapping.MapFaceNode(f,fi);
             double *psi = fluds->OutgoingPsi(spls_index, out_face_counter, fi, angle_set_index);
             for (int gsg = 0; gsg < gs_ss_size; ++gsg)
               psi[gsg] = b[gsg][i];
@@ -333,7 +335,7 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
           deploc_face_counter++;
           for (int fi = 0; fi < num_face_indices; ++fi)
           {
-            const int i = fe_intgrl_values.FaceDofMapping(f,fi);
+            const int i = cell_mapping.MapFaceNode(f,fi);
             double *psi = fluds->NLOutgoingPsi(deploc_face_counter, fi, angle_set_index);
             for (int gsg = 0; gsg < gs_ss_size; ++gsg)
               psi[gsg] = b[gsg][i];
@@ -346,7 +348,7 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
           {
             for (int fi = 0; fi < num_face_indices; ++fi)
             {
-              const int i = fe_intgrl_values.FaceDofMapping(f,fi);
+              const int i = cell_mapping.MapFaceNode(f,fi);
               double *psi = angle_set->ReflectingPsiOutBoundBndry(bndry_index, angle_num,
                                                                   cell.local_id, f,
                                                                   fi, gs_ss_begin);

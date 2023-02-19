@@ -3,7 +3,7 @@
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 
 #include "B_DO_SteadyState/lbs_DO_steady_state.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
@@ -20,7 +20,8 @@ class SweepChunkPWL : public chi_mesh::sweep_management::SweepChunk
 {
 protected:
   const std::shared_ptr<chi_mesh::MeshContinuum> grid_view;
-  chi_math::SpatialDiscretization_PWLD& grid_fe_view;
+  const chi_math::SpatialDiscretization& grid_fe_view;
+  const std::vector<UnitCellMatrices>& unit_cell_matrices_;
   std::vector<lbs::CellLBSView>& grid_transport_view;
   const std::vector<double>& q_moments;
   LBSGroupset& groupset;
@@ -40,7 +41,8 @@ public:
   std::vector<std::vector<double>> b;
 
   SweepChunkPWL(std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,
-                chi_math::SpatialDiscretization_PWLD& discretization,
+                const chi_math::SpatialDiscretization& discretization,
+                const std::vector<UnitCellMatrices>& unit_cell_matrices,
                 std::vector<lbs::CellLBSView>& cell_transport_views,
                 std::vector<double>& destination_phi,
                 std::vector<double>& destination_psi,

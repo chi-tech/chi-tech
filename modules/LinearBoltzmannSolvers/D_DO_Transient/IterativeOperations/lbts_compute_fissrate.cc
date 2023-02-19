@@ -1,7 +1,5 @@
 #include "D_DO_Transient/lbts_transient_solver.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
-
 using namespace lbs;
 
 //###################################################################

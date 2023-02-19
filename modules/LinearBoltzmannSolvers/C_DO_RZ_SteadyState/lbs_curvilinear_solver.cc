@@ -1,17 +1,18 @@
 #include "C_DO_RZ_SteadyState/lbs_curvilinear_solver.h"
 
-#include <iomanip>
-
-#include "chi_runtime.h"
-#include "chi_log.h"
-#include "chi_mpi.h"
-#include "ChiConsole/chi_console.h"
 #include "ChiMath/Quadratures/cylindrical_angular_quadrature.h"
 #include "ChiMath/Quadratures/spherical_angular_quadrature.h"
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+
 #include "A_LBSSolver/lbs_structs.h"
 #include "C_DO_RZ_SteadyState/lbs_curvilinear_sweepchunk_pwl.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
+
+#include "chi_runtime.h"
+#include "chi_log.h"
+
+#include "ChiConsole/chi_console.h"
+
+#include <iomanip>
 
 typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
 
@@ -238,100 +239,14 @@ lbs_curvilinear::DiscOrdSteadyStateSolver::PerformInputChecks()
 }
 
 
-void
-lbs_curvilinear::DiscOrdSteadyStateSolver::InitializeSpatialDiscretization()
-{
-  chi::log.Log() << "Initializing spatial discretization_.\n";
-
-  const auto setup_flags =
-    chi_math::finite_element::COMPUTE_CELL_MAPPINGS |
-    chi_math::finite_element::COMPUTE_UNIT_INTEGRALS;
-  auto qorder = chi_math::QuadratureOrder::INVALID_ORDER;
-  auto system = chi_math::CoordinateSystemType::UNDEFINED;
-
-  //  primary discretisation
-  switch (options_.geometry_type)
-  {
-    case lbs::GeometryType::ONED_SPHERICAL:
-    {
-      qorder = chi_math::QuadratureOrder::FOURTH;
-      system = chi_math::CoordinateSystemType::SPHERICAL;
-      break;
-    }
-    case lbs::GeometryType::ONED_CYLINDRICAL:
-    case lbs::GeometryType::TWOD_CYLINDRICAL:
-    {
-      qorder = chi_math::QuadratureOrder::THIRD;
-      system = chi_math::CoordinateSystemType::CYLINDRICAL;
-      break;
-    }
-    default:
-    {
-      chi::log.LogAllError()
-        << "C_DO_RZ_SteadyState::SteadyStateSolver::InitializeSpatialDiscretization : "
-        << "invalid geometry, static_cast<int>(type) = "
-        << static_cast<int>(options_.geometry_type);
-      chi::Exit(EXIT_FAILURE);
-    }
-  }
-
-  typedef chi_math::SpatialDiscretization_PWLD SDM_PWLD;
-  discretization_ = SDM_PWLD::New(grid_ptr_, setup_flags, qorder, system);
-
-  ComputeUnitIntegrals();
-
-  //  secondary discretisation
-  //  system - manipulated such that the spatial discretisation returns
-  //  a cell view of the same type but with weighting of degree one less
-  //  than the primary discretisation
-  switch (options_.geometry_type)
-  {
-    case lbs::GeometryType::ONED_SPHERICAL:
-    {
-      qorder = chi_math::QuadratureOrder::THIRD;
-      system = chi_math::CoordinateSystemType::CYLINDRICAL;
-      break;
-    }
-    case lbs::GeometryType::ONED_CYLINDRICAL:
-    case lbs::GeometryType::TWOD_CYLINDRICAL:
-    {
-      qorder = chi_math::QuadratureOrder::SECOND;
-      system = chi_math::CoordinateSystemType::CARTESIAN;
-      break;
-    }
-    default:
-    {
-      chi::log.LogAllError()
-        << "C_DO_RZ_SteadyState::SteadyStateSolver::InitializeSpatialDiscretization : "
-        << "invalid geometry, static_cast<int>(type) = "
-        << static_cast<int>(options_.geometry_type);
-      chi::Exit(EXIT_FAILURE);
-    }
-  }
-
-  discretization_secondary_ = SDM_PWLD::New(grid_ptr_, setup_flags, qorder, system);
-
-
-  MPI_Barrier(MPI_COMM_WORLD);
-  chi::log.Log()
-    << "Cell matrices computed.                   Process memory = "
-    << std::setprecision(3)
-    << chi_objects::ChiConsole::GetMemoryUsageInMB() << " MB";
-}
-
-
 std::shared_ptr<SweepChunk>
 lbs_curvilinear::DiscOrdSteadyStateSolver::SetSweepChunk(lbs::LBSGroupset& groupset)
 {
-  auto pwld_sdm_primary =
-    std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization_);
-  auto pwld_sdm_secondary =
-    std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization_secondary_);
-
    auto sweep_chunk =
      std::make_shared<SweepChunkPWL>(grid_ptr_,
-                                     *pwld_sdm_primary,
-                                     *pwld_sdm_secondary,
+                                     *discretization_,
+                                     unit_cell_matrices_,
+                                     secondary_unit_cell_matrices_,
                                      cell_transport_views_,
                                      phi_new_local_,
                                      psi_new_local_[groupset.id],

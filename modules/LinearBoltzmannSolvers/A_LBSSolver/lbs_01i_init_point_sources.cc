@@ -1,7 +1,5 @@
 #include "lbs_solver.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
-
 #include "chi_runtime.h"
 #include "chi_log.h"
 
@@ -9,9 +7,6 @@
 void lbs::LBSSolver::InitializePointSources()
 {
   const std::string fname = "InitializePointSources";
-
-  typedef chi_math::SpatialDiscretization_PWLD PWLD;
-  const auto& pwld = std::dynamic_pointer_cast<PWLD>(discretization_);
 
   //============================================= Loop over point sources
   for (auto& point_source : point_sources_)
@@ -32,10 +27,10 @@ void lbs::LBSSolver::InitializePointSources()
     {
       if (grid_ptr_->CheckPointInsideCell(cell, p))
       {
-        const auto& cell_view = pwld->GetCellMapping(cell);
-        const auto& fe_values = pwld->GetUnitIntegrals(cell);
-        const auto& M = fe_values.GetIntV_shapeI_shapeJ();
-        const auto& I = fe_values.GetIntV_shapeI();
+        const auto& cell_view = discretization_->GetCellMapping(cell);
+        const auto& cell_matrices = unit_cell_matrices_[cell.local_id];
+        const auto& M = cell_matrices.M_matrix;
+        const auto& I = cell_matrices.Vi_vectors;
 
         std::vector<double> shape_values;
         cell_view.ShapeValues(point_source.Location(),
@@ -63,9 +58,9 @@ void lbs::LBSSolver::InitializePointSources()
       const auto& neighbor_cell = grid_ptr_->cells[ghost_global_id];
       if (grid_ptr_->CheckPointInsideCell(neighbor_cell, p))
       {
-        const auto& neighbor_fe_values =
-          pwld->GetUnitIntegrals(neighbor_cell);
-        for (double val : neighbor_fe_values.GetIntV_shapeI())
+        const auto& cell_matrices =
+          unit_ghost_cell_matrices_[neighbor_cell.global_id];
+        for (double val : cell_matrices.Vi_vectors)
           v_total += val;
       }//if point inside
     }//for ghost cell

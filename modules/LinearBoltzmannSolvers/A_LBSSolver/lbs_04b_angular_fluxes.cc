@@ -1,10 +1,8 @@
 #include "lbs_solver.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-#include "chi_mpi.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
 
@@ -61,15 +59,6 @@ void lbs::LBSSolver::
 
   //============================================= Get relevant items
   auto NODES_ONLY = chi_math::UnknownManager::GetUnitaryUnknownManager();
-  auto fe = std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization_);
-  if (not fe)
-  {
-    file.close();
-    chi::log.LogAllWarning() << "Angular flux file reading cancelled "
-                                   "because a spatial discretization_ has not "
-                                   "been initialized.";
-    return;
-  }
 
   size_t num_local_nodes = discretization_->GetNumLocalDOFs(NODES_ONLY);
   size_t num_angles      = groupset.quadrature->abscissae.size();
@@ -83,19 +72,20 @@ void lbs::LBSSolver::
   file.write((char*)&num_groups     ,sizeof(size_t));
   file.write((char*)&num_local_dofs ,sizeof(size_t));
 
+  auto& sdm = discretization_;
+
   //============================================= Write per dof data
   size_t dof_count=0;
   for (const auto& cell : grid_ptr_->local_cells)
   {
-    const auto& cell_mapping = fe->GetCellMapping(cell);
-
-    for (unsigned int i=0; i < cell_mapping.NumNodes(); ++i)
+    const size_t num_nodes = sdm->GetCellNumNodes(cell);
+    for (unsigned int i=0; i < num_nodes; ++i)
       for (unsigned int n=0; n<num_angles; ++n)
         for (unsigned int g=0; g<num_groups; ++g)
         {
           if (++dof_count > num_local_dofs) goto close_file;
 
-          uint64_t dof_map = fe->MapDOFLocal(cell,i,dof_handler,n,g);
+          uint64_t dof_map = sdm->MapDOFLocal(cell,i,dof_handler,n,g);
           double value = psi_new_local_[groupset.id][dof_map];
 
           file.write((char*)&cell.global_id,sizeof(size_t));
@@ -135,15 +125,6 @@ void lbs::LBSSolver::
 
   //============================================= Get relevant items
   auto NODES_ONLY = chi_math::UnknownManager::GetUnitaryUnknownManager();
-  auto fe = std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization_);
-  if (not fe)
-  {
-    file.close();
-    chi::log.LogAllWarning() << "Angular flux file reading cancelled "
-                                   "because a spatial discretization_ has not "
-                                   "been initialized.";
-    return;
-  }
 
   size_t num_local_nodes   = discretization_->GetNumLocalDOFs(NODES_ONLY);
   size_t num_angles        = groupset.quadrature->abscissae.size();
@@ -186,6 +167,8 @@ void lbs::LBSSolver::
     return;
   }
 
+  auto& sdm = discretization_;
+
   //============================================= Commit to reading the file
   psi.reserve(file_num_local_dofs);
   std::set<uint64_t> cells_touched;
@@ -207,7 +190,7 @@ void lbs::LBSSolver::
 
     const auto& cell = grid_ptr_->cells[cell_global_id];
 
-    size_t imap = fe->MapDOFLocal(cell,node,dof_handler,angle_num,group);
+    size_t imap = sdm->MapDOFLocal(cell,node,dof_handler,angle_num,group);
 
     psi[imap] = psi_value;
   }

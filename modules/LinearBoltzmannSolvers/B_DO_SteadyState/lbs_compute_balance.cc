@@ -1,6 +1,6 @@
 #include "lbs_DO_steady_state.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+//#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -24,12 +24,6 @@ void lbs::DiscOrdSteadyStateSolver::ComputeBalance()
 {
   MPI_Barrier(MPI_COMM_WORLD);
   chi::log.Log() << "\n********** Computing balance\n";
-
-  auto pwld =
-    std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization_);
-  if (not pwld) throw std::logic_error("Trouble getting PWLD-SDM in " +
-                                      std::string(__FUNCTION__));
-  chi_math::SpatialDiscretization_PWLD& grid_fe_view = *pwld;
 
   //======================================== Get material source
   // This is done using the SetSource routine
@@ -64,11 +58,12 @@ void lbs::DiscOrdSteadyStateSolver::ComputeBalance()
   double local_production = 0.0;
   for (const auto& cell : grid_ptr_->local_cells)
   {
+    const auto&  cell_mapping     = discretization_->GetCellMapping(cell);
     const auto&  transport_view   = cell_transport_views_[cell.local_id];
-    const auto&  fe_intgrl_values = grid_fe_view.GetUnitIntegrals(cell);
+    const auto&  fe_intgrl_values = unit_cell_matrices_[cell.local_id];
     const size_t num_nodes        = transport_view.NumNodes();
-    const auto&  IntV_shapeI      = fe_intgrl_values.GetIntV_shapeI();
-    const auto&  IntS_shapeI      = fe_intgrl_values.GetIntS_shapeI();
+    const auto&  IntV_shapeI      = fe_intgrl_values.Vi_vectors;
+    const auto&  IntS_shapeI      = fe_intgrl_values.face_Si_vectors;
 
     //====================================== Inflow
     // This is essentially an integration over
@@ -92,7 +87,7 @@ void lbs::DiscOrdSteadyStateSolver::ComputeBalance()
             const auto &bndry = sweep_boundaries_[face.neighbor_id];
             for (int fi = 0; fi < face.vertex_ids.size(); ++fi)
             {
-              const int i = fe_intgrl_values.FaceDofMapping(f, fi);
+              const int i = cell_mapping.MapFaceNode(f, fi);
               const auto &IntFi_shapeI = IntS_shapeI[f][i];
 
               for (const auto &group : groupset.groups)

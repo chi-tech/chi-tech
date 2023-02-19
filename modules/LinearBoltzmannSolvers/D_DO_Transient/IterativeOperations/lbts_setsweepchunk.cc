@@ -6,9 +6,6 @@
 std::shared_ptr<SweepChunk> lbs::DiscOrdTransientSolver::
   SetTransientSweepChunk(LBSGroupset& groupset)
 {
-  auto pwl_sdm =
-    std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization_);
-
   double theta;
   if (method == chi_math::SteppingMethod::BACKWARD_EULER)
     theta = 1.0;
@@ -18,8 +15,9 @@ std::shared_ptr<SweepChunk> lbs::DiscOrdTransientSolver::
   //================================================== Setting up required
   //                                                   sweep chunks
   auto sweep_chunk = std::make_shared<SweepChunkPWLTransientTheta>(
-    grid_ptr_,                                    //Spatial grid_ptr_ of cells
-    *pwl_sdm,                                //Spatial discretization_
+    grid_ptr_,                                //Spatial grid_ptr_ of cells
+    *discretization_,                         //Spatial discretization_
+    unit_cell_matrices_,                      //Unit cell matrices
     cell_transport_views_,                    //Cell transport views
     phi_new_local_,                           //Destination phi
     psi_new_local_[groupset.id],              //Destination psi
@@ -29,8 +27,8 @@ std::shared_ptr<SweepChunk> lbs::DiscOrdTransientSolver::
     dt_,
 
     q_moments_local_,                         //Source moments
-    groupset,                                //Reference groupset
-    matid_to_xs_map_,                             //Material cross-sections
+    groupset,                                 //Reference groupset
+    matid_to_xs_map_,                         //Material cross-sections
     num_moments_,
     max_cell_dof_count_);
 

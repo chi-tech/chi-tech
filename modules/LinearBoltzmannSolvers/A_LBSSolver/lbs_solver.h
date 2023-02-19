@@ -57,6 +57,7 @@ protected:
   chi_mesh::MeshContinuumPtr grid_ptr_;
   std::vector<CellFaceNodalMapping> grid_nodal_mappings_;
   std::vector<UnitCellMatrices> unit_cell_matrices_;
+  std::map<uint64_t, UnitCellMatrices> unit_ghost_cell_matrices_;
   std::vector<lbs::CellLBSView> cell_transport_views_;
 
   std::map<uint64_t, BoundaryPreference>           boundary_preferences_;

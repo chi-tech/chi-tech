@@ -1,7 +1,5 @@
 #include "A_LBSSolver/lbs_solver.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
-
 #include "chi_runtime.h"
 
 
@@ -9,8 +7,6 @@
 /**Compute the steady state delayed neutron precursor concentrations.*/
 void lbs::LBSSolver::ComputePrecursors()
 {
-  auto fe =
-      std::dynamic_pointer_cast<chi_math::SpatialDiscretization_FE>(discretization_);
   const size_t J = max_precursors_per_material_;
 
   precursor_new_local_.assign(precursor_new_local_.size(), 0.0);

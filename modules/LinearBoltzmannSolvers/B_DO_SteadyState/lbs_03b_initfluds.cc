@@ -77,17 +77,18 @@ void lbs::DiscOrdSteadyStateSolver::
           make_primary = false;
           primary_fluds = new chi_mesh::sweep_management::
           PRIMARY_FLUDS(groupset.grp_subset_infos[gs_ss].ss_size,
-                        grid_nodal_mappings_);
+                        grid_nodal_mappings_,
+                        sweep_ordering);
 
-          chi::log.Log0Verbose1()
-            << "Initializing FLUDS for omega="
-            << sweep_ordering->omega.PrintS()
-            << "         Process memory = "
-            << std::setprecision(3)
-            <<chi_objects::ChiConsole::GetMemoryUsageInMB() << " MB.";
-
-          primary_fluds->InitializeAlphaElements(sweep_ordering);
-          primary_fluds->InitializeBetaElements(sweep_ordering);
+//          chi::log.Log0Verbose1()
+//            << "Initializing FLUDS for omega="
+//            << sweep_ordering->omega.PrintS()
+//            << "         Process memory = "
+//            << std::setprecision(3)
+//            <<chi_objects::ChiConsole::GetMemoryUsageInMB() << " MB.";
+//
+//          primary_fluds->InitializeAlphaElements(sweep_ordering);
+//          primary_fluds->InitializeBetaElements(sweep_ordering);
 
           fluds = primary_fluds;
         } else

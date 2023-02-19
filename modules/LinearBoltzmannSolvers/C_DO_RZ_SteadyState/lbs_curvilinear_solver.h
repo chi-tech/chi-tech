@@ -19,6 +19,7 @@ private:
   /** Discretisation pointer to matrices of the secondary cell view
    *  (matrices of the primary cell view forwarded to the base class). */
   std::shared_ptr<chi_math::SpatialDiscretization> discretization_secondary_;
+  std::vector<lbs::UnitCellMatrices> secondary_unit_cell_matrices_;
 
 //  Methods
 public:
@@ -33,8 +34,11 @@ public:
   , discretization_secondary_()
   {}
 
+protected:
   void PerformInputChecks() override;
   void InitializeSpatialDiscretization() override;
+  void ComputeSecondaryUnitIntegrals();
+
 private:
   std::shared_ptr<SweepChunk> SetSweepChunk(lbs::LBSGroupset& groupset) override;
 };
