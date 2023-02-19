@@ -10,10 +10,10 @@
 /**Transient solver timestep routine.*/
 void lbs::DiscOrdTransientSolver::Step()
 {
-  if (transient_options.verbosity_level >= 2)
-    chi::log.Log() << TextName() << " Stepping with dt " << dt;
+  if (transient_options_.verbosity_level >= 2)
+    chi::log.Log() << TextName() << " Stepping with dt " << dt_;
 
-  phi_old_local_ = phi_prev_local;
+  phi_old_local_ = phi_prev_local_;
 
   for (auto& groupset : groupsets_)
   {
@@ -53,7 +53,7 @@ void lbs::DiscOrdTransientSolver::Step()
     const double inv_theta = 1.0/theta;
 
     auto& phi = phi_new_local_;
-    const auto& phi_prev = phi_prev_local;
+    const auto& phi_prev = phi_prev_local_;
     for (size_t i = 0; i < phi.size(); ++i)
       phi[i] = inv_theta*(phi[i] + (theta-1.0) * phi_prev[i]);
 
@@ -64,10 +64,10 @@ void lbs::DiscOrdTransientSolver::Step()
   const double FR_new = ComputeFissionProduction(phi_new_local_);
 
   //============================================= Print end of timestep
-  if (transient_options.verbosity_level >= 1)
+  if (transient_options_.verbosity_level >= 1)
   {
     char buff[200];
-    snprintf(buff,200, " dt=%.1e time=%10.4g FR=%12.6g", dt, time + dt, FR_new);
+    snprintf(buff, 200, " dt=%.1e time=%10.4g FR=%12.6g", dt_, time_ + dt_, FR_new);
     chi::log.Log() << TextName() << buff;
   }
 

@@ -86,7 +86,7 @@ int chiLBTSSetProperty(lua_State* L)
 
     const double dt_input = lua_tonumber(L, 3);
 
-    solver.dt = dt_input;
+    solver.dt_ = dt_input;
 
     chi::log.Log() << solver.TextName() << ": dt set to "
                    << std::to_string(dt_input);
@@ -99,7 +99,7 @@ int chiLBTSSetProperty(lua_State* L)
 
     const double t_input = lua_tonumber(L, 3);
 
-    solver.time = t_input;
+    solver.time_ = t_input;
 
     chi::log.Log() << solver.TextName() << ": time set to "
                    << std::to_string(t_input);
@@ -112,7 +112,7 @@ int chiLBTSSetProperty(lua_State* L)
 
     const double t_input = lua_tonumber(L, 3);
 
-    solver.transient_options.t_final = t_input;
+    solver.transient_options_.t_final = t_input;
 
     chi::log.Log() << solver.TextName() << ": t_final set to "
                    << std::to_string(t_input);
@@ -125,7 +125,7 @@ int chiLBTSSetProperty(lua_State* L)
 
     const int t_input = lua_tointeger(L, 3);
 
-    solver.transient_options.max_time_steps = t_input;
+    solver.transient_options_.max_time_steps = t_input;
 
     chi::log.Log() << solver.TextName() << ": max_time_steps set to "
                    << std::to_string(t_input);
@@ -138,7 +138,7 @@ int chiLBTSSetProperty(lua_State* L)
 
     const bool inhibit_advance = lua_toboolean(L, 3);
 
-    solver.transient_options.inhibit_advance = inhibit_advance;
+    solver.transient_options_.inhibit_advance = inhibit_advance;
 
     chi::log.Log() << solver.TextName() << ": inhibit_advance set to "
                    << std::to_string(inhibit_advance);
@@ -151,7 +151,7 @@ int chiLBTSSetProperty(lua_State* L)
 
     const int verbosity_level = lua_tointeger(L, 3);
 
-    solver.transient_options.verbosity_level = verbosity_level;
+    solver.transient_options_.verbosity_level = verbosity_level;
 
     chi::log.Log() << solver.TextName() << ": verbosity_level set to "
                    << std::to_string(verbosity_level);
@@ -183,7 +183,7 @@ int chiLBTSSetProperty(lua_State* L)
 
     const std::string cbfname = lua_tostring(L, 3);
 
-    solver.transient_options.console_call_back_function = cbfname;
+    solver.transient_options_.console_call_back_function = cbfname;
     chi::log.Log() << solver.TextName() << ": console_call_back_function set to "
                    << cbfname;
   }
@@ -194,7 +194,7 @@ int chiLBTSSetProperty(lua_State* L)
     LuaCheckNilValue(fname, L, 3);
 
     const bool scale_fission_xs = lua_toboolean(L, 3);
-    solver.transient_options.scale_fission_xs = scale_fission_xs;
+    solver.transient_options_.scale_fission_xs = scale_fission_xs;
 
     chi::log.Log() << solver.TextName() << ": scale_fission_xs set to "
                    << std::to_string(scale_fission_xs);
@@ -208,13 +208,13 @@ int chiLBTSSetProperty(lua_State* L)
     const std::string option = lua_tostring(L, 3);
 
     if (option == "TOTAL_POWER")
-      solver.transient_options.normalization_method =
+      solver.transient_options_.normalization_method =
           lbs::DiscOrdTransientSolver::NormalizationMethod::TOTAL_POWER;
     else if (option == "POWER_DENSITY")
-      solver.transient_options.normalization_method =
+      solver.transient_options_.normalization_method =
           lbs::DiscOrdTransientSolver::NormalizationMethod::POWER_DENSITY;
     else if (option == "NONE")
-      solver.transient_options.normalization_method =
+      solver.transient_options_.normalization_method =
           lbs::DiscOrdTransientSolver::NormalizationMethod::NONE;
     else
       throw std::invalid_argument(

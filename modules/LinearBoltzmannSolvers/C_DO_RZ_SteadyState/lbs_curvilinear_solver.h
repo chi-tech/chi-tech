@@ -15,10 +15,10 @@ class DiscOrdSteadyStateSolver : public lbs::DiscOrdSteadyStateSolver
 //  Attributes
 private:
   /** Coordinate system type. */
-  chi_math::CoordinateSystemType coord_system_type;
+  chi_math::CoordinateSystemType coord_system_type_;
   /** Discretisation pointer to matrices of the secondary cell view
    *  (matrices of the primary cell view forwarded to the base class). */
-  std::shared_ptr<chi_math::SpatialDiscretization> discretization_secondary;
+  std::shared_ptr<chi_math::SpatialDiscretization> discretization_secondary_;
 
 //  Methods
 public:
@@ -29,8 +29,8 @@ public:
   DiscOrdSteadyStateSolver(const chi_math::CoordinateSystemType& coord_system_type,
                            const std::string& in_text_name)
   : lbs::DiscOrdSteadyStateSolver(in_text_name)
-  , coord_system_type(coord_system_type)
-  , discretization_secondary()
+  , coord_system_type_(coord_system_type)
+  , discretization_secondary_()
   {}
 
   void PerformInputChecks() override;

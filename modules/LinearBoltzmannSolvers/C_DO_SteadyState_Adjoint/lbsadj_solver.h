@@ -16,14 +16,14 @@ namespace lbs
 class DiscOrdSteadyStateAdjointSolver : public lbs::DiscOrdSteadyStateSolver
 {
 protected:
-  std::map<int, std::vector<chi_math::SparseMatrix>> matid_to_S_transpose;
+  std::map<int, std::vector<chi_math::SparseMatrix>> matid_to_S_transpose_;
 
   typedef std::vector<size_t> VecSize_t;
   typedef std::pair<ResponseFunctionDesignation,VecSize_t> RespFuncAndSubs;
-  std::vector<RespFuncAndSubs> response_functions;
+  std::vector<RespFuncAndSubs> response_functions_;
 
 public:
-  std::vector<std::vector<double>> m_moment_buffers;
+  std::vector<std::vector<double>> m_moment_buffers_;
 
 public:
   DiscOrdSteadyStateAdjointSolver (const DiscOrdSteadyStateAdjointSolver&) = delete;

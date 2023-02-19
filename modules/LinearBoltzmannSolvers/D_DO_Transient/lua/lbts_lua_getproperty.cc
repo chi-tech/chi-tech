@@ -56,22 +56,22 @@ int chiLBTSGetProperty(lua_State* L)
 
   if (property == "TIMESTEP")
   {
-    lua_pushnumber(L, solver.dt);
+    lua_pushnumber(L, solver.dt_);
     return 1;
   }
   else if (property == "TIMESTOP")
   {
-    lua_pushnumber(L, solver.transient_options.t_final);
+    lua_pushnumber(L, solver.transient_options_.t_final);
     return 1;
   }
   else if (property == "INHIBIT_ADVANCE")
   {
-    lua_pushboolean(L, solver.transient_options.inhibit_advance);
+    lua_pushboolean(L, solver.transient_options_.inhibit_advance);
     return 1;
   }
   else if (property == "TIME")
   {
-    lua_pushnumber(L, solver.time);
+    lua_pushnumber(L, solver.time_);
     return 1;
   }
   else

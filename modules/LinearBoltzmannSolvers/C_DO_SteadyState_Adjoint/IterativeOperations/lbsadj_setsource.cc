@@ -43,7 +43,7 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
     auto xs     = full_cell_view.XS();
     auto P0_src = matid_to_src_map_[cell.material_id];
 
-    const auto& S = matid_to_S_transpose[cell.material_id];
+    const auto& S = matid_to_S_transpose_[cell.material_id];
 
     //======================================== Loop over nodes
     const int num_nodes = full_cell_view.NumNodes();
@@ -124,7 +124,7 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
 
   //================================================== Apply reference QOI
   if (apply_fixed_src)
-    for (const auto& qoi_data : response_functions)
+    for (const auto& qoi_data : response_functions_)
     {
       const auto& qoi_designation = qoi_data.first;
       const auto& qoi_cell_subscription = qoi_data.second;

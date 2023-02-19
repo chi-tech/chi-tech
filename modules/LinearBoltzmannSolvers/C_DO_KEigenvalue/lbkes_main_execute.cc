@@ -13,7 +13,7 @@ void lbs::DiscOrdKEigenvalueSolver::Execute()
   if (options_.use_precursors)
   {
     ComputePrecursors();
-    for (auto& v : precursor_new_local_) v /= k_eff;
+    for (auto& v : precursor_new_local_) v /= k_eff_;
   }
 
   UpdateFieldFunctions();

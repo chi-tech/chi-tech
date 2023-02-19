@@ -8,21 +8,21 @@ void lbs::DiscOrdTransientSolver::Execute()
 {
   chi::log.Log() << "Executing " << TextName() << ".";
 
-  const int max_num_steps = transient_options.max_time_steps;
-  const double max_time = transient_options.t_final;
+  const int max_num_steps = transient_options_.max_time_steps;
+  const double max_time = transient_options_.t_final;
   int step_number = 0;
   while (((max_num_steps > 0 and step_number < max_num_steps) or
-         (max_num_steps < 0)) and (time < max_time))
+         (max_num_steps < 0)) and (time_ < max_time))
   {
     Step();
 
     PostStepCallBackFunction();
 
-    if (not transient_options.inhibit_advance)
+    if (not transient_options_.inhibit_advance)
     {
       AdvanceTimeValues(); //new copied to prev + time+=dt
       ++step_number;
-      transient_options.inhibit_advance = false;
+      transient_options_.inhibit_advance = false;
     }
   }
 

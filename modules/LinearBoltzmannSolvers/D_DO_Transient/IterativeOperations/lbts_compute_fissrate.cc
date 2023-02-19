@@ -19,7 +19,7 @@ double DiscOrdTransientSolver::ComputeFissionRate(const bool previous)
   const int first_grp = groups_.front().id;
   const int last_grp = groups_.back().id;
 
-  const auto& phi = (previous)? phi_prev_local : phi_new_local_;
+  const auto& phi = (previous) ? phi_prev_local_ : phi_new_local_;
 
   //============================================= Loop over local cells
   double local_production = 0.0;

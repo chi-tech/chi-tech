@@ -52,11 +52,11 @@ int chiLBKESSetProperty(lua_State *L)
           << "Must be greater than 0.";
       chi::Exit(EXIT_FAILURE);
     }
-    solver.max_iterations = static_cast<size_t>(max_iters);
+    solver.max_iterations_ = static_cast<size_t>(max_iters);
 
     chi::log.Log()
-        << "LinearBoltzmann::KEigenvalueSolver: "
-        << "max_iterations set to " << solver.max_iterations << ".";
+      << "LinearBoltzmann::KEigenvalueSolver: "
+      << "max_iterations set to " << solver.max_iterations_ << ".";
   }
 
   else if (property == "TOLERANCE")
@@ -71,7 +71,7 @@ int chiLBKESSetProperty(lua_State *L)
           << "Must be in the range (0.0, 1.0].";
       chi::Exit(EXIT_FAILURE);
     }
-    solver.tolerance = tol;
+    solver.tolerance_ = tol;
 
     char buff[100];
     snprintf(buff,100, "%.4e", tol);

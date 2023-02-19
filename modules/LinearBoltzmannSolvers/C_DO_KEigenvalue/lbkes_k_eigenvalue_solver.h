@@ -15,11 +15,11 @@ class DiscOrdKEigenvalueSolver : public lbs::DiscOrdSteadyStateSolver
 {
 public:
   /**The current k-eigenvalue estimate.*/
-  double k_eff = 1.0;
+  double k_eff_ = 1.0;
 
   /**Iterative parameters.*/
-  size_t max_iterations = 1000;
-  double tolerance = 1.0e-8;
+  size_t max_iterations_ = 1000;
+  double tolerance_ = 1.0e-8;
 
 public:
   DiscOrdKEigenvalueSolver (const DiscOrdKEigenvalueSolver&) = delete;

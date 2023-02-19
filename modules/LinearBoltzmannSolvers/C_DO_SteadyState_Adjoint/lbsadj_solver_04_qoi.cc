@@ -18,7 +18,7 @@ size_t lbs::DiscOrdSteadyStateAdjointSolver::
   // Make empty subscriber list (will be populated during initialize)
   std::vector<size_t> cell_rf_subscriptions;
 
-  response_functions.emplace_back(qoi_designation, cell_rf_subscriptions);
+  response_functions_.emplace_back(qoi_designation, cell_rf_subscriptions);
 
-  return response_functions.size() - 1;
+  return response_functions_.size() - 1;
 }

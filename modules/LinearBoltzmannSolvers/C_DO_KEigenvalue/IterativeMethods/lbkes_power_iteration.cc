@@ -24,7 +24,7 @@ void DiscOrdKEigenvalueSolver::PowerIteration()
   phi_old_local_.assign(phi_old_local_.size(), 1.0);
 
   double F_prev = 1.0;
-  k_eff = 1.0;
+  k_eff_ = 1.0;
   double k_eff_prev = 1.0;
   double k_eff_change = 1.0;
 
@@ -32,10 +32,10 @@ void DiscOrdKEigenvalueSolver::PowerIteration()
   primary_ags_solver_->SetVerbosity(options_.verbose_outer_iterations);
   int nit = 0;
   bool converged = false;
-  while (nit < max_iterations)
+  while (nit < max_iterations_)
   {
     // Divide phi_old by k_eff (phi_old gives better init-quess for GMRES)
-    for (auto& phi : phi_old_local_) phi /= k_eff;
+    for (auto& phi : phi_old_local_) phi /= k_eff_;
 
     q_moments_local_.assign(q_moments_local_.size(), 0.0);
     for (auto& groupset : groupsets_)
@@ -49,16 +49,16 @@ void DiscOrdKEigenvalueSolver::PowerIteration()
 
     //======================================== Recompute k-eigenvalue
     double F_new = ComputeFissionProduction(phi_new_local_);
-    k_eff = F_new / F_prev * k_eff;
-    double reactivity = (k_eff - 1.0) / k_eff;
+    k_eff_ = F_new / F_prev * k_eff_;
+    double reactivity = (k_eff_ - 1.0) / k_eff_;
 
     //======================================== Check convergence, bookkeeping
-    k_eff_change = fabs(k_eff - k_eff_prev) / k_eff;
-    k_eff_prev = k_eff;
+    k_eff_change = fabs(k_eff_ - k_eff_prev) / k_eff_;
+    k_eff_prev = k_eff_;
     F_prev = F_new;
     nit += 1;
 
-    if (k_eff_change < std::max(tolerance, 1.0e-12))
+    if (k_eff_change < std::max(tolerance_, 1.0e-12))
       converged = true;
 
     //======================================== Print iteration summary
@@ -66,9 +66,9 @@ void DiscOrdKEigenvalueSolver::PowerIteration()
     {
       std::stringstream k_iter_info;
       k_iter_info
-          << chi::program_timer.GetTimeString() << " "
-          << "  Iteration " << std::setw(5) << nit
-          << "  k_eff " << std::setw(11) << std::setprecision(7) << k_eff
+        << chi::program_timer.GetTimeString() << " "
+        << "  Iteration " << std::setw(5) << nit
+        << "  k_eff " << std::setw(11) << std::setprecision(7) << k_eff_
           << "  k_eff change " << std::setw(12) << k_eff_change
           << "  reactivity " << std::setw(10) << reactivity * 1e5;
       if (converged) k_iter_info << " CONVERGED\n";
@@ -82,8 +82,8 @@ void DiscOrdKEigenvalueSolver::PowerIteration()
   //================================================== Print summary
   chi::log.Log() << "\n";
   chi::log.Log()
-      << "        Final k-eigenvalue    :        "
-      << std::setprecision(7) << k_eff;
+    << "        Final k-eigenvalue    :        "
+    << std::setprecision(7) << k_eff_;
   chi::log.Log()
       << "        Final change          :        "
       << std::setprecision(6) << k_eff_change;

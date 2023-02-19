@@ -12,7 +12,7 @@ void lbs::DiscOrdTransientSolver::StepPrecursors()
   else if (method == CrankNicolson) theta = 0.5;
   else                              theta = 0.7;
 
-  const double eff_dt = theta*dt;
+  const double eff_dt = theta * dt_;
 
   //============================================= Clear destination vector
   precursor_new_local_.assign(precursor_new_local_.size(), 0.0);
@@ -51,7 +51,7 @@ void lbs::DiscOrdTransientSolver::StepPrecursors()
       const double coeff = 1.0 / (1.0 + eff_dt * precursor.decay_constant);
 
       //contribute last time step precursors
-      precursor_new_local_[dof_map] = coeff * precursor_prev_local[dof_map];
+      precursor_new_local_[dof_map] = coeff * precursor_prev_local_[dof_map];
 
       //contribute delayed fission production
       precursor_new_local_[dof_map] +=
@@ -62,7 +62,7 @@ void lbs::DiscOrdTransientSolver::StepPrecursors()
   //======================================== Compute t^{n+1} value
   {
     auto& Cj = precursor_new_local_;
-    const auto& Cj_prev = precursor_prev_local;
+    const auto& Cj_prev = precursor_prev_local_;
 
     const double inv_theta = 1.0/theta;
     for (size_t i = 0; i < Cj.size(); ++i)

@@ -24,9 +24,9 @@ std::shared_ptr<SweepChunk> lbs::DiscOrdTransientSolver::
     phi_new_local_,                           //Destination phi
     psi_new_local_[groupset.id],              //Destination psi
 
-    psi_prev_local[groupset.id],
+    psi_prev_local_[groupset.id],
     theta,
-    dt,
+    dt_,
 
     q_moments_local_,                         //Source moments
     groupset,                                //Reference groupset

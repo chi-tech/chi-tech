@@ -35,11 +35,11 @@ void lbs::DiscOrdSteadyStateAdjointSolver::Initialize()
       S_transpose.push_back(std::move(S_ell_transpose));
     }//for each S
 
-    matid_to_S_transpose[matid] = std::move(S_transpose);
+    matid_to_S_transpose_[matid] = std::move(S_transpose);
   }//for each mat
 
   //============================================= Initialize QOIs
-  for (auto& qoi_pair : response_functions)
+  for (auto& qoi_pair : response_functions_)
   {
     const auto& qoi_designation = qoi_pair.first;
     auto& qoi_cell_subscription = qoi_pair.second;

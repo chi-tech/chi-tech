@@ -33,7 +33,7 @@ void lbs::DiscOrdTransientSolver::
   else if (method == CrankNicolson) theta = 0.5;
   else                              theta = 0.7;
 
-  const double eff_dt = theta * dt;
+  const double eff_dt = theta * dt_;
 
   const bool apply_fixed_src       = (source_flags & APPLY_FIXED_SOURCES);
   const bool apply_wgs_scatter_src = (source_flags & APPLY_WGS_SCATTER_SOURCES);
@@ -177,7 +177,7 @@ void lbs::DiscOrdTransientSolver::
                   precursor.decay_constant /
                   (1.0 + eff_dt * precursor.decay_constant);
 
-              rhs += coeff * precursor_prev_local[dof_map + j];
+              rhs += coeff * precursor_prev_local_[dof_map + j];
             }
           }
 

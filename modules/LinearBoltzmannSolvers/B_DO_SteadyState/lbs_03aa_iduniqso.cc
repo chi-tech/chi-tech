@@ -7,25 +7,25 @@
 
 #include "ChiMath/Quadratures/angular_product_quadrature.h"
 
-#define POLAR_ILLEGAL_GEOTYPE fname + \
+#define POLAR_ILLEGAL_GEOTYPE (fname + \
   ": The simulation is using polar angle aggregation for which only " \
   "certain geometry types are supported, i.e., ORTHOGONAL, DIMENSION_2 " \
-  "or 3D EXTRUDED."
+  "or 3D EXTRUDED.")
 
-#define POLAR_ONLY_PRODUCT fname + \
+#define POLAR_ONLY_PRODUCT (fname + \
   ": The simulation is using polar angle aggregation for which only " \
-  "Product-type quadratures are supported."
+  "Product-type quadratures are supported.")
 
-#define PRODUCT_QUAD_CASTING_FAILED fname + \
-  ": Casting the angular quadrature to the product quadrature base, failed."
+#define PRODUCT_QUAD_CASTING_FAILED (fname + \
+  ": Casting the angular quadrature to the product quadrature base, failed.")
 
-#define AZIMUTHAL_ILLEGAL_GEOTYPE fname + \
+#define AZIMUTHAL_ILLEGAL_GEOTYPE (fname + \
   ": The simulation is using azimuthal angle aggregation for which only " \
-  "ONED_SPHERICAL or TWOD_CYLINDRICAL derived geometry types are supported."
+  "ONED_SPHERICAL or TWOD_CYLINDRICAL derived geometry types are supported.")
 
-#define AZIMUTHAL_ONLY_PRODUCT fname + \
+#define AZIMUTHAL_ONLY_PRODUCT (fname + \
   ": The simulation is using azimuthal angle aggregation for which only " \
-  "Product-type quadratures are supported."
+  "Product-type quadratures are supported.")
 
 #define LogicCheck(condition, message) \
 if ((condition)) \

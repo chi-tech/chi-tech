@@ -37,20 +37,20 @@ public:
 
     bool scale_fission_xs = false;
     NormalizationMethod normalization_method = NormalizationMethod::TOTAL_POWER;
-  }transient_options;
+  }transient_options_;
 
   /**Temporal domain and discretization information.*/
-  double dt = 2.0e-3;
-  double time = 0.0;
+  double dt_ = 2.0e-3;
+  double time_ = 0.0;
 
 protected:
   /**Previous time step vectors.*/
-  std::vector<double> phi_prev_local;
-  std::vector<double> precursor_prev_local;
-  std::vector<std::vector<double>> psi_prev_local;
+  std::vector<double> phi_prev_local_;
+  std::vector<double> precursor_prev_local_;
+  std::vector<std::vector<double>> psi_prev_local_;
 
   /**Fission rate vector*/
-  std::vector<double> fission_rate_local;
+  std::vector<double> fission_rate_local_;
 
 public:
   explicit DiscOrdTransientSolver(const std::string& in_text_name);

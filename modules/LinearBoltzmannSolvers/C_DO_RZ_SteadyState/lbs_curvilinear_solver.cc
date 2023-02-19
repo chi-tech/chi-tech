@@ -31,13 +31,13 @@ lbs_curvilinear::DiscOrdSteadyStateSolver::PerformInputChecks()
   //  --------------------------------------------------------------------------
 
   //  coordinate system must be curvilinear
-  if (coord_system_type != chi_math::CoordinateSystemType::CYLINDRICAL &&
-      coord_system_type != chi_math::CoordinateSystemType::SPHERICAL)
+  if (coord_system_type_ != chi_math::CoordinateSystemType::CYLINDRICAL &&
+      coord_system_type_ != chi_math::CoordinateSystemType::SPHERICAL)
   {
     chi::log.LogAllError()
       << "C_DO_RZ_SteadyState::SteadyStateSolver::PerformInputChecks : "
       << "invalid coordinate system, static_cast<int>(type) = "
-      << static_cast<int>(coord_system_type);
+      << static_cast<int>(coord_system_type_);
     chi::Exit(EXIT_FAILURE);
   }
 
@@ -46,7 +46,7 @@ lbs_curvilinear::DiscOrdSteadyStateSolver::PerformInputChecks()
   {
     case lbs::GeometryType::ONED_SLAB:
     {
-      switch (coord_system_type)
+      switch (coord_system_type_)
       {
         default:
         {
@@ -55,7 +55,7 @@ lbs_curvilinear::DiscOrdSteadyStateSolver::PerformInputChecks()
             << "invalid geometry, static_cast<int>(type) = "
             << static_cast<int>(options_.geometry_type) << " "
             << "for curvilinear coordinate system, static_cast<int>(type) = "
-            << static_cast<int>(coord_system_type);
+            << static_cast<int>(coord_system_type_);
           chi::Exit(EXIT_FAILURE);
         }
       }
@@ -63,7 +63,7 @@ lbs_curvilinear::DiscOrdSteadyStateSolver::PerformInputChecks()
     }
     case lbs::GeometryType::TWOD_CARTESIAN:
     {
-      switch (coord_system_type)
+      switch (coord_system_type_)
       {
         case chi_math::CoordinateSystemType::CYLINDRICAL:
         {
@@ -77,7 +77,7 @@ lbs_curvilinear::DiscOrdSteadyStateSolver::PerformInputChecks()
             << "invalid geometry, static_cast<int>(type) = "
             << static_cast<int>(options_.geometry_type) << " "
             << "for curvilinear coordinate system, static_cast<int>(type) = "
-            << static_cast<int>(coord_system_type);
+            << static_cast<int>(coord_system_type_);
           chi::Exit(EXIT_FAILURE);
         }
       }
@@ -98,7 +98,7 @@ lbs_curvilinear::DiscOrdSteadyStateSolver::PerformInputChecks()
   {
     //  angular quadrature type must be compatible with coordinate system
     const auto angular_quad_ptr = groupsets_[gs].quadrature;
-    switch (coord_system_type)
+    switch (coord_system_type_)
     {
       case chi_math::CoordinateSystemType::CYLINDRICAL:
       {
@@ -137,14 +137,14 @@ lbs_curvilinear::DiscOrdSteadyStateSolver::PerformInputChecks()
         chi::log.LogAllError()
           << "C_DO_RZ_SteadyState::SteadyStateSolver::PerformInputChecks : "
           << "invalid curvilinear coordinate system, static_cast<int>(type) = "
-          << static_cast<int>(coord_system_type);
+          << static_cast<int>(coord_system_type_);
         chi::Exit(EXIT_FAILURE);
       }
     }
 
     //  angle aggregation type must be compatible with coordinate system
     const auto angleagg_method = groupsets_[gs].angleagg_method;
-    switch (coord_system_type)
+    switch (coord_system_type_)
     {
       case chi_math::CoordinateSystemType::CYLINDRICAL:
       {
@@ -177,7 +177,7 @@ lbs_curvilinear::DiscOrdSteadyStateSolver::PerformInputChecks()
         chi::log.LogAllError()
           << "C_DO_RZ_SteadyState::SteadyStateSolver::PerformInputChecks : "
           << "invalid curvilinear coordinate system, static_cast<int>(type) = "
-          << static_cast<int>(coord_system_type);
+          << static_cast<int>(coord_system_type_);
         chi::Exit(EXIT_FAILURE);
       }
     }
@@ -309,7 +309,7 @@ lbs_curvilinear::DiscOrdSteadyStateSolver::InitializeSpatialDiscretization()
     }
   }
 
-  discretization_secondary = SDM_PWLD::New(grid_ptr_, setup_flags, qorder, system);
+  discretization_secondary_ = SDM_PWLD::New(grid_ptr_, setup_flags, qorder, system);
 
 
   MPI_Barrier(MPI_COMM_WORLD);
@@ -326,7 +326,7 @@ lbs_curvilinear::DiscOrdSteadyStateSolver::SetSweepChunk(lbs::LBSGroupset& group
   auto pwld_sdm_primary =
     std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization_);
   auto pwld_sdm_secondary =
-    std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization_secondary);
+    std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization_secondary_);
 
    auto sweep_chunk =
      std::make_shared<SweepChunkPWL>(grid_ptr_,

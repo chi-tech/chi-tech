@@ -10,10 +10,10 @@ void lbs::DiscOrdTransientSolver::PostStepCallBackFunction() const
 {
   const std::string fname = "lbs::TransientSolver::PostStepCallBackFunction";
 
-  if (transient_options.console_call_back_function.empty()) return;
+  if (transient_options_.console_call_back_function.empty()) return;
 
   auto& L = chi::console.consoleState;
-  const auto& lua_func_name = transient_options.console_call_back_function;
+  const auto& lua_func_name = transient_options_.console_call_back_function;
 
   //============= Load lua function
   lua_getglobal(L, lua_func_name.c_str());

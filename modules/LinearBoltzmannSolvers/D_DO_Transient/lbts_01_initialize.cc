@@ -23,12 +23,12 @@ void lbs::DiscOrdTransientSolver::Initialize()
   //       cross sections despite that not being intended.
   // NOTE: A potentially better way to handle this is to develop a
   //       flagging mechanism to tag materials for fission scaling.
-  if (transient_options.scale_fission_xs)
+  if (transient_options_.scale_fission_xs)
     for (const auto& xs : chi::trnsprt_xs_stack)
       if (!xs->is_fission_scaled)
-        xs->ScaleFissionData(k_eff);
+        xs->ScaleFissionData(k_eff_);
 
-  if (transient_options.verbosity_level >= 1)
+  if (transient_options_.verbosity_level >= 1)
   {
     const double FR = ComputeFissionRate(false);
     char buff[200];
@@ -37,17 +37,17 @@ void lbs::DiscOrdTransientSolver::Initialize()
   }
 
   //======================================== Compute auxiliary vectors
-  fission_rate_local.resize(grid_ptr_->local_cells.size(), 0.0);
-  phi_prev_local = phi_old_local_;
-  precursor_prev_local = precursor_new_local_;
-  psi_prev_local = psi_new_local_;
+  fission_rate_local_.resize(grid_ptr_->local_cells.size(), 0.0);
+  phi_prev_local_ = phi_old_local_;
+  precursor_prev_local_ = precursor_new_local_;
+  psi_prev_local_ = psi_new_local_;
 
-  if (transient_options.verbosity_level >= 0)
+  if (transient_options_.verbosity_level >= 0)
   {
     const double beta = ComputeBeta();
     char buff[200];
     snprintf(buff,200, " Beta=%.2f [pcm] reactivity=%.3f [$]",
-            beta*1e5, (1.0-1.0/k_eff)/beta);
+            beta*1e5, (1.0- 1.0 / k_eff_) / beta);
     chi::log.Log() << TextName() << buff;
   }
 
