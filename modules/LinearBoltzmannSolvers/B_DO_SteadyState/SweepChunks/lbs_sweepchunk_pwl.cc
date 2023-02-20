@@ -87,7 +87,7 @@ Sweep(chi_mesh::sweep_management::AngleSet *angle_set)
     a_and_b_initialized = true;
   }
 
-  const auto spds = angle_set->GetSPDS();
+  const auto& spds = angle_set->GetSPDS();
   const auto fluds = angle_set->fluds;
   const bool surface_source_active = IsSurfaceSourceActive();
   std::vector<double>& output_phi = GetDestinationPhi();
@@ -108,10 +108,10 @@ Sweep(chi_mesh::sweep_management::AngleSet *angle_set)
   typedef const int64_t cint64_t;
 
   // ========================================================== Loop over each cell
-  size_t num_loc_cells = spds->spls.item_id.size();
+  size_t num_loc_cells = spds.spls.item_id.size();
   for (size_t spls_index = 0; spls_index < num_loc_cells; ++spls_index)
   {
-    const int cell_local_id = spds->spls.item_id[spls_index];
+    const int cell_local_id = spds.spls.item_id[spls_index];
     const auto& cell = grid_view->local_cells[cell_local_id];
     const auto num_faces = cell.faces.size();
     const auto& cell_mapping = grid_fe_view.GetCellMapping(cell);

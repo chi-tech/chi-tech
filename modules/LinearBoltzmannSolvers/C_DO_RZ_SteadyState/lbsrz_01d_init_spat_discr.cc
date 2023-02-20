@@ -14,9 +14,7 @@ void lbs_curvilinear::DiscOrdSteadyStateSolver::
 {
   chi::log.Log() << "Initializing spatial discretization_.\n";
 
-  const auto setup_flags =
-    chi_math::finite_element::COMPUTE_CELL_MAPPINGS |
-    chi_math::finite_element::COMPUTE_UNIT_INTEGRALS;
+  const auto setup_flags = chi_math::finite_element::NO_FLAGS_SET;
   auto qorder = chi_math::QuadratureOrder::INVALID_ORDER;
   auto system = chi_math::CoordinateSystemType::UNDEFINED;
 

@@ -12,14 +12,14 @@ typedef std::vector<std::pair<int,short>> LockBox;
 //###################################################################
 /**Populates a flux data structure.*/
 void chi_mesh::sweep_management::PRIMARY_FLUDS::
-InitializeAlphaElements(SPDS_ptr spds)
+InitializeAlphaElements(const SPDS& spds)
 {
-  chi_mesh::MeshContinuumPtr         grid = spds->grid;
-  chi_mesh::sweep_management::SPLS& spls = spds->spls;
+  chi_mesh::MeshContinuum& grid = *spds.grid;
+  const chi_mesh::sweep_management::SPLS& spls = spds.spls;
 
   //================================================== Initialize face
   //                                                   categorization
-  num_face_categories = grid->NumberOfFaceHistogramBins();
+  num_face_categories = grid.NumberOfFaceHistogramBins();
   local_psi_stride.resize(num_face_categories,0);
   local_psi_max_elements.resize(num_face_categories,0);
   local_psi_n_block_stride.resize(num_face_categories, 0);
@@ -27,7 +27,7 @@ InitializeAlphaElements(SPDS_ptr spds)
 
   //================================================== Initialize dependent
   //                                                   locations
-  size_t num_of_deplocs = spds->location_successors.size();
+  size_t num_of_deplocs = spds.location_successors.size();
   deplocI_face_dof_count.resize(num_of_deplocs,0);
   deplocI_cell_views.resize(num_of_deplocs);
 
@@ -38,7 +38,7 @@ InitializeAlphaElements(SPDS_ptr spds)
 
   // Given a local cell index, gives the so index
   std::vector<int>  local_so_cell_mapping;
-  local_so_cell_mapping.resize(grid->local_cell_glob_indices.size(),0);
+  local_so_cell_mapping.resize(grid.local_cell_glob_indices.size(),0);
 
   largest_face = 0; // Will contain the max dofs per face
   std::vector<LockBox> lock_boxes(num_face_categories); //cell,face index pairs
@@ -52,9 +52,9 @@ InitializeAlphaElements(SPDS_ptr spds)
   for (int csoi=0; csoi<spls.item_id.size(); csoi++)
   {
     int cell_local_id = spls.item_id[csoi];
-    auto cell = &grid->local_cells[cell_local_id];
+    const auto& cell = grid.local_cells[cell_local_id];
 
-    local_so_cell_mapping[cell->local_id] = csoi; //Set mapping
+    local_so_cell_mapping[cell.local_id] = csoi; //Set mapping
 
     SlotDynamics(cell,
                  spds,
@@ -82,7 +82,7 @@ InitializeAlphaElements(SPDS_ptr spds)
   for (int csoi=0; csoi<spls.item_id.size(); csoi++)
   {
     int cell_local_id = spls.item_id[csoi];
-    auto cell = &grid->local_cells[cell_local_id];
+    const auto& cell = grid.local_cells[cell_local_id];
 
     LocalIncidentMapping(cell, spds, local_so_cell_mapping);
 
@@ -90,7 +90,7 @@ InitializeAlphaElements(SPDS_ptr spds)
 
   for (size_t fc=0; fc<num_face_categories; ++fc)
   {
-    local_psi_stride[fc] = grid->GetFaceHistogramBinDOFSize(fc);
+    local_psi_stride[fc] = grid.GetFaceHistogramBinDOFSize(fc);
     local_psi_max_elements[fc]     = lock_boxes[fc].size();
     local_psi_n_block_stride[fc]  = local_psi_stride[fc] * lock_boxes[fc].size();
     local_psi_Gn_block_strideG[fc] = local_psi_n_block_stride[fc] * G;

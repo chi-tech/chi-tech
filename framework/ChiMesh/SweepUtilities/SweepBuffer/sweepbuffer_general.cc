@@ -50,7 +50,7 @@ void chi_mesh::sweep_management::SweepBuffer::
   const auto& spds =  angleset->GetSPDS();
 
   done_sending = true;
-  for (size_t deplocI=0; deplocI<spds->location_successors.size(); deplocI++)
+  for (size_t deplocI=0; deplocI<spds.location_successors.size(); deplocI++)
   {
     int num_mess = deplocI_message_count[deplocI];
     for (int m=0; m<num_mess; m++)
@@ -65,7 +65,7 @@ void chi_mesh::sweep_management::SweepBuffer::
 
   if (done_sending)
   {
-    for (size_t deplocI=0; deplocI<spds->location_successors.size(); deplocI++)
+    for (size_t deplocI=0; deplocI<spds.location_successors.size(); deplocI++)
     {
       angleset->deplocI_outgoing_psi[deplocI].clear();
       angleset->deplocI_outgoing_psi[deplocI].shrink_to_fit();

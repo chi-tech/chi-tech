@@ -10,13 +10,13 @@
 void chi_mesh::sweep_management::SweepBuffer::
   InitializeDelayedUpstreamData()
 {
-  auto  spds =  angleset->GetSPDS();
+  const auto& spds = angleset->GetSPDS();
   auto fluds=  angleset->fluds;
 
   const auto num_grps   = angleset->GetNumGrps();
   const auto num_angles = angleset->angles.size();
 
-  const auto num_loc_deps = spds->delayed_location_dependencies.size();
+  const auto num_loc_deps = spds.delayed_location_dependencies.size();
 
   angleset->delayed_prelocI_outgoing_psi.clear();
   angleset->delayed_prelocI_outgoing_psi.resize(

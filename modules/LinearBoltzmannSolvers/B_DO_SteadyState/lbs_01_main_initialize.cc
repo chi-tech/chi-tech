@@ -20,9 +20,9 @@ void lbs::DiscOrdSteadyStateSolver::Initialize()
 
   //================================================== Initialize groupsets_ for
   //                                                   sweeping
+  InitializeSweepDataStructures();
   for (auto& groupset : groupsets_)
   {
-    ComputeSweepOrderings(groupset);
     InitFluxDataStructures(groupset);
 
     InitWGDSA(groupset);

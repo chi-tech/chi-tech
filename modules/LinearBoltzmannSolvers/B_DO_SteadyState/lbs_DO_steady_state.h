@@ -9,6 +9,20 @@ namespace lbs
 /**A neutral particle transport solver.*/
 class DiscOrdSteadyStateSolver : public LBSSolver
 {
+protected:
+  typedef std::shared_ptr<chi_math::AngularQuadrature> AngQuadPtr;
+  typedef std::shared_ptr<chi_mesh::sweep_management::SPDS> SPDS_ptr;
+  typedef std::vector<SPDS_ptr> SPDS_ptrs;
+  typedef std::pair<UniqueSOGroupings, DirIDToSOMap> SwpOrderGroupingInfo;
+  typedef chi_mesh::sweep_management::PRIMARY_FLUDS FLUDSTemplate;
+  typedef std::shared_ptr<FLUDSTemplate> FLUDSTemplatePtr;
+  typedef std::vector<FLUDSTemplatePtr> FLUDSTemplatePtrs;
+
+  std::map<AngQuadPtr, SwpOrderGroupingInfo> quadrature_unq_so_grouping_map_;
+  std::map<AngQuadPtr, SPDS_ptrs> quadrature_spds_map_;
+  std::map<AngQuadPtr, FLUDSTemplatePtrs> quadrature_fluds_templates_map_;
+
+
  public:
   //00
   explicit DiscOrdSteadyStateSolver(const std::string& in_text_name);
@@ -30,6 +44,7 @@ public:
 
   //03a
 protected:
+  void InitializeSweepDataStructures();
   void ComputeSweepOrderings(LBSGroupset& groupset) const;
   //03aa
   static

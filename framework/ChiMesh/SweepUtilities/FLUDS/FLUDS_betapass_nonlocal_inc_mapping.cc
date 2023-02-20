@@ -8,18 +8,18 @@
 //###################################################################
 /**Performs non-local incident mapping for polyhedron cells.*/
 void chi_mesh::sweep_management::PRIMARY_FLUDS::
-  NonLocalIncidentMapping(chi_mesh::Cell *cell,
-                          SPDS_ptr spds)
+  NonLocalIncidentMapping(const chi_mesh::Cell& cell,
+                          const SPDS& spds)
 {
-  chi_mesh::MeshContinuumPtr         grid = spds->grid;
+  chi_mesh::MeshContinuumPtr         grid = spds.grid;
 
   //=================================================== Loop over faces
   //           INCIDENT                                 but process
   //                                                    only incident faces
-  for (short f=0; f < cell->faces.size(); f++)
+  for (short f=0; f < cell.faces.size(); f++)
   {
-    CellFace&  face = cell->faces[f];
-    double     mu   = face.normal.Dot(spds->omega);
+    const CellFace&  face = cell.faces[f];
+    double     mu         = face.normal.Dot(spds.omega);
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face
     if (mu<(0.0-1.0e-16))
@@ -30,7 +30,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
       {
         //============================== Find prelocI
         int locJ = face.GetNeighborPartitionID(*grid);
-        int prelocI = spds->MapLocJToPrelocI(locJ);
+        int prelocI = spds.MapLocJToPrelocI(locJ);
 
         //###########################################################
         if (prelocI >= 0)

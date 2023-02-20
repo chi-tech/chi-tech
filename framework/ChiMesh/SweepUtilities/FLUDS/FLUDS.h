@@ -35,6 +35,8 @@ namespace chi_mesh::sweep_management
     size_t              delayed_local_psi_stride=0;       //Group-angle-faceDOF stride delayed cat
     size_t              delayed_local_psi_max_elements=0; //Number of faces in delayed cat
 
+    std::shared_ptr<SPDS> spds_;
+
   public:
     // This is a small vector [deplocI] that holds the number of
     // face dofs for each dependent location.
@@ -70,7 +72,7 @@ namespace chi_mesh::sweep_management
                        int face_dof,int g, int n) = 0;
 
     virtual
-    double*  NLOutgoingPsi(int outb_face_count,int face_dof, int n) = 0;
+    double*  NLOutgoingPsi(int nonl_outb_face_counter, int face_dof, int n) = 0;
 
     virtual
     double*  NLUpwindPsi(int nonl_inc_face_counter,
@@ -128,7 +130,8 @@ class chi_mesh::sweep_management::PRIMARY_FLUDS :
 //  std::vector<int>    prelocI_face_dof_count;
 //
 //  std::vector<int>    delayed_prelocI_face_dof_count;
-
+protected:
+  const SPDS& spds_;
 
 private:
   int largest_face=0;
@@ -236,10 +239,8 @@ private:
 
 public:
   PRIMARY_FLUDS(size_t in_G,
-                std::vector<CellFaceNodalMapping>& in_grid_nodal_mappings) :
-                G(in_G),
-                grid_nodal_mappings(in_grid_nodal_mappings)
-  { }
+                std::vector<CellFaceNodalMapping>& in_grid_nodal_mappings,
+                const SPDS& spds);
 
 public:
   /**Passes pointers from sweep buffers to FLUDS so
@@ -268,24 +269,24 @@ public:
 public:
   typedef std::shared_ptr<chi_mesh::sweep_management::SPDS> SPDS_ptr;
   //alphapass.cc
-  void InitializeAlphaElements(SPDS_ptr spds);
+  void InitializeAlphaElements(const SPDS& spds);
 
   void AddFaceViewToDepLocI(int deplocI, int cell_g_index,
-                            int face_slot, chi_mesh::CellFace& face);
+                            int face_slot, const chi_mesh::CellFace& face);
 
   //alphapass_slotdynamics.cc
-  void SlotDynamics(chi_mesh::Cell *cell,
-                    SPDS_ptr spds,
+  void SlotDynamics(const chi_mesh::Cell& cell,
+                    const SPDS& spds,
                     std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
                     std::vector<std::pair<int,short>>& delayed_lock_box,
                     std::set<int>& location_boundary_dependency_set);
   //alphapass_inc_mapping.cc
-  void LocalIncidentMapping(chi_mesh::Cell *cell,
-                            SPDS_ptr spds,
+  void LocalIncidentMapping(const chi_mesh::Cell& cell,
+                            const SPDS& spds,
                             std::vector<int>&  local_so_cell_mapping);
 
   //betapass.cc
-  void InitializeBetaElements(SPDS_ptr spds,
+  void InitializeBetaElements(const SPDS& spds,
                               int tag_index=0);
 
   void SerializeCellInfo(std::vector<CompactCellView>* cell_views,
@@ -296,8 +297,8 @@ public:
                            int& num_face_dofs);
 
   //betapass_nonlocal_inc_mapping.cc
-  void NonLocalIncidentMapping(chi_mesh::Cell *cell,
-                               SPDS_ptr spds);
+  void NonLocalIncidentMapping(const chi_mesh::Cell& cell,
+                               const SPDS& spds);
 
   //FLUDS_chunk_utilities.cc
   double*  OutgoingPsi(int cell_so_index, int outb_face_counter,

@@ -12,15 +12,15 @@
 bool chi_mesh::sweep_management::SweepBuffer::
   ReceiveDelayedData(int angle_set_num)
 {
-  auto spds =  angleset->GetSPDS();
+  const auto& spds = angleset->GetSPDS();
 
-  const size_t num_delayed_loc_deps = spds->delayed_location_dependencies.size();
+  const size_t num_delayed_loc_deps = spds.delayed_location_dependencies.size();
 
   //======================================== Receive delayed data
   bool all_messages_received = true;
   for (size_t prelocI=0; prelocI<num_delayed_loc_deps; prelocI++)
   {
-    int locJ = spds->delayed_location_dependencies[prelocI];
+    int locJ = spds.delayed_location_dependencies[prelocI];
 
 
     int num_mess = delayed_prelocI_message_count[prelocI];

@@ -3,18 +3,8 @@
 #include "ChiMath/Quadratures/cylindrical_angular_quadrature.h"
 #include "ChiMath/Quadratures/spherical_angular_quadrature.h"
 
-#include "A_LBSSolver/lbs_structs.h"
-#include "C_DO_RZ_SteadyState/lbs_curvilinear_sweepchunk_pwl.h"
-#include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
-
 #include "chi_runtime.h"
 #include "chi_log.h"
-
-#include "ChiConsole/chi_console.h"
-
-#include <iomanip>
-
-typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
 
 void
 lbs_curvilinear::DiscOrdSteadyStateSolver::PerformInputChecks()
@@ -236,25 +226,4 @@ lbs_curvilinear::DiscOrdSteadyStateSolver::PerformInputChecks()
   }
 
   chi::log.Log() << "C_DO_RZ_SteadyState::SteadyStateSolver::PerformInputChecks : exit";
-}
-
-
-std::shared_ptr<SweepChunk>
-lbs_curvilinear::DiscOrdSteadyStateSolver::SetSweepChunk(lbs::LBSGroupset& groupset)
-{
-   auto sweep_chunk =
-     std::make_shared<SweepChunkPWL>(grid_ptr_,
-                                     *discretization_,
-                                     unit_cell_matrices_,
-                                     secondary_unit_cell_matrices_,
-                                     cell_transport_views_,
-                                     phi_new_local_,
-                                     psi_new_local_[groupset.id],
-                                     q_moments_local_,
-                                     groupset,
-                                     matid_to_xs_map_,
-                                     num_moments_,
-                                     max_cell_dof_count_);
-
-  return sweep_chunk;
 }

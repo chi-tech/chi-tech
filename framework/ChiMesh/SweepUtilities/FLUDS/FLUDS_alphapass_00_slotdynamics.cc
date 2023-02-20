@@ -12,13 +12,13 @@ typedef std::vector<std::pair<int,short>> LockBox;
 //###################################################################
 /**Performs slot dynamics for Polyhedron cell.*/
 void chi_mesh::sweep_management::PRIMARY_FLUDS::
-  SlotDynamics(chi_mesh::Cell *cell,
-               SPDS_ptr spds,
+  SlotDynamics(const chi_mesh::Cell& cell,
+               const SPDS& spds,
                std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
                std::vector<std::pair<int,short>>& delayed_lock_box,
                std::set<int>& location_boundary_dependency_set)
 {
-  chi_mesh::MeshContinuumPtr grid = spds->grid;
+  chi_mesh::MeshContinuumPtr grid = spds.grid;
 
   chi_mesh::Vector3 ihat(1.0, 0.0, 0.0);
   chi_mesh::Vector3 jhat(0.0, 1.0, 0.0);
@@ -28,11 +28,11 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
   //           INCIDENT                                 but process
   //                                                    only incident faces
   std::vector<short> inco_face_face_category;
-  inco_face_face_category.reserve(cell->faces.size());
-  for (int f=0; f < cell->faces.size(); f++)
+  inco_face_face_category.reserve(cell.faces.size());
+  for (int f=0; f < cell.faces.size(); f++)
   {
-    CellFace&  face = cell->faces[f];
-    double     mu   = spds->omega.Dot(face.normal);
+    const CellFace& face = cell.faces[f];
+    double     mu        = spds.omega.Dot(face.normal);
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face
     if (mu<(0.0-1.0e-16))
@@ -52,11 +52,11 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
         //========================================== Check if part of cyclic
         //                                           dependency
         bool is_cyclic = false;
-        for (auto cyclic_dependency : spds->local_cyclic_dependencies)
+        for (auto cyclic_dependency : spds.local_cyclic_dependencies)
         {
           int a = cyclic_dependency.first;
           int b = cyclic_dependency.second;
-          int c = cell->local_id;
+          int c = cell.local_id;
           int d = face.GetNeighborLocalID(*grid);
 
           if ((a == c) && (b == d) )
@@ -97,13 +97,13 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           chi::log.LogAllError()
             << "Lock-box location not found in call to "
             << "InitializeAlphaElements. Local Cell "
-            << cell->local_id
+            << cell.local_id
             << " face " << f
             << " looking for cell "
             << face.GetNeighborLocalID(*grid)
             << " face " << ass_face
             << " cat: " << face_categ
-            << " omg=" << spds->omega.PrintS()
+            << " omg=" << spds.omega.PrintS()
             << " lbsize=" << lock_box.size();
           chi::Exit(EXIT_FAILURE);
         }
@@ -112,7 +112,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
       //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ BOUNDARY DEPENDENCE
       else if (not face.has_neighbor)
       {
-        chi_mesh::Vector3& face_norm = face.normal;
+        const chi_mesh::Vector3& face_norm = face.normal;
 
         if (face_norm.Dot(ihat)>0.999)
           location_boundary_dependency_set.insert(0);
@@ -143,14 +143,14 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
   //                                                    only outgoing faces
   std::vector<int>                outb_face_slot_indices;
   std::vector<short>              outb_face_face_category;
-  outb_face_slot_indices.reserve(cell->faces.size());
-  outb_face_face_category.reserve(cell->faces.size());
-  for (int f=0; f < cell->faces.size(); f++)
+  outb_face_slot_indices.reserve(cell.faces.size());
+  outb_face_face_category.reserve(cell.faces.size());
+  for (int f=0; f < cell.faces.size(); f++)
   {
-    CellFace&  face         = cell->faces[f];
-    double     mu           = spds->omega.Dot(face.normal);
+    const CellFace&  face   = cell.faces[f];
+    double     mu           = spds.omega.Dot(face.normal);
 //    int        neighbor     = face.neighbor_id;
-    int        cell_g_index = cell->global_id;
+    int        cell_g_index = cell.global_id;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Outgoing face
     if (mu>=(0.0+1.0e-16))
@@ -166,11 +166,11 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
       //                                           dependency
       if (face.IsNeighborLocal(*grid))
       {
-        for (auto cyclic_dependency : spds->local_cyclic_dependencies)
+        for (auto cyclic_dependency : spds.local_cyclic_dependencies)
         {
           int a = cyclic_dependency.first;
           int b = cyclic_dependency.second;
-          int c = cell->local_id;
+          int c = cell.local_id;
           int d = face.GetNeighborLocalID(*grid);
 
           if ((a == c) && (b == d) )
@@ -223,7 +223,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
       if (face.has_neighbor and (not face.IsNeighborLocal(*grid)))
       {
         int locJ         = face.GetNeighborPartitionID(*grid);
-        int deplocI      = spds->MapLocJToDeplocI(locJ);
+        int deplocI      = spds.MapLocJToDeplocI(locJ);
         int face_slot    = deplocI_face_dof_count[deplocI];
 
         deplocI_face_dof_count[deplocI]+= face.vertex_ids.size();
@@ -261,7 +261,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
  * of this position's upwind psi in the local upwind psi vector.*/
 void  chi_mesh::sweep_management::PRIMARY_FLUDS::
 AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
-                     chi_mesh::CellFace& face)
+                     const chi_mesh::CellFace& face)
 {
   //======================================== Check if cell is already there
   bool cell_already_there = false;

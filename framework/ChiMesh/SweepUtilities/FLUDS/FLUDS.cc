@@ -1,7 +1,34 @@
 #include "FLUDS.h"
 
+#include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
+
 #include "chi_runtime.h"
 #include "chi_log.h"
+
+#include "ChiConsole/chi_console.h"
+
+#include <iomanip>
+
+//###################################################################
+/**Constructor for the primary FLUDS data structure.*/
+chi_mesh::sweep_management::PRIMARY_FLUDS::
+  PRIMARY_FLUDS(size_t in_G,
+                std::vector<CellFaceNodalMapping>& in_grid_nodal_mappings,
+                const SPDS& spds) :
+  spds_(spds),
+  G(in_G),
+  grid_nodal_mappings(in_grid_nodal_mappings)
+{
+  chi::log.Log0Verbose1()
+    << "Initializing FLUDS for omega="
+    << spds_.omega.PrintS()
+    << "         Process memory = "
+    << std::setprecision(3)
+    <<chi_objects::ChiConsole::GetMemoryUsageInMB() << " MB.";
+
+  this->InitializeAlphaElements(spds_);
+  this->InitializeBetaElements(spds_);
+}
 
 //###################################################################
 /**Given a sweep ordering index, the outgoing face counter,

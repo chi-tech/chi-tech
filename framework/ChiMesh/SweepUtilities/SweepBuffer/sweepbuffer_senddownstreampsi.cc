@@ -9,12 +9,12 @@
 void chi_mesh::sweep_management::SweepBuffer::
 SendDownstreamPsi(int angle_set_num)
 {
-  auto spds =  angleset->GetSPDS();
+  const auto& spds = angleset->GetSPDS();
 
-  const size_t num_successors = spds->location_successors.size();
+  const size_t num_successors = spds.location_successors.size();
   for (size_t deplocI=0; deplocI<num_successors; deplocI++)
   {
-    int locJ = spds->location_successors[deplocI];
+    int locJ = spds.location_successors[deplocI];
 
     int num_mess = deplocI_message_count[deplocI];
     for (int m=0; m<num_mess; m++)

@@ -12,7 +12,7 @@
 chi_mesh::sweep_management::AngleSet::
 AngleSet(size_t in_numgrps,
          size_t in_ref_subset,
-         std::shared_ptr<SPDS>& in_spds,
+         const SPDS& in_spds,
          FLUDS* in_fluds,
          std::vector<size_t>& angle_indices,
          std::map<uint64_t, std::shared_ptr<SweepBndry>>& sim_boundaries,
@@ -105,8 +105,8 @@ chi_mesh::sweep_management::AngleSetStatus
 
 //###################################################################
 /**Returns a reference to the associated spds.*/
-std::shared_ptr<chi_mesh::sweep_management::SPDS>
-  chi_mesh::sweep_management::AngleSet::GetSPDS()
+const chi_mesh::sweep_management::SPDS&
+  chi_mesh::sweep_management::AngleSet::GetSPDS() const
 {
   return spds;
 }

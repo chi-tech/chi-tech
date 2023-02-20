@@ -13,14 +13,14 @@
 chi_mesh::sweep_management::AngleSetStatus
 chi_mesh::sweep_management::SweepBuffer::ReceiveUpstreamPsi(int angle_set_num)
 {
-  auto  spds =  angleset->GetSPDS();
+  const auto& spds = angleset->GetSPDS();
   auto fluds =  angleset->fluds;
 
   const auto num_grps   = angleset->GetNumGrps();
   const auto num_angles = angleset->angles.size();
 
   //============================== Resize FLUDS non-local incoming Data
-  const size_t num_loc_deps = spds->location_dependencies.size();
+  const size_t num_loc_deps = spds.location_dependencies.size();
   if (!upstream_data_initialized)
   {
     angleset->prelocI_outgoing_psi.resize(num_loc_deps, std::vector<double>());
@@ -38,7 +38,7 @@ chi_mesh::sweep_management::SweepBuffer::ReceiveUpstreamPsi(int angle_set_num)
   bool ready_to_execute = true;
   for (size_t prelocI=0; prelocI<num_loc_deps; prelocI++)
   {
-    int locJ = spds->location_dependencies[prelocI];
+    int locJ = spds.location_dependencies[prelocI];
 
     size_t num_mess = prelocI_message_count[prelocI];
     for (int m=0; m<num_mess; m++)

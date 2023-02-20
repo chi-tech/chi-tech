@@ -18,7 +18,7 @@ class chi_mesh::sweep_management::AngleSet
 {
 private:
   size_t                            num_grps;
-  std::shared_ptr<SPDS>             spds;
+  const SPDS&                       spds;
   bool                              executed = false;
 
   chi_mesh::sweep_management::SweepBuffer sweep_buffer;
@@ -42,7 +42,7 @@ public:
 
   AngleSet(size_t in_numgrps,
            size_t in_ref_subset,
-           std::shared_ptr<SPDS>& in_spds,
+           const SPDS& in_spds,
            FLUDS* in_fluds,
            std::vector<size_t>& angle_indices,
            std::map<uint64_t, std::shared_ptr<SweepBndry>>& sim_boundaries,
@@ -51,7 +51,7 @@ public:
 
   void InitializeDelayedUpstreamData();
 
-  std::shared_ptr<chi_mesh::sweep_management::SPDS> GetSPDS();
+  const chi_mesh::sweep_management::SPDS& GetSPDS() const;
 
   int GetMaxBufferMessages() const;
 
