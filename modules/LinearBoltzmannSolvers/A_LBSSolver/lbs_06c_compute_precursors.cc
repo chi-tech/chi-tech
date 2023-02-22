@@ -36,7 +36,7 @@ void lbs::LBSSolver::ComputePrecursors()
         const size_t uk_map = transport_view.MapDOF(i, 0, 0);
         const double node_V_fraction = fe_values.Vi_vectors[i]/cell_volume;
 
-        //============================== Loop over groups_
+        //============================== Loop over groups
         for (unsigned int g = 0; g < groups_.size(); ++g)
           precursor_new_local_[dof] += coeff *
                                        xs.nu_delayed_sigma_f[g] *

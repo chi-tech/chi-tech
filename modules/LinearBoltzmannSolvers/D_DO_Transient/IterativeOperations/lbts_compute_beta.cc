@@ -23,13 +23,13 @@ double lbs::DiscOrdTransientSolver::ComputeBeta()
     if (!xs.is_fissionable)
       continue;
 
-    //============================= Loop over groupsets_
+    //============================= Loop over groupsets
     for (const auto& groupset : groupsets_)
     {
       auto gs_i = static_cast<size_t>(groupset.groups[0].id);
       auto gs_f = static_cast<size_t>(groupset.groups.back().id);
 
-      //============================= Loop over groupset groups_
+      //============================= Loop over groupset groups
       for (size_t g = gs_i; g <= gs_f; ++g)
         for (unsigned int j = 0; j < xs.num_precursors; ++j)
         {

@@ -23,7 +23,7 @@ double lbs::acceleration::DiffusionMIPSolver::
   HPerpendicular(const chi_mesh::Cell& cell,
                  unsigned int f)
 {
-  const auto& cell_mapping = m_sdm.GetCellMapping(cell);
+  const auto& cell_mapping = sdm_.GetCellMapping(cell);
   double hp;
 
   const size_t num_faces = cell.faces.size();
@@ -87,7 +87,7 @@ double lbs::acceleration::DiffusionMIPSolver::
 }
 
 //###################################################################
-/**Maps a face, in a discontinuous sense, using the spatial discretization_.*/
+/**Maps a face, in a discontinuous sense, using the spatial discretization.*/
 int lbs::acceleration::DiffusionMIPSolver::
   MapFaceNodeDisc(const chi_mesh::Cell& cur_cell,
                   const chi_mesh::Cell& adj_cell,
@@ -97,8 +97,8 @@ int lbs::acceleration::DiffusionMIPSolver::
                   size_t ccfi,
                   double epsilon/*=1.0e-12*/)
 {
-  const auto& cur_cell_mapping = m_sdm.GetCellMapping(cur_cell);
-  const auto& adj_cell_mapping = m_sdm.GetCellMapping(adj_cell);
+  const auto& cur_cell_mapping = sdm_.GetCellMapping(cur_cell);
+  const auto& adj_cell_mapping = sdm_.GetCellMapping(adj_cell);
 
   const int i = cur_cell_mapping.MapFaceNode(ccf, ccfi);
   const auto& node_i_loc = cc_node_locs[i];

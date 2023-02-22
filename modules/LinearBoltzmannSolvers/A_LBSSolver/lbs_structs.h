@@ -88,7 +88,7 @@ typedef std::function<void(LBSGroupset&               groupset,
 
 class AGSSchemeEntry;
 
-/**Struct for storing LBS options_.*/
+/**Struct for storing LBS options.*/
 struct Options
 {
   typedef chi_math::SpatialDiscretizationType SDMType;

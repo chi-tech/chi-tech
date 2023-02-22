@@ -19,7 +19,7 @@ namespace chi_unit_sim_tests
 
 int chiSimTest92_DSA(lua_State* L)
 {
-  typedef std::map<int, lbs::acceleration::Multigroup_D_and_sigR> MapMatID2XS;
+  typedef std::map<int, lbs::acceleration::Multigroup_D_and_sigR> MatID2XSMap;
   chi::log.Log() << "chiSimTest92_DSA";
 
   //============================================= Get grid
@@ -51,8 +51,8 @@ int chiSimTest92_DSA(lua_State* L)
   bcs[4] = {lbs::acceleration::BCType::DIRICHLET,{2,0,0}},
   bcs[5] = {lbs::acceleration::BCType::DIRICHLET,{2,0,0}};
 
-  MapMatID2XS map_mat_id_2_xs;
-  map_mat_id_2_xs.insert(
+  MatID2XSMap matid_2_xs_map;
+  matid_2_xs_map.insert(
     std::make_pair(0,lbs::acceleration::Multigroup_D_and_sigR{{1.0},{0.0}}));
 
   std::vector<lbs::UnitCellMatrices> unit_cell_matrices;
@@ -152,7 +152,7 @@ int chiSimTest92_DSA(lua_State* L)
                                                sdm,
                                                OneDofPerNode,
                                                bcs,
-                                               map_mat_id_2_xs,
+                                               matid_2_xs_map,
                                                unit_cell_matrices,
                                                true);
   solver.options.ref_solution_lua_function = "MMS_phi";

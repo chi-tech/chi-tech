@@ -16,18 +16,18 @@ void lbs::acceleration::DiffusionMIPSolver::Solve(std::vector<double>& solution)
 {
   const std::string fname = "lbs::acceleration::DiffusionMIPSolver::Solve";
   Vec x;
-  VecDuplicate(m_rhs, &x);
+  VecDuplicate(rhs_, &x);
   VecSet(x,0.0);
-  KSPSetInitialGuessNonzero(m_ksp,PETSC_FALSE);
+  KSPSetInitialGuessNonzero(ksp_, PETSC_FALSE);
 
-  KSPSetTolerances(m_ksp,1.e-50,
-                   options.residual_tolerance,1.0e50,
+  KSPSetTolerances(ksp_, 1.e-50,
+                   options.residual_tolerance, 1.0e50,
                    options.max_iters);
 
   if (options.perform_symmetry_check)
   {
     PetscBool symmetry = PETSC_FALSE;
-    MatIsSymmetric(m_A, 1.0e-6, &symmetry);
+    MatIsSymmetric(A_, 1.0e-6, &symmetry);
     if (symmetry == PETSC_FALSE)
       throw std::logic_error(fname + ":Symmetry check failed");
   }
@@ -35,19 +35,19 @@ void lbs::acceleration::DiffusionMIPSolver::Solve(std::vector<double>& solution)
   if (options.verbose)
   {
     using namespace chi_math::PETScUtils;
-    KSPSetConvergenceTest(m_ksp, &RelativeResidualConvergenceTest,
+    KSPSetConvergenceTest(ksp_, &RelativeResidualConvergenceTest,
                           nullptr, nullptr);
 
-    KSPMonitorSet(m_ksp, &GeneralKSPMonitor, nullptr, nullptr);
+    KSPMonitorSet(ksp_, &GeneralKSPMonitor, nullptr, nullptr);
 
     double rhs_norm;
-    VecNorm(m_rhs, NORM_2, &rhs_norm);
+    VecNorm(rhs_, NORM_2, &rhs_norm);
     chi::log.Log() << "RHS-norm " << rhs_norm;
   }
 
 
   //============================================= Solve
-  KSPSolve(m_ksp,m_rhs,x);
+  KSPSolve(ksp_, rhs_, x);
 
 
   //============================================= Print convergence info
@@ -59,7 +59,7 @@ void lbs::acceleration::DiffusionMIPSolver::Solve(std::vector<double>& solution)
 
     using namespace chi_physics;
     KSPConvergedReason reason;
-    KSPGetConvergedReason(m_ksp, &reason);
+    KSPGetConvergedReason(ksp_, &reason);
 
     chi::log.Log() << "Convergence Reason: "
                    << GetPETScConvergedReasonstring(reason);
@@ -67,7 +67,7 @@ void lbs::acceleration::DiffusionMIPSolver::Solve(std::vector<double>& solution)
 
   //============================================= Transfer petsc solution to
   //                                              vector
-  m_sdm.LocalizePETScVector(x, solution, m_uk_man);
+  sdm_.LocalizePETScVector(x, solution, uk_man_);
 
   //============================================= Cleanup x
   VecDestroy(&x);
@@ -81,18 +81,18 @@ void lbs::acceleration::DiffusionMIPSolver::Solve(Vec petsc_solution)
 {
   const std::string fname = "lbs::acceleration::DiffusionMIPSolver::Solve";
   Vec x;
-  VecDuplicate(m_rhs, &x);
+  VecDuplicate(rhs_, &x);
   VecSet(x,0.0);
-  KSPSetInitialGuessNonzero(m_ksp,PETSC_FALSE);
+  KSPSetInitialGuessNonzero(ksp_, PETSC_FALSE);
 
-  KSPSetTolerances(m_ksp,1.e-50,
-                   options.residual_tolerance,1.0e50,
+  KSPSetTolerances(ksp_, 1.e-50,
+                   options.residual_tolerance, 1.0e50,
                    options.max_iters);
 
   if (options.perform_symmetry_check)
   {
     PetscBool symmetry = PETSC_FALSE;
-    MatIsSymmetric(m_A, 1.0e-6, &symmetry);
+    MatIsSymmetric(A_, 1.0e-6, &symmetry);
     if (symmetry == PETSC_FALSE)
       throw std::logic_error(fname + ":Symmetry check failed");
   }
@@ -100,19 +100,19 @@ void lbs::acceleration::DiffusionMIPSolver::Solve(Vec petsc_solution)
   if (options.verbose)
   {
     using namespace chi_math::PETScUtils;
-    KSPSetConvergenceTest(m_ksp, &RelativeResidualConvergenceTest,
+    KSPSetConvergenceTest(ksp_, &RelativeResidualConvergenceTest,
                           nullptr, nullptr);
 
-    KSPMonitorSet(m_ksp, &GeneralKSPMonitor, nullptr, nullptr);
+    KSPMonitorSet(ksp_, &GeneralKSPMonitor, nullptr, nullptr);
 
     double rhs_norm;
-    VecNorm(m_rhs, NORM_2, &rhs_norm);
+    VecNorm(rhs_, NORM_2, &rhs_norm);
     chi::log.Log() << "RHS-norm " << rhs_norm;
   }
 
 
   //============================================= Solve
-  KSPSolve(m_ksp,m_rhs,x);
+  KSPSolve(ksp_, rhs_, x);
 
 
   //============================================= Print convergence info
@@ -124,7 +124,7 @@ void lbs::acceleration::DiffusionMIPSolver::Solve(Vec petsc_solution)
 
     using namespace chi_physics;
     KSPConvergedReason reason;
-    KSPGetConvergedReason(m_ksp, &reason);
+    KSPGetConvergedReason(ksp_, &reason);
 
     chi::log.Log() << "Convergence Reason: "
                    << GetPETScConvergedReasonstring(reason);

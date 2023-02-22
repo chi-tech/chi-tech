@@ -40,19 +40,19 @@ void lbs::LBSSolver::InitTGDSA(LBSGroupset& groupset)
     }
 
     //=========================================== Make xs map
-    typedef lbs::acceleration::Multigroup_D_and_sigR MGXs;
-    typedef std::map<int, MGXs> MapMatID2MGDXS;
-    MapMatID2MGDXS map_mat_id_2_mgxs;
-    for (const auto& mat_id_xs_pair : matid_to_xs_map_)
+    typedef lbs::acceleration::Multigroup_D_and_sigR MGXS;
+    typedef std::map<int, MGXS> MatID2MGDXSMap;
+    MatID2MGDXSMap matid_2_mgxs_map;
+    for (const auto& matid_xs_pair : matid_to_xs_map_)
     {
-      const auto& mat_id = mat_id_xs_pair.first;
+      const auto& mat_id = matid_xs_pair.first;
 
       const auto& tg_info =
         groupset.tg_acceleration_info.map_mat_id_2_tginfo.at(mat_id);
 
-      map_mat_id_2_mgxs.insert(
-        std::make_pair(mat_id,MGXs{{tg_info.collapsed_D},
-                                   {tg_info.collapsed_sig_a}}));
+      matid_2_mgxs_map.insert(
+        std::make_pair(mat_id, MGXS{{tg_info.collapsed_D},
+                                    {tg_info.collapsed_sig_a}}));
     }
 
     //=========================================== Create solver
@@ -64,7 +64,7 @@ void lbs::LBSSolver::InitTGDSA(LBSGroupset& groupset)
         *grid_ptr_, sdm,
         uk_man,
         bcs,
-        map_mat_id_2_mgxs,
+        matid_2_mgxs_map,
         unit_cell_matrices_,
         true); //verbosity
 

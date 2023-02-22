@@ -23,7 +23,7 @@ void lbs::acceleration::DiffusionMIPSolver::
 {
   const std::string fname = "lbs::acceleration::DiffusionMIPSolver::"
                             "AssembleAand_b_wQpoints";
-  if (m_A == nullptr or m_rhs == nullptr or m_ksp == nullptr)
+  if (A_ == nullptr or rhs_ == nullptr or ksp_ == nullptr)
     throw std::logic_error(fname + ": Some or all PETSc elements are null. "
                                    "Check that Initialize has been called.");
   if (options.verbose)
@@ -33,17 +33,17 @@ void lbs::acceleration::DiffusionMIPSolver::
   const auto& source_function = options.source_lua_function;
   const auto& solution_function = options.ref_solution_lua_function;
 
-  VecSet(m_rhs, 0.0);
+  VecSet(rhs_, 0.0);
 
-  for (const auto& cell : m_grid.local_cells)
+  for (const auto& cell : grid_.local_cells)
   {
     const size_t num_faces    = cell.faces.size();
-    const auto&  cell_mapping = m_sdm.GetCellMapping(cell);
+    const auto&  cell_mapping = sdm_.GetCellMapping(cell);
     const size_t num_nodes    = cell_mapping.NumNodes();
     const auto   qp_data      = cell_mapping.MakeVolumeQuadraturePointData();
-    const size_t num_groups   = m_uk_man.unknowns.front().num_components;
+    const size_t num_groups   = uk_man_.unknowns.front().num_components;
 
-    const auto& xs = m_map_mat_id_2_xs.at(cell.material_id);
+    const auto& xs = mat_id_2_xs_map.at(cell.material_id);
 
     //=========================================== For component/group
     for (size_t g=0; g<num_groups; ++g)
@@ -53,12 +53,12 @@ void lbs::acceleration::DiffusionMIPSolver::
 
       std::vector<double> qg(num_nodes, 0.0);
       for (size_t j=0; j<num_nodes; j++)
-        qg[j] = q_vector[m_sdm.MapDOFLocal(cell, j, m_uk_man, 0, g)];
+        qg[j] = q_vector[sdm_.MapDOFLocal(cell, j, uk_man_, 0, g)];
 
       //==================================== Assemble continuous terms
       for (size_t i=0; i<num_nodes; i++)
       {
-        const int64_t imap = m_sdm.MapDOF(cell,i,m_uk_man,0,g);
+        const int64_t imap = sdm_.MapDOF(cell, i, uk_man_, 0, g);
         double entry_rhs_i = 0.0; //entry may accumulate over j
         if (source_function.empty())
           for (size_t j=0; j<num_nodes; j++)
@@ -80,7 +80,7 @@ void lbs::acceleration::DiffusionMIPSolver::
               qp_data.JxW(qp);
         }
 
-        VecSetValue(m_rhs, imap, entry_rhs_i, ADD_VALUES);
+        VecSetValue(rhs_, imap, entry_rhs_i, ADD_VALUES);
       }//for i
 
       //==================================== Assemble face terms
@@ -96,8 +96,8 @@ void lbs::acceleration::DiffusionMIPSolver::
         if (not face.has_neighbor)
         {
           auto bc = DefaultBCDirichlet;
-          if (m_bcs.count(face.neighbor_id) > 0)
-            bc = m_bcs.at(face.neighbor_id);
+          if (bcs_.count(face.neighbor_id) > 0)
+            bc = bcs_.at(face.neighbor_id);
 
           if (bc.type == BCType::DIRICHLET)
           {
@@ -116,7 +116,7 @@ void lbs::acceleration::DiffusionMIPSolver::
             for (size_t fi=0; fi<num_face_nodes; ++fi)
             {
               const int i  = cell_mapping.MapFaceNode(f,fi);
-              const int64_t imap = m_sdm.MapDOF(cell, i, m_uk_man, 0, g);
+              const int64_t imap = sdm_.MapDOF(cell, i, uk_man_, 0, g);
 
               for (size_t fj=0; fj<num_face_nodes; ++fj)
               {
@@ -140,7 +140,7 @@ void lbs::acceleration::DiffusionMIPSolver::
                       fqp_data.JxW(qp);
                 }
 
-                VecSetValue(m_rhs, imap, aij_bc_value, ADD_VALUES);
+                VecSetValue(rhs_, imap, aij_bc_value, ADD_VALUES);
               }//for fj
             }//for fi
 
@@ -151,7 +151,7 @@ void lbs::acceleration::DiffusionMIPSolver::
             // 0.5*D* n dot (b_j^+ - b_j^-)*nabla b_i^-
             for (size_t i=0; i<num_nodes; i++)
             {
-              const int64_t imap = m_sdm.MapDOF(cell, i, m_uk_man, 0, g);
+              const int64_t imap = sdm_.MapDOF(cell, i, uk_man_, 0, g);
 
               for (size_t j=0; j<num_nodes; j++)
               {
@@ -180,7 +180,7 @@ void lbs::acceleration::DiffusionMIPSolver::
                   aij_bc_value = -Dg*n_f.Dot(vec_aij_mms);
                 }
 
-                VecSetValue(m_rhs, imap, aij_bc_value, ADD_VALUES);
+                VecSetValue(rhs_, imap, aij_bc_value, ADD_VALUES);
               }//for fj
             }//for i
           }//Dirichlet BC
@@ -194,7 +194,7 @@ void lbs::acceleration::DiffusionMIPSolver::
             for (size_t fi=0; fi<num_face_nodes; fi++)
             {
               const int i  = cell_mapping.MapFaceNode(f,fi);
-              const int64_t ir = m_sdm.MapDOF(cell, i, m_uk_man, 0, g);
+              const int64_t ir = sdm_.MapDOF(cell, i, uk_man_, 0, g);
 
               if (std::fabs(fval) >= 1.0e-12)
               {
@@ -203,7 +203,7 @@ void lbs::acceleration::DiffusionMIPSolver::
                   rhs_val += fqp_data.ShapeValue(i,qp) * fqp_data.JxW(qp);
                 rhs_val *= (fval/bval);
 
-                VecSetValue(m_rhs,ir, rhs_val, ADD_VALUES);
+                VecSetValue(rhs_, ir, rhs_val, ADD_VALUES);
               }//if f nonzero
             }//for fi
           }//Robin BC
@@ -212,17 +212,17 @@ void lbs::acceleration::DiffusionMIPSolver::
     }//for g
   }//for cell
 
-  VecAssemblyBegin(m_rhs);
-  VecAssemblyEnd(m_rhs);
+  VecAssemblyBegin(rhs_);
+  VecAssemblyEnd(rhs_);
 
-  KSPSetOperators(m_ksp, m_A, m_A);
+  KSPSetOperators(ksp_, A_, A_);
 
   if (options.verbose)
     chi::log.Log() << chi::program_timer.GetTimeString() << " Assembly completed";
 
   PC pc;
-  KSPGetPC(m_ksp, &pc);
+  KSPGetPC(ksp_, &pc);
   PCSetUp(pc);
 
-  KSPSetUp(m_ksp);
+  KSPSetUp(ksp_);
 }

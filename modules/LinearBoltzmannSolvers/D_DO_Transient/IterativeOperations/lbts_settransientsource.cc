@@ -6,7 +6,7 @@
 #include "ChiTimer/chi_timer.h"
 
 //###################################################################
-/**Sets the source moments for the groups_ in the current group set.
+/**Sets the source moments for the groups in the current group set.
  *
  * \param groupset The groupset the under consideration.
  * \param destination_q A vector to contribute the source to.
@@ -14,7 +14,7 @@
  * \param source_flags Flags for adding specific terms into the
  *        destination vector. Available flags are for applying
  *        the material source, across/within-group scattering,
- *        and across/within-groups_ fission.
+ *        and across/within-groups fission.
  *
  * */
 void lbs::DiscOrdTransientSolver::
@@ -83,7 +83,7 @@ void lbs::DiscOrdTransientSolver::
 
         size_t uk_map = transport_view.MapDOF(i, m, 0); //unknown map
 
-        //=================================== Loop over groupset groups_
+        //=================================== Loop over groupset groups
         for (size_t g = gs_i; g <= gs_f; ++g)
         {
           double rhs = 0.0;

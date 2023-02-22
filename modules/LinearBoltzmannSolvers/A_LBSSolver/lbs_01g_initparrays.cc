@@ -74,7 +74,7 @@ void lbs::LBSSolver::InitializeParrays()
   //
   // Also, for a given cell, within a given sweep chunk,
   // we need to solve a matrix which square size is the
-  // amount of nodes on the cell. max_cell_dof_count_ is
+  // amount of nodes on the cell. max_cell_dof_count is
   // initialized here.
   //
   size_t block_MG_counter = 0;       //Counts the strides of moment and group
@@ -84,8 +84,8 @@ void lbs::LBSSolver::InitializeParrays()
   const chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
 
 //  auto pwl =
-//      std::dynamic_pointer_cast<chi_math::SpatialDiscretization_FE>(discretization_);
-//  auto& sdm = *discretization_;
+//      std::dynamic_pointer_cast<chi_math::SpatialdiscretizationFE>(discretization);
+//  auto& sdm = *discretization;
 
   cell_transport_views_.clear();
   cell_transport_views_.reserve(grid_ptr_->local_cells.size());
@@ -143,7 +143,7 @@ void lbs::LBSSolver::InitializeParrays()
     block_MG_counter += num_nodes * num_grps * num_moments_;
   }//for local cell
 
-  //================================================== Populate grid_ptr_ nodal mappings
+  //================================================== Populate grid nodal mappings
   // This is used in the Flux Data Structures (FLUDS)
   grid_nodal_mappings_.clear();
   grid_nodal_mappings_.reserve(grid_ptr_->local_cells.size());
@@ -189,7 +189,7 @@ void lbs::LBSSolver::InitializeParrays()
         using namespace chi_math;
         auto group_ff = std::make_shared<chi_physics::FieldFunction>(
           text_name,                     //Field name
-          discretization_,                //Spatial discretization_
+          discretization_,                //Spatial discretization
           Unknown(UnknownType::SCALAR)); //Unknown/Variable
 
         chi::field_function_stack.push_back(group_ff);

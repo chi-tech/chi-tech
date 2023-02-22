@@ -128,7 +128,7 @@ Specifies a vaccuum boundary condition. It is not followed by any value.\n
 \n
 LBSBoundaryTypes.INCIDENT_ISOTROPIC\n
 Incident isotropic flux. This argument needs to be followed by a lua table
-index 1 to G where G is the amount of energy groups_. Note internally this
+index 1 to G where G is the amount of energy groups. Note internally this
 is mapped as 0 to G-1.\n
 \n
 LBSBoundaryTypes.REFLECTING\n
@@ -222,7 +222,7 @@ int chiLBSSetProperty(lua_State *L)
       {
         chi::log.Log0Error()
           << "In call to chiLBSSetProperty, setting "
-          << "incident isotropic flux boundary type: Number of solver groups_"
+          << "incident isotropic flux boundary type: Number of solver groups"
           << " is zero. Boundary fluxes can only be set after group structure"
           << " has been defined.";
         chi::Exit(EXIT_FAILURE);
@@ -253,9 +253,9 @@ int chiLBSSetProperty(lua_State *L)
         chi::log.Log0Error()
           << "In call to chiLBSSetProperty, setting "
           << "incident isotropic flux boundary type: "
-          << "Number of groups_ in boundary flux specification is "
+          << "Number of groups in boundary flux specification is "
           << table_len << " but solver has a total of "
-          << lbs_solver.Groups().size() << " groups_. These two must be equal.";
+          << lbs_solver.Groups().size() << " groups. These two must be equal.";
         chi::Exit(EXIT_FAILURE);
       }
 
@@ -264,7 +264,7 @@ int chiLBSSetProperty(lua_State *L)
 
       chi::log.Log()
         << "Isotropic boundary condition for boundary " << bid
-        << " loaded with " << table_len << " groups_.";
+        << " loaded with " << table_len << " groups.";
     }
     else if (btype == (int)lbs::BoundaryType::REFLECTING)
     {

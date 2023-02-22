@@ -8,7 +8,7 @@ namespace lbs::common_lua_utils
 {
 
 //###################################################################
-/**Writes the flux-moments of a LBS solution to file (phi_old_local_).
+/**Writes the flux-moments of a LBS solution to file (phi_old_local).
 
 \param SolverIndex int Handle to the solver for which the group
 is to be created.
@@ -133,7 +133,7 @@ int chiLBSReadFluxMomentsAndMakeSourceMoments(lua_State *L)
 }
 
 //###################################################################
-/**Reads the source-moments from a file to a specific ext_src_moments_local_-vector
+/**Reads the source-moments from a file to a specific ext_src_moments_local-vector
  * to be used instead of a regular material/boundary source.
 
 \param SolverIndex int Handle to the solver for which the group
@@ -181,7 +181,7 @@ int chiLBSReadSourceMoments(lua_State *L)
 }
 
 //###################################################################
-/**Reads flux-moments from a file to phi_old_local_ (the initial flux solution).
+/**Reads flux-moments from a file to phi_old_local (the initial flux solution).
 
 \param SolverIndex int Handle to the solver for which the group
 is to be created.

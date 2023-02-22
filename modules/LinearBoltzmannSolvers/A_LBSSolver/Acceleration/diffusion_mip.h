@@ -63,25 +63,25 @@ struct BoundaryCondition
 class DiffusionMIPSolver
 {
 protected:
-  typedef std::map<int,Multigroup_D_and_sigR> MapMatID2XS;
+  typedef std::map<int,Multigroup_D_and_sigR> MatID2XSMap;
 protected:
-  const std::string m_text_name;
-  const chi_mesh::MeshContinuum& m_grid;
-  const chi_math::SpatialDiscretization& m_sdm;
-  const chi_math::UnknownManager m_uk_man;
+  const std::string text_name_;
+  const chi_mesh::MeshContinuum& grid_;
+  const chi_math::SpatialDiscretization& sdm_;
+  const chi_math::UnknownManager uk_man_;
 
-  const std::map<uint64_t, BoundaryCondition> m_bcs;
+  const std::map<uint64_t, BoundaryCondition> bcs_;
 
-  const MapMatID2XS m_map_mat_id_2_xs;
+  const MatID2XSMap mat_id_2_xs_map;
 
-  const std::vector<UnitCellMatrices>& m_unit_cell_matrices;
+  const std::vector<UnitCellMatrices>& unit_cell_matrices_;
 
-  const int64_t m_num_local_dofs;
-  const int64_t m_num_global_dofs;
+  const int64_t num_local_dofs_;
+  const int64_t num_global_dofs_;
 
-  Mat m_A = nullptr;
-  Vec m_rhs = nullptr;
-  KSP m_ksp = nullptr;
+  Mat A_ = nullptr;
+  Vec rhs_ = nullptr;
+  KSP ksp_ = nullptr;
 
 public:
   struct Options
@@ -98,7 +98,7 @@ public:
 public:
   const chi_math::UnknownManager& UnknownStructure() const
   {
-    return m_uk_man;
+    return uk_man_;
   }
   //00
   DiffusionMIPSolver(std::string text_name,
@@ -106,7 +106,7 @@ public:
                      const chi_math::SpatialDiscretization& sdm,
                      const chi_math::UnknownManager& uk_man,
                      std::map<uint64_t, BoundaryCondition> bcs,
-                     MapMatID2XS map_mat_id_2_xs,
+                     MatID2XSMap map_mat_id_2_xs,
                      const std::vector<UnitCellMatrices>& unit_cell_matrices,
                      bool verbose=false);
   const Vec& RHS() const;

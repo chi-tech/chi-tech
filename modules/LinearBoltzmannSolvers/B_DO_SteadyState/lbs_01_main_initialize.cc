@@ -18,7 +18,7 @@ void lbs::DiscOrdSteadyStateSolver::Initialize()
   active_set_source_function_ =
     std::bind(&LBSSolver::SetSource, this, _1, _2, _3, _4);
 
-  //================================================== Initialize groupsets_ for
+  //================================================== Initialize groupsets for
   //                                                   sweeping
   InitializeSweepDataStructures();
   for (auto& groupset : groupsets_)

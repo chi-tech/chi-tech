@@ -52,9 +52,9 @@ lbs::acceleration::TwoGridCollapsedInfo lbs::acceleration::
     }
   }//for g
 
-  //============================================= Correction for zero xs groups_
+  //============================================= Correction for zero xs groups
   //Some cross-sections developed from monte-carlo
-  //methods can result in some of the groups_
+  //methods can result in some of the groups
   //having zero cross-sections. In that case
   //it will screw up the power iteration
   //initial guess of 1.0. Here we reset them
@@ -73,7 +73,7 @@ lbs::acceleration::TwoGridCollapsedInfo lbs::acceleration::
   //============================================= Perform power iteration
   double rho = chi_math::PowerIteration(C, E, 1000, 1.0e-12);
 
-  //======================================== Compute two-grid_ptr_ diffusion quantities
+  //======================================== Compute two-grid diffusion quantities
   double sum = 0.0;
   for (int g=0; g < num_groups; g++)
     sum += std::fabs(E[g]);

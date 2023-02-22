@@ -61,8 +61,8 @@ void lbs::LBSSolver::
     "Header size: 500 bytes\n"
     "Structure(type-info):\n"
     "uint64_t num_local_nodes\n"
-    "uint64_t num_moments_\n"
-    "uint64_t num_groups_\n"
+    "uint64_t num_moments\n"
+    "uint64_t num_groups\n"
     "uint64_t num_records\n"
     "uint64_t num_cells\n"
     "Each cell:\n"
@@ -213,7 +213,7 @@ void lbs::LBSSolver::ReadFluxMoments(
                                     << num_local_nodes << "\n";
       outstr << "num_moments_    : " << file_num_moments << " vs "
                                     << num_moments_t << "\n";
-      outstr << "num_groups_     : " << file_num_groups << " vs "
+      outstr << "num_groups     : " << file_num_groups << " vs "
              << num_groups_ << "\n";
       outstr << "num_local_dofs : " << file_num_local_dofs << " vs "
                                     << num_local_dofs << "\n";

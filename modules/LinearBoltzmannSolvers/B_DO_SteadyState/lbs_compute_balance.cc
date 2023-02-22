@@ -67,7 +67,7 @@ void lbs::DiscOrdSteadyStateSolver::ComputeBalance()
 
     //====================================== Inflow
     // This is essentially an integration over
-    // all faces, all angles, and all groups_.
+    // all faces, all angles, and all groups.
     // Only the cosines that are negative are
     // added to the integral.
     for (int f=0; f<cell.faces.size(); ++f)

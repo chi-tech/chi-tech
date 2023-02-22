@@ -11,7 +11,7 @@ void lbs::LBSSolver::PerformInputChecks()
   if (groups_.empty())
   {
     chi::log.LogAllError()
-      << "LinearBoltzmann::SteadyStateSolver: No groups_ added to solver.";
+      << "LinearBoltzmann::SteadyStateSolver: No groups added to solver.";
     chi::Exit(EXIT_FAILURE);
   }
 
@@ -29,7 +29,7 @@ void lbs::LBSSolver::PerformInputChecks()
     if (group_set.groups.empty())
     {
       chi::log.LogAllError()
-        << "LinearBoltzmann::SteadyStateSolver: No groups_ added to groupset "
+        << "LinearBoltzmann::SteadyStateSolver: No groups added to groupset "
         << grpset_counter << ".";
       chi::Exit(EXIT_FAILURE);
     }

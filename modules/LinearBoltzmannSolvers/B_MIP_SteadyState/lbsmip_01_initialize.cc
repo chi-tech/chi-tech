@@ -15,7 +15,7 @@ void lbs::MIPSteadyStateSolver::Initialize()
   active_set_source_function_ =
     std::bind(&LBSSolver::SetSource, this, _1, _2, _3, _4);
 
-  //================================================== Initialize groupsets_
+  //================================================== Initialize groupsets
   //                                                   preconditioning
   for (auto& groupset : groupsets_)
     InitTGDSA(groupset);
@@ -54,13 +54,13 @@ void lbs::MIPSteadyStateSolver::InitializeWGSSolvers()
     }//for sweep-boundary
 
     //=========================================== Make xs map
-    typedef lbs::acceleration::Multigroup_D_and_sigR MGXs;
-    typedef std::map<int, lbs::acceleration::Multigroup_D_and_sigR> MapMatID2XS;
-    MapMatID2XS map_mat_id_2_mgxs;
-    for (const auto& mat_id_xs_pair : matid_to_xs_map_)
+    typedef lbs::acceleration::Multigroup_D_and_sigR MGXS;
+    typedef std::map<int, lbs::acceleration::Multigroup_D_and_sigR> MatID2XSMap;
+    MatID2XSMap matid_2_mgxs_map;
+    for (const auto& matid_xs_pair : matid_to_xs_map_)
     {
-      const auto& mat_id = mat_id_xs_pair.first;
-      const auto& xs     = mat_id_xs_pair.second;
+      const auto& mat_id = matid_xs_pair.first;
+      const auto& xs     = matid_xs_pair.second;
 
       std::vector<double> Dg  (gs_G, 0.0);
       std::vector<double> sigR(gs_G, 0.0);
@@ -74,7 +74,7 @@ void lbs::MIPSteadyStateSolver::InitializeWGSSolvers()
         ++g;
       }//for g
 
-      map_mat_id_2_mgxs.insert(std::make_pair(mat_id,MGXs{Dg,sigR}));
+      matid_2_mgxs_map.insert(std::make_pair(mat_id, MGXS{Dg, sigR}));
     }
 
     //=========================================== Create solver
@@ -86,7 +86,7 @@ void lbs::MIPSteadyStateSolver::InitializeWGSSolvers()
         *grid_ptr_, sdm,
         uk_man,
         bcs,
-        map_mat_id_2_mgxs,
+        matid_2_mgxs_map,
         unit_cell_matrices_,
         true); //verbosity
 

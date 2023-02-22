@@ -15,9 +15,9 @@ namespace lbs::acceleration
 
 /**For both WGDSA and TGDSA use, we define this
 * simplified data structure to hold multigroup diffusion coefficients and
-* removal cross sections only for the relevant groups_. E.g., for WGDSA it
+* removal cross sections only for the relevant groups. E.g., for WGDSA it
 * will only hold the cross sections for the groupset, and for TGDSA there will
-* only be one group (All groups_ collapsed into 1).*/
+* only be one group (All groups collapsed into 1).*/
 struct Multigroup_D_and_sigR
 {
   std::vector<double> Dg;

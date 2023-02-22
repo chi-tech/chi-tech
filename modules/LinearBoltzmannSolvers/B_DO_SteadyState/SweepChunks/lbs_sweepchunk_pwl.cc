@@ -200,7 +200,7 @@ Sweep(chi_mesh::sweep_management::AngleSet *angle_set)
         }//for face i
       } // for f
 
-      // ========================================== Looping over groups_
+      // ========================================== Looping over groups
       for (int gsg = 0; gsg < gs_ss_size; ++gsg)
       {
         const int g = gs_gi+gsg;

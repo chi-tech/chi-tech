@@ -27,7 +27,7 @@ chiLBSSetProperty(phys1,SCATTERING_ORDER,1)
 
 --========== Groups
 grp = {}
-for g=1,num_groups_ do
+for g=1,num_groups do
     grp[g] = chiLBSCreateGroup(phys1)
 end
 
@@ -51,9 +51,9 @@ chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false," ")
 chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
 \endcode
 
-Groupsets segregate the code into pieces arranged by the number of groups_
+Groupsets segregate the code into pieces arranged by the number of groups
 it contains. A great deal of care must be taken with intergroupset transfer
-since the order in which the groupsets_ are executed determine what information
+since the order in which the groupsets are executed determine what information
 will be available to them.
 
 \ingroup LuaLBS*/
@@ -102,7 +102,7 @@ Example:
 \code
 --========== Groups
 grp = {}
-for g=1,num_groups_ do
+for g=1,num_groups do
     grp[g] = chiLBSCreateGroup(phys1)
 end
 \endcode
@@ -144,7 +144,7 @@ int chiLBSCreateGroup(lua_State *L)
 
 
 //###################################################################
-/**Adds a block of groups_ to a groupset.
+/**Adds a block of groups to a groupset.
 \param SolverIndex int Handle to the solver for which the group
 is to be created.
 \param GroupsetIndex int Handle to the groupset to which the group is
@@ -157,7 +157,7 @@ is to be created.
 Example:
 \code
 grp = {}
-for g=1,num_groups_ do
+for g=1,num_groups do
     grp[g] = chiLBSCreateGroup(phys1)
 end
 
@@ -199,12 +199,12 @@ int chiLBSGroupsetAddGroups(lua_State *L)
     throw std::runtime_error("chiLBSGroupsetAddGroups: Bad trouble.");
 
 
-  //============================================= Add the groups_
+  //============================================= Add the groups
   if (to<from)
   {
     chi::log.LogAllError()
-    << "No groups_ added to groupset in chiLBSGroupsetAddGroups. "
-       "This is triggered when groups_ are added with the \"to\" "
+    << "No groups added to groupset in chiLBSGroupsetAddGroups. "
+       "This is triggered when groups are added with the \"to\" "
        "field being less than the \"from\" field.";
     chi::Exit(EXIT_FAILURE);
   }
@@ -617,7 +617,7 @@ Biconjugate Gradient Stabilized method with cyclic dependency convergence.\n\n
 The iterative methods NPT_CLASSICRICHARDSON, NPT_CLASSICRICHARDSON_CYCLES,
 NPT_GMRES and NPT_GMRES_CYCLES are considered legacy. The NPT_GMRES and
 NPT_GMRES_CYCLES are now considered deprecated with the inclusion of the
-generalized Krylov iteration method-class (which supports all the options_
+generalized Krylov iteration method-class (which supports all the options
 prepended with KRYLOV_).
 
 RICHARDSON is probably the least memory consuming but has the poorest

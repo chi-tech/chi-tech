@@ -2,7 +2,7 @@
 #include "D_DO_Transient/SweepChunks/lbts_sweepchunk_pwl.h"
 
 //###################################################################
-/**Sets up the sweek chunk for the given discretization_ method.*/
+/**Sets up the sweek chunk for the given discretization method.*/
 std::shared_ptr<SweepChunk> lbs::DiscOrdTransientSolver::
   SetTransientSweepChunk(LBSGroupset& groupset)
 {
@@ -15,8 +15,8 @@ std::shared_ptr<SweepChunk> lbs::DiscOrdTransientSolver::
   //================================================== Setting up required
   //                                                   sweep chunks
   auto sweep_chunk = std::make_shared<SweepChunkPWLTransientTheta>(
-    grid_ptr_,                                //Spatial grid_ptr_ of cells
-    *discretization_,                         //Spatial discretization_
+    grid_ptr_,                                //Spatial grid of cells
+    *discretization_,                         //Spatial discretization
     unit_cell_matrices_,                      //Unit cell matrices
     cell_transport_views_,                    //Cell transport views
     phi_new_local_,                           //Destination phi

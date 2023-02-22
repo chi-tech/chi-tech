@@ -132,7 +132,7 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
     "Header size: 500 bytes\n"
     "Structure(type-info):\n"
     "uint64_t num_global_cells\n"
-    "uint64_t num_groups_\n"
+    "uint64_t num_groups\n"
     "uint64_t num_records\n"
     "Each record:\n"
     "  uint64_t     cell_global_id\n"

@@ -39,7 +39,7 @@ void lbs::LBSSolver::
     "Structure(type-info):\n"
     "size_t-num_local_nodes\n"
     "size_t-num_angles\n"
-    "size_t-num_groups_\n"
+    "size_t-num_groups\n"
     "size_t-num_records\n"
     "Each record:\n"
     "size_t-cell_global_id\n"
@@ -158,7 +158,7 @@ void lbs::LBSSolver::
     std::stringstream outstr;
     outstr << "num_local_nodes: " << file_num_local_nodes << "\n";
     outstr << "num_angles     : " << file_num_angles << "\n";
-    outstr << "num_groups_     : " << file_num_groups << "\n";
+    outstr << "num_groups     : " << file_num_groups << "\n";
     outstr << "num_local_dofs : " << file_num_local_dofs << "\n";
     chi::log.LogAll()
       << "Incompatible DOF data found in file " << file_name << "\n"

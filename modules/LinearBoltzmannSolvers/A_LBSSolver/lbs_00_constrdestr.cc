@@ -24,12 +24,12 @@ lbs::Options& lbs::LBSSolver::Options()
 size_t lbs::LBSSolver::NumMoments() const
 {return num_moments_;}
 
-/**Returns the number of groups_ for the solver. This will only be non-zero
+/**Returns the number of groups for the solver. This will only be non-zero
  * after initialization.*/
 size_t lbs::LBSSolver::NumGroups() const
 {return num_groups_;}
 
-/**Adds a group to the list of groups_. If group id < 0, the id will be logically
+/**Adds a group to the list of groups. If group id < 0, the id will be logically
  * derived from the list size. If >= 0 the id will be set to the id specified.*/
 void lbs::LBSSolver::AddGroup(int id)
 {
@@ -45,7 +45,7 @@ const std::vector<lbs::LBSGroup>& lbs::LBSSolver::Groups() const
   return groups_;
 }
 
-/**Adds a groupset to the list of groupsets_. The groupset id will be logically
+/**Adds a groupset to the list of groupsets. The groupset id will be logically
  * derived from the list size.*/
 void lbs::LBSSolver::AddGroupset()
 {

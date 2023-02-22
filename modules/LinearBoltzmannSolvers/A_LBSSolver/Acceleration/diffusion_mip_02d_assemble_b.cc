@@ -25,26 +25,26 @@ void lbs::acceleration::DiffusionMIPSolver::
 {
   const std::string fname = "lbs::acceleration::DiffusionMIPSolver::"
                             "Assemble_b";
-  if (m_A == nullptr or m_rhs == nullptr or m_ksp == nullptr)
+  if (A_ == nullptr or rhs_ == nullptr or ksp_ == nullptr)
     throw std::logic_error(fname + ": Some or all PETSc elements are null. "
                                    "Check that Initialize has been called.");
   if (options.verbose)
     chi::log.Log() << chi::program_timer.GetTimeString() << " Starting assembly";
 
-  const size_t num_groups   = m_uk_man.unknowns.front().num_components;
+  const size_t num_groups   = uk_man_.unknowns.front().num_components;
 
-  VecSet(m_rhs, 0.0);
-  for (const auto& cell : m_grid.local_cells)
+  VecSet(rhs_, 0.0);
+  for (const auto& cell : grid_.local_cells)
   {
     const size_t num_faces    = cell.faces.size();
-    const auto&  cell_mapping = m_sdm.GetCellMapping(cell);
+    const auto&  cell_mapping = sdm_.GetCellMapping(cell);
     const size_t num_nodes    = cell_mapping.NumNodes();
     const auto   cc_nodes     = cell_mapping.GetNodeLocations();
-    const auto&  unit_cell_matrices = m_unit_cell_matrices[cell.local_id];
+    const auto&  unit_cell_matrices = unit_cell_matrices_[cell.local_id];
 
     const auto& cell_M_matrix = unit_cell_matrices.M_matrix;
 
-    const auto& xs = m_map_mat_id_2_xs.at(cell.material_id);
+    const auto& xs = mat_id_2_xs_map.at(cell.material_id);
 
     for (size_t g=0; g<num_groups; ++g)
     {
@@ -53,17 +53,17 @@ void lbs::acceleration::DiffusionMIPSolver::
 
       std::vector<double> qg(num_nodes, 0.0);
       for (size_t j=0; j<num_nodes; j++)
-        qg[j] = q_vector[m_sdm.MapDOFLocal(cell, j, m_uk_man, 0, g)];
+        qg[j] = q_vector[sdm_.MapDOFLocal(cell, j, uk_man_, 0, g)];
 
       //==================================== Assemble continuous terms
       for (size_t i=0; i<num_nodes; i++)
       {
-        const int64_t imap = m_sdm.MapDOF(cell,i,m_uk_man,0,g);
+        const int64_t imap = sdm_.MapDOF(cell, i, uk_man_, 0, g);
         double entry_rhs_i = 0.0;
         for (size_t j=0; j<num_nodes; j++)
           entry_rhs_i += qg[j]* cell_M_matrix[i][j];
 
-        VecSetValue(m_rhs, imap, entry_rhs_i, ADD_VALUES);
+        VecSetValue(rhs_, imap, entry_rhs_i, ADD_VALUES);
       }//for i
 
       //==================================== Assemble face terms
@@ -82,8 +82,8 @@ void lbs::acceleration::DiffusionMIPSolver::
         if (not face.has_neighbor)
         {
           auto bc = DefaultBCDirichlet;
-          if (m_bcs.count(face.neighbor_id) > 0)
-            bc = m_bcs.at(face.neighbor_id);
+          if (bcs_.count(face.neighbor_id) > 0)
+            bc = bcs_.at(face.neighbor_id);
 
           if (bc.type == BCType::DIRICHLET)
           {
@@ -102,7 +102,7 @@ void lbs::acceleration::DiffusionMIPSolver::
             for (size_t fi=0; fi<num_face_nodes; ++fi)
             {
               const int i  = cell_mapping.MapFaceNode(f,fi);
-              const int64_t imap = m_sdm.MapDOF(cell, i, m_uk_man, 0, g);
+              const int64_t imap = sdm_.MapDOF(cell, i, uk_man_, 0, g);
 
               for (size_t fj=0; fj<num_face_nodes; ++fj)
               {
@@ -111,7 +111,7 @@ void lbs::acceleration::DiffusionMIPSolver::
                 const double aij = kappa*face_M[i][jm];
                 const double aij_bc_value = aij*bc_value;
 
-                VecSetValue(m_rhs, imap, aij_bc_value, ADD_VALUES);
+                VecSetValue(rhs_, imap, aij_bc_value, ADD_VALUES);
               }//for fj
             }//for fi
 
@@ -122,14 +122,14 @@ void lbs::acceleration::DiffusionMIPSolver::
             // D* n dot (b_j^+ - b_j^-)*nabla b_i^-
             for (size_t i=0; i<num_nodes; i++)
             {
-              const int64_t imap = m_sdm.MapDOF(cell, i, m_uk_man, 0, g);
+              const int64_t imap = sdm_.MapDOF(cell, i, uk_man_, 0, g);
 
               for (size_t j=0; j<num_nodes; j++)
               {
                 const double aij = -Dg*n_f.Dot(face_G[j][i] + face_G[i][j]);
                 const double aij_bc_value = aij*bc_value;
 
-                VecSetValue(m_rhs, imap, aij_bc_value, ADD_VALUES);
+                VecSetValue(rhs_, imap, aij_bc_value, ADD_VALUES);
               }//for fj
             }//for i
           }//Dirichlet BC
@@ -143,13 +143,13 @@ void lbs::acceleration::DiffusionMIPSolver::
             for (size_t fi=0; fi<num_face_nodes; fi++)
             {
               const int i  = cell_mapping.MapFaceNode(f,fi);
-              const int64_t ir = m_sdm.MapDOF(cell, i, m_uk_man, 0, g);
+              const int64_t ir = sdm_.MapDOF(cell, i, uk_man_, 0, g);
 
               if (std::fabs(fval) >= 1.0e-12)
               {
                 const double rhs_val = (fval/bval) * face_Si[i];
 
-                VecSetValue(m_rhs,ir, rhs_val, ADD_VALUES);
+                VecSetValue(rhs_, ir, rhs_val, ADD_VALUES);
               }//if f nonzero
             }//for fi
           }//Robin BC
@@ -158,8 +158,8 @@ void lbs::acceleration::DiffusionMIPSolver::
     }//for g
   }//for cell
 
-  VecAssemblyBegin(m_rhs);
-  VecAssemblyEnd(m_rhs);
+  VecAssemblyBegin(rhs_);
+  VecAssemblyEnd(rhs_);
 
   if (options.verbose)
     chi::log.Log() << chi::program_timer.GetTimeString() << " Assembly completed";
@@ -173,29 +173,29 @@ Assemble_b(Vec petsc_q_vector)
 {
   const std::string fname = "lbs::acceleration::DiffusionMIPSolver::"
                             "Assemble_b";
-  if (m_A == nullptr or m_rhs == nullptr or m_ksp == nullptr)
+  if (A_ == nullptr or rhs_ == nullptr or ksp_ == nullptr)
     throw std::logic_error(fname + ": Some or all PETSc elements are null. "
                                    "Check that Initialize has been called.");
   if (options.verbose)
     chi::log.Log() << chi::program_timer.GetTimeString() << " Starting assembly";
 
-  const size_t num_groups   = m_uk_man.unknowns.front().num_components;
+  const size_t num_groups   = uk_man_.unknowns.front().num_components;
 
   const double* q_vector;
   VecGetArrayRead(petsc_q_vector, &q_vector);
 
-  VecSet(m_rhs, 0.0);
-  for (const auto& cell : m_grid.local_cells)
+  VecSet(rhs_, 0.0);
+  for (const auto& cell : grid_.local_cells)
   {
     const size_t num_faces    = cell.faces.size();
-    const auto&  cell_mapping = m_sdm.GetCellMapping(cell);
+    const auto&  cell_mapping = sdm_.GetCellMapping(cell);
     const size_t num_nodes    = cell_mapping.NumNodes();
     const auto   cc_nodes     = cell_mapping.GetNodeLocations();
-    const auto&  unit_cell_matrices = m_unit_cell_matrices[cell.local_id];
+    const auto&  unit_cell_matrices = unit_cell_matrices_[cell.local_id];
 
     const auto& cell_M_matrix = unit_cell_matrices.M_matrix;
 
-    const auto& xs = m_map_mat_id_2_xs.at(cell.material_id);
+    const auto& xs = mat_id_2_xs_map.at(cell.material_id);
 
     for (size_t g=0; g<num_groups; ++g)
     {
@@ -204,17 +204,17 @@ Assemble_b(Vec petsc_q_vector)
 
       std::vector<double> qg(num_nodes, 0.0);
       for (size_t j=0; j<num_nodes; j++)
-        qg[j] = q_vector[m_sdm.MapDOFLocal(cell, j, m_uk_man, 0, g)];
+        qg[j] = q_vector[sdm_.MapDOFLocal(cell, j, uk_man_, 0, g)];
 
       //==================================== Assemble continuous terms
       for (size_t i=0; i<num_nodes; i++)
       {
-        const int64_t imap = m_sdm.MapDOF(cell,i,m_uk_man,0,g);
+        const int64_t imap = sdm_.MapDOF(cell, i, uk_man_, 0, g);
         double entry_rhs_i = 0.0;
         for (size_t j=0; j<num_nodes; j++)
           entry_rhs_i += qg[j]* cell_M_matrix[i][j];
 
-        VecSetValue(m_rhs, imap, entry_rhs_i, ADD_VALUES);
+        VecSetValue(rhs_, imap, entry_rhs_i, ADD_VALUES);
       }//for i
 
       //==================================== Assemble face terms
@@ -233,8 +233,8 @@ Assemble_b(Vec petsc_q_vector)
         if (not face.has_neighbor)
         {
           auto bc = DefaultBCDirichlet;
-          if (m_bcs.count(face.neighbor_id) > 0)
-            bc = m_bcs.at(face.neighbor_id);
+          if (bcs_.count(face.neighbor_id) > 0)
+            bc = bcs_.at(face.neighbor_id);
 
           if (bc.type == BCType::DIRICHLET)
           {
@@ -253,7 +253,7 @@ Assemble_b(Vec petsc_q_vector)
             for (size_t fi=0; fi<num_face_nodes; ++fi)
             {
               const int i  = cell_mapping.MapFaceNode(f,fi);
-              const int64_t imap = m_sdm.MapDOF(cell, i, m_uk_man, 0, g);
+              const int64_t imap = sdm_.MapDOF(cell, i, uk_man_, 0, g);
 
               for (size_t fj=0; fj<num_face_nodes; ++fj)
               {
@@ -262,7 +262,7 @@ Assemble_b(Vec petsc_q_vector)
                 const double aij = kappa*face_M[i][jm];
                 const double aij_bc_value = aij*bc_value;
 
-                VecSetValue(m_rhs, imap, aij_bc_value, ADD_VALUES);
+                VecSetValue(rhs_, imap, aij_bc_value, ADD_VALUES);
               }//for fj
             }//for fi
 
@@ -273,14 +273,14 @@ Assemble_b(Vec petsc_q_vector)
             // D* n dot (b_j^+ - b_j^-)*nabla b_i^-
             for (size_t i=0; i<num_nodes; i++)
             {
-              const int64_t imap = m_sdm.MapDOF(cell, i, m_uk_man, 0, g);
+              const int64_t imap = sdm_.MapDOF(cell, i, uk_man_, 0, g);
 
               for (size_t j=0; j<num_nodes; j++)
               {
                 const double aij = -Dg*n_f.Dot(face_G[j][i] + face_G[i][j]);
                 const double aij_bc_value = aij*bc_value;
 
-                VecSetValue(m_rhs, imap, aij_bc_value, ADD_VALUES);
+                VecSetValue(rhs_, imap, aij_bc_value, ADD_VALUES);
               }//for fj
             }//for i
           }//Dirichlet BC
@@ -294,13 +294,13 @@ Assemble_b(Vec petsc_q_vector)
             for (size_t fi=0; fi<num_face_nodes; fi++)
             {
               const int i  = cell_mapping.MapFaceNode(f,fi);
-              const int64_t ir = m_sdm.MapDOF(cell, i, m_uk_man, 0, g);
+              const int64_t ir = sdm_.MapDOF(cell, i, uk_man_, 0, g);
 
               if (std::fabs(fval) >= 1.0e-12)
               {
                 const double rhs_val = (fval/bval) * face_Si[i];
 
-                VecSetValue(m_rhs,ir, rhs_val, ADD_VALUES);
+                VecSetValue(rhs_, ir, rhs_val, ADD_VALUES);
               }//if f nonzero
             }//for fi
           }//Robin BC
@@ -311,8 +311,8 @@ Assemble_b(Vec petsc_q_vector)
 
   VecRestoreArrayRead(petsc_q_vector, &q_vector);
 
-  VecAssemblyBegin(m_rhs);
-  VecAssemblyEnd(m_rhs);
+  VecAssemblyBegin(rhs_);
+  VecAssemblyEnd(rhs_);
 
   if (options.verbose)
     chi::log.Log() << chi::program_timer.GetTimeString() << " Assembly completed";

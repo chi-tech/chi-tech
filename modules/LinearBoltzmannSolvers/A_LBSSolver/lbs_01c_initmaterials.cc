@@ -88,7 +88,7 @@ void lbs::LBSSolver::InitMaterials()
           chi::log.LogAllWarning()
             << fname + ": Isotropic Multigroup source specified in "
             << "material \"" << current_material->name << "\" has fewer "
-            << "energy groups_ than called for in the simulation. "
+            << "energy groups than called for in the simulation. "
             << "Source will be ignored.";
         }
         else
@@ -106,14 +106,14 @@ void lbs::LBSSolver::InitMaterials()
         << "material \"" << current_material->name << "\".";
       chi::Exit(EXIT_FAILURE);
     }
-    //====================================== Check number of groups_ legal
+    //====================================== Check number of groups legal
     if (matid_to_xs_map_[mat_id]->num_groups < groups_.size())
     {
       chi::log.LogAllError()
         << fname + ": Found material \"" << current_material->name << "\" has "
-        << matid_to_xs_map_[mat_id]->num_groups << " groups_ and"
-        << " the simulation has " << groups_.size() << " groups_."
-        << " The material must have a greater or equal amount of groups_.";
+        << matid_to_xs_map_[mat_id]->num_groups << " groups and"
+        << " the simulation has " << groups_.size() << " groups."
+        << " The material must have a greater or equal amount of groups.";
       chi::Exit(EXIT_FAILURE);
     }
 

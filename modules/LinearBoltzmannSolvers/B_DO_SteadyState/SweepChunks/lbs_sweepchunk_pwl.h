@@ -15,7 +15,7 @@ typedef std::map<int,std::shared_ptr<chi_physics::TransportCrossSections>> TCros
 namespace lbs
 {
 //###################################################################
-/**Sweep chunk for cartesian PWLD discretization_.*/
+/**Sweep chunk for cartesian PWLD discretization.*/
 class SweepChunkPWL : public chi_mesh::sweep_management::SweepChunk
 {
 protected:

@@ -15,7 +15,7 @@ void lbs::LBSSolver::InitializePointSources()
       throw std::logic_error(
         fname + ": Point source multigroup strength vector "
                 "is not compatible with the number of "
-                "groups_ in the simulaation. Expected " +
+                "groups in the simulation. Expected " +
         std::to_string(num_groups_) + " found " +
         std::to_string(point_source.Strength().size()));
 

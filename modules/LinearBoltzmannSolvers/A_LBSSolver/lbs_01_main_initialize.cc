@@ -7,7 +7,7 @@
 /** Initialize the solver.*/
 void lbs::LBSSolver::Initialize()
 {
-  PerformInputChecks();                //a assigns num_groups_ and grid_ptr_
+  PerformInputChecks();                //a assigns num_groups and grid
   PrintSimHeader();                    //b
 
   MPI_Barrier(MPI_COMM_WORLD);

@@ -14,46 +14,46 @@
  * RHS vector. Creating the KSP solver. Setting the very specialized parameters
  * for Hypre's BooomerAMG. Note: `PCSetFromOptions` and
  * `KSPSetFromOptions` are called at the end. Therefore, any number of
- * additional PETSc options_ can be passed via the commandline.*/
+ * additional PETSc options can be passed via the commandline.*/
 void lbs::acceleration::DiffusionMIPSolver::Initialize()
 {
   if (options.verbose)
-    chi::log.Log() << m_text_name << ": Initializing PETSc items";
+    chi::log.Log() << text_name_ << ": Initializing PETSc items";
 
   if (options.verbose)
     chi::log.Log()
-    << m_text_name
-    << ": Global number of DOFs=" << m_num_global_dofs;
+      << text_name_
+      << ": Global number of DOFs=" << num_global_dofs_;
 
   //============================================= Create Matrix
   std::vector<int64_t> nodal_nnz_in_diag;
   std::vector<int64_t> nodal_nnz_off_diag;
-  m_sdm.BuildSparsityPattern(nodal_nnz_in_diag,
-                             nodal_nnz_off_diag,
-                             m_uk_man);
+  sdm_.BuildSparsityPattern(nodal_nnz_in_diag,
+                            nodal_nnz_off_diag,
+                            uk_man_);
 
-  m_A = chi_math::PETScUtils::CreateSquareMatrix(m_num_local_dofs,
-                                                 m_num_global_dofs);
-  chi_math::PETScUtils::InitMatrixSparsity(m_A,
+  A_ = chi_math::PETScUtils::CreateSquareMatrix(num_local_dofs_,
+                                                num_global_dofs_);
+  chi_math::PETScUtils::InitMatrixSparsity(A_,
                                            nodal_nnz_in_diag,
                                            nodal_nnz_off_diag);
 
   //============================================= Create RHS
-  m_rhs = chi_math::PETScUtils::CreateVector(m_num_local_dofs,
-                                             m_num_global_dofs);
+  rhs_ = chi_math::PETScUtils::CreateVector(num_local_dofs_,
+                                            num_global_dofs_);
 
   //============================================= Create KSP
-  KSPCreate(PETSC_COMM_WORLD, &m_ksp);
-  KSPSetOptionsPrefix(m_ksp, m_text_name.c_str());
-  KSPSetType(m_ksp, KSPCG);
+  KSPCreate(PETSC_COMM_WORLD, &ksp_);
+  KSPSetOptionsPrefix(ksp_, text_name_.c_str());
+  KSPSetType(ksp_, KSPCG);
 
-  KSPSetTolerances(m_ksp,1.e-50,
-                   options.residual_tolerance,1.0e50,
+  KSPSetTolerances(ksp_, 1.e-50,
+                   options.residual_tolerance, 1.0e50,
                    options.max_iters);
 
   //============================================= Set Pre-conditioner
   PC pc;
-  KSPGetPC(m_ksp,&pc);
+  KSPGetPC(ksp_, &pc);
 //  PCSetType(pc, PCGAMG);
   PCSetType(pc,PCHYPRE);
 
@@ -67,16 +67,16 @@ void lbs::acceleration::DiffusionMIPSolver::Initialize()
      "pc_hypre_boomeramg_coarsen_type HMIS",
      "pc_hypre_boomeramg_interp_type ext+i"};
 
-  if (m_grid.Attributes() & chi_mesh::DIMENSION_2)
+  if (grid_.Attributes() & chi_mesh::DIMENSION_2)
     pc_options.emplace_back("pc_hypre_boomeramg_strong_threshold 0.6");
-  if (m_grid.Attributes() & chi_mesh::DIMENSION_3)
+  if (grid_.Attributes() & chi_mesh::DIMENSION_3)
     pc_options.emplace_back("pc_hypre_boomeramg_strong_threshold 0.8");
 
   for (const auto& option : pc_options)
-    PetscOptionsInsertString(nullptr, ("-"+m_text_name+option).c_str());
+    PetscOptionsInsertString(nullptr, ("-" + text_name_ + option).c_str());
 
   PetscOptionsInsertString(nullptr, options.additional_options_string.c_str());
 
   PCSetFromOptions(pc);
-  KSPSetFromOptions(m_ksp);
+  KSPSetFromOptions(ksp_);
 }

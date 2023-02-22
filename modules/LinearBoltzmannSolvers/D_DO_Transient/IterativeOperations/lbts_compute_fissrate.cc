@@ -36,7 +36,7 @@ double DiscOrdTransientSolver::ComputeFissionRate(const bool previous)
       const size_t uk_map = transport_view.MapDOF(i, 0, 0);
       const double IntV_ShapeI = cell_matrices.Vi_vectors[i];
 
-      //=============================== Loop over groups_
+      //=============================== Loop over groups
       for (size_t g = first_grp; g <= last_grp; ++g)
         local_production += xs.sigma_f[g] *
                             phi[uk_map + g] *

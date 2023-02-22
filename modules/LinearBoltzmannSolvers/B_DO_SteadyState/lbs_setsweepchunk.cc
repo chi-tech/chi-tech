@@ -5,15 +5,15 @@
 typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
 
 //###################################################################
-/**Sets up the sweek chunk for the given discretization_ method.*/
+/**Sets up the sweek chunk for the given discretization method.*/
 std::shared_ptr<SweepChunk> lbs::DiscOrdSteadyStateSolver::
   SetSweepChunk(LBSGroupset& groupset)
 {
   //================================================== Setting up required
   //                                                   sweep chunks
   auto sweep_chunk = std::make_shared<SweepChunkPWL>(
-    grid_ptr_,                                    //Spatial grid_ptr_ of cells
-    *discretization_,                             //Spatial discretization_
+    grid_ptr_,                                    //Spatial grid of cells
+    *discretization_,                             //Spatial discretization
     unit_cell_matrices_,                          //Unit cell matrices
     cell_transport_views_,                        //Cell transport views
     phi_new_local_,                               //Destination phi
