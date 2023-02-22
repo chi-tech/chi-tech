@@ -47,6 +47,8 @@
 
  - <B>Variables</B> must use lower case and include "_" between words. i.e.
     num_faces. Variable must not start or end with an underscore.
+ - <B>class Members</B> same as variables but with a trailing "_". `struct`
+    members do not need trailing underscores.
  - <B>Namespaces</B> should be lower case and may include underscores
  - <B>FunctionNames</B> have no underscores and each word starts with a capital
    letter. Underscores can be allowed in some circumstances.
