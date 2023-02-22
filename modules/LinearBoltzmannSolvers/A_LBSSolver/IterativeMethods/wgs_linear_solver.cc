@@ -171,7 +171,7 @@ template<> void WGSLinearSolver<Mat, Vec, KSP>::PostSolveCallback()
   //============================================= Get convergence reason
   KSPConvergedReason reason;
   KSPGetConvergedReason(solver_,&reason);
-  if (reason != KSP_CONVERGED_RTOL)
+  if (reason != KSP_CONVERGED_RTOL and reason != KSP_DIVERGED_ITS)
     chi::log.Log0Warning()
       << "Krylov solver failed. "
       << "Reason: " << chi_physics::GetPETScConvergedReasonstring(reason);

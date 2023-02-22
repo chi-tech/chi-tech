@@ -29,7 +29,7 @@ void DiscOrdKEigenvalueSolver::PowerIteration()
   double k_eff_change = 1.0;
 
   //================================================== Start power iterations
-  primary_ags_solver_->SetVerbosity(options_.verbose_outer_iterations);
+  primary_ags_solver_->SetVerbosity(options_.verbose_ags_iterations);
   int nit = 0;
   bool converged = false;
   while (nit < max_iterations_)
