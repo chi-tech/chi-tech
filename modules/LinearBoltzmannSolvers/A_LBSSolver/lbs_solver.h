@@ -151,14 +151,6 @@ protected:
 //03d
   void InitWGDSA(LBSGroupset& groupset);
 public:
-  void ExecuteWGDSA(LBSGroupset& groupset,
-                    const std::vector<double>& ref_phi_old,
-                    std::vector<double>& ref_phi_new);
-  void AssembleWGDSADeltaPhiVector(const LBSGroupset& groupset,
-                                   const std::vector<double>& ref_phi_old,
-                                   const std::vector<double>& ref_phi_new,
-                                   std::vector<double>& delta_phi_local);
-
   void AssembleWGDSADeltaPhiVector(const LBSGroupset& groupset,
                                    const std::vector<double>& phi_in,
                                    std::vector<double>& delta_phi_local);
@@ -172,13 +164,6 @@ protected:
   //03e
   void InitTGDSA(LBSGroupset& groupset);
 public:
-  void ExecuteTGDSA(LBSGroupset& groupset,
-                    const std::vector<double>& ref_phi_old,
-                    std::vector<double>& ref_phi_new);
-  void AssembleTGDSADeltaPhiVector(const LBSGroupset& groupset,
-                                   const std::vector<double>& ref_phi_old,
-                                   const std::vector<double>& ref_phi_new,
-                                   std::vector<double>& delta_phi_local);
   void AssembleTGDSADeltaPhiVector(const LBSGroupset& groupset,
                                    const std::vector<double>& phi_in,
                                    std::vector<double>& delta_phi_local);

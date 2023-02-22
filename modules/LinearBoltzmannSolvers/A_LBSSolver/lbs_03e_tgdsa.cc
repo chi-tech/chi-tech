@@ -90,50 +90,6 @@ void lbs::LBSSolver::CleanUpTGDSA(LBSGroupset& groupset)
   if (groupset.apply_tgdsa) groupset.tgdsa_solver = nullptr;
 }
 
-//###################################################################
-/**Assembles a delta-phi vector on the first moment.*/
-void lbs::LBSSolver::
-  AssembleTGDSADeltaPhiVector(const LBSGroupset& groupset,
-                              const std::vector<double>& ref_phi_old,
-                              const std::vector<double>& ref_phi_new,
-                              std::vector<double>& delta_phi_local)
-{
-  const auto& sdm = *discretization_;
-  const auto& phi_uk_man  = flux_moments_uk_man_;
-
-  const int    gsi = groupset.groups.front().id;
-  const size_t gss = groupset.groups.size();
-
-  delta_phi_local.clear();
-  delta_phi_local.assign(local_node_count_, 0.0);
-
-  for (const auto& cell : grid_ptr_->local_cells)
-  {
-    const auto& cell_mapping = sdm.GetCellMapping(cell);
-    const size_t num_nodes = cell_mapping.NumNodes();
-    const auto& S = matid_to_xs_map_[cell.material_id]->transfer_matrices[0];
-
-    for (size_t i=0; i < num_nodes; ++i)
-    {
-      const int64_t dphi_map = sdm.MapDOFLocal(cell, i);
-      const int64_t  phi_map = sdm.MapDOFLocal(cell, i,  phi_uk_man, 0, 0);
-
-            double& delta_phi_mapped = delta_phi_local[dphi_map];
-      const double* phi_old_mapped   = &ref_phi_old[phi_map];
-      const double* phi_new_mapped   = &ref_phi_new[phi_map];
-
-      for (size_t g=0; g<gss; ++g)
-      {
-        double R_g = 0.0;
-        for (const auto& [row_g, gprime, sigma_sm] : S.Row(gsi+g))
-          if (gprime >= gsi and gprime != (gsi+g))
-            R_g += sigma_sm * (phi_new_mapped[gprime] - phi_old_mapped[gprime]);
-
-        delta_phi_mapped += R_g;
-      }//for g
-    }//for node
-  }//for cell
-}
 
 //###################################################################
 /**Assembles a delta-phi vector on the first moment.*/
@@ -213,21 +169,4 @@ void lbs::LBSSolver::
         phi_new_mapped[g] += delta_phi_mapped*xi_g[gsi+g];
     }//for dof
   }//for cell
-}
-
-//###################################################################
-/**Executes Two-Grid Acceleration. This involves assembling the system RHS,
- * solving the system and finally adding the solution to the scalar flux.*/
-void lbs::LBSSolver::
-  ExecuteTGDSA(LBSGroupset &groupset,
-               const std::vector<double>& ref_phi_old,
-               std::vector<double>& ref_phi_new)
-{
-  std::vector<double> delta_phi_local;
-  AssembleTGDSADeltaPhiVector(groupset, ref_phi_old, ref_phi_new, //inputs
-                              delta_phi_local);                   //output
-  groupset.tgdsa_solver->Assemble_b(delta_phi_local);
-  groupset.tgdsa_solver->Solve(delta_phi_local);
-  DisAssembleTGDSADeltaPhiVector(groupset, delta_phi_local, //inputs
-                                 ref_phi_new);              //output
 }

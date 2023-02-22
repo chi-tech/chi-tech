@@ -45,7 +45,6 @@ public:
   //03a
 protected:
   void InitializeSweepDataStructures();
-  void ComputeSweepOrderings(LBSGroupset& groupset) const;
   //03aa
   static
   std::pair<UniqueSOGroupings, DirIDToSOMap>
