@@ -19,7 +19,8 @@ enum class CellType
   POLYGON = 6,
   TETRAHEDRON = 7,
   HEXAHEDRON = 8,
-  POLYHEDRON = 9,
+  WEDGE = 9,
+  POLYHEDRON = 20,
   POINT = 99
 };
 

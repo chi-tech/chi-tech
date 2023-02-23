@@ -11,7 +11,8 @@
 #include <vtkXMLPUnstructuredGridWriter.h>
 
 //###################################################################
-/**Uploads vertices and cells to an unstructured grid.*/
+/**Uploads vertices and cells to an unstructured grid. This routine
+ * also uploads cell material ids (sub-domain ids) and partition ids.*/
 vtkNew<vtkUnstructuredGrid> chi_mesh::
   PrepareVtkUnstructuredGrid(const chi_mesh::MeshContinuum& grid)
 {

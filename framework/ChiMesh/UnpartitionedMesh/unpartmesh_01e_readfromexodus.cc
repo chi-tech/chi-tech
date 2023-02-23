@@ -8,6 +8,10 @@
 #include <vtkExodusIIReader.h>
 #include <vtkMultiBlockDataSet.h>
 
+#define ErrorReadingFile(fname) \
+std::runtime_error("Failed to open file: " + options.file_name + \
+" in call to " + #fname + ".")
+
 //###################################################################
 /**Reads an Exodus unstructured mesh.*/
 void chi_mesh::UnpartitionedMesh::
@@ -18,14 +22,7 @@ void chi_mesh::UnpartitionedMesh::
   //======================================== Attempt to open file
   std::ifstream file;
   file.open(options.file_name);
-
-  if (!file.is_open())
-  {
-    chi::log.LogAllError()
-      << "Failed to open file: "<< options.file_name <<" in call "
-      << "to ReadFromExodus \n";
-    chi::Exit(EXIT_FAILURE);
-  }
+  if (!file.is_open()) throw ErrorReadingFile(ReadFromExodus);
   file.close();
 
   //======================================== Read the file
@@ -63,11 +60,15 @@ void chi_mesh::UnpartitionedMesh::
 
   //======================================== Process blocks
   const int max_dimension = FindHighestDimension(grid_blocks);
-  const auto block_mat_ids = BuildBlockCellExtents(grid_blocks, max_dimension);
   auto ugrid = ConsolidateAndCleanBlocks(grid_blocks, max_dimension);
 
   //======================================== Copy Data
-  CopyUGridCellsAndPoints(*ugrid, block_mat_ids, options.scale);
+  CopyUGridCellsAndPoints(*ugrid, options.scale);
+
+  //======================================== Set material ids
+  const auto block_mat_ids =
+    BuildBlockCellExtents(grid_blocks, max_dimension);
+  SetMaterialIDsFromBlocks(block_mat_ids);
 
   //======================================== Always do this
   chi_mesh::MeshAttributes dimension = NONE;

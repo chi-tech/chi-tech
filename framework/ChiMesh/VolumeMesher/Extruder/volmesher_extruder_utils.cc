@@ -164,9 +164,21 @@ std::unique_ptr<chi_mesh::Cell> chi_mesh::VolumeMesherExtruder::
 {
   const size_t tc_num_verts = template_cell.vertex_ids.size();
 
+  //========================================= Determine cell sub-type
+  CellType extruded_subtype;
+  switch (template_cell.SubType())
+  {
+    case CellType::TRIANGLE:
+      extruded_subtype = CellType::WEDGE; break;
+    case CellType::QUADRILATERAL:
+      extruded_subtype = CellType::HEXAHEDRON; break;
+    default:
+      extruded_subtype = CellType::POLYHEDRON;
+  }
+
   //========================================= Create polyhedron
   auto cell = std::make_unique<chi_mesh::Cell>(CellType::POLYHEDRON,
-                                               CellType::POLYHEDRON);
+                                               extruded_subtype);
   cell->global_id    = cell_global_id;
   //cell->local_id set when added to mesh
   cell->partition_id = partition_id;

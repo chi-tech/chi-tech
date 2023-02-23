@@ -69,6 +69,7 @@ public:
            zmin=0.0, zmax=0.0;
   } bound_box;
 
+protected:
   static LightWeightCell* CreateCellFromVTKPolyhedron(vtkCell* vtk_cell);
   static LightWeightCell* CreateCellFromVTKHexahedron(vtkCell* vtk_cell);
   static LightWeightCell* CreateCellFromVTKTetrahedron(vtkCell* vtk_cell);
@@ -83,19 +84,29 @@ public:
 
   typedef vtkSmartPointer<vtkUnstructuredGrid> vtkUGridPtr;
   static int FindHighestDimension(std::vector<vtkUGridPtr>& ugrid_blocks);
-  static std::vector<uint64_t>
-    BuildBlockCellExtents(std::vector<vtkUGridPtr>& ugrid_blocks,
-                          int desired_dimension);
   static vtkUGridPtr
     ConsolidateAndCleanBlocks(std::vector<vtkUGridPtr>& ugrid_blocks,
                               int desired_dimension);
   void CopyUGridCellsAndPoints(vtkUnstructuredGrid& ugrid,
-                               const std::vector<uint64_t>& block_mat_ids,
                                double scale);
+
+
+  static std::vector<uint64_t>
+    BuildBlockCellExtents(std::vector<vtkUGridPtr>& ugrid_blocks,
+                          int desired_dimension);
+  void SetMaterialIDsFromBlocks(const std::vector<uint64_t>& block_mat_ids);
+
+  std::vector<int>
+    BuildCellMaterialIDsFromField(vtkUGridPtr &ugrid,
+                                  const std::string& field_name,
+                                  const std::string& file_name) const;
+  void SetMaterialIDsFromList(const std::vector<int>& material_ids);
+
 
   void BuildMeshConnectivity();
   void ComputeCentroidsAndCheckQuality();
 
+public:
   void ReadFromVTU(const Options& options);
   void ReadFromEnsightGold(const Options& options);
   void ReadFromWavefrontOBJ(const Options& options);
@@ -124,9 +135,6 @@ public:
     raw_boundary_cells.clear();
     vertex_cell_subscriptions.clear();
   }
-
-  void CopyUGridCellsAndPoints(vtkSmartPointer<vtkUnstructuredGrid> &ugrid, const std::vector<uint64_t> &block_mat_ids,
-                               const double scale);
 };
 
 
