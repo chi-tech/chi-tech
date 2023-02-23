@@ -12,15 +12,17 @@ enum class CellType
 {
   GHOST = 0,
   SLAB = 1,
-//  SPHERICAL_SHELL = 2,
-//  CYLINDRICAL_ANNULUS = 3,
+
   TRIANGLE = 4,
   QUADRILATERAL = 5,
   POLYGON = 6,
+
   TETRAHEDRON = 7,
   HEXAHEDRON = 8,
   WEDGE = 9,
+  PYRAMID = 10,
   POLYHEDRON = 20,
+
   POINT = 99
 };
 

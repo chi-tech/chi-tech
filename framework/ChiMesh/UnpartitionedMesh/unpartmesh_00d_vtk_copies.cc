@@ -87,7 +87,6 @@ void chi_mesh::UnpartitionedMesh::
   for (size_t c=0; c<total_cell_count; ++c)
   {
     auto vtk_cell = ugrid.GetCell(static_cast<vtkIdType>(c));
-    auto vtk_celltype = vtk_cell->GetCellType();
     auto vtk_celldim = vtk_cell->GetCellDimension();
 
     if (vtk_celldim == 3)
@@ -100,25 +99,6 @@ void chi_mesh::UnpartitionedMesh::
       raw_cells.push_back(CreateCellFromVTKVertex(vtk_cell));
     else
       throw std::logic_error(fname + ": Unsupported cell dimension.");
-
-//    if (vtk_celltype == VTK_POLYHEDRON)
-//      raw_cells.push_back(CreateCellFromVTKPolyhedron(vtk_cell));
-//    else if (vtk_celltype == VTK_HEXAHEDRON)
-//      raw_cells.push_back(CreateCellFromVTKHexahedron(vtk_cell));
-//    else if (vtk_celltype == VTK_TETRA)
-//      raw_cells.push_back(CreateCellFromVTKTetrahedron(vtk_cell));
-//    else if (vtk_celltype == VTK_POLYGON)
-//      raw_cells.push_back(CreateCellFromVTKPolygon(vtk_cell));
-//    else if (vtk_celltype == VTK_QUAD)
-//      raw_cells.push_back(CreateCellFromVTKQuad(vtk_cell));
-//    else if (vtk_celltype == VTK_TRIANGLE)
-//      raw_cells.push_back(CreateCellFromVTKTriangle(vtk_cell));
-//    else if (vtk_celltype == VTK_LINE)
-//      raw_cells.push_back(CreateCellFromVTKLine(vtk_cell));
-//    else if (vtk_celltype == VTK_VERTEX)
-//      raw_cells.push_back(CreateCellFromVTKVertex(vtk_cell));
-//    else
-//      throw std::logic_error(fname + ": Unsupported cell type.");
   }//for c
 
   //======================================== Push points
@@ -278,6 +258,7 @@ std::vector<int> chi_mesh::UnpartitionedMesh::
 end_error_checks:
   return material_ids;
 }
+
 
 //###################################################################
 /**Set material-ids from list.*/

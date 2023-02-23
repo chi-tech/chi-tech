@@ -168,12 +168,9 @@ std::unique_ptr<chi_mesh::Cell> chi_mesh::VolumeMesherExtruder::
   CellType extruded_subtype;
   switch (template_cell.SubType())
   {
-    case CellType::TRIANGLE:
-      extruded_subtype = CellType::WEDGE; break;
-    case CellType::QUADRILATERAL:
-      extruded_subtype = CellType::HEXAHEDRON; break;
-    default:
-      extruded_subtype = CellType::POLYHEDRON;
+    case CellType::TRIANGLE:      extruded_subtype = CellType::WEDGE; break;
+    case CellType::QUADRILATERAL: extruded_subtype = CellType::HEXAHEDRON; break;
+    default:                      extruded_subtype = CellType::POLYHEDRON;
   }
 
   //========================================= Create polyhedron

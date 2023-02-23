@@ -36,7 +36,16 @@ void chi_mesh::UploadCellGeometry(const chi_mesh::MeshContinuum &grid,
   }
   if (cell.Type() == chi_mesh::CellType::POLYGON)
   {
-    ugrid->InsertNextCell(VTK_POLYGON,
+    int vtk_subtype;
+    switch (cell.SubType())
+    {
+      case CellType::POLYGON:       vtk_subtype = VTK_POLYGON; break;
+      case CellType::QUADRILATERAL: vtk_subtype = VTK_QUAD; break;
+      case CellType::TRIANGLE:      vtk_subtype = VTK_TRIANGLE; break;
+      default: vtk_subtype = VTK_POLYGON; break;
+    }
+
+    ugrid->InsertNextCell(vtk_subtype,
                           static_cast<vtkIdType>(num_verts),
                           cell_vids.data());
   }
@@ -65,7 +74,18 @@ void chi_mesh::UploadCellGeometry(const chi_mesh::MeshContinuum &grid,
         faces_vids.push_back(vid);
     }//for f
 
-    ugrid->InsertNextCell(VTK_POLYHEDRON,
+    int vtk_subtype;
+    switch (cell.SubType())
+    {
+      case CellType::POLYHEDRON:  vtk_subtype = VTK_POLYHEDRON; break;
+      case CellType::PYRAMID:     vtk_subtype = VTK_PYRAMID; break;
+      case CellType::WEDGE:       vtk_subtype = VTK_WEDGE; break;
+      case CellType::HEXAHEDRON:  vtk_subtype = VTK_HEXAHEDRON; break;
+      case CellType::TETRAHEDRON: vtk_subtype = VTK_TETRA; break;
+      default: vtk_subtype = VTK_POLYHEDRON; break;
+    }
+
+    ugrid->InsertNextCell(vtk_subtype,
                           static_cast<vtkIdType>(num_verts),
                           cell_vids.data(),
                           static_cast<vtkIdType>(num_faces),

@@ -71,15 +71,8 @@ public:
 
 protected:
   static LightWeightCell* CreateCellFromVTKPolyhedron(vtkCell* vtk_cell);
-  static LightWeightCell* CreateCellFromVTKHexahedron(vtkCell* vtk_cell);
-  static LightWeightCell* CreateCellFromVTKTetrahedron(vtkCell* vtk_cell);
-
   static LightWeightCell* CreateCellFromVTKPolygon(vtkCell* vtk_cell);
-  static LightWeightCell* CreateCellFromVTKQuad(vtkCell* vtk_cell);
-  static LightWeightCell* CreateCellFromVTKTriangle(vtkCell* vtk_cell);
-
   static LightWeightCell* CreateCellFromVTKLine(vtkCell* vtk_cell);
-
   static LightWeightCell* CreateCellFromVTKVertex(vtkCell* vtk_cell);
 
   typedef vtkSmartPointer<vtkUnstructuredGrid> vtkUGridPtr;
@@ -103,10 +96,10 @@ protected:
   void SetMaterialIDsFromList(const std::vector<int>& material_ids);
 
 
+public:
   void BuildMeshConnectivity();
   void ComputeCentroidsAndCheckQuality();
 
-public:
   void ReadFromVTU(const Options& options);
   void ReadFromEnsightGold(const Options& options);
   void ReadFromWavefrontOBJ(const Options& options);
