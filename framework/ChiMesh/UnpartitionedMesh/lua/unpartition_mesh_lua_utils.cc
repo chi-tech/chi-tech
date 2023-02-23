@@ -1,17 +1,23 @@
 #include "unpartition_mesh_lua_utils.h"
 
-#include "chi_runtime.h"
+#define RegisterFunction(x) \
+  lua_register(L, #x, chi_mesh::unpartition_mesh_lua_utils::x)
 
 namespace chi_mesh::unpartition_mesh_lua_utils
 {
-chi_mesh::UnpartitionedMesh&
-  GetUnpartitionedMeshByHandle(int handle,
-                               const std::string& calling_function_name)
+void RegisterLuaEntities(lua_State* L)
 {
-  const std::string func_name = __FUNCTION__;
+  RegisterFunction(chiCreateEmptyUnpartitionedMesh);
+  RegisterFunction(chiDestroyUnpartitionedMesh);
 
-  return chi::GetStackItem<chi_mesh::UnpartitionedMesh>(
-    chi::unpartitionedmesh_stack,
-    handle, func_name);
+  RegisterFunction(chiUnpartitionedMeshFromVTU);
+  RegisterFunction(chiUnpartitionedMeshFromEnsightGold);
+  RegisterFunction(chiUnpartitionedMeshFromWavefrontOBJ);
+  RegisterFunction(chiUnpartitionedMeshFromMshFormat);
+  RegisterFunction(chiUnpartitionedMeshFromExodusII);
+
+  RegisterFunction(chiUnpartitionedMeshUploadVertex);
+  RegisterFunction(chiUnpartitionedMeshUploadCell);
+  RegisterFunction(chiUnpartitionedMeshFinalizeEmpty);
 }
 }//namespace chi_mesh

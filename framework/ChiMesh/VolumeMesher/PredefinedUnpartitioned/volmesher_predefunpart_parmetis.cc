@@ -7,8 +7,6 @@
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-;
-
 
 #include "petsc.h"
 

@@ -34,17 +34,7 @@ void chi_mesh::lua_utils::RegisterLuaEntities(lua_State *L)
   LUA_FMACRO1(chiMeshCreateUnpartitioned2DOrthoMesh);
   LUA_FMACRO1(chiMeshCreateUnpartitioned3DOrthoMesh);
 
-  LUA_FMACRO1(chiCreateEmptyUnpartitionedMesh);
-  LUA_FMACRO1(chiDestroyUnpartitionedMesh);
-
-  LUA_FMACRO1(chiUnpartitionedMeshFromVTU);
-  LUA_FMACRO1(chiUnpartitionedMeshFromEnsightGold);
-  LUA_FMACRO1(chiUnpartitionedMeshFromWavefrontOBJ);
-  LUA_FMACRO1(chiUnpartitionedMeshFromMshFormat);
-
-  LUA_FMACRO1(chiUnpartitionedMeshUploadVertex);
-  LUA_FMACRO1(chiUnpartitionedMeshUploadCell);
-  LUA_FMACRO1(chiUnpartitionedMeshFinalizeEmpty);
+  unpartition_mesh_lua_utils::RegisterLuaEntities(L);
 
   //=================================== Logical Volume
   LUA_FMACRO1(chiLogicalVolumeCreate);

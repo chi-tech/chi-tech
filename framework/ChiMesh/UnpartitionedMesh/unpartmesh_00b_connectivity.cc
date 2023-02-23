@@ -2,13 +2,10 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
 
 #include "ChiTimer/chi_timer.h"
 
-
 #include "chi_mpi.h"
-
 
 //###################################################################
 /**Establishes neighbor connectivity for the light-weight mesh.*/

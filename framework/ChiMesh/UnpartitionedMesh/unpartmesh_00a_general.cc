@@ -4,12 +4,8 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
 
 #include "ChiTimer/chi_timer.h"
-
-
-
 
 /**Compute centroids for all cells.*/
 void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()

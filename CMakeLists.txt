@@ -122,6 +122,7 @@ else ()
             IOXML ParallelCore IOParallelXML
             FiltersCore
             IOEnSight
+            IOExodus
             REQUIRED PATHS ${VTK_DIR})
     # vtk_module_autoinit is needed
     vtk_module_autoinit(TARGETS ${TARGET} MODULES ${VTK_LIBRARIES})

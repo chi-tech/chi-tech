@@ -320,11 +320,21 @@ def run_test(file_name, comment, num_procs, search_strings_vals_tols):
             run_test_local(file_name, comment, num_procs,
                            search_strings_vals_tols)
 
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#                             Mesh IO tests
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# Tests 1 - 1
+run_test(
+    file_name="MeshIO/ReadWavefrontObj",
+    comment="Mesh reading 2D Wavefront.obj",
+    num_procs=4,
+    search_strings_vals_tols=[
+        ["StrCompare", "VolumeMesherPredefinedUnpartitioned: Cells created = 3242"]])
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                             CFEM Diffusion Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 1 - 5
+# Tests 2 - 6
 
 run_test(
     file_name="CFEM_Diffusion/cDiffusion_2D_1a_linear",
@@ -359,7 +369,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                             CFEM Diffusion Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 6 - 10
+# Tests 7 - 11
 
 run_test(
     file_name="DFEM_Diffusion/dDiffusion_2D_1a_linear",
@@ -394,7 +404,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                                  Diffusion Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 11 - 22
+# Tests 12 - 23
 
 
 run_test(
@@ -472,7 +482,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                     Steady State Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 23 - 38
+# Tests 24 - 39
 
 run_test(
     file_name="Transport_Steady/Transport1D_1",
@@ -613,7 +623,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                     k-Eigenvalue Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 39
+# Tests 40
 
 run_test(
     file_name="Transport_Keigen/KEigenvalueTransport1D_1G",
@@ -625,7 +635,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #         Steady-State Cylindrical Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 40 - 41
+# Tests 41 - 42
 
 run_test(
     file_name="Transport_Steady_Cyl/Transport2DCyl_1Monoenergetic",
@@ -643,7 +653,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #             Steady-State Adjoint Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 42 - 50
+# Tests 43 - 51
 
 run_test(
     file_name="Transport_Adjoint/Adjoint2D_1a_forward",

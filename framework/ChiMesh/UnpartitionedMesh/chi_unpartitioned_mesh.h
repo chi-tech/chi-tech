@@ -4,7 +4,10 @@
 #include "ChiMesh/chi_mesh.h"
 #include "ChiMesh/Cell/cell.h"
 
-#include <vtkCell.h>
+class vtkCell;
+class vtkUnstructuredGrid;
+template<class T>
+class vtkSmartPointer;
 
 //###################################################################
 /**This object is intented for unpartitioned meshes that still require
@@ -78,6 +81,18 @@ public:
 
   static LightWeightCell* CreateCellFromVTKVertex(vtkCell* vtk_cell);
 
+  typedef vtkSmartPointer<vtkUnstructuredGrid> vtkUGridPtr;
+  static int FindHighestDimension(std::vector<vtkUGridPtr>& ugrid_blocks);
+  static std::vector<uint64_t>
+    BuildBlockCellExtents(std::vector<vtkUGridPtr>& ugrid_blocks,
+                          int desired_dimension);
+  static vtkUGridPtr
+    ConsolidateAndCleanBlocks(std::vector<vtkUGridPtr>& ugrid_blocks,
+                              int desired_dimension);
+  void CopyUGridCellsAndPoints(vtkUnstructuredGrid& ugrid,
+                               const std::vector<uint64_t>& block_mat_ids,
+                               double scale);
+
   void BuildMeshConnectivity();
   void ComputeCentroidsAndCheckQuality();
 
@@ -86,6 +101,8 @@ public:
   void ReadFromWavefrontOBJ(const Options& options);
 
   void ReadFromMsh(const Options& options);
+
+  void ReadFromExodus(const Options& options);
 
   void PushProxyCell(const std::string& type_str,
                      const std::string& sub_type_str,
@@ -107,6 +124,9 @@ public:
     raw_boundary_cells.clear();
     vertex_cell_subscriptions.clear();
   }
+
+  void CopyUGridCellsAndPoints(vtkSmartPointer<vtkUnstructuredGrid> &ugrid, const std::vector<uint64_t> &block_mat_ids,
+                               const double scale);
 };
 
 
