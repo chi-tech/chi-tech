@@ -148,7 +148,7 @@ int chiSimTest01_FV(lua_State* L)
 
   ff->UpdateFieldVector(field);
 
-  ff->ExportToVTK("CodeTut1_FV");
+  chi_physics::FieldFunction::ExportMultipleToVTK("CodeTut1_FV", {ff});
 
   return 0;
 }

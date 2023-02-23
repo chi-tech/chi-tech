@@ -218,7 +218,7 @@ int chiSimTest04_PWLC(lua_State* L)
 
   ff->UpdateFieldVector(field);
 
-  ff->ExportToVTK("CodeTut4_PWLC");
+  chi_physics::FieldFunction::ExportMultipleToVTK("CodeTut4_PWLC", {ff});
 
   //============================================= Compute error
   //First get ghosted values

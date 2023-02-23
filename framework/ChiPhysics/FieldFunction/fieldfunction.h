@@ -76,21 +76,13 @@ public:
   void UpdateFieldVector(const Vec& field_vector);
 
   //03 Export VTK
-  void ExportToVTK(const std::string& file_base_name) const;
   typedef std::vector<std::shared_ptr<const FieldFunction>> FFList;
   static
   void ExportMultipleToVTK(const std::string& file_base_name,
                            const FFList& ff_list);
 
-protected:
-  //04 Utils
-  static void UploadCellGeometry(const chi_mesh::MeshContinuum& grid,
-                          const chi_mesh::Cell &cell,
-                          int64_t& node_counter,
-                          vtkNew<vtkPoints>& points,
-                          vtkNew<vtkUnstructuredGrid> &ugrid);
-
 public:
+  //04 Utils
   std::vector<double> GetGhostedFieldVector() const;
 };
 

@@ -328,7 +328,8 @@ int chiSimTest06_WDD(lua_State* L)
   );
 
   phi_ff->UpdateFieldVector(m0_phi);
-  phi_ff->ExportToVTK("SimTest_06_WDD");
+
+  chi_physics::FieldFunction::ExportMultipleToVTK("SimTest_06_WDD", {phi_ff});
 
   return 0;
 }

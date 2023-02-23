@@ -150,7 +150,7 @@ int chiSimTest02_FV(lua_State* L)
 
   ff->UpdateFieldVector(field);
 
-  ff->ExportToVTK("CodeTut2_FV");
+  chi_physics::FieldFunction::ExportMultipleToVTK("CodeTut2_FV", {ff});
 
   //============================================= Make ghosted vectors
   std::vector<int64_t> ghost_ids = sdm.GetGhostDOFIndices(OneDofPerNode);
@@ -224,7 +224,7 @@ int chiSimTest02_FV(lua_State* L)
 
   ff_grad->UpdateFieldVector(grad_phi);
 
-  ff_grad->ExportToVTK("CodeTut2_FV_grad");
+  chi_physics::FieldFunction::ExportMultipleToVTK("CodeTut2_FV_grad", {ff_grad});
 
   return 0;
 }

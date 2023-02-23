@@ -184,7 +184,8 @@ int chiSimTest92_DSA(lua_State* L)
     );
 
   ff->UpdateFieldVector(x_vector);
-  ff->ExportToVTK("SimTest_92a_DSA");
+
+  chi_physics::FieldFunction::ExportMultipleToVTK("SimTest_92a_DSA", {ff});
 
   //============================================= Compute error
   //First get ghosted values

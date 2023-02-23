@@ -26,7 +26,8 @@ int chiExportFieldFunctionToVTK(lua_State *L)
 
   auto ff = chi::GetStackItemPtr(chi::field_function_stack, ff_handle, fname);
 
-  ff->ExportToVTK(base_name);
+//  ff->ExportToVTK(base_name);
+  chi_physics::FieldFunction::ExportMultipleToVTK(base_name, {ff});
 
   return 0;
 }
