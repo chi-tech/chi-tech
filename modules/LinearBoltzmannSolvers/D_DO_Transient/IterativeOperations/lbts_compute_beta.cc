@@ -20,7 +20,7 @@ double lbs::DiscOrdTransientSolver::ComputeBeta()
     auto xs = transport_view.XS();
 
     //skip cell if not fissionable
-    if (!xs.is_fissionable)
+    if (!xs.is_fissionable_)
       continue;
 
     //============================= Loop over groupsets
@@ -31,9 +31,9 @@ double lbs::DiscOrdTransientSolver::ComputeBeta()
 
       //============================= Loop over groupset groups
       for (size_t g = gs_i; g <= gs_f; ++g)
-        for (unsigned int j = 0; j < xs.num_precursors; ++j)
+        for (unsigned int j = 0; j < xs.num_precursors_; ++j)
         {
-          const auto& precursor = xs.precursors[j];
+          const auto& precursor = xs.precursors_[j];
 
           //TODO: Verify that this is correct.
           localDNPR += precursor.emission_spectrum[g] *

@@ -503,7 +503,7 @@ void chi_physics::TransportCrossSections::
         throw std::logic_error(
             "The specified number of energy groups "
             "must be strictly positive.");
-      num_groups = G;
+      num_groups_ = G;
     }
 
     //parse the number of scattering moments
@@ -515,7 +515,7 @@ void chi_physics::TransportCrossSections::
         throw std::logic_error(
             "The specified number of scattering moments "
             "must be non-negative.");
-      scattering_order = std::max(0, M - 1);
+      scattering_order_ = std::max(0, M - 1);
     }
 
     //parse the number of precursors species
@@ -527,8 +527,8 @@ void chi_physics::TransportCrossSections::
         throw std::logic_error(
             "The specified number of delayed neutron "
             "precursors must be non-negative.");
-      num_precursors = J;
-      precursors.resize(num_precursors);
+      num_precursors_ = J;
+      precursors_.resize(num_precursors_);
     }
 
     //parse nuclear data
@@ -545,29 +545,29 @@ void chi_physics::TransportCrossSections::
 
       if (fw == "GROUP_STRUCTURE_BEGIN")
         ReadGroupStructure("GROUP_STRUCTURE",
-                           e_bounds, num_groups, f, ls, ln);
+                           e_bounds_, num_groups_, f, ls, ln);
 
       if (fw == "INV_VELOCITY_BEGIN")
       {
-        Read1DData("INV_VELOCITY", inv_velocity, num_groups, f, ls, ln);
+        Read1DData("INV_VELOCITY", inv_velocity_, num_groups_, f, ls, ln);
 
-        if (not is_positive(inv_velocity))
+        if (not is_positive(inv_velocity_))
           throw std::logic_error(
               "Invalid inverse velocity value encountered.\n"
               "Only strictly positive values are permitted.");
       }
-      if (fw == "VELOCITY_BEGIN" and inv_velocity.empty())
+      if (fw == "VELOCITY_BEGIN" and inv_velocity_.empty())
       {
-        Read1DData("VELOCITY", inv_velocity, num_groups, f, ls, ln);
+        Read1DData("VELOCITY", inv_velocity_, num_groups_, f, ls, ln);
 
-        if (not is_positive(inv_velocity))
+        if (not is_positive(inv_velocity_))
           throw std::logic_error(
               "Invalid velocity value encountered.\n"
               "Only strictly positive values are permitted.");
 
         //compute inverse
-        for (unsigned int g = 0; g < num_groups; ++g)
-          inv_velocity[g] = 1.0 / inv_velocity[g];
+        for (unsigned int g = 0; g < num_groups_; ++g)
+          inv_velocity_[g] = 1.0 / inv_velocity_[g];
       }
 
       //==================================================
@@ -576,9 +576,9 @@ void chi_physics::TransportCrossSections::
 
       if (fw == "SIGMA_T_BEGIN")
       {
-        Read1DData("SIGMA_T", sigma_t, num_groups, f, ls, ln);
+        Read1DData("SIGMA_T", sigma_t_, num_groups_, f, ls, ln);
 
-        if (not is_nonnegative(sigma_t))
+        if (not is_nonnegative(sigma_t_))
           throw std::logic_error(
               "Invalid total cross section value encountered.\n"
               "Negative values are not permitted.");
@@ -586,9 +586,9 @@ void chi_physics::TransportCrossSections::
 
       if (fw == "SIGMA_A_BEGIN")
       {
-        Read1DData("SIGMA_A", sigma_a, num_groups, f, ls, ln);
+        Read1DData("SIGMA_A", sigma_a_, num_groups_, f, ls, ln);
 
-        if (not is_nonnegative(sigma_a))
+        if (not is_nonnegative(sigma_a_))
           throw std::logic_error(
               "Invalid absorption cross section value encountered.\n"
               "Negative values are not permitted.");
@@ -596,17 +596,17 @@ void chi_physics::TransportCrossSections::
 
       if (fw == "SIGMA_F_BEGIN")
       {
-        Read1DData("SIGMA_F", sigma_f, num_groups, f, ls, ln);
+        Read1DData("SIGMA_F", sigma_f_, num_groups_, f, ls, ln);
 
-        if (not has_nonzero(sigma_f))
+        if (not has_nonzero(sigma_f_))
         {
           chi::log.Log0Warning()
               << "The fission cross section specified in "
               << "\"" << file_name << "\" is uniformly zero..."
               << "Clearing it.";
-          sigma_f.clear();
+          sigma_f_.clear();
         }
-        if (not is_nonnegative(sigma_f))
+        if (not is_nonnegative(sigma_f_))
           throw std::logic_error(
               "Invalid fission cross section value encountered.\n"
               "Negative values are not permitted.");
@@ -614,17 +614,17 @@ void chi_physics::TransportCrossSections::
 
       if (fw == "NU_SIGMA_F_BEGIN")
       {
-        Read1DData("NU_SIGMA_F", nu_sigma_f, num_groups, f, ls, ln);
+        Read1DData("NU_SIGMA_F", nu_sigma_f_, num_groups_, f, ls, ln);
 
-        if (not has_nonzero(nu_sigma_f))
+        if (not has_nonzero(nu_sigma_f_))
         {
           chi::log.Log0Warning()
               << "The production cross-section specified in "
               << "\"" << file_name << "\" is uniformly zero..."
               << "Clearing it.";
-          nu_sigma_f.clear();
+          nu_sigma_f_.clear();
         }
-        if (not is_nonnegative(nu_sigma_f))
+        if (not is_nonnegative(nu_sigma_f_))
           throw std::logic_error(
               "Invalid production cross section value encountered.\n"
               "Negative values are not permitted.");
@@ -636,7 +636,7 @@ void chi_physics::TransportCrossSections::
 
       if (fw == "NU_BEGIN")
       {
-        Read1DData("NU", nu, num_groups, f, ls, ln);
+        Read1DData("NU", nu, num_groups_, f, ls, ln);
 
         if (not has_nonzero(nu))
         {
@@ -655,13 +655,13 @@ void chi_physics::TransportCrossSections::
               "permitted.");
 
         //compute prompt/delayed nu, if needed
-        if (num_precursors > 0 and
+        if (num_precursors_ > 0 and
             not nu.empty() and not beta.empty() and
             nu_prompt.empty() and nu_delayed.empty())
         {
-          nu_prompt.assign(num_groups, 0.0);
-          nu_delayed.assign(num_groups, 0.0);
-          for (unsigned int g = 0; g < num_groups; ++g)
+          nu_prompt.assign(num_groups_, 0.0);
+          nu_delayed.assign(num_groups_, 0.0);
+          for (unsigned int g = 0; g < num_groups_; ++g)
           {
             nu_prompt[g] = (1.0 - beta[g]) * nu[g];
             nu_delayed[g] = beta[g] * nu[g];
@@ -671,7 +671,7 @@ void chi_physics::TransportCrossSections::
 
       if (fw == "NU_PROMPT_BEGIN")
       {
-        Read1DData("NU_PROMPT", nu_prompt, num_groups, f, ls, ln);
+        Read1DData("NU_PROMPT", nu_prompt, num_groups_, f, ls, ln);
 
         if (not has_nonzero(nu_prompt))
         {
@@ -692,7 +692,7 @@ void chi_physics::TransportCrossSections::
 
       if (fw == "NU_DELAYED_BEGIN")
       {
-        Read1DData("NU_DELAYED", nu_delayed, num_groups, f, ls, ln);
+        Read1DData("NU_DELAYED", nu_delayed, num_groups_, f, ls, ln);
 
         if (not has_nonzero(nu_delayed))
         {
@@ -710,7 +710,7 @@ void chi_physics::TransportCrossSections::
 
       if (fw == "BETA_BEGIN")
       {
-        Read1DData("BETA", beta, num_groups, f, ls, ln);
+        Read1DData("BETA", beta, num_groups_, f, ls, ln);
 
         if (not has_nonzero(beta))
         {
@@ -728,13 +728,13 @@ void chi_physics::TransportCrossSections::
               "Only values in the range [0.0, 1.0] are permitted.");
 
         //compute prompt/delayed nu, if needed
-        if (num_precursors > 0 and
+        if (num_precursors_ > 0 and
             not nu.empty() and not beta.empty() and
             nu_prompt.empty() and nu_delayed.empty())
         {
-          nu_prompt.assign(num_groups, 0.0);
-          nu_delayed.assign(num_groups, 0.0);
-          for (unsigned int g = 0; g < num_groups; ++g)
+          nu_prompt.assign(num_groups_, 0.0);
+          nu_delayed.assign(num_groups_, 0.0);
+          for (unsigned int g = 0; g < num_groups_; ++g)
           {
             nu_prompt[g] = (1.0 - beta[g]) * nu[g];
             nu_delayed[g] = beta[g] * nu[g];
@@ -748,7 +748,7 @@ void chi_physics::TransportCrossSections::
 
       if (fw == "CHI_BEGIN")
       {
-        Read1DData("CHI", chi, num_groups, f, ls, ln);
+        Read1DData("CHI", chi, num_groups_, f, ls, ln);
 
         if (not has_nonzero(chi))
           throw std::logic_error(
@@ -767,7 +767,7 @@ void chi_physics::TransportCrossSections::
 
       if (fw == "CHI_PROMPT_BEGIN")
       {
-        Read1DData("CHI_PROMPT", chi_prompt, num_groups, f, ls, ln);
+        Read1DData("CHI_PROMPT", chi_prompt, num_groups_, f, ls, ln);
 
         if (not has_nonzero(chi_prompt))
           throw std::logic_error(
@@ -787,13 +787,13 @@ void chi_physics::TransportCrossSections::
 
       }//if prompt chi
 
-      if (num_precursors > 0 and fw == "CHI_DELAYED_BEGIN")
+      if (num_precursors_ > 0 and fw == "CHI_DELAYED_BEGIN")
       {
         //TODO: Should the be flipped to PRECURSOR_G_VAL?
         Read2DData("CHI_DELAYED", "G_PRECURSOR_VAL",
-                   emission_spectra, num_precursors, num_groups, f, ls, ln);
+                   emission_spectra, num_precursors_, num_groups_, f, ls, ln);
 
-        for (unsigned int j = 0; j < num_precursors; ++j)
+        for (unsigned int j = 0; j < num_precursors_; ++j)
         {
           if (not has_nonzero(emission_spectra[j]))
             throw std::logic_error(
@@ -820,12 +820,12 @@ void chi_physics::TransportCrossSections::
       // Delayed Neutron Precursor Data
       //==================================================
 
-      if (num_precursors > 0)
+      if (num_precursors_ > 0)
       {
         if (fw == "PRECURSOR_DECAY_CONSTANTS_BEGIN")
         {
           Read1DData("PRECURSOR_DECAY_CONSTANTS",
-                     decay_constants, num_precursors, f, ls, ln);
+                     decay_constants, num_precursors_, f, ls, ln);
 
           if (not is_positive(decay_constants))
             throw std::logic_error(
@@ -836,7 +836,7 @@ void chi_physics::TransportCrossSections::
         if (fw == "PRECURSOR_FRACTIONAL_YIELDS_BEGIN")
         {
           Read1DData("PRECURSOR_FRACTIONAL_YIELDS",
-                     fractional_yields, num_precursors, f, ls, ln);
+                     fractional_yields, num_precursors_, f, ls, ln);
 
           if (not has_nonzero(fractional_yields))
             throw std::logic_error(
@@ -866,12 +866,12 @@ void chi_physics::TransportCrossSections::
       //==================================================
 
       if (fw == "TRANSFER_MOMENTS_BEGIN")
-        ReadTransferMatrices("TRANSFER_MOMENTS", transfer_matrices,
-                             scattering_order + 1, num_groups, f, ls, ln);
+        ReadTransferMatrices("TRANSFER_MOMENTS", transfer_matrices_,
+                             scattering_order_ + 1, num_groups_, f, ls, ln);
 
       if (fw == "PRODUCTION_MATRIX_BEGIN")
         Read2DData("PRODUCTION_MATRIX", "GPRIME_G_VAL",
-                   production_matrix, num_groups, num_groups, f, ls, ln);
+                   production_matrix_, num_groups_, num_groups_, f, ls, ln);
     }//try
 
     catch (const std::runtime_error& err)
@@ -907,7 +907,7 @@ void chi_physics::TransportCrossSections::
   // Compute auxiliary data
   //============================================================
 
-  if (sigma_a.empty())
+  if (sigma_a_.empty())
     ComputeAbsorption();
 
   ComputeDiffusionParameters();
@@ -917,24 +917,24 @@ void chi_physics::TransportCrossSections::
   //============================================================
 
   //determine if the material is fissionable
-  is_fissionable = not sigma_f.empty() or not nu_sigma_f.empty() or
-                   not production_matrix.empty();
+  is_fissionable_ = not sigma_f_.empty() or not nu_sigma_f_.empty() or
+                    not production_matrix_.empty();
 
   //clear fission data if not fissionable
-  if (not is_fissionable)
+  if (not is_fissionable_)
   {
-    sigma_f.clear();
-    nu_sigma_f.clear();
-    nu_prompt_sigma_f.clear();
-    nu_delayed_sigma_f.clear();
-    precursors.clear();
+    sigma_f_.clear();
+    nu_sigma_f_.clear();
+    nu_prompt_sigma_f_.clear();
+    nu_delayed_sigma_f_.clear();
+    precursors_.clear();
   }//if not fissionable
 
   //otherwise, check and set the fission data
   else
   {
     //check vector data inputs
-    if (production_matrix.empty())
+    if (production_matrix_.empty())
     {
       //check for non-delayed fission neutron yield data
       if (nu.empty() and nu_prompt.empty())
@@ -977,13 +977,13 @@ void chi_physics::TransportCrossSections::
       //do this only when prompt is specified
       if (not nu_prompt.empty())
       {
-        nu.assign(num_groups, 0.0);
-        for (unsigned int g = 0; g < num_groups; ++g)
+        nu.assign(num_groups_, 0.0);
+        for (unsigned int g = 0; g < num_groups_; ++g)
           nu[g] = nu_prompt[g];
       }
 
       //check delayed neutron data
-      if (num_precursors > 0)
+      if (num_precursors_ > 0)
       {
         //check that prompt data was specified
         if (chi_prompt.empty() or nu_prompt.empty())
@@ -1008,59 +1008,59 @@ void chi_physics::TransportCrossSections::
               "emission spectra must all be specified.");
 
         //add delayed fission neutron yield to total
-        for (unsigned int g = 0; g < num_groups; ++g)
+        for (unsigned int g = 0; g < num_groups_; ++g)
           nu[g] += nu_delayed[g];
 
         //add data to precursor structs
-        for (unsigned int j = 0; j < num_precursors; ++j)
+        for (unsigned int j = 0; j < num_precursors_; ++j)
         {
-          precursors[j].decay_constant = decay_constants[j];
-          precursors[j].fractional_yield = fractional_yields[j];
-          precursors[j].emission_spectrum = emission_spectra[j];
+          precursors_[j].decay_constant = decay_constants[j];
+          precursors_[j].fractional_yield = fractional_yields[j];
+          precursors_[j].emission_spectrum = emission_spectra[j];
         }
       }
 
       //compute fission cross section
-      if (sigma_f.empty() and not nu_sigma_f.empty())
+      if (sigma_f_.empty() and not nu_sigma_f_.empty())
       {
-        sigma_f.assign(num_groups, 0.0);
-        for (unsigned int g = 0; g < num_groups; ++g)
-          if (nu_sigma_f[g] > 0.0)
-            sigma_f[g] = nu_sigma_f[g] / nu[g];
+        sigma_f_.assign(num_groups_, 0.0);
+        for (unsigned int g = 0; g < num_groups_; ++g)
+          if (nu_sigma_f_[g] > 0.0)
+            sigma_f_[g] = nu_sigma_f_[g] / nu[g];
       }
 
       //compute total production cross section
-      nu_sigma_f.assign(num_groups, 0.0);
-      for (unsigned int g = 0; g < num_groups; ++g)
-        nu_sigma_f[g] = nu[g] * sigma_f[g];
+      nu_sigma_f_.assign(num_groups_, 0.0);
+      for (unsigned int g = 0; g < num_groups_; ++g)
+        nu_sigma_f_[g] = nu[g] * sigma_f_[g];
 
       //compute prompt production cross section
       if (not nu_prompt.empty())
       {
-        nu_prompt_sigma_f.assign(num_groups, 0.0);
-        for (unsigned int g = 0; g < num_groups; ++g)
-          nu_prompt_sigma_f[g] = nu_prompt[g] * sigma_f[g];
+        nu_prompt_sigma_f_.assign(num_groups_, 0.0);
+        for (unsigned int g = 0; g < num_groups_; ++g)
+          nu_prompt_sigma_f_[g] = nu_prompt[g] * sigma_f_[g];
       }
 
       //compute delayed production cross section
       if (not nu_delayed.empty())
       {
-        nu_delayed_sigma_f.assign(num_groups, 0.0);
-        for (unsigned int g = 0; g < num_groups; ++g)
-          nu_delayed_sigma_f[g] = nu_delayed[g] * sigma_f[g];
+        nu_delayed_sigma_f_.assign(num_groups_, 0.0);
+        for (unsigned int g = 0; g < num_groups_; ++g)
+          nu_delayed_sigma_f_[g] = nu_delayed[g] * sigma_f_[g];
       }
 
       //compute production matrix
       const auto chi_ = not chi_prompt.empty()? chi_prompt : chi;
       const auto nu_sigma_f_ =
-          not nu_prompt.empty()? nu_prompt_sigma_f : nu_sigma_f;
+          not nu_prompt.empty() ? nu_prompt_sigma_f_ : nu_sigma_f_;
 
-      for (unsigned int g = 0; g < num_groups; ++g)
+      for (unsigned int g = 0; g < num_groups_; ++g)
       {
         std::vector<double> prod;
-        for (unsigned int gp = 0.0; gp < num_groups; ++gp)
+        for (unsigned int gp = 0.0; gp < num_groups_; ++gp)
           prod.push_back(chi_[g] * nu_sigma_f_[gp]);
-        production_matrix.push_back(prod);
+        production_matrix_.push_back(prod);
       }
     }//if production_matrix empty
 
@@ -1071,30 +1071,30 @@ void chi_physics::TransportCrossSections::
       //      different precursor species exist for neutron-induced
       //      fission than for photo-fission.
       //throw error if precursors are present
-      if (num_precursors > 0)
+      if (num_precursors_ > 0)
         throw std::runtime_error(
             "This setup has not been implemented.\n"
             "Currently, when a production matrix is specified, "
             "no delayed neutron precursors are allowed.");
 
       //check for fission cross sections
-      if (sigma_f.empty())
+      if (sigma_f_.empty())
         throw std::logic_error(
             "Invalid fission data specification encountered.\n"
             "When a production matrix is specified, the fission "
             "cross sections must also be specified.");
 
       //compute production cross section
-      nu_sigma_f.assign(num_groups, 0.0);
-      for (unsigned int g = 0; g < num_groups; ++g)
-        for (unsigned int gp = 0; gp < num_groups; ++gp)
-          nu_sigma_f[gp] += production_matrix[g][gp];
+      nu_sigma_f_.assign(num_groups_, 0.0);
+      for (unsigned int g = 0; g < num_groups_; ++g)
+        for (unsigned int gp = 0; gp < num_groups_; ++gp)
+          nu_sigma_f_[gp] += production_matrix_[g][gp];
 
       //check for reasonable fission neutron yield
-      nu.assign(num_groups, 0.0);
-      for (unsigned int g = 0; g < num_groups; ++g)
-        if (sigma_f[g] > 0.0)
-          nu[g] = nu_sigma_f[g] / sigma_f[g];
+      nu.assign(num_groups_, 0.0);
+      for (unsigned int g = 0; g < num_groups_; ++g)
+        if (sigma_f_[g] > 0.0)
+          nu[g] = nu_sigma_f_[g] / sigma_f_[g];
 
       if (not std::all_of(nu.begin(), nu.end(),
                           [](double x)

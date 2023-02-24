@@ -38,7 +38,7 @@ double DiscOrdTransientSolver::ComputeFissionRate(const bool previous)
 
       //=============================== Loop over groups
       for (size_t g = first_grp; g <= last_grp; ++g)
-        local_production += xs.sigma_f[g] *
+        local_production += xs.sigma_f_[g] *
                             phi[uk_map + g] *
                             IntV_ShapeI;
     }//for node

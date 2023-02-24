@@ -59,19 +59,19 @@ void chi_physics::TransportCrossSections::
   //============================================================
 
   std::vector<double> nu, nu_prompt, nu_delayed;
-  for (unsigned int g = 0; g < num_groups; ++g)
+  for (unsigned int g = 0; g < num_groups_; ++g)
   {
-    if (num_precursors > 0)
+    if (num_precursors_ > 0)
     {
-      nu_prompt.push_back(nu_prompt_sigma_f[g] / sigma_f[g]);
-      nu_delayed.push_back(nu_delayed_sigma_f[g] / sigma_f[g]);
+      nu_prompt.push_back(nu_prompt_sigma_f_[g] / sigma_f_[g]);
+      nu_delayed.push_back(nu_delayed_sigma_f_[g] / sigma_f_[g]);
     }
     else
-      nu.push_back(nu_sigma_f[g] / sigma_f[g]);
+      nu.push_back(nu_sigma_f_[g] / sigma_f_[g]);
   }
 
   std::vector<double> decay_constants, fractional_yields;
-  for (const auto& precursor : precursors)
+  for (const auto& precursor : precursors_)
   {
     decay_constants.push_back(precursor.decay_constant);
     fractional_yields.push_back(precursor.fractional_yield);
@@ -81,32 +81,32 @@ void chi_physics::TransportCrossSections::
 
   ofile << "# Exported cross section from ChiTech\n";
   ofile << "# Date: " << chi_objects::ChiTimer::GetLocalDateTimeString() << "\n";
-  ofile << "NUM_GROUPS " << num_groups << "\n";
-  ofile << "NUM_MOMENTS " << scattering_order+1 << "\n";
-  if (num_precursors > 0)
-    ofile << "NUM_PRECURSORS " << num_precursors << "\n";
+  ofile << "NUM_GROUPS " << num_groups_ << "\n";
+  ofile << "NUM_MOMENTS " << scattering_order_ + 1 << "\n";
+  if (num_precursors_ > 0)
+    ofile << "NUM_PRECURSORS " << num_precursors_ << "\n";
 
   //basic cross section data
-  Print1DXS(ofile, "SIGMA_T", sigma_t, 1.0e-20);
-  Print1DXS(ofile, "SIGMA_A", sigma_a, 1.0e-20);
+  Print1DXS(ofile, "SIGMA_T", sigma_t_, 1.0e-20);
+  Print1DXS(ofile, "SIGMA_A", sigma_a_, 1.0e-20);
 
   //fission data
-  if (!sigma_f.empty())
+  if (!sigma_f_.empty())
   {
-    Print1DXS(ofile, "SIGMA_F", sigma_f, 1.0e-20);
-    if (num_precursors > 0)
+    Print1DXS(ofile, "SIGMA_F", sigma_f_, 1.0e-20);
+    if (num_precursors_ > 0)
     {
       Print1DXS(ofile, "NU_PROMPT", nu_prompt, 1.0e-20);
       Print1DXS(ofile, "NU_DELAYED", nu_delayed, 1.0e-20);
 //      Print1DXS(ofile, "CHI_PROMPT", chi_prompt, 1.0e-20);
 
       ofile << "\nCHI_DELAYED_BEGIN\n";
-      for (unsigned int j = 0; j < num_precursors; ++j)
-        for (unsigned int g = 0; g < num_groups; ++g)
+      for (unsigned int j = 0; j < num_precursors_; ++j)
+        for (unsigned int g = 0; g < num_groups_; ++g)
           ofile << "G_PRECURSOR_VAL"
                 << " " << g
                 << " " << j
-                << " " << precursors[j].emission_spectrum[g]
+                << " " << precursors_[j].emission_spectrum[g]
                 << "\n";
       ofile << "CHI_DELAYED_END\n";
 
@@ -124,20 +124,20 @@ void chi_physics::TransportCrossSections::
   }
 
   //inverse speed data
-  if (!inv_velocity.empty())
-    Print1DXS(ofile, "INV_VELOCITY", inv_velocity, 1.0e-20);
+  if (!inv_velocity_.empty())
+    Print1DXS(ofile, "INV_VELOCITY", inv_velocity_, 1.0e-20);
 
   //transfer matrices
-  if (!transfer_matrices.empty())
+  if (!transfer_matrices_.empty())
   {
     ofile << "\n";
     ofile << "TRANSFER_MOMENTS_BEGIN\n";
-    for (size_t ell=0; ell < transfer_matrices.size(); ++ell)
+    for (size_t ell=0; ell < transfer_matrices_.size(); ++ell)
     {
       if (ell==0) ofile << "#Zeroth moment (l=0)\n";
       else        ofile << "#(l=" << ell << ")\n";
 
-      const auto& matrix = transfer_matrices[ell];
+      const auto& matrix = transfer_matrices_[ell];
 
       for (size_t g=0; g<matrix.rowI_values.size(); ++g)
       {
@@ -157,14 +157,14 @@ void chi_physics::TransportCrossSections::
     ofile << "TRANSFER_MOMENTS_END\n";
   }//if has transfer matrices
 
-  if (!production_matrix.empty())
+  if (!production_matrix_.empty())
   {
     ofile << "\n";
     ofile << "PRODUCTION_MATRIX_BEGIN\n";
-    for (unsigned int g = 0; g < num_groups; ++g)
+    for (unsigned int g = 0; g < num_groups_; ++g)
     {
-      const auto& prod = production_matrix[g];
-      for (unsigned int gp = 0; gp < num_groups; ++gp)
+      const auto& prod = production_matrix_[g];
+      for (unsigned int gp = 0; gp < num_groups_; ++gp)
         ofile << "G_GPRIME_VAL "
               << g << " "
               << gp << " "

@@ -298,7 +298,7 @@ int chiSimTest91_PWLD(lua_State* L)
 
 
       //Mass Matrix and Source
-      const double sigma_tg = cell_xs.sigma_t[g];
+      const double sigma_tg = cell_xs.sigma_t_[g];
 
       for (int i = 0; i < num_nodes; ++i)
       {
@@ -370,7 +370,7 @@ int chiSimTest91_PWLD(lua_State* L)
     {
       const auto& cell_mapping = sdm.GetCellMapping(cell);
       const size_t num_nodes = cell_mapping.NumNodes();
-      const auto& S = xs.transfer_matrices;
+      const auto& S = xs.transfer_matrices_;
 
       for (size_t i=0; i<num_nodes; ++i)
       {

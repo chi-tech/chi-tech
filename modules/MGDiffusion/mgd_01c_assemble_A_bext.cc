@@ -58,8 +58,8 @@ void mg_diffusion::Solver::Assemble_A_bext()
         }//for qp
         for (uint g=0; g < num_groups; ++g)
         {
-          const double Dg     = xs->diffusion_coeff[g];
-          const double sigr_g = xs->sigma_removal[g];
+          const double Dg     = xs->diffusion_coeff_[g];
+          const double sigr_g = xs->sigma_removal_[g];
           Acell[g][i][j] = entry_mij * sigr_g + entry_kij * Dg;
         }
         if (do_two_grid)

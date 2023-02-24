@@ -47,7 +47,7 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
         matid_to_xs_map[mat_id] = transp_xs;
         found_transport_xs = true;
         if (first_material_read)
-          mg_diffusion::Solver::num_groups = transp_xs->num_groups;
+          mg_diffusion::Solver::num_groups = transp_xs->num_groups_;
 
       }//transport xs
       if (property->Type() == MatProperty::ISOTROPIC_MG_SOURCE)
@@ -79,30 +79,30 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
       chi::Exit(EXIT_FAILURE);
     }
     //====================================== Check number of groups legal
-    if (matid_to_xs_map[mat_id]->num_groups != mg_diffusion::Solver::num_groups)
+    if (matid_to_xs_map[mat_id]->num_groups_ != mg_diffusion::Solver::num_groups)
     {
       chi::log.LogAllError()
-        << "MG-Diff-InitMaterials: Found material \"" << current_material->name << "\" has "
-        << matid_to_xs_map[mat_id]->num_groups << " groups and"
-        << " the simulation has " << mg_diffusion::Solver::num_groups << " groups."
-        << " The material must have the same number of groups.";
+          << "MG-Diff-InitMaterials: Found material \"" << current_material->name << "\" has "
+          << matid_to_xs_map[mat_id]->num_groups_ << " groups and"
+          << " the simulation has " << mg_diffusion::Solver::num_groups << " groups."
+          << " The material must have the same number of groups.";
       chi::Exit(EXIT_FAILURE);
     }
 
     //====================================== Check number of moments
-    if (matid_to_xs_map[mat_id]->scattering_order > 1)
+    if (matid_to_xs_map[mat_id]->scattering_order_ > 1)
     {
       chi::log.Log0Warning()
-        << "MG-Diff-InitMaterials: Found material \"" << current_material->name << "\" has "
-        << "a scattering order of "
-        << matid_to_xs_map[mat_id]->scattering_order << " and"
-        << " the simulation has a scattering order of One (MG-Diff)"
-        << " The higher moments will therefore not be used.";
+          << "MG-Diff-InitMaterials: Found material \"" << current_material->name << "\" has "
+          << "a scattering order of "
+          << matid_to_xs_map[mat_id]->scattering_order_ << " and"
+          << " the simulation has a scattering order of One (MG-Diff)"
+          << " The higher moments will therefore not be used.";
     }
 
     materials_list
-      << " number of moments "
-      << matid_to_xs_map[mat_id]->transfer_matrices.size() << "\n";
+        << " number of moments "
+        << matid_to_xs_map[mat_id]->transfer_matrices_.size() << "\n";
 
     first_material_read = false;
   }//for material id
@@ -131,7 +131,7 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
     for (const auto &mat_id_xs: matid_to_xs_map)
     {
       // get the P0 transfer matrix
-      const auto &S = mat_id_xs.second->transfer_matrices[0];
+      const auto &S = mat_id_xs.second->transfer_matrices_[0];
       // loop over all row of the transfer matrix
       const int G = static_cast<int>(mg_diffusion::Solver::num_groups);
       for (int g = G-1; g >=0 ; --g)

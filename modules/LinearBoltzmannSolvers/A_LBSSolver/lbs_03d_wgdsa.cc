@@ -45,8 +45,8 @@ void lbs::LBSSolver::InitWGDSA(LBSGroupset& groupset)
       for (size_t gprime = groupset.groups_.front().id_;
            gprime <= groupset.groups_.back().id_; ++gprime)
       {
-        Dg[g]   = xs->diffusion_coeff[gprime];
-        sigR[g] = xs->sigma_removal[gprime];
+        Dg[g]   = xs->diffusion_coeff_[gprime];
+        sigR[g] = xs->sigma_removal_[gprime];
         ++g;
       }//for g
 
@@ -110,7 +110,7 @@ void lbs::LBSSolver::
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
-    const auto& sigma_s = matid_to_xs_map_[cell.material_id]->sigma_s_gtog;
+    const auto& sigma_s = matid_to_xs_map_[cell.material_id]->sigma_s_gtog_;
 
     for (size_t i=0; i < num_nodes; i++)
     {

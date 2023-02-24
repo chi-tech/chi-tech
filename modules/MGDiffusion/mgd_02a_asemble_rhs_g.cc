@@ -24,7 +24,7 @@ void mg_diffusion::Solver::Assemble_RHS(const unsigned int g,
     const size_t num_nodes   = cell_mapping.NumNodes();
 
     const auto& xs = matid_to_xs_map.at(cell.material_id);
-    const auto& S = xs->transfer_matrices[0];
+    const auto& S = xs->transfer_matrices_[0];
 
     for (const auto& [row_g, gprime, sigma_sm] : S.Row(g))
     {

@@ -111,7 +111,7 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
     const auto& fe_intgrl_values_secondary = secondary_unit_cell_matrices_[cell_local_id];
     const int num_nodes = static_cast<int>(cell_mapping.NumNodes());
     auto& transport_view = grid_transport_view[cell.local_id];
-    const auto& sigma_tg = transport_view.XS().sigma_t;
+    const auto& sigma_tg = transport_view.XS().sigma_t_;
     std::vector<bool> face_incident_flags(num_faces, false);
     std::vector<double> face_mu_values(num_faces, 0.0);
 

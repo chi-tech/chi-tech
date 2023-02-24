@@ -30,45 +30,45 @@ public:
   };
 
 public:
-  unsigned int num_groups = 0;       ///< Total number of groups
-  unsigned int scattering_order = 0; ///< Legendre scattering order
-  unsigned int num_precursors = 0;   ///< Number of precursors
+  unsigned int num_groups_ = 0;       ///< Total number of groups
+  unsigned int scattering_order_ = 0; ///< Legendre scattering order
+  unsigned int num_precursors_ = 0;   ///< Number of precursors
 
-  bool is_fissionable = false;
-  bool is_fission_scaled = false;
+  bool is_fissionable_ = false;
+  bool is_fission_scaled_ = false;
 
   /// Energy bin boundaries in MeV
-  std::vector<std::vector<double>> e_bounds;
+  std::vector<std::vector<double>> e_bounds_;
 
-  std::vector<double> sigma_t;  ///< Total cross section
-  std::vector<double> sigma_a;  ///< Absorption cross section
-  std::vector<double> sigma_f;  ///< Fission cross section
+  std::vector<double> sigma_t_;  ///< Total cross section
+  std::vector<double> sigma_a_;  ///< Absorption cross section
+  std::vector<double> sigma_f_;  ///< Fission cross section
 
-  std::vector<double> nu_sigma_f;
-  std::vector<double> nu_prompt_sigma_f;
-  std::vector<double> nu_delayed_sigma_f;
+  std::vector<double> nu_sigma_f_;
+  std::vector<double> nu_prompt_sigma_f_;
+  std::vector<double> nu_delayed_sigma_f_;
 
-  std::vector<double> inv_velocity;
+  std::vector<double> inv_velocity_;
 
-  std::vector<TransferMatrix> transfer_matrices;
-  std::vector<std::vector<double>> production_matrix;
+  std::vector<TransferMatrix> transfer_matrices_;
+  std::vector<std::vector<double>> production_matrix_;
 
-  std::vector<Precursor> precursors;
+  std::vector<Precursor> precursors_;
 
   //Diffusion quantities
 public:
-  bool diffusion_initialized = false;
+  bool diffusion_initialized_ = false;
 public:
-  std::vector<double> diffusion_coeff; ///< Transport corrected diffusion coeff
-  std::vector<double> sigma_removal;   ///< Removal cross section
-  std::vector<double> sigma_s_gtog;    ///< Within-group scattering xs
+  std::vector<double> diffusion_coeff_; ///< Transport corrected diffusion coeff
+  std::vector<double> sigma_removal_;   ///< Removal cross section
+  std::vector<double> sigma_s_gtog_;    ///< Within-group scattering xs
 
   //Monte-Carlo quantities
 public:
-  bool scattering_initialized = false;
+  bool scattering_initialized_ = false;
 private:
-  std::vector<std::vector<double>>         cdf_gprime_g;
-  std::vector<std::vector<Tvecdbl_vecdbl>> scat_angles_gprime_g;
+  std::vector<std::vector<double>>         cdf_gprime_g_;
+  std::vector<std::vector<Tvecdbl_vecdbl>> scat_angles_gprime_g_;
 
 public:
   //00

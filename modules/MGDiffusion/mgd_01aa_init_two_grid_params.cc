@@ -9,9 +9,9 @@ void mg_diffusion::Solver::Compute_TwoGrid_Params()
   for (const auto &mat_id_xs: matid_to_xs_map) {
 
     // get the P0 transfer matrix and total XS
-    const auto &isotropic_transfer_matrix = mat_id_xs.second->transfer_matrices[0];
-    const auto &sigma_t = mat_id_xs.second->sigma_t;
-    const auto &diffusion_coeff = mat_id_xs.second->diffusion_coeff;
+    const auto &isotropic_transfer_matrix = mat_id_xs.second->transfer_matrices_[0];
+    const auto &sigma_t = mat_id_xs.second->sigma_t_;
+    const auto &diffusion_coeff = mat_id_xs.second->diffusion_coeff_;
 
     // put P0 transfer matrix in nicer form
     MatDbl S(num_groups, VecDbl(num_groups, 0.0));

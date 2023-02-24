@@ -13,7 +13,7 @@ void lbs::DiscOrdSteadyStateAdjointSolver::Initialize()
   for (const auto& matid_xs_pair : matid_to_xs_map_)
   {
     const auto  matid = matid_xs_pair.first;
-    const auto& S = matid_xs_pair.second->transfer_matrices;
+    const auto& S = matid_xs_pair.second->transfer_matrices_;
 
     std::vector<chi_math::SparseMatrix> S_transpose;
     for (const auto& S_ell : S)
