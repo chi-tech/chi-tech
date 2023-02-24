@@ -16,18 +16,18 @@ lbs::acceleration::DiffusionMIPSolver::
                      MatID2XSMap map_mat_id_2_xs,
                      const std::vector<UnitCellMatrices>& unit_cell_matrices,
                      const bool verbose/*=false*/) :
-  text_name_(std::move(text_name)),
-  grid_(grid),
-  sdm_(sdm),
-  uk_man_(uk_man),
-  bcs_(std::move(bcs)),
-  mat_id_2_xs_map(std::move(map_mat_id_2_xs)),
-  unit_cell_matrices_(unit_cell_matrices),
-  num_local_dofs_(static_cast<int64_t>(sdm_.GetNumLocalDOFs(uk_man_))),
-  num_global_dofs_(static_cast<int64_t>(sdm_.GetNumGlobalDOFs(uk_man_))),
-  A_(nullptr),
-  rhs_(nullptr),
-  ksp_(nullptr)
+    text_name_(std::move(text_name)),
+    grid_(grid),
+    sdm_(sdm),
+    uk_man_(uk_man),
+    bcs_(std::move(bcs)),
+    mat_id_2_xs_map_(std::move(map_mat_id_2_xs)),
+    unit_cell_matrices_(unit_cell_matrices),
+    num_local_dofs_(static_cast<int64_t>(sdm_.GetNumLocalDOFs(uk_man_))),
+    num_global_dofs_(static_cast<int64_t>(sdm_.GetNumGlobalDOFs(uk_man_))),
+    A_(nullptr),
+    rhs_(nullptr),
+    ksp_(nullptr)
 {
   options.verbose = verbose;
 

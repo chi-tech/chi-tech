@@ -26,7 +26,7 @@ void lbs::LBSSolver::PerformInputChecks()
   int grpset_counter=0;
   for (auto& group_set : groupsets_)
   {
-    if (group_set.groups.empty())
+    if (group_set.groups_.empty())
     {
       chi::log.LogAllError()
         << "LinearBoltzmann::SteadyStateSolver: No groups added to groupset "

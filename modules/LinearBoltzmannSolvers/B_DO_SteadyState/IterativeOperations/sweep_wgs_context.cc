@@ -34,12 +34,12 @@ void SweepWGSContext<Mat, Vec, KSP>::PreSetupCallback()
     }
     chi::log.Log()
       << "\n\n"
-      << "********** Solving groupset " << groupset_.id
+      << "********** Solving groupset " << groupset_.id_
       << " with " << method_name << ".\n\n"
       << "Quadrature number of angles: "
       << groupset_.quadrature->abscissae.size() << "\n"
-      << "Groups " << groupset_.groups.front().id << " "
-      << groupset_.groups.back().id << "\n\n";
+      << "Groups " << groupset_.groups_.front().id_ << " "
+      << groupset_.groups_.back().id_ << "\n\n";
   }
 }
 
@@ -71,7 +71,7 @@ std::pair<int64_t, int64_t> SweepWGSContext<Mat, Vec, KSP>::SystemSize()
   const size_t globl_node_count = lbs_solver_.GlobalNodeCount();
   const size_t num_moments      = lbs_solver_.NumMoments();
 
-  const size_t groupset_numgrps = groupset_.groups.size();
+  const size_t groupset_numgrps = groupset_.groups_.size();
   const auto num_delayed_psi_info = groupset_.angle_agg.GetNumDelayedAngularDOFs();
   const size_t local_size = local_node_count * num_moments * groupset_numgrps +
                             num_delayed_psi_info.first;
@@ -80,7 +80,7 @@ std::pair<int64_t, int64_t> SweepWGSContext<Mat, Vec, KSP>::SystemSize()
   const size_t num_angles = groupset_.quadrature->abscissae.size();
   const size_t num_psi_global = globl_node_count *
                                 num_angles *
-                                groupset_.groups.size();
+                                groupset_.groups_.size();
   const size_t num_delayed_psi_globl = num_delayed_psi_info.second;
 
   if (log_info_)

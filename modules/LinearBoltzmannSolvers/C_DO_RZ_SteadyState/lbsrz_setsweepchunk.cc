@@ -14,7 +14,7 @@ lbs_curvilinear::DiscOrdSteadyStateSolver::SetSweepChunk(lbs::LBSGroupset& group
                                     secondary_unit_cell_matrices_,
                                     cell_transport_views_,
                                     phi_new_local_,
-                                    psi_new_local_[groupset.id],
+                                    psi_new_local_[groupset.id_],
                                     q_moments_local_,
                                     groupset,
                                     matid_to_xs_map_,

@@ -8,11 +8,11 @@ namespace lbs
   class LBSGroup
   {
   public:
-    int id;
+    int id_;
 
   public:
-    LBSGroup() : id(-1) {}
-    explicit LBSGroup(int in_id) : id(in_id) {}
+    LBSGroup() : id_(-1) {}
+    explicit LBSGroup(int id) : id_(id) {}
   };
 }
 

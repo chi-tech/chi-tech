@@ -45,7 +45,7 @@ void lbs::acceleration::DiffusionMIPSolver::
     const auto   cc_nodes     = cell_mapping.GetNodeLocations();
     const auto   qp_data      = cell_mapping.MakeVolumeQuadraturePointData();
 
-    const auto& xs = mat_id_2_xs_map.at(cell.material_id);
+    const auto& xs = mat_id_2_xs_map_.at(cell.material_id);
 
     //=========================================== For component/group
     for (size_t g=0; g<num_groups; ++g)
@@ -118,7 +118,7 @@ void lbs::acceleration::DiffusionMIPSolver::
           const size_t acf              = Grid::MapCellFace(cell, adj_cell, f);
           const double hp               = HPerpendicular(adj_cell, acf);
 
-          const auto&  adj_xs   = mat_id_2_xs_map.at(adj_cell.material_id);
+          const auto&  adj_xs   = mat_id_2_xs_map_.at(adj_cell.material_id);
           const double adj_Dg   = adj_xs.Dg[g];
 
           //========================= Compute kappa

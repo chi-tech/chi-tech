@@ -34,7 +34,7 @@ void lbs::DiscOrdSteadyStateSolver::
   const auto& unique_so_groupings = quadrature_sweep_info.first;
   const auto& dir_id_to_so_map    = quadrature_sweep_info.second;
 
-  const size_t gs_num_grps = groupset.groups.size();
+  const size_t gs_num_grps = groupset.groups_.size();
   const size_t gs_num_ss = groupset.grp_subset_infos.size();
 
   //=========================================== Passing the sweep boundaries

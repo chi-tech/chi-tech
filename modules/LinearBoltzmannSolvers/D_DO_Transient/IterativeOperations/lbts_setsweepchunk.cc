@@ -20,9 +20,9 @@ std::shared_ptr<SweepChunk> lbs::DiscOrdTransientSolver::
     unit_cell_matrices_,                      //Unit cell matrices
     cell_transport_views_,                    //Cell transport views
     phi_new_local_,                           //Destination phi
-    psi_new_local_[groupset.id],              //Destination psi
+    psi_new_local_[groupset.id_],             //Destination psi
 
-    psi_prev_local_[groupset.id],
+    psi_prev_local_[groupset.id_],
     theta,
     dt_,
 

@@ -11,7 +11,7 @@ void lbs::LBSSolver::InitWGDSA(LBSGroupset& groupset)
   if (groupset.apply_wgdsa)
   {
     //=========================================== Make UnknownManager
-    const size_t gs_G = groupset.groups.size();
+    const size_t gs_G = groupset.groups_.size();
     chi_math::UnknownManager uk_man;
     uk_man.AddUnknown(chi_math::UnknownType::VECTOR_N, gs_G);
 
@@ -42,8 +42,8 @@ void lbs::LBSSolver::InitWGDSA(LBSGroupset& groupset)
       std::vector<double> sigR(gs_G, 0.0);
 
       size_t g = 0;
-      for (size_t gprime=groupset.groups.front().id;
-           gprime<=groupset.groups.back().id; ++gprime)
+      for (size_t gprime = groupset.groups_.front().id_;
+           gprime <= groupset.groups_.back().id_; ++gprime)
       {
         Dg[g]   = xs->diffusion_coeff[gprime];
         sigR[g] = xs->sigma_removal[gprime];
@@ -100,8 +100,8 @@ void lbs::LBSSolver::
   const auto& dphi_uk_man = groupset.wgdsa_solver->UnknownStructure();
   const auto& phi_uk_man  = flux_moments_uk_man_;
 
-  const int    gsi = groupset.groups.front().id;
-  const size_t gss = groupset.groups.size();
+  const int    gsi = groupset.groups_.front().id_;
+  const size_t gss = groupset.groups_.size();
 
   delta_phi_local.clear();
   delta_phi_local.assign(sdm.GetNumLocalDOFs(dphi_uk_man), 0.0);
@@ -139,8 +139,8 @@ void lbs::LBSSolver::
   const auto& dphi_uk_man = groupset.wgdsa_solver->UnknownStructure();
   const auto& phi_uk_man  = flux_moments_uk_man_;
 
-  const int    gsi = groupset.groups.front().id;
-  const size_t gss = groupset.groups.size();
+  const int    gsi = groupset.groups_.front().id_;
+  const size_t gss = groupset.groups_.size();
 
   for (const auto& cell : grid_ptr_->local_cells)
   {

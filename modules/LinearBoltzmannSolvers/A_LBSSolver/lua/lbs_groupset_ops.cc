@@ -83,7 +83,7 @@ int chiLBSCreateGroupset(lua_State *L)
   //============================================= Create groupset
   lbs_solver.AddGroupset();
 
-  lua_pushinteger(L, lbs_solver.Groupsets().back().id);
+  lua_pushinteger(L, lbs_solver.Groupsets().back().id_);
   return 1;
 }
 
@@ -135,7 +135,7 @@ int chiLBSCreateGroup(lua_State *L)
   //============================================= Create groupset
   lbs_solver.AddGroup(group_id);
 
-  lua_pushinteger(L,lbs_solver.Groups().back().id);
+  lua_pushinteger(L,lbs_solver.Groups().back().id_);
   return 1;
 }
 
@@ -226,7 +226,7 @@ int chiLBSGroupsetAddGroups(lua_State *L)
     if (group == nullptr)
       throw std::runtime_error("chiLBSGroupsetAddGroups: Bad trouble.");
 
-    groupset->groups.push_back(*group);
+    groupset->groups_.push_back(*group);
   }
   return 0;
 }

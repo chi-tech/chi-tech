@@ -14,8 +14,8 @@ using namespace lbs;
 \author Zachary Hardy.*/
 double DiscOrdTransientSolver::ComputeFissionRate(const bool previous)
 {
-  const int first_grp = groups_.front().id;
-  const int last_grp = groups_.back().id;
+  const int first_grp = groups_.front().id_;
+  const int last_grp = groups_.back().id_;
 
   const auto& phi = (previous) ? phi_prev_local_ : phi_new_local_;
 

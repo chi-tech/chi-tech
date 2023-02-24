@@ -43,7 +43,7 @@ lbs_curvilinear::SweepChunkPWL::
   //  configure unknown manager for quantities that depend on polar level
   for (const auto& dir_set : curvilinear_product_quadrature->GetDirectionMap())
     unknown_manager.AddUnknown(chi_math::UnknownType::VECTOR_N,
-                               groupset.groups.size());
+                               groupset.groups_.size());
 
   //  allocate storage for sweeping dependency
   const unsigned int n_dof =
@@ -83,9 +83,12 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
 
   const lbs::SubSetInfo& grp_ss_info =
     groupset.grp_subset_infos[angle_set->ref_subset];
+
   const size_t gs_ss_size  = grp_ss_info.ss_size;
   const size_t gs_ss_begin = grp_ss_info.ss_begin;
-  const size_t gs_gi = groupset.groups[gs_ss_begin].id; // Groupset subset first group number
+
+  // first groupset subset group
+  const size_t gs_gi = groupset.groups_[gs_ss_begin].id_;
 
   int deploc_face_counter = -1;
   int preloc_face_counter = -1;

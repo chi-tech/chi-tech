@@ -14,8 +14,8 @@ void lbs::DiscOrdSteadyStateAdjointSolver::Execute()
   chi::log.Log() << "LBAdjointSolver: post-processing.";
   std::set<int> set_group_numbers;
   for (const auto& groupset : groupsets_)
-    for (const auto& group : groupset.groups)
-      set_group_numbers.insert(group.id);
+    for (const auto& group : groupset.groups_)
+      set_group_numbers.insert(group.id_);
 
   const auto& m_to_ell_em_map =
     groupsets_.front().quadrature->GetMomentToHarmonicsIndexMap();

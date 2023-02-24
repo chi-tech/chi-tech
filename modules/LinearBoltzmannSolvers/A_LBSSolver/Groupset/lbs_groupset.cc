@@ -9,12 +9,6 @@
 
 #include <fstream>
 
-//##############################################
-/**Groupset constructor.*/
-lbs::LBSGroupset::LBSGroupset(int in_id) :
-  id(in_id)
-{
-}
 
 //###################################################################
 /**Computes the discrete to moment operator.*/
@@ -67,13 +61,13 @@ void lbs::LBSGroupset::BuildMomDiscOperator(
 /**Constructs the groupset subsets.*/
 void lbs::LBSGroupset::BuildSubsets()
 {
-  grp_subset_infos = lbs::MakeSubSets(groups.size(), master_num_grp_subsets);
+  grp_subset_infos = lbs::MakeSubSets(groups_.size(), master_num_grp_subsets);
   {
     size_t ss=0;
     for (const auto& info : grp_subset_infos)
     {
       chi::log.Log()
-        << "Groupset " << id << " has group-subset " << ss << " "
+        << "Groupset " << id_ << " has group-subset " << ss << " "
       << info.ss_begin << "->" << info.ss_end;
       ++ss;
     }

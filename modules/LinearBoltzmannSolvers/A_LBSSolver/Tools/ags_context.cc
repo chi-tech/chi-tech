@@ -21,8 +21,8 @@ std::pair<int64_t,int64_t> AGSContext<Mat,Vec,KSP>::SystemSize()
   for (auto& wgs_solver : sub_solvers_list_)
   {
     auto gs_context_ptr = GetGSContextPtr(wgs_solver->GetContext());
-    for (const auto& group : gs_context_ptr->groupset_.groups)
-      groupset_list_group_ids.insert(group.id);
+    for (const auto& group : gs_context_ptr->groupset_.groups_)
+      groupset_list_group_ids.insert(group.id_);
   }
 
   const size_t gslist_num_groups = groupset_list_group_ids.size();

@@ -43,7 +43,7 @@ void lbs::acceleration::DiffusionMIPSolver::
     const auto   qp_data      = cell_mapping.MakeVolumeQuadraturePointData();
     const size_t num_groups   = uk_man_.unknowns.front().num_components;
 
-    const auto& xs = mat_id_2_xs_map.at(cell.material_id);
+    const auto& xs = mat_id_2_xs_map_.at(cell.material_id);
 
     //=========================================== For component/group
     for (size_t g=0; g<num_groups; ++g)
