@@ -8,7 +8,7 @@
 /** Default constructor*/
 chi_objects::ChiLog::ChiLog() noexcept
 {
-  verbosity = LOG_0VERBOSE_0;
+  verbosity_ = LOG_0VERBOSE_0;
   std::string memory_usage_event("Maximum Memory Usage");
   repeating_events.emplace_back(memory_usage_event);
 
@@ -36,7 +36,7 @@ chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
       else
       {
         std::string header = " ";
-        return {&dummy_stream, header, true};
+        return {&dummy_stream_, header, true};
       }
     }
     case LOG_0WARNING:
@@ -50,7 +50,7 @@ chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
       else
       {
         std::string header = " ";
-        return {&dummy_stream, header, true};
+        return {&dummy_stream_, header, true};
       }
     }
     case LOG_0ERROR:
@@ -64,14 +64,14 @@ chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
       else
       {
         std::string header = " ";
-        return {&dummy_stream, header, true};
+        return {&dummy_stream_, header, true};
       }
     }
     case LOG_0VERBOSE_0:
     case LOG_0VERBOSE_1:
     case ChiLog::LOG_LVL::LOG_0VERBOSE_2:
     {
-      if ((chi::mpi.location_id == 0) && (verbosity >= level))
+      if ((chi::mpi.location_id == 0) && (verbosity_ >= level))
       {
         std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
         return {&std::cout, header};
@@ -79,7 +79,7 @@ chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
       else
       {
         std::string header = " ";
-        return {&dummy_stream, header, true};
+        return {&dummy_stream_, header, true};
       }
     }
     case LOG_ALL:
@@ -104,7 +104,7 @@ chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
     case LOG_ALLVERBOSE_1:
     case LOG_ALLVERBOSE_2:
     {
-      if (verbosity >= (level-6))
+      if (verbosity_ >= (level - 6))
       {
         std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
         return {&std::cout, header};
@@ -112,12 +112,12 @@ chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
       else
       {
         std::string header = " ";
-        return {&dummy_stream, header, true};
+        return {&dummy_stream_, header, true};
       }
     }
     default:
       std::string header = " ";
-      return {&dummy_stream, header};
+      return {&dummy_stream_, header};
   }
 }
 
@@ -128,15 +128,15 @@ void chi_objects::ChiLog::SetVerbosity(int int_level)
 {
   if (int_level == 0)
   {
-    verbosity = LOG_0VERBOSE_0;
+    verbosity_ = LOG_0VERBOSE_0;
   }
   else if (int_level == 1)
   {
-    verbosity = LOG_0VERBOSE_1;
+    verbosity_ = LOG_0VERBOSE_1;
   }
   else if (int_level == 2)
   {
-    verbosity = ChiLog::LOG_LVL::LOG_0VERBOSE_2;
+    verbosity_ = ChiLog::LOG_LVL::LOG_0VERBOSE_2;
   }
 }
 
@@ -144,7 +144,7 @@ void chi_objects::ChiLog::SetVerbosity(int int_level)
 /** Gets the current verbosity level.*/
 int chi_objects::ChiLog::GetVerbosity() const
 {
-  return verbosity;
+  return verbosity_;
 }
 
 //###################################################################

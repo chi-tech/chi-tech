@@ -1,5 +1,5 @@
-#ifndef _chi_logstream_h
-#define _chi_logstream_h
+#ifndef CHI_LOGSTREAM_H
+#define CHI_LOGSTREAM_H
 
 #include <iostream>
 #include <sstream>
@@ -11,18 +11,18 @@ namespace chi_objects
 class LogStream : public std::stringstream
 {
 private:
-  std::ostream* log_stream;
-  std::string  log_header;
-  const bool dummy = false;
+  std::ostream* log_stream_;
+  std::string  log_header_;
+  const bool dummy_ = false;
 
 public:
   /** Creates a string stream.*/
   LogStream(std::ostream* output_stream,
             std::string header,
             bool dummy_flag=false) :
-    log_stream(output_stream),
-    log_header(std::move(header)),
-    dummy(dummy_flag)
+    log_stream_(output_stream),
+    log_header_(std::move(header)),
+    dummy_(dummy_flag)
   { }
 
   /** Flushes the broken-up/headered stream to the output.*/
@@ -30,8 +30,8 @@ public:
 
   LogStream(const LogStream& other)
   {
-    log_stream = other.log_stream;
-    log_header = other.log_header;
+    log_stream_ = other.log_stream_;
+    log_header_ = other.log_header_;
   }
 };
 
@@ -47,4 +47,4 @@ struct DummyStream: public std::ostream
   ~DummyStream() {}
 };
 }//namespace chi_objects
-#endif
+#endif //CHI_LOGSTREAM_H

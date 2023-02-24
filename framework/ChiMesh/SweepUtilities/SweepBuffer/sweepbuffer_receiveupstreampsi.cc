@@ -4,6 +4,8 @@
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 #include "ChiMesh/SweepUtilities/FLUDS/FLUDS.h"
 
+#include "ChiMPI/chi_mpi_commset.h"
+
 #include "chi_log.h"
 #include "chi_mpi.h"
 
@@ -46,9 +48,9 @@ chi_mesh::sweep_management::SweepBuffer::ReceiveUpstreamPsi(int angle_set_num)
       if (!prelocI_message_received[prelocI][m])
       {
         int message_available = 0;
-        MPI_Iprobe(comm_set->MapIonJ(locJ,chi::mpi.location_id),
+        MPI_Iprobe(comm_set.MapIonJ(locJ,chi::mpi.location_id),
                    max_num_mess*angle_set_num + m, //tag
-                   comm_set->communicators[chi::mpi.location_id],
+                   comm_set.LocICommunicator(chi::mpi.location_id),
                    &message_available, MPI_STATUS_IGNORE);
 
         if (not message_available)
@@ -67,9 +69,9 @@ chi_mesh::sweep_management::SweepBuffer::ReceiveUpstreamPsi(int angle_set_num)
           MPI_Recv(&upstream_psi[block_addr],
                    static_cast<int>(message_size),
                    MPI_DOUBLE,
-                   comm_set->MapIonJ(locJ,chi::mpi.location_id),
+                   comm_set.MapIonJ(locJ,chi::mpi.location_id),
                    max_num_mess*angle_set_num + m, //tag
-                   comm_set->communicators[chi::mpi.location_id],
+                   comm_set.LocICommunicator(chi::mpi.location_id),
                    MPI_STATUS_IGNORE);
 
         prelocI_message_received[prelocI][m] = true;

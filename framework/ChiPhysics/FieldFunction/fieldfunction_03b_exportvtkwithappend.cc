@@ -33,12 +33,12 @@ void chi_physics::FieldFunction::
 
   for (const auto& ff_ptr : ff_list)
     if (ff_ptr != master_ff_ptr)
-      if (ff_ptr->m_sdm->ref_grid != master_ff_ptr->m_sdm->ref_grid)
+      if (ff_ptr->sdm_->ref_grid != master_ff_ptr->sdm_->ref_grid)
         throw std::logic_error(fname +
         ": Cannot be used with field functions based on different grids.");
 
   //============================================= Get grid
-  const auto& grid = *master_ff.m_sdm->ref_grid;
+  const auto& grid = *master_ff.sdm_->ref_grid;
 
   auto ugrid = chi_mesh::PrepareVtkUnstructuredGrid(grid);
 
@@ -49,13 +49,13 @@ void chi_physics::FieldFunction::
   {
     const auto field_vector = ff_ptr->GetGhostedFieldVector();
 
-    const auto& uk_man = ff_ptr->m_unknown_manager;
-    const auto& unknown = ff_ptr->m_unknown;
-    const auto& sdm = ff_ptr->m_sdm;
+    const auto& uk_man = ff_ptr->unknown_manager_;
+    const auto& unknown = ff_ptr->unknown_;
+    const auto& sdm = ff_ptr->sdm_;
 
     for (uint c=0; c<unknown.num_components; ++c)
     {
-      const std::string component_name = ff_ptr->m_text_name +
+      const std::string component_name = ff_ptr->text_name_ +
                                          unknown.text_name +
                                          unknown.component_text_names[c];
       vtkNew<vtkDoubleArray> point_array;

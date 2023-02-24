@@ -1,5 +1,5 @@
-#ifndef _chi_directed_graph_h
-#define _chi_directed_graph_h
+#ifndef CHI_DIRECTED_GRAPH_H
+#define CHI_DIRECTED_GRAPH_H
 
 #include "chi_directed_graph_vertex.h"
 #include <stack>
@@ -149,6 +149,6 @@ public:
   void Clear();
 
   ~DirectedGraph();
-};
+}; //CHI_DIRECTED_GRAPH_H
 
 #endif

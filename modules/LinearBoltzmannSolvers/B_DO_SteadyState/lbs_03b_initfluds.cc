@@ -89,7 +89,7 @@ void lbs::DiscOrdSteadyStateSolver::
           angle_indices,
           sweep_boundaries_,
           options_.sweep_eager_limit,
-          &grid_ptr_->GetCommunicator());
+          grid_ptr_->GetCommunicator());
 
         angle_set_group.angle_sets.push_back(angleSet);
       }//for an_ss

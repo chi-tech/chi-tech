@@ -17,6 +17,11 @@ namespace chi_data_types
   class NDArray;
 }//namespace chi_data_types
 
+namespace chi_objects
+{
+  class ChiMPICommunicatorSet;
+}
+
 //######################################################### Class Definition
 /**Stores the relevant information for completely defining a computational
  * domain. */
@@ -45,7 +50,9 @@ private:
   //is the number of faces in this category
   std::vector<std::pair<size_t,size_t>> face_categories;
 
-  chi_objects::ChiMPICommunicatorSet communicator_set;
+//  chi_objects::ChiMPICommunicatorSet communicator_set;
+
+  std::shared_ptr<chi_objects::ChiMPICommunicatorSet> communicator_set2_;
 
   MeshAttributes attributes = NONE;
 

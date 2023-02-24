@@ -22,7 +22,7 @@
 chi_objects::ChiConsole  chi_objects::ChiConsole::instance;
 chi_objects::ChiConsole& chi::console = chi_objects::ChiConsole::GetInstance();
 
-chi_objects::ChiLog      chi_objects::ChiLog::instance;
+chi_objects::ChiLog      chi_objects::ChiLog::instance_;
 chi_objects::ChiLog&      chi::log = chi_objects::ChiLog::GetInstance();
 
 /** Global stack of handlers */

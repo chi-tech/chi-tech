@@ -3,6 +3,8 @@
 #include "ChiMesh/SweepUtilities/AngleSet/angleset.h"
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 
+#include "ChiMPI/chi_mpi_commset.h"
+
 //###################################################################
 /**Sends downstream psi. This method gets called after a sweep chunk has
  * executed */
@@ -27,9 +29,9 @@ SendDownstreamPsi(int angle_set_num)
       MPI_Isend(&outgoing_psi[block_addr],
                 static_cast<int>(message_size),
                 MPI_DOUBLE,
-                comm_set->MapIonJ(locJ,locJ),
+                comm_set.MapIonJ(locJ,locJ),
                 max_num_mess*angle_set_num + m, //tag
-                comm_set->communicators[locJ],
+                comm_set.LocICommunicator(locJ),
                 &deplocI_message_request[deplocI][m]);
     }//for message
   }//for deplocI
