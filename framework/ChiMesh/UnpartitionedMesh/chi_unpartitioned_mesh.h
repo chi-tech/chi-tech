@@ -9,6 +9,8 @@ class vtkUnstructuredGrid;
 template<class T>
 class vtkSmartPointer;
 
+#include <map>
+
 //###################################################################
 /**This object is intented for unpartitioned meshes that still require
  * partitioning.*/
@@ -60,6 +62,8 @@ public:
     size_t ortho_Nx = 0;
     size_t ortho_Ny = 0;
     size_t ortho_Nz = 0;
+
+    std::map<uint64_t, std::string> boundary_id_map;
   }mesh_options;
 
   struct BoundBox
@@ -76,23 +80,10 @@ protected:
   static LightWeightCell* CreateCellFromVTKVertex(vtkCell* vtk_cell);
 
   typedef vtkSmartPointer<vtkUnstructuredGrid> vtkUGridPtr;
-  static int FindHighestDimension(std::vector<vtkUGridPtr>& ugrid_blocks);
-  static vtkUGridPtr
-    ConsolidateAndCleanBlocks(std::vector<vtkUGridPtr>& ugrid_blocks,
-                              int desired_dimension);
   void CopyUGridCellsAndPoints(vtkUnstructuredGrid& ugrid,
                                double scale);
 
-
-  static std::vector<uint64_t>
-    BuildBlockCellExtents(std::vector<vtkUGridPtr>& ugrid_blocks,
-                          int desired_dimension);
   void SetMaterialIDsFromBlocks(const std::vector<uint64_t>& block_mat_ids);
-
-  std::vector<int>
-    BuildCellMaterialIDsFromField(vtkUGridPtr &ugrid,
-                                  const std::string& field_name,
-                                  const std::string& file_name) const;
   void SetMaterialIDsFromList(const std::vector<int>& material_ids);
 
 
@@ -101,6 +92,7 @@ public:
   void ComputeCentroidsAndCheckQuality();
 
   void ReadFromVTU(const Options& options);
+  void ReadFromPVTU(const Options& options);
   void ReadFromEnsightGold(const Options& options);
   void ReadFromWavefrontOBJ(const Options& options);
 

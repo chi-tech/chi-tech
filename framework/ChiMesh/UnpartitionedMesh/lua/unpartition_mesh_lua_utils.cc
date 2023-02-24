@@ -11,6 +11,7 @@ void RegisterLuaEntities(lua_State* L)
   RegisterFunction(chiDestroyUnpartitionedMesh);
 
   RegisterFunction(chiUnpartitionedMeshFromVTU);
+  RegisterFunction(chiUnpartitionedMeshFromPVTU);
   RegisterFunction(chiUnpartitionedMeshFromEnsightGold);
   RegisterFunction(chiUnpartitionedMeshFromWavefrontOBJ);
   RegisterFunction(chiUnpartitionedMeshFromMshFormat);

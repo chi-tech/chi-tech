@@ -3,11 +3,8 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 #include "ChiMesh/UnpartitionedMesh/chi_unpartitioned_mesh.h"
 
-#include "chi_mpi.h"
-
-
 #include "chi_log.h"
-;
+
 
 //###################################################################
 /** Creates actual z-levels for the input layer specification.*/

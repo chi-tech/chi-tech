@@ -128,6 +128,64 @@ int chiUnpartitionedMeshFromVTU(lua_State* L)
 }
 
 //###################################################################
+/**Creates an unpartitioned mesh from VTK Partitioned Unstructured mesh files
+ * (.pvtu).
+
+\param file_name char Filename of the .vtu file.
+\param field char Name of the cell data field from which to read
+                  material and boundary identifiers (optional).
+
+\ingroup LuaUnpartitionedMesh
+
+##_
+
+### Example
+An example mesh creation below:
+\code
+chiMeshHandlerCreate()
+
+umesh = chiUnpartitionedMeshFromPVTU("ZMeshTest_0.vtu")
+
+chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED)
+chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED, umesh)
+
+chiSurfaceMesherExecute()
+chiVolumeMesherExecute()
+\endcode
+
+
+\return Handle A handle to the newly created UnpartitionedMesh*/
+  int chiUnpartitionedMeshFromPVTU(lua_State* L)
+  {
+    const std::string func_name = __FUNCTION__;
+    int num_args = lua_gettop(L);
+    if (num_args < 1)
+      LuaPostArgAmountError(func_name,1,num_args);
+
+    LuaCheckNilValue(func_name,L,1);
+    if (num_args >= 2) LuaCheckNilValue(func_name,L,2);
+
+    const char* temp = lua_tostring(L,1);
+    const char* field = "";
+    if (num_args >= 2) field = lua_tostring(L,2);
+    auto new_object = new chi_mesh::UnpartitionedMesh;
+
+    chi_mesh::UnpartitionedMesh::Options options;
+    options.file_name = std::string(temp);
+    options.material_id_fieldname = field;
+    options.boundary_id_fieldname = field;
+
+    new_object->ReadFromPVTU(options);
+
+    chi::unpartitionedmesh_stack.emplace_back(new_object);
+
+    lua_pushnumber(L,
+                   static_cast<lua_Number>(chi::unpartitionedmesh_stack.size()-1));
+
+    return 1;
+  }
+
+//###################################################################
 /**Creates an unpartitioned mesh from starccm+ exported
 Ensight Gold mesh files.
 

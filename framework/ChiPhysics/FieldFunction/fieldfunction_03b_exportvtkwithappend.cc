@@ -4,7 +4,7 @@
 #include "chi_log.h"
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum_vtk_utils.h"
+#include "ChiMesh/MeshContinuum/chi_grid_vtk_utils.h"
 
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 

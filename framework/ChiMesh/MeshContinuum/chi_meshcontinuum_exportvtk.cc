@@ -2,7 +2,7 @@
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/VolumeMesher/chi_volumemesher.h"
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum_vtk_utils.h"
+#include "ChiMesh/MeshContinuum/chi_grid_vtk_utils.h"
 
 #include <vtkUnstructuredGrid.h>
 

@@ -28,5 +28,5 @@ chiVolumeMesherExecute();
 
 --############################################### Exports
 if master_export == nil then
-    chiMeshHandlerExportMeshToVTK("ZObjMesh")
+    chiMeshHandlerExportMeshToVTK("ZExodus2")
 end

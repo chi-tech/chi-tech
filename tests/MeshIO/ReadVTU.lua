@@ -18,7 +18,7 @@ end
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
-umesh = chiUnpartitionedMeshFromExodusII("tests/MeshIO/QBlock.e")
+umesh = chiUnpartitionedMeshFromVTU("ZPhi3D_g0_0.vtu")
 
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
 chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED, umesh);
@@ -28,5 +28,5 @@ chiVolumeMesherExecute();
 
 --############################################### Exports
 if master_export == nil then
-    chiMeshHandlerExportMeshToVTK("ZExodus1")
+    chiMeshHandlerExportMeshToVTK("ZVTU")
 end

@@ -4,7 +4,7 @@
 
 #include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
-#include <vtkXMLUnstructuredGridReader.h>
+#include <vtkXMLPUnstructuredGridReader.h>
 
 #include <vtkInformation.h>
 
@@ -21,9 +21,9 @@ std::runtime_error("Failed to open file: " + options.file_name + \
  * - `file_name`, of course.
  * - `material_id_fieldname`, cell data for material_id.*/
 void chi_mesh::UnpartitionedMesh::
-  ReadFromVTU(const chi_mesh::UnpartitionedMesh::Options &options)
+  ReadFromPVTU(const chi_mesh::UnpartitionedMesh::Options &options)
 {
-  chi::log.Log() << "Reading VTU file: " << options.file_name << ".";
+  chi::log.Log() << "Reading PVTU file: " << options.file_name << ".";
 
   //======================================== Attempt to open file
   std::ifstream file;
@@ -33,7 +33,7 @@ void chi_mesh::UnpartitionedMesh::
 
   //======================================== Read the file
   mesh_options = options;
-  auto reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
+  auto reader = vtkSmartPointer<vtkXMLPUnstructuredGridReader>::New();
   reader->SetFileName(options.file_name.c_str());
 
   if (not reader->CanReadFile(options.file_name.c_str()))
@@ -74,6 +74,6 @@ void chi_mesh::UnpartitionedMesh::
   ComputeCentroidsAndCheckQuality();
   BuildMeshConnectivity();
 
-  chi::log.Log() << "Done reading VTU file: " << options.file_name << ".";
+  chi::log.Log() << "Done reading PVTU file: " << options.file_name << ".";
 }
 

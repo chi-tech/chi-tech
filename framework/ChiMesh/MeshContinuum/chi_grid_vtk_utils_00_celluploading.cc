@@ -1,4 +1,4 @@
-#include "chi_meshcontinuum_vtk_utils.h"
+#include "chi_grid_vtk_utils.h"
 
 #include "chi_meshcontinuum.h"
 
