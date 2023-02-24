@@ -1,5 +1,5 @@
-#ifndef _chi_directed_graph_graph_vertex_h
-#define _chi_directed_graph_graph_vertex_h
+#ifndef CHI_DIRECTED_GRAPH_VERTEX_H
+#define CHI_DIRECTED_GRAPH_VERTEX_H
 
 #include "chi_graph.h"
 
@@ -80,4 +80,4 @@ struct chi_graph::GraphVertex
   }
 };
 
-#endif
+#endif //CHI_DIRECTED_GRAPH_VERTEX_H

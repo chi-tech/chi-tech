@@ -3,16 +3,16 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-#include "chi_runtime.h"
-#include "chi_mpi.h"
+#include "ChiMPI/chi_mpi_commset.h"
 
 //###################################################################
-/***/
+/**Gets the communicator-set for interprocess communication,
+ * associated with this mesh. If not created yet, it will create it.*/
 chi_objects::ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
 {
   //================================================== Check if already avail
-  if (communicators_available)
-    return communicator_set;
+  if (communicator_set2_ != nullptr)
+    return *communicator_set2_;
 
   //================================================== Build the communicator
   chi::log.Log0Verbose1() << "Building communicator.";
@@ -50,7 +50,7 @@ chi_objects::ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
                                              std::vector<int>());
   for (int locI=0;locI<chi::mpi.process_count; locI++)
   {
-    int locI_num_connections = local_connections.size();
+    int locI_num_connections = static_cast<int>(local_connections.size());
 
     //If chi::mpi.location_id == locI then this call will
     //act like a send instead of receive. Otherwise
@@ -76,7 +76,7 @@ chi_objects::ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
     //act like a send instead of receive. Otherwise
     //It receives the count.
     MPI_Bcast(global_graph[locI].data(),
-              global_graph[locI].size(),
+              static_cast<int>(global_graph[locI].size()),
               MPI_INT,locI,MPI_COMM_WORLD);
   }
 
@@ -85,28 +85,32 @@ chi_objects::ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
 
 
   //============================================= Build groups
-  MPI_Comm_group(MPI_COMM_WORLD,&communicator_set.world_group);
-  communicator_set.location_groups.resize(chi::mpi.process_count, MPI_Group());
+  MPI_Group world_group;
+  MPI_Comm_group(MPI_COMM_WORLD,&world_group);
+
+  std::vector<MPI_Group> location_groups;
+  location_groups.resize(chi::mpi.process_count, MPI_Group());
 
   for (int locI=0;locI<chi::mpi.process_count; locI++)
   {
-    MPI_Group_incl(communicator_set.world_group,
-                   global_graph[locI].size(),
+    MPI_Group_incl(world_group,
+                   static_cast<int>(global_graph[locI].size()),
                    global_graph[locI].data(),
-                   &communicator_set.location_groups[locI]);
+                   &location_groups[locI]);
   }
 
   //============================================= Build communicators
+  std::vector<MPI_Comm>  communicators;
   chi::log.Log0Verbose1()
     << "Building communicators.";
-  communicator_set.communicators.resize(chi::mpi.process_count, MPI_Comm());
+  communicators.resize(chi::mpi.process_count, MPI_Comm());
 
   for (int locI=0;locI<chi::mpi.process_count; locI++)
   {
     int err = MPI_Comm_create_group(MPI_COMM_WORLD,
-                                    communicator_set.location_groups[locI],
+                                    location_groups[locI],
                                     0, //tag
-                                    &communicator_set.communicators[locI]);
+                                    &communicators[locI]);
 
     if (err != MPI_SUCCESS)
     {
@@ -118,6 +122,9 @@ chi_objects::ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
   chi::log.Log0Verbose1()
     << "Done building communicators.";
 
-  communicators_available = true;
-  return communicator_set;
+  communicator_set2_ = std::make_shared<chi_objects::ChiMPICommunicatorSet>(
+    communicators, location_groups, world_group);
+
+  return *communicator_set2_;
 }
+
