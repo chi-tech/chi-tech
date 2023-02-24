@@ -44,7 +44,7 @@ void lbs::acceleration::DiffusionMIPSolver::
 
     const auto& cell_M_matrix = unit_cell_matrices.M_matrix;
 
-    const auto& xs = mat_id_2_xs_map.at(cell.material_id);
+    const auto& xs = mat_id_2_xs_map_.at(cell.material_id);
 
     for (size_t g=0; g<num_groups; ++g)
     {
@@ -195,7 +195,7 @@ Assemble_b(Vec petsc_q_vector)
 
     const auto& cell_M_matrix = unit_cell_matrices.M_matrix;
 
-    const auto& xs = mat_id_2_xs_map.at(cell.material_id);
+    const auto& xs = mat_id_2_xs_map_.at(cell.material_id);
 
     for (size_t g=0; g<num_groups; ++g)
     {

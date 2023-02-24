@@ -72,7 +72,7 @@ protected:
 
   const std::map<uint64_t, BoundaryCondition> bcs_;
 
-  const MatID2XSMap mat_id_2_xs_map;
+  const MatID2XSMap mat_id_2_xs_map_;
 
   const std::vector<UnitCellMatrices>& unit_cell_matrices_;
 
