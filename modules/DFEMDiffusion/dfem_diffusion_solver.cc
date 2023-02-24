@@ -146,7 +146,7 @@ void dfem_diffusion::Solver::Initialize()
                                            nodal_nnz_in_diag,
                                            nodal_nnz_off_diag);
 
-  if (field_functions.empty())
+  if (field_functions_.empty())
   {
     std::string solver_name;
     if (not TextName().empty()) solver_name = TextName() + "-";
@@ -160,7 +160,7 @@ void dfem_diffusion::Solver::Initialize()
         sdm_ptr,                       //Spatial Discretization
         Unknown(UnknownType::SCALAR)); //Unknown/Variable
 
-    field_functions.push_back(initial_field_function);
+    field_functions_.push_back(initial_field_function);
     chi::field_function_stack.push_back(initial_field_function);
   }//if not ff set
 
@@ -486,8 +486,8 @@ void dfem_diffusion::Solver::Execute()
       TextName(),      //Solver name
       KSPCG,           //Solver type
       PCGAMG,          //Preconditioner type
-      basic_options("residual_tolerance").FloatValue(),  //Relative residual tolerance
-      basic_options("max_iters").IntegerValue()          //Max iterations
+      basic_options_("residual_tolerance").FloatValue(),  //Relative residual tolerance
+      basic_options_("max_iters").IntegerValue()          //Max iterations
       );
  
   //============================================= Solve
@@ -498,5 +498,5 @@ void dfem_diffusion::Solver::Execute()
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;
   sdm.LocalizePETScVector(x,field,OneDofPerNode);
 
-  field_functions.front()->UpdateFieldVector(field);
+  field_functions_.front()->UpdateFieldVector(field);
 }

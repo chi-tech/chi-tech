@@ -170,7 +170,7 @@ void lbs::LBSSolver::InitializeParrays()
   }//for local cell
 
   //================================================== Initialize Field Functions
-  if (field_functions.empty())
+  if (field_functions_.empty())
   {
     for (size_t g = 0; g < groups_.size(); ++g)
     {
@@ -193,7 +193,7 @@ void lbs::LBSSolver::InitializeParrays()
           Unknown(UnknownType::SCALAR)); //Unknown/Variable
 
         chi::field_function_stack.push_back(group_ff);
-        field_functions.push_back(group_ff);
+        field_functions_.push_back(group_ff);
       }//for m
     }//for g
   }//if empty

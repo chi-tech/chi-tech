@@ -13,7 +13,7 @@ void mg_diffusion::Solver::UpdateFieldFunctions()
     std::vector<double> data_vector;
     sdm_ptr->LocalizePETScVector(x[g], data_vector, OneDOFPerNode);
 
-    auto& ff = field_functions.at(g);
+    auto& ff = field_functions_.at(g);
     ff->UpdateFieldVector(data_vector);
   }//for g
 }

@@ -22,8 +22,8 @@ void mg_diffusion::Solver::Execute()
       TextName(),      //Solver name
       KSPCG,           //Solver type
       PCGAMG,          //Preconditioner type
-      basic_options("residual_tolerance").FloatValue(),  //Relative residual tolerance
-      basic_options("max_inner_iters").IntegerValue()    //Max # of inner iterations
+      basic_options_("residual_tolerance").FloatValue(),  //Relative residual tolerance
+      basic_options_("max_inner_iters").IntegerValue()    //Max # of inner iterations
     );
 
   KSPSetApplicationContext(petsc_solver.ksp, (void*)&my_app_context);
@@ -31,7 +31,7 @@ void mg_diffusion::Solver::Execute()
   KSPMonitorSet(petsc_solver.ksp, &mg_diffusion::MGKSPMonitor,
                 nullptr, nullptr);
 
-  int64_t iverbose = basic_options("verbose_level").IntegerValue();
+  int64_t iverbose = basic_options_("verbose_level").IntegerValue();
   my_app_context.verbose = iverbose > 1 ? PETSC_TRUE : PETSC_FALSE;
 //  if (my_app_context.verbose == PETSC_TRUE)
 //    cout << "--context TRUE" << endl;
@@ -53,9 +53,9 @@ void mg_diffusion::Solver::Execute()
   //============================================= Solve thermal groups:
   unsigned int thermal_iteration = 0;
   // max # of thermal iterations
-  int64_t max_thermal_iters = basic_options("max_thermal_iters").IntegerValue();
+  int64_t max_thermal_iters = basic_options_("max_thermal_iters").IntegerValue();
   // max thermal error between two successive iterates
-  double  thermal_tol = basic_options("thermal_flux_tolerance").FloatValue();
+  double  thermal_tol = basic_options_("thermal_flux_tolerance").FloatValue();
   // computed error
   double thermal_error_all;
   double thermal_error_g;

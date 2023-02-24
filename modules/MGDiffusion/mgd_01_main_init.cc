@@ -172,7 +172,7 @@ void mg_diffusion::Solver::Initialize()
   //                                              update
 
   //============================================= Field Function
-  if (field_functions.empty())
+  if (field_functions_.empty())
   {
     for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
     {
@@ -191,7 +191,7 @@ void mg_diffusion::Solver::Initialize()
           sdm_ptr,                       //Spatial Discretization
           Unknown(UnknownType::SCALAR)); //Unknown Manager
 
-      field_functions.push_back(initial_field_function);
+      field_functions_.push_back(initial_field_function);
       chi::field_function_stack.push_back(initial_field_function);
     }//for g
   }//if not ff set

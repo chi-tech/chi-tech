@@ -7,14 +7,14 @@
 /** Default constructor.*/
 chi_objects::ChiTimer::ChiTimer() noexcept
 {
-  startTime = std::chrono::steady_clock::now();
+  start_time_ = std::chrono::steady_clock::now();
 }
 
 //################################################################### Reset
 /** Resets the timer to zero.*/
 void chi_objects::ChiTimer::Reset()
 {
-  startTime = std::chrono::steady_clock::now();
+  start_time_ = std::chrono::steady_clock::now();
 }
 
 //################################################################### Get time
@@ -25,7 +25,7 @@ double chi_objects::ChiTimer::GetTime() const
 
   steady_clock::time_point newTime = std::chrono::steady_clock::now();
   duration<double> time_span =
-    duration_cast<duration<double>>(newTime - startTime);
+    duration_cast<duration<double>>(newTime - start_time_);
 
   return time_span.count()*1000.0;
 }

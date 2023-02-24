@@ -43,9 +43,9 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
     chi::Exit(EXIT_FAILURE);
   }
 
-  auto property_map_D     = basic_options("property_map_D").IntegerValue();
-  auto property_map_q     = basic_options("property_map_q").IntegerValue();
-  auto property_map_sigma = basic_options("property_map_sigma").IntegerValue();
+  auto property_map_D     = basic_options_("property_map_D").IntegerValue();
+  auto property_map_q     = basic_options_("property_map_q").IntegerValue();
+  auto property_map_sigma = basic_options_("property_map_sigma").IntegerValue();
 
   auto material = chi::GetStackItemPtr(chi::material_stack, mat_id, __FUNCTION__);
 
@@ -188,7 +188,7 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
 void chi_diffusion::Solver::UpdateFieldFunctions()
 {
   chi::log.LogAll() << "Updating field functions" << std::endl;
-  auto& ff = *field_functions.front();
+  auto& ff = *field_functions_.front();
   const auto& OneDofPerNode = discretization->UNITARY_UNKNOWN_MANAGER;
 
   std::vector<double> data_vector;
