@@ -11,8 +11,8 @@ namespace chi_objects
   /** Timer object.*/
   class ChiTimer
   {
-  public:
-    std::chrono::steady_clock::time_point startTime;
+  private:
+    std::chrono::steady_clock::time_point start_time_;
 
   public:
     //00

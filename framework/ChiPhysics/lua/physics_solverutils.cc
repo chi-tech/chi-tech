@@ -123,7 +123,7 @@ int chiSolverSetBasicOption(lua_State* L)
 
   try
   {
-    auto& option = solver.basic_options[option_name];
+    auto& option = solver.GetBasicOptions()[option_name];
 
     switch (option.Type())
     {
@@ -218,13 +218,13 @@ int chiSolverGetFieldFunctionList(lua_State* L)
   //======================================================= Getting solver
   const int solver_handle = lua_tonumber(L,1);
 
-  auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::solver_stack,
-                                                       solver_handle,
-                                                       fname);
+  const auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::solver_stack,
+                                                              solver_handle,
+                                                              fname);
 
   //============================================= Push up new table
   lua_newtable(L);
-  for (size_t ff=0; ff<solver.field_functions.size(); ff++)
+  for (size_t ff=0; ff<solver.GetFieldFunctions().size(); ff++)
   {
     lua_pushinteger(L,static_cast<lua_Integer>(ff)+1);
     int pff_count = -1;
@@ -232,7 +232,7 @@ int chiSolverGetFieldFunctionList(lua_State* L)
     for (auto& pff : chi::field_function_stack)
     {
       ++pff_count;
-      if (pff == solver.field_functions[ff])
+      if (pff == solver.GetFieldFunctions()[ff])
       {
         lua_pushnumber(L,pff_count);
         found = true;
@@ -247,7 +247,7 @@ int chiSolverGetFieldFunctionList(lua_State* L)
     lua_settable(L,-3);
   }
 
-  lua_pushinteger(L,static_cast<lua_Integer>(solver.field_functions.size()));
+  lua_pushinteger(L,static_cast<lua_Integer>(solver.GetFieldFunctions().size()));
 
   return 2;
 }

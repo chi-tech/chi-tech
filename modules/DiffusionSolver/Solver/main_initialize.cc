@@ -25,7 +25,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
 
   chi_objects::ChiTimer t_init; t_init.Reset();
 
-  auto sdm_string = basic_options("discretization_method").StringValue();
+  auto sdm_string = basic_options_("discretization_method").StringValue();
   {
     using namespace chi_math::finite_element;
     if      (sdm_string == "PWLC")
@@ -65,7 +65,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
 
   //================================================== Initialize discretization
   //                                                   method
-  if (field_functions.empty())
+  if (field_functions_.empty())
   {
     auto& sdm_ptr = discretization;
     std::string solver_name;
@@ -80,7 +80,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
         sdm_ptr,                       //Spatial Discretization
         Unknown(UnknownType::SCALAR)); //Unknown/Variable
 
-    field_functions.push_back(initial_field_function);
+    field_functions_.push_back(initial_field_function);
     chi::field_function_stack.push_back(initial_field_function);
   }//if not ff set
 
@@ -196,9 +196,9 @@ int chi_diffusion::Solver::Initialize(bool verbose)
 
   ierr = KSPSetTolerances(ksp,
                           1.e-50,
-                          basic_options("residual_tolerance").FloatValue(),
+                          basic_options_("residual_tolerance").FloatValue(),
                           1.0e50,
-                          basic_options("max_iters").IntegerValue());
+                          basic_options_("max_iters").IntegerValue());
   ierr = KSPSetInitialGuessNonzero(ksp,PETSC_TRUE);
 
   return false;

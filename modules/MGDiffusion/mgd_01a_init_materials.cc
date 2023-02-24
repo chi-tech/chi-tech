@@ -148,7 +148,7 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
   mg_diffusion::Solver::last_fast_group = lfg;
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Compute two-grid params
-  do_two_grid = basic_options("do_two_grid").BoolValue();
+  do_two_grid = basic_options_("do_two_grid").BoolValue();
   if ( (lfg == num_groups) && do_two_grid)
   {
     chi::log.Log0Error() << "Two-grid is not possible with no upscattering.";

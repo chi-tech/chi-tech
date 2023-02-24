@@ -30,7 +30,7 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
 
   //================================================== Loop over locally owned
   //                                                   cells
-  auto fem_method = basic_options("discretization_method").StringValue();
+  auto fem_method = basic_options_("discretization_method").StringValue();
   if (fem_method == "PWLC")
   {
     if (!suppress_assembly)
