@@ -34,7 +34,7 @@ lbs_curvilinear::SweepChunkPWL::
   , normal_vector_boundary()
 {
   const auto curvilinear_product_quadrature =
-    std::dynamic_pointer_cast<chi_math::CurvilinearAngularQuadrature>(groupset.quadrature);
+    std::dynamic_pointer_cast<chi_math::CurvilinearAngularQuadrature>(groupset.quadrature_);
 
   if (!curvilinear_product_quadrature)
     throw std::invalid_argument("C_DO_RZ_SteadyState::SweepChunkPWL::SweepChunkPWL : "
@@ -93,11 +93,11 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
   int deploc_face_counter = -1;
   int preloc_face_counter = -1;
 
-  const auto& d2m_op = groupset.quadrature->GetDiscreteToMomentOperator();
-  const auto& m2d_op = groupset.quadrature->GetMomentToDiscreteOperator();
+  const auto& d2m_op = groupset.quadrature_->GetDiscreteToMomentOperator();
+  const auto& m2d_op = groupset.quadrature_->GetMomentToDiscreteOperator();
 
   const auto curvilinear_product_quadrature =
-    std::dynamic_pointer_cast<chi_math::CurvilinearAngularQuadrature>(groupset.quadrature);
+    std::dynamic_pointer_cast<chi_math::CurvilinearAngularQuadrature>(groupset.quadrature_);
 
   //========================================================== Loop over each cell
   size_t num_loc_cells = spds.spls.item_id.size();
@@ -131,7 +131,7 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
       deploc_face_counter = ni_deploc_face_counter;
       preloc_face_counter = ni_preloc_face_counter;
       const auto& angle_num = angle_set->angles[angle_set_index];
-      const auto& omega = groupset.quadrature->omegas[angle_num];
+      const auto& omega = groupset.quadrature_->omegas[angle_num];
 
       const auto polar_level = map_polar_level[angle_num];
 

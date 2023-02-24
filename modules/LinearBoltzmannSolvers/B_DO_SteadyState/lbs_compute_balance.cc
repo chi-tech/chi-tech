@@ -76,10 +76,10 @@ void lbs::DiscOrdSteadyStateSolver::ComputeBalance()
 
       for (const auto& groupset : groupsets_)
       {
-        for (int n = 0; n < groupset.quadrature->omegas.size(); ++n)
+        for (int n = 0; n < groupset.quadrature_->omegas.size(); ++n)
         {
-          const auto &omega = groupset.quadrature->omegas[n];
-          const double wt = groupset.quadrature->weights[n];
+          const auto &omega = groupset.quadrature_->omegas[n];
+          const double wt = groupset.quadrature_->weights[n];
           const double mu = omega.Dot(face.normal);
 
           if (mu < 0.0 and (not face.has_neighbor)) //mu<0 and bndry

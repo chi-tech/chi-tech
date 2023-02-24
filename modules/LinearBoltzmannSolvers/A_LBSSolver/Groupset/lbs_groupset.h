@@ -34,7 +34,7 @@ protected:
 public:
   int                                          id_;
   std::vector<LBSGroup>                        groups_;
-  std::shared_ptr<chi_math::AngularQuadrature> quadrature = nullptr;
+  std::shared_ptr<chi_math::AngularQuadrature> quadrature_ = nullptr;
   chi_mesh::sweep_management::AngleAggregation angle_agg;
   std::vector<SPDS_ptr>                        sweep_orderings;
   UniqueSOGroupings                            unique_so_groupings;

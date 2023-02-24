@@ -46,15 +46,15 @@ void DiscOrdSteadyStateSolver::InitializeSweepDataStructures()
   std::map<AngQuadPtr, bool> quadrature_allow_cycles_map_;
   for (auto& groupset : groupsets_)
   {
-    if (quadrature_unq_so_grouping_map_.count(groupset.quadrature)==0)
-      quadrature_unq_so_grouping_map_[groupset.quadrature] =
+    if (quadrature_unq_so_grouping_map_.count(groupset.quadrature_) == 0)
+      quadrature_unq_so_grouping_map_[groupset.quadrature_] =
         AssociateSOsAndDirections(*grid_ptr_,
-                                  *groupset.quadrature,
+                                  *groupset.quadrature_,
                                   groupset.angleagg_method,
                                   options_.geometry_type);
 
-    if (quadrature_allow_cycles_map_.count(groupset.quadrature)==0)
-      quadrature_allow_cycles_map_[groupset.quadrature] = groupset.allow_cycles;
+    if (quadrature_allow_cycles_map_.count(groupset.quadrature_) == 0)
+      quadrature_allow_cycles_map_[groupset.quadrature_] = groupset.allow_cycles;
   }
 
   //=================================== Build sweep orderings

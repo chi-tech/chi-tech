@@ -88,7 +88,7 @@ lbs_curvilinear::DiscOrdSteadyStateSolver::PerformInputChecks()
   for (size_t gs = 0; gs < groupsets_.size(); ++gs)
   {
     //  angular quadrature type must be compatible with coordinate system
-    const auto angular_quad_ptr = groupsets_[gs].quadrature;
+    const auto angular_quad_ptr = groupsets_[gs].quadrature_;
     switch (coord_system_type_)
     {
       case chi_math::CoordinateSystemType::CYLINDRICAL:

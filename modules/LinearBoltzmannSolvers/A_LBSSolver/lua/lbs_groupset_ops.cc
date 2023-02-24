@@ -304,7 +304,7 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
     chi::Exit(EXIT_FAILURE);
   }
 
-  groupset->quadrature = ang_quad;
+  groupset->quadrature_ = ang_quad;
 
   if (ang_quad->type == chi_math::AngularQuadratureType::ProductQuadrature)
   {

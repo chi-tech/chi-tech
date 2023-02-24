@@ -29,7 +29,7 @@ void lbs::DiscOrdSteadyStateSolver::
   typedef sweep_namespace::AngleSet TAngleSet;
 
   const auto& quadrature_sweep_info =
-    quadrature_unq_so_grouping_map_[groupset.quadrature];
+    quadrature_unq_so_grouping_map_[groupset.quadrature_];
 
   const auto& unique_so_groupings = quadrature_sweep_info.first;
   const auto& dir_id_to_so_map    = quadrature_sweep_info.second;
@@ -42,7 +42,7 @@ void lbs::DiscOrdSteadyStateSolver::
   groupset.angle_agg.Setup(sweep_boundaries_,
                            gs_num_grps,
                            gs_num_ss,
-                           groupset.quadrature,
+                           groupset.quadrature_,
                            grid_ptr_);
 
   TAngleSetGroup angle_set_group;
@@ -52,9 +52,9 @@ void lbs::DiscOrdSteadyStateSolver::
     const size_t so_id = dir_id_to_so_map.at(master_dir_id);
 
     const auto& sweep_ordering =
-      quadrature_spds_map_[groupset.quadrature][so_id];
+      quadrature_spds_map_[groupset.quadrature_][so_id];
     const auto& fluds_template =
-      *quadrature_fluds_templates_map_[groupset.quadrature][so_id];
+      *quadrature_fluds_templates_map_[groupset.quadrature_][so_id];
 
     //Compute direction subsets
     const auto dir_subsets = lbs::MakeSubSets(so_grouping.size(),

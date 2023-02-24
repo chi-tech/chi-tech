@@ -18,7 +18,7 @@ void lbs::DiscOrdSteadyStateAdjointSolver::Execute()
       set_group_numbers.insert(group.id_);
 
   const auto& m_to_ell_em_map =
-    groupsets_.front().quadrature->GetMomentToHarmonicsIndexMap();
+    groupsets_.front().quadrature_->GetMomentToHarmonicsIndexMap();
 
   //============================================= Reorient phi-moments for reverse
   //                                              angle

@@ -29,7 +29,7 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
       set_group_numbers.insert(group.id_);
 
   const auto& m_to_ell_em_map =
-    groupsets_.front().quadrature->GetMomentToHarmonicsIndexMap();
+    groupsets_.front().quadrature_->GetMomentToHarmonicsIndexMap();
 
   typedef chi_math::VectorN<4> Arr4; //phi, J_x, J_y, J_z
   typedef std::vector<Arr4> MGVec4;

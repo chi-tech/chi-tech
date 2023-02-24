@@ -38,7 +38,7 @@ void lbs::LBSSolver::
   auto last_grp = static_cast<size_t>(groups_.back().id_);
 
   const auto& m_to_ell_em_map =
-      groupset.quadrature->GetMomentToHarmonicsIndexMap();
+      groupset.quadrature_->GetMomentToHarmonicsIndexMap();
 
   std::vector<double> default_zero_src(groups_.size(), 0.0);
 

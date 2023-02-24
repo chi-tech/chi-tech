@@ -114,8 +114,8 @@ void lbs::SweepChunkPWLTransientTheta::
   int deploc_face_counter = -1;
   int preloc_face_counter = -1;
 
-  auto const& d2m_op = groupset.quadrature->GetDiscreteToMomentOperator();
-  auto const& m2d_op = groupset.quadrature->GetMomentToDiscreteOperator();
+  auto const& d2m_op = groupset.quadrature_->GetDiscreteToMomentOperator();
+  auto const& m2d_op = groupset.quadrature_->GetMomentToDiscreteOperator();
 
   const auto& psi_uk_man = groupset.psi_uk_man;
   typedef const int64_t cint64_t;
@@ -161,8 +161,8 @@ void lbs::SweepChunkPWLTransientTheta::
       deploc_face_counter = ni_deploc_face_counter;
       preloc_face_counter = ni_preloc_face_counter;
       const int angle_num = angle_set->angles[angle_set_index];
-      const chi_mesh::Vector3& omega = groupset.quadrature->omegas[angle_num];
-      const double wt = groupset.quadrature->weights[angle_num];
+      const chi_mesh::Vector3& omega = groupset.quadrature_->omegas[angle_num];
+      const double wt = groupset.quadrature_->weights[angle_num];
 
       // ============================================ Gradient matrix
       for (int i = 0; i < num_nodes; ++i)

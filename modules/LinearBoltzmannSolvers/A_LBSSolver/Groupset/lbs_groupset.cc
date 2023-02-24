@@ -20,16 +20,16 @@ void lbs::LBSGroupset::BuildDiscMomOperator(
       geometry_type == lbs::GeometryType::ONED_CYLINDRICAL ||
       geometry_type == lbs::GeometryType::ONED_SPHERICAL)
   {
-    quadrature->BuildDiscreteToMomentOperator(scattering_order,1);
+    quadrature_->BuildDiscreteToMomentOperator(scattering_order, 1);
   }
   else if (geometry_type == lbs::GeometryType::TWOD_CARTESIAN ||
            geometry_type == lbs::GeometryType::TWOD_CYLINDRICAL)
   {
-    quadrature->BuildDiscreteToMomentOperator(scattering_order,2);
+    quadrature_->BuildDiscreteToMomentOperator(scattering_order, 2);
   }
   else if (geometry_type == lbs::GeometryType::THREED_CARTESIAN)
   {
-    quadrature->BuildDiscreteToMomentOperator(scattering_order,3);
+    quadrature_->BuildDiscreteToMomentOperator(scattering_order, 3);
   }
 }
 
@@ -43,16 +43,16 @@ void lbs::LBSGroupset::BuildMomDiscOperator(
       geometry_type == lbs::GeometryType::ONED_CYLINDRICAL ||
       geometry_type == lbs::GeometryType::ONED_SPHERICAL)
   {
-    quadrature->BuildMomentToDiscreteOperator(scattering_order,1);
+    quadrature_->BuildMomentToDiscreteOperator(scattering_order, 1);
   }
   else if (geometry_type == lbs::GeometryType::TWOD_CARTESIAN ||
            geometry_type == lbs::GeometryType::TWOD_CYLINDRICAL)
   {
-    quadrature->BuildMomentToDiscreteOperator(scattering_order,2);
+    quadrature_->BuildMomentToDiscreteOperator(scattering_order, 2);
   }
   else if (geometry_type == lbs::GeometryType::THREED_CARTESIAN)
   {
-    quadrature->BuildMomentToDiscreteOperator(scattering_order,3);
+    quadrature_->BuildMomentToDiscreteOperator(scattering_order, 3);
   }
 }
 
@@ -104,7 +104,7 @@ void lbs::LBSGroupset::PrintSweepInfoFile(size_t ev_tag, const std::string& file
 
       for (auto& ang_num : ang_set->angles)
       {
-        const auto& angle = quadrature->abscissae[ang_num];
+        const auto& angle = quadrature_->abscissae[ang_num];
 
         ofile
           << "    " << ang_num
