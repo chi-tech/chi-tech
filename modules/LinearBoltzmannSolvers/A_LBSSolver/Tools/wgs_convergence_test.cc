@@ -60,9 +60,9 @@ PetscErrorCode GSConvergenceTest(KSP ksp, PetscInt n, PetscReal rnorm,
     << chi::program_timer.GetTimeString() << " "
     << offset
     << "WGS groups ["
-    << context->groupset_.groups.front().id
+    << context->groupset_.groups.front().id_
     << "-"
-    << context->groupset_.groups.back().id
+    << context->groupset_.groups.back().id_
     << "]"
     << " Iteration " << std::setw(5) << n
     << " Residual " << std::setw(9) << scaled_residual;

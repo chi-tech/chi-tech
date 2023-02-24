@@ -22,7 +22,7 @@ double lbs::DiscOrdSteadyStateAdjointSolver::ComputeInnerProduct()
 
     for (const auto& group : groups_)
     {
-      const int g = group.id;
+      const int g = group.id_;
       const double Q = source->source_value_g[g];
 
       if (Q > 0.0)
@@ -54,7 +54,7 @@ double lbs::DiscOrdSteadyStateAdjointSolver::ComputeInnerProduct()
 
       for (const auto& group : groups_)
       {
-        const int g = group.id;
+        const int g = group.id_;
         const double S = source_strength[g] * info.volume_weight;
 
         if (S > 0.0)

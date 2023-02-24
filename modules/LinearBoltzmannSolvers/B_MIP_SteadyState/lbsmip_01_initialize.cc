@@ -66,8 +66,8 @@ void lbs::MIPSteadyStateSolver::InitializeWGSSolvers()
       std::vector<double> sigR(gs_G, 0.0);
 
       size_t g = 0;
-      for (size_t gprime=groupset.groups.front().id;
-           gprime<=groupset.groups.back().id; ++gprime)
+      for (size_t gprime=groupset.groups.front().id_;
+           gprime<=groupset.groups.back().id_; ++gprime)
       {
         Dg[g]   = xs->diffusion_coeff[gprime];
         sigR[g] = xs->sigma_removal[gprime];

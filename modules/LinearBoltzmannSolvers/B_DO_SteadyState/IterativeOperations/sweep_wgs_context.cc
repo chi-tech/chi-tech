@@ -38,8 +38,8 @@ void SweepWGSContext<Mat, Vec, KSP>::PreSetupCallback()
       << " with " << method_name << ".\n\n"
       << "Quadrature number of angles: "
       << groupset_.quadrature->abscissae.size() << "\n"
-      << "Groups " << groupset_.groups.front().id << " "
-      << groupset_.groups.back().id << "\n\n";
+      << "Groups " << groupset_.groups.front().id_ << " "
+      << groupset_.groups.back().id_ << "\n\n";
   }
 }
 

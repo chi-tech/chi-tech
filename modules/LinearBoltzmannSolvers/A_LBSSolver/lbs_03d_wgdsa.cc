@@ -42,8 +42,8 @@ void lbs::LBSSolver::InitWGDSA(LBSGroupset& groupset)
       std::vector<double> sigR(gs_G, 0.0);
 
       size_t g = 0;
-      for (size_t gprime=groupset.groups.front().id;
-           gprime<=groupset.groups.back().id; ++gprime)
+      for (size_t gprime = groupset.groups.front().id_;
+           gprime <= groupset.groups.back().id_; ++gprime)
       {
         Dg[g]   = xs->diffusion_coeff[gprime];
         sigR[g] = xs->sigma_removal[gprime];
@@ -100,7 +100,7 @@ void lbs::LBSSolver::
   const auto& dphi_uk_man = groupset.wgdsa_solver->UnknownStructure();
   const auto& phi_uk_man  = flux_moments_uk_man_;
 
-  const int    gsi = groupset.groups.front().id;
+  const int    gsi = groupset.groups.front().id_;
   const size_t gss = groupset.groups.size();
 
   delta_phi_local.clear();
@@ -139,7 +139,7 @@ void lbs::LBSSolver::
   const auto& dphi_uk_man = groupset.wgdsa_solver->UnknownStructure();
   const auto& phi_uk_man  = flux_moments_uk_man_;
 
-  const int    gsi = groupset.groups.front().id;
+  const int    gsi = groupset.groups.front().id_;
   const size_t gss = groupset.groups.size();
 
   for (const auto& cell : grid_ptr_->local_cells)

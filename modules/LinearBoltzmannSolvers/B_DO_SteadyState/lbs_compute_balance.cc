@@ -15,7 +15,7 @@ void lbs::DiscOrdSteadyStateSolver::ZeroOutflowBalanceVars(LBSGroupset& groupset
 {
   for (auto& cell_transport_view : cell_transport_views_)
     for (auto& group : groupset.groups)
-      cell_transport_view.ZeroOutflow(group.id);
+      cell_transport_view.ZeroOutflow(group.id_);
 }
 
 //###################################################################
@@ -92,7 +92,7 @@ void lbs::DiscOrdSteadyStateSolver::ComputeBalance()
 
               for (const auto &group : groupset.groups)
               {
-                const int g = group.id;
+                const int g = group.id_;
                 const double psi = bndry->boundary_flux[g];
                 local_in_flow -= mu * wt * psi * IntFi_shapeI;
               }//for g

@@ -7,8 +7,8 @@ using namespace lbs;
 \author Zachary Hardy.*/
 double LBSSolver::ComputeFissionProduction(const std::vector<double>& phi)
 {
-  const int first_grp = groups_.front().id;
-  const int last_grp = groups_.back().id;
+  const int first_grp = groups_.front().id_;
+  const int last_grp = groups_.back().id_;
 
   //============================================= Loop over local cells
   double local_production = 0.0;
@@ -69,8 +69,8 @@ double LBSSolver::ComputeFissionProduction(const std::vector<double>& phi)
 \author Zachary Hardy.*/
 double LBSSolver::ComputeFissionRate(const bool previous)
 {
-  const int first_grp = groups_.front().id;
-  const int last_grp = groups_.back().id;
+  const int first_grp = groups_.front().id_;
+  const int last_grp = groups_.back().id_;
 
   const auto& phi = phi_old_local_;
 

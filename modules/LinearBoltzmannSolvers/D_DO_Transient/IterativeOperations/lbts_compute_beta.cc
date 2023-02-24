@@ -26,8 +26,8 @@ double lbs::DiscOrdTransientSolver::ComputeBeta()
     //============================= Loop over groupsets
     for (const auto& groupset : groupsets_)
     {
-      auto gs_i = static_cast<size_t>(groupset.groups[0].id);
-      auto gs_f = static_cast<size_t>(groupset.groups.back().id);
+      auto gs_i = static_cast<size_t>(groupset.groups.front().id_);
+      auto gs_f = static_cast<size_t>(groupset.groups.back().id_);
 
       //============================= Loop over groupset groups
       for (size_t g = gs_i; g <= gs_f; ++g)

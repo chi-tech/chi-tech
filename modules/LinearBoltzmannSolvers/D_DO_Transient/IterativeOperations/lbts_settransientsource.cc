@@ -42,11 +42,11 @@ void lbs::DiscOrdTransientSolver::
   const bool apply_ags_fission_src = (source_flags & APPLY_AGS_FISSION_SOURCES);
 
   //================================================== Get group setup
-  auto gs_i = static_cast<size_t>(groupset.groups[0].id);
-  auto gs_f = static_cast<size_t>(groupset.groups.back().id);
+  auto gs_i = static_cast<size_t>(groupset.groups.front().id_);
+  auto gs_f = static_cast<size_t>(groupset.groups.back().id_);
 
-  auto first_grp = static_cast<size_t>(groups_.front().id);
-  auto last_grp = static_cast<size_t>(groups_.back().id);
+  auto first_grp = static_cast<size_t>(groups_.front().id_);
+  auto last_grp = static_cast<size_t>(groups_.back().id_);
 
   const auto& m_to_ell_em_map =
     groupset.quadrature->GetMomentToHarmonicsIndexMap();

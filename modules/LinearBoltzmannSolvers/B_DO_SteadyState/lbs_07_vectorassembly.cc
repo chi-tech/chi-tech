@@ -19,8 +19,8 @@ void lbs::DiscOrdSteadyStateSolver::
   double* x_ref;
   VecGetArray(x,&x_ref);
 
-  int gsi = groupset.groups[0].id;
-  int gsf = groupset.groups.back().id;
+  int gsi = groupset.groups.front().id_;
+  int gsf = groupset.groups.back().id_;
   int gss = gsf-gsi+1;
 
   int index = -1;
@@ -73,8 +73,8 @@ void lbs::DiscOrdSteadyStateSolver::
   const double* x_ref;
   VecGetArrayRead(x_src,&x_ref);
 
-  int gsi = groupset.groups[0].id;
-  int gsf = groupset.groups.back().id;
+  int gsi = groupset.groups.front().id_;
+  int gsf = groupset.groups.back().id_;
   int gss = gsf-gsi+1;
 
   int index = -1;
@@ -133,7 +133,7 @@ void lbs::DiscOrdSteadyStateSolver::
       throw std::logic_error("GSScopedCopyPrimarySTLvectors");
   }
 
-  int gsi = groupset.groups[0].id;
+  int gsi = groupset.groups[0].id_;
   size_t gss = groupset.groups.size();
 
   for (const auto& cell : grid_ptr_->local_cells)
