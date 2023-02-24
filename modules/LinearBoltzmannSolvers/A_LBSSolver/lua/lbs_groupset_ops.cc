@@ -83,7 +83,7 @@ int chiLBSCreateGroupset(lua_State *L)
   //============================================= Create groupset
   lbs_solver.AddGroupset();
 
-  lua_pushinteger(L, lbs_solver.Groupsets().back().id);
+  lua_pushinteger(L, lbs_solver.Groupsets().back().id_);
   return 1;
 }
 

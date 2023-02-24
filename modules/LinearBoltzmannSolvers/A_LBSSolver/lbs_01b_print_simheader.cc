@@ -24,7 +24,7 @@ void lbs::LBSSolver::PrintSimHeader()
     {
       char buf_pol[20];
 
-      outstr << "\n***** Groupset " << groupset.id << " *****\n" << "Groups: ";
+      outstr << "\n***** Groupset " << groupset.id_ << " *****\n" << "Groups: ";
       int counter = 0;
       for (auto group : groupset.groups)
       {

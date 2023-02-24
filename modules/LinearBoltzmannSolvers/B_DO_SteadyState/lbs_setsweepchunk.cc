@@ -17,7 +17,7 @@ std::shared_ptr<SweepChunk> lbs::DiscOrdSteadyStateSolver::
     unit_cell_matrices_,                          //Unit cell matrices
     cell_transport_views_,                        //Cell transport views
     phi_new_local_,                               //Destination phi
-    psi_new_local_[groupset.id],                  //Destination psi
+    psi_new_local_[groupset.id_],                 //Destination psi
     q_moments_local_,                             //Source moments
     groupset,                                     //Reference groupset
     matid_to_xs_map_,                             //Material cross-sections

@@ -36,7 +36,7 @@ void MIPWGSContext<Mat, Vec, KSP>::PreSetupCallback()
     }
     chi::log.Log()
       << "\n\n"
-      << "********** Solving groupset " << groupset_.id
+      << "********** Solving groupset " << groupset_.id_
       << " with " << method_name << ".\n\n";
   }
 }
@@ -78,7 +78,7 @@ template<>
 void MIPWGSContext<Mat, Vec, KSP>::ApplyInverseTransportOperator(int scope)
 {
 
-  auto& mip_solver = *lbs_mip_ss_solver_.gs_mip_solvers_[groupset_.id];
+  auto& mip_solver = *lbs_mip_ss_solver_.gs_mip_solvers_[groupset_.id_];
 
   lbs_solver_.PhiNewLocal() = lbs_solver_.QMomentsLocal();
 

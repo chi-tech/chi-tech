@@ -34,7 +34,7 @@ void SweepWGSContext<Mat, Vec, KSP>::PreSetupCallback()
     }
     chi::log.Log()
       << "\n\n"
-      << "********** Solving groupset " << groupset_.id
+      << "********** Solving groupset " << groupset_.id_
       << " with " << method_name << ".\n\n"
       << "Quadrature number of angles: "
       << groupset_.quadrature->abscissae.size() << "\n"

@@ -63,7 +63,7 @@ void lbs::LBSSolver::
   size_t num_local_nodes = discretization_->GetNumLocalDOFs(NODES_ONLY);
   size_t num_angles      = groupset.quadrature->abscissae.size();
   size_t num_groups      = groupset.groups.size();
-  size_t num_local_dofs  = psi_new_local_[groupset.id].size();
+  size_t num_local_dofs  = psi_new_local_[groupset.id_].size();
   auto   dof_handler     = groupset.psi_uk_man;
 
   //============================================= Write num_ quantities
@@ -86,7 +86,7 @@ void lbs::LBSSolver::
           if (++dof_count > num_local_dofs) goto close_file;
 
           uint64_t dof_map = sdm->MapDOFLocal(cell,i,dof_handler,n,g);
-          double value = psi_new_local_[groupset.id][dof_map];
+          double value = psi_new_local_[groupset.id_][dof_map];
 
           file.write((char*)&cell.global_id,sizeof(size_t));
           file.write((char*)&i             ,sizeof(unsigned int));
@@ -129,8 +129,8 @@ void lbs::LBSSolver::
   size_t num_local_nodes   = discretization_->GetNumLocalDOFs(NODES_ONLY);
   size_t num_angles        = groupset.quadrature->abscissae.size();
   size_t num_groups        = groupset.groups.size();
-  size_t num_local_dofs    = psi_new_local_[groupset.id].size();
-  std::vector<double>& psi = psi_new_local_[groupset.id];
+  size_t num_local_dofs    = psi_new_local_[groupset.id_].size();
+  std::vector<double>& psi = psi_new_local_[groupset.id_];
   auto   dof_handler       = groupset.psi_uk_man;
 
   size_t file_num_local_nodes;
