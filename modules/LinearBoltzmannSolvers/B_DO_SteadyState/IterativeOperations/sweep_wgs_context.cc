@@ -22,7 +22,7 @@ void SweepWGSContext<Mat, Vec, KSP>::PreSetupCallback()
   if (log_info_)
   {
     std::string method_name;
-    switch (groupset_.iterative_method)
+    switch (groupset_.iterative_method_)
     {
       case IterativeMethod::KRYLOV_RICHARDSON:
         method_name = "KRYLOV_RICHARDSON"; break;
@@ -52,7 +52,7 @@ void SweepWGSContext<Mat, Vec, KSP>::SetPreconditioner(KSP& solver)
   PC pc;
   KSPGetPC(ksp, &pc);
 
-  if (groupset_.apply_wgdsa or groupset_.apply_tgdsa)
+  if (groupset_.apply_wgdsa_ or groupset_.apply_tgdsa_)
   {
     PCSetType(pc, PCSHELL);
     PCShellSetApply(pc, (PCShellPtr) WGDSA_TGDSA_PreConditionerMult);
@@ -72,7 +72,7 @@ std::pair<int64_t, int64_t> SweepWGSContext<Mat, Vec, KSP>::SystemSize()
   const size_t num_moments      = lbs_solver_.NumMoments();
 
   const size_t groupset_numgrps = groupset_.groups_.size();
-  const auto num_delayed_psi_info = groupset_.angle_agg.GetNumDelayedAngularDOFs();
+  const auto num_delayed_psi_info = groupset_.angle_agg_.GetNumDelayedAngularDOFs();
   const size_t local_size = local_node_count * num_moments * groupset_numgrps +
                             num_delayed_psi_info.first;
   const size_t globl_size = globl_node_count * num_moments * groupset_numgrps +

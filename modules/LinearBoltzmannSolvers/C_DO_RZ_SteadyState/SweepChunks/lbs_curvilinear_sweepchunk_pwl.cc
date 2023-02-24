@@ -82,7 +82,7 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
   std::vector<double>& output_psi = GetDestinationPsi();
 
   const lbs::SubSetInfo& grp_ss_info =
-    groupset.grp_subset_infos[angle_set->ref_subset];
+    groupset.grp_subset_infos_[angle_set->ref_subset];
 
   const size_t gs_ss_size  = grp_ss_info.ss_size;
   const size_t gs_ss_begin = grp_ss_info.ss_begin;
@@ -300,7 +300,7 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
       // ============================= Save angular fluxes if needed
       if (save_angular_flux)
       {
-        const auto& psi_uk_man = groupset.psi_uk_man;
+        const auto& psi_uk_man = groupset.psi_uk_man_;
         for (int i = 0; i < num_nodes; ++i)
         {
           int64_t ir = grid_fe_view.MapDOFLocal(cell,i,psi_uk_man,angle_num,0);

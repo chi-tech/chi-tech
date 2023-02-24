@@ -23,12 +23,12 @@ int lbs::MIP_TGDSA_PreConditionerMult(PC pc, Vec phi_input, Vec pc_output)
                                            PhiSTLOption::PHI_NEW);
 
   //============================================= Apply TGDSA
-  if (groupset.apply_tgdsa)
+  if (groupset.apply_tgdsa_)
   {
     std::vector<double> delta_phi_local;
     solver.AssembleTGDSADeltaPhiVector(groupset, phi_delta, delta_phi_local);
-    groupset.tgdsa_solver->Assemble_b(delta_phi_local);
-    groupset.tgdsa_solver->Solve(delta_phi_local);
+    groupset.tgdsa_solver_->Assemble_b(delta_phi_local);
+    groupset.tgdsa_solver_->Solve(delta_phi_local);
     solver.DisAssembleTGDSADeltaPhiVector(groupset, delta_phi_local, phi_delta);
   }
 

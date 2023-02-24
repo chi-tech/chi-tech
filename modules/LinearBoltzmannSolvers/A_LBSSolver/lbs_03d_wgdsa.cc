@@ -8,7 +8,7 @@
 /**Initializes the Within-Group DSA solver. */
 void lbs::LBSSolver::InitWGDSA(LBSGroupset& groupset)
 {
-  if (groupset.apply_wgdsa)
+  if (groupset.apply_wgdsa_)
   {
     //=========================================== Make UnknownManager
     const size_t gs_G = groupset.groups_.size();
@@ -66,10 +66,10 @@ void lbs::LBSSolver::InitWGDSA(LBSGroupset& groupset)
         unit_cell_matrices_,
         true); //verbosity
 
-    solver->options.residual_tolerance        = groupset.wgdsa_tol;
-    solver->options.max_iters                 = groupset.wgdsa_max_iters;
-    solver->options.verbose                   = groupset.wgdsa_verbose;
-    solver->options.additional_options_string = groupset.wgdsa_string;
+    solver->options.residual_tolerance        = groupset.wgdsa_tol_;
+    solver->options.max_iters                 = groupset.wgdsa_max_iters_;
+    solver->options.verbose                   = groupset.wgdsa_verbose_;
+    solver->options.additional_options_string = groupset.wgdsa_string_;
 
     solver->Initialize();
 
@@ -77,7 +77,7 @@ void lbs::LBSSolver::InitWGDSA(LBSGroupset& groupset)
 
     solver->AssembleAand_b(dummy_rhs);
 
-    groupset.wgdsa_solver = solver;
+    groupset.wgdsa_solver_ = solver;
   }
 }
 
@@ -85,7 +85,7 @@ void lbs::LBSSolver::InitWGDSA(LBSGroupset& groupset)
 /**Cleans up memory consuming items. */
 void lbs::LBSSolver::CleanUpWGDSA(LBSGroupset& groupset)
 {
-  if (groupset.apply_wgdsa) groupset.wgdsa_solver = nullptr;
+  if (groupset.apply_wgdsa_) groupset.wgdsa_solver_ = nullptr;
 }
 
 
@@ -97,7 +97,7 @@ void lbs::LBSSolver::
                               std::vector<double>& delta_phi_local)
 {
   const auto& sdm = *discretization_;
-  const auto& dphi_uk_man = groupset.wgdsa_solver->UnknownStructure();
+  const auto& dphi_uk_man = groupset.wgdsa_solver_->UnknownStructure();
   const auto& phi_uk_man  = flux_moments_uk_man_;
 
   const int    gsi = groupset.groups_.front().id_;
@@ -136,7 +136,7 @@ void lbs::LBSSolver::
                                  std::vector<double>& ref_phi_new)
 {
   const auto& sdm = *discretization_;
-  const auto& dphi_uk_man = groupset.wgdsa_solver->UnknownStructure();
+  const auto& dphi_uk_man = groupset.wgdsa_solver_->UnknownStructure();
   const auto& phi_uk_man  = flux_moments_uk_man_;
 
   const int    gsi = groupset.groups_.front().id_;

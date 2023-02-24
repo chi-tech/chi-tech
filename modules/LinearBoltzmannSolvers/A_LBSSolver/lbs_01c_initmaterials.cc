@@ -172,7 +172,7 @@ void lbs::LBSSolver::InitMaterials()
   bool develop_diffusion_properties = false;
   for (auto& group_set : groupsets_)
   {
-    if (group_set.apply_wgdsa || group_set.apply_tgdsa)
+    if (group_set.apply_wgdsa_ || group_set.apply_tgdsa_)
       develop_diffusion_properties = true;
   }
 

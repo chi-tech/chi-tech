@@ -23,27 +23,27 @@ int lbs::WGDSA_TGDSA_PreConditionerMult(PC pc, Vec phi_input, Vec pc_output)
                                                PhiSTLOption::PHI_NEW);
 
   //============================================= Apply WGDSA
-  if (groupset.apply_wgdsa)
+  if (groupset.apply_wgdsa_)
   {
     std::vector<double> delta_phi_local;
     lbs_solver.AssembleWGDSADeltaPhiVector(groupset,phi_new_local, //From
                                            delta_phi_local);       //To
 
-    groupset.wgdsa_solver->Assemble_b(delta_phi_local);
-    groupset.wgdsa_solver->Solve(delta_phi_local);
+    groupset.wgdsa_solver_->Assemble_b(delta_phi_local);
+    groupset.wgdsa_solver_->Solve(delta_phi_local);
 
     lbs_solver.DisAssembleWGDSADeltaPhiVector(groupset, delta_phi_local, //From
                                               phi_new_local);            //To
   }
   //============================================= Apply TGDSA
-  if (groupset.apply_tgdsa)
+  if (groupset.apply_tgdsa_)
   {
     std::vector<double> delta_phi_local;
     lbs_solver.AssembleTGDSADeltaPhiVector(groupset, phi_new_local, //From
                                            delta_phi_local);        //To
 
-    groupset.tgdsa_solver->Assemble_b(delta_phi_local);
-    groupset.tgdsa_solver->Solve(delta_phi_local);
+    groupset.tgdsa_solver_->Assemble_b(delta_phi_local);
+    groupset.tgdsa_solver_->Solve(delta_phi_local);
 
     lbs_solver.DisAssembleTGDSADeltaPhiVector(groupset, delta_phi_local, //From
                                               phi_new_local);            //To

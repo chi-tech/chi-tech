@@ -90,10 +90,10 @@ void lbs::MIPSteadyStateSolver::InitializeWGSSolvers()
         unit_cell_matrices_,
         true); //verbosity
 
-    solver->options.residual_tolerance        = groupset.wgdsa_tol;
-    solver->options.max_iters                 = groupset.wgdsa_max_iters;
-    solver->options.verbose                   = groupset.wgdsa_verbose;
-    solver->options.additional_options_string = groupset.wgdsa_string;
+    solver->options.residual_tolerance        = groupset.wgdsa_tol_;
+    solver->options.max_iters                 = groupset.wgdsa_max_iters_;
+    solver->options.verbose                   = groupset.wgdsa_verbose_;
+    solver->options.additional_options_string = groupset.wgdsa_string_;
 
     solver->Initialize();
 

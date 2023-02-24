@@ -24,7 +24,7 @@ void MIPWGSContext<Mat, Vec, KSP>::PreSetupCallback()
   if (log_info_)
   {
     std::string method_name;
-    switch (groupset_.iterative_method)
+    switch (groupset_.iterative_method_)
     {
       case IterativeMethod::KRYLOV_RICHARDSON:
         method_name = "KRYLOV_RICHARDSON"; break;
@@ -49,7 +49,7 @@ void MIPWGSContext<Mat, Vec, KSP>::SetPreconditioner(KSP& solver)
   PC pc;
   KSPGetPC(ksp, &pc);
 
-  if (groupset_.apply_tgdsa)
+  if (groupset_.apply_tgdsa_)
   {
     PCSetType(pc, PCSHELL);
     PCShellSetApply(pc, (PCShellPtr) MIP_TGDSA_PreConditionerMult);

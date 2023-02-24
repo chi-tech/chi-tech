@@ -8,7 +8,7 @@
 /**Initializes the Within-Group DSA solver. */
 void lbs::LBSSolver::InitTGDSA(LBSGroupset& groupset)
 {
-  if (groupset.apply_tgdsa)
+  if (groupset.apply_tgdsa_)
   {
     //=========================================== Make UnknownManager
     const auto& uk_man = discretization_->UNITARY_UNKNOWN_MANAGER;
@@ -35,7 +35,7 @@ void lbs::LBSSolver::InitTGDSA(LBSGroupset& groupset)
       acceleration::TwoGridCollapsedInfo tginfo =
         MakeTwoGridCollapsedInfo(*xs, acceleration::EnergyCollapseScheme::JFULL);
 
-      groupset.tg_acceleration_info.map_mat_id_2_tginfo.insert(
+      groupset.tg_acceleration_info_.map_mat_id_2_tginfo.insert(
         std::make_pair(mat_id, std::move(tginfo)));
     }
 
@@ -48,7 +48,7 @@ void lbs::LBSSolver::InitTGDSA(LBSGroupset& groupset)
       const auto& mat_id = matid_xs_pair.first;
 
       const auto& tg_info =
-        groupset.tg_acceleration_info.map_mat_id_2_tginfo.at(mat_id);
+        groupset.tg_acceleration_info_.map_mat_id_2_tginfo.at(mat_id);
 
       matid_2_mgxs_map.insert(
         std::make_pair(mat_id, MGXS{{tg_info.collapsed_D},
@@ -68,10 +68,10 @@ void lbs::LBSSolver::InitTGDSA(LBSGroupset& groupset)
         unit_cell_matrices_,
         true); //verbosity
 
-    solver->options.residual_tolerance        = groupset.tgdsa_tol;
-    solver->options.max_iters                 = groupset.tgdsa_max_iters;
-    solver->options.verbose                   = groupset.tgdsa_verbose;
-    solver->options.additional_options_string = groupset.tgdsa_string;
+    solver->options.residual_tolerance        = groupset.tgdsa_tol_;
+    solver->options.max_iters                 = groupset.tgdsa_max_iters_;
+    solver->options.verbose                   = groupset.tgdsa_verbose_;
+    solver->options.additional_options_string = groupset.tgdsa_string_;
 
     solver->Initialize();
 
@@ -79,7 +79,7 @@ void lbs::LBSSolver::InitTGDSA(LBSGroupset& groupset)
 
     solver->AssembleAand_b(dummy_rhs);
 
-    groupset.tgdsa_solver = solver;
+    groupset.tgdsa_solver_ = solver;
   }
 }
 
@@ -87,7 +87,7 @@ void lbs::LBSSolver::InitTGDSA(LBSGroupset& groupset)
 /**Cleans up memory consuming items. */
 void lbs::LBSSolver::CleanUpTGDSA(LBSGroupset& groupset)
 {
-  if (groupset.apply_tgdsa) groupset.tgdsa_solver = nullptr;
+  if (groupset.apply_tgdsa_) groupset.tgdsa_solver_ = nullptr;
 }
 
 
@@ -148,7 +148,7 @@ void lbs::LBSSolver::
   const size_t gss = groupset.groups_.size();
 
   const auto& map_mat_id_2_tginfo =
-    groupset.tg_acceleration_info.map_mat_id_2_tginfo;
+    groupset.tg_acceleration_info_.map_mat_id_2_tginfo;
 
   for (const auto& cell : grid_ptr_->local_cells)
   {

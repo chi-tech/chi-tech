@@ -39,7 +39,7 @@ struct SweepWGSContext : public WGSContext<MatType,VecType,SolverType>
     sweep_chunk_(std::move(sweep_chunk)),
     sweep_scheduler_(
       chi_mesh::sweep_management::SchedulingAlgorithm::DEPTH_OF_GRAPH,
-      groupset.angle_agg,
+      groupset.angle_agg_,
       *sweep_chunk_),
     lbs_ss_solver_(lbs_solver)
   {}

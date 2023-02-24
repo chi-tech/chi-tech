@@ -134,7 +134,7 @@ lbs_curvilinear::DiscOrdSteadyStateSolver::PerformInputChecks()
     }
 
     //  angle aggregation type must be compatible with coordinate system
-    const auto angleagg_method = groupsets_[gs].angleagg_method;
+    const auto angleagg_method = groupsets_[gs].angleagg_method_;
     switch (coord_system_type_)
     {
       case chi_math::CoordinateSystemType::CYLINDRICAL:

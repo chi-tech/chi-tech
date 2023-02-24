@@ -399,11 +399,11 @@ int chiLBSGroupsetSetAngleAggregationType(lua_State *L)
 
   //============================================= Setting aggregation type
   if      (agg_type == (int)lbs::AngleAggregationType::SINGLE)
-    groupset->angleagg_method = lbs::AngleAggregationType::SINGLE;
+    groupset->angleagg_method_ = lbs::AngleAggregationType::SINGLE;
   else if (agg_type == (int)lbs::AngleAggregationType::POLAR)
-    groupset->angleagg_method = lbs::AngleAggregationType::POLAR;
+    groupset->angleagg_method_ = lbs::AngleAggregationType::POLAR;
   else if (agg_type == (int)lbs::AngleAggregationType::AZIMUTHAL)
-    groupset->angleagg_method = lbs::AngleAggregationType::AZIMUTHAL;
+    groupset->angleagg_method_ = lbs::AngleAggregationType::AZIMUTHAL;
   else
   {
     chi::log.LogAllError()
@@ -488,7 +488,7 @@ int chiLBSGroupsetSetAngleAggDiv(lua_State *L)
       << "in call to chiLBSGroupsetSetAngleAggDiv. Must be >= 1.";
   }
 
-  groupset->master_num_ang_subsets = num_div;
+  groupset->master_num_ang_subsets_ = num_div;
 
   chi::log.Log()
     << "Groupset " << grpset_index << " angle aggregation divisions "
@@ -556,7 +556,7 @@ int chiLBSGroupsetSetGroupSubsets(lua_State *L)
       << "in call to chiLBSGroupsetSetGroupSubsets. Must be >= 1.";
   }
 
-  groupset->master_num_grp_subsets = num_div;
+  groupset->master_num_grp_subsets_ = num_div;
 
   chi::log.Log()
     << "Groupset " << grpset_index << " subset divisions "
@@ -696,13 +696,13 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
     using lbs::IterativeMethod;
     if (iter_method == sc_int(IterativeMethod::CLASSICRICHARDSON))
     {
-      groupset->iterative_method = IterativeMethod::CLASSICRICHARDSON;
+      groupset->iterative_method_ = IterativeMethod::CLASSICRICHARDSON;
     }
     else if (iter_method ==
                 sc_int(IterativeMethod::CLASSICRICHARDSON_CYCLES))
     {
-      groupset->allow_cycles = true;
-      groupset->iterative_method = IterativeMethod::CLASSICRICHARDSON;
+      groupset->allow_cycles_ = true;
+      groupset->iterative_method_ = IterativeMethod::CLASSICRICHARDSON;
     }
     else if (iter_method == sc_int(IterativeMethod::GMRES))
     {
@@ -716,30 +716,30 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
     }
     else if (iter_method == sc_int(IterativeMethod::KRYLOV_RICHARDSON))
     {
-      groupset->iterative_method = IterativeMethod::KRYLOV_RICHARDSON;
+      groupset->iterative_method_ = IterativeMethod::KRYLOV_RICHARDSON;
     }
     else if (iter_method == sc_int(IterativeMethod::KRYLOV_RICHARDSON_CYCLES))
     {
-      groupset->allow_cycles = true;
-      groupset->iterative_method = IterativeMethod::KRYLOV_RICHARDSON;
+      groupset->allow_cycles_ = true;
+      groupset->iterative_method_ = IterativeMethod::KRYLOV_RICHARDSON;
     }
     else if (iter_method == sc_int(IterativeMethod::KRYLOV_GMRES))
     {
-      groupset->iterative_method = IterativeMethod::KRYLOV_GMRES;
+      groupset->iterative_method_ = IterativeMethod::KRYLOV_GMRES;
     }
     else if (iter_method == sc_int(IterativeMethod::KRYLOV_GMRES_CYCLES))
     {
-      groupset->allow_cycles = true;
-      groupset->iterative_method = IterativeMethod::KRYLOV_GMRES;
+      groupset->allow_cycles_ = true;
+      groupset->iterative_method_ = IterativeMethod::KRYLOV_GMRES;
     }
     else if (iter_method == sc_int(IterativeMethod::KRYLOV_BICGSTAB))
     {
-      groupset->iterative_method = IterativeMethod::KRYLOV_BICGSTAB;
+      groupset->iterative_method_ = IterativeMethod::KRYLOV_BICGSTAB;
     }
     else if (iter_method == sc_int(IterativeMethod::KRYLOV_BICGSTAB_CYCLES))
     {
-      groupset->allow_cycles = true;
-      groupset->iterative_method = IterativeMethod::KRYLOV_BICGSTAB;
+      groupset->allow_cycles_ = true;
+      groupset->iterative_method_ = IterativeMethod::KRYLOV_BICGSTAB;
     }
     else
     {
@@ -817,7 +817,7 @@ int chiLBSGroupsetSetResidualTolerance(lua_State *L)
     chi::Exit(EXIT_FAILURE);
   }
 
-  groupset->residual_tolerance = resid_tol;
+  groupset->residual_tolerance_ = resid_tol;
 
   char buff[100];
   snprintf(buff,100,"%.4e",resid_tol);
@@ -888,7 +888,7 @@ int chiLBSGroupsetSetMaxIterations(lua_State *L)
       << "in call to chiLBSGroupsetSetMaxIterations. Must be >= 0.";
   }
 
-  groupset->max_iterations = num_iter;
+  groupset->max_iterations_ = num_iter;
 
   chi::log.Log()
     << "Groupset " << grpset_index << " max # iterations "
@@ -956,7 +956,7 @@ int chiLBSGroupsetSetGMRESRestartIntvl(lua_State *L)
       << "in call to chiLBSGroupsetSetGMRESRestartIntvl. Must be >= 3.";
   }
 
-  groupset->gmres_restart_intvl = restart_intvl;
+  groupset->gmres_restart_intvl_ = restart_intvl;
 
   chi::log.Log()
     << "Groupset " << grpset_index << " GMRES restart interval set to "
@@ -1017,7 +1017,7 @@ int chiLBSGroupsetSetEnableSweepLog(lua_State *L)
     chi::Exit(EXIT_FAILURE);
   }
 
-  groupset->log_sweep_events = log_flag;
+  groupset->log_sweep_events_ = log_flag;
 
   chi::log.Log()
     << "Groupset " << grpset_index << " flag for writing sweep log "
@@ -1101,11 +1101,11 @@ int chiLBSGroupsetSetWGDSA(lua_State *L)
     chi::Exit(EXIT_FAILURE);
   }
 
-  groupset->apply_wgdsa     = true;
-  groupset->wgdsa_max_iters = max_iters;
-  groupset->wgdsa_tol       = resid_tol;
-  groupset->wgdsa_verbose   = verbose;
-  groupset->wgdsa_string    = std::string(petsc_string);
+  groupset->apply_wgdsa_     = true;
+  groupset->wgdsa_max_iters_ = max_iters;
+  groupset->wgdsa_tol_       = resid_tol;
+  groupset->wgdsa_verbose_   = verbose;
+  groupset->wgdsa_string_    = std::string(petsc_string);
 
   chi::log.Log()
     << "Groupset " << grpset_index << " set to apply WGDSA with "
@@ -1191,11 +1191,11 @@ int chiLBSGroupsetSetTGDSA(lua_State *L)
     chi::Exit(EXIT_FAILURE);
   }
 
-  groupset->apply_tgdsa     = true;
-  groupset->tgdsa_max_iters = max_iters;
-  groupset->tgdsa_tol       = resid_tol;
-  groupset->tgdsa_verbose   = verbose;
-  groupset->tgdsa_string    = std::string(petsc_string);
+  groupset->apply_tgdsa_     = true;
+  groupset->tgdsa_max_iters_ = max_iters;
+  groupset->tgdsa_tol_       = resid_tol;
+  groupset->tgdsa_verbose_   = verbose;
+  groupset->tgdsa_string_    = std::string(petsc_string);
 
   chi::log.Log()
     << "Groupset " << grpset_index << " set to apply TGDSA with "

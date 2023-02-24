@@ -24,7 +24,7 @@ SweepChunkPWLTransientTheta(
   const int in_num_moms,
   const int in_max_num_cell_dofs)
                     : SweepChunk(destination_phi, destination_psi,
-                                 in_groupset.angle_agg, false),
+                                 in_groupset.angle_agg_, false),
                       grid_view(std::move(grid_ptr)),
                       grid_fe_view(discretization),
                       unit_cell_matrices_(unit_cell_matrices),
@@ -103,7 +103,7 @@ void lbs::SweepChunkPWLTransientTheta::
   std::vector<double>& output_psi = GetDestinationPsi();
 
   const SubSetInfo& grp_ss_info =
-      groupset.grp_subset_infos[angle_set->ref_subset];
+      groupset.grp_subset_infos_[angle_set->ref_subset];
 
   const size_t gs_ss_size  = grp_ss_info.ss_size;
   const size_t gs_ss_begin = grp_ss_info.ss_begin;
@@ -117,7 +117,7 @@ void lbs::SweepChunkPWLTransientTheta::
   auto const& d2m_op = groupset.quadrature_->GetDiscreteToMomentOperator();
   auto const& m2d_op = groupset.quadrature_->GetMomentToDiscreteOperator();
 
-  const auto& psi_uk_man = groupset.psi_uk_man;
+  const auto& psi_uk_man = groupset.psi_uk_man_;
   typedef const int64_t cint64_t;
 
   const bool fixed_src_active = surface_source_active;

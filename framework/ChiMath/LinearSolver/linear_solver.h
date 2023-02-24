@@ -37,10 +37,10 @@ protected:
 
   struct ToleranceOptions
   {
-    double residual_relative_   = 1.0e-50;
-    double residual_absolute_   = 1.0e-6;
-    double residual_divergence_ = 1.0e6;
-    int    maximum_iterations_  = 100;
+    double residual_relative   = 1.0e-50;
+    double residual_absolute   = 1.0e-6;
+    double residual_divergence = 1.0e6;
+    int    maximum_iterations  = 100;
     int    gmres_restart_interval = 100;
     double gmres_breakdown_tolerance = 1.0e6;
   }tolerance_options_;

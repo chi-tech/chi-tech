@@ -32,7 +32,7 @@ void DiscOrdSteadyStateSolver::InitializeSweepDataStructures()
     for (const auto& groupset : groupsets_)
     {
       bool no_cycles_parmetis_partitioning =
-        (IsPartitionTypeParmetis and (not groupset.allow_cycles));
+        (IsPartitionTypeParmetis and (not groupset.allow_cycles_));
 
       bool is_1D_geometry = options_.geometry_type == GeometryType::ONED_SLAB;
 
@@ -50,11 +50,11 @@ void DiscOrdSteadyStateSolver::InitializeSweepDataStructures()
       quadrature_unq_so_grouping_map_[groupset.quadrature_] =
         AssociateSOsAndDirections(*grid_ptr_,
                                   *groupset.quadrature_,
-                                  groupset.angleagg_method,
+                                  groupset.angleagg_method_,
                                   options_.geometry_type);
 
     if (quadrature_allow_cycles_map_.count(groupset.quadrature_) == 0)
-      quadrature_allow_cycles_map_[groupset.quadrature_] = groupset.allow_cycles;
+      quadrature_allow_cycles_map_[groupset.quadrature_] = groupset.allow_cycles_;
   }
 
   //=================================== Build sweep orderings

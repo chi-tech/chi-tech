@@ -64,7 +64,7 @@ void lbs::LBSSolver::
   size_t num_angles      = groupset.quadrature_->abscissae.size();
   size_t num_groups      = groupset.groups_.size();
   size_t num_local_dofs  = psi_new_local_[groupset.id_].size();
-  auto   dof_handler     = groupset.psi_uk_man;
+  auto   dof_handler     = groupset.psi_uk_man_;
 
   //============================================= Write num_ quantities
   file.write((char*)&num_local_nodes,sizeof(size_t));
@@ -131,7 +131,7 @@ void lbs::LBSSolver::
   size_t num_groups        = groupset.groups_.size();
   size_t num_local_dofs    = psi_new_local_[groupset.id_].size();
   std::vector<double>& psi = psi_new_local_[groupset.id_];
-  auto   dof_handler       = groupset.psi_uk_man;
+  auto   dof_handler       = groupset.psi_uk_man_;
 
   size_t file_num_local_nodes;
   size_t file_num_angles     ;
