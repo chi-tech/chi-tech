@@ -66,7 +66,7 @@ std::pair<int64_t, int64_t> MIPWGSContext<Mat, Vec, KSP>::SystemSize()
   const size_t local_node_count = lbs_solver_.LocalNodeCount();
   const size_t globl_node_count = lbs_solver_.GlobalNodeCount();
 
-  const size_t groupset_numgrps = groupset_.groups.size();
+  const size_t groupset_numgrps = groupset_.groups_.size();
   const size_t local_size = local_node_count * groupset_numgrps;
   const size_t globl_size = globl_node_count * groupset_numgrps;
 

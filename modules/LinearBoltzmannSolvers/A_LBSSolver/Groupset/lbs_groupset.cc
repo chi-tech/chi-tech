@@ -61,7 +61,7 @@ void lbs::LBSGroupset::BuildMomDiscOperator(
 /**Constructs the groupset subsets.*/
 void lbs::LBSGroupset::BuildSubsets()
 {
-  grp_subset_infos = lbs::MakeSubSets(groups.size(), master_num_grp_subsets);
+  grp_subset_infos = lbs::MakeSubSets(groups_.size(), master_num_grp_subsets);
   {
     size_t ss=0;
     for (const auto& info : grp_subset_infos)

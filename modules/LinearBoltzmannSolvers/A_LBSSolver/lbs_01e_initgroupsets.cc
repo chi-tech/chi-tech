@@ -10,7 +10,7 @@ void lbs::LBSSolver::InitializeGroupsets()
     //                                                   flux unknown manager
     groupset.psi_uk_man.unknowns.clear();
     size_t num_angles = groupset.quadrature->abscissae.size();
-    size_t gs_num_groups = groupset.groups.size();
+    size_t gs_num_groups = groupset.groups_.size();
     auto& grpset_psi_uk_man = groupset.psi_uk_man;
 
     const auto VarVecN = chi_math::UnknownType::VECTOR_N;

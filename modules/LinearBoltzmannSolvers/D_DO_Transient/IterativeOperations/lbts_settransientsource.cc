@@ -42,8 +42,8 @@ void lbs::DiscOrdTransientSolver::
   const bool apply_ags_fission_src = (source_flags & APPLY_AGS_FISSION_SOURCES);
 
   //================================================== Get group setup
-  auto gs_i = static_cast<size_t>(groupset.groups.front().id_);
-  auto gs_f = static_cast<size_t>(groupset.groups.back().id_);
+  auto gs_i = static_cast<size_t>(groupset.groups_.front().id_);
+  auto gs_f = static_cast<size_t>(groupset.groups_.back().id_);
 
   auto first_grp = static_cast<size_t>(groups_.front().id_);
   auto last_grp = static_cast<size_t>(groups_.back().id_);

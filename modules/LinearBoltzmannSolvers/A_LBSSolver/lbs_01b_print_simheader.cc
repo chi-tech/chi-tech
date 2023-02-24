@@ -26,7 +26,7 @@ void lbs::LBSSolver::PrintSimHeader()
 
       outstr << "\n***** Groupset " << groupset.id_ << " *****\n" << "Groups: ";
       int counter = 0;
-      for (auto group : groupset.groups)
+      for (auto group : groupset.groups_)
       {
         snprintf(buf_pol,20,"%5d ",group.id_);
         outstr << std::string(buf_pol);

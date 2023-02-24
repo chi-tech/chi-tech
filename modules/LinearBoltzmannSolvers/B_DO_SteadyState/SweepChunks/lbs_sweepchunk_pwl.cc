@@ -29,7 +29,7 @@ lbs::SweepChunkPWL::
                       groupset(in_groupset),
                       xsections(in_xsections),
                       num_moms(in_num_moms),
-                      num_grps(in_groupset.groups.size()),
+                      num_grps(in_groupset.groups_.size()),
                       max_num_cell_dofs(in_max_num_cell_dofs),
                       save_angular_flux(!destination_psi.empty()),
                       a_and_b_initialized(false)
@@ -100,7 +100,7 @@ Sweep(chi_mesh::sweep_management::AngleSet *angle_set)
   const size_t gs_ss_begin = grp_ss_info.ss_begin;
 
   // first groupset subset group
-  const int    gs_gi = groupset.groups[gs_ss_begin].id_;
+  const int    gs_gi = groupset.groups_[gs_ss_begin].id_;
 
   int deploc_face_counter = -1;
   int preloc_face_counter = -1;

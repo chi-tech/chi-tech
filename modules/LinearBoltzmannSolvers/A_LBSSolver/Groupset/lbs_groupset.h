@@ -33,7 +33,7 @@ protected:
   typedef std::shared_ptr<chi_mesh::sweep_management::SPDS> SPDS_ptr;
 public:
   int                                          id_;
-  std::vector<LBSGroup>                        groups;
+  std::vector<LBSGroup>                        groups_;
   std::shared_ptr<chi_math::AngularQuadrature> quadrature = nullptr;
   chi_mesh::sweep_management::AngleAggregation angle_agg;
   std::vector<SPDS_ptr>                        sweep_orderings;

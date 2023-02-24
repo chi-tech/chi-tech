@@ -101,8 +101,8 @@ void lbs::LBSSolver::
   const auto& sdm = *discretization_;
   const auto& phi_uk_man  = flux_moments_uk_man_;
 
-  const int    gsi = groupset.groups.front().id_;
-  const size_t gss = groupset.groups.size();
+  const int    gsi = groupset.groups_.front().id_;
+  const size_t gss = groupset.groups_.size();
 
   delta_phi_local.clear();
   delta_phi_local.assign(local_node_count_, 0.0);
@@ -144,8 +144,8 @@ void lbs::LBSSolver::
   const auto& sdm = *discretization_;
   const auto& phi_uk_man  = flux_moments_uk_man_;
 
-  const int    gsi = groupset.groups.front().id_;
-  const size_t gss = groupset.groups.size();
+  const int    gsi = groupset.groups_.front().id_;
+  const size_t gss = groupset.groups_.size();
 
   const auto& map_mat_id_2_tginfo =
     groupset.tg_acceleration_info.map_mat_id_2_tginfo;

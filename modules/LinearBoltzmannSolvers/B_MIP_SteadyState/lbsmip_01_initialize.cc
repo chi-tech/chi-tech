@@ -35,7 +35,7 @@ void lbs::MIPSteadyStateSolver::InitializeWGSSolvers()
     const auto& groupset = groupsets_[gs];
 
     //=========================================== Make UnknownManager
-    const size_t gs_G = groupset.groups.size();
+    const size_t gs_G = groupset.groups_.size();
     chi_math::UnknownManager uk_man;
     uk_man.AddUnknown(chi_math::UnknownType::VECTOR_N, gs_G);
 
@@ -66,8 +66,8 @@ void lbs::MIPSteadyStateSolver::InitializeWGSSolvers()
       std::vector<double> sigR(gs_G, 0.0);
 
       size_t g = 0;
-      for (size_t gprime=groupset.groups.front().id_;
-           gprime<=groupset.groups.back().id_; ++gprime)
+      for (size_t gprime=groupset.groups_.front().id_;
+           gprime<=groupset.groups_.back().id_; ++gprime)
       {
         Dg[g]   = xs->diffusion_coeff[gprime];
         sigR[g] = xs->sigma_removal[gprime];

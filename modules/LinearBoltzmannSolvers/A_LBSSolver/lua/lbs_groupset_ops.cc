@@ -226,7 +226,7 @@ int chiLBSGroupsetAddGroups(lua_State *L)
     if (group == nullptr)
       throw std::runtime_error("chiLBSGroupsetAddGroups: Bad trouble.");
 
-    groupset->groups.push_back(*group);
+    groupset->groups_.push_back(*group);
   }
   return 0;
 }

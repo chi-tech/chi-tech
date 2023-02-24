@@ -14,7 +14,7 @@
 void lbs::DiscOrdSteadyStateSolver::ZeroOutflowBalanceVars(LBSGroupset& groupset)
 {
   for (auto& cell_transport_view : cell_transport_views_)
-    for (auto& group : groupset.groups)
+    for (auto& group : groupset.groups_)
       cell_transport_view.ZeroOutflow(group.id_);
 }
 
@@ -90,7 +90,7 @@ void lbs::DiscOrdSteadyStateSolver::ComputeBalance()
               const int i = cell_mapping.MapFaceNode(f, fi);
               const auto &IntFi_shapeI = IntS_shapeI[f][i];
 
-              for (const auto &group : groupset.groups)
+              for (const auto& group : groupset.groups_)
               {
                 const int g = group.id_;
                 const double psi = bndry->boundary_flux[g];
