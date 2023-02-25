@@ -34,49 +34,49 @@ protected:
 public:
   int                                          id_;
   std::vector<LBSGroup>                        groups_;
-  std::shared_ptr<chi_math::AngularQuadrature> quadrature = nullptr;
-  chi_mesh::sweep_management::AngleAggregation angle_agg;
-  std::vector<SPDS_ptr>                        sweep_orderings;
-  UniqueSOGroupings                            unique_so_groupings;
-  DirIDToSOMap                                 dir_id_to_so_map;
+  std::shared_ptr<chi_math::AngularQuadrature> quadrature_ = nullptr;
+  chi_mesh::sweep_management::AngleAggregation angle_agg_;
+  std::vector<SPDS_ptr>                        sweep_orderings_;
+  UniqueSOGroupings                            unique_so_groupings_;
+  DirIDToSOMap                                 dir_id_to_so_map_;
 
-  int                                          master_num_grp_subsets = 1;
-  int                                          master_num_ang_subsets = 1;
+  int                                          master_num_grp_subsets_ = 1;
+  int                                          master_num_ang_subsets_ = 1;
 
-  std::vector<SubSetInfo>                      grp_subset_infos;
+  std::vector<SubSetInfo>                      grp_subset_infos_;
 
-  IterativeMethod      iterative_method = IterativeMethod::CLASSICRICHARDSON;
-  AngleAggregationType angleagg_method = AngleAggregationType::POLAR;
-  double               residual_tolerance = 1.0e-6;
-  int                  max_iterations = 200;
-  int                  gmres_restart_intvl = 30;
+  IterativeMethod      iterative_method_ = IterativeMethod::CLASSICRICHARDSON;
+  AngleAggregationType angleagg_method_ = AngleAggregationType::POLAR;
+  double               residual_tolerance_ = 1.0e-6;
+  int                  max_iterations_ = 200;
+  int                  gmres_restart_intvl_ = 30;
 
-  bool                 allow_cycles = false;
-  bool                 log_sweep_events = false;
+  bool                 allow_cycles_ = false;
+  bool                 log_sweep_events_ = false;
 
-  bool                 apply_wgdsa = false;
-  bool                 apply_tgdsa = false;
-  int                  wgdsa_max_iters = 30;
-  int                  tgdsa_max_iters = 30;
-  double               wgdsa_tol = 1.0e-4;
-  double               tgdsa_tol = 1.0e-4;
-  bool                 wgdsa_verbose = false;
-  bool                 tgdsa_verbose = false;
-  std::string          wgdsa_string;
-  std::string          tgdsa_string;
+  bool                 apply_wgdsa_ = false;
+  bool                 apply_tgdsa_ = false;
+  int                  wgdsa_max_iters_ = 30;
+  int                  tgdsa_max_iters_ = 30;
+  double               wgdsa_tol_ = 1.0e-4;
+  double               tgdsa_tol_ = 1.0e-4;
+  bool                 wgdsa_verbose_ = false;
+  bool                 tgdsa_verbose_ = false;
+  std::string          wgdsa_string_;
+  std::string          tgdsa_string_;
 
-  std::shared_ptr<lbs::acceleration::DiffusionMIPSolver> wgdsa_solver;
-  std::shared_ptr<lbs::acceleration::DiffusionMIPSolver> tgdsa_solver;
+  std::shared_ptr<lbs::acceleration::DiffusionMIPSolver> wgdsa_solver_;
+  std::shared_ptr<lbs::acceleration::DiffusionMIPSolver> tgdsa_solver_;
 
   struct TwoGridAccelerationInfo
   {
     std::map<int, acceleration::TwoGridCollapsedInfo> map_mat_id_2_tginfo;
     acceleration::EnergyCollapseScheme scheme =
       acceleration::EnergyCollapseScheme::JFULL;
-  }tg_acceleration_info;
+  }tg_acceleration_info_;
 
 
-  chi_math::UnknownManager psi_uk_man;
+  chi_math::UnknownManager psi_uk_man_;
 
   //lbs_groupset.cc
   LBSGroupset() : LBSGroupset(-1) {};

@@ -19,7 +19,7 @@ double LBSSolver::ComputeFissionProduction(const std::vector<double>& phi)
 
     //====================================== Obtain xs
     const auto& xs = transport_view.XS();
-    if (not xs.is_fissionable) continue;
+    if (not xs.is_fissionable_) continue;
 
     //====================================== Loop over nodes
     const int num_nodes = transport_view.NumNodes();
@@ -31,15 +31,15 @@ double LBSSolver::ComputeFissionProduction(const std::vector<double>& phi)
       //=============================== Loop over groups
       for (size_t g = first_grp; g <= last_grp; ++g)
       {
-        const auto& prod = xs.production_matrix[g];
+        const auto& prod = xs.production_matrix_[g];
         for (size_t gp = 0; gp <= last_grp; ++gp)
           local_production += prod[gp] *
                               phi[uk_map + gp] *
                               IntV_ShapeI;
 
         if (options_.use_precursors)
-          for (unsigned int j = 0; j < xs.num_precursors; ++j)
-            local_production += xs.nu_delayed_sigma_f[g] *
+          for (unsigned int j = 0; j < xs.num_precursors_; ++j)
+            local_production += xs.nu_delayed_sigma_f_[g] *
                                 phi[uk_map + g] *
                                 IntV_ShapeI;
       }
@@ -83,7 +83,7 @@ double LBSSolver::ComputeFissionRate(const bool previous)
 
     //====================================== Obtain xs
     const auto& xs = transport_view.XS();
-    if (not xs.is_fissionable) continue;
+    if (not xs.is_fissionable_) continue;
 
     //====================================== Loop over nodes
     const int num_nodes = transport_view.NumNodes();
@@ -94,7 +94,7 @@ double LBSSolver::ComputeFissionRate(const bool previous)
 
       //=============================== Loop over groups
       for (size_t g = first_grp; g <= last_grp; ++g)
-        local_fission_rate += xs.sigma_f[g] *
+        local_fission_rate += xs.sigma_f_[g] *
                               phi[uk_map + g] *
                               IntV_ShapeI;
     }//for node

@@ -24,7 +24,7 @@ SweepChunkPWLTransientTheta(
   const int in_num_moms,
   const int in_max_num_cell_dofs)
                     : SweepChunk(destination_phi, destination_psi,
-                                 in_groupset.angle_agg, false),
+                                 in_groupset.angle_agg_, false),
                       grid_view(std::move(grid_ptr)),
                       grid_fe_view(discretization),
                       unit_cell_matrices_(unit_cell_matrices),
@@ -103,7 +103,7 @@ void lbs::SweepChunkPWLTransientTheta::
   std::vector<double>& output_psi = GetDestinationPsi();
 
   const SubSetInfo& grp_ss_info =
-      groupset.grp_subset_infos[angle_set->ref_subset];
+      groupset.grp_subset_infos_[angle_set->ref_subset];
 
   const size_t gs_ss_size  = grp_ss_info.ss_size;
   const size_t gs_ss_begin = grp_ss_info.ss_begin;
@@ -114,10 +114,10 @@ void lbs::SweepChunkPWLTransientTheta::
   int deploc_face_counter = -1;
   int preloc_face_counter = -1;
 
-  auto const& d2m_op = groupset.quadrature->GetDiscreteToMomentOperator();
-  auto const& m2d_op = groupset.quadrature->GetMomentToDiscreteOperator();
+  auto const& d2m_op = groupset.quadrature_->GetDiscreteToMomentOperator();
+  auto const& m2d_op = groupset.quadrature_->GetMomentToDiscreteOperator();
 
-  const auto& psi_uk_man = groupset.psi_uk_man;
+  const auto& psi_uk_man = groupset.psi_uk_man_;
   typedef const int64_t cint64_t;
 
   const bool fixed_src_active = surface_source_active;
@@ -134,12 +134,12 @@ void lbs::SweepChunkPWLTransientTheta::
     const auto& fe_intgrl_values = unit_cell_matrices_[cell_local_id];
     const int num_nodes = static_cast<int>(cell_mapping.NumNodes());
     auto& transport_view = grid_transport_view[cell.local_id];
-    const auto& sigma_tg = transport_view.XS().sigma_t;
+    const auto& sigma_tg = transport_view.XS().sigma_t_;
     std::vector<bool> face_incident_flags(num_faces, false);
     std::vector<double> face_mu_values(num_faces, 0.0);
 
     //Transient parameters
-    const auto& inv_velg = transport_view.XS().inv_velocity;
+    const auto& inv_velg = transport_view.XS().inv_velocity_;
     const double inv_theta = 1.0/theta;
     const double inv_dt    = 1.0/dt;
     std::vector<double> tau_gsg(gs_ss_size, 0.0);
@@ -161,8 +161,8 @@ void lbs::SweepChunkPWLTransientTheta::
       deploc_face_counter = ni_deploc_face_counter;
       preloc_face_counter = ni_preloc_face_counter;
       const int angle_num = angle_set->angles[angle_set_index];
-      const chi_mesh::Vector3& omega = groupset.quadrature->omegas[angle_num];
-      const double wt = groupset.quadrature->weights[angle_num];
+      const chi_mesh::Vector3& omega = groupset.quadrature_->omegas[angle_num];
+      const double wt = groupset.quadrature_->weights[angle_num];
 
       // ============================================ Gradient matrix
       for (int i = 0; i < num_nodes; ++i)

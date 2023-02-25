@@ -38,7 +38,7 @@ void lbs::LBSSolver::
   auto last_grp = static_cast<size_t>(groups_.back().id_);
 
   const auto& m_to_ell_em_map =
-      groupset.quadrature->GetMomentToHarmonicsIndexMap();
+      groupset.quadrature_->GetMomentToHarmonicsIndexMap();
 
   std::vector<double> default_zero_src(groups_.size(), 0.0);
 
@@ -52,7 +52,7 @@ void lbs::LBSSolver::
     auto xs = transport_view.XS();
     auto P0_src = matid_to_src_map_[cell.material_id];
 
-    const auto& S = xs.transfer_matrices;
+    const auto& S = xs.transfer_matrices_;
 
     //==================== Obtain src
     double* src = default_zero_src.data();
@@ -100,22 +100,22 @@ void lbs::LBSSolver::
               }
 
           //============================== Apply fission sources
-          const bool fission_avail = xs.is_fissionable and ell == 0;
+          const bool fission_avail = xs.is_fissionable_ and ell == 0;
 
           //==================== Across groupset
           if (fission_avail and apply_ags_fission_src)
           {
-            const auto& prod = xs.production_matrix[g];
+            const auto& prod = xs.production_matrix_[g];
             for (size_t gp = first_grp; gp <= last_grp; ++gp)
               if (gp < gs_i or gp > gs_f)
               {
                 rhs += prod[gp] * phi[uk_map + gp];
 
                 if (options_.use_precursors)
-                  for (const auto& precursor : xs.precursors)
+                  for (const auto& precursor : xs.precursors_)
                     rhs += precursor.emission_spectrum[g] *
                            precursor.fractional_yield *
-                           xs.nu_delayed_sigma_f[gp] *
+                           xs.nu_delayed_sigma_f_[gp] *
                            phi[uk_map + gp];
               }
           }
@@ -123,16 +123,16 @@ void lbs::LBSSolver::
           //==================== Within groupset
           if (fission_avail and apply_wgs_fission_src)
           {
-            const auto& prod = xs.production_matrix[g];
+            const auto& prod = xs.production_matrix_[g];
             for (size_t gp = gs_i; gp <= gs_f; ++gp)
             {
               rhs += prod[gp] * phi[uk_map + gp];
 
               if (options_.use_precursors)
-                for (const auto& precursor : xs.precursors)
+                for (const auto& precursor : xs.precursors_)
                   rhs += precursor.emission_spectrum[g] *
                          precursor.fractional_yield *
-                         xs.nu_delayed_sigma_f[gp] *
+                         xs.nu_delayed_sigma_f_[gp] *
                          phi[uk_map + gp];
             }
           }

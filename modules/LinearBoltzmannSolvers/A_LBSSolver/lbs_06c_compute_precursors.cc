@@ -23,10 +23,10 @@ void lbs::LBSSolver::ComputePrecursors()
 
 
     //======================================== Loop over precursors
-    for (unsigned int j = 0; j < xs.num_precursors; ++j)
+    for (unsigned int j = 0; j < xs.num_precursors_; ++j)
     {
       size_t dof = cell.local_id * J + j;
-      const auto& precursor = xs.precursors[j];
+      const auto& precursor = xs.precursors_[j];
       const double coeff = precursor.fractional_yield /
                            precursor.decay_constant;
 
@@ -39,7 +39,7 @@ void lbs::LBSSolver::ComputePrecursors()
         //============================== Loop over groups
         for (unsigned int g = 0; g < groups_.size(); ++g)
           precursor_new_local_[dof] += coeff *
-                                       xs.nu_delayed_sigma_f[g] *
+                                       xs.nu_delayed_sigma_f_[g] *
                                        phi_new_local_[uk_map + g] *
                                        node_V_fraction;
       }//for node i

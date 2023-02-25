@@ -20,16 +20,16 @@ void lbs::LBSGroupset::BuildDiscMomOperator(
       geometry_type == lbs::GeometryType::ONED_CYLINDRICAL ||
       geometry_type == lbs::GeometryType::ONED_SPHERICAL)
   {
-    quadrature->BuildDiscreteToMomentOperator(scattering_order,1);
+    quadrature_->BuildDiscreteToMomentOperator(scattering_order, 1);
   }
   else if (geometry_type == lbs::GeometryType::TWOD_CARTESIAN ||
            geometry_type == lbs::GeometryType::TWOD_CYLINDRICAL)
   {
-    quadrature->BuildDiscreteToMomentOperator(scattering_order,2);
+    quadrature_->BuildDiscreteToMomentOperator(scattering_order, 2);
   }
   else if (geometry_type == lbs::GeometryType::THREED_CARTESIAN)
   {
-    quadrature->BuildDiscreteToMomentOperator(scattering_order,3);
+    quadrature_->BuildDiscreteToMomentOperator(scattering_order, 3);
   }
 }
 
@@ -43,16 +43,16 @@ void lbs::LBSGroupset::BuildMomDiscOperator(
       geometry_type == lbs::GeometryType::ONED_CYLINDRICAL ||
       geometry_type == lbs::GeometryType::ONED_SPHERICAL)
   {
-    quadrature->BuildMomentToDiscreteOperator(scattering_order,1);
+    quadrature_->BuildMomentToDiscreteOperator(scattering_order, 1);
   }
   else if (geometry_type == lbs::GeometryType::TWOD_CARTESIAN ||
            geometry_type == lbs::GeometryType::TWOD_CYLINDRICAL)
   {
-    quadrature->BuildMomentToDiscreteOperator(scattering_order,2);
+    quadrature_->BuildMomentToDiscreteOperator(scattering_order, 2);
   }
   else if (geometry_type == lbs::GeometryType::THREED_CARTESIAN)
   {
-    quadrature->BuildMomentToDiscreteOperator(scattering_order,3);
+    quadrature_->BuildMomentToDiscreteOperator(scattering_order, 3);
   }
 }
 
@@ -61,10 +61,10 @@ void lbs::LBSGroupset::BuildMomDiscOperator(
 /**Constructs the groupset subsets.*/
 void lbs::LBSGroupset::BuildSubsets()
 {
-  grp_subset_infos = lbs::MakeSubSets(groups_.size(), master_num_grp_subsets);
+  grp_subset_infos_ = lbs::MakeSubSets(groups_.size(), master_num_grp_subsets_);
   {
     size_t ss=0;
-    for (const auto& info : grp_subset_infos)
+    for (const auto& info : grp_subset_infos_)
     {
       chi::log.Log()
         << "Groupset " << id_ << " has group-subset " << ss << " "
@@ -78,7 +78,7 @@ void lbs::LBSGroupset::BuildSubsets()
 /**Constructs the groupset subsets.*/
 void lbs::LBSGroupset::PrintSweepInfoFile(size_t ev_tag, const std::string& file_name)
 {
-  if (not log_sweep_events) return;
+  if (not log_sweep_events_) return;
 
   std::ofstream ofile;
   ofile.open(file_name,std::ofstream::out);
@@ -89,10 +89,10 @@ void lbs::LBSGroupset::PrintSweepInfoFile(size_t ev_tag, const std::string& file
 
 
   //======================================== Print all anglesets
-  for (int q=0; q<angle_agg.angle_set_groups.size(); ++q)
+  for (int q=0; q < angle_agg_.angle_set_groups.size(); ++q)
   {
     ofile << "Angle-set group " << q << ":\n";
-    auto& ang_set_grp = angle_agg.angle_set_groups[q];
+    auto& ang_set_grp = angle_agg_.angle_set_groups[q];
     int num_ang_sets_per_grp = (int)ang_set_grp.angle_sets.size();
     for (int as=0; as<num_ang_sets_per_grp; ++as)
     {
@@ -104,7 +104,7 @@ void lbs::LBSGroupset::PrintSweepInfoFile(size_t ev_tag, const std::string& file
 
       for (auto& ang_num : ang_set->angles)
       {
-        const auto& angle = quadrature->abscissae[ang_num];
+        const auto& angle = quadrature_->abscissae[ang_num];
 
         ofile
           << "    " << ang_num

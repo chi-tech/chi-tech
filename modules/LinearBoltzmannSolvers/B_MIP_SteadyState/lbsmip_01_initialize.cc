@@ -69,8 +69,8 @@ void lbs::MIPSteadyStateSolver::InitializeWGSSolvers()
       for (size_t gprime=groupset.groups_.front().id_;
            gprime<=groupset.groups_.back().id_; ++gprime)
       {
-        Dg[g]   = xs->diffusion_coeff[gprime];
-        sigR[g] = xs->sigma_removal[gprime];
+        Dg[g]   = xs->diffusion_coeff_[gprime];
+        sigR[g] = xs->sigma_removal_[gprime];
         ++g;
       }//for g
 
@@ -90,10 +90,10 @@ void lbs::MIPSteadyStateSolver::InitializeWGSSolvers()
         unit_cell_matrices_,
         true); //verbosity
 
-    solver->options.residual_tolerance        = groupset.wgdsa_tol;
-    solver->options.max_iters                 = groupset.wgdsa_max_iters;
-    solver->options.verbose                   = groupset.wgdsa_verbose;
-    solver->options.additional_options_string = groupset.wgdsa_string;
+    solver->options.residual_tolerance        = groupset.wgdsa_tol_;
+    solver->options.max_iters                 = groupset.wgdsa_max_iters_;
+    solver->options.verbose                   = groupset.wgdsa_verbose_;
+    solver->options.additional_options_string = groupset.wgdsa_string_;
 
     solver->Initialize();
 

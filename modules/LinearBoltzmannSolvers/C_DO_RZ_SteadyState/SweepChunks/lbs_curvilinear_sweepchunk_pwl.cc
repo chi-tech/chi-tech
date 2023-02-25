@@ -34,7 +34,7 @@ lbs_curvilinear::SweepChunkPWL::
   , normal_vector_boundary()
 {
   const auto curvilinear_product_quadrature =
-    std::dynamic_pointer_cast<chi_math::CurvilinearAngularQuadrature>(groupset.quadrature);
+    std::dynamic_pointer_cast<chi_math::CurvilinearAngularQuadrature>(groupset.quadrature_);
 
   if (!curvilinear_product_quadrature)
     throw std::invalid_argument("C_DO_RZ_SteadyState::SweepChunkPWL::SweepChunkPWL : "
@@ -82,7 +82,7 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
   std::vector<double>& output_psi = GetDestinationPsi();
 
   const lbs::SubSetInfo& grp_ss_info =
-    groupset.grp_subset_infos[angle_set->ref_subset];
+    groupset.grp_subset_infos_[angle_set->ref_subset];
 
   const size_t gs_ss_size  = grp_ss_info.ss_size;
   const size_t gs_ss_begin = grp_ss_info.ss_begin;
@@ -93,11 +93,11 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
   int deploc_face_counter = -1;
   int preloc_face_counter = -1;
 
-  const auto& d2m_op = groupset.quadrature->GetDiscreteToMomentOperator();
-  const auto& m2d_op = groupset.quadrature->GetMomentToDiscreteOperator();
+  const auto& d2m_op = groupset.quadrature_->GetDiscreteToMomentOperator();
+  const auto& m2d_op = groupset.quadrature_->GetMomentToDiscreteOperator();
 
   const auto curvilinear_product_quadrature =
-    std::dynamic_pointer_cast<chi_math::CurvilinearAngularQuadrature>(groupset.quadrature);
+    std::dynamic_pointer_cast<chi_math::CurvilinearAngularQuadrature>(groupset.quadrature_);
 
   //========================================================== Loop over each cell
   size_t num_loc_cells = spds.spls.item_id.size();
@@ -111,7 +111,7 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
     const auto& fe_intgrl_values_secondary = secondary_unit_cell_matrices_[cell_local_id];
     const int num_nodes = static_cast<int>(cell_mapping.NumNodes());
     auto& transport_view = grid_transport_view[cell.local_id];
-    const auto& sigma_tg = transport_view.XS().sigma_t;
+    const auto& sigma_tg = transport_view.XS().sigma_t_;
     std::vector<bool> face_incident_flags(num_faces, false);
     std::vector<double> face_mu_values(num_faces, 0.0);
 
@@ -131,7 +131,7 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
       deploc_face_counter = ni_deploc_face_counter;
       preloc_face_counter = ni_preloc_face_counter;
       const auto& angle_num = angle_set->angles[angle_set_index];
-      const auto& omega = groupset.quadrature->omegas[angle_num];
+      const auto& omega = groupset.quadrature_->omegas[angle_num];
 
       const auto polar_level = map_polar_level[angle_num];
 
@@ -300,7 +300,7 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
       // ============================= Save angular fluxes if needed
       if (save_angular_flux)
       {
-        const auto& psi_uk_man = groupset.psi_uk_man;
+        const auto& psi_uk_man = groupset.psi_uk_man_;
         for (int i = 0; i < num_nodes; ++i)
         {
           int64_t ir = grid_fe_view.MapDOFLocal(cell,i,psi_uk_man,angle_num,0);

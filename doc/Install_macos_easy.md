@@ -89,7 +89,7 @@ or
     $ git clone https://github.com/YOUR-NAME/chi-tech
 ```
 
-**Important:** We recommend building all the dependencies into a separate folder. For instance_,
+**Important:** We recommend building all the dependencies into a separate folder. For instance,
 ```bash
     $ mkdir dependencies
 ```

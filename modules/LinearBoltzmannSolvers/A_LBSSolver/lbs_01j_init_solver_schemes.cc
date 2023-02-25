@@ -25,7 +25,7 @@ void lbs::LBSSolver::InitializeSolverSchemes()
       auto ags_solver = std::make_shared<AGSLinearSolver<Mat,Vec,KSP>>(
         "richardson", ags_context,
         groupsets_.front().id_, groupsets_.back().id_);
-      ags_solver->ToleranceOptions().maximum_iterations_ = 1;
+      ags_solver->ToleranceOptions().maximum_iterations = 1;
       ags_solver->SetVerbosity(options_.verbose_ags_iterations);
 
       ags_solvers_.push_back(ags_solver);

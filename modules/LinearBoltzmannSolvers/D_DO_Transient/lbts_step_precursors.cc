@@ -37,17 +37,17 @@ void lbs::DiscOrdTransientSolver::StepPrecursors()
       const double node_V_fraction = fe_values.Vi_vectors[i]/cell_volume;
 
       for (int g = 0; g < groups_.size(); ++g)
-        delayed_fission += xs->nu_delayed_sigma_f[g] *
+        delayed_fission += xs->nu_delayed_sigma_f_[g] *
                            phi_new_local_[uk_map + g] *
                            node_V_fraction;
     }
 
     //========================================= Loop over precursors
     const auto& max_precursors = max_precursors_per_material_;
-    for (unsigned int j = 0; j < xs->num_precursors; ++j)
+    for (unsigned int j = 0; j < xs->num_precursors_; ++j)
     {
       const size_t dof_map = cell.local_id * max_precursors + j;
-      const auto& precursor = xs->precursors[j];
+      const auto& precursor = xs->precursors_[j];
       const double coeff = 1.0 / (1.0 + eff_dt * precursor.decay_constant);
 
       //contribute last time step precursors

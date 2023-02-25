@@ -227,7 +227,7 @@ int chiSimTest06_WDD(lua_State* L)
       if (Ny > 1) rhs += 2.0*std::fabs(omega.y)*psi_us_y[g]/dy;
       if (Nz > 1) rhs += 2.0*std::fabs(omega.z)*psi_us_z[g]/dz;
 
-      double lhs = cell_xs.sigma_t[g];
+      double lhs = cell_xs.sigma_t_[g];
       if (Nx > 1) lhs += 2.0*std::fabs(omega.x)/dx;
       if (Ny > 1) lhs += 2.0*std::fabs(omega.y)/dy;
       if (Nz > 1) lhs += 2.0*std::fabs(omega.z)/dz;
@@ -409,7 +409,7 @@ std::vector<double> SetSource(
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
-    const auto& S = xs.transfer_matrices;
+    const auto& S = xs.transfer_matrices_;
 
     for (size_t i=0; i<num_nodes; ++i)
     {

@@ -8,10 +8,10 @@ void lbs::LBSSolver::InitializeGroupsets()
   {
     //================================================== Build groupset angular
     //                                                   flux unknown manager
-    groupset.psi_uk_man.unknowns.clear();
-    size_t num_angles = groupset.quadrature->abscissae.size();
+    groupset.psi_uk_man_.unknowns.clear();
+    size_t num_angles = groupset.quadrature_->abscissae.size();
     size_t gs_num_groups = groupset.groups_.size();
-    auto& grpset_psi_uk_man = groupset.psi_uk_man;
+    auto& grpset_psi_uk_man = groupset.psi_uk_man_;
 
     const auto VarVecN = chi_math::UnknownType::VECTOR_N;
     for (unsigned int n=0; n<num_angles; ++n)

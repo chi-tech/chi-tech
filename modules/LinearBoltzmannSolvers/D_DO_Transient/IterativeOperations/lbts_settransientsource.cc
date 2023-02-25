@@ -49,7 +49,7 @@ void lbs::DiscOrdTransientSolver::
   auto last_grp = static_cast<size_t>(groups_.back().id_);
 
   const auto& m_to_ell_em_map =
-    groupset.quadrature->GetMomentToHarmonicsIndexMap();
+    groupset.quadrature_->GetMomentToHarmonicsIndexMap();
 
   std::vector<double> default_zero_src(groups_.size(), 0.0);
 
@@ -65,7 +65,7 @@ void lbs::DiscOrdTransientSolver::
     auto xs = transport_view.XS();
     auto P0_src = matid_to_src_map_[cell.material_id];
 
-    const auto& S = xs.transfer_matrices;
+    const auto& S = xs.transfer_matrices_;
 
     //==================== Obtain src
     double* src = default_zero_src.data();
@@ -110,19 +110,19 @@ void lbs::DiscOrdTransientSolver::
                 rhs += sigma_sm * phi[uk_map + gp];
 
           //============================== Apply fission sources
-          const bool fission_avail = xs.is_fissionable and ell == 0;
+          const bool fission_avail = xs.is_fissionable_ and ell == 0;
 
           //==================== Across groupset
           if (fission_avail and apply_ags_fission_src)
           {
-            const auto& prod = xs.production_matrix[g];
+            const auto& prod = xs.production_matrix_[g];
             for (size_t gp = first_grp; gp <= last_grp; ++gp)
               if (gp < gs_i or gp > gs_f)
               {
                 rhs += prod[gp] * phi[uk_map + gp];
 
                 if (options_.use_precursors)
-                  for (const auto& precursor : xs.precursors)
+                  for (const auto& precursor : xs.precursors_)
                   {
                     const double coeff =
                         precursor.emission_spectrum[g] *
@@ -131,7 +131,7 @@ void lbs::DiscOrdTransientSolver::
 
                     rhs += coeff * eff_dt *
                            precursor.fractional_yield *
-                           xs.nu_delayed_sigma_f[gp] *
+                           xs.nu_delayed_sigma_f_[gp] *
                            phi[uk_map + gp] /
                            cell_volume;
                   }
@@ -141,13 +141,13 @@ void lbs::DiscOrdTransientSolver::
           //==================== Within groupset
           if (fission_avail and apply_wgs_fission_src)
           {
-            const auto& prod = xs.production_matrix[g];
+            const auto& prod = xs.production_matrix_[g];
             for (size_t gp = gs_i; gp <= gs_f; ++gp)
             {
               rhs += prod[gp] * phi[uk_map + gp];
 
               if (options_.use_precursors)
-                for (const auto& precursor : xs.precursors)
+                for (const auto& precursor : xs.precursors_)
                 {
                   const double coeff =
                       precursor.emission_spectrum[g] *
@@ -156,7 +156,7 @@ void lbs::DiscOrdTransientSolver::
 
                   rhs += coeff * eff_dt *
                          precursor.fractional_yield *
-                         xs.nu_delayed_sigma_f[gp] *
+                         xs.nu_delayed_sigma_f_[gp] *
                          phi[uk_map + gp] /
                          cell_volume;
                 }
@@ -168,9 +168,9 @@ void lbs::DiscOrdTransientSolver::
           {
             const auto& J = max_precursors_per_material_;
             const size_t dof_map = cell.local_id * J;
-            for (unsigned int j = 0; j < xs.num_precursors; ++j)
+            for (unsigned int j = 0; j < xs.num_precursors_; ++j)
             {
-              const auto& precursor = xs.precursors[j];
+              const auto& precursor = xs.precursors_[j];
 
               const double coeff =
                   precursor.emission_spectrum[g] *

@@ -18,9 +18,9 @@ void lbs::DiscOrdSteadyStateSolver::ResetSweepOrderings(LBSGroupset& groupset)
   chi::log.Log0Verbose1()
     << "Resetting SPDS and FLUDS";
 
-  groupset.sweep_orderings.clear();
+  groupset.sweep_orderings_.clear();
 
-  auto& angle_agg = groupset.angle_agg;
+  auto& angle_agg = groupset.angle_agg_;
 
   for (auto& angset_grp : angle_agg.angle_set_groups)
   {

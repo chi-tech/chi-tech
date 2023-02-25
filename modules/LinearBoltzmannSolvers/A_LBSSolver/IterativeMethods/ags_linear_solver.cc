@@ -86,7 +86,7 @@ void AGSLinearSolver<Mat,Vec,KSP>::Solve()
   Vec x_old;
   VecDuplicate(x_, &x_old);
 
-  for (int iter=0; iter < tolerance_options_.maximum_iterations_; ++iter)
+  for (int iter = 0; iter < tolerance_options_.maximum_iterations; ++iter)
   {
     lbs_solver.SetGroupScopedPETScVecFromPrimarySTLvector(gid_i,gid_f,x_old,phi);
 
@@ -109,7 +109,7 @@ void AGSLinearSolver<Mat,Vec,KSP>::Solve()
       << " Relative change " << std::setw(10) << std::setprecision(4)
       << error_norm/sol_norm;
 
-    if (error_norm < tolerance_options_.residual_absolute_)
+    if (error_norm < tolerance_options_.residual_absolute)
       break;
   }//for iteration
 

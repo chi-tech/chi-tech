@@ -52,7 +52,7 @@ PetscErrorCode GSConvergenceTest(KSP ksp, PetscInt n, PetscReal rnorm,
 
   //======================================== Print iteration information
   std::string offset;
-  if (context->groupset_.apply_wgdsa || context->groupset_.apply_tgdsa)
+  if (context->groupset_.apply_wgdsa_ || context->groupset_.apply_tgdsa_)
     offset = std::string("    ");
 
   std::stringstream iter_info;

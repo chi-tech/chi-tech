@@ -132,11 +132,11 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
         auto xs = std::static_pointer_cast<chi_physics::TransportCrossSections>(
           material->properties[p]);
 
-        if (!xs->diffusion_initialized)
+        if (!xs->diffusion_initialized_)
           xs->ComputeDiffusionParameters();
 
-        diffCoeff.assign(cell_dofs,xs->diffusion_coeff[group]);
-        sigmaa.assign(cell_dofs,xs->sigma_removal[group]);
+        diffCoeff.assign(cell_dofs,xs->diffusion_coeff_[group]);
+        sigmaa.assign(cell_dofs,xs->sigma_removal_[group]);
         transportxs_found = true;
       }
     }//for properties

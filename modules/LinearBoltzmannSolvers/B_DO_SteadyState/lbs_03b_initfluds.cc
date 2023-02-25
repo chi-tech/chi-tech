@@ -29,21 +29,21 @@ void lbs::DiscOrdSteadyStateSolver::
   typedef sweep_namespace::AngleSet TAngleSet;
 
   const auto& quadrature_sweep_info =
-    quadrature_unq_so_grouping_map_[groupset.quadrature];
+    quadrature_unq_so_grouping_map_[groupset.quadrature_];
 
   const auto& unique_so_groupings = quadrature_sweep_info.first;
   const auto& dir_id_to_so_map    = quadrature_sweep_info.second;
 
   const size_t gs_num_grps = groupset.groups_.size();
-  const size_t gs_num_ss = groupset.grp_subset_infos.size();
+  const size_t gs_num_ss = groupset.grp_subset_infos_.size();
 
   //=========================================== Passing the sweep boundaries
   //                                            to the angle aggregation
-  groupset.angle_agg.Setup(sweep_boundaries_,
-                           gs_num_grps,
-                           gs_num_ss,
-                           groupset.quadrature,
-                           grid_ptr_);
+  groupset.angle_agg_.Setup(sweep_boundaries_,
+                            gs_num_grps,
+                            gs_num_ss,
+                            groupset.quadrature_,
+                            grid_ptr_);
 
   TAngleSetGroup angle_set_group;
   for (const auto& so_grouping : unique_so_groupings)
@@ -52,17 +52,17 @@ void lbs::DiscOrdSteadyStateSolver::
     const size_t so_id = dir_id_to_so_map.at(master_dir_id);
 
     const auto& sweep_ordering =
-      quadrature_spds_map_[groupset.quadrature][so_id];
+      quadrature_spds_map_[groupset.quadrature_][so_id];
     const auto& fluds_template =
-      *quadrature_fluds_templates_map_[groupset.quadrature][so_id];
+      *quadrature_fluds_templates_map_[groupset.quadrature_][so_id];
 
     //Compute direction subsets
     const auto dir_subsets = lbs::MakeSubSets(so_grouping.size(),
-                                              groupset.master_num_ang_subsets);
+                                              groupset.master_num_ang_subsets_);
 
     for (size_t gs_ss=0; gs_ss<gs_num_ss; gs_ss++)
     {
-      const size_t gs_ss_size = groupset.grp_subset_infos[gs_ss].ss_size;
+      const size_t gs_ss_size = groupset.grp_subset_infos_[gs_ss].ss_size;
       for (const auto & dir_ss_info : dir_subsets)
       {
         const auto& dir_ss_begin = dir_ss_info.ss_begin;
@@ -96,7 +96,7 @@ void lbs::DiscOrdSteadyStateSolver::
     }//for gs_ss
   }//for so_grouping
 
-  groupset.angle_agg.angle_set_groups.push_back(std::move(angle_set_group));
+  groupset.angle_agg_.angle_set_groups.push_back(std::move(angle_set_group));
 
   if (options_.verbose_inner_iterations)
     chi::log.Log()

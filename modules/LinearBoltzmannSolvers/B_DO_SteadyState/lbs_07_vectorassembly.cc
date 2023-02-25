@@ -45,10 +45,10 @@ void lbs::DiscOrdSteadyStateSolver::
   switch (which_phi)
   {
     case PhiSTLOption::PHI_NEW:
-      groupset.angle_agg.AppendNewDelayedAngularDOFsToArray(index, x_ref);
+      groupset.angle_agg_.AppendNewDelayedAngularDOFsToArray(index, x_ref);
       break;
     case PhiSTLOption::PHI_OLD:
-      groupset.angle_agg.AppendOldDelayedAngularDOFsToArray(index, x_ref);
+      groupset.angle_agg_.AppendOldDelayedAngularDOFsToArray(index, x_ref);
       break;
   }
 
@@ -99,10 +99,10 @@ void lbs::DiscOrdSteadyStateSolver::
   switch (which_phi)
   {
     case PhiSTLOption::PHI_NEW:
-      groupset.angle_agg.SetNewDelayedAngularDOFsFromArray(index, x_ref);
+      groupset.angle_agg_.SetNewDelayedAngularDOFsFromArray(index, x_ref);
       break;
     case PhiSTLOption::PHI_OLD:
-      groupset.angle_agg.SetOldDelayedAngularDOFsFromArray(index, x_ref);
+      groupset.angle_agg_.SetOldDelayedAngularDOFsFromArray(index, x_ref);
   }
 
   VecRestoreArrayRead(x_src,&x_ref);
@@ -155,8 +155,8 @@ void lbs::DiscOrdSteadyStateSolver::
 
   if (from_which_phi == PhiSTLOption::PHI_NEW and
       to_which_phi == PhiSTLOption::PHI_OLD)
-    groupset.angle_agg.SetDelayedPsiOld2New();
+    groupset.angle_agg_.SetDelayedPsiOld2New();
   if (from_which_phi == PhiSTLOption::PHI_OLD and
       to_which_phi == PhiSTLOption::PHI_NEW)
-    groupset.angle_agg.SetDelayedPsiNew2Old();
+    groupset.angle_agg_.SetDelayedPsiNew2Old();
 }
