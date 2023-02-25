@@ -21,21 +21,21 @@ struct RayTracerOutputInformation
 class RayTracer
 {
 private:
-  const chi_mesh::MeshContinuum& reference_grid;
-  std::vector<double> cell_sizes;
-  double epsilon_nudge      = 1.0e-8;
-  double backward_tolerance = 1.0e-10;
-  double extension_distance = 1.0e5;
-public:
-  bool   perform_concavity_checks = true;
+  const chi_mesh::MeshContinuum& reference_grid_;
+  std::vector<double> cell_sizes_;
+  double epsilon_nudge_      = 1.0e-8;
+  double backward_tolerance_ = 1.0e-10;
+  double extension_distance_ = 1.0e5;
+  bool   perform_concavity_checks_ = true;
 
+public:
   explicit
   RayTracer(const chi_mesh::MeshContinuum& grid,
             std::vector<double> in_cell_sizes,
             bool   in_perform_concavity_checks = true) :
-    reference_grid(grid),
-    cell_sizes(std::move(in_cell_sizes)),
-    perform_concavity_checks(in_perform_concavity_checks)
+    reference_grid_(grid),
+    cell_sizes_(std::move(in_cell_sizes)),
+    perform_concavity_checks_(in_perform_concavity_checks)
   {}
 
 private:
@@ -43,9 +43,9 @@ private:
 
   void SetTolerancesFromCellSize(double cell_size)
   {
-    epsilon_nudge = cell_size * 1.0e-2;
-    backward_tolerance = cell_size * 1.0e-10;
-    extension_distance = 3.0 * cell_size;
+    epsilon_nudge_ = cell_size * 1.0e-2;
+    backward_tolerance_ = cell_size * 1.0e-10;
+    extension_distance_ = 3.0 * cell_size;
   }
 
 public:

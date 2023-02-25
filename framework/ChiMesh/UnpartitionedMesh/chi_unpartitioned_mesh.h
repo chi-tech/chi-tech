@@ -44,15 +44,6 @@ public:
                     sub_type(in_sub_type) {}
   };
 
-public:
-  std::vector<chi_mesh::Vertex>    vertices;
-  std::vector<LightWeightCell*>    raw_cells;
-  std::vector<LightWeightCell*>    raw_boundary_cells;
-  std::vector<std::set<uint64_t>>  vertex_cell_subscriptions;
-
-  MeshAttributes attributes = NONE;
-
-public:
   struct Options
   {
     std::string file_name;
@@ -64,14 +55,24 @@ public:
     size_t ortho_Nz = 0;
 
     std::map<uint64_t, std::string> boundary_id_map;
-  }mesh_options;
+  };
 
   struct BoundBox
   {
     double xmin=0.0, xmax=0.0,
-           ymin=0.0, ymax=0.0,
-           zmin=0.0, zmax=0.0;
-  } bound_box;
+      ymin=0.0, ymax=0.0,
+      zmin=0.0, zmax=0.0;
+  };
+
+protected:
+  std::vector<chi_mesh::Vertex>    vertices_;
+  std::vector<LightWeightCell*>    raw_cells_;
+  std::vector<LightWeightCell*>    raw_boundary_cells_;
+  std::vector<std::set<uint64_t>>  vertex_cell_subscriptions_;
+
+  MeshAttributes attributes_ = NONE;
+  Options mesh_options_;
+  std::shared_ptr<BoundBox> bound_box_ = nullptr;
 
 protected:
   static LightWeightCell* CreateCellFromVTKPolyhedron(vtkCell* vtk_cell);
@@ -88,6 +89,27 @@ protected:
 
 
 public:
+  const BoundBox& GetBoundBox() const {return *bound_box_;}
+
+  Options& GetMeshOptions() {return mesh_options_;}
+  const Options& GetMeshOptions() const {return mesh_options_;}
+
+  MeshAttributes& GetMeshAttributes() {return attributes_;}
+  const MeshAttributes& GetMeshAttributes() const {return attributes_;}
+
+  const std::vector<std::set<uint64_t>>&
+  GetVertextCellSubscriptions() const {return vertex_cell_subscriptions_;}
+
+  void AddCell(LightWeightCell*& cell) {raw_cells_.push_back(cell);}
+  size_t GetNumberOfCells() const {return raw_cells_.size();}
+  const std::vector<LightWeightCell*>&
+  GetRawCells() const {return raw_cells_;}
+
+  const std::vector<chi_mesh::Vertex>&
+  GetVertices() const {return vertices_;}
+  std::vector<chi_mesh::Vertex>&
+  GetVertices() {return vertices_;}
+
   void BuildMeshConnectivity();
   void ComputeCentroidsAndCheckQuality();
 
@@ -108,17 +130,17 @@ public:
 
   ~UnpartitionedMesh()
   {
-    for (auto& cell : raw_cells)          delete cell;
-    for (auto& cell : raw_boundary_cells) delete cell;
+    for (auto& cell : raw_cells_)          delete cell;
+    for (auto& cell : raw_boundary_cells_) delete cell;
   }
   void CleanUp()
   {
-    for (auto& cell : raw_cells)          delete cell;
-    for (auto& cell : raw_boundary_cells) delete cell;
-    vertices.clear();
-    raw_cells.clear();
-    raw_boundary_cells.clear();
-    vertex_cell_subscriptions.clear();
+    for (auto& cell : raw_cells_)          delete cell;
+    for (auto& cell : raw_boundary_cells_) delete cell;
+    vertices_.clear();
+    raw_cells_.clear();
+    raw_boundary_cells_.clear();
+    vertex_cell_subscriptions_.clear();
   }
 };
 

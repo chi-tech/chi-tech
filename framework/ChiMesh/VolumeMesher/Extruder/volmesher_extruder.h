@@ -15,7 +15,6 @@ class chi_mesh::VolumeMesherExtruder : public chi_mesh::VolumeMesher
 public:
   enum class TemplateType : int
   {
-    SURFACE_MESH       = 1,
     UNPARTITIONED_MESH = 2
   };
   struct MeshLayer
@@ -25,27 +24,23 @@ public:
     int    sub_divisions;
   };
 private:
-  const TemplateType template_type;
-  std::shared_ptr<SurfaceMesh> template_surface_mesh = nullptr;
-  std::shared_ptr<UnpartitionedMesh> template_unpartitioned_mesh = nullptr;
-public:
-  std::vector<MeshLayer> input_layers;
-  std::vector<double> vertex_layers;
-  size_t node_z_index_incr=0;
+  const TemplateType template_type_;
+  std::shared_ptr<const UnpartitionedMesh> template_unpartitioned_mesh_ = nullptr;
+
+  std::vector<MeshLayer> input_layers_;
+  std::vector<double> vertex_layers_;
+  size_t node_z_index_incr_=0;
 
 public:
   explicit
-  VolumeMesherExtruder(std::shared_ptr<chi_mesh::SurfaceMesh> in_surface_mesh) :
+  VolumeMesherExtruder(std::shared_ptr<const chi_mesh::UnpartitionedMesh> in_unpartitioned_mesh) :
     VolumeMesher(VolumeMesherType::EXTRUDER),
-    template_type(TemplateType::SURFACE_MESH),
-    template_surface_mesh(std::move(in_surface_mesh))
+    template_type_(TemplateType::UNPARTITIONED_MESH),
+    template_unpartitioned_mesh_(std::move(in_unpartitioned_mesh))
   {}
-  explicit
-  VolumeMesherExtruder(std::shared_ptr<chi_mesh::UnpartitionedMesh> in_unpartitioned_mesh) :
-    VolumeMesher(VolumeMesherType::EXTRUDER),
-    template_type(TemplateType::UNPARTITIONED_MESH),
-    template_unpartitioned_mesh(std::move(in_unpartitioned_mesh))
-  {}
+
+  const std::vector<double>& GetVertexLayers() const {return vertex_layers_;}
+  void AddLayer(const MeshLayer& new_layer) {input_layers_.push_back(new_layer);}
 
   void Execute() override;
 

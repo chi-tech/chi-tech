@@ -6,7 +6,7 @@
 
 const chi_mesh::MeshContinuum& chi_mesh::RayTracer::Grid() const
 {
-  return reference_grid;
+  return reference_grid_;
 }
 
 //###################################################################
@@ -16,8 +16,8 @@ chi_mesh::RayTracerOutputInformation chi_mesh::RayTracer::
            Vector3 &omega_i,
            int function_depth/*=0*/)
 {
-  if (not cell_sizes.empty())
-    SetTolerancesFromCellSize(cell_sizes[cell.local_id]);
+  if (not cell_sizes_.empty())
+    SetTolerancesFromCellSize(cell_sizes_[cell.local_id]);
 
   RayTracerOutputInformation oi;
 
@@ -49,7 +49,7 @@ chi_mesh::RayTracerOutputInformation chi_mesh::RayTracer::
     {
       // Nudge particle towards centroid
       chi_mesh::Vector3 v_p_i_cc = (cell.centroid - pos_i);
-      chi_mesh::Vector3 pos_i_nudged = pos_i + v_p_i_cc * epsilon_nudge;
+      chi_mesh::Vector3 pos_i_nudged = pos_i + v_p_i_cc * epsilon_nudge_;
 
       oi = TraceRay(cell,pos_i_nudged,omega_i,function_depth+1);
 
@@ -60,7 +60,7 @@ chi_mesh::RayTracerOutputInformation chi_mesh::RayTracer::
     {
       // Nudge particle away from line between location and cell center
       chi_mesh::Vector3 v_p_i_cc = (cell.centroid - pos_i).Cross(omega_i);
-      chi_mesh::Vector3 pos_i_nudged = pos_i + v_p_i_cc * epsilon_nudge;
+      chi_mesh::Vector3 pos_i_nudged = pos_i + v_p_i_cc * epsilon_nudge_;
 
       oi = TraceRay(cell,pos_i_nudged,omega_i,function_depth+1);
 
@@ -75,8 +75,8 @@ chi_mesh::RayTracerOutputInformation chi_mesh::RayTracer::
       << ((backward_tolerance_hit)? " Backward tolerance hit. " : "")
       << "For particle xyz="
       << pos_i.PrintS() << " uvw="
-      << omega_i.PrintS() << " " << (pos_i + extension_distance*omega_i).PrintS()
-      << " " << extension_distance
+      << omega_i.PrintS() << " " << (pos_i + extension_distance_ * omega_i).PrintS()
+      << " " << extension_distance_
       << " in cell " << cell.global_id
       << " with vertices: \n";
 
@@ -137,8 +137,8 @@ TraceIncidentRay(const Cell& cell,
                  const Vector3& omega_i)
 {
   const auto cell_type = cell.Type();
-  const double cell_char_length = cell_sizes[cell.local_id];
-  const auto& grid = reference_grid;
+  const double cell_char_length = cell_sizes_[cell.local_id];
+  const auto& grid = reference_grid_;
 
   bool intersects_cell = false;
   chi_mesh::Vector3 I;

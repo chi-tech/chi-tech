@@ -10,8 +10,8 @@ void chi_mesh::SurfaceMesh::SplitByPatch(
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Copy all faces from surface
   FaceList unsorted_faces;
   FaceList::iterator cur_face;
-  for (cur_face = this->faces.begin();
-       cur_face != this->faces.end();
+  for (cur_face = this->faces_.begin();
+       cur_face != this->faces_.end();
        cur_face++)
   {
     unsorted_faces.push_back((*cur_face));
@@ -213,12 +213,12 @@ void chi_mesh::SurfaceMesh::SplitByPatch(
         else
         {
           //=========================== Copy vertex
-          chi_mesh::Vertex v = this->vertices.at(vi);
+          chi_mesh::Vertex v = this->vertices_.at(vi);
           int* newMapping = new int[2];
           newMapping[0] = vi;
-          newMapping[1] = new_surface->vertices.size();
+          newMapping[1] = new_surface->vertices_.size();
 
-          new_surface->vertices.push_back(v);
+          new_surface->vertices_.push_back(v);
           vertex_mapping.push_back(newMapping);
 
           newFace.v_index[e] = newMapping[1];
@@ -241,7 +241,7 @@ void chi_mesh::SurfaceMesh::SplitByPatch(
         newFace.e_index[e][3] = -1;
       }
 
-      new_surface->faces.push_back(newFace);
+      new_surface->faces_.push_back(newFace);
     }
     new_surface->UpdateInternalConnectivity();
     //std::cout << (*new_surface);

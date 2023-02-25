@@ -27,18 +27,18 @@ size_t chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
   //======================================== Create unpartitioned mesh
   auto umesh = std::make_shared<chi_mesh::UnpartitionedMesh>();
 
-  umesh->attributes = DIMENSION_1 | ORTHOGONAL;
+  umesh->GetMeshAttributes() = DIMENSION_1 | ORTHOGONAL;
 
   //======================================== Create vertices
   size_t Nz = vertices.size();
 
-  umesh->mesh_options.ortho_Nx = 1;
-  umesh->mesh_options.ortho_Ny = 1;
-  umesh->mesh_options.ortho_Nz = Nz-1;
+  umesh->GetMeshOptions().ortho_Nx = 1;
+  umesh->GetMeshOptions().ortho_Ny = 1;
+  umesh->GetMeshOptions().ortho_Nz = Nz-1;
 
-  umesh->vertices.reserve(Nz);
+  umesh->GetVertices().reserve(Nz);
   for (auto& vertex : zverts)
-    umesh->vertices.push_back(vertex);
+    umesh->GetVertices().push_back(vertex);
 
   //======================================== Create cells
   for (size_t c=0; c<(zverts.size()-1); ++c)
@@ -57,7 +57,7 @@ size_t chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
     cell->faces.push_back(left_face);
     cell->faces.push_back(rite_face);
 
-    umesh->raw_cells.push_back(cell);
+    umesh->AddCell(cell);
   }
 
   umesh->ComputeCentroidsAndCheckQuality();
@@ -101,28 +101,28 @@ size_t chi_mesh::CreateUnpartitioned2DOrthoMesh(
   //======================================== Create unpartitioned mesh
   auto umesh = std::make_shared<chi_mesh::UnpartitionedMesh>();
 
-  umesh->attributes = DIMENSION_2 | ORTHOGONAL;
+  umesh->GetMeshAttributes() = DIMENSION_2 | ORTHOGONAL;
 
   //======================================== Create vertices
   size_t Nx = vertices_1d_x.size();
   size_t Ny = vertices_1d_y.size();
 
-  umesh->mesh_options.ortho_Nx = Nx-1;
-  umesh->mesh_options.ortho_Ny = Ny-1;
-  umesh->mesh_options.ortho_Nz = 1;
+  umesh->GetMeshOptions().ortho_Nx = Nx-1;
+  umesh->GetMeshOptions().ortho_Ny = Ny-1;
+  umesh->GetMeshOptions().ortho_Nz = 1;
 
   typedef std::vector<uint64_t> VecIDs;
   std::vector<VecIDs> vertex_ij_to_i_map(Ny,VecIDs(Nx));
-  umesh->vertices.reserve(Nx*Ny);
+  umesh->GetVertices().reserve(Nx * Ny);
   uint64_t k=0;
   for (size_t i=0; i<Ny; ++i)
   {
     for (size_t j=0; j<Nx; ++j)
     {
       vertex_ij_to_i_map[i][j] = k++;
-      umesh->vertices.emplace_back(vertices_1d_x[j],
-                                   vertices_1d_y[i],
-                                   0.0);
+      umesh->GetVertices().emplace_back(vertices_1d_x[j],
+                                        vertices_1d_y[i],
+                                        0.0);
     }//for j
   }//for i
 
@@ -152,7 +152,7 @@ size_t chi_mesh::CreateUnpartitioned2DOrthoMesh(
         cell->faces.push_back(face);
       }
 
-      umesh->raw_cells.push_back(cell);
+      umesh->AddCell(cell);
     }//for j
   }//for i
 
@@ -200,16 +200,16 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
   //======================================== Create unpartitioned mesh
   auto umesh = std::make_shared<chi_mesh::UnpartitionedMesh>();
 
-  umesh->attributes = DIMENSION_3 | ORTHOGONAL;
+  umesh->GetMeshAttributes() = DIMENSION_3 | ORTHOGONAL;
 
   //======================================== Create vertices
   size_t Nx = vertices_1d_x.size();
   size_t Ny = vertices_1d_y.size();
   size_t Nz = vertices_1d_z.size();
 
-  umesh->mesh_options.ortho_Nx = Nx-1;
-  umesh->mesh_options.ortho_Ny = Ny-1;
-  umesh->mesh_options.ortho_Nz = Nz-1;
+  umesh->GetMeshOptions().ortho_Nx = Nx-1;
+  umesh->GetMeshOptions().ortho_Ny = Ny-1;
+  umesh->GetMeshOptions().ortho_Nz = Nz-1;
 
   // i is j, and j is i, MADNESS explanation:
   // In math convention the i-index refers to the ith row
@@ -222,7 +222,7 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
   for (auto& vec : vertex_ijk_to_i_map)
     vec.resize(Nx,VecIDs(Nz));
 
-  umesh->vertices.reserve(Nx*Ny*Nz);
+  umesh->GetVertices().reserve(Nx * Ny * Nz);
   uint64_t c=0;
   for (size_t i=0; i<Ny; ++i)
   {
@@ -231,9 +231,9 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
       for (size_t k=0; k<Nz; ++k)
       {
         vertex_ijk_to_i_map[i][j][k] = c++;
-        umesh->vertices.emplace_back(vertices_1d_x[j],
-                                     vertices_1d_y[i],
-                                     vertices_1d_z[k]);
+        umesh->GetVertices().emplace_back(vertices_1d_x[j],
+                                          vertices_1d_y[i],
+                                          vertices_1d_z[k]);
       }//for k
     }//for j
   }//for i
@@ -328,7 +328,7 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
           cell->faces.push_back(face);
         }
 
-        umesh->raw_cells.push_back(cell);
+        umesh->AddCell(cell);
       }//for k
     }//for j
   }//for i

@@ -97,9 +97,9 @@ void chi_mesh::FieldFunctionInterpolationSlice::
       {
         FFIFaceEdgeIntersection face_isds;
 
-        const auto nudge = 1.0e-4*(grid.vertices[v0gi]-cell.centroid);
+        const auto nudge = 1.0e-4*(grid.vertices[v0gi] - cell.centroid);
 
-        face_isds.point   = grid.vertices[v0gi]-nudge;
+        face_isds.point   = grid.vertices[v0gi] - nudge;
         face_isds.point2d = grid.vertices[v0gi];
         cell_isds.intersections.push_back(face_isds);
       }

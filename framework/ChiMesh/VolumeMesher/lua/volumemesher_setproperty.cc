@@ -137,13 +137,13 @@ int chiVolumeMesherSetProperty(lua_State *L)
   else if (property_index == VMP::CUTS_Y)
   {
     double p = lua_tonumber(L,2);
-    cur_hndlr.surface_mesher->ycuts.push_back(p);
+    cur_hndlr.surface_mesher->AddYCut(p);
     cur_hndlr.volume_mesher->options.ycuts.push_back(p);
   }
   else if (property_index == VMP::CUTS_X)
   {
     double p = lua_tonumber(L,2);
-    cur_hndlr.surface_mesher->xcuts.push_back(p);
+    cur_hndlr.surface_mesher->AddXCut(p);
     cur_hndlr.volume_mesher->options.xcuts.push_back(p);
   }
   else if (property_index == VMP::PARTITION_TYPE)
@@ -183,7 +183,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
       {
         new_layer.name = std::string(lua_tostring(L,4));
       }
-      mesher.input_layers.push_back(new_layer);
+      mesher.AddLayer(new_layer);
     }
     else
     {

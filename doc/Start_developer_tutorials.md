@@ -40,7 +40,7 @@ Specifically,
 Start adding source files.
 - I created a new folder (```DFEMDIffusionSolver```), added source code there.
 - I had to update the ```CMakeLists.txt``` file at the upper level by adding ```add_subdirectory("${PROJECT_SOURCE_DIR}/DFEMDiffusionSolver/")```
-- I created a new ```CMakeLists.txt``` file in the new folder and included the following lines:
+- I created a new ```CMakeLists.txt``` file in the new folder and included the following lines_:
    ```bash
    file (GLOB_RECURSE MORE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cc")
    set(SOURCES ${SOURCES} ${MORE_SOURCES} PARENT_SCOPE) 

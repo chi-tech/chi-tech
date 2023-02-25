@@ -17,7 +17,7 @@ CreateLocalNodes(chi_mesh::MeshContinuum& template_grid,
 {
   //================================================== For each layer
   std::set<uint64_t> vertex_ids_with_local_scope;
-  for (size_t iz=0; iz<(vertex_layers.size()-1); iz++)
+  for (size_t iz=0; iz<(vertex_layers_.size() - 1); iz++)
   {
     for (const auto& template_cell : template_grid.local_cells)
     {
@@ -32,10 +32,10 @@ CreateLocalNodes(chi_mesh::MeshContinuum& template_grid,
       {
         auto& vertex_set = vertex_ids_with_local_scope;
         for (auto tc_vid : template_cell.vertex_ids)
-          vertex_set.insert(tc_vid + iz * node_z_index_incr);
+          vertex_set.insert(tc_vid + iz * node_z_index_incr_);
 
         for (auto tc_vid : template_cell.vertex_ids)
-          vertex_set.insert(tc_vid + (iz + 1) * node_z_index_incr);
+          vertex_set.insert(tc_vid + (iz + 1) * node_z_index_incr_);
       }
     }//for template cell
   }//for layer
@@ -43,7 +43,7 @@ CreateLocalNodes(chi_mesh::MeshContinuum& template_grid,
   //============================================= Now add all nodes
   //                                              that are local or neighboring
   uint64_t vid = 0;
-  for (auto layer_z_level : vertex_layers)
+  for (auto layer_z_level : vertex_layers_)
   {
     for (auto& id_vertex : template_grid.vertices)
     {

@@ -1052,14 +1052,14 @@ void chi_physics::TransportCrossSections::
 
       //compute production matrix
       const auto chi_ = not chi_prompt.empty()? chi_prompt : chi;
-      const auto nu_sigma_f_ =
+      const auto nu_sigma_f =
           not nu_prompt.empty() ? nu_prompt_sigma_f_ : nu_sigma_f_;
 
       for (unsigned int g = 0; g < num_groups_; ++g)
       {
         std::vector<double> prod;
         for (unsigned int gp = 0.0; gp < num_groups_; ++gp)
-          prod.push_back(chi_[g] * nu_sigma_f_[gp]);
+          prod.push_back(chi_[g] * nu_sigma_f[gp]);
         production_matrix_.push_back(prod);
       }
     }//if production_matrix empty

@@ -63,8 +63,8 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
     throw std::logic_error(fname + ": Failed while trying to read "
                                    "the number of nodes.");
 
-  vertices.clear();
-  vertices.resize(num_nodes);
+  vertices_.clear();
+  vertices_.resize(num_nodes);
 
   for (int n=0; n<num_nodes; n++)
   {
@@ -75,9 +75,9 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
     if ( !(iss >> vert_index) )
       throw std::logic_error(fname + ": Failed to read vertex index.");
 
-    if (!(iss >> vertices[vert_index-1].x
-              >> vertices[vert_index-1].y
-              >> vertices[vert_index-1].z))
+    if (!(iss >> vertices_[vert_index - 1].x
+              >> vertices_[vert_index - 1].y
+              >> vertices_[vert_index - 1].z))
       throw std::logic_error(fname + ": Failed while reading the vertex "
                                      "coordinates.");
   }
@@ -260,14 +260,14 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
       if (IsElementType1D(elem_type))
       {
         raw_cell = new LightWeightCell(CellType::SLAB, CellType::SLAB);
-        raw_boundary_cells.push_back(raw_cell);
+        raw_boundary_cells_.push_back(raw_cell);
         chi::log.Log0Verbose2() << "Added to raw_boundary_cells.";
       }
       else if (IsElementType2D(elem_type))
       {
         raw_cell = new LightWeightCell(CellType::POLYGON,
                                        CellTypeFromMSHTypeID(elem_type));
-        raw_cells.push_back(raw_cell);
+        raw_cells_.push_back(raw_cell);
         chi::log.Log0Verbose2() << "Added to raw_cells.";
       }
     }
@@ -277,14 +277,14 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
       {
         raw_cell = new LightWeightCell(CellType::POLYGON,
                                        CellTypeFromMSHTypeID(elem_type));
-        raw_boundary_cells.push_back(raw_cell);
+        raw_boundary_cells_.push_back(raw_cell);
         chi::log.Log0Verbose2() << "Added to raw_boundary_cells.";
       }
       else if (IsElementType3D(elem_type))
       {
         raw_cell = new LightWeightCell(CellType::POLYHEDRON,
                                        CellTypeFromMSHTypeID(elem_type));
-        raw_cells.push_back(raw_cell);
+        raw_cells_.push_back(raw_cell);
         chi::log.Log0Verbose2() << "Added to raw_cells.";
       }
     }
@@ -353,13 +353,13 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
   std::set<int>     material_ids_set_as_read;
   std::map<int,int> material_mapping;
 
-  for (auto& cell : raw_cells)
+  for (auto& cell : raw_cells_)
     material_ids_set_as_read.insert(cell->material_id);
 
   std::set<int>     boundary_ids_set_as_read;
   std::map<int,int> boundary_mapping;
 
-  for (auto& cell : raw_boundary_cells)
+  for (auto& cell : raw_boundary_cells_)
     boundary_ids_set_as_read.insert(cell->material_id);
 
   {
@@ -372,24 +372,24 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
       boundary_mapping.insert(std::make_pair(bndry_id,b++));
   }
 
-  for (auto& cell : raw_cells)
+  for (auto& cell : raw_cells_)
     cell->material_id = material_mapping[cell->material_id];
 
-  for (auto& cell : raw_boundary_cells)
+  for (auto& cell : raw_boundary_cells_)
     cell->material_id = boundary_mapping[cell->material_id];
 
   //======================================== Always do this
   chi_mesh::MeshAttributes dimension = DIMENSION_2;
   if (not mesh_is_2D_assumption) dimension = DIMENSION_3;
 
-  attributes = dimension | UNSTRUCTURED;
+  attributes_ = dimension | UNSTRUCTURED;
 
   ComputeCentroidsAndCheckQuality();
   BuildMeshConnectivity();
 
   chi::log.Log() << "Done processing " << options.file_name << ".\n"
-                << "Number of nodes read: " << vertices.size() << "\n"
-                << "Number of cells read: " << raw_cells.size();
+                 << "Number of nodes read: " << vertices_.size() << "\n"
+                 << "Number of cells read: " << raw_cells_.size();
 }
 
 

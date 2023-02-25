@@ -28,7 +28,7 @@ ln -s /Users/USERNAME/local/homebrew/Cellar/gcc/12.2.0/bin/gfortran-12 gfortran
 ln -s /Users/USERNAME/local/homebrew/Cellar/gcc/12.2.0/bin/g++-12 g++
 ```
 
-In your ```.bashrc``` file (or ```.bash_profile```), add these lines
+In your ```.bashrc``` file (or ```.bash_profile```), add these lines_
 ```bash
 export PATH=/Users/jean.ragusa/local/bin/:$PATH
 

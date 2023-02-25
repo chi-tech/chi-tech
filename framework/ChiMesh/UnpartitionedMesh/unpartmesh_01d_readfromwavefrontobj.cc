@@ -74,7 +74,7 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
         //============================= Stop word extraction on line end
         if (end_of_word==std::string::npos) {break;}
       }
-      this->vertices.push_back(newVertex);
+      this->vertices_.push_back(newVertex);
     }
 
     //===================================================== Keyword "f" for face
@@ -130,13 +130,13 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
         cell->faces.push_back(std::move(face));
       }
 
-      this->raw_cells.push_back(cell);
+      this->raw_cells_.push_back(cell);
     }
   }
   file.close();
 
   //======================================== Always do this
-  attributes = DIMENSION_2 | UNSTRUCTURED;
+  attributes_ = DIMENSION_2 | UNSTRUCTURED;
 
   ComputeCentroidsAndCheckQuality();
   BuildMeshConnectivity();

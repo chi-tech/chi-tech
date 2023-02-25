@@ -18,7 +18,7 @@ void chi_mesh::RayTracer::TraceSlab(const Cell &cell,
 
   const double fabs_mu = std::fabs(omega_i.Dot(cell.faces[0].normal));
 
-  double d_extend = (fabs_mu<1.0e-15)? 1.0e15 : extension_distance/fabs_mu;
+  double d_extend = (fabs_mu<1.0e-15)? 1.0e15 : extension_distance_ / fabs_mu;
 
   chi_mesh::Vector3 pos_f_line = pos_i + omega_i * d_extend;
 
@@ -35,7 +35,7 @@ void chi_mesh::RayTracer::TraceSlab(const Cell &cell,
 
     double D = weights.first*d_extend;
 
-    if ( (D > backward_tolerance) and intersects )
+    if ((D > backward_tolerance_) and intersects )
     {
       oi.distance_to_surface = D;
       oi.pos_f = intersection_point;
