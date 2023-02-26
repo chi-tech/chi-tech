@@ -55,7 +55,7 @@ public:
   }
   std::vector<chi_mesh::Vector3> GetNodeLocations() const override
   {
-    return {cell._centroid_};
+    return {cell_.centroid_};
   }
 
   //03 Quadrature

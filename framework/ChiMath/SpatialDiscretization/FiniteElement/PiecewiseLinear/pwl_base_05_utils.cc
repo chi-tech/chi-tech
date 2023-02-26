@@ -91,8 +91,8 @@ chi_math::SpatialDiscretization_PWLBase::
 {
   if (ref_grid_->IsCellLocal(cell.global_id_))
   {
-    if (qp_data_initialized)
-      return fe_vol_qp_data.at(cell.local_id_);
+    if (qp_data_initialized_)
+      return fe_vol_qp_data_.at(cell.local_id_);
     else
     {
       const auto& cell_mapping = GetCellMapping(cell);
@@ -103,7 +103,7 @@ chi_math::SpatialDiscretization_PWLBase::
   else
   {
     if (nb_qp_data_initialized_)
-      return nb_fe_vol_qp_data.at(cell.global_id_);
+      return nb_fe_vol_qp_data_.at(cell.global_id_);
     else
     {
       const auto& cell_mapping = GetCellMapping(cell);

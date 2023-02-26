@@ -20,7 +20,7 @@ chi_math::PolygonMappingFE_PWL::
     surface_quadrature_(surface_quadrature)
 {
   num_of_subtris_ = static_cast<int>(poly_cell.faces_.size());
-  beta = 1.0/num_of_subtris_;
+  beta_ = 1.0/num_of_subtris_;
 
   //=========================================== Get raw vertices
   vc_ = poly_cell.centroid_;
@@ -30,8 +30,8 @@ chi_math::PolygonMappingFE_PWL::
   {
     const chi_mesh::CellFace& face = poly_cell.faces_[side];
 
-    const auto& v0 = grid_ptr_->vertices[face.vertex_ids[0]];
-    const auto& v1 = grid_ptr_->vertices[face.vertex_ids[1]];
+    const auto& v0 = grid_ptr_->vertices[face.vertex_ids_[0]];
+    const auto& v1 = grid_ptr_->vertices[face.vertex_ids_[1]];
     chi_mesh::Vertex v2 = vc_;
 
     chi_mesh::Vector3 sidev01 = v1 - v0;
