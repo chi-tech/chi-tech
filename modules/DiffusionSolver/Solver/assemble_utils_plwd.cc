@@ -28,8 +28,8 @@ double chi_diffusion::Solver::
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
   if (cell.Type() == chi_mesh::CellType::SLAB)
   {
-    const auto& v0 = grid->vertices[cell.vertex_ids[0]];
-    const auto& v1 = grid->vertices[cell.vertex_ids[1]];
+    const auto& v0 = grid_->vertices[cell.vertex_ids[0]];
+    const auto& v1 = grid_->vertices[cell.vertex_ids[1]];
 
     hp = (v1-v0).Norm()/2.0;
   }
@@ -42,8 +42,8 @@ double chi_diffusion::Solver::
     uint64_t v0i = face.vertex_ids[0];
     uint64_t v1i = face.vertex_ids[1];
 
-    const auto& v0 = grid->vertices[v0i];
-    const auto& v1 = grid->vertices[v1i];
+    const auto& v0 = grid_->vertices[v0i];
+    const auto& v1 = grid_->vertices[v1i];
 
     double perimeter = (v1 - v0).Norm();
 

@@ -32,11 +32,12 @@
 class chi_diffusion::Solver : public chi_physics::Solver
 {
 private:
-  chi_objects::ChiTimer t_assembly;
-  chi_objects::ChiTimer t_solve;
+  chi_objects::ChiTimer t_assembly_;
+  chi_objects::ChiTimer t_solve_;
 
-  double time_assembly=0.0, time_solve=0.0;
-  bool verbose_info=true;
+  double time_assembly_ = 0.0;
+  double time_solve_    = 0.0;
+  bool   verbose_info_  = true;
 
 public:
   typedef unsigned int uint;
@@ -44,35 +45,35 @@ public:
   typedef std::map<uint, BoundaryInfo> BoundaryPreferences;
 
 public:
-  BoundaryPreferences                      boundary_preferences;
-  std::vector<chi_diffusion::Boundary*>    boundaries;
-  chi_mesh::MeshContinuumPtr                 grid = nullptr;
+  BoundaryPreferences                      boundary_preferences_;
+  std::vector<chi_diffusion::Boundary*>    boundaries_;
+  chi_mesh::MeshContinuumPtr               grid_ = nullptr;
 
-  std::shared_ptr<chi_math::SpatialDiscretization>   discretization;
+  std::shared_ptr<chi_math::SpatialDiscretization>  discretization_;
 
-  chi_math::UnknownManager                 unknown_manager;
+  chi_math::UnknownManager unknown_manager_;
 
-  int   material_mode      = DIFFUSION_MATERIALS_REGULAR;
+  int  material_mode_ = DIFFUSION_MATERIALS_REGULAR;
 
-  bool common_items_initialized=false;
+  bool common_items_initialized_ = false;
 
-  Vec            x = nullptr;            // approx solution
-  Vec            b = nullptr;            // RHS
-  Mat            A = nullptr;            // linear system matrix
-  KSP            ksp = nullptr;          // linear solver context
-  PC             pc = nullptr;           // preconditioner context
+  Vec            x_ = nullptr;            // approx solution
+  Vec            b_ = nullptr;            // RHS
+  Mat            A_ = nullptr;            // linear system matrix
+  KSP            ksp_ = nullptr;          // linear solver context
+  PC             pc_ = nullptr;           // preconditioner context
 
-  PetscReal      norm = 0.0;         /* norm of solution error */
-  PetscErrorCode ierr = 0;         // General error code
+  PetscReal      norm_ = 0.0;         /* norm of solution error */
+  PetscErrorCode ierr_ = 0;         // General error code
 
-  size_t         local_dof_count = 0;
-  size_t         global_dof_count = 0;
+  size_t         local_dof_count_ = 0;
+  size_t         global_dof_count_ = 0;
 
-  std::vector<double>            pwld_phi_local;
+  std::vector<double> pwld_phi_local_;
 
-  int    gi = 0;
-  int    G = 1;
-  std::string options_string;
+  int    gi_ = 0;
+  int    G_ = 1;
+  std::string options_string_;
 
 public:
   //00
@@ -81,6 +82,7 @@ public:
 
   explicit Solver(const std::string& in_solver_name);
   virtual ~Solver();
+
   //01 General
   void GetMaterialProperties(const chi_mesh::Cell& cell,
                              int cell_dofs,
@@ -97,36 +99,33 @@ public:
   int Initialize(bool verbose);
 
   //02a
-  void Execute() override
-  { ExecuteS(); }
+  void Execute() override { ExecuteS(); }
   int ExecuteS(bool suppress_assembly = false, bool suppress_solve = false);
 
   void CFEM_Assemble_A_and_b(chi_mesh::Cell& cell, int group=0);
 
   //02c_c
-  void PWLD_Assemble_A_and_b(const chi_mesh::Cell& cell,
-                             int component=0);
-  void PWLD_Assemble_b(const chi_mesh::Cell& cell,
-                       int component=0);
+  void PWLD_Assemble_A_and_b(const chi_mesh::Cell& cell, int component = 0);
+  void PWLD_Assemble_b(const chi_mesh::Cell& cell, int component = 0);
 
   //02e_c
 //  void PWLD_Assemble_A_and_b_GAGG(const chi_mesh::Cell& cell);
 //  void PWLD_Assemble_b_GAGG(const chi_mesh::Cell& cell);
 
-
   //03b
-  double HPerpendicular(const chi_mesh::Cell& cell,
-                        const chi_math::finite_element::UnitIntegralData& fe_intgrl_values,
-                        unsigned int f);
+  double HPerpendicular(
+      const chi_mesh::Cell& cell,
+      const chi_math::finite_element::UnitIntegralData& fe_intgrl_values,
+      unsigned int f);
 
-  static
-  uint64_t MapCellLocalNodeIDFromGlobalID(const chi_mesh::Cell& cell,
-                                          uint64_t node_global_id);
+  static uint64_t
+  MapCellLocalNodeIDFromGlobalID(const chi_mesh::Cell& cell,
+                                 uint64_t node_global_id);
 
-  static
-  unsigned int MapCellFace(const chi_mesh::Cell& cur_cell,
-                           const chi_mesh::Cell& adj_cell,
-                           unsigned int f);
+  static unsigned int
+  MapCellFace(const chi_mesh::Cell& cur_cell,
+              const chi_mesh::Cell& adj_cell,
+              unsigned int f);
 
   void UpdateFieldFunctions();
 };

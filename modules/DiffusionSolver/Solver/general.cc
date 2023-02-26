@@ -55,7 +55,7 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
   sigmaa.resize(cell_dofs,0.0);
 
   //####################################################### REGULAR MATERIAL
-  if (material_mode == DIFFUSION_MATERIALS_REGULAR)
+  if (material_mode_ == DIFFUSION_MATERIALS_REGULAR)
   {
     //We absolutely need the diffusion coefficient so process error
     if ((property_map_D < 0) || (property_map_D >= material->properties.size()))
@@ -120,7 +120,7 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
   //####################################################### TRANSPORT XS D
   //                                                        TRANSPORT XS SIGA
   //                                                        SCALAR       Q
-  else if (material_mode == DIFFUSION_MATERIALS_FROM_TRANSPORTXS_TTR)
+  else if (material_mode_ == DIFFUSION_MATERIALS_FROM_TRANSPORTXS_TTR)
   {
     //====================================== Setting D and Sigma_a
     bool transportxs_found = false;
@@ -189,10 +189,10 @@ void chi_diffusion::Solver::UpdateFieldFunctions()
 {
   chi::log.LogAll() << "Updating field functions" << std::endl;
   auto& ff = *field_functions_.front();
-  const auto& OneDofPerNode = discretization->UNITARY_UNKNOWN_MANAGER;
+  const auto& OneDofPerNode = discretization_->UNITARY_UNKNOWN_MANAGER;
 
   std::vector<double> data_vector;
-  discretization->LocalizePETScVector(x, data_vector, OneDofPerNode);
+  discretization_->LocalizePETScVector(x_, data_vector, OneDofPerNode);
 
   ff.UpdateFieldVector(data_vector);
 }

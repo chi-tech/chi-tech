@@ -23,13 +23,13 @@ void chi_diffusion::Solver::InitializeCommonItems()
 //  auto& region = regions.back();
 //  grid = region->GetGrid();
 
-  grid = chi_mesh::GetCurrentHandler().GetGrid();
+  grid_ = chi_mesh::GetCurrentHandler().GetGrid();
 
-  if (grid == nullptr)
+  if (grid_ == nullptr)
     throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
                            " No grid defined.");
 
-  auto globl_unique_bndry_ids = grid->GetDomainUniqueBoundaryIDs();
+  auto globl_unique_bndry_ids = grid_->GetDomainUniqueBoundaryIDs();
 
   uint64_t max_boundary_id = 0;
   for (const auto& id : globl_unique_bndry_ids)
@@ -39,15 +39,15 @@ void chi_diffusion::Solver::InitializeCommonItems()
 
   for (int bndry=0; bndry<(max_boundary_id+1); bndry++)
   {
-    if (boundary_preferences.find(bndry) != boundary_preferences.end())
+    if (boundary_preferences_.find(bndry) != boundary_preferences_.end())
     {
-      BoundaryInfo bndry_info = boundary_preferences.at(bndry);
+      BoundaryInfo bndry_info = boundary_preferences_.at(bndry);
       auto& bndry_vals = bndry_info.second;
       switch (bndry_info.first)
       {
         case BoundaryType::Reflecting:
         {
-          boundaries.push_back(
+          boundaries_.push_back(
             new chi_diffusion::BoundaryReflecting);
           chi::log.Log() << "Boundary " << bndry << " set to reflecting.";
           break;
@@ -55,7 +55,7 @@ void chi_diffusion::Solver::InitializeCommonItems()
         case BoundaryType::Dirichlet:
         {
           if (bndry_vals.empty()) bndry_vals.resize(1,0.0);
-          boundaries.push_back(
+          boundaries_.push_back(
             new chi_diffusion::BoundaryDirichlet(bndry_vals[0]));
           chi::log.Log() << "Boundary " << bndry << " set to dirichlet.";
           break;
@@ -63,7 +63,7 @@ void chi_diffusion::Solver::InitializeCommonItems()
         case BoundaryType::Robin:
         {
           if (bndry_vals.size()<3) bndry_vals.resize(3,0.0);
-          boundaries.push_back(
+          boundaries_.push_back(
             new chi_diffusion::BoundaryRobin(bndry_vals[0],
                                              bndry_vals[1],
                                              bndry_vals[2]));
@@ -72,14 +72,14 @@ void chi_diffusion::Solver::InitializeCommonItems()
         }
         case BoundaryType::Vacuum:
         {
-          boundaries.push_back(new chi_diffusion::BoundaryRobin(0.25,0.5,0.0));
+          boundaries_.push_back(new chi_diffusion::BoundaryRobin(0.25, 0.5, 0.0));
           chi::log.Log() << "Boundary " << bndry << " set to vacuum.";
           break;
         }
         case BoundaryType::Neumann:
         {
           if (bndry_vals.size()<3) bndry_vals.resize(3,0.0);
-          boundaries.push_back(
+          boundaries_.push_back(
             new chi_diffusion::BoundaryRobin(bndry_vals[0],
                                              bndry_vals[1],
                                              bndry_vals[2]));
@@ -90,14 +90,14 @@ void chi_diffusion::Solver::InitializeCommonItems()
     }
     else
     {
-      boundaries.push_back(new chi_diffusion::BoundaryDirichlet);
+      boundaries_.push_back(new chi_diffusion::BoundaryDirichlet);
       chi::log.Log0Verbose1()
         << "No boundary preference found for boundary index " << bndry
         << "Dirichlet boundary added with zero boundary value.";
     }
   }//for bndry
 
-  common_items_initialized = true;
+  common_items_initialized_ = true;
 }
 
 

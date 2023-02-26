@@ -20,10 +20,10 @@ namespace chi_diffusion
 class chi_diffusion::Boundary
 {
 public:
-  BoundaryType type;
+  BoundaryType type_;
 
   explicit
-  Boundary(BoundaryType in_bndry_type) : type(in_bndry_type) {}
+  Boundary(BoundaryType in_bndry_type) : type_(in_bndry_type) {}
 };
 
 //###################################################################
