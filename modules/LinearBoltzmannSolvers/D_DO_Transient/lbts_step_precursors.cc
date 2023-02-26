@@ -22,12 +22,12 @@ void lbs::DiscOrdTransientSolver::StepPrecursors()
   // precursor_new_local(theta-flavor)
   for (auto& cell : grid_ptr_->local_cells)
   {
-    const auto& fe_values = unit_cell_matrices_[cell.local_id];
-    const auto& transport_view = cell_transport_views_[cell.local_id];
+    const auto& fe_values = unit_cell_matrices_[cell.local_id_];
+    const auto& transport_view = cell_transport_views_[cell.local_id_];
     const double cell_volume = transport_view.Volume();
 
     //==================== Obtain xs
-    const auto& xs = matid_to_xs_map_.at(cell.material_id);
+    const auto& xs = matid_to_xs_map_.at(cell.material_id_);
 
     //======================================== Compute delayed fission rate
     double delayed_fission = 0.0;
@@ -46,7 +46,7 @@ void lbs::DiscOrdTransientSolver::StepPrecursors()
     const auto& max_precursors = max_precursors_per_material_;
     for (unsigned int j = 0; j < xs->num_precursors_; ++j)
     {
-      const size_t dof_map = cell.local_id * max_precursors + j;
+      const size_t dof_map = cell.local_id_ * max_precursors + j;
       const auto& precursor = xs->precursors_[j];
       const double coeff = 1.0 / (1.0 + eff_dt * precursor.decay_constant);
 

@@ -14,8 +14,8 @@ double LBSSolver::ComputeFissionProduction(const std::vector<double>& phi)
   double local_production = 0.0;
   for (auto& cell : grid_ptr_->local_cells)
   {
-    const auto& transport_view = cell_transport_views_[cell.local_id];
-    const auto& cell_matrices = unit_cell_matrices_[cell.local_id];
+    const auto& transport_view = cell_transport_views_[cell.local_id_];
+    const auto& cell_matrices = unit_cell_matrices_[cell.local_id_];
 
     //====================================== Obtain xs
     const auto& xs = transport_view.XS();
@@ -78,8 +78,8 @@ double LBSSolver::ComputeFissionRate(const bool previous)
   double local_fission_rate = 0.0;
   for (auto& cell : grid_ptr_->local_cells)
   {
-    const auto& transport_view = cell_transport_views_[cell.local_id];
-    const auto& cell_matrices = unit_cell_matrices_[cell.local_id];
+    const auto& transport_view = cell_transport_views_[cell.local_id_];
+    const auto& cell_matrices = unit_cell_matrices_[cell.local_id_];
 
     //====================================== Obtain xs
     const auto& xs = transport_view.XS();

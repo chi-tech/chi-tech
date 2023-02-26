@@ -26,9 +26,9 @@ void lbs::DiscOrdSteadyStateSolver::
   int index = -1;
   for (const auto& cell : grid_ptr_->local_cells)
   {
-    auto& transport_view = cell_transport_views_[cell.local_id];
+    auto& transport_view = cell_transport_views_[cell.local_id_];
 
-    for (int i=0; i < cell.vertex_ids.size(); i++)
+    for (int i=0; i < cell.vertex_ids_.size(); i++)
     {
       for (int m=0; m < num_moments_; m++)
       {
@@ -80,9 +80,9 @@ void lbs::DiscOrdSteadyStateSolver::
   int index = -1;
   for (const auto& cell : grid_ptr_->local_cells)
   {
-    auto& transport_view = cell_transport_views_[cell.local_id];
+    auto& transport_view = cell_transport_views_[cell.local_id_];
 
-    for (int i=0; i < cell.vertex_ids.size(); i++)
+    for (int i=0; i < cell.vertex_ids_.size(); i++)
     {
       for (int m=0; m < num_moments_; m++)
       {
@@ -138,9 +138,9 @@ void lbs::DiscOrdSteadyStateSolver::
 
   for (const auto& cell : grid_ptr_->local_cells)
   {
-    auto& transport_view = cell_transport_views_[cell.local_id];
+    auto& transport_view = cell_transport_views_[cell.local_id_];
 
-    for (int i=0; i < cell.vertex_ids.size(); i++)
+    for (int i=0; i < cell.vertex_ids_.size(); i++)
     {
       for (int m=0; m < num_moments_; m++)
       {

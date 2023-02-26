@@ -45,8 +45,8 @@ void lbs::DiscOrdSteadyStateAdjointSolver::Initialize()
     auto& qoi_cell_subscription = qoi_pair.second;
 
     for (const auto& cell : grid_ptr_->local_cells)
-      if (qoi_designation.logical_volume->Inside(cell.centroid))
-        qoi_cell_subscription.push_back(cell.local_id);
+      if (qoi_designation.logical_volume->Inside(cell.centroid_))
+        qoi_cell_subscription.push_back(cell.local_id_);
 
     size_t num_local_subs = qoi_cell_subscription.size();
     size_t num_globl_subs = 0;

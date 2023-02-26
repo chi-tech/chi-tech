@@ -1,13 +1,12 @@
 #include "FLUDS.h"
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
+#include "ChiMesh/MeshContinuum/chi_grid_face_histogram.h"
 
 #include <ChiMesh/Cell/cell.h>
 
 typedef std::vector<std::pair<int,short>> LockBox;
 
-#include <chi_log.h>
-
-;
+#include "chi_log.h"
 
 //###################################################################
 /**Performs slot dynamics for Polyhedron cell.*/
@@ -28,11 +27,11 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
   //           INCIDENT                                 but process
   //                                                    only incident faces
   std::vector<short> inco_face_face_category;
-  inco_face_face_category.reserve(cell.faces.size());
-  for (int f=0; f < cell.faces.size(); f++)
+  inco_face_face_category.reserve(cell.faces_.size());
+  for (int f=0; f < cell.faces_.size(); f++)
   {
-    const CellFace& face = cell.faces[f];
-    double     mu        = spds.omega.Dot(face.normal);
+    const CellFace& face = cell.faces_[f];
+    double     mu        = spds.omega.Dot(face.normal_);
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face
     if (mu<(0.0-1.0e-16))
@@ -42,8 +41,8 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
       //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ LOCAL CELL DEPENDENCE
       if (face.IsNeighborLocal(*grid))
       {
-        size_t num_face_dofs = face.vertex_ids.size();
-        size_t face_categ = grid->MapFaceHistogramBins(num_face_dofs);
+        size_t num_face_dofs = face.vertex_ids_.size();
+        size_t face_categ = grid_face_histogram_.MapFaceHistogramBins(num_face_dofs);
 
         inco_face_face_category.push_back(face_categ);
 
@@ -56,7 +55,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
         {
           int a = cyclic_dependency.first;
           int b = cyclic_dependency.second;
-          int c = cell.local_id;
+          int c = cell.local_id_;
           int d = face.GetNeighborLocalID(*grid);
 
           if ((a == c) && (b == d) )
@@ -83,7 +82,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
         bool found = false;
         for (auto& lock_box_slot : lock_box)
         {
-          if ((lock_box_slot.first == face.neighbor_id) &&
+          if ((lock_box_slot.first == face.neighbor_id_) &&
               (lock_box_slot.second== ass_face))
           {
             lock_box_slot.first = -1;
@@ -97,7 +96,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           chi::log.LogAllError()
             << "Lock-box location not found in call to "
             << "InitializeAlphaElements. Local Cell "
-            << cell.local_id
+            << cell.local_id_
             << " face " << f
             << " looking for cell "
             << face.GetNeighborLocalID(*grid)
@@ -110,9 +109,9 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
 
       }//if local
       //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ BOUNDARY DEPENDENCE
-      else if (not face.has_neighbor)
+      else if (not face.has_neighbor_)
       {
-        const chi_mesh::Vector3& face_norm = face.normal;
+        const chi_mesh::Vector3& face_norm = face.normal_;
 
         if (face_norm.Dot(ihat)>0.999)
           location_boundary_dependency_set.insert(0);
@@ -143,20 +142,20 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
   //                                                    only outgoing faces
   std::vector<int>                outb_face_slot_indices;
   std::vector<short>              outb_face_face_category;
-  outb_face_slot_indices.reserve(cell.faces.size());
-  outb_face_face_category.reserve(cell.faces.size());
-  for (int f=0; f < cell.faces.size(); f++)
+  outb_face_slot_indices.reserve(cell.faces_.size());
+  outb_face_face_category.reserve(cell.faces_.size());
+  for (int f=0; f < cell.faces_.size(); f++)
   {
-    const CellFace&  face   = cell.faces[f];
-    double     mu           = spds.omega.Dot(face.normal);
+    const CellFace&  face   = cell.faces_[f];
+    double     mu           = spds.omega.Dot(face.normal_);
 //    int        neighbor     = face.neighbor_id;
-    int        cell_g_index = cell.global_id;
+    int        cell_g_index = cell.global_id_;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Outgoing face
     if (mu>=(0.0+1.0e-16))
     {
-      size_t num_face_dofs = face.vertex_ids.size();
-      size_t face_categ = grid->MapFaceHistogramBins(num_face_dofs);
+      size_t num_face_dofs = face.vertex_ids_.size();
+      size_t face_categ = grid_face_histogram_.MapFaceHistogramBins(num_face_dofs);
 
       outb_face_face_category.push_back(face_categ);
 
@@ -170,7 +169,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
         {
           int a = cyclic_dependency.first;
           int b = cyclic_dependency.second;
-          int c = cell.local_id;
+          int c = cell.local_id_;
           int d = face.GetNeighborLocalID(*grid);
 
           if ((a == c) && (b == d) )
@@ -220,13 +219,13 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
       }
 
       //========================================== Non-local outgoing
-      if (face.has_neighbor and (not face.IsNeighborLocal(*grid)))
+      if (face.has_neighbor_ and (not face.IsNeighborLocal(*grid)))
       {
         int locJ         = face.GetNeighborPartitionID(*grid);
         int deplocI      = spds.MapLocJToDeplocI(locJ);
         int face_slot    = deplocI_face_dof_count[deplocI];
 
-        deplocI_face_dof_count[deplocI]+= face.vertex_ids.size();
+        deplocI_face_dof_count[deplocI]+= face.vertex_ids_.size();
 
         nonlocal_outb_face_deplocI_slot.emplace_back(deplocI,face_slot);
 
@@ -270,7 +269,7 @@ AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
     if (cell_view.first == cell_g_index)
     {
       cell_already_there = true;
-      cell_view.second.emplace_back(face_slot, face.vertex_ids);
+      cell_view.second.emplace_back(face_slot, face.vertex_ids_);
       break;
     }
   }
@@ -281,7 +280,7 @@ AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
     CompactCellView new_cell_view;
     new_cell_view.first = cell_g_index;
     new_cell_view.second.
-      emplace_back(face_slot, face.vertex_ids);
+      emplace_back(face_slot, face.vertex_ids_);
 
     deplocI_cell_views[deplocI].push_back(new_cell_view);
   }

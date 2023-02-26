@@ -29,7 +29,7 @@ void lbs::acceleration::DiffusionMIPSolver::
   if (options.verbose)
     chi::log.Log() << chi::program_timer.GetTimeString() << " Starting assembly";
 
-  lua_State* L = chi::console.consoleState;
+  lua_State* L = chi::console.GetConsoleState();
   const auto& source_function = options.source_lua_function;
   const auto& solution_function = options.ref_solution_lua_function;
 
@@ -37,13 +37,13 @@ void lbs::acceleration::DiffusionMIPSolver::
 
   for (const auto& cell : grid_.local_cells)
   {
-    const size_t num_faces    = cell.faces.size();
+    const size_t num_faces    = cell.faces_.size();
     const auto&  cell_mapping = sdm_.GetCellMapping(cell);
     const size_t num_nodes    = cell_mapping.NumNodes();
     const auto   qp_data      = cell_mapping.MakeVolumeQuadraturePointData();
     const size_t num_groups   = uk_man_.unknowns.front().num_components;
 
-    const auto& xs = mat_id_2_xs_map_.at(cell.material_id);
+    const auto& xs = mat_id_2_xs_map_.at(cell.material_id_);
 
     //=========================================== For component/group
     for (size_t g=0; g<num_groups; ++g)
@@ -86,18 +86,18 @@ void lbs::acceleration::DiffusionMIPSolver::
       //==================================== Assemble face terms
       for (size_t f=0; f<num_faces; ++f)
       {
-        const auto&  face           = cell.faces[f];
-        const auto&  n_f            = face.normal;
+        const auto&  face           = cell.faces_[f];
+        const auto&  n_f            = face.normal_;
         const size_t num_face_nodes = cell_mapping.NumFaceNodes(f);
         const auto   fqp_data   = cell_mapping.MakeFaceQuadraturePointData(f);
 
         const double hm = HPerpendicular(cell, f);
 
-        if (not face.has_neighbor)
+        if (not face.has_neighbor_)
         {
           auto bc = DefaultBCDirichlet;
-          if (bcs_.count(face.neighbor_id) > 0)
-            bc = bcs_.at(face.neighbor_id);
+          if (bcs_.count(face.neighbor_id_) > 0)
+            bc = bcs_.at(face.neighbor_id_);
 
           if (bc.type == BCType::DIRICHLET)
           {

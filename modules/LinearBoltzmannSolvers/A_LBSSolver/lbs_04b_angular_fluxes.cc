@@ -88,7 +88,7 @@ void lbs::LBSSolver::
           uint64_t dof_map = sdm->MapDOFLocal(cell,i,dof_handler,n,g);
           double value = psi_new_local_[groupset.id_][dof_map];
 
-          file.write((char*)&cell.global_id,sizeof(size_t));
+          file.write((char*)&cell.global_id_, sizeof(size_t));
           file.write((char*)&i             ,sizeof(unsigned int));
           file.write((char*)&n             ,sizeof(unsigned int));
           file.write((char*)&g             ,sizeof(unsigned int));

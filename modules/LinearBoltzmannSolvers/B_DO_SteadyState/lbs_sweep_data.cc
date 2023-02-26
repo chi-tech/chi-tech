@@ -13,7 +13,7 @@
 #define IsParallel chi::mpi.process_count>1
 
 #define IsPartitionTypeParmetis \
-mesher->options.partition_type == chi_mesh::VolumeMesher::PartitionType::PARMETIS
+mesher.options.partition_type == chi_mesh::VolumeMesher::PartitionType::PARMETIS
 
 namespace lbs
 {
@@ -27,7 +27,7 @@ void DiscOrdSteadyStateSolver::InitializeSweepDataStructures()
   //=================================== Perform checks
   {
     auto& mesh_handler = chi_mesh::GetCurrentHandler();
-    auto mesher = mesh_handler.volume_mesher;
+    auto& mesher = mesh_handler.GetVolumeMesher();
 
     for (const auto& groupset : groupsets_)
     {
@@ -84,7 +84,8 @@ void DiscOrdSteadyStateSolver::InitializeSweepDataStructures()
   {
     for (const auto& spds : spds_list)
       quadrature_fluds_templates_map_[quadrature].push_back(
-        std::make_shared<FLUDSTemplate>(1, grid_nodal_mappings_, *spds)
+        std::make_shared<FLUDSTemplate>(1, grid_nodal_mappings_, *spds,
+                                        *grid_face_histogram_)
         );
   }//for quadrature spds-list pair
 }

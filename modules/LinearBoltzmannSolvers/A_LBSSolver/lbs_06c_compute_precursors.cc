@@ -14,8 +14,8 @@ void lbs::LBSSolver::ComputePrecursors()
   //================================================== Loop over cells
   for (const auto& cell : grid_ptr_->local_cells)
   {
-    const auto& fe_values = unit_cell_matrices_[cell.local_id];
-    const auto& transport_view = cell_transport_views_[cell.local_id];
+    const auto& fe_values = unit_cell_matrices_[cell.local_id_];
+    const auto& transport_view = cell_transport_views_[cell.local_id_];
     const double cell_volume = transport_view.Volume();
 
     //==================== Obtain xs
@@ -25,7 +25,7 @@ void lbs::LBSSolver::ComputePrecursors()
     //======================================== Loop over precursors
     for (unsigned int j = 0; j < xs.num_precursors_; ++j)
     {
-      size_t dof = cell.local_id * J + j;
+      size_t dof = cell.local_id_ * J + j;
       const auto& precursor = xs.precursors_[j];
       const double coeff = precursor.fractional_yield /
                            precursor.decay_constant;

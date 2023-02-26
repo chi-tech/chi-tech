@@ -129,11 +129,11 @@ void lbs::SweepChunkPWLTransientTheta::
   {
     const int cell_local_id = spds.spls.item_id[spls_index];
     const auto& cell = grid_view->local_cells[cell_local_id];
-    const auto num_faces = cell.faces.size();
+    const auto num_faces = cell.faces_.size();
     const auto& cell_mapping = grid_fe_view.GetCellMapping(cell);
     const auto& fe_intgrl_values = unit_cell_matrices_[cell_local_id];
     const int num_nodes = static_cast<int>(cell_mapping.NumNodes());
-    auto& transport_view = grid_transport_view[cell.local_id];
+    auto& transport_view = grid_transport_view[cell.local_id_];
     const auto& sigma_tg = transport_view.XS().sigma_t_;
     std::vector<bool> face_incident_flags(num_faces, false);
     std::vector<double> face_mu_values(num_faces, 0.0);
@@ -178,7 +178,7 @@ void lbs::SweepChunkPWLTransientTheta::
         /*preloc_face_counter*/0,
         /*out_face_counter*/0,
         /*deploc_face_counter*/0,
-        /*bndry_id*/0, angle_num, cell.local_id,
+        /*bndry_id*/0, angle_num, cell.local_id_,
         /*f*/0,gs_gi, gs_ss_begin,
                       surface_source_active};
 
@@ -186,16 +186,16 @@ void lbs::SweepChunkPWLTransientTheta::
       int in_face_counter = -1;
       for (int f = 0; f < num_faces; ++f)
       {
-        const auto& face = cell.faces[f];
-        const double mu = omega.Dot(face.normal);
+        const auto& face = cell.faces_[f];
+        const double mu = omega.Dot(face.normal_);
         face_mu_values[f] = mu;
 
         if (mu >= 0.0) continue;
 
         face_incident_flags[f] = true;
         const bool local = transport_view.IsFaceLocal(f);
-        const bool boundary = not face.has_neighbor;
-        const uint64_t bndry_id = face.neighbor_id;
+        const bool boundary = not face.has_neighbor_;
+        const uint64_t bndry_id = face.neighbor_id_;
 
         if (local)             ++in_face_counter;
         else if (not boundary) ++preloc_face_counter;
@@ -205,7 +205,7 @@ void lbs::SweepChunkPWLTransientTheta::
         upwind.bndry_id = bndry_id;
         upwind.f = f;
 
-        const size_t num_face_indices = face.vertex_ids.size();
+        const size_t num_face_indices = face.vertex_ids_.size();
         for (int fi = 0; fi < num_face_indices; ++fi)
         {
           const int i = cell_mapping.MapFaceNode(f,fi);
@@ -300,12 +300,12 @@ void lbs::SweepChunkPWLTransientTheta::
 
         // ============================= Set flags and counters
         out_face_counter++;
-        const auto& face = cell.faces[f];
+        const auto& face = cell.faces_[f];
         const bool local = transport_view.IsFaceLocal(f);
-        const bool boundary = not face.has_neighbor;
-        const size_t num_face_indices = face.vertex_ids.size();
+        const bool boundary = not face.has_neighbor_;
+        const size_t num_face_indices = face.vertex_ids_.size();
         const std::vector<double>& IntF_shapeI = IntS_shapeI[f];
-        const uint64_t bndry_id = face.neighbor_id;
+        const uint64_t bndry_id = face.neighbor_id_;
 
         bool reflecting_bndry = false;
         if (boundary)

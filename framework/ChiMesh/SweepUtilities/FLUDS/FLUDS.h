@@ -4,6 +4,11 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 #include "ChiMesh/Cell/cell.h"
 
+namespace chi_mesh
+{
+  class GridFaceHistogram;
+}
+
 #include <iostream>
 
 //face_slot index, vertex ids
@@ -132,6 +137,7 @@ class chi_mesh::sweep_management::PRIMARY_FLUDS :
 //  std::vector<int>    delayed_prelocI_face_dof_count;
 protected:
   const SPDS& spds_;
+  const GridFaceHistogram& grid_face_histogram_;
 
 private:
   int largest_face=0;
@@ -240,7 +246,8 @@ private:
 public:
   PRIMARY_FLUDS(size_t in_G,
                 std::vector<CellFaceNodalMapping>& in_grid_nodal_mappings,
-                const SPDS& spds);
+                const SPDS& spds,
+                const chi_mesh::GridFaceHistogram& grid_face_histogram);
 
 public:
   /**Passes pointers from sweep buffers to FLUDS so

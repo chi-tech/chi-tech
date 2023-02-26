@@ -28,7 +28,7 @@ void lbs::LBSSolver::InitializePointSources()
       if (grid_ptr_->CheckPointInsideCell(cell, p))
       {
         const auto& cell_view = discretization_->GetCellMapping(cell);
-        const auto& cell_matrices = unit_cell_matrices_[cell.local_id];
+        const auto& cell_matrices = unit_cell_matrices_[cell.local_id_];
         const auto& M = cell_matrices.M_matrix;
         const auto& I = cell_matrices.Vi_vectors;
 
@@ -46,7 +46,7 @@ void lbs::LBSSolver::InitializePointSources()
 
         temp_list.push_back(
           PointSource::ContainingCellInfo{v_cell,
-                                          cell.local_id,
+                                          cell.local_id_,
                                           shape_values,
                                           q_p_weights});
       }//if inside
@@ -59,7 +59,7 @@ void lbs::LBSSolver::InitializePointSources()
       if (grid_ptr_->CheckPointInsideCell(neighbor_cell, p))
       {
         const auto& cell_matrices =
-          unit_ghost_cell_matrices_[neighbor_cell.global_id];
+          unit_ghost_cell_matrices_[neighbor_cell.global_id_];
         for (double val : cell_matrices.Vi_vectors)
           v_total += val;
       }//if point inside
@@ -77,7 +77,7 @@ void lbs::LBSSolver::InitializePointSources()
       {
         std::stringstream output;
         output << "Point source at " << p.PrintStr() << " assigned to cell "
-               << cell.global_id << " with shape values ";
+               << cell.global_id_ << " with shape values ";
         for (double val : info.shape_values) output << val << " ";
         output << "volume_weight=" << info.volume_weight/v_total;
 

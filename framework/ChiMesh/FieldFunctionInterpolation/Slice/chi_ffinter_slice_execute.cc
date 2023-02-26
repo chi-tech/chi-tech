@@ -10,17 +10,17 @@
 /**Executes the slice interpolation.*/
 void chi_mesh::FieldFunctionInterpolationSlice::Execute()
 {
-  const auto& ref_ff = *field_functions.front();
+  const auto& ref_ff = *field_functions_.front();
   const auto& sdm    = ref_ff.SDM();
   const auto& grid   = *sdm.ref_grid;
 
   const auto& uk_man = ref_ff.UnkManager();
   const auto uid = 0;
-  const auto cid = m_ref_component;
+  const auto cid = ref_component_;
 
   const auto field_data = ref_ff.GetGhostedFieldVector();
 
-  for (auto& cell_intersection : cell_intersections)
+  for (auto& cell_intersection : cell_intersections_)
   {
     const auto& cell = grid.local_cells[cell_intersection.ref_cell_local_id];
     const auto& cell_mapping = sdm.GetCellMapping(cell);

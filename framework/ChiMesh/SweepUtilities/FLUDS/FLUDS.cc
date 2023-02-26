@@ -14,8 +14,10 @@
 chi_mesh::sweep_management::PRIMARY_FLUDS::
   PRIMARY_FLUDS(size_t in_G,
                 std::vector<CellFaceNodalMapping>& in_grid_nodal_mappings,
-                const SPDS& spds) :
+                const SPDS& spds,
+                const chi_mesh::GridFaceHistogram& grid_face_histogram) :
   spds_(spds),
+  grid_face_histogram_(grid_face_histogram),
   G(in_G),
   grid_nodal_mappings(in_grid_nodal_mappings)
 {

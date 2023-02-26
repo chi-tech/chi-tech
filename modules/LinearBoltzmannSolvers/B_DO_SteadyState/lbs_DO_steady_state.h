@@ -10,6 +10,8 @@ namespace lbs
 class DiscOrdSteadyStateSolver : public LBSSolver
 {
 protected:
+  typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
+protected:
   typedef std::shared_ptr<chi_math::AngularQuadrature> AngQuadPtr;
   typedef std::shared_ptr<chi_mesh::sweep_management::SPDS> SPDS_ptr;
   typedef std::vector<SPDS_ptr> SPDS_ptrs;

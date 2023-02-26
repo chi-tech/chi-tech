@@ -24,21 +24,29 @@ namespace chi_mesh
 class FieldFunctionInterpolationLine :
   public FieldFunctionInterpolation
 {
-public:
-  int                number_of_points = 2;
-  chi_mesh::Vector3  pi, pf;
+protected:
+  int                number_of_points_ = 2;
+  chi_mesh::Vector3  pi_, pf_;
 
-  std::vector<std::vector<double>>   custom_arrays;
-  std::vector<chi_mesh::Vector3>     interpolation_points;
-  std::vector<FieldFunctionContext>  ff_contexts;
+  std::vector<std::vector<double>>   custom_arrays_;
+  std::vector<chi_mesh::Vector3>     interpolation_points_;
+  std::vector<FieldFunctionContext>  ff_contexts_;
 
-private:
-  double                         delta_d = 1.0;
+  double                         delta_d_ = 1.0;
 
 public:
   FieldFunctionInterpolationLine() :
     FieldFunctionInterpolation(ff_interpolation::Type::LINE)
   {  }
+
+  int& GetNumberOfPoints() {return number_of_points_;}
+  chi_mesh::Vector3& GetInitialPoint() {return pi_;}
+  chi_mesh::Vector3& GetFinalPoint() {return pf_;}
+  std::vector<std::vector<double>>& GetCustomArrays() {return custom_arrays_;}
+  std::vector<chi_mesh::Vector3>& GetInterpolationPoints()
+  {return interpolation_points_;}
+  std::vector<FieldFunctionContext>& GetFFContexts()
+  {return ff_contexts_;}
   //01
   void Initialize() override;
 

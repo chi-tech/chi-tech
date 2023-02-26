@@ -68,16 +68,16 @@ void mg_diffusion::Solver::Initialize()
   int invalid_mat_cell_count = 0;
   for (auto& cell : grid.local_cells)
   {
-    unique_material_ids.insert(cell.material_id);
-    if (cell.material_id<0)
+    unique_material_ids.insert(cell.material_id_);
+    if (cell.material_id_ < 0)
       ++invalid_mat_cell_count;
   }
   const auto& ghost_cell_ids = grid.cells.GetGhostGlobalIDs();
   for (uint64_t cell_id : ghost_cell_ids)
   {
     const auto& cell = grid.cells[cell_id];
-    unique_material_ids.insert(cell.material_id);
-    if (cell.material_id<0)
+    unique_material_ids.insert(cell.material_id_);
+    if (cell.material_id_ < 0)
       ++invalid_mat_cell_count;
   }
 

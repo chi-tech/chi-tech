@@ -108,7 +108,7 @@ void lbs::LBSSolver::
   //                                              each cell
   for (const auto& cell : grid_ptr_->local_cells)
   {
-    uint64_t cell_global_id = static_cast<uint64_t>(cell.global_id);
+    uint64_t cell_global_id = static_cast<uint64_t>(cell.global_id_);
     file.write((char *) &cell_global_id, sizeof(uint64_t));
 
     uint64_t num_nodes = discretization_->GetCellNumNodes(cell);
@@ -129,7 +129,7 @@ void lbs::LBSSolver::
       for (unsigned int m=0; m<num_moments_t; ++m)
         for (unsigned int g=0; g < num_groups_; ++g)
         {
-          uint64_t cell_global_id = cell.global_id;
+          uint64_t cell_global_id = cell.global_id_;
           uint64_t dof_map = sdm->MapDOFLocal(cell, i, flux_moments_uk_man_, m, g);
 
           assert(dof_map < flux_moments.size());

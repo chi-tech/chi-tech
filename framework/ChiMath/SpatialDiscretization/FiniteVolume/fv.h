@@ -77,7 +77,7 @@ public:
   std::vector<chi_mesh::Vector3>
     GetCellNodeLocations(const chi_mesh::Cell& cell) const override
   {
-    std::vector<chi_mesh::Vector3> node_locations(1,cell.centroid);
+    std::vector<chi_mesh::Vector3> node_locations(1,cell.centroid_);
 
     return node_locations;
   }

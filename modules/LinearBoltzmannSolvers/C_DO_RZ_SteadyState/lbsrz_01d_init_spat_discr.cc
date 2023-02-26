@@ -139,7 +139,7 @@ void lbs_curvilinear::DiscOrdSteadyStateSolver::ComputeSecondaryUnitIntegrals()
   secondary_unit_cell_matrices_.resize(num_local_cells);
 
   for (const auto& cell : grid_ptr_->local_cells)
-    secondary_unit_cell_matrices_[cell.local_id] =
+    secondary_unit_cell_matrices_[cell.local_id_] =
       ComputeCellUnitIntegrals(cell,*swf_ptr);
 
   MPI_Barrier(MPI_COMM_WORLD);

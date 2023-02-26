@@ -110,7 +110,7 @@ void lbs::LBSSolver::
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
-    const auto& sigma_s = matid_to_xs_map_[cell.material_id]->sigma_s_gtog_;
+    const auto& sigma_s = matid_to_xs_map_[cell.material_id_]->sigma_s_gtog_;
 
     for (size_t i=0; i < num_nodes; i++)
     {

@@ -48,7 +48,7 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
 
     for (const auto& cell : grid_ptr_->local_cells)
     {
-      const auto& cell_view = cell_transport_views_[cell.local_id];
+      const auto& cell_view = cell_transport_views_[cell.local_id_];
       const int num_nodes = cell_view.NumNodes();
       const auto& fe_values = fe_sdm->GetUnitIntegrals(cell);
 
@@ -91,7 +91,7 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
         }//for node i
         cell_p1_avg /= volume_total;
 
-        cell_avg_p1_moments[cell.local_id][g] = cell_p1_avg;
+        cell_avg_p1_moments[cell.local_id_][g] = cell_p1_avg;
       }//for g
     }//for cell
   }
@@ -107,14 +107,14 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
     {
       for (int g : set_group_numbers)
       {
-        const auto& p1_moments = cell_avg_p1_moments[cell.local_id][g];
+        const auto& p1_moments = cell_avg_p1_moments[cell.local_id_][g];
 
         auto a_b = MakeExpRepFromP1({p1_moments[0],
                                      p1_moments[1],
                                      p1_moments[2],
                                      p1_moments[3]});
 
-        cell_exp_reps[cell.local_id][g] = std::make_pair(a_b[0], a_b[1]);
+        cell_exp_reps[cell.local_id_][g] = std::make_pair(a_b[0], a_b[1]);
       }//for g
     }//for cell
   }
@@ -185,10 +185,10 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
 
     for (const auto& cell : grid_ptr_->local_cells)
     {
-      MGVec4            p1_moments = cell_avg_p1_moments[cell.local_id];
-      VecOfABCoeffsPair exp_rep    = cell_exp_reps[cell.local_id];
+      MGVec4            p1_moments = cell_avg_p1_moments[cell.local_id_];
+      VecOfABCoeffsPair exp_rep    = cell_exp_reps[cell.local_id_];
 
-      auto cell_global_id = static_cast<uint64_t>(cell.global_id);
+      auto cell_global_id = static_cast<uint64_t>(cell.global_id_);
       for (int group : set_group_numbers)
       {
         auto g = static_cast<unsigned int>(group);

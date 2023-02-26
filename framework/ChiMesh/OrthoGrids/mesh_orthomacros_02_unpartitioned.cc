@@ -66,11 +66,11 @@ size_t chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
   chi::unpartitionedmesh_stack.push_back(umesh);
 
   //======================================== Create meshers
-  handler.surface_mesher = std::make_shared<chi_mesh::SurfaceMesherPredefined>();
-  handler.volume_mesher = std::make_shared<
-    chi_mesh::VolumeMesherPredefinedUnpartitioned>(umesh);
+  handler.SetSurfaceMesher(std::make_shared<chi_mesh::SurfaceMesherPredefined>());
+  handler.SetVolumeMesher(std::make_shared<
+    chi_mesh::VolumeMesherPredefinedUnpartitioned>(umesh));
 
-  handler.surface_mesher->Execute();
+  handler.GetVolumeMesher().Execute();
 
   return chi::unpartitionedmesh_stack.size()-1;
 }
@@ -162,11 +162,11 @@ size_t chi_mesh::CreateUnpartitioned2DOrthoMesh(
   chi::unpartitionedmesh_stack.push_back(umesh);
 
   //======================================== Create meshers
-  handler.surface_mesher = std::make_shared<chi_mesh::SurfaceMesherPredefined>();
-  handler.volume_mesher = std::make_shared<
-    chi_mesh::VolumeMesherPredefinedUnpartitioned>(umesh);
+  handler.SetSurfaceMesher(std::make_shared<chi_mesh::SurfaceMesherPredefined>());
+  handler.SetVolumeMesher(std::make_shared<
+    chi_mesh::VolumeMesherPredefinedUnpartitioned>(umesh));
 
-  handler.surface_mesher->Execute();
+  handler.GetSurfaceMesher().Execute();
 
   return chi::unpartitionedmesh_stack.size()-1;
 }
@@ -339,11 +339,11 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
   chi::unpartitionedmesh_stack.push_back(umesh);
 
   //======================================== Create meshers
-  handler.surface_mesher = std::make_shared<chi_mesh::SurfaceMesherPredefined>();
-  handler.volume_mesher = std::make_shared<
-    chi_mesh::VolumeMesherPredefinedUnpartitioned>(umesh);
+  handler.SetSurfaceMesher(std::make_shared<chi_mesh::SurfaceMesherPredefined>());
+  handler.SetVolumeMesher(std::make_shared<
+    chi_mesh::VolumeMesherPredefinedUnpartitioned>(umesh));
 
-  handler.surface_mesher->Execute();
+  handler.GetSurfaceMesher().Execute();
 
   return chi::unpartitionedmesh_stack.size()-1;
 }

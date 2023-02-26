@@ -11,12 +11,12 @@
  * throw `std::logic_error`.*/
 chi_mesh::MeshContinuumPtr& chi_mesh::MeshHandler::GetGrid() const
 {
-  if (volume_mesher == nullptr)
+  if (volume_mesher_ == nullptr)
     throw std::logic_error("chi_mesh::MeshHandler::GetGrid: Volume mesher "
                            "undefined. This usually means a grid is not defined"
                            " or is incomplete.");
 
-  auto& grid_ptr = volume_mesher->GetContinuum();
+  auto& grid_ptr = volume_mesher_->GetContinuum();
 
   if (grid_ptr == nullptr)
     throw std::logic_error("chi_mesh::MeshHandler::GetGrid: Volume mesher has "
@@ -24,4 +24,51 @@ chi_mesh::MeshContinuumPtr& chi_mesh::MeshHandler::GetGrid() const
                            "been executed.");
 
   return grid_ptr;
+}
+
+
+//###################################################################
+/**Obtains a reference to the surface mesher.*/
+chi_mesh::SurfaceMesher& chi_mesh::MeshHandler::GetSurfaceMesher()
+{
+  if (surface_mesher_ == nullptr)
+    throw std::logic_error("chi_mesh::MeshHandler::GetSurfaceMesher: "
+                           "Surface mesher undefined This usually means a "
+                           "grid is not defined or is incomplete.");
+  return *surface_mesher_;
+}
+
+
+//###################################################################
+/**Obtains a reference to the surface mesher.*/
+chi_mesh::VolumeMesher& chi_mesh::MeshHandler::GetVolumeMesher()
+{
+  if (volume_mesher_ == nullptr)
+    throw std::logic_error("chi_mesh::MeshHandler::GetVolumeMesher: "
+                           "Volume mesher undefined This usually means a "
+                           "grid is not defined or is incomplete.");
+  return *volume_mesher_;
+}
+
+
+//###################################################################
+/**Obtains a reference to the surface mesher.*/
+const chi_mesh::SurfaceMesher& chi_mesh::MeshHandler::GetSurfaceMesher() const
+{
+  if (surface_mesher_ == nullptr)
+    throw std::logic_error("chi_mesh::MeshHandler::GetSurfaceMesher: "
+                           "Surface mesher undefined This usually means a "
+                           "grid is not defined or is incomplete.");
+  return *surface_mesher_;
+}
+
+//###################################################################
+/**Obtains a reference to the surface mesher.*/
+const chi_mesh::VolumeMesher& chi_mesh::MeshHandler::GetVolumeMesher() const
+{
+  if (volume_mesher_ == nullptr)
+    throw std::logic_error("chi_mesh::MeshHandler::GetVolumeMesher: "
+                           "Volume mesher undefined This usually means a "
+                           "grid is not defined or is incomplete.");
+  return *volume_mesher_;
 }

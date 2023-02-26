@@ -27,6 +27,8 @@ public:
 
   virtual void Execute();
 
+  virtual ~SurfaceMesher() = default;
+
 };
 
 #endif//CHI_MESH_SURFACEMESHER_H

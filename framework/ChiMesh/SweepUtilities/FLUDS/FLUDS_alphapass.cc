@@ -1,6 +1,7 @@
 #include "FLUDS.h"
 
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
+#include "ChiMesh/MeshContinuum/chi_grid_face_histogram.h"
 
 #include <ChiMesh/Cell/cell.h>
 
@@ -19,7 +20,7 @@ InitializeAlphaElements(const SPDS& spds)
 
   //================================================== Initialize face
   //                                                   categorization
-  num_face_categories = grid.NumberOfFaceHistogramBins();
+  num_face_categories = grid_face_histogram_.NumberOfFaceHistogramBins();
   local_psi_stride.resize(num_face_categories,0);
   local_psi_max_elements.resize(num_face_categories,0);
   local_psi_n_block_stride.resize(num_face_categories, 0);
@@ -38,7 +39,7 @@ InitializeAlphaElements(const SPDS& spds)
 
   // Given a local cell index, gives the so index
   std::vector<int>  local_so_cell_mapping;
-  local_so_cell_mapping.resize(grid.local_cell_glob_indices.size(),0);
+  local_so_cell_mapping.resize(grid.local_cells.size(),0);
 
   largest_face = 0; // Will contain the max dofs per face
   std::vector<LockBox> lock_boxes(num_face_categories); //cell,face index pairs
@@ -54,7 +55,7 @@ InitializeAlphaElements(const SPDS& spds)
     int cell_local_id = spls.item_id[csoi];
     const auto& cell = grid.local_cells[cell_local_id];
 
-    local_so_cell_mapping[cell.local_id] = csoi; //Set mapping
+    local_so_cell_mapping[cell.local_id_] = csoi; //Set mapping
 
     SlotDynamics(cell,
                  spds,
@@ -90,7 +91,7 @@ InitializeAlphaElements(const SPDS& spds)
 
   for (size_t fc=0; fc<num_face_categories; ++fc)
   {
-    local_psi_stride[fc] = grid.GetFaceHistogramBinDOFSize(fc);
+    local_psi_stride[fc] = grid_face_histogram_.GetFaceHistogramBinDOFSize(fc);
     local_psi_max_elements[fc]     = lock_boxes[fc].size();
     local_psi_n_block_stride[fc]  = local_psi_stride[fc] * lock_boxes[fc].size();
     local_psi_Gn_block_strideG[fc] = local_psi_n_block_stride[fc] * G;

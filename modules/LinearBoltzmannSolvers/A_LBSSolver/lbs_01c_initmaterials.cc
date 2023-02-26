@@ -23,16 +23,16 @@ void lbs::LBSSolver::InitMaterials()
   int invalid_mat_cell_count = 0;
   for (auto& cell : grid_ptr_->local_cells)
   {
-    unique_material_ids.insert(cell.material_id);
-    if (cell.material_id<0)
+    unique_material_ids.insert(cell.material_id_);
+    if (cell.material_id_ < 0)
       ++invalid_mat_cell_count;
   }
   const auto& ghost_cell_ids = grid_ptr_->cells.GetGhostGlobalIDs();
   for (uint64_t cell_id : ghost_cell_ids)
   {
     const auto& cell = grid_ptr_->cells[cell_id];
-    unique_material_ids.insert(cell.material_id);
-    if (cell.material_id<0)
+    unique_material_ids.insert(cell.material_id_);
+    if (cell.material_id_ < 0)
       ++invalid_mat_cell_count;
   }
 
@@ -69,7 +69,7 @@ void lbs::LBSSolver::InitMaterials()
     //====================================== Extract properties
     using MatProperty = chi_physics::PropertyType;
     bool found_transport_xs = false;
-    for (const auto& property : current_material->properties)
+    for (const auto& property : current_material->properties_)
     {
       if (property->Type() == MatProperty::TRANSPORT_XSECTIONS)
       {
@@ -83,11 +83,11 @@ void lbs::LBSSolver::InitMaterials()
         auto mg_source =
           std::static_pointer_cast<chi_physics::IsotropicMultiGrpSource>(property);
 
-        if (mg_source->source_value_g.size() < groups_.size())
+        if (mg_source->source_value_g_.size() < groups_.size())
         {
           chi::log.LogAllWarning()
             << fname + ": Isotropic Multigroup source specified in "
-            << "material \"" << current_material->name << "\" has fewer "
+            << "material \"" << current_material->name_ << "\" has fewer "
             << "energy groups than called for in the simulation. "
             << "Source will be ignored.";
         }
@@ -103,14 +103,14 @@ void lbs::LBSSolver::InitMaterials()
     {
       chi::log.LogAllError()
         << fname + ": Found no transport cross-section property for "
-        << "material \"" << current_material->name << "\".";
+        << "material \"" << current_material->name_ << "\".";
       chi::Exit(EXIT_FAILURE);
     }
     //====================================== Check number of groups legal
     if (matid_to_xs_map_[mat_id]->num_groups_ < groups_.size())
     {
       chi::log.LogAllError()
-          << fname + ": Found material \"" << current_material->name << "\" has "
+          << fname + ": Found material \"" << current_material->name_ << "\" has "
           << matid_to_xs_map_[mat_id]->num_groups_ << " groups and"
           << " the simulation has " << groups_.size() << " groups."
           << " The material must have a greater or equal amount of groups.";
@@ -121,7 +121,7 @@ void lbs::LBSSolver::InitMaterials()
     if (matid_to_xs_map_[mat_id]->scattering_order_ < options_.scattering_order)
     {
       chi::log.Log0Warning()
-          << fname + ": Found material \"" << current_material->name << "\" has "
+          << fname + ": Found material \"" << current_material->name_ << "\" has "
           << "a scattering order of "
           << matid_to_xs_map_[mat_id]->scattering_order_ << " and"
           << " the simulation has a scattering order of "
@@ -189,8 +189,8 @@ void lbs::LBSSolver::InitMaterials()
   if (grid_ptr_->local_cells.size() == cell_transport_views_.size())
     for (const auto& cell : grid_ptr_->local_cells)
     {
-      const auto& xs_ptr = matid_to_xs_map_[cell.material_id];
-      auto& transport_view = cell_transport_views_[cell.local_id];
+      const auto& xs_ptr = matid_to_xs_map_[cell.material_id_];
+      auto& transport_view = cell_transport_views_[cell.local_id_];
 
       transport_view.ReassingXS(*xs_ptr);
     }

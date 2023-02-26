@@ -47,22 +47,22 @@ void chi_mesh::mesh_cutting::
                               const std::vector<uint64_t> &vertex_ids,
                               chi_mesh::Cell &cell)
 {
-  cell.faces.clear();
-  cell.faces.reserve(vertex_ids.size());
-  cell.vertex_ids = vertex_ids;
+  cell.faces_.clear();
+  cell.faces_.reserve(vertex_ids.size());
+  cell.vertex_ids_ = vertex_ids;
 
-  cell.centroid = chi_mesh::Vector3(0.0,0.0,0.0);
-  for (uint64_t vid : cell.vertex_ids)
-    cell.centroid += mesh.vertices[vid];
-  cell.centroid /= double(cell.vertex_ids.size());
+  cell.centroid_ = chi_mesh::Vector3(0.0, 0.0, 0.0);
+  for (uint64_t vid : cell.vertex_ids_)
+    cell.centroid_ += mesh.vertices[vid];
+  cell.centroid_ /= double(cell.vertex_ids_.size());
 
   size_t num_verts = vertex_ids.size();
   for (size_t v=0; v<num_verts; ++v)
   {
     size_t v1_ref = (v < (num_verts-1))? v+1 : 0;
 
-    uint64_t v0id = cell.vertex_ids[v];
-    uint64_t v1id = cell.vertex_ids[v1_ref];
+    uint64_t v0id = cell.vertex_ids_[v];
+    uint64_t v1id = cell.vertex_ids_[v1_ref];
 
     const auto& v0 = mesh.vertices[v0id];
     const auto& v1 = mesh.vertices[v1id];
@@ -70,11 +70,11 @@ void chi_mesh::mesh_cutting::
     chi_mesh::Vector3 v01 = v1 - v0;
 
     chi_mesh::CellFace face;
-    face.vertex_ids = {v0id,v1id};
-    face.normal     = v01.Cross(chi_mesh::Normal(0.0,0.0,1.0)).Normalized();
-    face.centroid   = (v0+v1)/2.0;
+    face.vertex_ids_ = {v0id, v1id};
+    face.normal_     = v01.Cross(chi_mesh::Normal(0.0, 0.0, 1.0)).Normalized();
+    face.centroid_   = (v0 + v1) / 2.0;
 
-    cell.faces.push_back(face);
+    cell.faces_.push_back(face);
   }
 }
 
@@ -89,12 +89,12 @@ bool chi_mesh::mesh_cutting::
 {
   const chi_mesh::Vector3 khat(0.0,0.0,1.0);
 
-  auto& v0 = cell.centroid;
-  size_t num_edges = cell.vertex_ids.size();
+  auto& v0 = cell.centroid_;
+  size_t num_edges = cell.vertex_ids_.size();
 
   for (size_t e=0; e<num_edges; ++e)
   {
-    auto edge = MakeEdgeFromPolygonEdgeIndex(cell.vertex_ids,e);
+    auto edge = MakeEdgeFromPolygonEdgeIndex(cell.vertex_ids_, e);
 
     const auto& v1 = mesh.vertices[edge.first];
     const auto& v2 = mesh.vertices[edge.second];

@@ -46,18 +46,18 @@ void lbs::LBSSolver::
   // Apply all nodal sources
   for (const auto& cell : grid_ptr_->local_cells)
   {
-    auto& transport_view = cell_transport_views_[cell.local_id];
+    auto& transport_view = cell_transport_views_[cell.local_id_];
 
     //==================== Obtain xs
     auto xs = transport_view.XS();
-    auto P0_src = matid_to_src_map_[cell.material_id];
+    auto P0_src = matid_to_src_map_[cell.material_id_];
 
     const auto& S = xs.transfer_matrices_;
 
     //==================== Obtain src
     double* src = default_zero_src.data();
     if (P0_src and apply_fixed_src)
-      src = P0_src->source_value_g.data();
+      src = P0_src->source_value_g_.data();
 
     //======================================== Loop over nodes
     const int num_nodes = transport_view.NumNodes();

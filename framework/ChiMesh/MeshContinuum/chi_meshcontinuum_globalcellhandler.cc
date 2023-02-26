@@ -8,27 +8,25 @@
 void chi_mesh::GlobalCellHandler::
   push_back(std::unique_ptr<chi_mesh::Cell> new_cell)
 {
-  if (new_cell->partition_id == static_cast<uint64_t>(chi::mpi.location_id))
+  if (new_cell->partition_id_ == static_cast<uint64_t>(chi::mpi.location_id))
   {
-    local_cell_glob_indices.push_back(new_cell->global_id);
-    size_t local_cell_index = local_cell_glob_indices.size() - 1;
-    new_cell->local_id = local_cell_index;
+    new_cell->local_id_ = local_cells_ref_.size();
 
-    native_cells.push_back(std::move(new_cell));
+    local_cells_ref_.push_back(std::move(new_cell));
 
-    const auto& cell = native_cells.back();
+    const auto& cell = local_cells_ref_.back();
 
     global_cell_id_to_native_id_map.insert(std::make_pair(
-      cell->global_id, native_cells.size()-1));
+      cell->global_id_, local_cells_ref_.size() - 1));
   }
   else
   {
-    foreign_cells.push_back(std::move(new_cell));
+    ghost_cells_ref_.push_back(std::move(new_cell));
 
-    const auto& cell = foreign_cells.back();
+    const auto& cell = ghost_cells_ref_.back();
 
     global_cell_id_to_foreign_id_map.insert(std::make_pair(
-      cell->global_id, foreign_cells.size() - 1));
+      cell->global_id_, ghost_cells_ref_.size() - 1));
   }
 
 }
@@ -41,12 +39,12 @@ chi_mesh::Cell& chi_mesh::GlobalCellHandler::
   auto native_location = global_cell_id_to_native_id_map.find(cell_global_index);
 
   if (native_location != global_cell_id_to_native_id_map.end())
-    return *native_cells[native_location->second];
+    return *local_cells_ref_[native_location->second];
   else
   {
     auto foreign_location = global_cell_id_to_foreign_id_map.find(cell_global_index);
     if (foreign_location != global_cell_id_to_foreign_id_map.end())
-      return *foreign_cells[foreign_location->second];
+      return *ghost_cells_ref_[foreign_location->second];
   }
 
   std::stringstream ostr;
@@ -65,12 +63,12 @@ const chi_mesh::Cell& chi_mesh::GlobalCellHandler::
   auto native_location = global_cell_id_to_native_id_map.find(cell_global_index);
 
   if (native_location != global_cell_id_to_native_id_map.end())
-    return *native_cells[native_location->second];
+    return *local_cells_ref_[native_location->second];
   else
   {
     auto foreign_location = global_cell_id_to_foreign_id_map.find(cell_global_index);
     if (foreign_location != global_cell_id_to_foreign_id_map.end())
-      return *foreign_cells[foreign_location->second];
+      return *ghost_cells_ref_[foreign_location->second];
   }
 
   std::stringstream ostr;
@@ -85,7 +83,7 @@ const chi_mesh::Cell& chi_mesh::GlobalCellHandler::
 /**Returns the total number of global cells.*/
 size_t chi_mesh::MeshContinuum::GetGlobalNumberOfCells() const
 {
-  size_t num_local_cells = native_cells.size();
+  size_t num_local_cells = local_cells_.size();
   size_t num_globl_cells = 0;
 
   MPI_Allreduce(&num_local_cells,
@@ -108,8 +106,8 @@ std::vector<uint64_t> chi_mesh::GlobalCellHandler::
   std::vector<uint64_t> ids;
   ids.reserve(GetNumGhosts());
 
-  for (auto& cell : foreign_cells)
-    ids.push_back(cell->global_id);
+  for (auto& cell : ghost_cells_ref_)
+    ids.push_back(cell->global_id_);
 
   return ids;
 }

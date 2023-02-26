@@ -88,7 +88,7 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
     if (bndry->IsReflecting())
     {
       size_t tot_num_angles = quadrature->abscissae.size();
-      size_t num_local_cells = grid->local_cell_glob_indices.size();
+      size_t num_local_cells = grid->local_cells.size();
       auto& rbndry = (BoundaryReflecting&)(*bndry);
 
       rbndry.reflected_anglenum.resize(tot_num_angles,-1);
@@ -133,13 +133,13 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
         cell_vec.resize(num_local_cells);
         for (const auto& cell : grid->local_cells)
         {
-          const uint64_t c = cell.local_id;
+          const uint64_t c = cell.local_id_;
 
           //=========================== Check cell on ref bndry
           bool on_ref_bndry = false;
-          for (const auto& face : cell.faces){
-            if ( (not face.has_neighbor) and
-                 (face.normal.Dot(rbndry.normal) > 0.999999) )
+          for (const auto& face : cell.faces_){
+            if ((not face.has_neighbor_) and
+                (face.normal_.Dot(rbndry.normal) > 0.999999) )
             {
               on_ref_bndry = true;
               break;
@@ -148,15 +148,15 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
           if (not on_ref_bndry) continue;
 
           //=========================== If cell on ref bndry
-          cell_vec[c].resize(cell.faces.size());
+          cell_vec[c].resize(cell.faces_.size());
           int f=0;
-          for (const auto& face : cell.faces)
+          for (const auto& face : cell.faces_)
           {
-            if ( (not face.has_neighbor) and
-                 (face.normal.Dot(rbndry.normal) > 0.999999) )
+            if ((not face.has_neighbor_) and
+                (face.normal_.Dot(rbndry.normal) > 0.999999) )
             {
               cell_vec[c][f].clear();
-              cell_vec[c][f].resize(face.vertex_ids.size(),
+              cell_vec[c][f].resize(face.vertex_ids_.size(),
                                     std::vector<double>(number_of_groups,0.0));
             }
             ++f;

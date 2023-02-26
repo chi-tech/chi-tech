@@ -181,14 +181,14 @@ lbs_curvilinear::DiscOrdSteadyStateSolver::PerformInputChecks()
       chi_mesh::Vector3(0.0, 0.0, 1.0), };
   for (const auto& cell : grid_ptr_->local_cells)
   {
-    for (const auto& face : cell.faces)
+    for (const auto& face : cell.faces_)
     {
-      if (!face.has_neighbor)
+      if (!face.has_neighbor_)
       {
         bool face_orthogonal = false;
         for (size_t d = 0; d < unit_normal_vectors.size(); ++d)
         {
-          const auto n_dot_e = face.normal.Dot(unit_normal_vectors[d]);
+          const auto n_dot_e = face.normal_.Dot(unit_normal_vectors[d]);
           if      (n_dot_e >  0.999999)
           {
             face_orthogonal = true;
@@ -196,7 +196,7 @@ lbs_curvilinear::DiscOrdSteadyStateSolver::PerformInputChecks()
           }
           else if (n_dot_e < -0.999999)
           {
-            for (const auto& v_id : face.vertex_ids)
+            for (const auto& v_id : face.vertex_ids_)
             {
               const auto& vertex = grid_ptr_->vertices[v_id];
               if (std::abs(vertex[d]) > 1.0e-12)

@@ -49,7 +49,7 @@ std::vector<double> lbs::ResponseFunctionDesignation::
   }
 
   //============================================= Load lua function
-  lua_State* L = chi::console.consoleState;
+  lua_State* L = chi::console.GetConsoleState();
   lua_getglobal(L, lua_functional.c_str());
 
 
@@ -60,8 +60,8 @@ std::vector<double> lbs::ResponseFunctionDesignation::
                            " could not be retrieved.");
 
   //============================================= Push arguments
-  PushVector3AsTable(L, cell.centroid);
-  lua_pushinteger(L, cell.material_id); //4 arguments on stack
+  PushVector3AsTable(L, cell.centroid_);
+  lua_pushinteger(L, cell.material_id_); //4 arguments on stack
 
   //============================================= Call lua function
   //2 arguments, 1 result (table), 0=original error object

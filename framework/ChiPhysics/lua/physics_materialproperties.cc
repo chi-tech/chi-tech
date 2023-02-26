@@ -7,12 +7,8 @@
 #include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
 #include "ChiPhysics/PhysicsMaterial/material_property_isotropic_mg_src.h"
 
-
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
-
-
 
 //#############################################################################
 /** Adds a material property to a material.
@@ -94,12 +90,12 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
     auto prop = std::make_shared<chi_physics::ScalarValue>();
 
     prop->property_name = std::string("Property ") +
-                          std::to_string(cur_material->properties.size());
+                          std::to_string(cur_material->properties_.size());
 
     if (numArgs == 3)
       prop->property_name = std::string(provided_name);
 
-    cur_material->properties.push_back(prop);
+    cur_material->properties_.push_back(prop);
     chi::log.Log0Verbose1() << "Scalar Value Property added to material"
                                  " at index " << material_index;
   }
@@ -107,13 +103,13 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
   else if (property_index == static_cast<int>(MatProperty::TRANSPORT_XSECTIONS))
   {
     //================================= Check for duplicate
-    for (int p=0; p<cur_material->properties.size(); p++)
+    for (int p=0; p<cur_material->properties_.size(); p++)
     {
-      if (cur_material->properties[p]->Type() ==
-            MatProperty::TRANSPORT_XSECTIONS)
+      if (cur_material->properties_[p]->Type() ==
+          MatProperty::TRANSPORT_XSECTIONS)
       {
         chi::log.Log0Error()    << "Material " << material_index << " \""
-                                   << cur_material->name << "\""
+                                   << cur_material->name_ << "\""
                                    << " already has property "
                                       "TRANSPORT_XSECTIONS"
                                    << std::endl;
@@ -124,12 +120,12 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
     auto prop = std::make_shared<chi_physics::TransportCrossSections>();
 
     prop->property_name = std::string("Property ") +
-                          std::to_string(cur_material->properties.size());
+                          std::to_string(cur_material->properties_.size());
 
     if (numArgs == 3)
       prop->property_name = std::string(provided_name);
 
-    cur_material->properties.push_back(prop);
+    cur_material->properties_.push_back(prop);
     chi::log.Log0Verbose1() << "Transport cross-sections added to material"
                                  " at index " << material_index;
 
@@ -143,13 +139,13 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
   else if (property_index == static_cast<int>(MatProperty::ISOTROPIC_MG_SOURCE))
   {
     //================================= Check for duplicate
-    for (int p=0; p<cur_material->properties.size(); p++)
+    for (int p=0; p<cur_material->properties_.size(); p++)
     {
-      if (cur_material->properties[p]->Type() ==
-            MatProperty::ISOTROPIC_MG_SOURCE)
+      if (cur_material->properties_[p]->Type() ==
+          MatProperty::ISOTROPIC_MG_SOURCE)
       {
         chi::log.Log0Error()    << "Material " << material_index << " \""
-                                   << cur_material->name << "\""
+                                   << cur_material->name_ << "\""
                                    << " already has property "
                                       "ISOTROPIC_MG_SOURCE "
                                    << property_index
@@ -161,12 +157,12 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
     auto prop = std::make_shared<chi_physics::IsotropicMultiGrpSource>();
 
     prop->property_name = std::string("Property ") +
-                          std::to_string(cur_material->properties.size());
+                          std::to_string(cur_material->properties_.size());
 
     if (numArgs == 3)
       prop->property_name = std::string(provided_name);
 
-    cur_material->properties.push_back(prop);
+    cur_material->properties_.push_back(prop);
     chi::log.Log0Verbose1() << "Isotropic Multigroup Source added to material"
                                  " at index " << material_index;
   }
@@ -319,7 +315,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
   //                                              find property index
   if (!lua_isnumber(L,2))
   {
-    for (auto& property : cur_material->properties)
+    for (auto& property : cur_material->properties_)
       if (property->property_name == property_index_name)
         property_index = static_cast<int>(property->Type());
   }
@@ -334,14 +330,14 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
     //================================= Check if the material has this property
     if (lua_isnumber(L,2))
     {
-      for (int p=0; p<cur_material->properties.size(); p++)
-        if (cur_material->properties[p]->Type() == MatProperty::SCALAR_VALUE)
+      for (int p=0; p<cur_material->properties_.size(); p++)
+        if (cur_material->properties_[p]->Type() == MatProperty::SCALAR_VALUE)
           location_of_prop = p;
     }
     else
     {
-      for (int p=0; p<cur_material->properties.size(); p++)
-        if (cur_material->properties[p]->property_name == property_index_name)
+      for (int p=0; p<cur_material->properties_.size(); p++)
+        if (cur_material->properties_[p]->property_name == property_index_name)
           location_of_prop = p;
     }
 
@@ -350,13 +346,13 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
     if (location_of_prop>=0)
     {
       auto prop = std::static_pointer_cast<chi_physics::ScalarValue>(
-        cur_material->properties[location_of_prop]);
+        cur_material->properties_[location_of_prop]);
 
       //========================== Process operation
       if (operation_index == static_cast<int>(OpType::SINGLE_VALUE))
       {
         double value = lua_tonumber(L,4);
-        prop->value = value;
+        prop->value_ = value;
         chi::log.Log0Verbose1() << "Scalar value for material"
                                      " at index " << material_index
                                   << " set to " << value;
@@ -383,10 +379,10 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
     //================================= Check if the material has this property
     if (lua_isnumber(L,2))
     {
-      for (int p=0; p<cur_material->properties.size(); p++)
+      for (int p=0; p<cur_material->properties_.size(); p++)
       {
-        if (cur_material->properties[p]->Type() ==
-              MatProperty::TRANSPORT_XSECTIONS)
+        if (cur_material->properties_[p]->Type() ==
+            MatProperty::TRANSPORT_XSECTIONS)
         {
           location_of_prop = p;
         }
@@ -394,9 +390,9 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
     }
     else
     {
-      for (int p=0; p<cur_material->properties.size(); p++)
+      for (int p=0; p<cur_material->properties_.size(); p++)
       {
-        if (cur_material->properties[p]->property_name == property_index_name)
+        if (cur_material->properties_[p]->property_name == property_index_name)
         {
           location_of_prop = p;
         }
@@ -407,7 +403,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
     if (location_of_prop>=0)
     {
       auto prop = std::static_pointer_cast<chi_physics::TransportCrossSections>(
-                  cur_material->properties[location_of_prop]);
+                  cur_material->properties_[location_of_prop]);
 
       //========================== Process operation
       if (operation_index == static_cast<int>(OpType::SIMPLEXS0))
@@ -462,7 +458,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
 //        auto old_prop = prop;
         prop = xs;
 
-        cur_material->properties[location_of_prop] = prop;
+        cur_material->properties_[location_of_prop] = prop;
 
 //        delete old_prop; //Still debating if this should be deleted
       }
@@ -488,10 +484,10 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
     //================================= Check if the material has this property
     if (lua_isnumber(L,2))
     {
-      for (int p=0; p<cur_material->properties.size(); p++)
+      for (int p=0; p<cur_material->properties_.size(); p++)
       {
-        if (cur_material->properties[p]->Type() ==
-              MatProperty::ISOTROPIC_MG_SOURCE)
+        if (cur_material->properties_[p]->Type() ==
+            MatProperty::ISOTROPIC_MG_SOURCE)
         {
           location_of_prop = p;
         }
@@ -499,9 +495,9 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
     }
     else
     {
-      for (int p=0; p<cur_material->properties.size(); p++)
+      for (int p=0; p<cur_material->properties_.size(); p++)
       {
-        if (cur_material->properties[p]->property_name == property_index_name)
+        if (cur_material->properties_[p]->property_name == property_index_name)
         {
           location_of_prop = p;
         }
@@ -512,7 +508,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
     if (location_of_prop>=0)
     {
       auto prop = std::static_pointer_cast<chi_physics::IsotropicMultiGrpSource>(
-          cur_material->properties[location_of_prop]);
+          cur_material->properties_[location_of_prop]);
 
 
       if (operation_index == static_cast<int>(OpType::SINGLE_VALUE))
@@ -522,7 +518,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
 
         double value = lua_tonumber(L,4);
 
-        prop->source_value_g.resize(1,value);
+        prop->source_value_g_.resize(1, value);
         chi::log.Log0Verbose1() << "Isotropic Multigroup Source value "
                                      "for material"
                                      " at index " << material_index
@@ -537,7 +533,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
         {
           chi::log.LogAllError()
             << "In call to chiPhysicsMaterialSetProperty: "
-            << "Material \"" << cur_material->name
+            << "Material \"" << cur_material->name_
             << "\", when setting "
             << "ISOTROPIC_MG_SOURCE using operation FROM_ARRAY, the fourth "
                "argument was detected not to be a lua table.";
@@ -555,8 +551,8 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
           lua_pop(L,1);
         }
 
-        prop->source_value_g.resize(table_len,0.0);
-        std::copy(values.begin(),values.end(),prop->source_value_g.begin());
+        prop->source_value_g_.resize(table_len, 0.0);
+        std::copy(values.begin(),values.end(),prop->source_value_g_.begin());
         chi::log.Log0Verbose1() << "Isotropic Multigroup Source populated "
                                   << " with " << table_len << " values";
       }
@@ -569,7 +565,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
     }
     else
     {
-      chi::log.LogAllError() << "Material \"" << cur_material->name
+      chi::log.LogAllError() << "Material \"" << cur_material->name_
                                 << "\" has no property "
                                    "ISOTROPIC_MG_SOURCE." << std::endl;
       chi::Exit(EXIT_FAILURE);
@@ -625,14 +621,14 @@ int chiPhysicsMaterialGetProperty(lua_State* L)
   //                                              find property index
   if (!lua_isnumber(L,2))
   {
-    for (auto& property : cur_material->properties)
+    for (auto& property : cur_material->properties_)
       if (property->property_name == property_index_name)
         property_index = static_cast<int>(property->Type());
   }
 
   //============================================= Process property
   bool property_polulated = false;
-  for (auto& property : cur_material->properties)
+  for (auto& property : cur_material->properties_)
   {
     if (static_cast<int>(property->Type()) == property_index)
     {
@@ -680,7 +676,7 @@ int chiPhysicsMaterialModifyTotalCrossSection(lua_State* L)
   using MatProperty = chi_physics::PropertyType;
   using XS = chi_physics::TransportCrossSections;
   bool xs_property_found = false;
-  for (auto& property : cur_material->properties)
+  for (auto& property : cur_material->properties_)
   {
     auto ptype = MatProperty::TRANSPORT_XSECTIONS;
     if (property->Type() == ptype) {

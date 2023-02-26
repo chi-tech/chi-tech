@@ -166,7 +166,7 @@ void cfem_diffusion::Solver::Execute()
   const auto& grid = *grid_ptr;
   const auto& sdm  = *sdm_ptr;
 
-  lua_State* L = chi::console.consoleState;
+  lua_State* L = chi::console.GetConsoleState();
 
   //============================================= Assemble the system
   chi::log.Log() << "Assembling system: ";
@@ -175,7 +175,7 @@ void cfem_diffusion::Solver::Execute()
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const auto  qp_data      = cell_mapping.MakeVolumeQuadraturePointData();
  
-    const auto imat  = cell.material_id;
+    const auto imat  = cell.material_id_;
     const size_t num_nodes = cell_mapping.NumNodes();
     MatDbl Acell(num_nodes, VecDbl(num_nodes, 0.0));
     VecDbl cell_rhs(num_nodes, 0.0);
@@ -208,20 +208,20 @@ void cfem_diffusion::Solver::Execute()
     std::vector<int> dirichlet_count(num_nodes, 0);
     std::vector<double> dirichlet_value(num_nodes, 0.0);
 
-    const size_t num_faces = cell.faces.size();
+    const size_t num_faces = cell.faces_.size();
     for (size_t f=0; f<num_faces; ++f)
     {
-      const auto& face = cell.faces[f];
+      const auto& face = cell.faces_[f];
       // not a boundary face
-	    if (face.has_neighbor) continue; 
+	    if (face.has_neighbor_) continue;
 	  
-      const auto& bndry = boundaries[face.neighbor_id];
+      const auto& bndry = boundaries[face.neighbor_id_];
 
       // Robin boundary
       if (bndry.type == BoundaryType::Robin)
       { 
         const auto  qp_face_data = cell_mapping.MakeFaceQuadraturePointData( f );
-        const size_t num_face_nodes = face.vertex_ids.size();
+        const size_t num_face_nodes = face.vertex_ids_.size();
 
         const auto& aval = bndry.values[0];
         const auto& bval = bndry.values[1];
@@ -266,7 +266,7 @@ void cfem_diffusion::Solver::Execute()
 	    // Dirichlet boundary
 	    if (bndry.type == BoundaryType::Dirichlet)
       {
- 		    const size_t num_face_nodes = face.vertex_ids.size();
+ 		    const size_t num_face_nodes = face.vertex_ids_.size();
 
         const auto& boundary_value = bndry.values[0];
 

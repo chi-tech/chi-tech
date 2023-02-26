@@ -27,8 +27,8 @@ double dfem_diffusion::Solver::HPerpendicular(const chi_mesh::Cell& cell,
   const auto& cell_mapping = sdm.GetCellMapping(cell);
   double hp;
 
-  const size_t num_faces = cell.faces.size();
-  const size_t num_vertices = cell.vertex_ids.size();
+  const size_t num_faces = cell.faces_.size();
+  const size_t num_vertices = cell.vertex_ids_.size();
 
   const double volume = cell_mapping.CellVolume();
   const double face_area = cell_mapping.FaceArea(f);

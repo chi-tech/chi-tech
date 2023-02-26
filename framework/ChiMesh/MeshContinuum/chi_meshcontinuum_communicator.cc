@@ -8,39 +8,31 @@
 //###################################################################
 /**Gets the communicator-set for interprocess communication,
  * associated with this mesh. If not created yet, it will create it.*/
-chi_objects::ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
+std::shared_ptr<chi_objects::ChiMPICommunicatorSet>
+  chi_mesh::MeshContinuum::MakeMPILocalCommunicatorSet() const
 {
-  //================================================== Check if already avail
-  if (communicator_set2_ != nullptr)
-    return *communicator_set2_;
-
   //================================================== Build the communicator
   chi::log.Log0Verbose1() << "Building communicator.";
   std::set<int>    local_graph_edges;
-  std::vector<int> local_connections;
 
   //================================================== Loop over local cells
   //Populate local_graph_edges
   local_graph_edges.insert(chi::mpi.location_id); //add current location
   for (auto& cell : local_cells)
   {
-    for (auto& face : cell.faces)
+    for (auto& face : cell.faces_)
     {
-      if (face.has_neighbor)
+      if (face.has_neighbor_)
         if (not face.IsNeighborLocal(*this))
           local_graph_edges.insert(face.GetNeighborPartitionID(*this));
     }//for f
   }//for local cells
 
   //============================================= Convert set to vector
-  //This is just done for convenience
-  std::set<int>::iterator graph_edge;
-  for (graph_edge =  local_graph_edges.begin();
-       graph_edge != local_graph_edges.end();
-       graph_edge++)
-  {
-    local_connections.push_back(*graph_edge);
-  }
+  //This is just done for convenience because MPI
+  //needs a contiguous array
+  std::vector<int> local_connections(local_graph_edges.begin(),
+                                     local_graph_edges.end());
 
   //============================================= Broadcast local connection size
   chi::log.Log0Verbose1()
@@ -122,9 +114,7 @@ chi_objects::ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
   chi::log.Log0Verbose1()
     << "Done building communicators.";
 
-  communicator_set2_ = std::make_shared<chi_objects::ChiMPICommunicatorSet>(
+  return std::make_shared<chi_objects::ChiMPICommunicatorSet>(
     communicators, location_groups, world_group);
-
-  return *communicator_set2_;
 }
 

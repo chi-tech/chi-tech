@@ -15,7 +15,7 @@ int64_t chi_math::SpatialDiscretization_PWLC::
          const unsigned int unknown_id,
          const unsigned int component/*=0*/) const
 {
-  const uint64_t vertex_id = cell.vertex_ids[node];
+  const uint64_t vertex_id = cell.vertex_ids_[node];
 
   const int64_t global_id = node_mapping.at(vertex_id);
 
@@ -53,7 +53,7 @@ int64_t chi_math::SpatialDiscretization_PWLC::
               const unsigned int unknown_id,
               const unsigned int component/*=0*/) const
 {
-  const uint64_t vertex_id = cell.vertex_ids[node];
+  const uint64_t vertex_id = cell.vertex_ids_[node];
 
   const int64_t global_id = node_mapping.at(vertex_id);
 

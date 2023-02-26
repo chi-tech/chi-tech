@@ -31,7 +31,7 @@ void chi_math::SpatialDiscretization_PWLD::OrderNodes()
   for (const auto& cell : ref_grid->local_cells)
   {
     const auto& cell_mapping = GetCellMapping(cell);
-    cell_local_block_address[cell.local_id] =
+    cell_local_block_address[cell.local_id_] =
       static_cast<int64_t>(local_node_count);
     local_node_count += cell_mapping.NumNodes();
   }
@@ -65,11 +65,11 @@ void chi_math::SpatialDiscretization_PWLD::OrderNodes()
   for (uint64_t global_id : ref_grid->cells.GetGhostGlobalIDs())
   {
     const auto& cell = ref_grid->cells[global_id];
-    const int locI = static_cast<int>(cell.partition_id);
+    const int locI = static_cast<int>(cell.partition_id_);
 
     std::vector<uint64_t>& locI_cell_id_list = ghost_cell_ids_consolidated[locI];
 
-    locI_cell_id_list.push_back(cell.global_id);
+    locI_cell_id_list.push_back(cell.global_id_);
   }
 
   //================================================== AllToAll to get query
@@ -89,7 +89,7 @@ void chi_math::SpatialDiscretization_PWLD::OrderNodes()
       const auto& cell = ref_grid->cells[cell_global_id];
 
       const uint64_t cell_block_address = local_block_address +
-                                          cell_local_block_address[cell.local_id];
+                                          cell_local_block_address[cell.local_id_];
       map_list.push_back(cell_block_address);
     }
   }

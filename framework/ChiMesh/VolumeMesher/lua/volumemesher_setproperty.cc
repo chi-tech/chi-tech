@@ -82,6 +82,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
   const std::string fname = "chiVolumeMesherSetProperty";
   //============================================= Get current mesh handler
   auto& cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& volume_mesher = cur_hndlr.GetVolumeMesher();
 
   //============================================= Get property index
   const int num_args = lua_gettop(L);
@@ -99,59 +100,59 @@ int chiVolumeMesherSetProperty(lua_State *L)
   if (property_index == VMP::FORCE_POLYGONS)
   {
     bool force_condition = lua_toboolean(L,2);
-    cur_hndlr.volume_mesher->options.force_polygons = force_condition;
+    volume_mesher.options.force_polygons = force_condition;
   }
 
   else if (property_index == VMP::MESH_GLOBAL)
   {
     bool mesh_global = lua_toboolean(L,2);
-    cur_hndlr.volume_mesher->options.mesh_global = mesh_global;
+    volume_mesher.options.mesh_global = mesh_global;
   }
 
   else if (property_index == VMP::PARTITION_Z)
   {
     int pz = lua_tonumber(L,2);
-    cur_hndlr.volume_mesher->options.partition_z = pz;
+    volume_mesher.options.partition_z = pz;
     chi::log.LogAllVerbose1()
       << "Partition z set to " << pz;
   }
   else if (property_index == VMP::PARTITION_Y)
   {
     int p = lua_tonumber(L,2);
-    cur_hndlr.volume_mesher->options.partition_y = p;
+    volume_mesher.options.partition_y = p;
     chi::log.LogAllVerbose1()
       << "Partition y set to " << p;
   }
   else if (property_index == VMP::PARTITION_X)
   {
     int p = lua_tonumber(L,2);
-    cur_hndlr.volume_mesher->options.partition_x = p;
+    volume_mesher.options.partition_x = p;
     chi::log.LogAllVerbose1()
       << "Partition x set to " << p;
   }
   else if (property_index == VMP::CUTS_Z)
   {
     double p = lua_tonumber(L,2);
-    cur_hndlr.volume_mesher->options.zcuts.push_back(p);
+    volume_mesher.options.zcuts.push_back(p);
   }
   else if (property_index == VMP::CUTS_Y)
   {
     double p = lua_tonumber(L,2);
-    cur_hndlr.surface_mesher->AddYCut(p);
-    cur_hndlr.volume_mesher->options.ycuts.push_back(p);
+    cur_hndlr.GetSurfaceMesher().AddYCut(p);
+    volume_mesher.options.ycuts.push_back(p);
   }
   else if (property_index == VMP::CUTS_X)
   {
     double p = lua_tonumber(L,2);
-    cur_hndlr.surface_mesher->AddXCut(p);
-    cur_hndlr.volume_mesher->options.xcuts.push_back(p);
+    cur_hndlr.GetSurfaceMesher().AddXCut(p);
+    volume_mesher.options.xcuts.push_back(p);
   }
   else if (property_index == VMP::PARTITION_TYPE)
   {
     int p = lua_tonumber(L,2);
     if (p >= chi_mesh::VolumeMesher::PartitionType::KBA_STYLE_XYZ and
         p <= chi_mesh::VolumeMesher::PartitionType::PARMETIS)
-      cur_hndlr.volume_mesher->options.partition_type =
+      volume_mesher.options.partition_type =
         (chi_mesh::VolumeMesher::PartitionType)p;
     else
     {
@@ -164,9 +165,9 @@ int chiVolumeMesherSetProperty(lua_State *L)
 
   else if (property_index == VMP::EXTRUSION_LAYER)
   {
-    if (cur_hndlr.volume_mesher->Type() == chi_mesh::VolumeMesherType::EXTRUDER)
+    if (volume_mesher.Type() == chi_mesh::VolumeMesherType::EXTRUDER)
     {
-      auto& mesher = (chi_mesh::VolumeMesherExtruder&)*cur_hndlr.volume_mesher;
+      auto& mesher = dynamic_cast<chi_mesh::VolumeMesherExtruder&>(volume_mesher);
 
       double layer_height = lua_tonumber(L,2);
       int    subdivisions = 1;
@@ -280,15 +281,15 @@ int chiVolumeMesherSetKBAPartitioningPxPyPz(lua_State *L)
 
   //============================================= Get current mesh handler
   auto& cur_hndlr = chi_mesh::GetCurrentHandler();
-  auto vol_mesher= cur_hndlr.volume_mesher;
+  auto& vol_mesher= cur_hndlr.GetVolumeMesher();
 
   int px = lua_tonumber(L,1);
   int py = lua_tonumber(L,2);
   int pz = lua_tonumber(L,3);
 
-  vol_mesher->options.partition_x = px;
-  vol_mesher->options.partition_y = py;
-  vol_mesher->options.partition_z = pz;
+  vol_mesher.options.partition_x = px;
+  vol_mesher.options.partition_y = py;
+  vol_mesher.options.partition_z = pz;
 
   return 0;
 }
@@ -309,7 +310,7 @@ int chiVolumeMesherSetKBACutsX(lua_State *L)
   LuaPopulateVectorFrom1DArray(__FUNCTION__,L,1,cuts);
 
   auto& mesh_handler = chi_mesh::GetCurrentHandler();
-  mesh_handler.volume_mesher->options.xcuts = cuts;
+  mesh_handler.GetVolumeMesher().options.xcuts = cuts;
 
   return 0;
 }
@@ -330,7 +331,7 @@ int chiVolumeMesherSetKBACutsY(lua_State *L)
   LuaPopulateVectorFrom1DArray(__FUNCTION__,L,1,cuts);
 
   auto& mesh_handler = chi_mesh::GetCurrentHandler();
-  mesh_handler.volume_mesher->options.ycuts = cuts;
+  mesh_handler.GetVolumeMesher().options.ycuts = cuts;
 
   return 0;
 }
@@ -351,7 +352,7 @@ int chiVolumeMesherSetKBACutsZ(lua_State *L)
   LuaPopulateVectorFrom1DArray(__FUNCTION__,L,1,cuts);
 
   auto& mesh_handler = chi_mesh::GetCurrentHandler();
-  mesh_handler.volume_mesher->options.zcuts = cuts;
+  mesh_handler.GetVolumeMesher().options.zcuts = cuts;
 
   return 0;
 }

@@ -13,9 +13,9 @@ double lbs::DiscOrdTransientSolver::ComputeBeta()
   double localDNPR = 0.0;
   for (const auto& cell : grid_ptr_->local_cells)
   {
-    const auto& transport_view = cell_transport_views_[cell.local_id];
+    const auto& transport_view = cell_transport_views_[cell.local_id_];
     const double cell_volume = transport_view.Volume();
-    const size_t dof_map = cell.local_id + max_precursors_per_material_;
+    const size_t dof_map = cell.local_id_ + max_precursors_per_material_;
 
     auto xs = transport_view.XS();
 

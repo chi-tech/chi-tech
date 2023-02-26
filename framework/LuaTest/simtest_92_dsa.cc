@@ -64,7 +64,7 @@ int chiSimTest92_DSA(lua_State* L)
   for (const auto& cell : grid.local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
-    const size_t cell_num_faces = cell.faces.size();
+    const size_t cell_num_faces = cell.faces_.size();
     const size_t cell_num_nodes = cell_mapping.NumNodes();
     const auto vol_qp_data = cell_mapping.MakeVolumeQuadraturePointData();
 
@@ -135,7 +135,7 @@ int chiSimTest92_DSA(lua_State* L)
       }//for i
     }//for f
 
-    unit_cell_matrices[cell.local_id] =
+    unit_cell_matrices[cell.local_id_] =
       lbs::UnitCellMatrices{IntV_gradshapeI_gradshapeJ, //K-matrix
                             {},                         //G-matrix
                             IntV_shapeI_shapeJ,         //M-matrix

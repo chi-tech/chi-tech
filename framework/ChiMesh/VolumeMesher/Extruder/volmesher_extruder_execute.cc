@@ -119,7 +119,7 @@ void chi_mesh::VolumeMesherExtruder::Execute()
   chi::log.LogAllVerbose1()
     << "### LOCATION[" << chi::mpi.location_id
     << "] amount of local cells="
-    << grid->local_cell_glob_indices.size();
+    << grid->local_cells.size();
 
 
   chi::log.Log()

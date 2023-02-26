@@ -36,15 +36,15 @@ void lbs::acceleration::DiffusionMIPSolver::
   VecSet(rhs_, 0.0);
   for (const auto& cell : grid_.local_cells)
   {
-    const size_t num_faces    = cell.faces.size();
+    const size_t num_faces    = cell.faces_.size();
     const auto&  cell_mapping = sdm_.GetCellMapping(cell);
     const size_t num_nodes    = cell_mapping.NumNodes();
     const auto   cc_nodes     = cell_mapping.GetNodeLocations();
-    const auto&  unit_cell_matrices = unit_cell_matrices_[cell.local_id];
+    const auto&  unit_cell_matrices = unit_cell_matrices_[cell.local_id_];
 
     const auto& cell_M_matrix = unit_cell_matrices.M_matrix;
 
-    const auto& xs = mat_id_2_xs_map_.at(cell.material_id);
+    const auto& xs = mat_id_2_xs_map_.at(cell.material_id_);
 
     for (size_t g=0; g<num_groups; ++g)
     {
@@ -69,8 +69,8 @@ void lbs::acceleration::DiffusionMIPSolver::
       //==================================== Assemble face terms
       for (size_t f=0; f<num_faces; ++f)
       {
-        const auto&  face           = cell.faces[f];
-        const auto&  n_f            = face.normal;
+        const auto&  face           = cell.faces_[f];
+        const auto&  n_f            = face.normal_;
         const size_t num_face_nodes = cell_mapping.NumFaceNodes(f);
 
         const auto& face_M = unit_cell_matrices.face_M_matrices[f];
@@ -79,11 +79,11 @@ void lbs::acceleration::DiffusionMIPSolver::
 
         const double hm = HPerpendicular(cell, f);
 
-        if (not face.has_neighbor)
+        if (not face.has_neighbor_)
         {
           auto bc = DefaultBCDirichlet;
-          if (bcs_.count(face.neighbor_id) > 0)
-            bc = bcs_.at(face.neighbor_id);
+          if (bcs_.count(face.neighbor_id_) > 0)
+            bc = bcs_.at(face.neighbor_id_);
 
           if (bc.type == BCType::DIRICHLET)
           {
@@ -187,15 +187,15 @@ Assemble_b(Vec petsc_q_vector)
   VecSet(rhs_, 0.0);
   for (const auto& cell : grid_.local_cells)
   {
-    const size_t num_faces    = cell.faces.size();
+    const size_t num_faces    = cell.faces_.size();
     const auto&  cell_mapping = sdm_.GetCellMapping(cell);
     const size_t num_nodes    = cell_mapping.NumNodes();
     const auto   cc_nodes     = cell_mapping.GetNodeLocations();
-    const auto&  unit_cell_matrices = unit_cell_matrices_[cell.local_id];
+    const auto&  unit_cell_matrices = unit_cell_matrices_[cell.local_id_];
 
     const auto& cell_M_matrix = unit_cell_matrices.M_matrix;
 
-    const auto& xs = mat_id_2_xs_map_.at(cell.material_id);
+    const auto& xs = mat_id_2_xs_map_.at(cell.material_id_);
 
     for (size_t g=0; g<num_groups; ++g)
     {
@@ -220,8 +220,8 @@ Assemble_b(Vec petsc_q_vector)
       //==================================== Assemble face terms
       for (size_t f=0; f<num_faces; ++f)
       {
-        const auto&  face           = cell.faces[f];
-        const auto&  n_f            = face.normal;
+        const auto&  face           = cell.faces_[f];
+        const auto&  n_f            = face.normal_;
         const size_t num_face_nodes = cell_mapping.NumFaceNodes(f);
 
         const auto& face_M = unit_cell_matrices.face_M_matrices[f];
@@ -230,11 +230,11 @@ Assemble_b(Vec petsc_q_vector)
 
         const double hm = HPerpendicular(cell, f);
 
-        if (not face.has_neighbor)
+        if (not face.has_neighbor_)
         {
           auto bc = DefaultBCDirichlet;
-          if (bcs_.count(face.neighbor_id) > 0)
-            bc = bcs_.at(face.neighbor_id);
+          if (bcs_.count(face.neighbor_id_) > 0)
+            bc = bcs_.at(face.neighbor_id_);
 
           if (bc.type == BCType::DIRICHLET)
           {

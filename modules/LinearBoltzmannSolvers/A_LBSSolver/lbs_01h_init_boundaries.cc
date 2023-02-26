@@ -12,9 +12,9 @@ void lbs::LBSSolver::InitializeBoundaries()
   {
     std::set<uint64_t> local_unique_bids_set;
     for (const auto& cell : grid_ptr_->local_cells)
-      for (const auto& face : cell.faces)
-        if (not face.has_neighbor)
-          local_unique_bids_set.insert(face.neighbor_id);
+      for (const auto& face : cell.faces_)
+        if (not face.has_neighbor_)
+          local_unique_bids_set.insert(face.neighbor_id_);
 
     std::vector<uint64_t> local_unique_bids(local_unique_bids_set.begin(),
                                             local_unique_bids_set.end());

@@ -13,12 +13,12 @@ void chi_mesh::UploadCellGeometry(const chi_mesh::MeshContinuum &grid,
                                   vtkNew<vtkPoints> &points,
                                   vtkNew<vtkUnstructuredGrid> &ugrid)
 {
-  size_t num_verts = cell.vertex_ids.size();
+  size_t num_verts = cell.vertex_ids_.size();
 
   std::vector<vtkIdType> cell_vids(num_verts);
   for (size_t v=0; v<num_verts; v++)
   {
-    uint64_t vgi = cell.vertex_ids[v];
+    uint64_t vgi = cell.vertex_ids_[v];
     std::vector<double> d_node(3);
     d_node[0] = grid.vertices[vgi].x;
     d_node[1] = grid.vertices[vgi].y;
@@ -54,16 +54,16 @@ void chi_mesh::UploadCellGeometry(const chi_mesh::MeshContinuum &grid,
     // Build polyhedron faces
     std::vector<vtkIdType> faces_vids;
 
-    size_t num_faces = cell.faces.size();
-    for (auto& face : cell.faces)
+    size_t num_faces = cell.faces_.size();
+    for (auto& face : cell.faces_)
     {
-      size_t num_fverts = face.vertex_ids.size();
+      size_t num_fverts = face.vertex_ids_.size();
       std::vector<vtkIdType> face_info(num_fverts);
       for (size_t fv=0; fv<num_fverts; fv++)
       {
         size_t v = 0;
         for (size_t cv=0; cv<num_verts; ++cv)
-          if (cell.vertex_ids[cv] == face.vertex_ids[fv])
+          if (cell.vertex_ids_[cv] == face.vertex_ids_[fv])
           { v = cv; break; }
 
         face_info[fv] = cell_vids[v];

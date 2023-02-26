@@ -174,7 +174,7 @@ void dfem_diffusion::Solver::Execute()
   const auto& grid = *grid_ptr;
   const auto& sdm  = *sdm_ptr;
 
-  lua_State* L = chi::console.consoleState;
+  lua_State* L = chi::console.GetConsoleState();
 
   //============================================= Assemble the system
   // is this needed?
@@ -189,7 +189,7 @@ void dfem_diffusion::Solver::Execute()
     const auto   cc_nodes    = cell_mapping.GetNodeLocations();
     const auto  qp_data      = cell_mapping.MakeVolumeQuadraturePointData();
 
-    const auto imat  = cell.material_id;
+    const auto imat  = cell.material_id_;
     MatDbl Acell(num_nodes, VecDbl(num_nodes, 0.0));
     VecDbl cell_rhs(num_nodes, 0.0);
 
@@ -225,10 +225,10 @@ void dfem_diffusion::Solver::Execute()
     }//for i
 
     //==================================== Assemble face terms
-    const size_t num_faces = cell.faces.size();
+    const size_t num_faces = cell.faces_.size();
     for (size_t f = 0; f < num_faces; ++f) {
-      const auto &face = cell.faces[f];
-      const auto &n_f = face.normal;
+      const auto &face = cell.faces_[f];
+      const auto &n_f = face.normal_;
       const size_t num_face_nodes = cell_mapping.NumFaceNodes(f);
       const auto fqp_data = cell_mapping.MakeFaceQuadraturePointData(f);
 
@@ -237,15 +237,15 @@ void dfem_diffusion::Solver::Execute()
       typedef chi_mesh::MeshContinuum Grid;
 
       // interior face
-      if (face.has_neighbor)
+      if (face.has_neighbor_)
       {
-        const auto &adj_cell = grid.cells[face.neighbor_id];
+        const auto &adj_cell = grid.cells[face.neighbor_id_];
         const auto &adj_cell_mapping = sdm.GetCellMapping(adj_cell);
         const auto ac_nodes = adj_cell_mapping.GetNodeLocations();
         const size_t acf = Grid::MapCellFace(cell, adj_cell, f);
         const double hp_neigh = HPerpendicular(adj_cell, acf);
 
-        const auto imat_neigh = adj_cell.material_id;
+        const auto imat_neigh = adj_cell.material_id_;
 
         //========================= Compute Ckappa IP
         double Ckappa = 1.0;
@@ -344,7 +344,7 @@ void dfem_diffusion::Solver::Execute()
       }//internal face
       else
       { // boundary face
-        const auto &bndry = boundaries[face.neighbor_id];
+        const auto &bndry = boundaries[face.neighbor_id_];
         // Robin boundary
         if (bndry.type == BoundaryType::Robin)
         {

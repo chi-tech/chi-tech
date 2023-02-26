@@ -22,8 +22,17 @@ namespace lbs
   class WGSLinearSolver;
 }
 
-namespace sweep_namespace = chi_mesh::sweep_management;
-typedef sweep_namespace::SweepChunk SweepChunk;
+namespace chi_objects
+{
+  class ChiMPICommunicatorSet;
+}
+typedef std::shared_ptr<chi_objects::ChiMPICommunicatorSet> MPILocalCommSetPtr;
+
+namespace chi_mesh
+{
+  class GridFaceHistogram;
+}
+typedef std::shared_ptr<chi_mesh::GridFaceHistogram> GridFaceHistogramPtr;
 
 namespace lbs
 {
@@ -55,7 +64,11 @@ protected:
 
   std::shared_ptr<chi_math::SpatialDiscretization> discretization_ = nullptr;
   chi_mesh::MeshContinuumPtr grid_ptr_;
+
   std::vector<CellFaceNodalMapping> grid_nodal_mappings_;
+  MPILocalCommSetPtr grid_local_comm_set_ = nullptr;
+  GridFaceHistogramPtr grid_face_histogram_ = nullptr;
+
   std::vector<UnitCellMatrices> unit_cell_matrices_;
   std::map<uint64_t, UnitCellMatrices> unit_ghost_cell_matrices_;
   std::vector<lbs::CellLBSView> cell_transport_views_;

@@ -38,7 +38,7 @@ namespace chi_unit_sim_tests
     double local_error = 0.0;
     for (const auto& cell : sdm.ref_grid->local_cells)
     {
-      const int mat_id = cell.material_id;
+      const int mat_id = cell.material_id_;
       const auto& cell_mapping = sdm.GetCellMapping(cell);
       const size_t num_nodes = cell_mapping.NumNodes();
       const auto qp_data = cell_mapping.MakeVolumeQuadraturePointData();

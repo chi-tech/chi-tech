@@ -57,20 +57,20 @@ void lbs::DiscOrdTransientSolver::
   // Apply all nodal sources
   for (const auto& cell : grid_ptr_->local_cells)
   {
-    const auto& fe_values = unit_cell_matrices_[cell.local_id];
-    auto& transport_view = cell_transport_views_[cell.local_id];
+    const auto& fe_values = unit_cell_matrices_[cell.local_id_];
+    auto& transport_view = cell_transport_views_[cell.local_id_];
     const double cell_volume = transport_view.Volume();
 
     //==================== Obtain xs
     auto xs = transport_view.XS();
-    auto P0_src = matid_to_src_map_[cell.material_id];
+    auto P0_src = matid_to_src_map_[cell.material_id_];
 
     const auto& S = xs.transfer_matrices_;
 
     //==================== Obtain src
     double* src = default_zero_src.data();
     if (P0_src and apply_fixed_src)
-      src = P0_src->source_value_g.data();
+      src = P0_src->source_value_g_.data();
 
     //======================================== Loop over nodes
     const int num_nodes = transport_view.NumNodes();
@@ -167,7 +167,7 @@ void lbs::DiscOrdTransientSolver::
           if (fission_avail and apply_fixed_src and options_.use_precursors)
           {
             const auto& J = max_precursors_per_material_;
-            const size_t dof_map = cell.local_id * J;
+            const size_t dof_map = cell.local_id_ * J;
             for (unsigned int j = 0; j < xs.num_precursors_; ++j)
             {
               const auto& precursor = xs.precursors_[j];

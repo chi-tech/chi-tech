@@ -22,38 +22,32 @@ namespace chi_objects
   class ChiMPICommunicatorSet;
 }
 
+namespace chi_mesh
+{
+  class GridFaceHistogram;
+}
+
 //######################################################### Class Definition
 /**Stores the relevant information for completely defining a computational
  * domain. */
 class chi_mesh::MeshContinuum
 {
 private:
-  std::vector<std::unique_ptr<chi_mesh::Cell>> native_cells;  ///< Actual native cells
-  std::vector<std::unique_ptr<chi_mesh::Cell>> foreign_cells; ///< Locally stored ghosts
+  typedef std::shared_ptr<chi_objects::ChiMPICommunicatorSet> MPILocalCommSetPtr;
+private:
+  std::vector<std::unique_ptr<chi_mesh::Cell>> local_cells_;  ///< Actual local cells
+  std::vector<std::unique_ptr<chi_mesh::Cell>> ghost_cells_; ///< Locally stored ghosts
 
-  std::map<uint64_t,uint64_t> global_cell_id_to_native_id_map;
-  std::map<uint64_t,uint64_t> global_cell_id_to_foreign_id_map;
+  std::map<uint64_t,uint64_t> global_cell_id_to_local_id_map_;
+  std::map<uint64_t,uint64_t> global_cell_id_to_nonlocal_id_map_;
 
-  uint64_t global_vertex_count=0;
+  uint64_t global_vertex_count_=0;
 
 public:
   VertexHandler                  vertices;
   LocalCellHandler               local_cells;
   GlobalCellHandler              cells;
-  std::vector<uint64_t>          local_cell_glob_indices;
-
 private:
-  bool                           face_histogram_available = false;
-  bool                           communicators_available  = false;
-
-  //Pair.first is the max dofs-per-face for the category and Pair.second
-  //is the number of faces in this category
-  std::vector<std::pair<size_t,size_t>> face_categories;
-
-//  chi_objects::ChiMPICommunicatorSet communicator_set;
-
-  std::shared_ptr<chi_objects::ChiMPICommunicatorSet> communicator_set2_;
-
   MeshAttributes attributes = NONE;
 
   struct
@@ -65,17 +59,16 @@ private:
 
 public:
   MeshContinuum() :
-    local_cells(native_cells),
-    cells(local_cell_glob_indices,
-          native_cells,
-          foreign_cells,
-          global_cell_id_to_native_id_map,
-          global_cell_id_to_foreign_id_map)
+    local_cells(local_cells_),
+    cells(local_cells_,
+          ghost_cells_,
+          global_cell_id_to_local_id_map_,
+          global_cell_id_to_nonlocal_id_map_)
   {
   }
 
-  void SetGlobalVertexCount(const uint64_t count) {global_vertex_count = count;}
-  uint64_t GetGlobalVertexCount() const {return global_vertex_count;}
+  void SetGlobalVertexCount(const uint64_t count) { global_vertex_count_ = count;}
+  uint64_t GetGlobalVertexCount() const {return global_vertex_count_;}
 
   static
   std::shared_ptr<MeshContinuum> New()
@@ -85,10 +78,10 @@ public:
    * to another grid.*/
   void ClearCellReferences()
   {
-    native_cells.clear();
-    foreign_cells.clear();
-    global_cell_id_to_native_id_map.clear();
-    global_cell_id_to_foreign_id_map.clear();
+    local_cells_.clear();
+    ghost_cells_.clear();
+    global_cell_id_to_local_id_map_.clear();
+    global_cell_id_to_nonlocal_id_map_.clear();
   }
 
   void ExportCellsToObj(const char* fileName,
@@ -96,10 +89,10 @@ public:
                            int options = 0) const;
   void ExportCellsToVTK(const std::string& file_base_name) const;
 
-  void BuildFaceHistogramInfo(double master_tolerance=100.0, double slave_tolerance=1.1);
-  size_t NumberOfFaceHistogramBins();
-  size_t MapFaceHistogramBins(size_t num_face_dofs);
-  size_t GetFaceHistogramBinDOFSize(size_t category);
+  std::shared_ptr<GridFaceHistogram>
+  MakeGridFaceHistogram(double master_tolerance=100.0,
+                        double slave_tolerance=1.1) const;
+
   bool IsCellLocal(uint64_t cell_global_index) const;
   bool IsCellBndry(uint64_t cell_global_index) const;
 
@@ -112,7 +105,8 @@ public:
   chi_mesh::Vector3
   ComputeCentroidFromListOfNodes(const std::vector<uint64_t>& list) const;
 
-  chi_objects::ChiMPICommunicatorSet& GetCommunicator();
+  MPILocalCommSetPtr MakeMPILocalCommunicatorSet() const;
+
 
   size_t GetGlobalNumberOfCells() const;
 

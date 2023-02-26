@@ -30,8 +30,8 @@ void chi_math::CellMapping::ComputeCellVolumeAndAreas(
   {
     case chi_mesh::CellType::SLAB:
     {
-      const auto& v0 = grid.vertices[cell.vertex_ids[0]];
-      const auto& v1 = grid.vertices[cell.vertex_ids[1]];
+      const auto& v0 = grid.vertices[cell.vertex_ids_[0]];
+      const auto& v1 = grid.vertices[cell.vertex_ids_[1]];
 
       volume = (v1-v0).Norm();
       areas = {1.0,1.0};
@@ -40,15 +40,15 @@ void chi_math::CellMapping::ComputeCellVolumeAndAreas(
     case chi_mesh::CellType::POLYGON:
     {
       volume = 0.0;
-      const auto& v2 = cell.centroid;
+      const auto& v2 = cell.centroid_;
 
-      size_t num_faces = cell.faces.size();
+      size_t num_faces = cell.faces_.size();
       areas.reserve(num_faces);
 
       for (size_t f=0; f<num_faces; ++f)
       {
-        const uint64_t v0i = cell.faces[f].vertex_ids[0];
-        const uint64_t v1i = cell.faces[f].vertex_ids[1];
+        const uint64_t v0i = cell.faces_[f].vertex_ids_[0];
+        const uint64_t v1i = cell.faces_[f].vertex_ids_[1];
 
         const auto& v0 = grid.vertices[v0i];
         const auto& v1 = grid.vertices[v1i];
@@ -69,22 +69,22 @@ void chi_math::CellMapping::ComputeCellVolumeAndAreas(
     case chi_mesh::CellType::POLYHEDRON:
     {
       volume = 0.0;
-      const auto& vcc = cell.centroid;
+      const auto& vcc = cell.centroid_;
 
-      size_t num_faces = cell.faces.size();
+      size_t num_faces = cell.faces_.size();
       areas.assign(num_faces, 0.0);
       for (size_t f=0; f<num_faces; f++)
       {
-        const auto& face = cell.faces[f];
-        const size_t num_edges = face.vertex_ids.size();
+        const auto& face = cell.faces_[f];
+        const size_t num_edges = face.vertex_ids_.size();
         for (size_t e=0; e<num_edges; ++e)
         {
           size_t ep1 = (e < (num_edges-1))? e+1 : 0;
-          uint64_t v0i = face.vertex_ids[e  ];
-          uint64_t v1i = face.vertex_ids[ep1];
+          uint64_t v0i = face.vertex_ids_[e  ];
+          uint64_t v1i = face.vertex_ids_[ep1];
 
           const auto& v0 = grid.vertices[v0i];
-          const auto& v1 = cell.faces[f].centroid;
+          const auto& v1 = cell.faces_[f].centroid_;
           const auto& v2 = grid.vertices[v1i];
           const auto& v3 = vcc;
 

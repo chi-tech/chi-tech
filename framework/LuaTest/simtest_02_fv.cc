@@ -66,20 +66,20 @@ int chiSimTest02_FV(lua_State* L)
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const int64_t imap = sdm.MapDOF(cell,0);
 
-    const auto& xp = cell.centroid;
+    const auto& xp = cell.centroid_;
     const double V = cell_mapping.CellVolume();
 
     size_t f=0;
-    for (const auto& face : cell.faces)
+    for (const auto& face : cell.faces_)
     {
-      const auto Af = face.normal * cell_mapping.FaceArea(f);
+      const auto Af = face.normal_ * cell_mapping.FaceArea(f);
 
-      if (face.has_neighbor)
+      if (face.has_neighbor_)
       {
-        const auto& adj_cell = grid.cells[face.neighbor_id];
+        const auto& adj_cell = grid.cells[face.neighbor_id_];
         const int64_t jnmap = sdm.MapDOF(adj_cell,0);
 
-        const auto& xn = adj_cell.centroid;
+        const auto& xn = adj_cell.centroid_;
 
         const auto xpn = xn - xp;
 
@@ -90,7 +90,7 @@ int chiSimTest02_FV(lua_State* L)
       }
       else
       {
-        const auto& xn = xp + 2.0*(face.centroid - xp);
+        const auto& xn = xp + 2.0*(face.centroid_ - xp);
         const auto xpn = xn - xp;
 
         const auto cf = Af.Dot(xpn) / xpn.NormSquare();
@@ -178,26 +178,26 @@ int chiSimTest02_FV(lua_State* L)
     const int64_t imap = sdm.MapDOFLocal(cell, 0);
     const double  phi_P = field_wg[imap];
 
-    const auto& xp = cell.centroid;
+    const auto& xp = cell.centroid_;
 
     auto grad_phi_P = chi_mesh::Vector3(0,0,0);
 
     size_t f=0;
-    for (const auto& face : cell.faces)
+    for (const auto& face : cell.faces_)
     {
-      const auto& xf = face.centroid;
-      const auto  Af = cell_mapping.FaceArea(f) * face.normal;
+      const auto& xf = face.centroid_;
+      const auto  Af = cell_mapping.FaceArea(f) * face.normal_;
 
       double phi_N = 0.0;
       auto xn = xp + 2*(xf-xp);
 
-      if (face.has_neighbor)
+      if (face.has_neighbor_)
       {
-        const auto& adj_cell = grid.cells[face.neighbor_id];
+        const auto& adj_cell = grid.cells[face.neighbor_id_];
         const int64_t nmap = sdm.MapDOFLocal(adj_cell, 0);
         phi_N = field_wg[nmap];
 
-        xn = adj_cell.centroid;
+        xn = adj_cell.centroid_;
       }
 
       grad_phi_P += Af * ((xn-xf).Norm()*phi_P + (xf-xp).Norm()*phi_N)/

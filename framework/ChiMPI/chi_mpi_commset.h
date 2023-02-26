@@ -9,12 +9,20 @@ namespace chi_objects
 {
 
 //################################################################### Class def
-/**Simple implementation a communicator set.*/
+/**Simple implementation a communicator set.
+ * Definitions:
+ * P = total amount of processors.
+ * locI = process I in [0,P]*/
 class ChiMPICommunicatorSet
 {
 private:
+  /**A list of communicators, size P, contains a communicator for
+   * only communicating with the neighbors of locI.*/
   std::vector<MPI_Comm>  communicators_;
+  /**A list of groupings, size P, allows mapping of the rank of locJ
+   * relative to the local communicator.*/
   std::vector<MPI_Group> location_groups_;
+  /**Used to translate ranks.*/
   MPI_Group              world_group_;
 
 public:

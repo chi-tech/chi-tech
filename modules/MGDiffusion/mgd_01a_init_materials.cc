@@ -38,7 +38,7 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
     //====================================== Extract properties
     using MatProperty = chi_physics::PropertyType;
     bool found_transport_xs = false;
-    for (const auto& property : current_material->properties)
+    for (const auto& property : current_material->properties_)
     {
       if (property->Type() == MatProperty::TRANSPORT_XSECTIONS)
       {
@@ -55,11 +55,11 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
         auto mg_source =
           std::static_pointer_cast<chi_physics::IsotropicMultiGrpSource>(property);
 
-        if (mg_source->source_value_g.size() < mg_diffusion::Solver::num_groups)
+        if (mg_source->source_value_g_.size() < mg_diffusion::Solver::num_groups)
         {
           chi::log.LogAllWarning()
             << "MG-Diff-InitMaterials: Isotropic Multigroup source specified in "
-            << "material \"" << current_material->name << "\" has fewer "
+            << "material \"" << current_material->name_ << "\" has fewer "
             << "energy groups than called for in the simulation. "
             << "Source will be ignored.";
         }
@@ -75,14 +75,14 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
     {
       chi::log.LogAllError()
         << "MG-Diff-InitMaterials: Found no transport cross-section property for "
-        << "material \"" << current_material->name << "\".";
+        << "material \"" << current_material->name_ << "\".";
       chi::Exit(EXIT_FAILURE);
     }
     //====================================== Check number of groups legal
     if (matid_to_xs_map[mat_id]->num_groups_ != mg_diffusion::Solver::num_groups)
     {
       chi::log.LogAllError()
-          << "MG-Diff-InitMaterials: Found material \"" << current_material->name << "\" has "
+          << "MG-Diff-InitMaterials: Found material \"" << current_material->name_ << "\" has "
           << matid_to_xs_map[mat_id]->num_groups_ << " groups and"
           << " the simulation has " << mg_diffusion::Solver::num_groups << " groups."
           << " The material must have the same number of groups.";
@@ -93,7 +93,7 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
     if (matid_to_xs_map[mat_id]->scattering_order_ > 1)
     {
       chi::log.Log0Warning()
-          << "MG-Diff-InitMaterials: Found material \"" << current_material->name << "\" has "
+          << "MG-Diff-InitMaterials: Found material \"" << current_material->name_ << "\" has "
           << "a scattering order of "
           << matid_to_xs_map[mat_id]->scattering_order_ << " and"
           << " the simulation has a scattering order of One (MG-Diff)"

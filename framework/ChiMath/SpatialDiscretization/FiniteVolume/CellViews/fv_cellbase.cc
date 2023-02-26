@@ -6,7 +6,7 @@ void chi_math::CellFVValues::InitializeVolumeQuadraturePointData(
   finite_element::InternalQuadraturePointData &internal_data) const
 {
   internal_data.InitializeData({0},
-                               {{m_cell.centroid}},
+                               {{m_cell.centroid_}},
                                {{1.0}},
                                {{chi_mesh::Vector3(0, 0, 0)}},
                                {m_volume},

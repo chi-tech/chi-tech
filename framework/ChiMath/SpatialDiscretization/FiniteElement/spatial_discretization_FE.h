@@ -60,7 +60,7 @@ namespace chi_math
         throw std::invalid_argument("SpatialDiscretization_FE::GetUnitIntegrals "
                                     "called without integrals being initialized."
                                     " Set flag COMPUTE_UNIT_INTEGRALS.");
-      return fe_unit_integrals[cell.local_id];
+      return fe_unit_integrals[cell.local_id_];
     }
 
     virtual
@@ -71,7 +71,7 @@ namespace chi_math
         throw std::invalid_argument("SpatialDiscretization_FE::GetQPData_Volumetric "
                                     "called without integrals being initialized."
                                     " Set flag INIT_QP_DATA.");
-      return fe_vol_qp_data[cell.local_id];
+      return fe_vol_qp_data[cell.local_id_];
     }
 
     virtual
@@ -83,7 +83,7 @@ namespace chi_math
         throw std::invalid_argument("SpatialDiscretization_FE::GetQPData_Surface "
                                     "called without integrals being initialized."
                                     " Set flag INIT_QP_DATA.");
-      return fe_srf_qp_data[cell.local_id][face];
+      return fe_srf_qp_data[cell.local_id_][face];
     }
 
     virtual ~SpatialDiscretization_FE() = default;

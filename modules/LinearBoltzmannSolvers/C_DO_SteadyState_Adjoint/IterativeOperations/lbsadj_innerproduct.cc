@@ -14,16 +14,16 @@ double lbs::DiscOrdSteadyStateAdjointSolver::ComputeInnerProduct()
   //============================================= Material sources
   for (const auto& cell : grid_ptr_->local_cells)
   {
-    if (matid_to_src_map_.count(cell.material_id) == 0) continue; //Skip if no src
+    if (matid_to_src_map_.count(cell.material_id_) == 0) continue; //Skip if no src
 
-    const auto& transport_view = cell_transport_views_[cell.local_id];
-    const auto& source = matid_to_src_map_[cell.material_id];
+    const auto& transport_view = cell_transport_views_[cell.local_id_];
+    const auto& source = matid_to_src_map_[cell.material_id_];
     const auto& fe_values = pwl->GetUnitIntegrals(cell);
 
     for (const auto& group : groups_)
     {
       const int g = group.id_;
-      const double Q = source->source_value_g[g];
+      const double Q = source->source_value_g_[g];
 
       if (Q > 0.0)
       {
@@ -47,7 +47,7 @@ double lbs::DiscOrdSteadyStateAdjointSolver::ComputeInnerProduct()
     for (const auto& info : info_list)
     {
       const auto& cell = grid_ptr_->local_cells[info.cell_local_id];
-      const auto& transport_view = cell_transport_views_[cell.local_id];
+      const auto& transport_view = cell_transport_views_[cell.local_id_];
       const auto& source_strength = point_source.Strength();
       const auto& shape_values = info.shape_values;
       const auto& fe_values = pwl->GetUnitIntegrals(cell);

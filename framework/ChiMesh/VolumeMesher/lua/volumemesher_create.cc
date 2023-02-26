@@ -121,7 +121,7 @@ int chiVolumeMesherCreate(lua_State *L)
   }
 
   auto& cur_hndlr = chi_mesh::GetCurrentHandler();
-  cur_hndlr.volume_mesher = new_mesher;
+  cur_hndlr.SetVolumeMesher(new_mesher);
 
   chi::log.LogAllVerbose2()
     << "chiVolumeMesherCreate: Volume mesher created."

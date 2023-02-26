@@ -52,14 +52,14 @@ int chiFFInterpolationGetValue(lua_State *L)
 
     lua_newtable(L);
 
-    for (int ff=0; ff<cur_ffi_line.field_functions.size(); ff++)
+    for (int ff=0; ff<cur_ffi_line.GetFieldFunctions().size(); ff++)
     {
       lua_pushnumber(L,ff+1);
 
       lua_newtable(L);
-      const auto& ff_ctx = cur_ffi_line.ff_contexts[ff];
+      const auto& ff_ctx = cur_ffi_line.GetFFContexts()[ff];
 
-      for (int p=0; p<cur_ffi_line.interpolation_points.size(); p++)
+      for (int p=0; p<cur_ffi_line.GetInterpolationPoints().size(); p++)
       {
         lua_pushnumber(L,p+1);
         lua_pushnumber(L,ff_ctx.interpolation_points_values[p]);
@@ -74,7 +74,7 @@ int chiFFInterpolationGetValue(lua_State *L)
   else if ( p_ffi->Type() == chi_mesh::ff_interpolation::Type::VOLUME)
   {
     auto& cur_ffi_volume = dcastVolume(*p_ffi);
-    double value = cur_ffi_volume.op_value;
+    double value = cur_ffi_volume.GetOpValue();
 
     lua_pushnumber(L,value);
     return 1;

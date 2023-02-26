@@ -23,12 +23,12 @@ void mg_diffusion::Solver::Assemble_A_bext()
     const auto  qp_data      = cell_mapping.MakeVolumeQuadraturePointData();
     const size_t num_nodes   = cell_mapping.NumNodes();
 
-    const auto& xs   = matid_to_xs_map.at(cell.material_id);
-    const auto& qext = matid_to_src_map.at(cell.material_id);
+    const auto& xs   = matid_to_xs_map.at(cell.material_id_);
+    const auto& qext = matid_to_src_map.at(cell.material_id_);
     double collapsed_D=0.,collapsed_sig_a=0.;
     if (do_two_grid)
     {
-      const auto &xstg = map_mat_id_2_tginfo.at(cell.material_id);
+      const auto &xstg = map_mat_id_2_tginfo.at(cell.material_id_);
       collapsed_D = xstg.collapsed_D;
       collapsed_sig_a = xstg.collapsed_sig_a;
     }
@@ -70,25 +70,25 @@ void mg_diffusion::Solver::Assemble_A_bext()
       for (size_t qp : qp_data.QuadraturePointIndices())
         entry_rhsi += qp_data.ShapeValue(i, qp) * qp_data.JxW(qp);
       for (uint g=0; g < num_groups; ++g)
-        rhs_cell[g][i] = entry_rhsi * (qext->source_value_g[g]);
+        rhs_cell[g][i] = entry_rhsi * (qext->source_value_g_[g]);
     }//for i
 
     //======================= Deal with BC (all based on variations of Robin)
-    const size_t num_faces = cell.faces.size();
+    const size_t num_faces = cell.faces_.size();
     for (size_t f=0; f<num_faces; ++f)
     {
-      const auto& face = cell.faces[f];
+      const auto& face = cell.faces_[f];
       // not a boundary face
-	    if (face.has_neighbor) continue; 
+	    if (face.has_neighbor_) continue;
 	  
-      auto& bndry = boundaries[face.neighbor_id];
+      auto& bndry = boundaries[face.neighbor_id_];
 
       // Robin boundary
       //   for two-grid, it is homogenous Robin
       if (bndry.type == BoundaryType::Robin)
       {
         const auto  qp_face_data = cell_mapping.MakeFaceQuadraturePointData( f );
-        const size_t num_face_nodes = face.vertex_ids.size();
+        const size_t num_face_nodes = face.vertex_ids_.size();
 
         auto& aval = bndry.mg_values[0];
         auto& bval = bndry.mg_values[1];

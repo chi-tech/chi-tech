@@ -13,8 +13,8 @@ SlabMappingFE_PWL(const chi_mesh::Cell& slab_cell,
                               MakeFaceNodeMapping(slab_cell)),
   volume_quadrature(volume_quadrature)
 {
-  v0i = slab_cell.vertex_ids[0];
-  v1i = slab_cell.vertex_ids[1];
+  v0i = slab_cell.vertex_ids_[0];
+  v1i = slab_cell.vertex_ids_[1];
   v0 = m_grid_ptr->vertices[v0i];
   const auto& v1 = m_grid_ptr->vertices[v1i];
 
@@ -24,6 +24,6 @@ SlabMappingFE_PWL(const chi_mesh::Cell& slab_cell,
 //  face_node_mappings.emplace_back(1, 0);
 //  face_node_mappings.emplace_back(1, 1);
 
-  normals[0] = slab_cell.faces[0].normal;
-  normals[1] = slab_cell.faces[1].normal;
+  normals[0] = slab_cell.faces_[0].normal_;
+  normals[1] = slab_cell.faces_[1].normal_;
 }

@@ -16,7 +16,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
   size_t num_nodes = fe_intgrl_values.NumNodes();
 
   //====================================== Process material id
-  int mat_id = cell.material_id;
+  int mat_id = cell.material_id_;
 
   std::vector<double> D(num_nodes, 1.0);
   std::vector<double> q(num_nodes, 1.0);
@@ -53,19 +53,19 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
 
 
   //========================================= Loop over faces
-  int num_faces = cell.faces.size();
+  int num_faces = cell.faces_.size();
   for (unsigned int f=0; f<num_faces; f++)
   {
-    auto& face = cell.faces[f];
+    auto& face = cell.faces_[f];
 
     //================================== Get face normal
-    chi_mesh::Vector3 n  = face.normal;
+    chi_mesh::Vector3 n  = face.normal_;
 
-    int num_face_dofs = face.vertex_ids.size();
+    int num_face_dofs = face.vertex_ids_.size();
 
-    if (face.has_neighbor)
+    if (face.has_neighbor_)
     {
-      const auto& adj_cell = grid->cells[face.neighbor_id];
+      const auto& adj_cell = grid->cells[face.neighbor_id_];
       const auto& adj_fe_intgrl_values = pwl_sdm->GetUnitIntegrals(adj_cell);
 
 
@@ -102,7 +102,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
       for (int fi=0; fi<num_face_dofs; fi++)
       {
         int i    = fe_intgrl_values.FaceDofMapping(f,fi);
-        int imap = MapCellLocalNodeIDFromGlobalID(adj_cell, cell.vertex_ids[i]);
+        int imap = MapCellLocalNodeIDFromGlobalID(adj_cell, cell.vertex_ids_[i]);
         adj_D_avg += adj_D[imap]* adj_fe_intgrl_values.IntS_shapeI(fmap, imap);
         adj_intS += adj_fe_intgrl_values.IntS_shapeI(fmap, imap);
       }
@@ -127,7 +127,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
         {
           int j     = fe_intgrl_values.FaceDofMapping(f,fj);
           int jr    = pwl_sdm->MapDOF(cell, j, unknown_manager, 0, component);
-          int jmap  = MapCellLocalNodeIDFromGlobalID(adj_cell, face.vertex_ids[fj]);
+          int jmap  = MapCellLocalNodeIDFromGlobalID(adj_cell, face.vertex_ids_[fj]);
           int jrmap = pwl_sdm->MapDOF(adj_cell, jmap, unknown_manager, 0, component);
 
           double aij = kappa* fe_intgrl_values.IntS_shapeI_shapeJ(f, i, j);
@@ -151,7 +151,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
         {
           int j     = fe_intgrl_values.FaceDofMapping(f,fj);
           int jr    = pwl_sdm->MapDOF(cell, j, unknown_manager, 0, component);
-          int jmap  = MapCellLocalNodeIDFromGlobalID(adj_cell, face.vertex_ids[fj]);
+          int jmap  = MapCellLocalNodeIDFromGlobalID(adj_cell, face.vertex_ids_[fj]);
           int jrmap = pwl_sdm->MapDOF(adj_cell, jmap, unknown_manager, 0, component);
 
           double aij =
@@ -167,7 +167,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
       {
         int i     = fe_intgrl_values.FaceDofMapping(f,fi);
         int ir    = pwl_sdm->MapDOF(cell, i, unknown_manager, 0, component);
-        int imap  = MapCellLocalNodeIDFromGlobalID(adj_cell, face.vertex_ids[fi]);
+        int imap  = MapCellLocalNodeIDFromGlobalID(adj_cell, face.vertex_ids_[fi]);
         int irmap = pwl_sdm->MapDOF(adj_cell, imap, unknown_manager, 0, component);
 
         for (int j=0; j<fe_intgrl_values.NumNodes(); j++)
@@ -185,7 +185,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
     }//if not bndry
     else
     {
-      int ir_boundary_index = face.neighbor_id;
+      int ir_boundary_index = face.neighbor_id_;
       auto ir_boundary_type  = boundaries[ir_boundary_index]->type;
 
       if (ir_boundary_type == BoundaryType::Dirichlet)
@@ -295,7 +295,7 @@ void chi_diffusion::Solver::PWLD_Assemble_b(const chi_mesh::Cell& cell,
   size_t num_nodes = fe_intgrl_values.NumNodes();
 
   //====================================== Process material id
-  int mat_id = cell.material_id;
+  int mat_id = cell.material_id_;
 
   std::vector<double> D(num_nodes, 1.0);
   std::vector<double> q(num_nodes, 1.0);

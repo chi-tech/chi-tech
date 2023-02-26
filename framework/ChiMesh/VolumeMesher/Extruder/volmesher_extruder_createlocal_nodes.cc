@@ -31,10 +31,10 @@ CreateLocalNodes(chi_mesh::MeshContinuum& template_grid,
       if (has_local_scope)
       {
         auto& vertex_set = vertex_ids_with_local_scope;
-        for (auto tc_vid : template_cell.vertex_ids)
+        for (auto tc_vid : template_cell.vertex_ids_)
           vertex_set.insert(tc_vid + iz * node_z_index_incr_);
 
-        for (auto tc_vid : template_cell.vertex_ids)
+        for (auto tc_vid : template_cell.vertex_ids_)
           vertex_set.insert(tc_vid + (iz + 1) * node_z_index_incr_);
       }
     }//for template cell

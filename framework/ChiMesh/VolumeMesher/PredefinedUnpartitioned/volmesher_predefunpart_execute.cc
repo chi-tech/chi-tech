@@ -70,7 +70,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
       auto cell = MakeCell(*raw_cell, cell_globl_id,
                            cell_pids[cell_globl_id], umesh->GetVertices());
 
-      for (uint64_t vid : cell->vertex_ids)
+      for (uint64_t vid : cell->vertex_ids_)
         grid->vertices.Insert(vid, umesh->GetVertices()[vid]);
 
       grid->cells.push_back(std::move(cell));
@@ -94,7 +94,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   chi::log.LogAllVerbose1()
     << "### LOCATION[" << chi::mpi.location_id
     << "] amount of local cells="
-    << grid->local_cell_glob_indices.size();
+    << grid->local_cells.size();
 
   size_t total_local_cells = grid->local_cells.size();
   size_t total_global_cells = 0;

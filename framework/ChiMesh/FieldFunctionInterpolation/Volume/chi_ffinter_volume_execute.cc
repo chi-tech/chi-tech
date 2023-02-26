@@ -10,13 +10,13 @@
 /**Executes the volume interpolation.*/
 void chi_mesh::FieldFunctionInterpolationVolume::Execute()
 {
-  const auto& ref_ff = *field_functions.front();
+  const auto& ref_ff = *field_functions_.front();
   const auto& sdm    = ref_ff.SDM();
   const auto& grid   = *sdm.ref_grid;
 
   const auto& uk_man = ref_ff.UnkManager();
   const auto uid = 0;
-  const auto cid = m_ref_component;
+  const auto cid = ref_component_;
 
   using namespace chi_mesh::ff_interpolation;
   const auto field_data = ref_ff.GetGhostedFieldVector();
@@ -25,7 +25,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::Execute()
   double local_sum = 0.0;
   double local_max = 0.0;
   double local_min = 0.0;
-  for (const uint64_t cell_local_id : cell_local_ids_inside_logvol)
+  for (const uint64_t cell_local_id : cell_local_ids_inside_logvol_)
   {
     const auto& cell = grid.local_cells[cell_local_id];
     const auto& cell_mapping = sdm.GetCellMapping(cell);
@@ -39,7 +39,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::Execute()
       node_dof_values[i] = field_data[imap];
     }//for i
 
-    if (cell_local_id == cell_local_ids_inside_logvol.front())
+    if (cell_local_id == cell_local_ids_inside_logvol_.front())
     {
       local_max = node_dof_values.front();
       local_min = node_dof_values.front();
@@ -58,9 +58,9 @@ void chi_mesh::FieldFunctionInterpolationVolume::Execute()
         ff_value += qp_data.ShapeValue(j,qp) * node_dof_values[j];
 
       double function_value = ff_value;
-      if (op_type >= Operation::OP_SUM_LUA and
-          op_type <= Operation::OP_MAX_LUA)
-        function_value = CallLuaFunction(ff_value, cell.material_id);
+      if (op_type_ >= Operation::OP_SUM_LUA and
+          op_type_ <= Operation::OP_MAX_LUA)
+        function_value = CallLuaFunction(ff_value, cell.material_id_);
 
       local_volume += qp_data.JxW(qp);
       local_sum += function_value * qp_data.JxW(qp);
@@ -69,13 +69,13 @@ void chi_mesh::FieldFunctionInterpolationVolume::Execute()
     }//for qp
   }//for cell-id
 
-  if (op_type == Operation::OP_SUM or op_type == Operation::OP_SUM_LUA)
+  if (op_type_ == Operation::OP_SUM or op_type_ == Operation::OP_SUM_LUA)
   {
     double global_sum;
     MPI_Allreduce(&local_sum,&global_sum,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
-    op_value = global_sum;
+    op_value_ = global_sum;
   }
-  if (op_type == Operation::OP_AVG or op_type == Operation::OP_AVG_LUA)
+  if (op_type_ == Operation::OP_AVG or op_type_ == Operation::OP_AVG_LUA)
   {
     double local_data[] = {local_volume, local_sum};
     double global_data[] = {0.0,0.0};
@@ -83,12 +83,12 @@ void chi_mesh::FieldFunctionInterpolationVolume::Execute()
     MPI_Allreduce(&local_data,&global_data,2,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
     double global_volume = global_data[0];
     double global_sum = global_data[1];
-    op_value = global_sum/global_volume;
+    op_value_ = global_sum / global_volume;
   }
-  if (op_type == Operation::OP_MAX or op_type == Operation::OP_MAX_LUA)
+  if (op_type_ == Operation::OP_MAX or op_type_ == Operation::OP_MAX_LUA)
   {
     double global_value;
     MPI_Allreduce(&local_max,&global_value,1,MPI_DOUBLE,MPI_MAX,MPI_COMM_WORLD);
-    op_value = global_value;
+    op_value_ = global_value;
   }
 }

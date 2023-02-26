@@ -11,16 +11,16 @@
 void chi_mesh::FieldFunctionInterpolationPoint::Initialize()
 {
   const std::string fname = "FieldFunctionInterpolationPoint::Initialize";
-  const auto& grid = *field_functions.front()->SDM().ref_grid;
+  const auto& grid = *field_functions_.front()->SDM().ref_grid;
 
   std::vector<uint64_t> cells_potentially_owning_point;
   for (const auto& cell : grid.local_cells)
   {
-    const auto& vcc = cell.centroid;
-    const auto& poi = m_point_of_interest;
+    const auto& vcc = cell.centroid_;
+    const auto& poi = point_of_interest_;
     const auto nudged_point = poi + 1.0e-6*(vcc-poi);
     if (grid.CheckPointInsideCell(cell, nudged_point))
-      cells_potentially_owning_point.push_back(cell.global_id);
+      cells_potentially_owning_point.push_back(cell.global_id_);
   }
 
   const int local_count = static_cast<int>(cells_potentially_owning_point.size());
@@ -57,12 +57,12 @@ void chi_mesh::FieldFunctionInterpolationPoint::Initialize()
  for (const uint64_t gid : recvbuf)
    owning_cell_gid = std::min(owning_cell_gid, gid);
 
- m_locally_owned = false;
+  locally_owned_ = false;
  for (const uint64_t gid : cells_potentially_owning_point)
    if (gid == owning_cell_gid)
    {
-     m_locally_owned = true;
-     m_owning_cell_gid = owning_cell_gid;
+     locally_owned_ = true;
+     owning_cell_gid_ = owning_cell_gid;
      break;
    }
 }
@@ -71,20 +71,20 @@ void chi_mesh::FieldFunctionInterpolationPoint::Initialize()
 /**Executes the point interpolator.*/
 void chi_mesh::FieldFunctionInterpolationPoint::Execute()
 {
-  if (not m_locally_owned) return;
+  if (not locally_owned_) return;
 
-  const auto& ref_ff = *field_functions.front();
+  const auto& ref_ff = *field_functions_.front();
   const auto& sdm    = ref_ff.SDM();
   const auto& grid   = *sdm.ref_grid;
 
   const auto& uk_man = ref_ff.UnkManager();
   const auto uid = 0;
-  const auto cid = m_ref_component;
+  const auto cid = ref_component_;
 
   using namespace chi_mesh::ff_interpolation;
   const auto field_data = ref_ff.GetGhostedFieldVector();
 
-  const auto& cell = grid.cells[m_owning_cell_gid];
+  const auto& cell = grid.cells[owning_cell_gid_];
   const auto& cell_mapping = sdm.GetCellMapping(cell);
   const size_t num_nodes = cell_mapping.NumNodes();
 
@@ -96,11 +96,11 @@ void chi_mesh::FieldFunctionInterpolationPoint::Execute()
   }//for i
 
   std::vector<double> shape_values(num_nodes, 0.0);
-  cell_mapping.ShapeValues(m_point_of_interest, shape_values);
+  cell_mapping.ShapeValues(point_of_interest_, shape_values);
 
-  m_point_value = 0.0;
+  point_value_ = 0.0;
   for (size_t i=0; i<num_nodes; ++i)
-    m_point_value += node_dof_values[i]*shape_values[i];
+    point_value_ += node_dof_values[i] * shape_values[i];
 }
 
 //###################################################################
@@ -108,7 +108,7 @@ void chi_mesh::FieldFunctionInterpolationPoint::Execute()
 double chi_mesh::FieldFunctionInterpolationPoint::GetPointValue() const
 {
   double global_point_value;
-  MPI_Allreduce(&m_point_value,      //sendbuf
+  MPI_Allreduce(&point_value_,      //sendbuf
                 &global_point_value, //recvbuf
                 1, MPI_DOUBLE,       //count + datatype
                 MPI_SUM,             //operation

@@ -17,7 +17,7 @@ chi_mesh::RayTracerOutputInformation chi_mesh::RayTracer::
            int function_depth/*=0*/)
 {
   if (not cell_sizes_.empty())
-    SetTolerancesFromCellSize(cell_sizes_[cell.local_id]);
+    SetTolerancesFromCellSize(cell_sizes_[cell.local_id_]);
 
   RayTracerOutputInformation oi;
 
@@ -48,7 +48,7 @@ chi_mesh::RayTracerOutputInformation chi_mesh::RayTracer::
     if (function_depth < 5)
     {
       // Nudge particle towards centroid
-      chi_mesh::Vector3 v_p_i_cc = (cell.centroid - pos_i);
+      chi_mesh::Vector3 v_p_i_cc = (cell.centroid_ - pos_i);
       chi_mesh::Vector3 pos_i_nudged = pos_i + v_p_i_cc * epsilon_nudge_;
 
       oi = TraceRay(cell,pos_i_nudged,omega_i,function_depth+1);
@@ -59,7 +59,7 @@ chi_mesh::RayTracerOutputInformation chi_mesh::RayTracer::
     if (function_depth < 7)
     {
       // Nudge particle away from line between location and cell center
-      chi_mesh::Vector3 v_p_i_cc = (cell.centroid - pos_i).Cross(omega_i);
+      chi_mesh::Vector3 v_p_i_cc = (cell.centroid_ - pos_i).Cross(omega_i);
       chi_mesh::Vector3 pos_i_nudged = pos_i + v_p_i_cc * epsilon_nudge_;
 
       oi = TraceRay(cell,pos_i_nudged,omega_i,function_depth+1);
@@ -77,44 +77,44 @@ chi_mesh::RayTracerOutputInformation chi_mesh::RayTracer::
       << pos_i.PrintS() << " uvw="
       << omega_i.PrintS() << " " << (pos_i + extension_distance_ * omega_i).PrintS()
       << " " << extension_distance_
-      << " in cell " << cell.global_id
+      << " in cell " << cell.global_id_
       << " with vertices: \n";
 
     const auto& grid = Grid();
 
-    for (auto vi : cell.vertex_ids)
+    for (auto vi : cell.vertex_ids_)
       outstr << grid.vertices[vi].PrintS() << "\n";
 
-    for (auto& face : cell.faces)
+    for (auto& face : cell.faces_)
     {
-      outstr << "Face with centroid: " << face.centroid.PrintS() << " ";
-      outstr << "n=" << face.normal.PrintS() << "\n";
-      for (auto vi : face.vertex_ids)
+      outstr << "Face with centroid: " << face.centroid_.PrintS() << " ";
+      outstr << "n=" << face.normal_.PrintS() << "\n";
+      for (auto vi : face.vertex_ids_)
         outstr << grid.vertices[vi].PrintS() << "\n";
     }
 
     outstr << "o Cell\n";
-    for (auto& vid : cell.vertex_ids)
+    for (auto& vid : cell.vertex_ids_)
     {
       auto& v = grid.vertices[vid];
       outstr << "v " << v.x << " " << v.y << " " << v.z << "\n";
     }
 
-    for (auto& face : cell.faces)
+    for (auto& face : cell.faces_)
     {
-      auto& v = face.centroid;
+      auto& v = face.centroid_;
       outstr << "v " << v.x << " " << v.y << " " << v.z << "\n";
     }
 
-    for (size_t f=0; f < cell.faces.size(); ++f)
+    for (size_t f=0; f < cell.faces_.size(); ++f)
     {
-      auto& face = cell.faces[f];
+      auto& face = cell.faces_[f];
       outstr << "f ";
-      for (auto vid : face.vertex_ids)
+      for (auto vid : face.vertex_ids_)
       {
         size_t ref_cell_id=0;
-        for (size_t cid=0; cid < cell.vertex_ids.size(); ++cid)
-          if (cell.vertex_ids[cid] == vid)
+        for (size_t cid=0; cid < cell.vertex_ids_.size(); ++cid)
+          if (cell.vertex_ids_[cid] == vid)
             ref_cell_id = cid + 1;
 
         outstr << ref_cell_id << "// ";
@@ -137,19 +137,19 @@ TraceIncidentRay(const Cell& cell,
                  const Vector3& omega_i)
 {
   const auto cell_type = cell.Type();
-  const double cell_char_length = cell_sizes_[cell.local_id];
+  const double cell_char_length = cell_sizes_[cell.local_id_];
   const auto& grid = reference_grid_;
 
   bool intersects_cell = false;
   chi_mesh::Vector3 I;
 
   size_t f = 0;
-  for (const auto& face : cell.faces)
+  for (const auto& face : cell.faces_)
   {
-    if (face.normal.Dot(omega_i) > 0.0) { ++f; continue/*the loop*/; }
+    if (face.normal_.Dot(omega_i) > 0.0) { ++f; continue/*the loop*/; }
 
-    const auto& p0 = grid.vertices[face.vertex_ids[0]];
-    const auto& n = face.normal;
+    const auto& p0 = grid.vertices[face.vertex_ids_[0]];
+    const auto& n = face.normal_;
 
     const auto ppos_i = p0 - pos_i;
     const double d = ppos_i.Dot(omega_i);
@@ -164,13 +164,13 @@ TraceIncidentRay(const Cell& cell,
       }//SLAB
       else if (cell_type == CellType::POLYGON)
       {
-        const auto& p1 = grid.vertices[face.vertex_ids[1]];
+        const auto& p1 = grid.vertices[face.vertex_ids_[1]];
         intersects_cell = CheckLineIntersectStrip(p0, p1, n, pos_i, pos_ext, I);
       }//POLYGON
       else if (cell_type == CellType::POLYHEDRON)
       {
-        const auto& vids = face.vertex_ids;
-        const size_t num_sides = face.vertex_ids.size();
+        const auto& vids = face.vertex_ids_;
+        const size_t num_sides = face.vertex_ids_.size();
         for (size_t s=0; s<num_sides; ++s)
         {
           uint64_t v0i = vids[s];
@@ -178,7 +178,7 @@ TraceIncidentRay(const Cell& cell,
 
           const auto& v0 = grid.vertices[v0i];
           const auto& v1 = grid.vertices[v1i];
-          const auto& v2 = face.centroid;
+          const auto& v2 = face.centroid_;
 
 
           const auto v01 = v1 - v0;
@@ -203,7 +203,7 @@ TraceIncidentRay(const Cell& cell,
     oi.distance_to_surface       = (I - pos_i).Norm();
     oi.pos_f                     = I;
     oi.destination_face_index    = f;
-    oi.destination_face_neighbor = cell.global_id;
+    oi.destination_face_neighbor = cell.global_id_;
     oi.particle_lost             = false;
   }
   else

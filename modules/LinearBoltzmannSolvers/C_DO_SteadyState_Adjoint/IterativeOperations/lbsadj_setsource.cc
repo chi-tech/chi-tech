@@ -37,13 +37,13 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
   //                                                   and apply scattering only
   for (const auto& cell : grid_ptr_->local_cells)
   {
-    auto& full_cell_view = cell_transport_views_[cell.local_id];
+    auto& full_cell_view = cell_transport_views_[cell.local_id_];
 
     //==================== Obtain xs
     auto xs     = full_cell_view.XS();
-    auto P0_src = matid_to_src_map_[cell.material_id];
+    auto P0_src = matid_to_src_map_[cell.material_id_];
 
-    const auto& S = matid_to_S_transpose_[cell.material_id];
+    const auto& S = matid_to_S_transpose_[cell.material_id_];
 
     //======================================== Loop over nodes
     const int num_nodes = full_cell_view.NumNodes();

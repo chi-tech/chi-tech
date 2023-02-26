@@ -90,10 +90,10 @@ public:
   class run_time
   {
   public:
-    static bool        termination_posted;
-    static std::string input_file_name;
-    static bool        sim_option_interactive;
-    static bool        allow_petsc_error_handler;
+    static bool        termination_posted_;
+    static std::string input_file_name_;
+    static bool        sim_option_interactive_;
+    static bool        allow_petsc_error_handler_;
 
   private:
     friend class chi;

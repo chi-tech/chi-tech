@@ -24,7 +24,7 @@ void lbs::DiscOrdSteadyStateAdjointSolver::Execute()
   //                                              angle
   for (const auto& cell : grid_ptr_->local_cells)
   {
-    const auto& cell_view = cell_transport_views_[cell.local_id];
+    const auto& cell_view = cell_transport_views_[cell.local_id_];
     const int num_nodes = cell_view.NumNodes();
 
     for (int i = 0; i < num_nodes; ++i)

@@ -12,7 +12,7 @@ void lbs::DiscOrdTransientSolver::PostStepCallBackFunction() const
 
   if (transient_options_.console_call_back_function.empty()) return;
 
-  auto& L = chi::console.consoleState;
+  auto& L = chi::console.GetConsoleState();
   const auto& lua_func_name = transient_options_.console_call_back_function;
 
   //============= Load lua function

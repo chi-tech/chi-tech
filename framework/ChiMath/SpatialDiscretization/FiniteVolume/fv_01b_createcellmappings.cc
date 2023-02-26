@@ -22,8 +22,8 @@ void chi_math::SpatialDiscretization_FV::CreateCellMappings()
       {
         typedef std::vector<std::vector<int>> FaceDofMapping;
         mapping = make_unique<CellFVValues>(
-          ref_grid,cell,cell.centroid,
-          FaceDofMapping(cell.faces.size(),{-1}));
+          ref_grid,cell,cell.centroid_,
+          FaceDofMapping(cell.faces_.size(), {-1}));
         break;
       }
       default:

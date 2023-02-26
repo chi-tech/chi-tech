@@ -32,10 +32,10 @@ SetupOrthogonalBoundaries()
   const chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
 
   for (auto& cell : vol_cont->local_cells)
-    for (auto& face : cell.faces)
-      if (not face.has_neighbor)
+    for (auto& face : cell.faces_)
+      if (not face.has_neighbor_)
       {
-        chi_mesh::Vector3& n = face.normal;
+        chi_mesh::Vector3& n = face.normal_;
 
         int boundary_id = -1;
         if      (n.Dot(ihat)>0.999)  boundary_id = 0;
@@ -45,7 +45,7 @@ SetupOrthogonalBoundaries()
         else if (n.Dot(khat)> 0.999) boundary_id = 4;
         else if (n.Dot(khat)<-0.999) boundary_id = 5;
 
-        if (boundary_id >= 0) face.neighbor_id = boundary_id;
+        if (boundary_id >= 0) face.neighbor_id_ = boundary_id;
       }//if bndry
 
   MPI_Barrier(MPI_COMM_WORLD);

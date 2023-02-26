@@ -111,7 +111,7 @@ void lbs::LBSSolver::
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
-    const auto& S = matid_to_xs_map_[cell.material_id]->transfer_matrices_[0];
+    const auto& S = matid_to_xs_map_[cell.material_id_]->transfer_matrices_[0];
 
     for (size_t i=0; i < num_nodes; ++i)
     {
@@ -155,7 +155,7 @@ void lbs::LBSSolver::
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
 
-    const auto& xi_g = map_mat_id_2_tginfo.at(cell.material_id).spectrum;
+    const auto& xi_g = map_mat_id_2_tginfo.at(cell.material_id_).spectrum;
 
     for (size_t i=0; i < num_nodes; ++i)
     {

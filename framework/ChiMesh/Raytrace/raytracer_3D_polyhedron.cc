@@ -17,22 +17,22 @@ void chi_mesh::RayTracer::TracePolyhedron(const Cell &cell,
 
   std::vector<RayTracerOutputInformation> triangle_intersections;
 
-  size_t num_faces = cell.faces.size();
+  size_t num_faces = cell.faces_.size();
   triangle_intersections.reserve(num_faces*4); //Guessing 4 tris per face
   for (int f=0; f<num_faces; f++)
   {
-    const auto& face = cell.faces[f];
+    const auto& face = cell.faces_[f];
 
-    size_t num_sides = face.vertex_ids.size();
+    size_t num_sides = face.vertex_ids_.size();
     for (size_t s=0; s<num_sides; s++)
     {
-      size_t v0_index = face.vertex_ids[s];
-      size_t v1_index = (s<(num_sides-1))?     //if not last vertex
-                        face.vertex_ids[s+1] :
-                        face.vertex_ids[0];    //else
+      size_t v0_index = face.vertex_ids_[s];
+      size_t v1_index = (s<(num_sides-1)) ?     //if not last vertex
+                        face.vertex_ids_[s + 1] :
+                        face.vertex_ids_[0];    //else
       const auto& v0 = grid.vertices[v0_index];
       const auto& v1 = grid.vertices[v1_index];
-      const auto& v2 = cell.faces[f].centroid;
+      const auto& v2 = cell.faces_[f].centroid_;
 
       auto v01 = v1 - v0;
       auto v02 = v2 - v0;
@@ -51,7 +51,7 @@ void chi_mesh::RayTracer::TracePolyhedron(const Cell &cell,
         triangle_oi.pos_f = ip;
 
         triangle_oi.destination_face_index = f;
-        triangle_oi.destination_face_neighbor = cell.faces[f].neighbor_id;
+        triangle_oi.destination_face_neighbor = cell.faces_[f].neighbor_id_;
 
         intersection_found = true;
         triangle_intersections.emplace_back(std::move(triangle_oi));

@@ -26,7 +26,7 @@ void mg_diffusion::Solver::Update_Flux_With_TwoGrid(const int64_t verbose)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
-    const auto& xstg = map_mat_id_2_tginfo.at(cell.material_id);
+    const auto& xstg = map_mat_id_2_tginfo.at(cell.material_id_);
 
     for (unsigned int g = last_fast_group; g < num_groups; ++g)
     {

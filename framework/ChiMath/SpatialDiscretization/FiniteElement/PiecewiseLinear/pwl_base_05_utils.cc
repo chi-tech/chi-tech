@@ -27,16 +27,16 @@ GetNumGlobalDOFs(const chi_math::UnknownManager& unknown_manager) const
 size_t chi_math::SpatialDiscretization_PWLBase::
   GetCellNumNodes(const chi_mesh::Cell& cell) const
 {
-  return cell.vertex_ids.size();
+  return cell.vertex_ids_.size();
 }
 
 std::vector<chi_mesh::Vector3> chi_math::SpatialDiscretization_PWLBase::
   GetCellNodeLocations(const chi_mesh::Cell& cell) const
 {
   std::vector<chi_mesh::Vector3> node_locations;
-  node_locations.reserve(cell.vertex_ids.size());
+  node_locations.reserve(cell.vertex_ids_.size());
 
-  for (auto& vid : cell.vertex_ids)
+  for (auto& vid : cell.vertex_ids_)
     node_locations.emplace_back(ref_grid->vertices[vid]);
 
   return node_locations;
@@ -60,10 +60,10 @@ const chi_math::finite_element::UnitIntegralData&
 chi_math::SpatialDiscretization_PWLBase::
   GetUnitIntegrals(const chi_mesh::Cell& cell)
 {
-  if (ref_grid->IsCellLocal(cell.global_id))
+  if (ref_grid->IsCellLocal(cell.global_id_))
   {
     if (integral_data_initialized)
-      return fe_unit_integrals.at(cell.local_id);
+      return fe_unit_integrals.at(cell.local_id_);
     else
     {
       const auto& cell_mapping = GetCellMapping(cell);
@@ -75,7 +75,7 @@ chi_math::SpatialDiscretization_PWLBase::
   else
   {
     if (nb_integral_data_initialized)
-      return nb_fe_unit_integrals.at(cell.global_id);
+      return nb_fe_unit_integrals.at(cell.global_id_);
     else
     {
       const auto& cell_mapping = GetCellMapping(cell);
@@ -89,10 +89,10 @@ const chi_math::finite_element::InternalQuadraturePointData&
 chi_math::SpatialDiscretization_PWLBase::
   GetQPData_Volumetric(const chi_mesh::Cell& cell)
 {
-  if (ref_grid->IsCellLocal(cell.global_id))
+  if (ref_grid->IsCellLocal(cell.global_id_))
   {
     if (qp_data_initialized)
-      return fe_vol_qp_data.at(cell.local_id);
+      return fe_vol_qp_data.at(cell.local_id_);
     else
     {
       const auto& cell_mapping = GetCellMapping(cell);
@@ -103,7 +103,7 @@ chi_math::SpatialDiscretization_PWLBase::
   else
   {
     if (nb_qp_data_initialized)
-      return nb_fe_vol_qp_data.at(cell.global_id);
+      return nb_fe_vol_qp_data.at(cell.global_id_);
     else
     {
       const auto& cell_mapping = GetCellMapping(cell);
@@ -118,11 +118,11 @@ chi_math::SpatialDiscretization_PWLBase::
   GetQPData_Surface(const chi_mesh::Cell& cell,
                     const unsigned int face)
 {
-  if (ref_grid->IsCellLocal(cell.global_id))
+  if (ref_grid->IsCellLocal(cell.global_id_))
   {
     if (qp_data_initialized)
     {
-      const auto& face_data = fe_srf_qp_data.at(cell.local_id);
+      const auto& face_data = fe_srf_qp_data.at(cell.local_id_);
 
       return face_data.at(face);
     }
@@ -137,7 +137,7 @@ chi_math::SpatialDiscretization_PWLBase::
   {
     if (nb_qp_data_initialized)
     {
-      const auto& face_data = nb_fe_srf_qp_data.at(cell.global_id);
+      const auto& face_data = nb_fe_srf_qp_data.at(cell.global_id_);
 
       return face_data.at(face);
     }

@@ -8,10 +8,10 @@
 double chi_mesh::FieldFunctionInterpolationVolume::
   CallLuaFunction(double ff_value, int mat_id) const
 {
-  lua_State* L  = chi::console.consoleState;
+  lua_State* L  = chi::console.GetConsoleState();
   double ret_val = 0.0;
 
-  lua_getglobal(L,op_lua_func.c_str());
+  lua_getglobal(L, op_lua_func_.c_str());
   lua_pushnumber(L,ff_value);
   lua_pushnumber(L,mat_id);
 

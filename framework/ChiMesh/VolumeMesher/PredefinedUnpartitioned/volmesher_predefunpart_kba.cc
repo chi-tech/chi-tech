@@ -28,11 +28,11 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
   {
     auto& handler = chi_mesh::GetCurrentHandler();
 
-    int Px = handler.volume_mesher->options.partition_x;
-    int Py = handler.volume_mesher->options.partition_y;
+    int Px = handler.GetVolumeMesher().options.partition_x;
+    int Py = handler.GetVolumeMesher().options.partition_y;
 
     chi_mesh::Cell temp_cell(CellType::GHOST, CellType::GHOST);
-    temp_cell.centroid = centroid;
+    temp_cell.centroid_ = centroid;
 
     auto xyz = GetCellXYZPartitionID(&temp_cell);
 

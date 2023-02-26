@@ -35,13 +35,13 @@ void chi_mesh::MeshContinuum::
     {
       if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
       {
-        for (auto& face : cell.faces)
+        for (auto& face : cell.faces_)
         {
-          if (not face.has_neighbor)
+          if (not face.has_neighbor_)
           {
             faces_to_export.push_back(face);
 
-            for (int vid : face.vertex_ids)
+            for (int vid : face.vertex_ids_)
               nodes_set.insert(vid);
           }//if boundary
         }//for face
@@ -74,9 +74,9 @@ void chi_mesh::MeshContinuum::
     for (const auto& face : faces_to_export)
     {
       fprintf(of,"vn %.4f %.4f %.4f\n",
-              face.normal.x,
-              face.normal.y,
-              face.normal.z);
+              face.normal_.x,
+              face.normal_.y,
+              face.normal_.z);
     }
 
     //====================================== Write faces
@@ -86,7 +86,7 @@ void chi_mesh::MeshContinuum::
       normal_counter++;
       fprintf(of,"f");
 
-      for (auto v_g_index : face.vertex_ids)
+      for (auto v_g_index : face.vertex_ids_)
         fprintf(of," %d//%d",node_mapping[v_g_index],normal_counter);
 
       fprintf(of,"\n");
@@ -138,28 +138,28 @@ void chi_mesh::MeshContinuum::
       {
         if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
         {
-          if (cell.material_id != mat) continue;
+          if (cell.material_id_ != mat) continue;
 
-          for (const auto& face : cell.faces)
+          for (const auto& face : cell.faces_)
           {
-            int adjcell_glob_index = face.neighbor_id;
+            int adjcell_glob_index = face.neighbor_id_;
 
             if (adjcell_glob_index<0)
             {
               faces_to_export.push_back(face);
 
-              for (auto vid : face.vertex_ids)
+              for (auto vid : face.vertex_ids_)
                 nodes_set.insert(vid);
             }//if boundary
             else
             {
               auto& adj_cell = cells[adjcell_glob_index];
 
-              if (adj_cell.material_id != mat)
+              if (adj_cell.material_id_ != mat)
               {
                 faces_to_export.push_back(face);
 
-                for (auto vid : face.vertex_ids)
+                for (auto vid : face.vertex_ids_)
                   nodes_set.insert(vid);
               }//if material missmatch
             }//if neigbor cell
@@ -190,9 +190,9 @@ void chi_mesh::MeshContinuum::
       for (const auto& face : faces_to_export)
       {
         fprintf(of,"vn %.4f %.4f %.4f\n",
-                face.normal.x,
-                face.normal.y,
-                face.normal.z);
+                face.normal_.x,
+                face.normal_.y,
+                face.normal_.z);
       }
 
       //====================================== Write faces
@@ -202,7 +202,7 @@ void chi_mesh::MeshContinuum::
         normal_counter++;
         fprintf(of,"f");
 
-        for (auto v_g_index : face.vertex_ids)
+        for (auto v_g_index : face.vertex_ids_)
           fprintf(of," %d//%d",node_mapping[v_g_index],normal_counter);
 
         fprintf(of,"\n");

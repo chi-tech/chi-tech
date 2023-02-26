@@ -165,7 +165,7 @@ void fv_diffusion::Solver::Execute()
   const auto& grid = *grid_ptr;
   const auto& sdm  = *sdm_ptr;
 
-  lua_State* L = chi::console.consoleState;
+  lua_State* L = chi::console.GetConsoleState();
 
   //============================================= Assemble the system
   // P ~ Present cell
@@ -175,9 +175,9 @@ void fv_diffusion::Solver::Execute()
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell_P);
     const double volume_P = cell_mapping.CellVolume(); //Volume of present cell
-    const auto& x_cc_P = cell_P.centroid;
+    const auto& x_cc_P = cell_P.centroid_;
 
-    const auto imat  = cell_P.material_id;
+    const auto imat  = cell_P.material_id_;
 
     const double sigma_a = CallLua_iXYZFunction(L, "Sigma_a",imat,x_cc_P);
     const double q_ext   = CallLua_iXYZFunction(L, "Q_ext"  ,imat,x_cc_P);
@@ -187,19 +187,19 @@ void fv_diffusion::Solver::Execute()
     MatSetValue(A, imap, imap, sigma_a * volume_P, ADD_VALUES);
     VecSetValue(b, imap,       q_ext   * volume_P, ADD_VALUES);
 
-    for (size_t f=0; f < cell_P.faces.size(); ++f)
+    for (size_t f=0; f < cell_P.faces_.size(); ++f)
     {
-      const auto& face  = cell_P.faces[f];
-      const auto& x_fc  = face.centroid;
+      const auto& face  = cell_P.faces_[f];
+      const auto& x_fc  = face.centroid_;
       const auto  x_PF  = x_fc - x_cc_P;
       const auto  A_f   = cell_mapping.FaceArea(f);
-      const auto  A_f_n = A_f * face.normal;
+      const auto  A_f_n = A_f * face.normal_;
 
-      if (face.has_neighbor)
+      if (face.has_neighbor_)
       {
-        const auto& cell_N = grid.cells[face.neighbor_id];
-        const int   jmat   = cell_N.material_id;
-        const auto& x_cc_N = cell_N.centroid;
+        const auto& cell_N = grid.cells[face.neighbor_id_];
+        const int   jmat   = cell_N.material_id_;
+        const auto& x_cc_N = cell_N.centroid_;
         const auto  x_PN   = x_cc_N - x_cc_P;
 
         const double D_N = CallLua_iXYZFunction(L, "D_coef",jmat,x_cc_N);
@@ -216,7 +216,7 @@ void fv_diffusion::Solver::Execute()
       }//internal face
       else
       {
-        const auto& bndry = boundaries[face.neighbor_id];
+        const auto& bndry = boundaries[face.neighbor_id_];
 
         if (bndry.type == BoundaryType::Robin)
         {

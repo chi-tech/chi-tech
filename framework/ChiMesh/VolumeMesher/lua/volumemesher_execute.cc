@@ -27,20 +27,12 @@ int chiVolumeMesherExecute(lua_State *L)
   auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //Get memory before
-  chi_objects::CSTMemory mem_before = chi::console.GetMemoryUsage();
+  chi_objects::CSTMemory mem_before = chi_objects::ChiConsole::GetMemoryUsage();
 
-  if (cur_hndlr.volume_mesher == nullptr)
-  {
-    chi::log.LogAllError()
-      << __FUNCTION__ << ": called without a volume mesher set. Make a "
-                         "call to chiVolumeMesherCreate.";
-    chi::Exit(EXIT_FAILURE);
-  }
-
-  cur_hndlr.volume_mesher->Execute();
+  cur_hndlr.GetVolumeMesher().Execute();
 
   //Get memory usage
-  chi_objects::CSTMemory mem_after = chi::console.GetMemoryUsage();
+  chi_objects::CSTMemory mem_after = chi_objects::ChiConsole::GetMemoryUsage();
 
   std::stringstream mem_string;
   mem_string

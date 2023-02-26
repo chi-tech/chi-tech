@@ -83,34 +83,30 @@ void lbs::LBSSolver::InitializeParrays()
   const chi_mesh::Vector3 jhat(0.0, 1.0, 0.0);
   const chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
 
-//  auto pwl =
-//      std::dynamic_pointer_cast<chi_math::SpatialdiscretizationFE>(discretization);
-//  auto& sdm = *discretization;
-
   cell_transport_views_.clear();
   cell_transport_views_.reserve(grid_ptr_->local_cells.size());
   for (auto& cell : grid_ptr_->local_cells)
   {
     size_t num_nodes  = discretization_->GetCellNumNodes(cell);
-    int    mat_id     = cell.material_id;
+    int    mat_id     = cell.material_id_;
 
     //compute cell volumes
     double cell_volume = 0.0;
-    const auto& IntV_shapeI = unit_cell_matrices_[cell.local_id].Vi_vectors;
+    const auto& IntV_shapeI = unit_cell_matrices_[cell.local_id_].Vi_vectors;
     for (size_t i = 0; i < num_nodes; ++i)
       cell_volume += IntV_shapeI[i];
 
     size_t cell_phi_address = block_MG_counter;
 
     std::vector<bool> face_local_flags;
-    face_local_flags.resize(cell.faces.size(), true);
+    face_local_flags.resize(cell.faces_.size(), true);
     bool cell_on_boundary = false;
     int f=0;
-    for (auto& face : cell.faces)
+    for (auto& face : cell.faces_)
     {
-      if (not face.has_neighbor)
+      if (not face.has_neighbor_)
       {
-        chi_mesh::Vector3& n = face.normal;
+        chi_mesh::Vector3& n = face.normal_;
 
         int boundary_id = -1;
         if      (n.Dot(ihat)>0.999)  boundary_id = 0;
@@ -120,7 +116,7 @@ void lbs::LBSSolver::InitializeParrays()
         else if (n.Dot(khat)> 0.999) boundary_id = 4;
         else if (n.Dot(khat)<-0.999) boundary_id = 5;
 
-        if (boundary_id >= 0) face.neighbor_id = boundary_id;
+        if (boundary_id >= 0) face.neighbor_id_ = boundary_id;
         cell_on_boundary = true;
       }//if bndry
 
@@ -150,14 +146,14 @@ void lbs::LBSSolver::InitializeParrays()
   for (auto& cell : grid_ptr_->local_cells)
   {
     chi_mesh::sweep_management::CellFaceNodalMapping cell_nodal_mapping;
-    cell_nodal_mapping.reserve(cell.faces.size());
+    cell_nodal_mapping.reserve(cell.faces_.size());
 
-    for (auto& face : cell.faces)
+    for (auto& face : cell.faces_)
     {
       std::vector<short> face_nodal_mapping;
       int ass_face = -1;
 
-      if (face.has_neighbor and face.IsNeighborLocal(*grid_ptr_))
+      if (face.has_neighbor_ and face.IsNeighborLocal(*grid_ptr_))
       {
         grid_ptr_->FindAssociatedVertices(face, face_nodal_mapping);
         ass_face = face.GetNeighborAssociatedFace(*grid_ptr_);
@@ -168,6 +164,13 @@ void lbs::LBSSolver::InitializeParrays()
 
     grid_nodal_mappings_.push_back(cell_nodal_mapping);
   }//for local cell
+
+  //================================================== Get grid localized
+  //                                                   communicator set
+  grid_local_comm_set_ = grid_ptr_->MakeMPILocalCommunicatorSet();
+
+  //================================================== Make face histogram
+  grid_face_histogram_ = grid_ptr_->MakeGridFaceHistogram();
 
   //================================================== Initialize Field Functions
   if (field_functions_.empty())

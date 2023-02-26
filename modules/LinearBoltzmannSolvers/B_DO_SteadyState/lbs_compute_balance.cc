@@ -59,8 +59,8 @@ void lbs::DiscOrdSteadyStateSolver::ComputeBalance()
   for (const auto& cell : grid_ptr_->local_cells)
   {
     const auto&  cell_mapping     = discretization_->GetCellMapping(cell);
-    const auto&  transport_view   = cell_transport_views_[cell.local_id];
-    const auto&  fe_intgrl_values = unit_cell_matrices_[cell.local_id];
+    const auto&  transport_view   = cell_transport_views_[cell.local_id_];
+    const auto&  fe_intgrl_values = unit_cell_matrices_[cell.local_id_];
     const size_t num_nodes        = transport_view.NumNodes();
     const auto&  IntV_shapeI      = fe_intgrl_values.Vi_vectors;
     const auto&  IntS_shapeI      = fe_intgrl_values.face_Si_vectors;
@@ -70,9 +70,9 @@ void lbs::DiscOrdSteadyStateSolver::ComputeBalance()
     // all faces, all angles, and all groups.
     // Only the cosines that are negative are
     // added to the integral.
-    for (int f=0; f<cell.faces.size(); ++f)
+    for (int f=0; f<cell.faces_.size(); ++f)
     {
-      const auto& face  = cell.faces[f];
+      const auto& face  = cell.faces_[f];
 
       for (const auto& groupset : groupsets_)
       {
@@ -80,12 +80,12 @@ void lbs::DiscOrdSteadyStateSolver::ComputeBalance()
         {
           const auto &omega = groupset.quadrature_->omegas[n];
           const double wt = groupset.quadrature_->weights[n];
-          const double mu = omega.Dot(face.normal);
+          const double mu = omega.Dot(face.normal_);
 
-          if (mu < 0.0 and (not face.has_neighbor)) //mu<0 and bndry
+          if (mu < 0.0 and (not face.has_neighbor_)) //mu<0 and bndry
           {
-            const auto &bndry = sweep_boundaries_[face.neighbor_id];
-            for (int fi = 0; fi < face.vertex_ids.size(); ++fi)
+            const auto &bndry = sweep_boundaries_[face.neighbor_id_];
+            for (int fi = 0; fi < face.vertex_ids_.size(); ++fi)
             {
               const int i = cell_mapping.MapFaceNode(f, fi);
               const auto &IntFi_shapeI = IntS_shapeI[f][i];

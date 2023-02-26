@@ -54,7 +54,7 @@ void lbs::LBSSolver::ComputeUnitIntegrals()
                                          const SpatialWeightFunction& swf)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
-    const size_t cell_num_faces = cell.faces.size();
+    const size_t cell_num_faces = cell.faces_.size();
     const size_t cell_num_nodes = cell_mapping.NumNodes();
     const auto vol_qp_data = cell_mapping.MakeVolumeQuadraturePointData();
 
@@ -152,7 +152,7 @@ void lbs::LBSSolver::ComputeUnitIntegrals()
   unit_cell_matrices_.resize(num_local_cells);
 
   for (const auto& cell : grid_ptr_->local_cells)
-    unit_cell_matrices_[cell.local_id] = ComputeCellUnitIntegrals(cell,*swf_ptr);
+    unit_cell_matrices_[cell.local_id_] = ComputeCellUnitIntegrals(cell, *swf_ptr);
 
   const auto ghost_ids = grid_ptr_->cells.GetGhostGlobalIDs();
   for (uint64_t ghost_id : ghost_ids)

@@ -38,13 +38,13 @@ CreatePolygonCells(const chi_mesh::UnpartitionedMesh& umesh,
     auto cell = std::make_unique<chi_mesh::Cell>(CellType::POLYGON,
                                                  raw_cell->sub_type);
 
-    cell->global_id = num_cells;
-    cell->local_id  = num_cells;
-    cell->partition_id = chi::mpi.location_id;
+    cell->global_id_ = num_cells;
+    cell->local_id_  = num_cells;
+    cell->partition_id_ = chi::mpi.location_id;
 
-    cell->centroid    = raw_cell->centroid;
-    cell->material_id = raw_cell->material_id;
-    cell->vertex_ids  = raw_cell->vertex_ids;
+    cell->centroid_    = raw_cell->centroid;
+    cell->material_id_ = raw_cell->material_id;
+    cell->vertex_ids_  = raw_cell->vertex_ids;
 
     // Copy faces + compute face centroid and normal
     const chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
@@ -52,21 +52,21 @@ CreatePolygonCells(const chi_mesh::UnpartitionedMesh& umesh,
     {
       chi_mesh::CellFace new_face;
 
-      new_face.vertex_ids  = raw_face.vertex_ids;
+      new_face.vertex_ids_  = raw_face.vertex_ids;
 
-      const auto& v0 = grid->vertices[new_face.vertex_ids[0]];
-      const auto& v1 = grid->vertices[new_face.vertex_ids[1]];
-      new_face.centroid = v0*0.5 + v1*0.5;
+      const auto& v0 = grid->vertices[new_face.vertex_ids_[0]];
+      const auto& v1 = grid->vertices[new_face.vertex_ids_[1]];
+      new_face.centroid_ = v0 * 0.5 + v1 * 0.5;
 
       chi_mesh::Vector3 va = v1 - v0;
       chi_mesh::Vector3 vn = va.Cross(khat);
       vn = vn/vn.Norm();
-      new_face.normal = vn;
+      new_face.normal_ = vn;
 
-      new_face.has_neighbor = raw_face.has_neighbor;
-      new_face.neighbor_id = raw_face.neighbor;
+      new_face.has_neighbor_ = raw_face.has_neighbor;
+      new_face.neighbor_id_ = raw_face.neighbor;
 
-      cell->faces.push_back(new_face);
+      cell->faces_.push_back(new_face);
     }
 
     //====================================== Push to grid

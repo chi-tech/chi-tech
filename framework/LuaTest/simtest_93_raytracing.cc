@@ -103,7 +103,7 @@ int chiSimTest93_RayTracing(lua_State* Lstate)
   if (source_cell_ptr == nullptr)
     throw std::logic_error(fname + ": Source cell not found.");
 
-  const uint64_t source_cell_id = source_cell_ptr->global_id;
+  const uint64_t source_cell_id = source_cell_ptr->global_id_;
 
   //============================================= Define lambdas
   chi_math::RandomNumberGenerator rng;
@@ -197,12 +197,12 @@ int chiSimTest93_RayTracing(lua_State* Lstate)
 
   auto GetCellApproximateSize = [&grid](const chi_mesh::Cell& cell)
   {
-    const auto& v0 = grid.vertices[cell.vertex_ids[0]];
+    const auto& v0 = grid.vertices[cell.vertex_ids_[0]];
     double xmin = v0.x, xmax = v0.x;
     double ymin = v0.y, ymax = v0.y;
     double zmin = v0.z, zmax = v0.z;
 
-    for (uint64_t vid : cell.vertex_ids)
+    for (uint64_t vid : cell.vertex_ids_)
     {
       const auto& v = grid.vertices[vid];
 
@@ -218,7 +218,7 @@ int chiSimTest93_RayTracing(lua_State* Lstate)
   //============================================= Create raytracer
   std::vector<double> cell_sizes(grid.local_cells.size(), 0.0);
   for (const auto& cell : grid.local_cells)
-    cell_sizes[cell.local_id] = GetCellApproximateSize(cell);
+    cell_sizes[cell.local_id_] = GetCellApproximateSize(cell);
 
   chi_mesh::RayTracer ray_tracer(grid, cell_sizes);
 
@@ -266,10 +266,10 @@ int chiSimTest93_RayTracing(lua_State* Lstate)
       if (not destination_info.particle_lost)
       {
         const auto& f = destination_info.destination_face_index;
-        const auto& current_cell_face = cell.faces[f];
+        const auto& current_cell_face = cell.faces_[f];
 
-        if (current_cell_face.has_neighbor)
-          particle.cell_id = current_cell_face.neighbor_id;
+        if (current_cell_face.has_neighbor_)
+          particle.cell_id = current_cell_face.neighbor_id_;
         else
           particle.alive = false; //Death at the boundary
       }

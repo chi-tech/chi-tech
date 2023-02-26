@@ -24,9 +24,9 @@ void chi_mesh::VolumeMesherExtruder::
 
       //========================================= Check cell not inverted
       {
-        const auto& v0 = template_cell.centroid;
-        const auto& v1 = template_grid.vertices[template_cell.vertex_ids[0]];
-        const auto& v2 = template_grid.vertices[template_cell.vertex_ids[1]];
+        const auto& v0 = template_cell.centroid_;
+        const auto& v1 = template_grid.vertices[template_cell.vertex_ids_[0]];
+        const auto& v2 = template_grid.vertices[template_cell.vertex_ids_[1]];
 
         auto v01 = v1 - v0;
         auto v02 = v2 - v0;
@@ -38,7 +38,7 @@ void chi_mesh::VolumeMesherExtruder::
                                  " corrected.");
       }
 
-      auto projected_centroid = ProjectCentroidToLevel(template_cell.centroid, iz);
+      auto projected_centroid = ProjectCentroidToLevel(template_cell.centroid_, iz);
       int pid = GetCellKBAPartitionIDFromCentroid(projected_centroid);
 
       bool has_local_scope = HasLocalScope(template_cell, template_grid, iz);
@@ -52,7 +52,7 @@ void chi_mesh::VolumeMesherExtruder::
                                      pid,
                                      template_grid.local_cells.size());
 
-        cell->material_id = template_cell.material_id;
+        cell->material_id_ = template_cell.material_id_;
 
         grid.cells.push_back(std::move(cell));
       }

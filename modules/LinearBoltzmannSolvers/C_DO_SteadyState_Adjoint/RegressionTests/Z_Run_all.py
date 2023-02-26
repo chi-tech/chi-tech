@@ -91,7 +91,7 @@ def run_test_tacc(file_name, comment, num_procs,
             #SBATCH -J {file_name} # Job name
             #SBATCH -o tests/{file_name}.o # output file
             #SBATCH -e tests/{file_name}.e # error file
-            #SBATCH -p skx-normal # Queue (partition) name
+            #SBATCH -p skx-normal_ # Queue (partition) name
             #SBATCH -N {num_procs // 48 + 1} # Total # of nodes
             #SBATCH -n {num_procs} # Total # of mpi tasks
             #SBATCH -t 00:05:00 # Runtime (hh:mm:ss)

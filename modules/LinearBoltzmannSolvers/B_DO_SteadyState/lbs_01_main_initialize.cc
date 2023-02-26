@@ -7,6 +7,8 @@
 #include "ChiMPI/chi_mpi.h"
 #include "chi_log.h"
 
+typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
+
 //###################################################################
 /** Initialize the solver.*/
 void lbs::DiscOrdSteadyStateSolver::Initialize()

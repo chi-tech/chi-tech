@@ -32,9 +32,9 @@ void chi_math::SpatialDiscretization_FV::BuildSparsityPattern(
 
         nodal_nnz_in_diag[i]   += 1;
 
-        for (auto& face : cell.faces)
+        for (auto& face : cell.faces_)
         {
-          if (not face.has_neighbor) continue;
+          if (not face.has_neighbor_) continue;
 
           if (face.IsNeighborLocal(*ref_grid))
             nodal_nnz_in_diag[i] += 1;

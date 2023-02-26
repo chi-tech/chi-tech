@@ -151,7 +151,7 @@ int chiSimTest06_WDD(lua_State* L)
   //============================================= Make material source term
   for (const auto& cell : grid.local_cells)
   {
-    const auto& cc = cell.centroid;
+    const auto& cc = cell.centroid_;
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
 
@@ -188,7 +188,7 @@ int chiSimTest06_WDD(lua_State* L)
   {
     const auto   cell_global_id = ijk_mapping.MapNDtoLin(ijk[1],ijk[0],ijk[2]);
     const auto&  cell           = grid.cells[cell_global_id];
-    const auto   cell_local_id  = cell.local_id;
+    const auto   cell_local_id  = cell.local_id_;
     const auto&  cell_mapping   = sdm.GetCellMapping(cell);
 
     const auto& cell_ortho_size = cell_ortho_sizes[cell_local_id];

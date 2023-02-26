@@ -13,18 +13,18 @@ void chi_mesh::FieldFunctionInterpolationVolume::Initialize()
 {
   chi::log.Log0Verbose1() << "Initializing volume interpolator.";
   //================================================== Check grid available
-  if (field_functions.empty())
+  if (field_functions_.empty())
     throw std::logic_error("Unassigned field function in volume field "
                            "function interpolator.");
 
-  if (logical_volume == nullptr)
+  if (logical_volume_ == nullptr)
     throw std::logic_error("Unassigned logical volume in volume field function"
                            "interpolator.");
 
-  const auto& grid = *field_functions.front()->SDM().ref_grid;
+  const auto& grid = *field_functions_.front()->SDM().ref_grid;
 
   //================================================== Find cells inside volume
   for (const auto& cell : grid.local_cells)
-    if (logical_volume->Inside(cell.centroid))
-      cell_local_ids_inside_logvol.push_back(cell.local_id);
+    if (logical_volume_->Inside(cell.centroid_))
+      cell_local_ids_inside_logvol_.push_back(cell.local_id_);
 }

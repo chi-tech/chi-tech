@@ -56,11 +56,11 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
   // Dirichlets are just collected
   std::vector<int>    dirichlet_count(num_nodes, 0);
   std::vector<double> dirichlet_value(num_nodes, 0.0);
-  for (int f=0; f<cell.faces.size(); f++)
+  for (int f=0; f<cell.faces_.size(); f++)
   {
-    if (not cell.faces[f].has_neighbor)
+    if (not cell.faces_[f].has_neighbor_)
     {
-      int ir_boundary_index = cell.faces[f].neighbor_id;
+      int ir_boundary_index = cell.faces_[f].neighbor_id_;
       auto ir_boundary_type  = boundaries[ir_boundary_index]->type;
 
       if (ir_boundary_type == BoundaryType::Dirichlet)
@@ -68,7 +68,7 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
         auto dirichlet_bndry =
           (chi_diffusion::BoundaryDirichlet*)boundaries[ir_boundary_index];
 
-        int num_face_dofs = cell.faces[f].vertex_ids.size();
+        int num_face_dofs = cell.faces_[f].vertex_ids_.size();
         for (int fi=0; fi<num_face_dofs; fi++)
         {
           int i  = fe_intgrl_values.FaceDofMapping(f,fi);
@@ -82,7 +82,7 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
         auto robin_bndry =
           (chi_diffusion::BoundaryRobin*)boundaries[ir_boundary_index];
 
-        int num_face_dofs = cell.faces[f].vertex_ids.size();
+        int num_face_dofs = cell.faces_[f].vertex_ids_.size();
         for (int fi=0; fi<num_face_dofs; fi++)
         {
           int i  = fe_intgrl_values.FaceDofMapping(f,fi);

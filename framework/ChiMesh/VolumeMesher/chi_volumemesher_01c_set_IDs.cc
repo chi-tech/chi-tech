@@ -30,8 +30,8 @@ void chi_mesh::VolumeMesher::
   int num_cells_modified = 0;
   for (auto& cell : vol_cont->local_cells)
   {
-    if (log_vol.Inside(cell.centroid) && sense){
-      cell.material_id = mat_id;
+    if (log_vol.Inside(cell.centroid_) && sense){
+      cell.material_id_ = mat_id;
       ++num_cells_modified;
     }
   }
@@ -40,8 +40,8 @@ void chi_mesh::VolumeMesher::
   for (uint64_t ghost_id : ghost_ids)
   {
     auto& cell = vol_cont->cells[ghost_id];
-    if (log_vol.Inside(cell.centroid) && sense)
-      cell.material_id = mat_id;
+    if (log_vol.Inside(cell.centroid_) && sense)
+      cell.material_id_ = mat_id;
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
@@ -69,11 +69,11 @@ void chi_mesh::VolumeMesher::
   int num_faces_modified = 0;
   for (auto& cell : vol_cont->local_cells)
   {
-    for (auto& face : cell.faces)
+    for (auto& face : cell.faces_)
     {
-      if (face.has_neighbor) continue;
-      if (log_vol.Inside(face.centroid) && sense){
-        face.neighbor_id = abs(bndry_id);
+      if (face.has_neighbor_) continue;
+      if (log_vol.Inside(face.centroid_) && sense){
+        face.neighbor_id_ = abs(bndry_id);
         ++num_faces_modified;
       }
     }
@@ -100,11 +100,11 @@ void chi_mesh::VolumeMesher::SetMatIDToAll(int mat_id)
   auto vol_cont = handler.GetGrid();
 
   for (auto& cell : vol_cont->local_cells)
-    cell.material_id = mat_id;
+    cell.material_id_ = mat_id;
 
   const auto& ghost_ids = vol_cont->cells.GetGhostGlobalIDs();
   for (uint64_t ghost_id : ghost_ids)
-    vol_cont->cells[ghost_id].material_id = mat_id;
+    vol_cont->cells[ghost_id].material_id_ = mat_id;
 
   MPI_Barrier(MPI_COMM_WORLD);
   chi::log.Log()
@@ -135,7 +135,7 @@ void chi_mesh::VolumeMesher::
     << " Setting material id from lua function.";
 
   //============================================= Define console call
-  auto L = chi::console.consoleState;
+  auto L = chi::console.GetConsoleState();
   auto CallLuaXYZFunction = [&L,&lua_fname,&fname](const chi_mesh::Cell& cell)
   {
     //============= Load lua function
@@ -147,13 +147,13 @@ void chi_mesh::VolumeMesher::
                                lua_fname + ", but it seems the function"
                                              " could not be retrieved.");
 
-    const auto& xyz = cell.centroid;
+    const auto& xyz = cell.centroid_;
 
     //============= Push arguments
     lua_pushnumber(L, xyz.x);
     lua_pushnumber(L, xyz.y);
     lua_pushnumber(L, xyz.z);
-    lua_pushinteger(L, cell.material_id);
+    lua_pushinteger(L, cell.material_id_);
 
     //============= Call lua function
     //4 arguments, 1 result (double), 0=original error object
@@ -183,9 +183,9 @@ void chi_mesh::VolumeMesher::
   {
     int new_matid = CallLuaXYZFunction(cell);
 
-    if (cell.material_id != new_matid)
+    if (cell.material_id_ != new_matid)
     {
-      cell.material_id = new_matid;
+      cell.material_id_ = new_matid;
       ++local_num_cells_modified;
     }
   }//for local cell
@@ -196,9 +196,9 @@ void chi_mesh::VolumeMesher::
     auto& cell = grid.cells[ghost_id];
     int new_matid = CallLuaXYZFunction(cell);
 
-    if (cell.material_id != new_matid)
+    if (cell.material_id_ != new_matid)
     {
-      cell.material_id = new_matid;
+      cell.material_id_ = new_matid;
       ++local_num_cells_modified;
     }
   }//for ghost cell id
@@ -239,7 +239,7 @@ void chi_mesh::VolumeMesher::
     << " Setting boundary id from lua function.";
 
   //============================================= Define console call
-  auto L = chi::console.consoleState;
+  auto L = chi::console.GetConsoleState();
   auto CallLuaXYZFunction = [&L,&lua_fname,&fname]
     (const chi_mesh::CellFace& face)
   {
@@ -252,8 +252,8 @@ void chi_mesh::VolumeMesher::
                              lua_fname + ", but it seems the function"
                                          " could not be retrieved.");
 
-    const auto& xyz = face.centroid;
-    const auto& n   = face.normal;
+    const auto& xyz = face.centroid_;
+    const auto& n   = face.normal_;
 
     //============= Push arguments
     lua_pushnumber(L, xyz.x);
@@ -262,7 +262,7 @@ void chi_mesh::VolumeMesher::
     lua_pushnumber(L, n.x);
     lua_pushnumber(L, n.y);
     lua_pushnumber(L, n.z);
-    lua_pushinteger(L, static_cast<lua_Integer>(face.neighbor_id));
+    lua_pushinteger(L, static_cast<lua_Integer>(face.neighbor_id_));
 
     //============= Call lua function
     //7 arguments, 1 result (double), 0=original error object
@@ -289,14 +289,14 @@ void chi_mesh::VolumeMesher::
 
   int local_num_faces_modified = 0;
   for (auto& cell : grid.local_cells)
-    for (auto& face : cell.faces)
-      if (not face.has_neighbor)
+    for (auto& face : cell.faces_)
+      if (not face.has_neighbor_)
       {
         int new_bndryid = CallLuaXYZFunction(face);
 
-        if (face.neighbor_id != new_bndryid)
+        if (face.neighbor_id_ != new_bndryid)
         {
-          face.neighbor_id = new_bndryid;
+          face.neighbor_id_ = new_bndryid;
           ++local_num_faces_modified;
         }
       }//for bndry face
@@ -305,14 +305,14 @@ void chi_mesh::VolumeMesher::
   for (uint64_t ghost_id : ghost_ids)
   {
     auto& cell = grid.cells[ghost_id];
-    for (auto& face : cell.faces)
-      if (not face.has_neighbor)
+    for (auto& face : cell.faces_)
+      if (not face.has_neighbor_)
       {
         int new_bndryid = CallLuaXYZFunction(face);
 
-        if (face.neighbor_id != new_bndryid)
+        if (face.neighbor_id_ != new_bndryid)
         {
-          face.neighbor_id = new_bndryid;
+          face.neighbor_id_ = new_bndryid;
           ++local_num_faces_modified;
         }
       }//for bndry face

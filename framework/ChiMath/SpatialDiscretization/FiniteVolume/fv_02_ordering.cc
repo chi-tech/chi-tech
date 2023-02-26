@@ -44,7 +44,7 @@ void chi_math::SpatialDiscretization_FV::
   for (uint64_t gid : neighbor_gids)
   {
     const auto& cell = ref_grid->cells[gid];
-    sorted_nb_gids[cell.partition_id].push_back(gid);
+    sorted_nb_gids[cell.partition_id_].push_back(gid);
   }
 
   //============================================= Communicate neighbor ids
@@ -69,7 +69,7 @@ void chi_math::SpatialDiscretization_FV::
         throw std::logic_error(MappingError);
 
       const auto& local_cell = ref_grid->cells[gid];
-      local_ids.push_back(local_cell.local_id);
+      local_ids.push_back(local_cell.local_id_);
     }//for gid
   }//for pid_list_pair
 

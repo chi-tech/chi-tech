@@ -32,8 +32,8 @@ vtkNew<vtkUnstructuredGrid> chi_mesh::
   {
     chi_mesh::UploadCellGeometry(grid, cell, node_count, points, ugrid);
 
-    material_array->InsertNextValue(cell.material_id);
-    partition_id_array->InsertNextValue(cell.partition_id);
+    material_array->InsertNextValue(cell.material_id_);
+    partition_id_array->InsertNextValue(cell.partition_id_);
   }//for local cells
   ugrid->SetPoints(points);
 
