@@ -22,9 +22,9 @@ cfem_diffusion::Solver::Solver(const std::string& in_solver_name):
 //============================================= destructor
 cfem_diffusion::Solver::~Solver()
 {
-  VecDestroy(&x);
-  VecDestroy(&b);
-  MatDestroy(&A);
+  VecDestroy(&x_);
+  VecDestroy(&b_);
+  MatDestroy(&A_);
 }
 
 //============================================= Initialize
@@ -35,9 +35,9 @@ void cfem_diffusion::Solver::Initialize()
                      << TextName() << ": Initializing CFEM Diffusion solver ";
 
   //============================================= Get grid
-  grid_ptr = chi_mesh::GetCurrentHandler().GetGrid();
-  const auto& grid = *grid_ptr;
-  if (grid_ptr == nullptr)
+  grid_ptr_ = chi_mesh::GetCurrentHandler().GetGrid();
+  const auto& grid = *grid_ptr_;
+  if (grid_ptr_ == nullptr)
     throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
                            " No grid defined.");
  
@@ -54,22 +54,22 @@ void cfem_diffusion::Solver::Initialize()
 
   for (int bndry=0; bndry<(max_boundary_id+1); bndry++)
   {
-    if (boundary_preferences.find(bndry) != boundary_preferences.end())
+    if (boundary_preferences_.find(bndry) != boundary_preferences_.end())
     {
-      BoundaryInfo bndry_info = boundary_preferences.at(bndry);
+      BoundaryInfo bndry_info = boundary_preferences_.at(bndry);
       auto& bndry_vals = bndry_info.second;
       switch (bndry_info.first)
       {
         case BoundaryType::Reflecting:
         {
-          boundaries.push_back({BoundaryType::Reflecting, {0.,0.,0.}});
+          boundaries_.push_back({BoundaryType::Reflecting, {0., 0., 0.}});
           chi::log.Log() << "Boundary " << bndry << " set to reflecting.";
           break;
         }
         case BoundaryType::Dirichlet:
         {
           if (bndry_vals.empty()) bndry_vals.resize(1,0.0);
-          boundaries.push_back({BoundaryType::Dirichlet, {bndry_vals[0],0.,0.}});
+          boundaries_.push_back({BoundaryType::Dirichlet, {bndry_vals[0], 0., 0.}});
           chi::log.Log() << "Boundary " << bndry << " set to dirichlet.";
           break;
         }
@@ -78,15 +78,15 @@ void cfem_diffusion::Solver::Initialize()
           if (bndry_vals.size()!=3)
             throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
                            " Robin needs 3 values in bndry vals.");
-          boundaries.push_back({BoundaryType::Robin, {bndry_vals[0],
-                                                      bndry_vals[1],
-                                                      bndry_vals[2]}});
+          boundaries_.push_back({BoundaryType::Robin, {bndry_vals[0],
+                                                       bndry_vals[1],
+                                                       bndry_vals[2]}});
           chi::log.Log() << "Boundary " << bndry << " set to robin." << bndry_vals[0]<<","<<bndry_vals[1]<<","<<bndry_vals[2];
           break;
         }
         case BoundaryType::Vacuum:
         {
-          boundaries.push_back({BoundaryType::Robin, {0.25,0.5,0.}});
+          boundaries_.push_back({BoundaryType::Robin, {0.25, 0.5, 0.}});
           chi::log.Log() << "Boundary " << bndry << " set to vacuum.";
           break;
         }
@@ -95,8 +95,8 @@ void cfem_diffusion::Solver::Initialize()
           if (bndry_vals.size()!=3) 
             throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
                            " Neumann needs 3 values in bndry vals.");
-          boundaries.push_back({BoundaryType::Robin, {0.,bndry_vals[0],
-                                                      bndry_vals[1]}});
+          boundaries_.push_back({BoundaryType::Robin, {0., bndry_vals[0],
+                                                       bndry_vals[1]}});
           chi::log.Log() << "Boundary " << bndry << " set to neumann." << bndry_vals[0];
           break;
         }
@@ -104,7 +104,7 @@ void cfem_diffusion::Solver::Initialize()
     }
     else
     {
-      boundaries.push_back({BoundaryType::Dirichlet, {0.,0.,0.}});
+      boundaries_.push_back({BoundaryType::Dirichlet, {0., 0., 0.}});
       chi::log.Log0Verbose1()
         << "No boundary preference found for boundary index " << bndry
         << "Dirichlet boundary added with zero boundary value.";
@@ -112,29 +112,29 @@ void cfem_diffusion::Solver::Initialize()
   }//for bndry
   
   //============================================= Make SDM
-  sdm_ptr = chi_math::SpatialDiscretization_PWLC::New(grid_ptr);
-  const auto& sdm = *sdm_ptr;
+  sdm_ptr_ = chi_math::SpatialDiscretization_PWLC::New(grid_ptr_);
+  const auto& sdm = *sdm_ptr_;
  
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;
-  num_local_dofs = sdm.GetNumLocalDOFs(OneDofPerNode);
-  num_globl_dofs = sdm.GetNumGlobalDOFs(OneDofPerNode);
+  num_local_dofs_ = sdm.GetNumLocalDOFs(OneDofPerNode);
+  num_globl_dofs_ = sdm.GetNumGlobalDOFs(OneDofPerNode);
  
-  chi::log.Log() << "Num local DOFs: " << num_local_dofs;
-  chi::log.Log() << "Num globl DOFs: " << num_globl_dofs;
+  chi::log.Log() << "Num local DOFs: " << num_local_dofs_;
+  chi::log.Log() << "Num globl DOFs: " << num_globl_dofs_;
 
   //============================================= Initializes Mats and Vecs
-  const auto n = static_cast<int64_t>(num_local_dofs);
-  const auto N = static_cast<int64_t>(num_globl_dofs);
- 
-  A = chi_math::PETScUtils::CreateSquareMatrix(n,N);
-  x = chi_math::PETScUtils::CreateVector(n,N);
-  b = chi_math::PETScUtils::CreateVector(n,N);
+  const auto n = static_cast<int64_t>(num_local_dofs_);
+  const auto N = static_cast<int64_t>(num_globl_dofs_);
+
+  A_ = chi_math::PETScUtils::CreateSquareMatrix(n, N);
+  x_ = chi_math::PETScUtils::CreateVector(n, N);
+  b_ = chi_math::PETScUtils::CreateVector(n, N);
  
   std::vector<int64_t> nodal_nnz_in_diag;
   std::vector<int64_t> nodal_nnz_off_diag;
   sdm.BuildSparsityPattern(nodal_nnz_in_diag,nodal_nnz_off_diag, OneDofPerNode);
  
-  chi_math::PETScUtils::InitMatrixSparsity(A,
+  chi_math::PETScUtils::InitMatrixSparsity(A_,
                                            nodal_nnz_in_diag,
                                            nodal_nnz_off_diag);
 
@@ -148,9 +148,9 @@ void cfem_diffusion::Solver::Initialize()
     using namespace chi_math;
     auto initial_field_function =
       std::make_shared<chi_physics::FieldFunction>(
-        text_name,                     //Text name
-        sdm_ptr,                       //Spatial Discretization
-        Unknown(UnknownType::SCALAR)); //Unknown/Variable
+          text_name,                     //Text name
+          sdm_ptr_,                      //Spatial Discretization
+          Unknown(UnknownType::SCALAR)); //Unknown/Variable
 
     field_functions_.push_back(initial_field_function);
     chi::field_function_stack.push_back(initial_field_function);
@@ -163,8 +163,8 @@ void cfem_diffusion::Solver::Execute()
 {
   chi::log.Log() << "\nExecuting CFEM Diffusion solver";
 
-  const auto& grid = *grid_ptr;
-  const auto& sdm  = *sdm_ptr;
+  const auto& grid = *grid_ptr_;
+  const auto& sdm  = *sdm_ptr_;
 
   lua_State* L = chi::console.consoleState;
 
@@ -215,17 +215,17 @@ void cfem_diffusion::Solver::Execute()
       // not a boundary face
 	    if (face.has_neighbor) continue; 
 	  
-      const auto& bndry = boundaries[face.neighbor_id];
+      const auto& bndry = boundaries_[face.neighbor_id];
 
       // Robin boundary
-      if (bndry.type == BoundaryType::Robin)
+      if (bndry.type_ == BoundaryType::Robin)
       { 
         const auto  qp_face_data = cell_mapping.MakeFaceQuadraturePointData( f );
         const size_t num_face_nodes = face.vertex_ids.size();
 
-        const auto& aval = bndry.values[0];
-        const auto& bval = bndry.values[1];
-        const auto& fval = bndry.values[2];
+        const auto& aval = bndry.values_[0];
+        const auto& bval = bndry.values_[1];
+        const auto& fval = bndry.values_[2];
 
         chi::log.Log0Verbose1() << "Boundary  set as Robin with a,b,f = ("
                     << aval << ","
@@ -264,11 +264,11 @@ void cfem_diffusion::Solver::Execute()
       }//if Robin
 	  
 	    // Dirichlet boundary
-	    if (bndry.type == BoundaryType::Dirichlet)
+	    if (bndry.type_ == BoundaryType::Dirichlet)
       {
  		    const size_t num_face_nodes = face.vertex_ids.size();
 
-        const auto& boundary_value = bndry.values[0];
+        const auto& boundary_value = bndry.values_[0];
 
         // loop over nodes of that face
         for (size_t fi=0; fi<num_face_nodes; ++fi)
@@ -291,34 +291,34 @@ void cfem_diffusion::Solver::Execute()
     {
       if (dirichlet_count[i]>0) //if Dirichlet boundary node
       {
-        MatSetValue(A, imap[i], imap[i], 1.0, ADD_VALUES);
+        MatSetValue(A_, imap[i], imap[i], 1.0, ADD_VALUES);
 		    // because we use CFEM, a given node is common to several faces
 		    const double aux = dirichlet_value[i]/dirichlet_count[i];
-        VecSetValue(b, imap[i], aux, ADD_VALUES);
+        VecSetValue(b_, imap[i], aux, ADD_VALUES);
       }
       else
       {
         for (size_t j=0; j<num_nodes; ++j)
         {
           if (dirichlet_count[j]==0) // not related to a dirichlet node
-            MatSetValue(A, imap[i], imap[j], Acell[i][j], ADD_VALUES);
+            MatSetValue(A_, imap[i], imap[j], Acell[i][j], ADD_VALUES);
 		      else
           {
 		        const double aux = dirichlet_value[j]/dirichlet_count[j];
 			      cell_rhs[i] -= Acell[i][j]*aux;
           }
         }//for j
-        VecSetValue(b, imap[i], cell_rhs[i], ADD_VALUES);
+        VecSetValue(b_, imap[i], cell_rhs[i], ADD_VALUES);
       }
     }//for i
   }//for cell
  
   chi::log.Log() << "Global assembly";
  
-  MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY);
-  MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY);
-  VecAssemblyBegin(b);
-  VecAssemblyEnd(b);
+  MatAssemblyBegin(A_, MAT_FINAL_ASSEMBLY);
+  MatAssemblyEnd(A_, MAT_FINAL_ASSEMBLY);
+  VecAssemblyBegin(b_);
+  VecAssemblyEnd(b_);
  
   chi::log.Log() << "Done global assembly";
 
@@ -326,16 +326,16 @@ void cfem_diffusion::Solver::Execute()
   chi::log.Log() << "Solving: ";
   auto petsc_solver =
     chi_math::PETScUtils::CreateCommonKrylovSolverSetup(
-      A,               //Matrix
-      TextName(),      //Solver name
-      KSPCG,           //Solver type
-      PCGAMG,          //Preconditioner type
-      basic_options_("residual_tolerance").FloatValue(),  //Relative residual tolerance
-      basic_options_("max_iters").IntegerValue()          //Max iterations
-      );
+        A_,              //Matrix
+        TextName(),      //Solver name
+        KSPCG,           //Solver type
+        PCGAMG,          //Preconditioner type
+        basic_options_("residual_tolerance").FloatValue(),  //Relative residual tolerance
+        basic_options_("max_iters").IntegerValue()          //Max iterations
+    );
  
   //============================================= Solve
-  KSPSolve(petsc_solver.ksp,b,x);
+  KSPSolve(petsc_solver.ksp, b_, x_);
 
   UpdateFieldFunctions();
  
