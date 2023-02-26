@@ -33,7 +33,7 @@ void lbs::acceleration::DiffusionMIPSolver::
   const auto& source_function = options.source_lua_function;
   const auto& solution_function = options.ref_solution_lua_function;
 
-  const size_t num_groups   = uk_man_.unknowns.front().num_components;
+  const size_t num_groups   = uk_man_.unknowns_.front().num_components_;
 
   VecSet(rhs_, 0.0);
 

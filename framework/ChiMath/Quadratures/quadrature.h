@@ -33,23 +33,23 @@ namespace chi_math
 class chi_math::Quadrature
 {
 public:
-  const QuadratureOrder order;
-  std::vector<chi_math::QuadraturePointXYZ> qpoints;
-  std::vector<double> weights;
+  const QuadratureOrder order_;
+  std::vector<chi_math::QuadraturePointXYZ> qpoints_;
+  std::vector<double> weights_;
 protected:
   /**Interval on which the quadrature is defined
    * (relevant for one-dimensional quadratures only).*/
-  std::pair<double, double> range;
+  std::pair<double, double> range_;
 
 protected:
   explicit
-  Quadrature(QuadratureOrder in_order) : order(in_order), range({0, 0}) {}
+  Quadrature(QuadratureOrder in_order) : order_(in_order), range_({0, 0}) {}
 
 public:
   /**Get the range on which the quadrature is defined
    * (relevant for one-dimensional quadratures only).*/
   const std::pair<double, double>& GetRange() const
-  { return range; }
+  { return range_; }
   /**Set the range on which the quadrature is defined.
    * (relevant for one-dimensional quadratures only).
    * Note that calling this method results in translation

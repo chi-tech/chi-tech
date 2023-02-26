@@ -20,7 +20,7 @@ void lbs::LBSSolver::InitializeParrays()
   for (size_t m=0; m < num_moments_; m++)
   {
     flux_moments_uk_man_.AddUnknown(chi_math::UnknownType::VECTOR_N, groups_.size());
-    flux_moments_uk_man_.unknowns.back().text_name = "m" + std::to_string(m);
+    flux_moments_uk_man_.unknowns_.back().text_name_ = "m" + std::to_string(m);
   }
 
   //================================================== Compute local # of dof

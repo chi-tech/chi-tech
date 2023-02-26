@@ -45,7 +45,7 @@ std::vector<std::vector<std::vector<int>>> chi_math::SpatialDiscretization::
   typedef std::vector<FaceAdjMapping> PerFaceAdjMapping;
   typedef std::vector<PerFaceAdjMapping> CellAdjMapping;
 
-  const auto& grid = *this->ref_grid;
+  const auto& grid = *this->ref_grid_;
 
   CellAdjMapping cell_adj_mapping;
   for (const auto& cell : grid.local_cells)
@@ -129,16 +129,16 @@ void chi_math::SpatialDiscretization::
   const auto& ukidT = to_vec_uk_id;
   try
   {
-    const auto& ukA = from_vec_uk_structure.unknowns.at(from_vec_uk_id);
-    const auto& ukB = to_vec_uk_structure.unknowns.at(to_vec_uk_id);
+    const auto& ukA = from_vec_uk_structure.unknowns_.at(from_vec_uk_id);
+    const auto& ukB = to_vec_uk_structure.unknowns_.at(to_vec_uk_id);
 
-    if (ukA.num_components  != ukB.num_components)
+    if (ukA.num_components_ != ukB.num_components_)
       throw std::logic_error(fname + " Unknowns do not have the "
                                      "same number of components");
 
-    const size_t num_comps = ukA.num_components;
+    const size_t num_comps = ukA.num_components_;
 
-    for (const auto& cell : ref_grid->local_cells)
+    for (const auto& cell : ref_grid_->local_cells)
     {
       const auto& cell_mapping = this->GetCellMapping(cell);
       const size_t num_nodes = cell_mapping.NumNodes();

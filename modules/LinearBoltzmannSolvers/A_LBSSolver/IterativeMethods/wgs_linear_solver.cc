@@ -129,7 +129,7 @@ void WGSLinearSolver<Mat, Vec, KSP>::SetRHS()
                                                PhiSTLOption::PHI_NEW);
 
   //============================================= Compute RHS norm
-  VecNorm(b_, NORM_2, &context_ptr_->rhs_norm_);
+  VecNorm(b_, NORM_2, &context_ptr_->rhs_norm);
 
   //============================================= Compute precondition RHS norm
   PC pc;
@@ -137,7 +137,7 @@ void WGSLinearSolver<Mat, Vec, KSP>::SetRHS()
   Vec temp_vec;
   VecDuplicate(b_, &temp_vec);
   PCApply(pc, b_, temp_vec);
-  VecNorm(temp_vec, NORM_2, &context_ptr_->rhs_preconditioned_norm_);
+  VecNorm(temp_vec, NORM_2, &context_ptr_->rhs_preconditioned_norm);
   VecDestroy(&temp_vec);
 }
 

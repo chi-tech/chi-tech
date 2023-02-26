@@ -6,24 +6,24 @@ chi_math::SlabMappingFE_PWL::
 SlabMappingFE_PWL(const chi_mesh::Cell& slab_cell,
                   const chi_mesh::MeshContinuumConstPtr& ref_grid,
                   const chi_math::QuadratureLine &volume_quadrature) :
-  chi_math::CellMappingFE_PWL(ref_grid,
+    chi_math::CellMappingFE_PWL(ref_grid,
                               slab_cell,
                               2, //num_nodes
                               GetVertexLocations(*ref_grid,slab_cell),
                               MakeFaceNodeMapping(slab_cell)),
-  volume_quadrature(volume_quadrature)
+    volume_quadrature_(volume_quadrature)
 {
-  v0i = slab_cell.vertex_ids_[0];
-  v1i = slab_cell.vertex_ids_[1];
-  v0 = m_grid_ptr->vertices[v0i];
-  const auto& v1 = m_grid_ptr->vertices[v1i];
+  v0i_ = slab_cell.vertex_ids_[0];
+  v1i_ = slab_cell.vertex_ids_[1];
+  v0_ = grid_ptr_->vertices[v0i_];
+  const auto& v1 = grid_ptr_->vertices[v1i_];
 
-  chi_mesh::Vector3 v01 = v1 - v0;
-  h = v01.Norm();
+  chi_mesh::Vector3 v01 = v1 - v0_;
+  h_ = v01.Norm();
 
 //  face_node_mappings.emplace_back(1, 0);
 //  face_node_mappings.emplace_back(1, 1);
 
-  normals[0] = slab_cell.faces_[0].normal_;
-  normals[1] = slab_cell.faces_[1].normal_;
+  normals_[0] = slab_cell.faces_[0].normal_;
+  normals_[1] = slab_cell.faces_[1].normal_;
 }

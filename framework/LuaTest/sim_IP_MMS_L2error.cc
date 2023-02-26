@@ -21,7 +21,7 @@ namespace chi_unit_sim_tests
 
     solver.Initialize();
 
-    const auto& sdm = *solver.sdm_ptr;
+    const auto& sdm = *solver.sdm_ptr_;
     const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;
     const size_t num_local_dofs = sdm.GetNumLocalDOFs(OneDofPerNode);
     const size_t num_globl_dofs = sdm.GetNumGlobalDOFs(OneDofPerNode);
@@ -33,10 +33,10 @@ namespace chi_unit_sim_tests
 
     //============================================= Compute error
     //First get ghosted values
-    const auto& field = solver.field;
+    const auto& field = solver.field_;
 
     double local_error = 0.0;
-    for (const auto& cell : sdm.ref_grid->local_cells)
+    for (const auto& cell : sdm.ref_grid_->local_cells)
     {
       const int mat_id = cell.material_id_;
       const auto& cell_mapping = sdm.GetCellMapping(cell);
@@ -71,8 +71,8 @@ namespace chi_unit_sim_tests
     auto ff =
       std::make_shared<chi_physics::FieldFunction>(
         std::string("phi"),        //Text name
-        solver.sdm_ptr,            //Spatial Discretization
-        unk_man.unknowns.front()); //Unknown Manager
+        solver.sdm_ptr_,            //Spatial Discretization
+        unk_man.unknowns_.front()); //Unknown Manager
 
     chi::field_function_stack.push_back(ff);
 
@@ -92,10 +92,10 @@ namespace chi_unit_sim_tests
     global_error = std::sqrt(global_error);
 
     chi::log.Log() << "Error: " << std::scientific << global_error
-                   << " Num-cells: " << sdm.ref_grid->GetGlobalNumberOfCells();
+                   << " Num-cells: " << sdm.ref_grid_->GetGlobalNumberOfCells();
 
     auto stl_vector = new std::vector<double>();
-    sdm.LocalizePETScVector(solver.x, *stl_vector, OneDofPerNode);
+    sdm.LocalizePETScVector(solver.x_, *stl_vector, OneDofPerNode);
 
     //Create ff but use stl_vector instead of &solver.x
 

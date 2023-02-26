@@ -161,8 +161,8 @@ void lbs::SweepChunkPWLTransientTheta::
       deploc_face_counter = ni_deploc_face_counter;
       preloc_face_counter = ni_preloc_face_counter;
       const int angle_num = angle_set->angles[angle_set_index];
-      const chi_mesh::Vector3& omega = groupset.quadrature_->omegas[angle_num];
-      const double wt = groupset.quadrature_->weights[angle_num];
+      const chi_mesh::Vector3& omega = groupset.quadrature_->omegas_[angle_num];
+      const double wt = groupset.quadrature_->weights_[angle_num];
 
       // ============================================ Gradient matrix
       for (int i = 0; i < num_nodes; ++i)

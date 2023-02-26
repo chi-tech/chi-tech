@@ -306,24 +306,24 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
 
   groupset->quadrature_ = ang_quad;
 
-  if (ang_quad->type == chi_math::AngularQuadratureType::ProductQuadrature)
+  if (ang_quad->type_ == chi_math::AngularQuadratureType::ProductQuadrature)
   {
     auto prodquad = std::static_pointer_cast<chi_math::ProductQuadrature>(ang_quad);
 
     chi::log.Log()
       << "Groupset " << grpset_index
       << " quadrature set to quadrature with "
-      << prodquad->azimu_ang.size()
+      << prodquad->azimu_ang_.size()
       << " azimuthal angles and "
-      << prodquad->polar_ang.size()
+      << prodquad->polar_ang_.size()
       << " polar angles. ";
   }
-  else if (ang_quad->type == chi_math::AngularQuadratureType::Arbitrary)
+  else if (ang_quad->type_ == chi_math::AngularQuadratureType::Arbitrary)
   {
     chi::log.Log()
       << "Groupset " << grpset_index
       << " quadrature set to quadrature with "
-      << ang_quad->abscissae.size()
+      << ang_quad->abscissae_.size()
       << " number of angles.";
   }
   else

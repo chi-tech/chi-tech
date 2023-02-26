@@ -5,13 +5,13 @@
 double chi_math::SlabMappingFE_PWL::
   ShapeValue(const int i, const chi_mesh::Vector3& xyz) const
 {
-  const auto& p0 = m_grid_ptr->vertices[v0i];
-  const auto& p1 = m_grid_ptr->vertices[v1i];
+  const auto& p0 = grid_ptr_->vertices[v0i_];
+  const auto& p1 = grid_ptr_->vertices[v1i_];
   chi_mesh::Vector3 xyz_ref = xyz - p0;
 
   chi_mesh::Vector3 v01 = p1 - p0;
 
-  double xi   = v01.Dot(xyz_ref)/v01.Norm()/h;
+  double xi   = v01.Dot(xyz_ref) / v01.Norm() / h_;
 
   if ((xi>=-1.0e-6) and (xi<=1.0+1.0e-6))
   {
@@ -31,18 +31,18 @@ void chi_math::SlabMappingFE_PWL::
   ShapeValues(const chi_mesh::Vector3& xyz,
               std::vector<double>& shape_values) const
 {
-  shape_values.resize(m_num_nodes, 0.0);
-  const auto& p0 = m_grid_ptr->vertices[v0i];
-  const auto& p1 = m_grid_ptr->vertices[v1i];
+  shape_values.resize(num_nodes_, 0.0);
+  const auto& p0 = grid_ptr_->vertices[v0i_];
+  const auto& p1 = grid_ptr_->vertices[v1i_];
   chi_mesh::Vector3 xyz_ref = xyz - p0;
 
   chi_mesh::Vector3 v01 = p1 - p0;
 
-  double xi   = v01.Dot(xyz_ref)/v01.Norm()/h;
+  double xi   = v01.Dot(xyz_ref) / v01.Norm() / h_;
 
   if ((xi>=-1.0e-6) and (xi<=1.0+1.0e-6))
   {
-    for (int i=0; i < m_num_nodes; i++)
+    for (int i=0; i < num_nodes_; i++)
     {
       if (i==0)
         shape_values[i] = 1.0 - xi;
@@ -61,9 +61,9 @@ chi_mesh::Vector3 chi_math::SlabMappingFE_PWL::
   GradShapeValue(const int i, const chi_mesh::Vector3& xyz) const
 {
   if (i==0)
-    return chi_mesh::Vector3(0.0, 0.0, -1.0 / h);
+    return chi_mesh::Vector3(0.0, 0.0, -1.0 / h_);
   else
-    return chi_mesh::Vector3(0.0, 0.0, 1.0 / h);
+    return chi_mesh::Vector3(0.0, 0.0, 1.0 / h_);
 }
 
 //###################################################################

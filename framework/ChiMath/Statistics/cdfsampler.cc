@@ -69,27 +69,27 @@ chi_math::CDFSampler::SubIntvl::SubIntvl(std::string offset,
 chi_math::CDFSampler::CDFSampler(std::vector<double> &in_cdf,
                                  int subdiv_factor,
                                  int final_res) :
-                                 ref_cdf(in_cdf)
+    ref_cdf_(in_cdf)
 {
   //=================================== Setting sub-division factor
   if (subdiv_factor >= 1)
-    this->subdiv_factor = subdiv_factor;
+    this->subdiv_factor_ = subdiv_factor;
   else
   {
     if (in_cdf.size() <= 10)
-      this->subdiv_factor = 1;
+      this->subdiv_factor_ = 1;
     else if (in_cdf.size() <= 10000)
-      this->subdiv_factor = 10;
+      this->subdiv_factor_ = 10;
     else
-      this->subdiv_factor = 10; //sqrt(in_cdf.size());
+      this->subdiv_factor_ = 10; //sqrt(in_cdf.size());
   }
 
   //=================================== Setting final resolution
   if (final_res >= 3)
-    this->final_res = final_res;
+    this->final_res_ = final_res;
   else
   {
-    this->final_res = 100;
+    this->final_res_ = 100;
   }
 
 //  chi::log.Log()
@@ -98,33 +98,33 @@ chi_math::CDFSampler::CDFSampler(std::vector<double> &in_cdf,
 
   //=================================== Sub-dividing the interval
   size_t cdf_size = in_cdf.size();
-  size_t intvl_size = ceil(cdf_size/(double)this->subdiv_factor);
+  size_t intvl_size = ceil(cdf_size/(double)this->subdiv_factor_);
 
-  if (intvl_size < this->final_res)
-    sub_intvls.push_back(new SubIntvl(std::string("  "),0,cdf_size-1,
-                                      ref_cdf,
-                                      this->subdiv_factor,
-                                      this->final_res,
-                                      true));
+  if (intvl_size < this->final_res_)
+    sub_intvls_.push_back(new SubIntvl(std::string("  "), 0, cdf_size - 1,
+                                       ref_cdf_,
+                                       this->subdiv_factor_,
+                                       this->final_res_,
+                                       true));
   else
   {
-    sub_intvls.resize(this->subdiv_factor);
-    for (int i=0; i<this->subdiv_factor; i++)
+    sub_intvls_.resize(this->subdiv_factor_);
+    for (int i=0; i<this->subdiv_factor_; i++)
     {
       int beg = i*intvl_size;
       int end = (i+1)*intvl_size-1;
 
-      if (i == (this->subdiv_factor-1))
+      if (i == (this->subdiv_factor_ - 1))
         end = cdf_size-1;
 
 //      chi::log.Log()
 //        << "Sub-interval " << beg
 //        << " " << end;
 
-      sub_intvls[i] = new SubIntvl(std::string("  "),beg,end,
-                                   ref_cdf,
-                                   this->subdiv_factor,
-                                   this->final_res);
+      sub_intvls_[i] = new SubIntvl(std::string("  "), beg, end,
+                                    ref_cdf_,
+                                    this->subdiv_factor_,
+                                    this->final_res_);
     }
   }
 
@@ -135,12 +135,12 @@ chi_math::CDFSampler::CDFSampler(std::vector<double> &in_cdf,
 int chi_math::CDFSampler::Sample(double x)
 {
   int ret_val=-1;
-  int cdf_size = ref_cdf.size();
+  int cdf_size = ref_cdf_.size();
 
   //============================================= Check bracket lo and hi
-  if      (x <= ref_cdf[0])
+  if      (x <= ref_cdf_[0])
     ret_val = 0;
-  else if (x >= ref_cdf[cdf_size-1])
+  else if (x >= ref_cdf_[cdf_size - 1])
     ret_val = cdf_size-1;
   //============================================= Check internal
   else
@@ -148,10 +148,10 @@ int chi_math::CDFSampler::Sample(double x)
     std::pair<int,int> range(0,cdf_size-1);
 
     //================================= Sample sub-intvls for range
-    int num_sub_intvls = sub_intvls.size();
+    int num_sub_intvls = sub_intvls_.size();
     for (int s=0; s<num_sub_intvls; s++)
     {
-      if (sub_intvls[s]->Sample(x,range))
+      if (sub_intvls_[s]->Sample(x, range))
         break;
     }
 
@@ -163,13 +163,13 @@ int chi_math::CDFSampler::Sample(double x)
     {
       if (k==0)
       {
-        if (x < ref_cdf[k])
+        if (x < ref_cdf_[k])
         {
           ret_val = k;
           break;
         }
       }
-      else if ((x >= ref_cdf[k-1]) and (x < ref_cdf[k]))
+      else if ((x >= ref_cdf_[k - 1]) and (x < ref_cdf_[k]))
       {
         ret_val = k;
         break;

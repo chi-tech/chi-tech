@@ -17,16 +17,19 @@ namespace chi_math
       const chi_mesh::Cell& poly_cell,
       const chi_mesh::MeshContinuumConstPtr& ref_grid,
       const QuadratureTriangle& volume_quadrature,
-      const QuadratureLine&     surface_quadrature)
-    : PolygonMappingFE_PWL(poly_cell, ref_grid,
-                           volume_quadrature, surface_quadrature)
+      const QuadratureLine&     surface_quadrature) :
+        PolygonMappingFE_PWL(
+            poly_cell, ref_grid,
+            volume_quadrature, surface_quadrature)
     {}
+
   private:
     double SpatialWeightFunction(const chi_mesh::Vector3& pt) const override
     { return pt[0]; }
+
   public:
-    void
-    ComputeUnitIntegrals(finite_element::UnitIntegralData& ui_data) const override
+    void ComputeUnitIntegrals(
+        finite_element::UnitIntegralData& ui_data) const override
     { ComputeWeightedUnitIntegrals(ui_data); }
   };
 }

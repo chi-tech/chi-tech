@@ -13,10 +13,10 @@ namespace chi_math
   template<class MatType, class VecType>
   struct LinearSolverContext
   {
-    double rhs_norm_ = 0.0;
-    double rhs_preconditioned_norm_ = 0.0;
-    double custom_residual_scale_ = 1.0;
-    ResidualScaleType residual_scale_type_ = ResidualScaleType::NONE;
+    double rhs_norm = 0.0;
+    double rhs_preconditioned_norm = 0.0;
+    double custom_residual_scale = 1.0;
+    ResidualScaleType residual_scale_type = ResidualScaleType::NONE;
 
     virtual int MatrixAction(MatType& matrix, VecType& vector, VecType& action)
     {return 0;}

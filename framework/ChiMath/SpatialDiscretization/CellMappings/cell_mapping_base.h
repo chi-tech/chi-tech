@@ -40,17 +40,17 @@ protected:
                              double&,
                              std::vector<double>&)> VandAFunction;
 protected:
-  chi_mesh::MeshContinuumConstPtr m_grid_ptr;
-  const chi_mesh::Cell& m_cell;
-  const size_t m_num_nodes;
-  double m_volume = 0.0;
-  std::vector<double> m_areas;
+  chi_mesh::MeshContinuumConstPtr grid_ptr_;
+  const chi_mesh::Cell& cell_;
+  const size_t num_nodes_;
+  double volume_ = 0.0;
+  std::vector<double> areas_;
 
   /** For each cell face, map from the face node index to the corresponding
      *  cell node index. More specifically, \p face_dof_mappings[f][fi], with
      *  \p fi the face node index of the face identified by face index \p f,
      *  contains the corresponding cell node index. */
-  const std::vector<std::vector<int>> face_node_mappings;
+  const std::vector<std::vector<int>> face_node_mappings_;
 
   CellMapping(chi_mesh::MeshContinuumConstPtr   in_grid,
               const chi_mesh::Cell& in_cell,
@@ -60,10 +60,10 @@ protected:
 
 public:
   //00
-  size_t NumNodes() const {return m_num_nodes;}
+  size_t NumNodes() const { return num_nodes_; }
   size_t NumFaceNodes(size_t face_index) const
   {
-    return face_node_mappings.at(face_index).size();
+    return face_node_mappings_.at(face_index).size();
   }
 
   static void ComputeCellVolumeAndAreas(
@@ -72,37 +72,33 @@ public:
     double& volume,
     std::vector<double>& areas);
 
-  double CellVolume() const {return m_volume;}
-  double FaceArea(size_t face_index) const {return m_areas[face_index];}
+  double CellVolume() const {return volume_;}
+  double FaceArea(size_t face_index) const {return areas_[face_index];}
 
-  int MapFaceNode(size_t face_index,
-                  size_t face_node_index) const;
+  int MapFaceNode(size_t face_index, size_t face_node_index) const;
 
   //02 ShapeFuncs
-  virtual
-  double ShapeValue(int i, const chi_mesh::Vector3& xyz) const = 0;
-  virtual
-  void ShapeValues(const chi_mesh::Vector3& xyz,
-                   std::vector<double>& shape_values) const = 0;
-  virtual
-  chi_mesh::Vector3 GradShapeValue(int i,
-                                   const chi_mesh::Vector3& xyz) const = 0;
-  virtual
-  void GradShapeValues(
-    const chi_mesh::Vector3& xyz,
-    std::vector<chi_mesh::Vector3>& gradshape_values) const = 0;
-  virtual
-  std::vector<chi_mesh::Vector3> GetNodeLocations() const = 0;
+  virtual double ShapeValue(int i, const chi_mesh::Vector3& xyz) const = 0;
+
+  virtual void ShapeValues(const chi_mesh::Vector3& xyz,
+                           std::vector<double>& shape_values) const = 0;
+  virtual chi_mesh::Vector3
+  GradShapeValue(int i, const chi_mesh::Vector3& xyz) const = 0;
+
+  virtual void GradShapeValues(
+      const chi_mesh::Vector3& xyz,
+      std::vector<chi_mesh::Vector3>& gradshape_values) const = 0;
+
+  virtual std::vector<chi_mesh::Vector3> GetNodeLocations() const = 0;
 
   //03 Quadrature
   /** Compute unit integrals. */
-  virtual void
-  ComputeUnitIntegrals(finite_element::UnitIntegralData& ui_data) const;
+  virtual void ComputeUnitIntegrals(
+      finite_element::UnitIntegralData& ui_data) const;
 
   /** Initialize volume quadrature point data and
    *  surface quadrature point data for all faces. */
-  void
-  InitializeAllQuadraturePointData(
+  void InitializeAllQuadraturePointData(
     finite_element::InternalQuadraturePointData& internal_data,
     std::vector<finite_element::FaceQuadraturePointData>& faces_qp_data) const;
 
@@ -112,13 +108,12 @@ public:
     finite_element::InternalQuadraturePointData& internal_data) const = 0;
 
   /** Initialize surface quadrature point data for face index \p face. */
-  virtual void
-  InitializeFaceQuadraturePointData(
+  virtual void InitializeFaceQuadraturePointData(
     unsigned int face,
     finite_element::FaceQuadraturePointData& faces_qp_data) const = 0;
 
   finite_element::InternalQuadraturePointData
-    MakeVolumeQuadraturePointData() const;
+  MakeVolumeQuadraturePointData() const;
 
   finite_element::FaceQuadraturePointData
   MakeFaceQuadraturePointData(size_t face_index) const;

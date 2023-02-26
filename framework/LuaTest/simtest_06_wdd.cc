@@ -115,7 +115,7 @@ int chiSimTest06_WDD(lua_State* L)
   const auto& m_ell_em_map = quadrature->GetMomentToHarmonicsIndexMap();
 
   const size_t num_moments = m_ell_em_map.size();
-  const size_t num_dirs = quadrature->omegas.size();
+  const size_t num_dirs = quadrature->omegas_.size();
 
   chi::log.Log() << "End Set/Get params." << std::endl;
   chi::log.Log() << "Num Moments: " << num_moments << std::endl;
@@ -257,8 +257,8 @@ int chiSimTest06_WDD(lua_State* L)
   {
     for (size_t d=0; d<num_dirs; ++d)
     {
-      const auto &omega = quadrature->omegas[d];
-      const auto &weight = quadrature->weights[d];
+      const auto &omega = quadrature->omegas_[d];
+      const auto &weight = quadrature->weights_[d];
 
       std::vector<int64_t> iorder, jorder, korder;
       if (omega.x > 0.0) iorder = chi_math::Range<int64_t>(0, Nx);
@@ -344,8 +344,8 @@ double ComputeRelativePWChange(
   )
 {
   double pw_change = 0.0;
-  const size_t num_moments = phi_uk_man.unknowns.size();
-  const size_t num_groups = phi_uk_man.unknowns.front().num_components;
+  const size_t num_moments = phi_uk_man.unknowns_.size();
+  const size_t num_groups = phi_uk_man.unknowns_.front().num_components_;
 
   for (const auto& cell : grid.local_cells)
   {
@@ -402,8 +402,8 @@ std::vector<double> SetSource(
   const size_t num_local_phi_dofs = sdm.GetNumLocalDOFs(phi_uk_man);
   std::vector<double> source_moments(num_local_phi_dofs, 0.0);
 
-  const size_t num_moments = phi_uk_man.unknowns.size();
-  const size_t num_groups = phi_uk_man.unknowns.front().num_components;
+  const size_t num_moments = phi_uk_man.unknowns_.size();
+  const size_t num_groups = phi_uk_man.unknowns_.front().num_components_;
 
   for (const auto& cell : grid.local_cells)
   {

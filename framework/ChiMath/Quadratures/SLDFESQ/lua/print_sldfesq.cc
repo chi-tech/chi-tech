@@ -43,14 +43,14 @@ int chiPrintToPythonSLDFESQAngularQuadrature(lua_State* L)
 
   try{
     auto ref_quadrature = chi::angular_quadrature_stack.at(handle);
-    if (ref_quadrature->type == chi_math::AngularQuadratureType::SLDFESQ)
+    if (ref_quadrature->type_ == chi_math::AngularQuadratureType::SLDFESQ)
     {
       auto sldfesq = std::dynamic_pointer_cast<
         chi_math::SimplifiedLDFESQ::Quadrature>(ref_quadrature);
 
       if (chi::mpi.location_id == 0)
       {
-        sldfesq->output_filename_prefix = file_name;
+        sldfesq->output_filename_prefix_ = file_name;
         sldfesq->PrintQuadratureToFile();
       }
     }

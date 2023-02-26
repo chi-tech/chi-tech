@@ -10,21 +10,21 @@ chi_math::QuadratureQuadrilateral::QuadratureQuadrilateral(QuadratureOrder order
 {
   QuadratureGaussLegendre legendre(order);
 
-  size_t N = legendre.qpoints.size();
+  size_t N = legendre.qpoints_.size();
 
-  qpoints.resize(N*N);
-  weights.resize(N*N);
+  qpoints_.resize(N * N);
+  weights_.resize(N * N);
 
   unsigned int q=0;
 
   for (unsigned int j=0; j<N; j++)
     for (unsigned int i=0; i<N; i++)
     {
-      qpoints[q](0) = legendre.qpoints[i](0);
-      qpoints[q](1) = legendre.qpoints[j](0);
+      qpoints_[q](0) = legendre.qpoints_[i](0);
+      qpoints_[q](1) = legendre.qpoints_[j](0);
 
-      weights[q] = legendre.weights[i] *
-                   legendre.weights[j];
+      weights_[q] = legendre.weights_[i] *
+                    legendre.weights_[j];
 
       q++;
     }

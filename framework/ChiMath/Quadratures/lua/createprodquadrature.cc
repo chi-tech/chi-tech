@@ -77,9 +77,9 @@ int chiCreateProductQuadrature(lua_State *L)
     {
       chi::log.Log()
         << "Created Gauss-Legendre Quadrature with "
-        << new_quad->azimu_ang.size()
+        << new_quad->azimu_ang_.size()
         << " azimuthal angles and "
-        << new_quad->polar_ang.size()
+        << new_quad->polar_ang_.size()
         << " polar angles.";
     }
 
@@ -108,9 +108,9 @@ int chiCreateProductQuadrature(lua_State *L)
     {
       chi::log.Log()
         << "Created Gauss-Legendre-Legendre Quadrature with "
-        << new_quad->azimu_ang.size()
+        << new_quad->azimu_ang_.size()
         << " azimuthal angles and "
-        << new_quad->polar_ang.size()
+        << new_quad->polar_ang_.size()
         << " polar angles.";
     }
 
@@ -139,9 +139,9 @@ int chiCreateProductQuadrature(lua_State *L)
     {
       chi::log.Log()
       << "Created Gauss-Legendre-Chebyshev Quadrature with "
-      << new_quad->azimu_ang.size()
+      << new_quad->azimu_ang_.size()
       << " azimuthal angles and "
-      << new_quad->polar_ang.size()
+      << new_quad->polar_ang_.size()
       << " polar angles.";
     }
 
@@ -221,9 +221,9 @@ int chiCreateProductQuadrature(lua_State *L)
     {
       chi::log.Log()
         << "Created Custom Quadrature with "
-        << new_quad->azimu_ang.size()
+        << new_quad->azimu_ang_.size()
         << " azimuthal angles and "
-        << new_quad->polar_ang.size()
+        << new_quad->polar_ang_.size()
         << " polar angles.";
     }
 

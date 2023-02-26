@@ -29,7 +29,7 @@ public:
   //02 Shapefuncs
   double ShapeValue(int i, const chi_mesh::Vector3& xyz) const override
   {
-    if (m_grid_ptr->CheckPointInsideCell(m_cell, xyz))
+    if (grid_ptr_->CheckPointInsideCell(cell_, xyz))
       return 1.0;
     else
       return 0.0;
@@ -37,10 +37,10 @@ public:
   void ShapeValues(const chi_mesh::Vector3& xyz,
                    std::vector<double>& shape_values) const override
   {
-    if (m_grid_ptr->CheckPointInsideCell(m_cell, xyz))
-      shape_values.assign(m_num_nodes, 1.0);
+    if (grid_ptr_->CheckPointInsideCell(cell_, xyz))
+      shape_values.assign(num_nodes_, 1.0);
     else
-      shape_values.assign(m_num_nodes, 0.0);
+      shape_values.assign(num_nodes_, 0.0);
   }
   chi_mesh::Vector3 GradShapeValue(int i,
                                    const chi_mesh::Vector3& xyz) const override
@@ -51,11 +51,11 @@ public:
                        std::vector<chi_mesh::Vector3>& gradshape_values)
                        const override
   {
-    gradshape_values.assign(m_num_nodes, chi_mesh::Vector3(0, 0, 0));
+    gradshape_values.assign(num_nodes_, chi_mesh::Vector3(0, 0, 0));
   }
   std::vector<chi_mesh::Vector3> GetNodeLocations() const override
   {
-    return {m_cell.centroid_};
+    return {cell._centroid_};
   }
 
   //03 Quadrature

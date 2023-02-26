@@ -19,7 +19,7 @@ chi_math::SpatialDiscretization_PWLC::
   if (setup_flags == chi_math::finite_element::COMPUTE_UNIT_INTEGRALS)
   {
     int qorder_min;
-    switch (cs_type)
+    switch (coord_sys_type_)
     {
       case chi_math::CoordinateSystemType::CARTESIAN:
       {
@@ -42,25 +42,25 @@ chi_math::SpatialDiscretization_PWLC::
           "Unsupported coordinate system type encountered.");
     }
 
-    if (static_cast<int>(line_quad_order_arbitrary.order) < qorder_min)
+    if (static_cast<int>(line_quad_order_arbitrary_.order_) < qorder_min)
       chi::log.LogAllWarning()
         << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
         << "static_cast<int>(line_quad_order_arbitrary.order) < "
         << qorder_min << ".";
 
-    if (static_cast<int>(tri_quad_order_arbitrary.order) < qorder_min)
+    if (static_cast<int>(tri_quad_order_arbitrary_.order_) < qorder_min)
       chi::log.LogAllWarning()
         << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
         << "static_cast<int>(tri_quad_order_arbitrary.order) < "
         << qorder_min << ".";
 
-    if (static_cast<int>(quad_quad_order_arbitrary.order) < qorder_min)
+    if (static_cast<int>(quad_quad_order_arbitrary_.order_) < qorder_min)
       chi::log.LogAllWarning()
         << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
         << "static_cast<int>(quad_quad_order_arbitrary.order) < "
         << qorder_min << ".";
 
-    if (static_cast<int>(tet_quad_order_arbitrary.order) < qorder_min)
+    if (static_cast<int>(tet_quad_order_arbitrary_.order_) < qorder_min)
       chi::log.LogAllWarning()
         << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
         << "static_cast<int>(tet_quad_order_arbitrary.order) < "

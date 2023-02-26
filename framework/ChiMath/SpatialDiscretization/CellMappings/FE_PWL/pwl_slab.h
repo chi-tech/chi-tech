@@ -15,12 +15,13 @@ namespace chi_math
   class SlabMappingFE_PWL : public chi_math::CellMappingFE_PWL
   {
   private:
-    chi_mesh::Vector3 v0;
-    uint64_t v0i;
-    uint64_t v1i;
-    std::array<chi_mesh::Normal,2> normals;
-    const QuadratureLine& volume_quadrature;
-    double h;
+    chi_mesh::Vector3 v0_;
+    uint64_t v0i_;
+    uint64_t v1i_;
+    std::array<chi_mesh::Normal,2> normals_;
+    const QuadratureLine& volume_quadrature_;
+    double h_;
+
   public:
 
     /**Constructor for a slab view.*/
@@ -45,6 +46,7 @@ namespace chi_math
                      const chi_mesh::Vector3& qpoint,
                      bool on_surface=false,
                      const int edge=0) const;
+
     double SlabGradShape(int index) const;
 
 
@@ -53,17 +55,17 @@ namespace chi_math
     //                                                coordinates
   public:
     double ShapeValue(const int i, const chi_mesh::Vector3& xyz) const override;
+
     chi_mesh::Vector3 GradShapeValue(
       const int i,
       const chi_mesh::Vector3& xyz) const override;
 
     void ShapeValues(const chi_mesh::Vector3& xyz,
                      std::vector<double>& shape_values) const override;
+
     void GradShapeValues(
       const chi_mesh::Vector3& xyz,
       std::vector<chi_mesh::Vector3>& gradshape_values) const override;
-
-
   };
 }
 #endif

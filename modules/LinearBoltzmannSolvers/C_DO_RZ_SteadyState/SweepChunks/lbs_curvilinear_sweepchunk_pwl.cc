@@ -131,7 +131,7 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
       deploc_face_counter = ni_deploc_face_counter;
       preloc_face_counter = ni_preloc_face_counter;
       const auto& angle_num = angle_set->angles[angle_set_index];
-      const auto& omega = groupset.quadrature_->omegas[angle_num];
+      const auto& omega = groupset.quadrature_->omegas_[angle_num];
 
       const auto polar_level = map_polar_level[angle_num];
 

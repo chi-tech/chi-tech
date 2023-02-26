@@ -20,7 +20,7 @@ class chi_math::DynamicMatrix
 {
   typedef std::pair<size_t,size_t> MatDim;
 public:
-  std::vector<std::vector<NumberFormat>> elements;
+  std::vector<std::vector<NumberFormat>> elements_;
 
   /**Default constructor. Does nothing.*/
   DynamicMatrix()
@@ -32,7 +32,7 @@ public:
 
   /**Constructor with number of entries. Value defaults.*/
   DynamicMatrix(size_t Nrows, size_t Ncols) :
-    elements(Nrows,std::vector<NumberFormat>(Ncols))
+      elements_(Nrows, std::vector<NumberFormat>(Ncols))
   {
     static_assert(std::is_floating_point<NumberFormat>::value,
                   "Only floating point number formats are "
@@ -41,7 +41,7 @@ public:
 
   /**Constructor with number of entries and default value.*/
   DynamicMatrix(size_t Nrows, size_t Ncols, NumberFormat value) :
-    elements(Nrows, std::vector<NumberFormat>(Ncols,value))
+      elements_(Nrows, std::vector<NumberFormat>(Ncols, value))
   {
     static_assert(std::is_floating_point<NumberFormat>::value,
                   "Only floating point number formats are "
@@ -49,78 +49,78 @@ public:
   }
 
   /**Copy constructor.*/
-  DynamicMatrix(const DynamicMatrix& other) { elements = other.elements;}
+  DynamicMatrix(const DynamicMatrix& other) { elements_ = other.elements_;}
 
   /**Assignment operator.*/
   DynamicMatrix& operator=(const DynamicMatrix& other)
   {
-    elements = other.elements;
+    elements_ = other.elements_;
     return *this;
   }
 
   /**Move constructor.*/
   DynamicMatrix(DynamicMatrix&& other) noexcept
-  { elements = std::move(other.elements);}
+  { elements_ = std::move(other.elements_);}
 
   /**Move assignment operator.*/
   DynamicMatrix& operator=(DynamicMatrix&& other) noexcept
   {
-    elements = std::move(other.elements);
+    elements_ = std::move(other.elements_);
     return *this;
   }
 
   /**Constructor with vector.*/
   explicit
-  DynamicMatrix(const std::vector<std::vector<double>>& in) { elements = in;}
+  DynamicMatrix(const std::vector<std::vector<double>>& in) { elements_ = in;}
 
   /**Copy constructor with vector.*/
   DynamicMatrix& operator=(const std::vector<std::vector<double>>& in)
   {
-    elements = in;
+    elements_ = in;
     return *this;
   }
 
   /**Constructor with vector.*/
   DynamicMatrix(std::initializer_list<std::initializer_list<NumberFormat>> in)
   {
-    elements.clear();
+    elements_.clear();
     for (auto& v : in)
-      elements.push_back(v);
+      elements_.push_back(v);
   }
 
   /**Copy constructor with vector.*/
   DynamicMatrix& operator=(std::initializer_list<std::initializer_list<NumberFormat>> in)
   {
-    elements.clear();
+    elements_.clear();
     for (auto& v : in)
-      elements.push_back(v);
+      elements_.push_back(v);
     return *this;
   }
 
   //============================================= Element access
-  std::vector<NumberFormat>& operator[](size_t i) {return elements[i];}
+  std::vector<NumberFormat>& operator[](size_t i) {return elements_[i];}
 
-  std::vector<NumberFormat>& at(size_t i) {return elements.at(i);}
+  std::vector<NumberFormat>& at(size_t i) {return elements_.at(i);}
 
-  std::vector<NumberFormat>& back() {return elements.back();}
+  std::vector<NumberFormat>& back() {return elements_.back();}
 
-  std::vector<NumberFormat>& front() {return elements.front();}
+  std::vector<NumberFormat>& front() {return elements_.front();}
 
-  std::vector<NumberFormat>* data() {return elements.data();}
+  std::vector<NumberFormat>* data() {return elements_.data();}
 
-  void clear() {elements.clear();}
+  void clear() {elements_.clear();}
 
   void resize(size_t Nrows, size_t Ncols)
   {
-    elements.resize(Nrows);
-    for (auto& row : elements)
+    elements_.resize(Nrows);
+    for (auto& row : elements_)
       row.resize(Ncols);
   }
 
   void resize(size_t Nrows, size_t Ncols, const NumberFormat& val)
   {
-    elements.resize(Nrows);
-    for (auto& row : elements)
+    elements_.resize(Nrows);
+    for (auto& row : elements_)
     {
       row.resize(Ncols,val);
       for (auto& entry : row)
@@ -130,30 +130,30 @@ public:
 
   void reserve(size_t Nrows)
   {
-    elements.reserve(Nrows);
+    elements_.reserve(Nrows);
   }
 
   void push_back(const std::vector<NumberFormat>& val)
-    {elements.push_back(val);}
-  void pop_back() {elements.pop_back();}
+    {elements_.push_back(val);}
+  void pop_back() {elements_.pop_back();}
 
-  bool empty() const noexcept {return elements.empty();}
+  bool empty() const noexcept {return elements_.empty();}
 
   //============================================= Iterator access
   typename std::vector<std::vector<NumberFormat>>::iterator
-    begin() {return elements.begin();}
+    begin() {return elements_.begin();}
 
   typename std::vector<std::vector<NumberFormat>>::iterator
-    end() {return elements.end();}
+    end() {return elements_.end();}
 
-  size_t size() const {return elements.size();}
+  size_t size() const {return elements_.size();}
 
   MatDim Dimensions() const
   {
-    if (elements.empty())
+    if (elements_.empty())
       return {0,0};
     else
-      return {elements.size(),elements[0].size()};
+      return {elements_.size(), elements_[0].size()};
   }
 
   void bounds_check_rows_cols(const MatDim a, const MatDim b) const
@@ -179,7 +179,7 @@ public:
     DynamicMatrix<NumberFormat> newVector(dim.first, dim.second, 0.0);
     for (int i=0; i<dim.first; ++i)
       for (int j=0; j<dim.second;++j)
-        newVector.elements[i][j] = elements[i][j] + rhs.elements[i][j];
+        newVector.elements_[i][j] = elements_[i][j] + rhs.elements_[i][j];
 
     return newVector;
   }
@@ -192,7 +192,7 @@ public:
     bounds_check_rows_cols(dim,rhs.Dimensions());
     for (int i=0; i<dim.first; ++i)
       for (int j=0; j<dim.second;++j)
-        elements[i][j] = elements[i][j] + rhs.elements[i][j];
+        elements_[i][j] = elements_[i][j] + rhs.elements_[i][j];
 
     return *this;
   }
@@ -207,7 +207,7 @@ public:
     DynamicMatrix<NumberFormat> newVector(dim.first, dim.second, 0.0);
     for (int i=0; i<dim.first; ++i)
       for (int j=0; j<dim.second;++j)
-        newVector.elements[i][j] = elements[i][j] - rhs.elements[i][j];
+        newVector.elements_[i][j] = elements_[i][j] - rhs.elements_[i][j];
 
     return newVector;
   }
@@ -220,7 +220,7 @@ public:
     bounds_check_rows_cols(dim,rhs.Dimensions());
     for (int i=0; i<dim.first; ++i)
       for (int j=0; j<dim.second;++j)
-        elements[i][j] = elements[i][j] - rhs.elements[i][j];
+        elements_[i][j] = elements_[i][j] - rhs.elements_[i][j];
 
     return *this;
   }
@@ -234,7 +234,7 @@ public:
     DynamicMatrix<NumberFormat> newVector(dim.first, dim.second);
     for (int i=0; i<dim.first; ++i)
       for (int j=0; j<dim.second;++j)
-        newVector.elements[i][j] = elements[i][j]*value;
+        newVector.elements_[i][j] = elements_[i][j] * value;
 
     return newVector;
   }
@@ -246,7 +246,7 @@ public:
     auto dim = Dimensions();
     for (int i=0; i<dim.first; ++i)
       for (int j=0; j<dim.second;++j)
-        elements[i][j] *= value;
+        elements_[i][j] *= value;
 
     return *this;
   }
@@ -267,7 +267,7 @@ public:
       {
         NumberFormat value = 0.0;
         for (unsigned int k=0; k<dimA.second; ++k)
-          value += elements[i][k]*rhs.elements[k][j];
+          value += elements_[i][k] * rhs.elements_[k][j];
 
         newMatrix[istar][jstar] = value;
         ++jstar;
@@ -295,7 +295,7 @@ public:
     {
       NumberFormat value = 0.0;
       for (unsigned int j=0; j<dimA.second; ++j)
-        value += elements[i][j]*V[j];
+        value += elements_[i][j] * V[j];
       newV[k] = value;
       ++k;
     }
@@ -312,7 +312,7 @@ public:
     DynamicMatrix<NumberFormat> newVector(dim.first, dim.second);
     for (int i=0; i<dim.first; ++i)
       for (int j=0; j<dim.second;++j)
-        newVector.elements[i][j] = elements[i][j]/value;
+        newVector.elements_[i][j] = elements_[i][j] / value;
 
     return newVector;
   }
@@ -324,7 +324,7 @@ public:
     auto dim = Dimensions();
     for (int i=0; i<dim.first; ++i)
       for (int j=0; j<dim.second;++j)
-        elements[i][j] /= value;
+        elements_[i][j] /= value;
 
     return *this;
   }
@@ -343,7 +343,7 @@ public:
     }
 
     for (int i=0; i<dimA.first; ++i)
-      elements[i][i] = V[i];
+      elements_[i][i] = V[i];
   }
 
   /** Set the diagonal using value.*/
@@ -352,7 +352,7 @@ public:
     auto dimA = Dimensions();
 
     for (int i=0; i<dimA.first; ++i)
-      elements[i][i] = val;
+      elements_[i][i] = val;
   }
 
   /**Prints the matrix to a string and then returns the string.*/
@@ -364,8 +364,8 @@ public:
     for (int i = 0; i<dim.first ; ++i)
     {
       for (int j=0; j<(dim.second-1); ++j)
-        out<<elements[i][j]<<" ";
-      out<<elements[i][dim.second-1];
+        out << elements_[i][j] << " ";
+      out << elements_[i][dim.second - 1];
 
       if (i<(dim.first -1)) out << "\n";
     }
@@ -383,7 +383,7 @@ operator*(const double value, chi_math::DynamicMatrix<NumberFormat>& that)
   chi_math::DynamicMatrix<NumberFormat> newMatrix(dim.first, dim.second);
   for (int i=0; i<dim.first; ++i)
     for (int j=0; j<dim.second;++j)
-      newMatrix.elements[i][j] = that.elements[i][j]*value;
+      newMatrix.elements_[i][j] = that.elements_[i][j] * value;
 
   return newMatrix;
 }

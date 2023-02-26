@@ -9,13 +9,13 @@ const chi_math::CellMapping& chi_math::SpatialDiscretization::
                                      "GetCellMapping";
   try
   {
-    if (ref_grid->IsCellLocal(cell.global_id_))
+    if (ref_grid_->IsCellLocal(cell.global_id_))
     {
-      return *cell_mappings.at(cell.local_id_);
+      return *cell_mappings_.at(cell.local_id_);
     }
     else
     {
-      return *nb_cell_mappings.at(cell.global_id_);
+      return *nb_cell_mappings_.at(cell.global_id_);
     }
   }
   catch (const std::out_of_range& oor)

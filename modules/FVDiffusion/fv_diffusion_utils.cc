@@ -58,5 +58,5 @@ double fv_diffusion::Solver::CallLua_iXYZFunction(
 void fv_diffusion::Solver::UpdateFieldFunctions()
 {
   auto& ff = *field_functions_.front();
-  ff.UpdateFieldVector(x);
+  ff.UpdateFieldVector(x_);
 }

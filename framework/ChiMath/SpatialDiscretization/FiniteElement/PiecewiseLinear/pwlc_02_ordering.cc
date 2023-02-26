@@ -20,7 +20,7 @@ void chi_math::SpatialDiscretization_PWLC::OrderNodes()
   //============================================= Build set of local scope nodes
   // ls_node_id = local scope node id
   std::set<uint64_t> ls_node_ids_set;
-  for (const auto& cell : ref_grid->local_cells)
+  for (const auto& cell : ref_grid_->local_cells)
     for (uint64_t node_id : cell.vertex_ids_)
       ls_node_ids_set.insert(node_id);
 
@@ -38,10 +38,10 @@ void chi_math::SpatialDiscretization_PWLC::OrderNodes()
 
   // Now we add the partitions assoc. with the
   // ghost cells.
-  const auto ghost_cell_ids = ref_grid->cells.GetGhostGlobalIDs();
+  const auto ghost_cell_ids = ref_grid_->cells.GetGhostGlobalIDs();
   for (const uint64_t ghost_id : ghost_cell_ids)
   {
-    const auto& ghost_cell = ref_grid->cells[ghost_id];
+    const auto& ghost_cell = ref_grid_->cells[ghost_id];
     for (const uint64_t vid : ghost_cell.vertex_ids_)
       ls_node_ids_psubs[vid].insert(ghost_cell.partition_id_);
   }//for ghost_id
@@ -65,33 +65,33 @@ void chi_math::SpatialDiscretization_PWLC::OrderNodes()
 
   //============================================= Communicate node counts
   const uint64_t local_num_nodes = local_node_ids.size();
-  locJ_block_size.assign(chi::mpi.process_count,0);
+  locJ_block_size_.assign(chi::mpi.process_count, 0);
   MPI_Allgather(&local_num_nodes,       // sendbuf
                 1, MPI_UINT64_T,        // sendcount, sendtype
-                locJ_block_size.data(), // recvbuf
+                locJ_block_size_.data(), // recvbuf
                 1, MPI_UINT64_T,        // recvcount, recvtype
                 MPI_COMM_WORLD);        // comm
 
   //============================================= Build block addresses
-  locJ_block_address.assign(chi::mpi.process_count,0);
+  locJ_block_address_.assign(chi::mpi.process_count, 0);
   uint64_t global_num_nodes = 0;
   for (int j=0; j<chi::mpi.process_count; ++j)
   {
-    locJ_block_address[j] = global_num_nodes;
-    global_num_nodes += locJ_block_size[j];
+    locJ_block_address_[j] = global_num_nodes;
+    global_num_nodes += locJ_block_size_[j];
   }
 
-  local_block_address = locJ_block_address[chi::mpi.location_id];
+  local_block_address_ = locJ_block_address_[chi::mpi.location_id];
 
-  local_base_block_size = local_num_nodes;
-  globl_base_block_size = global_num_nodes;
+  local_base_block_size_ = local_num_nodes;
+  globl_base_block_size_ = global_num_nodes;
 
   //============================================= Build node mapping for local
   //                                              nodes
-  node_mapping.clear();
+  node_mapping_.clear();
   for (uint64_t i=0; i<local_num_nodes; ++i)
-    node_mapping[local_node_ids[i]] =
-      static_cast<int64_t>(local_block_address + i);
+    node_mapping_[local_node_ids[i]] =
+      static_cast<int64_t>(local_block_address_ + i);
 
   //============================================= Communicate nodes in need
   //                                              of mapping
@@ -106,11 +106,11 @@ void chi_math::SpatialDiscretization_PWLC::OrderNodes()
     const auto& node_list = key_value.second;
 
     for (const uint64_t node_id : node_list)
-      if (node_mapping.count(node_id) == 0)
+      if (node_mapping_.count(node_id) == 0)
         throw std::logic_error("Error mapping query node.");
       else
       {
-        const int64_t mapping = node_mapping.at(node_id);
+        const int64_t mapping = node_mapping_.at(node_id);
         mapped_node_ids[pid].push_back(mapping);
       }
   }//for query location and nodes
@@ -121,7 +121,7 @@ void chi_math::SpatialDiscretization_PWLC::OrderNodes()
 
   //============================================= Processing the mapping for
   //                                              non-local nodes
-  m_ghost_node_mapping.clear();
+  m_ghost_node_mapping_.clear();
   try
   {
     for (const auto& pid_node_ids : nonlocal_node_ids_map)
@@ -136,8 +136,8 @@ void chi_math::SpatialDiscretization_PWLC::OrderNodes()
       const size_t num_nodes = node_list.size();
       for (size_t i=0; i<num_nodes; ++i)
       {
-        node_mapping[node_list[i]] = mappings[i];
-        m_ghost_node_mapping[node_list[i]] = mappings[i];
+        node_mapping_[node_list[i]] = mappings[i];
+        m_ghost_node_mapping_[node_list[i]] = mappings[i];
       }
     }//for pid and non-local id
   }

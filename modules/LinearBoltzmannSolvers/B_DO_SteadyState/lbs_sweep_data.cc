@@ -68,7 +68,7 @@ void DiscOrdSteadyStateSolver::InitializeSweepDataStructures()
       if (so_grouping.empty()) continue;
 
       const size_t master_dir_id = so_grouping.front();
-      const auto& omega = quadrature->omegas[master_dir_id];
+      const auto& omega = quadrature->omegas_[master_dir_id];
       const auto new_swp_order =
         chi_mesh::sweep_management::
         CreateSweepOrder(omega,

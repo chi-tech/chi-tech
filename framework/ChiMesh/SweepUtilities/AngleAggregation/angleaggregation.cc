@@ -87,7 +87,7 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
   {
     if (bndry->IsReflecting())
     {
-      size_t tot_num_angles = quadrature->abscissae.size();
+      size_t tot_num_angles = quadrature->abscissae_.size();
       size_t num_local_cells = grid->local_cells.size();
       auto& rbndry = (BoundaryReflecting&)(*bndry);
 
@@ -98,18 +98,18 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
       //========================================= Determine reflected angle
       for (int n=0; n<tot_num_angles; ++n)
       {
-        auto omega_reflected = (quadrature->omegas[n]) -
-                               rbndry.normal*
-                               quadrature->omegas[n].Dot(rbndry.normal)*2.0;
+        auto omega_reflected = (quadrature->omegas_[n]) -
+                               rbndry.normal *
+                               quadrature->omegas_[n].Dot(rbndry.normal) * 2.0;
         for (int nstar=0; nstar<tot_num_angles; ++nstar)
-          if (omega_reflected.Dot(quadrature->omegas[nstar])> (1.0-epsilon))
+          if (omega_reflected.Dot(quadrature->omegas_[nstar]) > (1.0 - epsilon))
             {rbndry.reflected_anglenum[n] = nstar;break;}
 
         if (rbndry.reflected_anglenum[n]<0)
         {
           chi::log.LogAllError()
             << "Reflected angle not found for angle " << n
-            << " with direction " << quadrature->omegas[n].PrintS()
+            << " with direction " << quadrature->omegas_[n].PrintS()
             << ". This can happen for two reasons: i) A quadrature is used"
                " that is not symmetric about the axis associated with the "
                "reflected boundary, or ii) the reflecting boundary is not "
@@ -125,7 +125,7 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
       for (int n=0; n<tot_num_angles; ++n)
       {
         //Only continue if omega is outgoing
-        if ( quadrature->omegas[n].Dot(rbndry.normal)< 0.0 )
+        if (quadrature->omegas_[n].Dot(rbndry.normal) < 0.0 )
           continue;
 
         //================================== For cells

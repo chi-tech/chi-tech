@@ -21,7 +21,7 @@ chi_math::QuadratureGaussLegendre::
                           double tol)
   : chi_math::Quadrature(in_order)
 {
-  const unsigned int N = std::ceil( ((int)order + 1)/2.0 );
+  const unsigned int N = std::ceil(((int)order_ + 1) / 2.0 );
   Initialize(N, verbose, max_iters, tol);
 }
 
@@ -46,7 +46,7 @@ void
 chi_math::QuadratureGaussLegendre::Initialize(unsigned int N, bool verbose,
                                               unsigned int max_iters, double tol)
 {
-  switch (order)
+  switch (order_)
   {
     default:
     {
@@ -56,28 +56,28 @@ chi_math::QuadratureGaussLegendre::Initialize(unsigned int N, bool verbose,
 
       //========================= Compute the roots
       auto roots = FindRoots(N, max_iters, tol);
-      for (auto v : roots) qpoints.emplace_back(v);
+      for (auto v : roots) qpoints_.emplace_back(v);
 
       //========================= Compute the weights
-      weights.resize(N,1.0);
-      for (size_t k=0; k < qpoints.size(); k++)
+      weights_.resize(N, 1.0);
+      for (size_t k=0; k < qpoints_.size(); k++)
       {
-        weights[k] =
-          2.0 * (1.0 - qpoints[k][0] * qpoints[k][0]) /
-          ((N + 1) * (N + 1) *
-           Legendre(N+1, qpoints[k][0]) * Legendre(N + 1, qpoints[k][0]) );
+        weights_[k] =
+            2.0 * (1.0 - qpoints_[k][0] * qpoints_[k][0]) /
+            ((N + 1) * (N + 1) *
+             Legendre(N+1, qpoints_[k][0]) * Legendre(N + 1, qpoints_[k][0]) );
 
         if (verbose)
           chi::log.Log()
-            << "root[" << k << "]=" << qpoints[k][0]
-            << ", weight=" << weights[k];
+              << "root[" << k << "]=" << qpoints_[k][0]
+              << ", weight=" << weights_[k];
       }//for abscissae
 
       break;
     }
   }//switch order
 
-  range = {-1, +1};
+  range_ = {-1, +1};
 }
 
 

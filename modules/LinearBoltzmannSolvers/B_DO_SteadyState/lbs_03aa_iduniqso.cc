@@ -44,9 +44,9 @@ std::pair<UniqueSOGroupings, DirIDToSOMap> DiscOrdSteadyStateSolver::
   const std::string fname = __FUNCTION__;
 
   //================================================== Checks
-  LogicCheck(quadrature.omegas.empty(),
+  LogicCheck(quadrature.omegas_.empty(),
              ": Quadrature with no omegas cannot be used.")
-  LogicCheck(quadrature.weights.empty(),
+  LogicCheck(quadrature.weights_.empty(),
              ": Quadrature with no weights cannot be used.")
 
   //================================================== Build groupings
@@ -60,7 +60,7 @@ std::pair<UniqueSOGroupings, DirIDToSOMap> DiscOrdSteadyStateSolver::
     // the direction indices.
     case AngleAggregationType::SINGLE:
     {
-      const size_t num_dirs = quadrature.omegas.size();
+      const size_t num_dirs = quadrature.omegas_.size();
       for (size_t n=0; n<num_dirs; ++n)
         unq_so_grps.push_back({n});
       break;
@@ -79,7 +79,7 @@ std::pair<UniqueSOGroupings, DirIDToSOMap> DiscOrdSteadyStateSolver::
         throw std::logic_error(POLAR_ILLEGAL_GEOTYPE);
 
       //Check quadrature type
-      const auto quad_type = quadrature.type;
+      const auto quad_type = quadrature.type_;
       if (quad_type != chi_math::AngularQuadratureType::ProductQuadrature)
         throw std::logic_error(POLAR_ONLY_PRODUCT);
 
@@ -89,15 +89,15 @@ std::pair<UniqueSOGroupings, DirIDToSOMap> DiscOrdSteadyStateSolver::
         typedef chi_math::ProductQuadrature ProdQuadType;
         const auto& product_quad = dynamic_cast<const ProdQuadType&>(quadrature);
 
-        const auto num_azi = product_quad.azimu_ang.size();
-        const auto num_pol = product_quad.polar_ang.size();
+        const auto num_azi = product_quad.azimu_ang_.size();
+        const auto num_pol = product_quad.polar_ang_.size();
 
         //Make two separate list of polar angles
         //One upward-pointing and one downward
         std::vector<size_t> upward_polar_ids;
         std::vector<size_t> dnward_polar_ids;
         for (size_t p=0; p<num_pol; ++p)
-          if (product_quad.polar_ang[p] > M_PI_2)
+          if (product_quad.polar_ang_[p] > M_PI_2)
             upward_polar_ids.push_back(p);
           else
             dnward_polar_ids.push_back(p);
@@ -141,7 +141,7 @@ std::pair<UniqueSOGroupings, DirIDToSOMap> DiscOrdSteadyStateSolver::
         throw std::logic_error(AZIMUTHAL_ILLEGAL_GEOTYPE);
 
       //Check quadrature type
-      const auto quad_type = quadrature.type;
+      const auto quad_type = quadrature.type_;
       if (quad_type != chi_math::AngularQuadratureType::ProductQuadrature)
         throw std::logic_error(AZIMUTHAL_ONLY_PRODUCT);
 
@@ -156,7 +156,7 @@ std::pair<UniqueSOGroupings, DirIDToSOMap> DiscOrdSteadyStateSolver::
           std::vector<unsigned int> group1;
           std::vector<unsigned int> group2;
           for (const auto& dir_id : dir_set.second)
-            if (quadrature.abscissae[dir_id].phi > M_PI_2)
+            if (quadrature.abscissae_[dir_id].phi > M_PI_2)
               group1.push_back(dir_id);
             else
               group2.push_back(dir_id);

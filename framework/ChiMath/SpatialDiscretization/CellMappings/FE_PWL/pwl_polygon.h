@@ -43,15 +43,15 @@ namespace chi_math
     };
     //Goes into sides
 
-    std::vector<FEside_data2d> sides;
-    const QuadratureTriangle& volume_quadrature;
-    const QuadratureLine&     surface_quadrature;
+    std::vector<FEside_data2d> sides_;
+    const QuadratureTriangle& volume_quadrature_;
+    const QuadratureLine&     surface_quadrature_;
 
   private:
-    int      num_of_subtris;
-    double   beta;
-    chi_mesh::Vertex vc;
-    std::vector<std::vector<int>> node_to_side_map;
+    int      num_of_subtris_;
+    double   beta_;
+    chi_mesh::Vertex vc_;
+    std::vector<std::vector<int>> node_to_side_map_;
 
 
 
@@ -72,20 +72,21 @@ namespace chi_math
     //################################################## Define standard
     //                                                   triangle linear shape
     //                                                   functions
-    static
-    double TriShape(int index,
-                    const chi_mesh::Vector3& qpoint,
-                    bool on_surface = false);
+    static double TriShape(int index,
+                           const chi_mesh::Vector3& qpoint,
+                           bool on_surface = false);
 
     //############################################### Shape functions per side
     double SideShape(unsigned int side,
                      unsigned int i,
                      const chi_mesh::Vector3& qpoint,
                      bool on_surface = false) const;
+
     double SideGradShape_x(unsigned int side, int i) const;
     double SideGradShape_y(unsigned int side, int i) const;
 
     double ShapeValue(int i, const chi_mesh::Vector3& xyz) const override;
+
     chi_mesh::Vector3 GradShapeValue(
       int i,
       const chi_mesh::Vector3& xyz) const override;

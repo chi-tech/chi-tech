@@ -22,8 +22,8 @@ void chi_math::SpatialDiscretization_FV::CreateCellMappings()
       {
         typedef std::vector<std::vector<int>> FaceDofMapping;
         mapping = make_unique<CellFVValues>(
-          ref_grid,cell,cell.centroid_,
-          FaceDofMapping(cell.faces_.size(), {-1}));
+          ref_grid_,cell,cell.centroid_,
+          FaceDofMapping(cell.faces_.size(),{-1}));
         break;
       }
       default:
@@ -33,13 +33,13 @@ void chi_math::SpatialDiscretization_FV::CreateCellMappings()
     return mapping;
   };
 
-  for (const auto& cell : ref_grid->local_cells)
-    cell_mappings.push_back(MakeCellMapping(cell));
+  for (const auto& cell : ref_grid_->local_cells)
+    cell_mappings_.push_back(MakeCellMapping(cell));
 
-  const auto ghost_ids = ref_grid->cells.GetGhostGlobalIDs();
+  const auto ghost_ids = ref_grid_->cells.GetGhostGlobalIDs();
   for (uint64_t ghost_id : ghost_ids)
   {
-    auto ghost_mapping = MakeCellMapping(ref_grid->cells[ghost_id]);
-    nb_cell_mappings.insert(std::make_pair(ghost_id, std::move(ghost_mapping)));
+    auto ghost_mapping = MakeCellMapping(ref_grid_->cells[ghost_id]);
+    nb_cell_mappings_.insert(std::make_pair(ghost_id, std::move(ghost_mapping)));
   }
 }

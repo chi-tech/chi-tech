@@ -25,16 +25,16 @@ void mg_diffusion::Solver::Set_BCs(const std::vector<uint64_t>& globl_unique_bnd
 
   for (int bndry=0; bndry<(max_boundary_id+1); ++bndry)
   {
-    if (boundary_preferences.find(bndry) != boundary_preferences.end())
+    if (boundary_preferences_.find(bndry) != boundary_preferences_.end())
     {
-      BoundaryInfo bndry_info = boundary_preferences.at(bndry);
+      BoundaryInfo bndry_info = boundary_preferences_.at(bndry);
       auto& bndry_vals = bndry_info.second;
 
       switch (bndry_info.first)
       {
         case BoundaryType::Reflecting: // ------------- REFLECTING
         {
-          boundaries.push_back({BoundaryType::Reflecting});
+          boundaries_.push_back({BoundaryType::Reflecting});
           chi::log.Log() << "Boundary " << bndry << " set to reflecting.";
           break;
         }
@@ -43,18 +43,18 @@ void mg_diffusion::Solver::Set_BCs(const std::vector<uint64_t>& globl_unique_bnd
           if (bndry_vals.size()!=3)
             throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
                                    " Robin needs 3 values in bndry vals.");
-          boundaries.push_back(Boundary{BoundaryType::Robin, bndry_vals});
+          boundaries_.push_back(Boundary{BoundaryType::Robin, bndry_vals});
           chi::log.Log() << "Boundary " << bndry << " set to robin.";
           break;
         }
         case BoundaryType::Vacuum: // ------------- VACUUM
         {
-          auto ng = mg_diffusion::Solver::num_groups;
+          auto ng = mg_diffusion::Solver::num_groups_;
           std::vector<double> a_values(ng, 0.25);
           std::vector<double> b_values(ng, 0.5);
           std::vector<double> f_values(ng, 0.0);
-          boundaries.push_back(Boundary{BoundaryType::Robin,
-                                {a_values,b_values,f_values}});
+          boundaries_.push_back(Boundary{BoundaryType::Robin,
+                                         {a_values,b_values,f_values}});
           chi::log.Log() << "Boundary " << bndry << " set to vacuum.";
           break;
         }
@@ -63,7 +63,7 @@ void mg_diffusion::Solver::Set_BCs(const std::vector<uint64_t>& globl_unique_bnd
           if (bndry_vals.size()!=3)
             throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
                                    " Neumann needs 3 values in bndry vals.");
-          boundaries.push_back(Boundary{BoundaryType::Robin, bndry_vals});
+          boundaries_.push_back(Boundary{BoundaryType::Robin, bndry_vals});
           chi::log.Log() << "Boundary " << bndry << " set to neumann.";
           break;
         }
@@ -71,11 +71,11 @@ void mg_diffusion::Solver::Set_BCs(const std::vector<uint64_t>& globl_unique_bnd
     }
     else
     {
-      auto ng = mg_diffusion::Solver::num_groups;
+      auto ng = mg_diffusion::Solver::num_groups_;
       std::vector<double> a_values(ng, 0.25);
       std::vector<double> b_values(ng, 0.5);
       std::vector<double> f_values(ng, 0.0);
-      boundaries.push_back({BoundaryType::Robin, {a_values,b_values,f_values}});
+      boundaries_.push_back({BoundaryType::Robin, {a_values, b_values, f_values}});
       chi::log.Log0Verbose1()
         << "No boundary preference found for boundary index " << bndry
         << "Vacuum boundary added as default.";

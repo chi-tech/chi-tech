@@ -59,5 +59,5 @@ void cfem_diffusion::Solver::UpdateFieldFunctions()
 {
   auto& ff = *field_functions_.front();
 
-  ff.UpdateFieldVector(x);
+  ff.UpdateFieldVector(x_);
 }

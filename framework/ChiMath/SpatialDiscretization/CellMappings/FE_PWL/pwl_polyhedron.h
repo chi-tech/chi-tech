@@ -75,16 +75,16 @@ namespace chi_math
     // node_maps[n]->face_map[f]->side_map[s]
 
   private:
-    std::vector<double>            face_betaf;     ///< Face Beta-factor.
-    double                         alphac;         ///< Cell alpha-factor.
+    std::vector<double>            face_betaf_;     ///< Face Beta-factor.
+    double                         alphac_;         ///< Cell alpha-factor.
 
-    std::vector<FEface_data>       face_data;      ///< Holds determinants and data tet-by-tet.
+    std::vector<FEface_data>       face_data_;      ///< Holds determinants and data tet-by-tet.
   private:
-    std::vector<FEnodeMap>         node_side_maps; ///< Maps nodes to side tets.
+    std::vector<FEnodeMap>         node_side_maps_; ///< Maps nodes to side tets.
 
   private:
-    const QuadratureTetrahedron& volume_quadrature;
-    const QuadratureTriangle&    surface_quadrature;
+    const QuadratureTetrahedron& volume_quadrature_;
+    const QuadratureTriangle&    surface_quadrature_;
 
   public:
     //00_constrdestr.cc
@@ -109,6 +109,7 @@ namespace chi_math
     double TetShape(unsigned int index,
                     const chi_mesh::Vector3& qpoint,
                     bool on_surface = false);
+
     static double TetGradShape_x(unsigned int index);
     static double TetGradShape_y(unsigned int index);
     static double TetGradShape_z(unsigned int index);
@@ -121,12 +122,15 @@ namespace chi_math
                          unsigned int i,
                          const chi_mesh::Vector3& qpoint,
                          bool on_surface = false) const;
+
     double FaceSideGradShape_x(unsigned int face_index,
                                unsigned int side_index,
                                unsigned int i) const;
+
     double FaceSideGradShape_y(unsigned int face_index,
                                unsigned int side_index,
                                unsigned int i) const;
+
     double FaceSideGradShape_z(unsigned int face_index,
                                unsigned int side_index,
                                unsigned int i) const;
@@ -136,6 +140,7 @@ namespace chi_math
     //                                                coordinates
   public:
     double ShapeValue(int i, const chi_mesh::Vector3& xyz) const override;
+    
     chi_mesh::Vector3 GradShapeValue(
       int i,
       const chi_mesh::Vector3& xyz) const override;

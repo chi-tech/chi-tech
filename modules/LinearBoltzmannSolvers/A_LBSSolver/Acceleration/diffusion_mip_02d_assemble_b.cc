@@ -31,7 +31,7 @@ void lbs::acceleration::DiffusionMIPSolver::
   if (options.verbose)
     chi::log.Log() << chi::program_timer.GetTimeString() << " Starting assembly";
 
-  const size_t num_groups   = uk_man_.unknowns.front().num_components;
+  const size_t num_groups   = uk_man_.unknowns_.front().num_components_;
 
   VecSet(rhs_, 0.0);
   for (const auto& cell : grid_.local_cells)
@@ -179,7 +179,7 @@ Assemble_b(Vec petsc_q_vector)
   if (options.verbose)
     chi::log.Log() << chi::program_timer.GetTimeString() << " Starting assembly";
 
-  const size_t num_groups   = uk_man_.unknowns.front().num_components;
+  const size_t num_groups   = uk_man_.unknowns_.front().num_components_;
 
   const double* q_vector;
   VecGetArrayRead(petsc_q_vector, &q_vector);
