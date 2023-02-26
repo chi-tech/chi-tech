@@ -126,8 +126,8 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
       {
         for (unsigned int g = 0; g < matrix.NumRows(); ++g)
         {
-          const auto& col_indices = matrix.rowI_indices[g];
-          const auto& col_values  = matrix.rowI_values[g];
+          const auto& col_indices = matrix.rowI_indices_[g];
+          const auto& col_values  = matrix.rowI_values_[g];
           size_t num_vals = col_values.size();
 
           lua_pushinteger(L, g + 1);

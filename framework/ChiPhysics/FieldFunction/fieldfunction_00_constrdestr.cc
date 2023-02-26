@@ -62,19 +62,19 @@ FieldFunction::FieldFunction(std::string text_name,
   unknown_manager_({unknown})
 {
   const std::string fname = __FUNCTION__;
-  if (field_component_value.size() != unknown.num_components)
+  if (field_component_value.size() != unknown.num_components_)
     throw std::logic_error(fname + ": Constructor initialized with incompatible "
                                    "number of component values.");
 
   const size_t num_local_dofs = sdm_->GetNumLocalDOFs(unknown_manager_);
   field_vector_.assign(num_local_dofs, 0.0);
 
-  const auto& grid = *sdm_ptr->ref_grid;
+  const auto& grid = *sdm_ptr->ref_grid_;
   for (const auto& cell : grid.local_cells)
   {
     const size_t num_nodes = sdm_->GetCellNumNodes(cell);
     for (size_t n=0; n<num_nodes; ++n)
-      for (size_t c=0; c < unknown_.num_components; ++c)
+      for (size_t c=0; c < unknown_.num_components_; ++c)
       {
         const auto nmap = sdm_->MapDOFLocal(cell, n, unknown_manager_, 0, c);
 

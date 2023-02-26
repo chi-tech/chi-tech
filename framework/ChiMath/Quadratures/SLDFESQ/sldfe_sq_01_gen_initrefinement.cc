@@ -13,7 +13,7 @@ void chi_math::SimplifiedLDFESQ::Quadrature::GenerateInitialRefinement(int level
 {
   chi_objects::ChiTimer timer;
   timer.Reset();
-  initial_level = level;
+  initial_level_ = level;
 
   //======================================== Define constants
   const chi_mesh::Vector3 ihat = chi_mesh::Vector3(1.0,0.0,0.0);
@@ -56,7 +56,7 @@ void chi_math::SimplifiedLDFESQ::Quadrature::GenerateInitialRefinement(int level
   double area_max = -100.0;
   double area_min =  100.0;
   bool negative_weights_found = false;
-  for (auto& sq : initial_octant_SQs)
+  for (auto& sq : initial_octant_SQs_)
   {
     double area = 0.0;
     for (int i=0; i<4; ++i)
@@ -68,7 +68,7 @@ void chi_math::SimplifiedLDFESQ::Quadrature::GenerateInitialRefinement(int level
     area_max = std::fmax(area_max,area);
     area_min = std::fmin(area_min,area);
   }
-  double area_avg = total_area / initial_octant_SQs.size();
+  double area_avg = total_area / initial_octant_SQs_.size();
 
   if (negative_weights_found)
     chi::log.Log0Warning()
@@ -76,7 +76,7 @@ void chi_math::SimplifiedLDFESQ::Quadrature::GenerateInitialRefinement(int level
 
   //======================================== Print Statistics
   double time = timer.GetTime()/1000.0;
-  chi::log.Log0Verbose1() << "Number of dirs/octant: " << initial_octant_SQs.size();
+  chi::log.Log0Verbose1() << "Number of dirs/octant: " << initial_octant_SQs_.size();
   chi::log.Log0Verbose1() << "Total weight         : " << total_area;
   chi::log.Log0Verbose1() << "Total weight/(pi/2)  : " << total_area/M_PI_2;
   chi::log.Log0Verbose1() << "Area Max/Min         : " << area_max/area_min;

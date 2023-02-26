@@ -31,10 +31,10 @@ chi_math::SphericalAngularQuadrature::
   //  --------------------------------------------------------------------------
   const auto eps = std::numeric_limits<double>::epsilon();
 
-  if (polar_quad.weights.size() == 0)
+  if (polar_quad.weights_.size() == 0)
     throw std::invalid_argument("chi_math::SphericalAngularQuadrature::Initialize : "
                                 "invalid polar quadrature size = "
-                                +std::to_string(polar_quad.weights.size()));
+                                +std::to_string(polar_quad.weights_.size()));
 
   //  --------------------------------------------------------------------------
   //  verifications on polar quadrature
@@ -44,12 +44,12 @@ chi_math::SphericalAngularQuadrature::
 
   //  weights sum to 2
   const auto integral_weights =
-    std::accumulate(polar_quad.weights.begin(), polar_quad.weights.end(), 0.0);
+    std::accumulate(polar_quad.weights_.begin(), polar_quad.weights_.end(), 0.0);
   if (std::abs(integral_weights) > 0)
   {
     const auto fac = polar_quad_sum_weights / integral_weights;
     if (std::abs(fac - 1) > eps)
-      for (auto& w : polar_quad.weights)
+      for (auto& w : polar_quad.weights_)
         w *= fac;
   }
   else
@@ -65,22 +65,22 @@ chi_math::SphericalAngularQuadrature::
   auto lt_qp = [](const chi_math::QuadraturePointXYZ& qp0,
                   const chi_math::QuadraturePointXYZ& qp1)
     { return qp0[0] < qp1[0]; };
-  if (!std::is_sorted(polar_quad.qpoints.begin(), polar_quad.qpoints.end(), lt_qp))
+  if (!std::is_sorted(polar_quad.qpoints_.begin(), polar_quad.qpoints_.end(), lt_qp))
     throw std::invalid_argument("chi_math::SphericalAngularQuadrature::Initialize : "
                                 "polar quadrature abscissae not in ascending order.");
 
   //  existence of zero-weight abscissae at the start and at the end of the interval
-  if (std::abs(polar_quad.weights.front()) > eps &&
-      std::abs(polar_quad.qpoints.front()[0] - polar_quad_span.first) > eps)
+  if (std::abs(polar_quad.weights_.front()) > eps &&
+      std::abs(polar_quad.qpoints_.front()[0] - polar_quad_span.first) > eps)
   {
-    polar_quad.weights.emplace(polar_quad.weights.begin(), 0);
-    polar_quad.qpoints.emplace(polar_quad.qpoints.begin(), polar_quad_span.first);
+    polar_quad.weights_.emplace(polar_quad.weights_.begin(), 0);
+    polar_quad.qpoints_.emplace(polar_quad.qpoints_.begin(), polar_quad_span.first);
   }
-  if (std::abs(polar_quad.weights.back()) > eps &&
-      std::abs(polar_quad.qpoints.back()[0] - polar_quad_span.second) > eps)
+  if (std::abs(polar_quad.weights_.back()) > eps &&
+      std::abs(polar_quad.qpoints_.back()[0] - polar_quad_span.second) > eps)
   {
-    polar_quad.weights.emplace(polar_quad.weights.end(), 0);
-    polar_quad.qpoints.emplace(polar_quad.qpoints.end(), polar_quad_span.second);
+    polar_quad.weights_.emplace(polar_quad.weights_.end(), 0);
+    polar_quad.qpoints_.emplace(polar_quad.qpoints_.end(), polar_quad_span.second);
   }
 
   //  --------------------------------------------------------------------------
@@ -89,34 +89,34 @@ chi_math::SphericalAngularQuadrature::
 
   //  compute weights, abscissae $(0, \vartheta_{p})$ and direction vectors
   //  $\omega_{p} := ((1-\mu_{p}^{2})^{1/2}, 0, \mu_{p})$
-  weights.clear();
-  abscissae.clear();
-  omegas.clear();
-  for (size_t p = 0; p < polar_quad.weights.size(); ++p)
+  weights_.clear();
+  abscissae_.clear();
+  omegas_.clear();
+  for (size_t p = 0; p < polar_quad.weights_.size(); ++p)
   {
-    const auto pol_wei = polar_quad.weights[p];
-    const auto pol_abs = polar_quad.qpoints[p][0];
+    const auto pol_wei = polar_quad.weights_[p];
+    const auto pol_abs = polar_quad.qpoints_[p][0];
     const auto pol_com = std::sqrt(1 - pol_abs * pol_abs);
 
     const auto weight = pol_wei;
     const auto abscissa = QuadraturePointPhiTheta(0, std::acos(pol_abs));
     const auto omega = chi_mesh::Vector3(pol_com, 0, pol_abs);
 
-    weights.emplace_back(weight);
-    abscissae.emplace_back(abscissa);
-    omegas.emplace_back(omega);
+    weights_.emplace_back(weight);
+    abscissae_.emplace_back(abscissa);
+    omegas_.emplace_back(omega);
   }
-  weights.shrink_to_fit();
-  abscissae.shrink_to_fit();
-  omegas.shrink_to_fit();
+  weights_.shrink_to_fit();
+  abscissae_.shrink_to_fit();
+  omegas_.shrink_to_fit();
 
   //  map of direction indices
-  map_directions.clear();
-  for (size_t p = 0; p < polar_quad.weights.size(); ++p)
+  map_directions_.clear();
+  for (size_t p = 0; p < polar_quad.weights_.size(); ++p)
   {
     std::vector<unsigned int> vec_directions_p;
     vec_directions_p.emplace_back(p);
-    map_directions.emplace(p, vec_directions_p);
+    map_directions_.emplace(p, vec_directions_p);
   }
 
   //  --------------------------------------------------------------------------
@@ -130,7 +130,7 @@ chi_math::SphericalAngularQuadrature::
   if (verbose)
   {
     chi::log.Log() << "map_directions" << std::endl;
-    for (const auto& dir : map_directions)
+    for (const auto& dir : map_directions_)
     {
       chi::log.Log() << "polar level " << dir.first << " : ";
       for (const auto& q : dir.second)
@@ -138,16 +138,16 @@ chi_math::SphericalAngularQuadrature::
       chi::log.Log() << std::endl;
     }
     chi::log.Log() << "curvilinear product quadrature : spherical" << std::endl;
-    for (size_t k = 0; k < weights.size(); ++k)
+    for (size_t k = 0; k < weights_.size(); ++k)
       chi::log.Log()
-        << "angle index " << k << ": weight = " << weights[k]
-        << ", (phi, theta) = (" << abscissae[k].phi << ", " << abscissae[k].theta << ")"
-        << ", omega = " << omegas[k].PrintStr()
-        << ", fac_diamond_difference = " << fac_diamond_difference[k]
-        << ", fac_streaming_operator = " << fac_streaming_operator[k]
-        << std::endl;
+          << "angle index " << k << ": weight = " << weights_[k]
+          << ", (phi, theta) = (" << abscissae_[k].phi << ", " << abscissae_[k].theta << ")"
+          << ", omega = " << omegas_[k].PrintStr()
+          << ", fac_diamond_difference = " << fac_diamond_difference_[k]
+          << ", fac_streaming_operator = " << fac_streaming_operator_[k]
+          << std::endl;
     const auto sum_weights =
-      std::accumulate(weights.begin(), weights.end(), 0.0);
+      std::accumulate(weights_.begin(), weights_.end(), 0.0);
     chi::log.Log() << "sum(weights) = " << sum_weights << std::endl;
   }
 }
@@ -156,19 +156,19 @@ chi_math::SphericalAngularQuadrature::
 void
 chi_math::SphericalAngularQuadrature::InitializeParameters()
 {
-  fac_diamond_difference.resize(weights.size(), 1);
-  fac_streaming_operator.resize(weights.size(), 0);
+  fac_diamond_difference_.resize(weights_.size(), 1);
+  fac_streaming_operator_.resize(weights_.size(), 0);
 
   //  interface quantities initialised to starting direction values
   double alpha_interface = 0;
-  std::vector<double> mu_interface(2, omegas[map_directions[0].front()].z);
+  std::vector<double> mu_interface(2, omegas_[map_directions_[0].front()].z);
 
   //  initialisation permits to forego start direction and final direction
-  for (size_t p = 1; p < map_directions.size()-1; ++p)
+  for (size_t p = 1; p < map_directions_.size() - 1; ++p)
   {
-    const auto k = map_directions[p][0];
-    const auto w_p = weights[k];
-    const auto mu_p = omegas[k].z;
+    const auto k = map_directions_[p][0];
+    const auto w_p = weights_[k];
+    const auto mu_p = omegas_[k].z;
 
     alpha_interface -= w_p * mu_p;
 
@@ -177,9 +177,9 @@ chi_math::SphericalAngularQuadrature::InitializeParameters()
 
     const auto tau = (mu_p - mu_interface[0]) / (mu_interface[1] - mu_interface[0]);
 
-    fac_diamond_difference[k] = tau;
-    fac_streaming_operator[k] = alpha_interface / (w_p * tau) + mu_p;
-    fac_streaming_operator[k] *= 2;
+    fac_diamond_difference_[k] = tau;
+    fac_streaming_operator_[k] = alpha_interface / (w_p * tau) + mu_p;
+    fac_streaming_operator_[k] *= 2;
   }
 }
 
@@ -187,11 +187,11 @@ chi_math::SphericalAngularQuadrature::InitializeParameters()
 void
 chi_math::SphericalAngularQuadrature::MakeHarmonicIndices(unsigned int scattering_order, int dimension)
 {
-  if (m_to_ell_em_map.empty())
+  if (m_to_ell_em_map_.empty())
   {
     if (dimension == 1)
       for (unsigned int l = 0; l <= scattering_order; ++l)
-        m_to_ell_em_map.emplace_back(l, 0);
+        m_to_ell_em_map_.emplace_back(l, 0);
     else
       throw std::invalid_argument("chi_math::SphericalAngularQuadrature::MakeHarmonicIndices : "
                                   "invalid dimension.");

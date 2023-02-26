@@ -25,9 +25,9 @@ double chi_math::SlabMappingFE_PWL::SlabGradShape(int index) const
   double value = 0.0;
 
   if (index == 0)
-    value = -1.0/h;
+    value = -1.0 / h_;
   else
-    value =  1.0/h;
+    value = 1.0 / h_;
 
   return value;
 }

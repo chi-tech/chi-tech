@@ -101,7 +101,7 @@ lbs_curvilinear::DiscOrdSteadyStateSolver::PerformInputChecks()
           chi::log.LogAllError()
             << "C_DO_RZ_SteadyState::SteadyStateSolver::PerformInputChecks : "
             << "invalid angular quadrature, static_cast<int>(type) = "
-            << static_cast<int>(angular_quad_ptr->type)
+            << static_cast<int>(angular_quad_ptr->type_)
             << ", for groupset = " << gs;
           chi::Exit(EXIT_FAILURE);
         }
@@ -117,7 +117,7 @@ lbs_curvilinear::DiscOrdSteadyStateSolver::PerformInputChecks()
           chi::log.LogAllError()
             << "C_DO_RZ_SteadyState::SteadyStateSolver::PerformInputChecks : "
             << "invalid angular quadrature, static_cast<int>(type) = "
-            << static_cast<int>(angular_quad_ptr->type)
+            << static_cast<int>(angular_quad_ptr->type_)
             << ", for groupset = " << gs;
           chi::Exit(EXIT_FAILURE);
         }

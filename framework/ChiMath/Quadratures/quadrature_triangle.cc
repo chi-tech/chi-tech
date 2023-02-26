@@ -14,8 +14,8 @@ chi_math::QuadratureTriangle::
 {
   double x=0.0,y=0.0,z=0.0;
 
-  auto& _points = qpoints;
-  auto& _weights = weights;
+  auto& _points = qpoints_;
+  auto& _weights = weights_;
 
   typedef chi_mesh::Vector3 Point;
   typedef double Real;
@@ -27,33 +27,33 @@ chi_math::QuadratureTriangle::
     {
       x = 1.0/3.0;
       y = 1.0/3.0;
-      qpoints.emplace_back(x,y,z);
-      weights.push_back(0.5);
+      qpoints_.emplace_back(x, y, z);
+      weights_.push_back(0.5);
       break;
     }
     case QuadratureOrder::SECOND:
     {
       x = 1.0/6.0;
       y = 1.0/6.0;
-      qpoints.emplace_back(x,y,z);
-      weights.push_back(1.0/6.0);
+      qpoints_.emplace_back(x, y, z);
+      weights_.push_back(1.0 / 6.0);
 
       x = 4.0/6.0;
       y = 1.0/6.0;
-      qpoints.emplace_back(x,y,z);
-      weights.push_back(1.0/6.0);
+      qpoints_.emplace_back(x, y, z);
+      weights_.push_back(1.0 / 6.0);
 
       x = 1.0/6.0;
       y = 4.0/6.0;
-      qpoints.emplace_back(x,y,z);
-      weights.push_back(1.0/6.0);
+      qpoints_.emplace_back(x, y, z);
+      weights_.push_back(1.0 / 6.0);
       break;
     }
     case QuadratureOrder::THIRD:
     {
       // Exact for cubics
-      qpoints.resize(4);
-      weights.resize(4);
+      qpoints_.resize(4);
+      weights_.resize(4);
 
       // This rule is formed from a tensor product of
       // appropriately-scaled Gauss and Jacobi rules.  (See
@@ -63,19 +63,19 @@ chi_math::QuadratureTriangle::
       // but at extremely low order they are competitive and
       // have the additional benefit of having all positive
       // weights.
-      qpoints[0](0) = (1.5505102572168219018027159252941e-01L);
-      qpoints[0](1) = (1.7855872826361642311703513337422e-01L);
-      qpoints[1](0) = (6.4494897427831780981972840747059e-01L);
-      qpoints[1](1) = (7.5031110222608118177475598324603e-02L);
-      qpoints[2](0) = (1.5505102572168219018027159252941e-01L);
-      qpoints[2](1) = (6.6639024601470138670269327409637e-01L);
-      qpoints[3](0) = (6.4494897427831780981972840747059e-01L);
-      qpoints[3](1) = (2.8001991549907407200279599420481e-01L);
+      qpoints_[0](0) = (1.5505102572168219018027159252941e-01L);
+      qpoints_[0](1) = (1.7855872826361642311703513337422e-01L);
+      qpoints_[1](0) = (6.4494897427831780981972840747059e-01L);
+      qpoints_[1](1) = (7.5031110222608118177475598324603e-02L);
+      qpoints_[2](0) = (1.5505102572168219018027159252941e-01L);
+      qpoints_[2](1) = (6.6639024601470138670269327409637e-01L);
+      qpoints_[3](0) = (6.4494897427831780981972840747059e-01L);
+      qpoints_[3](1) = (2.8001991549907407200279599420481e-01L);
 
-      weights[0] = (1.5902069087198858469718450103758e-01L);
-      weights[1] = (9.0979309128011415302815498962418e-02L);
-      weights[2] = (1.5902069087198858469718450103758e-01L);
-      weights[3] = (9.0979309128011415302815498962418e-02L);
+      weights_[0] = (1.5902069087198858469718450103758e-01L);
+      weights_[1] = (9.0979309128011415302815498962418e-02L);
+      weights_[2] = (1.5902069087198858469718450103758e-01L);
+      weights_[3] = (9.0979309128011415302815498962418e-02L);
       break;
     }
 
@@ -1155,8 +1155,8 @@ chi_math::QuadratureTriangle::
     {
       chi_math::QuadratureConical conical(order);
       conical.Initialize_Conical_Product_Tri();
-      qpoints.swap(conical.qpoints);
-      weights.swap(conical.weights);
+      qpoints_.swap(conical.qpoints_);
+      weights_.swap(conical.weights_);
     }
   }//switch order
 }
@@ -1205,13 +1205,13 @@ void chi_math::QuadratureTriangle::dunavant_rule(const double rule_data[][4],
       case 1:
       {
         // Be sure we have enough space to insert this point
-        assert (offset + 0 < qpoints.size());
+        assert (offset + 0 < qpoints_.size());
 
         // The point has only a single permutation (the centroid!)
-        qpoints[offset + 0] = chi_mesh::Vector3(rule_data[p][0], rule_data[p][0]);
+        qpoints_[offset + 0] = chi_mesh::Vector3(rule_data[p][0], rule_data[p][0]);
 
         // The weight is always the last entry in the row.
-        weights[offset + 0] = rule_data[p][3];
+        weights_[offset + 0] = rule_data[p][3];
 
         offset += 1;
         break;
@@ -1220,16 +1220,16 @@ void chi_math::QuadratureTriangle::dunavant_rule(const double rule_data[][4],
       case 3:
       {
         // Be sure we have enough space to insert these points
-        assert (offset + 2 < qpoints.size());
+        assert (offset + 2 < qpoints_.size());
 
         // Here it's understood the second entry is to be used twice, and
         // thus there are three possible permutations.
-        qpoints[offset + 0] = chi_mesh::Vector3(rule_data[p][0], rule_data[p][1]);
-        qpoints[offset + 1] = chi_mesh::Vector3(rule_data[p][1], rule_data[p][0]);
-        qpoints[offset + 2] = chi_mesh::Vector3(rule_data[p][1], rule_data[p][1]);
+        qpoints_[offset + 0] = chi_mesh::Vector3(rule_data[p][0], rule_data[p][1]);
+        qpoints_[offset + 1] = chi_mesh::Vector3(rule_data[p][1], rule_data[p][0]);
+        qpoints_[offset + 2] = chi_mesh::Vector3(rule_data[p][1], rule_data[p][1]);
 
         for (unsigned int j=0; j<3; ++j)
-          weights[offset + j] = rule_data[p][3];
+          weights_[offset + j] = rule_data[p][3];
 
         offset += 3;
         break;
@@ -1238,18 +1238,18 @@ void chi_math::QuadratureTriangle::dunavant_rule(const double rule_data[][4],
       case 6:
       {
         // Be sure we have enough space to insert these points
-        assert (offset + 5 < qpoints.size());
+        assert (offset + 5 < qpoints_.size());
 
         // Three individual entries with six permutations.
-        qpoints[offset + 0] = chi_mesh::Vector3(rule_data[p][0], rule_data[p][1]);
-        qpoints[offset + 1] = chi_mesh::Vector3(rule_data[p][0], rule_data[p][2]);
-        qpoints[offset + 2] = chi_mesh::Vector3(rule_data[p][1], rule_data[p][0]);
-        qpoints[offset + 3] = chi_mesh::Vector3(rule_data[p][1], rule_data[p][2]);
-        qpoints[offset + 4] = chi_mesh::Vector3(rule_data[p][2], rule_data[p][0]);
-        qpoints[offset + 5] = chi_mesh::Vector3(rule_data[p][2], rule_data[p][1]);
+        qpoints_[offset + 0] = chi_mesh::Vector3(rule_data[p][0], rule_data[p][1]);
+        qpoints_[offset + 1] = chi_mesh::Vector3(rule_data[p][0], rule_data[p][2]);
+        qpoints_[offset + 2] = chi_mesh::Vector3(rule_data[p][1], rule_data[p][0]);
+        qpoints_[offset + 3] = chi_mesh::Vector3(rule_data[p][1], rule_data[p][2]);
+        qpoints_[offset + 4] = chi_mesh::Vector3(rule_data[p][2], rule_data[p][0]);
+        qpoints_[offset + 5] = chi_mesh::Vector3(rule_data[p][2], rule_data[p][1]);
 
         for (unsigned int j=0; j<6; ++j)
-          weights[offset + j] = rule_data[p][3];
+          weights_[offset + j] = rule_data[p][3];
 
         offset += 6;
         break;
@@ -1274,8 +1274,8 @@ void chi_math::QuadratureTriangle::dunavant_rule2(const double * wts,
                             const unsigned int * permutation_ids,
                             unsigned int n_wts)
 {
-  auto& _points = qpoints;
-  auto& _weights = weights;
+  auto& _points = qpoints_;
+  auto& _weights = weights_;
 
   typedef chi_mesh::Vector3 Point;
 

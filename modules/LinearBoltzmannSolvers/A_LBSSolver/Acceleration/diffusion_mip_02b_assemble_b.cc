@@ -41,7 +41,7 @@ void lbs::acceleration::DiffusionMIPSolver::
     const auto&  cell_mapping = sdm_.GetCellMapping(cell);
     const size_t num_nodes    = cell_mapping.NumNodes();
     const auto   qp_data      = cell_mapping.MakeVolumeQuadraturePointData();
-    const size_t num_groups   = uk_man_.unknowns.front().num_components;
+    const size_t num_groups   = uk_man_.unknowns_.front().num_components_;
 
     const auto& xs = mat_id_2_xs_map_.at(cell.material_id);
 

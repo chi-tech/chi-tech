@@ -12,7 +12,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::Execute()
 {
   const auto& ref_ff = *field_functions.front();
   const auto& sdm    = ref_ff.SDM();
-  const auto& grid   = *sdm.ref_grid;
+  const auto& grid   = *sdm.ref_grid_;
 
   const auto& uk_man = ref_ff.UnkManager();
   const auto uid = 0;

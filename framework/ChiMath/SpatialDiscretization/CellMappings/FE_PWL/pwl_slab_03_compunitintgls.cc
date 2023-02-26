@@ -24,10 +24,10 @@ void chi_math::SlabMappingFE_PWL::
   IntV_gradShapeI_gradShapeJ.emplace_back(2, 0.0);
   IntV_gradShapeI_gradShapeJ.emplace_back(2, 0.0);
 
-  IntV_gradShapeI_gradShapeJ[0][0] =  1.0 / h;
-  IntV_gradShapeI_gradShapeJ[0][1] = -1.0 / h;
-  IntV_gradShapeI_gradShapeJ[1][0] = -1.0 / h;
-  IntV_gradShapeI_gradShapeJ[1][1] =  1.0 / h;
+  IntV_gradShapeI_gradShapeJ[0][0] = 1.0 / h_;
+  IntV_gradShapeI_gradShapeJ[0][1] = -1.0 / h_;
+  IntV_gradShapeI_gradShapeJ[1][0] = -1.0 / h_;
+  IntV_gradShapeI_gradShapeJ[1][1] = 1.0 / h_;
 
   //shapeI_gradShapeJ
   IntV_shapeI_gradshapeJ.resize(2);
@@ -43,14 +43,14 @@ void chi_math::SlabMappingFE_PWL::
   IntV_shapeI_shapeJ.emplace_back(2, 0.0);
   IntV_shapeI_shapeJ.emplace_back(2, 0.0);
 
-  IntV_shapeI_shapeJ[0][0] = h / 3;
-  IntV_shapeI_shapeJ[0][1] = h / 6;
-  IntV_shapeI_shapeJ[1][0] = h / 6;
-  IntV_shapeI_shapeJ[1][1] = h / 3;
+  IntV_shapeI_shapeJ[0][0] = h_ / 3;
+  IntV_shapeI_shapeJ[0][1] = h_ / 6;
+  IntV_shapeI_shapeJ[1][0] = h_ / 6;
+  IntV_shapeI_shapeJ[1][1] = h_ / 3;
 
   //shapeI
-  IntV_shapeI.push_back(h / 2);
-  IntV_shapeI.push_back(h / 2);
+  IntV_shapeI.push_back(h_ / 2);
+  IntV_shapeI.push_back(h_ / 2);
 
   //gradShapeI
   IntV_gradshapeI.push_back(chi_mesh::Vector3(0.0, 0.0,-1.0));
@@ -97,16 +97,16 @@ void chi_math::SlabMappingFE_PWL::
   IntS_shapeI_gradshapeJ[1][1].resize(2);
 
   //Left face
-  IntS_shapeI_gradshapeJ[0][0][0] = chi_mesh::Vector3(0.0, 0.0, -1.0 / h);
-  IntS_shapeI_gradshapeJ[0][0][1] = chi_mesh::Vector3(0.0, 0.0, 1.0 / h);
+  IntS_shapeI_gradshapeJ[0][0][0] = chi_mesh::Vector3(0.0, 0.0, -1.0 / h_);
+  IntS_shapeI_gradshapeJ[0][0][1] = chi_mesh::Vector3(0.0, 0.0, 1.0 / h_);
   IntS_shapeI_gradshapeJ[0][1][0] = chi_mesh::Vector3(0.0, 0.0, 0.0  );
   IntS_shapeI_gradshapeJ[0][1][1] = chi_mesh::Vector3(0.0, 0.0, 0.0  );
 
   //Right face
   IntS_shapeI_gradshapeJ[1][0][0] = chi_mesh::Vector3(0.0, 0.0, 0.0  );
   IntS_shapeI_gradshapeJ[1][0][1] = chi_mesh::Vector3(0.0, 0.0, 0.0  );
-  IntS_shapeI_gradshapeJ[1][1][0] = chi_mesh::Vector3(0.0, 0.0, -1.0 / h);
-  IntS_shapeI_gradshapeJ[1][1][1] = chi_mesh::Vector3(0.0, 0.0, 1.0 / h);
+  IntS_shapeI_gradshapeJ[1][1][0] = chi_mesh::Vector3(0.0, 0.0, -1.0 / h_);
+  IntS_shapeI_gradshapeJ[1][1][1] = chi_mesh::Vector3(0.0, 0.0, 1.0 / h_);
 
   ui_data.Initialize(IntV_gradShapeI_gradShapeJ,
                      IntV_shapeI_gradshapeJ,
@@ -116,7 +116,7 @@ void chi_math::SlabMappingFE_PWL::
                      IntS_shapeI_shapeJ    ,
                      IntS_shapeI           ,
                      IntS_shapeI_gradshapeJ,
-                     face_node_mappings,
-                     m_num_nodes);
+                     face_node_mappings_,
+                     num_nodes_);
 
 }

@@ -13,25 +13,25 @@ unsigned int chi_math::UnknownManager::
   auto& log = chi_objects::ChiLog::GetInstance();
 
   unsigned int last_unknown_end = -1;
-  if (not unknowns.empty())
-    last_unknown_end = unknowns.back().GetMapEnd();
+  if (not unknowns_.empty())
+    last_unknown_end = unknowns_.back().GetMapEnd();
 
-  unsigned int new_unknown_index = unknowns.size();
+  unsigned int new_unknown_index = unknowns_.size();
 
   if (unk_type == UnknownType::SCALAR)
   {
-    unknowns.emplace_back(UnknownType::SCALAR, 1, last_unknown_end + 1);
-    unknowns.back().text_name = "Unknown_" + std::to_string(unknowns.size()-1);
+    unknowns_.emplace_back(UnknownType::SCALAR, 1, last_unknown_end + 1);
+    unknowns_.back().text_name_ = "Unknown_" + std::to_string(unknowns_.size() - 1);
   }
   else if (unk_type == UnknownType::VECTOR_2)
   {
-    unknowns.emplace_back(UnknownType::VECTOR_2, 2, last_unknown_end + 1);
-    unknowns.back().text_name = "Unknown_" + std::to_string(unknowns.size()-1);
+    unknowns_.emplace_back(UnknownType::VECTOR_2, 2, last_unknown_end + 1);
+    unknowns_.back().text_name_ = "Unknown_" + std::to_string(unknowns_.size() - 1);
   }
   else if (unk_type == UnknownType::VECTOR_3)
   {
-    unknowns.emplace_back(UnknownType::VECTOR_3, 3, last_unknown_end + 1);
-    unknowns.back().text_name = "Unknown_" + std::to_string(unknowns.size()-1);
+    unknowns_.emplace_back(UnknownType::VECTOR_3, 3, last_unknown_end + 1);
+    unknowns_.back().text_name_ = "Unknown_" + std::to_string(unknowns_.size() - 1);
   }
   else if (unk_type == UnknownType::VECTOR_N)
   {
@@ -43,8 +43,8 @@ unsigned int chi_math::UnknownManager::
      chi::Exit(EXIT_FAILURE);
     }
 
-    unknowns.emplace_back(UnknownType::VECTOR_N, dimension, last_unknown_end + 1);
-    unknowns.back().text_name = "Unknown_" + std::to_string(unknowns.size()-1);
+    unknowns_.emplace_back(UnknownType::VECTOR_N, dimension, last_unknown_end + 1);
+    unknowns_.back().text_name_ = "Unknown_" + std::to_string(unknowns_.size() - 1);
   }
   else if (unk_type == UnknownType::TENSOR)
   {
@@ -75,23 +75,23 @@ unsigned int chi_math::UnknownManager::
 {
   auto& log = chi_objects::ChiLog::GetInstance();
 
-  if (unknown_id < 0 or unknown_id >= unknowns.size())
+  if (unknown_id < 0 or unknown_id >= unknowns_.size())
   {
     log.LogAllError()
       << "UnknownManager failed call to MapUnknown";
    chi::Exit(EXIT_FAILURE);
   }
-  return unknowns[unknown_id].GetMap(component);
+  return unknowns_[unknown_id].GetMap(component);
 }
 
 //###################################################################
 /**Determines the total number of components over all unknowns.*/
 unsigned int chi_math::UnknownManager::GetTotalUnknownStructureSize() const
 {
-  if (unknowns.empty())
+  if (unknowns_.empty())
     return 0;
 
-  return unknowns.back().GetMapEnd()+1;
+  return unknowns_.back().GetMapEnd() + 1;
 }
 
 //###################################################################
@@ -103,7 +103,7 @@ void chi_math::UnknownManager::
 {
   auto& log = chi_objects::ChiLog::GetInstance();
 
-  if (unknown_id < 0 or unknown_id >= unknowns.size())
+  if (unknown_id < 0 or unknown_id >= unknowns_.size())
   {
     log.LogAllError()
       << "UnknownManager failed call to SetUnknownNumOffBlockConnections,"
@@ -111,7 +111,7 @@ void chi_math::UnknownManager::
    chi::Exit(EXIT_FAILURE);
   }
 
-  for (auto& val : unknowns[unknown_id].num_off_block_connections)
+  for (auto& val : unknowns_[unknown_id].num_off_block_connections_)
     val = num_conn;
 }
 //###################################################################
@@ -124,7 +124,7 @@ void chi_math::UnknownManager::
 {
   auto& log = chi_objects::ChiLog::GetInstance();
 
-  if (unknown_id < 0 or unknown_id >= unknowns.size())
+  if (unknown_id < 0 or unknown_id >= unknowns_.size())
   {
     log.LogAllError()
       << "UnknownManager failed call to SetUnknownComponentTextName,"
@@ -132,7 +132,7 @@ void chi_math::UnknownManager::
    chi::Exit(EXIT_FAILURE);
   }
 
-  if (component < 0 or component >= unknowns[unknown_id].num_components)
+  if (component < 0 or component >= unknowns_[unknown_id].num_components_)
   {
     log.LogAllError()
       << "UnknownManager failed call to SetUnknownComponentTextName,"
@@ -140,7 +140,7 @@ void chi_math::UnknownManager::
    chi::Exit(EXIT_FAILURE);
   }
 
-  unknowns[unknown_id].num_off_block_connections[component] = num_conn;
+  unknowns_[unknown_id].num_off_block_connections_[component] = num_conn;
 
 }
 
@@ -152,7 +152,7 @@ void chi_math::UnknownManager::
 {
   auto& log = chi_objects::ChiLog::GetInstance();
 
-  if (unknown_id < 0 or unknown_id >= unknowns.size())
+  if (unknown_id < 0 or unknown_id >= unknowns_.size())
   {
     log.LogAllError()
       << "UnknownManager failed call to SetUnknownTextName,"
@@ -160,7 +160,7 @@ void chi_math::UnknownManager::
    chi::Exit(EXIT_FAILURE);
   }
 
-  unknowns[unknown_id].text_name = in_text_name;
+  unknowns_[unknown_id].text_name_ = in_text_name;
 }
 
 //###################################################################
@@ -173,7 +173,7 @@ void chi_math::UnknownManager::
 {
   auto& log = chi_objects::ChiLog::GetInstance();
 
-  if (unknown_id < 0 or unknown_id >= unknowns.size())
+  if (unknown_id < 0 or unknown_id >= unknowns_.size())
   {
     log.LogAllError()
       << "UnknownManager failed call to SetUnknownComponentTextName,"
@@ -181,7 +181,7 @@ void chi_math::UnknownManager::
    chi::Exit(EXIT_FAILURE);
   }
 
-  if (component < 0 or component >= unknowns[unknown_id].num_components)
+  if (component < 0 or component >= unknowns_[unknown_id].num_components_)
   {
     log.LogAllError()
       << "UnknownManager failed call to SetUnknownComponentTextName,"
@@ -189,6 +189,6 @@ void chi_math::UnknownManager::
    chi::Exit(EXIT_FAILURE);
   }
 
-  unknowns[unknown_id].component_text_names[component] = in_text_name;
+  unknowns_[unknown_id].component_text_names_[component] = in_text_name;
 
 }

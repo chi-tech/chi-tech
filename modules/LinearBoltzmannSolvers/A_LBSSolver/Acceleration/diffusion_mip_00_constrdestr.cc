@@ -34,7 +34,7 @@ lbs::acceleration::DiffusionMIPSolver::
   using SDM_TYPE = chi_math::SpatialDiscretizationType;
   const auto& PWLD = SDM_TYPE ::PIECEWISE_LINEAR_DISCONTINUOUS;
 
-  if (sdm_.type != PWLD)
+  if (sdm_.type_ != PWLD)
     throw std::logic_error("lbs::acceleration::DiffusionMIPSolver: can only be"
                            " used with PWLD.");
 }

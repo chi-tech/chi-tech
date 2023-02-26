@@ -10,8 +10,8 @@ chi_math::SpatialDiscretization_PWLBase::
                                 CoordinateSystemType in_cs_type
                                 ) :
     SpatialDiscretization_FE(in_grid, in_cs_type, in_type,in_setup_flags),
-    line_quad_order_arbitrary(qorder),
-    tri_quad_order_arbitrary(qorder),
-    quad_quad_order_arbitrary(qorder),
-    tet_quad_order_arbitrary(qorder)
+    line_quad_order_arbitrary_(qorder),
+    tri_quad_order_arbitrary_(qorder),
+    quad_quad_order_arbitrary_(qorder),
+    tet_quad_order_arbitrary_(qorder)
 {}

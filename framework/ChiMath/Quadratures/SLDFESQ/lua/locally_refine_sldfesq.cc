@@ -83,7 +83,7 @@ int chiLocallyRefineSLDFESQAngularQuadrature(lua_State* L)
 
   try{
     auto ref_quadrature = chi::angular_quadrature_stack.at(handle);
-    if (ref_quadrature->type == chi_math::AngularQuadratureType::SLDFESQ)
+    if (ref_quadrature->type_ == chi_math::AngularQuadratureType::SLDFESQ)
     {
       auto sldfesq = std::dynamic_pointer_cast<
         chi_math::SimplifiedLDFESQ::Quadrature>(ref_quadrature);

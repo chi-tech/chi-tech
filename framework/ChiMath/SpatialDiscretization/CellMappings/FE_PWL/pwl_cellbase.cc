@@ -8,7 +8,7 @@
 
 std::vector<chi_mesh::Vector3> chi_math::CellMappingFE_PWL::GetNodeLocations() const
 {
-  return m_node_locations;
+  return node_locations_;
 }
 
 /** This section just determines a mapping of face dofs
@@ -182,8 +182,8 @@ chi_math::CellMappingFE_PWL::
                      IntS_shapeI_shapeJ,
                      IntS_shapeI,
                      IntS_shapeI_gradshapeJ,
-                     face_node_mappings,
-                     m_num_nodes);
+                     face_node_mappings_,
+                     num_nodes_);
 }
 
 std::vector<chi_mesh::Vector3>

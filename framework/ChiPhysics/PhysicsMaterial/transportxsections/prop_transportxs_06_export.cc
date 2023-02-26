@@ -139,10 +139,10 @@ void chi_physics::TransportCrossSections::
 
       const auto& matrix = transfer_matrices_[ell];
 
-      for (size_t g=0; g<matrix.rowI_values.size(); ++g)
+      for (size_t g=0; g<matrix.rowI_values_.size(); ++g)
       {
-        const auto& col_indices = matrix.rowI_indices[g];
-        const auto& col_values  = matrix.rowI_values[g];
+        const auto& col_indices = matrix.rowI_indices_[g];
+        const auto& col_values  = matrix.rowI_values_[g];
 
         for (size_t k=0; k<col_indices.size(); ++k)
           ofile << "M_GPRIME_G_VAL "

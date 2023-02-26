@@ -329,8 +329,8 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
         const auto& Sm_other = xsecs[x]->transfer_matrices_[m];
         for (unsigned int g = 0; g < num_groups_; ++g)
         {
-          const auto& cols = Sm_other.rowI_indices[g];
-          const auto& vals = Sm_other.rowI_values[g];
+          const auto& cols = Sm_other.rowI_indices_[g];
+          const auto& vals = Sm_other.rowI_values_[g];
           for (size_t t = 0; t < cols.size(); ++t)
             Sm.InsertAdd(g, t, vals[t] * N_i);
         }
@@ -370,8 +370,8 @@ ComputeAbsorption()
       double sig_s = 0.0;
       for (size_t row = 0; row < S0.NumRows(); ++row)
       {
-        const auto& cols = S0.rowI_indices[row];
-        const auto& vals = S0.rowI_values[row];
+        const auto& cols = S0.rowI_indices_[row];
+        const auto& vals = S0.rowI_values_[row];
         for (size_t t = 0; t < cols.size(); ++t)
           if (cols[t] == g)
           {

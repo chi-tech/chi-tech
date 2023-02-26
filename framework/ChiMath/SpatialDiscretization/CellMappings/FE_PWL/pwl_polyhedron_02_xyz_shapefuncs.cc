@@ -7,15 +7,15 @@
 double chi_math::PolyhedronMappingFE_PWL::
   ShapeValue(const int i, const chi_mesh::Vector3& xyz) const
 {
-  for (size_t f=0; f < face_data.size(); f++)
+  for (size_t f=0; f < face_data_.size(); f++)
   {
-    for (size_t s=0; s < face_data[f].sides.size(); s++)
+    for (size_t s=0; s < face_data_[f].sides.size(); s++)
     {
       //Map xyz to xi_eta_zeta
-      const auto& p0 = m_grid_ptr->vertices[face_data[f].sides[s].v_index[0]];
+      const auto& p0 = grid_ptr_->vertices[face_data_[f].sides[s].v_index[0]];
       chi_mesh::Vector3 xyz_ref = xyz - p0;
 
-      chi_mesh::Vector3 xi_eta_zeta   = face_data[f].sides[s].Jinv * xyz_ref;
+      chi_mesh::Vector3 xi_eta_zeta   = face_data_[f].sides[s].Jinv * xyz_ref;
 
       double xi  = xi_eta_zeta.x;
       double eta = xi_eta_zeta.y;
@@ -28,20 +28,20 @@ double chi_math::PolyhedronMappingFE_PWL::
       {
         double Ni = 0.0;
         double Nf = 0.0;
-        double Nc = alphac*zeta;
+        double Nc = alphac_ * zeta;
 
-        if (node_side_maps[i].face_map[f].side_map[s].part_of_face)
+        if (node_side_maps_[i].face_map[f].side_map[s].part_of_face)
         {
-          if (node_side_maps[i].face_map[f].side_map[s].index == 0)
+          if (node_side_maps_[i].face_map[f].side_map[s].index == 0)
           {
             Ni = 1-xi-eta-zeta;
           }
-          if (node_side_maps[i].face_map[f].side_map[s].index == 2)
+          if (node_side_maps_[i].face_map[f].side_map[s].index == 2)
           {
             Ni = eta;
           }
 
-          Nf = face_betaf[f]*xi;
+          Nf = face_betaf_[f] * xi;
         }
 
         return Ni + Nf + Nc;
@@ -58,14 +58,14 @@ void chi_math::PolyhedronMappingFE_PWL::
   ShapeValues(const chi_mesh::Vector3& xyz,
               std::vector<double>& shape_values) const
 {
-  shape_values.resize(m_num_nodes, 0.0);
-  for (size_t f=0; f < face_data.size(); f++)
+  shape_values.resize(num_nodes_, 0.0);
+  for (size_t f=0; f < face_data_.size(); f++)
   {
-    for (size_t s=0; s < face_data[f].sides.size(); s++)
+    for (size_t s=0; s < face_data_[f].sides.size(); s++)
     {
-      auto& side_fe_info = face_data[f].sides[s];
+      auto& side_fe_info = face_data_[f].sides[s];
       //Map xyz to xi_eta_zeta
-      const auto& p0 = m_grid_ptr->vertices[side_fe_info.v_index[0]];
+      const auto& p0 = grid_ptr_->vertices[side_fe_info.v_index[0]];
       chi_mesh::Vector3 xi_eta_zeta   = side_fe_info.Jinv * (xyz - p0);
 
       double xi  = xi_eta_zeta.x;
@@ -77,20 +77,20 @@ void chi_math::PolyhedronMappingFE_PWL::
       if ((xi>=-1.0e-12) and (eta>=-1.0e-12) and (zeta>=-1.0e-12) and
           ((xi + eta + zeta)<=(1.0+1.0e-12)))
       {
-        for (int i=0; i < m_num_nodes; i++)
+        for (int i=0; i < num_nodes_; i++)
         {
-          auto side_map = node_side_maps[i].face_map[f].side_map[s];
+          auto side_map = node_side_maps_[i].face_map[f].side_map[s];
 
           double Ni = 0.0;
           double Nf = 0.0;
-          double Nc = alphac*zeta;
+          double Nc = alphac_ * zeta;
 
           if (side_map.part_of_face)
           {
             if      (side_map.index == 0) Ni = 1-xi-eta-zeta;
             else if (side_map.index == 2) Ni = eta;
 
-            Nf = face_betaf[f]*xi;
+            Nf = face_betaf_[f] * xi;
           }
 
           shape_values[i] = Ni + Nf + Nc;
@@ -108,15 +108,15 @@ chi_mesh::Vector3 chi_math::PolyhedronMappingFE_PWL::
                  const chi_mesh::Vector3& xyz) const
 {
   chi_mesh::Vector3 grad,gradr;
-  for (size_t f=0; f < face_data.size(); f++)
+  for (size_t f=0; f < face_data_.size(); f++)
   {
-    for (size_t s=0; s < face_data[f].sides.size(); s++)
+    for (size_t s=0; s < face_data_[f].sides.size(); s++)
     {
       //Map xyz to xi_eta_zeta
-      const auto& p0 = m_grid_ptr->vertices[face_data[f].sides[s].v_index[0]];
+      const auto& p0 = grid_ptr_->vertices[face_data_[f].sides[s].v_index[0]];
       chi_mesh::Vector3 xyz_ref = xyz - p0;
 
-      chi_mesh::Vector3 xi_eta_zeta = face_data[f].sides[s].Jinv * xyz_ref;
+      chi_mesh::Vector3 xi_eta_zeta = face_data_[f].sides[s].Jinv * xyz_ref;
 
       double xi  = xi_eta_zeta.x;
       double eta = xi_eta_zeta.y;
@@ -130,32 +130,32 @@ chi_mesh::Vector3 chi_math::PolyhedronMappingFE_PWL::
         chi_mesh::Vector3 grad_f;
         chi_mesh::Vector3 grad_c;
 
-        if (node_side_maps[i].face_map[f].side_map[s].part_of_face)
+        if (node_side_maps_[i].face_map[f].side_map[s].part_of_face)
         {
-          if (node_side_maps[i].face_map[f].side_map[s].index == 0)
+          if (node_side_maps_[i].face_map[f].side_map[s].index == 0)
           {
             grad_i.x =-1.0;
             grad_i.y =-1.0;
             grad_i.z =-1.0;
           }
-          if (node_side_maps[i].face_map[f].side_map[s].index == 2)
+          if (node_side_maps_[i].face_map[f].side_map[s].index == 2)
           {
             grad_i.x = 0.0;
             grad_i.y = 1.0;
             grad_i.z = 0.0;
           }
 
-          grad_f.x = face_betaf[f]*1.0;
-          grad_f.y = face_betaf[f]*0.0;
-          grad_f.z = face_betaf[f]*0.0;
+          grad_f.x = face_betaf_[f] * 1.0;
+          grad_f.y = face_betaf_[f] * 0.0;
+          grad_f.z = face_betaf_[f] * 0.0;
         }
 
-        grad_c.x = alphac*0.0;
-        grad_c.y = alphac*0.0;
-        grad_c.z = alphac*1.0;
+        grad_c.x = alphac_ * 0.0;
+        grad_c.y = alphac_ * 0.0;
+        grad_c.z = alphac_ * 1.0;
 
         grad = (grad_i+grad_f+grad_c);
-        grad = face_data[f].sides[s].JTinv * grad;
+        grad = face_data_[f].sides[s].JTinv * grad;
 
 
         return grad;
@@ -173,6 +173,6 @@ void chi_math::PolyhedronMappingFE_PWL::GradShapeValues(
   std::vector<chi_mesh::Vector3> &gradshape_values) const
 {
   gradshape_values.clear();
-  for (int i=0; i < m_num_nodes; ++i)
+  for (int i=0; i < num_nodes_; ++i)
     gradshape_values.emplace_back(GradShapeValue(i,xyz));
 }

@@ -46,7 +46,7 @@ struct WGSContext : public chi_math::LinearSolverContext<MatType, VecType>
             with_delayed_psi_(with_delayed_psi),
             log_info_(log_info)
   {
-    this->residual_scale_type_ =
+    this->residual_scale_type =
       chi_math::ResidualScaleType::RHS_PRECONDITIONED_NORM;
   }
 

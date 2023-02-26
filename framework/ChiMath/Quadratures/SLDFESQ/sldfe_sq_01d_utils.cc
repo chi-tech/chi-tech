@@ -128,19 +128,19 @@ IntegrateLDFEShapeFunctions(
 /**Deploys the current set of SQs to all octants.*/
 void chi_math::SimplifiedLDFESQ::Quadrature::CopyToAllOctants()
 {
-  deployed_SQs.clear(); //just to be sure
-  deployed_SQs.reserve(initial_octant_SQs.size()*8);
+  deployed_SQs_.clear(); //just to be sure
+  deployed_SQs_.reserve(initial_octant_SQs_.size() * 8);
 
   //======================================== Define modifying variables
   chi_mesh::Vector3 octant_mod(1.0,1.0,1.0);
 
   //======================================== Top NE octant, no change
-  for (auto& sq : initial_octant_SQs)
-    deployed_SQs.push_back(sq);
+  for (auto& sq : initial_octant_SQs_)
+    deployed_SQs_.push_back(sq);
 
   //======================================== Top NW octant
   octant_mod = chi_mesh::Vector3(-1.0,1.0,1.0);
-  for (auto& sq : initial_octant_SQs)
+  for (auto& sq : initial_octant_SQs_)
   {
     SphericalQuadrilateral new_sq = sq;
 
@@ -149,12 +149,12 @@ void chi_math::SimplifiedLDFESQ::Quadrature::CopyToAllOctants()
     for (auto& xyz : new_sq.sub_sqr_points) xyz = xyz*octant_mod;
     new_sq.octant_modifier                      = octant_mod;
 
-    deployed_SQs.push_back(new_sq);
+    deployed_SQs_.push_back(new_sq);
   }
 
   //======================================== Top SW octant
   octant_mod = chi_mesh::Vector3(-1.0,-1.0,1.0);
-  for (auto& sq : initial_octant_SQs)
+  for (auto& sq : initial_octant_SQs_)
   {
     SphericalQuadrilateral new_sq = sq;
 
@@ -163,12 +163,12 @@ void chi_math::SimplifiedLDFESQ::Quadrature::CopyToAllOctants()
     for (auto& xyz : new_sq.sub_sqr_points) xyz = xyz*octant_mod;
     new_sq.octant_modifier                      = octant_mod;
 
-    deployed_SQs.push_back(new_sq);
+    deployed_SQs_.push_back(new_sq);
   }
 
   //======================================== Top SE octant
   octant_mod = chi_mesh::Vector3(1.0,-1.0,1.0);
-  for (auto& sq : initial_octant_SQs)
+  for (auto& sq : initial_octant_SQs_)
   {
     SphericalQuadrilateral new_sq = sq;
 
@@ -177,12 +177,12 @@ void chi_math::SimplifiedLDFESQ::Quadrature::CopyToAllOctants()
     for (auto& xyz : new_sq.sub_sqr_points) xyz = xyz*octant_mod;
     new_sq.octant_modifier                      = octant_mod;
 
-    deployed_SQs.push_back(new_sq);
+    deployed_SQs_.push_back(new_sq);
   }
 
   //======================================== Bot NE octant
   octant_mod = chi_mesh::Vector3(1.0,1.0,-1.0);
-  for (auto& sq : initial_octant_SQs)
+  for (auto& sq : initial_octant_SQs_)
   {
     SphericalQuadrilateral new_sq = sq;
 
@@ -191,12 +191,12 @@ void chi_math::SimplifiedLDFESQ::Quadrature::CopyToAllOctants()
     for (auto& xyz : new_sq.sub_sqr_points) xyz = xyz*octant_mod;
     new_sq.octant_modifier                      = octant_mod;
 
-    deployed_SQs.push_back(new_sq);
+    deployed_SQs_.push_back(new_sq);
   }
 
   //======================================== Bot NW octant
   octant_mod = chi_mesh::Vector3(-1.0,1.0,-1.0);
-  for (auto& sq : initial_octant_SQs)
+  for (auto& sq : initial_octant_SQs_)
   {
     SphericalQuadrilateral new_sq = sq;
 
@@ -205,12 +205,12 @@ void chi_math::SimplifiedLDFESQ::Quadrature::CopyToAllOctants()
     for (auto& xyz : new_sq.sub_sqr_points) xyz = xyz*octant_mod;
     new_sq.octant_modifier                      = octant_mod;
 
-    deployed_SQs.push_back(new_sq);
+    deployed_SQs_.push_back(new_sq);
   }
 
   //======================================== Bot SW octant
   octant_mod = chi_mesh::Vector3(-1.0,-1.0,-1.0);
-  for (auto& sq : initial_octant_SQs)
+  for (auto& sq : initial_octant_SQs_)
   {
     SphericalQuadrilateral new_sq = sq;
 
@@ -219,12 +219,12 @@ void chi_math::SimplifiedLDFESQ::Quadrature::CopyToAllOctants()
     for (auto& xyz : new_sq.sub_sqr_points) xyz = xyz*octant_mod;
     new_sq.octant_modifier                      = octant_mod;
 
-    deployed_SQs.push_back(new_sq);
+    deployed_SQs_.push_back(new_sq);
   }
 
   //======================================== Bot SE octant
   octant_mod = chi_mesh::Vector3(1.0,-1.0,-1.0);
-  for (auto& sq : initial_octant_SQs)
+  for (auto& sq : initial_octant_SQs_)
   {
     SphericalQuadrilateral new_sq = sq;
 
@@ -233,22 +233,22 @@ void chi_math::SimplifiedLDFESQ::Quadrature::CopyToAllOctants()
     for (auto& xyz : new_sq.sub_sqr_points) xyz = xyz*octant_mod;
     new_sq.octant_modifier                      = octant_mod;
 
-    deployed_SQs.push_back(new_sq);
+    deployed_SQs_.push_back(new_sq);
   }
 
   //======================================== Make history entry
-  deployed_SQs_history.push_back(deployed_SQs);
+  deployed_SQs_history_.push_back(deployed_SQs_);
 }
 
 //###################################################################
 /**Populates the quadrature abscissaes, weights and direction vectors.*/
 void chi_math::SimplifiedLDFESQ::Quadrature::PopulateQuadratureAbscissae()
 {
-  abscissae.clear();
-  weights.clear();
-  omegas.clear();
+  abscissae_.clear();
+  weights_.clear();
+  omegas_.clear();
 
-  for (const auto& sq : deployed_SQs)
+  for (const auto& sq : deployed_SQs_)
   {
     for (int i=0;i<4;++i)
     {
@@ -263,9 +263,9 @@ void chi_math::SimplifiedLDFESQ::Quadrature::PopulateQuadratureAbscissae()
 
       const auto abscissa = chi_math::QuadraturePointPhiTheta(phi, theta);
 
-      abscissae.push_back(abscissa);
-      weights.push_back(weight);
-      omegas.push_back(omega);
+      abscissae_.push_back(abscissa);
+      weights_.push_back(weight);
+      omegas_.push_back(omega);
     }
   }
 }

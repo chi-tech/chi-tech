@@ -24,22 +24,22 @@ PetscErrorCode GSConvergenceTest(KSP ksp, PetscInt n, PetscReal rnorm,
 
   //======================================== Set rhs norm
   double residual_scale = 1.0;
-  switch (context->residual_scale_type_)
+  switch (context->residual_scale_type)
   {
     case chi_math::ResidualScaleType::NONE:
       residual_scale = 1.0;
       break;
     case chi_math::ResidualScaleType::RHS_NORM:
-      if (context->rhs_norm_ > 1.0e-25)
-        residual_scale = 1.0/context->rhs_norm_;
+      if (context->rhs_norm > 1.0e-25)
+        residual_scale = 1.0/context->rhs_norm;
       break;
     case chi_math::ResidualScaleType::RHS_PRECONDITIONED_NORM:
-      if (context->rhs_preconditioned_norm_ > 1.0e-25)
-        residual_scale = 1.0/context->rhs_preconditioned_norm_;
+      if (context->rhs_preconditioned_norm > 1.0e-25)
+        residual_scale = 1.0/context->rhs_preconditioned_norm;
       break;
     case chi_math::ResidualScaleType::CUSTOM_SCALE:
-      if (context->custom_residual_scale_ > 1.0e-25)
-        residual_scale = 1.0/context->custom_residual_scale_;
+      if (context->custom_residual_scale > 1.0e-25)
+        residual_scale = 1.0/context->custom_residual_scale;
       break;
   }
 

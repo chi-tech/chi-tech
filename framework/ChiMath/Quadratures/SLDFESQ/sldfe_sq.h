@@ -62,19 +62,19 @@ public:
     ISOLATED,
 //    MULTI_VARIATE_SECANT
   };
-  QuadraturePointOptimization qp_optimization_type =
+  QuadraturePointOptimization qp_optimization_type_ =
     QuadraturePointOptimization::EMPIRICAL;
-  std::string output_filename_prefix;
+  std::string output_filename_prefix_;
 
 private:
   static constexpr double a = 0.57735026919; ///< Inscribed cude side length
-  int initial_level = 0;
-  std::vector<chi_mesh::Vector3>      diagonal_vertices;
-  std::vector<SphericalQuadrilateral> initial_octant_SQs;
+  int initial_level_ = 0;
+  std::vector<chi_mesh::Vector3>      diagonal_vertices_;
+  std::vector<SphericalQuadrilateral> initial_octant_SQs_;
 public:
-  std::vector<SphericalQuadrilateral> deployed_SQs;
+  std::vector<SphericalQuadrilateral> deployed_SQs_;
 private:
-  std::vector<std::vector<SphericalQuadrilateral>> deployed_SQs_history;
+  std::vector<std::vector<SphericalQuadrilateral>> deployed_SQs_history_;
 public:
   friend struct FUNCTION_WEIGHT_FROM_RHO;
   Quadrature() :
@@ -187,8 +187,8 @@ struct chi_math::SimplifiedLDFESQ::FUNCTION_WEIGHT_FROM_RHO
     sq(in_sq),
     A(4,4),
     A_inv(4,4),
-    lqp(in_legendre_quadrature.qpoints),
-    lqw(in_legendre_quadrature.weights)
+    lqp(in_legendre_quadrature.qpoints_),
+    lqw(in_legendre_quadrature.weights_)
   {
     //============================ Init RHS
     for (int i=0;i<4;++i)
@@ -220,7 +220,7 @@ struct chi_math::SimplifiedLDFESQ::FUNCTION_WEIGHT_FROM_RHO
       A[i] = {1.0,qpoints[i][0],qpoints[i][1],qpoints[i][2]};
 
     //=============================== Compute A-inverse
-    A_inv = chi_math::Inverse(A.elements);
+    A_inv = chi_math::Inverse(A.elements_);
 
     //=============================== Compute coefficients
     for (int i=0;i<4;++i)

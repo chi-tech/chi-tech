@@ -12,15 +12,15 @@ namespace chi_math
 class QuadratureJacobi : public chi_math::Quadrature
 {
 private:
-  const unsigned int m_alpha;
-  const unsigned int m_beta;
+  const unsigned int m_alpha_;
+  const unsigned int m_beta_;
 public:
   QuadratureJacobi(QuadratureOrder order,
                    unsigned int alpha,
                    unsigned int beta) :
-                   chi_math::Quadrature(order),
-                   m_alpha(alpha),
-                   m_beta(beta)
+      chi_math::Quadrature(order),
+      m_alpha_(alpha),
+      m_beta_(beta)
   {
     Initialize(order);
   }

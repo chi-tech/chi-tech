@@ -16,7 +16,7 @@ chi_math::QuadratureGaussChebyshev::
                            bool verbose)
   : chi_math::Quadrature(in_order)
 {
-  const unsigned int N = std::ceil( ((int)order + 1)/2.0 );
+  const unsigned int N = std::ceil(((int)order_ + 1) / 2.0 );
   Initialize(N, verbose);
 }
 
@@ -48,14 +48,14 @@ chi_math::QuadratureGaussChebyshev::Initialize(unsigned int N, bool verbose)
     const double xn = -std::cos( (2*n + 1)*pi_N/2.0 );
     const double wn = pi_N;
 
-    qpoints.emplace_back(xn);
-    weights.emplace_back(wn);
+    qpoints_.emplace_back(xn);
+    weights_.emplace_back(wn);
 
     if (verbose)
       chi::log.Log()
-        << "root[" << n << "]=" << qpoints[n][0]
-        << ", weight=" << weights[n];
+          << "root[" << n << "]=" << qpoints_[n][0]
+          << ", weight=" << weights_[n];
   }
 
-  range = {-1, +1};
+  range_ = {-1, +1};
 }

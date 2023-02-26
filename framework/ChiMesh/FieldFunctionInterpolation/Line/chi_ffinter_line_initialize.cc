@@ -40,7 +40,7 @@ void chi_mesh::FieldFunctionInterpolationLine::
 
     ff_context.ref_ff = field_functions[ff];
     const auto& sdm = ff_context.ref_ff->SDM();
-    const auto& grid = *sdm.ref_grid;
+    const auto& grid = *sdm.ref_grid_;
 
     ff_context.interpolation_points_ass_cell.assign(number_of_points,0);
     ff_context.interpolation_points_has_ass_cell.assign(number_of_points,false);

@@ -104,7 +104,7 @@ void lbs::LBSGroupset::PrintSweepInfoFile(size_t ev_tag, const std::string& file
 
       for (auto& ang_num : ang_set->angles)
       {
-        const auto& angle = quadrature_->abscissae[ang_num];
+        const auto& angle = quadrature_->abscissae_[ang_num];
 
         ofile
           << "    " << ang_num

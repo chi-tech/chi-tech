@@ -22,11 +22,11 @@ void lbs::DiscOrdSteadyStateAdjointSolver::Initialize()
 
       for (size_t g=0; g<S_ell.NumRows(); ++g)
       {
-        size_t num_col_indices = S_ell.rowI_indices[g].size();
+        size_t num_col_indices = S_ell.rowI_indices_[g].size();
         for (size_t j=0; j<num_col_indices; ++j)
         {
-          size_t gprime = S_ell.rowI_indices[g][j];
-          double value  = S_ell.rowI_values[g][j];
+          size_t gprime = S_ell.rowI_indices_[g][j];
+          double value  = S_ell.rowI_values_[g][j];
 
           S_ell_transpose.Insert(gprime, g, value);
         }

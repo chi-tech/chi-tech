@@ -12,12 +12,12 @@ chi_math::CellMapping::
               size_t in_num_nodes,
               std::vector<std::vector<int>> in_face_node_mappings,
               const VandAFunction& volume_area_function) :
-  m_grid_ptr(std::move(in_grid)),
-  m_cell(in_cell),
-  m_num_nodes(in_num_nodes),
-  face_node_mappings(std::move(in_face_node_mappings))
+    grid_ptr_(std::move(in_grid)),
+    cell_(in_cell),
+    num_nodes_(in_num_nodes),
+    face_node_mappings_(std::move(in_face_node_mappings))
 {
-  volume_area_function(*m_grid_ptr, in_cell, m_volume, m_areas);
+  volume_area_function(*grid_ptr_, in_cell, volume_, areas_);
 }
 
 void chi_math::CellMapping::ComputeCellVolumeAndAreas(
@@ -113,7 +113,7 @@ void chi_math::CellMapping::ComputeCellVolumeAndAreas(
 int chi_math::CellMapping::
   MapFaceNode(size_t face_index, size_t face_node_index) const
 {
-  try {return face_node_mappings.at(face_index).at(face_node_index);}
+  try {return face_node_mappings_.at(face_index).at(face_node_index);}
   catch (const std::out_of_range& oor)
   {
     throw std::out_of_range("chi_math::CellMapping::MapFaceNode: "
@@ -128,7 +128,7 @@ chi_math::CellMapping::
   std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) const
 {
   InitializeVolumeQuadraturePointData(internal_data);
-  faces_qp_data.resize(face_node_mappings.size());
+  faces_qp_data.resize(face_node_mappings_.size());
   for (size_t f = 0; f < faces_qp_data.size(); ++f)
     InitializeFaceQuadraturePointData(f, faces_qp_data[f]);
 }
@@ -237,8 +237,8 @@ chi_math::CellMapping::
                      IntS_shapeI_shapeJ,
                      IntS_shapeI,
                      IntS_shapeI_gradshapeJ,
-                     face_node_mappings,
-                     m_num_nodes);
+                     face_node_mappings_,
+                     num_nodes_);
 }
 
 

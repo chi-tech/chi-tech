@@ -180,7 +180,7 @@ int chiSimTest92_DSA(lua_State* L)
   auto ff = std::make_shared<chi_physics::FieldFunction>(
     "Phi",
     sdm_ptr,
-    OneDofPerNode.unknowns.front()
+    OneDofPerNode.unknowns_.front()
     );
 
   ff->UpdateFieldVector(x_vector);

@@ -36,7 +36,7 @@ namespace chi_unit_sim_tests
     const auto& field = solver.field;
 
     double local_error = 0.0;
-    for (const auto& cell : sdm.ref_grid->local_cells)
+    for (const auto& cell : sdm.ref_grid_->local_cells)
     {
       const int mat_id = cell.material_id;
       const auto& cell_mapping = sdm.GetCellMapping(cell);
@@ -72,7 +72,7 @@ namespace chi_unit_sim_tests
       std::make_shared<chi_physics::FieldFunction>(
         std::string("phi"),        //Text name
         solver.sdm_ptr,            //Spatial Discretization
-        unk_man.unknowns.front()); //Unknown Manager
+        unk_man.unknowns_.front()); //Unknown Manager
 
     chi::field_function_stack.push_back(ff);
 
@@ -92,7 +92,7 @@ namespace chi_unit_sim_tests
     global_error = std::sqrt(global_error);
 
     chi::log.Log() << "Error: " << std::scientific << global_error
-                   << " Num-cells: " << sdm.ref_grid->GetGlobalNumberOfCells();
+                   << " Num-cells: " << sdm.ref_grid_->GetGlobalNumberOfCells();
 
     auto stl_vector = new std::vector<double>();
     sdm.LocalizePETScVector(solver.x, *stl_vector, OneDofPerNode);

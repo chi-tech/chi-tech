@@ -53,7 +53,7 @@ void chi_math::SimplifiedLDFESQ::Quadrature::
     SA_i[i] = ComputeSphericalQuadrilateralArea(sub_sub_square_xyz[i]);
 
   //============================================= Apply optimization
-  if (qp_optimization_type == QuadraturePointOptimization::CENTROID)
+  if (qp_optimization_type_ == QuadraturePointOptimization::CENTROID)
     for (int i=0; i<4; ++i)
     {
       for (int j=0; j<4; ++j)
@@ -63,9 +63,9 @@ void chi_math::SimplifiedLDFESQ::Quadrature::
 
       sq.sub_sqr_weights[i] = SA_i[i];
     }//for i
-  else if (qp_optimization_type == QuadraturePointOptimization::EMPIRICAL)
+  else if (qp_optimization_type_ == QuadraturePointOptimization::EMPIRICAL)
     EmpiricalQPOptimization(sq,legendre,vc,vctoi,SA_i);
-  else if (qp_optimization_type == QuadraturePointOptimization::ISOLATED)
+  else if (qp_optimization_type_ == QuadraturePointOptimization::ISOLATED)
     IsolatedQPOptimization(sq,legendre,vc,vctoi,SA_i);
 
 }

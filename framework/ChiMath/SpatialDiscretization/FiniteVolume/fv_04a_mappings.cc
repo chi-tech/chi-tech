@@ -17,11 +17,11 @@ int64_t chi_math::SpatialDiscretization_FV::
          const unsigned int unknown_id,
          const unsigned int component) const
 {
-  auto storage = unknown_manager.dof_storage_type;
+  auto storage = unknown_manager.dof_storage_type_;
 
   const size_t num_unknowns = unknown_manager.GetTotalUnknownStructureSize();
   const size_t block_id     = unknown_manager.MapUnknown(unknown_id, component);
-  const size_t num_local_cells = ref_grid->local_cells.size();
+  const size_t num_local_cells = ref_grid_->local_cells.size();
 
   if (component >= num_unknowns) return -1;
 
@@ -30,24 +30,24 @@ int64_t chi_math::SpatialDiscretization_FV::
   if (cell.partition_id == chi::mpi.location_id)
   {
     if (storage == chi_math::UnknownStorageType::BLOCK)
-      address = sc_int64(local_block_address) * num_unknowns +
+      address = sc_int64(local_block_address_) * num_unknowns +
                 num_local_cells*block_id +
                 cell.local_id;
     else if (storage == chi_math::UnknownStorageType::NODAL)
-      address = sc_int64(local_block_address) * num_unknowns +
+      address = sc_int64(local_block_address_) * num_unknowns +
                 cell.local_id*num_unknowns +
                 block_id;
   }
   else
   {
-    const uint64_t ghost_local_id = neighbor_cell_local_ids.at(cell.global_id);
+    const uint64_t ghost_local_id = neighbor_cell_local_ids_.at(cell.global_id);
 
     if (storage == chi_math::UnknownStorageType::BLOCK)
-      address = sc_int64(locJ_block_address[cell.partition_id]) * num_unknowns +
-                locJ_block_size[cell.partition_id] * block_id +
+      address = sc_int64(locJ_block_address_[cell.partition_id]) * num_unknowns +
+                locJ_block_size_[cell.partition_id] * block_id +
                 ghost_local_id;
     else if (storage == chi_math::UnknownStorageType::NODAL)
-      address = sc_int64(locJ_block_address[cell.partition_id]) * num_unknowns +
+      address = sc_int64(locJ_block_address_[cell.partition_id]) * num_unknowns +
                 ghost_local_id*num_unknowns +
                 block_id;
   }
@@ -65,11 +65,11 @@ int64_t chi_math::SpatialDiscretization_FV::
               const unsigned int unknown_id,
               const unsigned int component) const
 {
-  auto storage = unknown_manager.dof_storage_type;
+  auto storage = unknown_manager.dof_storage_type_;
 
   const size_t num_unknowns = unknown_manager.GetTotalUnknownStructureSize();
   const size_t block_id     = unknown_manager.MapUnknown(unknown_id, component);
-  const size_t num_local_cells = ref_grid->local_cells.size();
+  const size_t num_local_cells = ref_grid_->local_cells.size();
 
   if (component >= num_unknowns) return -1;
 
@@ -87,7 +87,7 @@ int64_t chi_math::SpatialDiscretization_FV::
     const size_t num_local_dofs = GetNumLocalDOFs(unknown_manager);
     const size_t num_ghost_nodes = GetNumGhostDOFs(UNITARY_UNKNOWN_MANAGER);
     const uint64_t ghost_local_id =
-      ref_grid->cells.GetGhostLocalID(cell.global_id);
+      ref_grid_->cells.GetGhostLocalID(cell.global_id);
 
     if (storage == chi_math::UnknownStorageType::BLOCK)
       address = sc_int64(num_local_dofs) +

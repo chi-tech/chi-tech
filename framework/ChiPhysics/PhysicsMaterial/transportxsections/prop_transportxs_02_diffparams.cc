@@ -28,8 +28,8 @@ ComputeDiffusionParameters()
     {
       for (unsigned int gp = 0; gp < num_groups_; ++gp)
       {
-        const auto& cols = S[1].rowI_indices[gp];
-        const auto& vals = S[1].rowI_values[gp];
+        const auto& cols = S[1].rowI_indices_[gp];
+        const auto& vals = S[1].rowI_values_[gp];
         for (size_t t = 0; t < cols.size(); ++t)
           if (cols[t] == g)
           {
@@ -64,8 +64,8 @@ ComputeDiffusionParameters()
 
     if (!S.empty())
     {
-      const auto& cols = S[0].rowI_indices[g];
-      const auto& vals = S[0].rowI_values[g];
+      const auto& cols = S[0].rowI_indices_[g];
+      const auto& vals = S[0].rowI_values_[g];
       for (size_t t = 0; t < cols.size(); ++t)
         if (cols[t] == g)
         {
