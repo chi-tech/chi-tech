@@ -12,12 +12,12 @@ void mg_diffusion::Solver::Assemble_RHS(const unsigned int g,
     chi::log.Log() << "\nAssemblying RHS for group " + std::to_string(g);
 
   // copy the external source vector for group g into b
-  VecSet(b, 0.0);
-  VecCopy(bext[g], b);
+  VecSet(b_, 0.0);
+  VecCopy(bext_[g], b_);
 
-  const auto& sdm  = *mg_diffusion::Solver::sdm_ptr;
+  const auto& sdm  = *mg_diffusion::Solver::sdm_ptr_;
   // compute inscattering term
-  for (const auto& cell :  mg_diffusion::Solver::grid_ptr->local_cells)
+  for (const auto& cell :  mg_diffusion::Solver::grid_ptr_->local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const auto  qp_data      = cell_mapping.MakeVolumeQuadraturePointData();
@@ -31,7 +31,7 @@ void mg_diffusion::Solver::Assemble_RHS(const unsigned int g,
       if (gprime != g) // g and row_g are the same, maybe different int types
       {
         const double* xlocal;
-        VecGetArrayRead(x[gprime], &xlocal);
+        VecGetArrayRead(x_[gprime], &xlocal);
 
         for (size_t i=0; i<num_nodes; ++i)
         {
@@ -50,15 +50,15 @@ void mg_diffusion::Solver::Assemble_RHS(const unsigned int g,
                          qp_data.JxW(qp);
           }//for j
           // add inscattering value to vector
-          VecSetValue(b, imap, inscatter_g, ADD_VALUES);
+          VecSetValue(b_, imap, inscatter_g, ADD_VALUES);
         }//for i
-        VecRestoreArrayRead(x[gprime], &xlocal);
+        VecRestoreArrayRead(x_[gprime], &xlocal);
       }//if gp!=g
     }// for gprime
   }//for cell
 
-  VecAssemblyBegin(b);
-  VecAssemblyEnd(b);
+  VecAssemblyBegin(b_);
+  VecAssemblyEnd(b_);
 
 }
 

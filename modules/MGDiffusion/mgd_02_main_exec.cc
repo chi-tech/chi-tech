@@ -16,23 +16,23 @@ void mg_diffusion::Solver::Execute()
 
   //============================================= Create Krylov Solver
   // setup KSP once for all
-  petsc_solver =
+  petsc_solver_ =
     chi_math::PETScUtils::CreateCommonKrylovSolverSetup(
-      A.front(),        //Matrix
-      TextName(),      //Solver name
-      KSPCG,           //Solver type
-      PCGAMG,          //Preconditioner type
-      basic_options_("residual_tolerance").FloatValue(),  //Relative residual tolerance
-      basic_options_("max_inner_iters").IntegerValue()    //Max # of inner iterations
+        A_.front(),        //Matrix
+        TextName(),      //Solver name
+        KSPCG,           //Solver type
+        PCGAMG,          //Preconditioner type
+        basic_options_("residual_tolerance").FloatValue(),  //Relative residual tolerance
+        basic_options_("max_inner_iters").IntegerValue()    //Max # of inner iterations
     );
 
-  KSPSetApplicationContext(petsc_solver.ksp, (void*)&my_app_context);
-  KSPMonitorCancel(petsc_solver.ksp);
-  KSPMonitorSet(petsc_solver.ksp, &mg_diffusion::MGKSPMonitor,
+  KSPSetApplicationContext(petsc_solver_.ksp, (void*)&my_app_context_);
+  KSPMonitorCancel(petsc_solver_.ksp);
+  KSPMonitorSet(petsc_solver_.ksp, &mg_diffusion::MGKSPMonitor,
                 nullptr, nullptr);
 
   int64_t iverbose = basic_options_("verbose_level").IntegerValue();
-  my_app_context.verbose = iverbose > 1 ? PETSC_TRUE : PETSC_FALSE;
+  my_app_context_.verbose = iverbose > 1 ? PETSC_TRUE : PETSC_FALSE;
 //  if (my_app_context.verbose == PETSC_TRUE)
 //    cout << "--context TRUE" << endl;
 //  if (my_app_context.verbose == PETSC_FALSE)
@@ -44,7 +44,7 @@ void mg_diffusion::Solver::Execute()
   // unsigned int ng = mg_diffusion::Solver::num_groups;
 
   //============================================= Solve fast groups:
-  for (unsigned int g=0; g < last_fast_group; ++g)
+  for (unsigned int g=0; g < last_fast_group_; ++g)
   {
     mg_diffusion::Solver::Assemble_RHS(g, iverbose);
     mg_diffusion::Solver::SolveOneGroupProblem(g, iverbose);
@@ -63,25 +63,25 @@ void mg_diffusion::Solver::Execute()
   do
   {
     thermal_error_all = 0.0;
-    for (unsigned int g=last_fast_group; g < num_groups; ++g)
+    for (unsigned int g=last_fast_group_; g < num_groups_; ++g)
     {
       // conpute rhs src
       mg_diffusion::Solver::Assemble_RHS(g, iverbose);
       // copy solution
-      VecCopy(x[g], x_old[g]);
+      VecCopy(x_[g], x_old_[g]);
       // solve group g for new solution
       mg_diffusion::Solver::SolveOneGroupProblem(g, iverbose);
       // compute L2 norm of thermal error for current g (requires one more copy)
-      VecCopy(x[g], thermal_dphi);
-      VecAXPY(thermal_dphi, -1.0, x_old[g]);
-      VecNorm(thermal_dphi,NORM_2,&thermal_error_g);
+      VecCopy(x_[g], thermal_dphi_);
+      VecAXPY(thermal_dphi_, -1.0, x_old_[g]);
+      VecNorm(thermal_dphi_, NORM_2, &thermal_error_g);
       thermal_error_all = std::max(thermal_error_all,thermal_error_g);
     }
     // perform two-grid
-    if (do_two_grid)
+    if (do_two_grid_)
     {
       mg_diffusion::Solver::Assemble_RHS_TwoGrid(iverbose);
-      mg_diffusion::Solver::SolveOneGroupProblem(num_groups, iverbose);
+      mg_diffusion::Solver::SolveOneGroupProblem(num_groups_, iverbose);
       mg_diffusion::Solver::Update_Flux_With_TwoGrid(iverbose);
     }
 
