@@ -45,16 +45,17 @@
 
 \subsection devman1_sec0_2 General code
 
- - <B>Variables</B> must use lower case and include "_" between words. i.e.
+ - <B>Variables</B> use snake_case, must use lower case and include "_" between words. i.e.
     num_faces. Variable must not start or end with an underscore.
  - <B>class Members</B> same as variables but with a trailing "_". `struct`
-    members do not need trailing underscores.
- - <B>Namespaces</B> should be lower case and may include underscores
- - <B>FunctionNames</B> have no underscores and each word starts with a capital
+    members do not need trailing underscores. See more about this below.
+ - <B>Namespaces</B> use snake_case, should be lower case and may include underscores
+ - <B>FunctionNames</B> use PascalCase, have no underscores and each word starts with a capital
    letter. Underscores can be allowed in some circumstances.
- - <B>Classes and structures</B> have each
+ - <B>Classes, structures, and types</B> use PascalCase, have each
    word start with a capital letter. For example chi_mesh::Vector is a structure
    called Vector and is defined in the namespace chi_mesh.
+ - <B>enums and constants</B> use SCREAMING_SNAKE_CASE.
 
 \code
 int good_variable_name;    // Good variable name
@@ -89,6 +90,23 @@ public:
   int data;
 };
 \endcode
+
+## More on Class member conventions
+- All class members should be named the same as regular variables, but with
+  a trailing underscore ('_'), e.g., `cell.centroid_`.
+- `struct` members should NOT be followed by an underscore.
+- Strongly consider making all class members `private/protected` unless
+  - They are `const`.
+  - They cause a sensitivity to speed, e.g., `chi_mesh::cell` does not have
+    accessor functions because `cell.vertex_ids_` is faster than
+    `cell.GetVertexIDs()`
+- References to `private/protected` members should be obtained with a method
+  starting with `Get`, e.g., `object.member` should be referenced with
+  `object.GetMember()`
+- Use `const` and non-`const` getters judicially. Favor using setters over
+  non-const reference if possible, e.g., setting a single value can be done
+  with `GetSingleValue`/`SetSingleValue`, however, vector manipulation might
+  be better done with `GetVector` followed by manipulations.
 
 \subsection devman1_sec0_3 Tabs, spaces and braces
 
