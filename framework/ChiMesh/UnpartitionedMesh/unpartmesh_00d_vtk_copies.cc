@@ -33,13 +33,13 @@ void chi_mesh::UnpartitionedMesh::
     auto vtk_celldim = vtk_cell->GetCellDimension();
 
     if (vtk_celldim == 3)
-      raw_cells.push_back(CreateCellFromVTKPolyhedron(vtk_cell));
+      raw_cells_.push_back(CreateCellFromVTKPolyhedron(vtk_cell));
     else if (vtk_celldim == 2)
-      raw_cells.push_back(CreateCellFromVTKPolygon(vtk_cell));
+      raw_cells_.push_back(CreateCellFromVTKPolygon(vtk_cell));
     else if (vtk_celldim == 1)
-      raw_cells.push_back(CreateCellFromVTKLine(vtk_cell));
+      raw_cells_.push_back(CreateCellFromVTKLine(vtk_cell));
     else if (vtk_celldim == 0)
-      raw_cells.push_back(CreateCellFromVTKVertex(vtk_cell));
+      raw_cells_.push_back(CreateCellFromVTKVertex(vtk_cell));
     else
       throw std::logic_error(fname + ": Unsupported cell dimension.");
   }//for c
@@ -53,14 +53,19 @@ void chi_mesh::UnpartitionedMesh::
     point[1] = point[1]*scale;
     point[2] = point[2]*scale;
 
-    vertices.emplace_back(point[0],point[1],point[2]);
+    vertices_.emplace_back(point[0], point[1], point[2]);
 
-    if (point[0] < bound_box.xmin) bound_box.xmin = point[0];
-    if (point[0] > bound_box.xmax) bound_box.xmax = point[0];
-    if (point[1] < bound_box.ymin) bound_box.ymin = point[1];
-    if (point[1] > bound_box.ymax) bound_box.ymax = point[1];
-    if (point[2] < bound_box.zmin) bound_box.zmin = point[2];
-    if (point[2] > bound_box.zmax) bound_box.zmax = point[2];
+    if (not bound_box_)
+      bound_box_ = std::shared_ptr<BoundBox>(new BoundBox{point[0],point[0],
+                                                          point[1],point[1],
+                                                          point[2],point[2]});
+
+    bound_box_->xmin = std::min(bound_box_->xmin, point[0]);
+    bound_box_->xmax = std::max(bound_box_->xmax, point[0]);
+    bound_box_->ymin = std::min(bound_box_->ymin, point[1]);
+    bound_box_->ymax = std::max(bound_box_->ymax, point[1]);
+    bound_box_->zmin = std::min(bound_box_->zmin, point[2]);
+    bound_box_->zmax = std::max(bound_box_->zmax, point[2]);
   }
 }
 
@@ -70,10 +75,10 @@ void chi_mesh::UnpartitionedMesh::
 void chi_mesh::UnpartitionedMesh::
   SetMaterialIDsFromBlocks(const std::vector<uint64_t> &block_mat_ids)
 {
-  size_t total_cell_count = raw_cells.size();
+  size_t total_cell_count = raw_cells_.size();
   for (size_t c=0; c<total_cell_count; ++c)
   {
-    auto cell = raw_cells[c];
+    auto cell = raw_cells_[c];
 
     int mat_id=-1;
     uint64_t prev_block_lim = 0;
@@ -95,10 +100,10 @@ void chi_mesh::UnpartitionedMesh::
 void chi_mesh::UnpartitionedMesh::
   SetMaterialIDsFromList(const std::vector<int> &material_ids)
 {
-  const size_t total_cell_count = raw_cells.size();
+  const size_t total_cell_count = raw_cells_.size();
 
   for (size_t c = 0; c < total_cell_count; ++c)
-    raw_cells[c]->material_id = material_ids[c];
+    raw_cells_[c]->material_id = material_ids[c];
 }
 
 

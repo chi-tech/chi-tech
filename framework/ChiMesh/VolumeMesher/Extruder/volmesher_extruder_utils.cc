@@ -12,7 +12,7 @@ void chi_mesh::VolumeMesherExtruder::SetupLayers(int default_layer_count)
 {
   //================================================== Create default layers if no
   //                                                   input layers are provided
-  if (input_layers.empty())
+  if (input_layers_.empty())
   {
     chi::log.Log0Warning()
       << "VolumeMesherExtruder: No extrusion layers have been specified. "
@@ -21,29 +21,29 @@ void chi_mesh::VolumeMesherExtruder::SetupLayers(int default_layer_count)
     double dz = 1.0/default_layer_count;
     for (int k=0; k<=default_layer_count; k++)
     {
-      vertex_layers.push_back(k*dz);
+      vertex_layers_.push_back(k * dz);
     }
   }
   else
   {
     double last_z=0.0;
-    vertex_layers.push_back(last_z);
+    vertex_layers_.push_back(last_z);
 
-    for (const auto& input_layer : input_layers)
+    for (const auto& input_layer : input_layers_)
     {
       double dz = input_layer.height/input_layer.sub_divisions;
 
       for (int k=0; k<input_layer.sub_divisions; k++)
       {
         last_z += dz;
-        vertex_layers.push_back(last_z);
+        vertex_layers_.push_back(last_z);
       }
     }
   }
 
   chi::log.Log()
     << "VolumeMesherExtruder: Total number of cell layers is "
-    << vertex_layers.size()-1;
+    << vertex_layers_.size() - 1;
 }
 
 //###################################################################
@@ -52,7 +52,7 @@ chi_mesh::Vector3 chi_mesh::VolumeMesherExtruder::
   ProjectCentroidToLevel(const chi_mesh::Vector3 &centroid,
                          const size_t level)
 {
-  double z_location = 0.5 * (vertex_layers[level] + vertex_layers[level+1]);
+  double z_location = 0.5 * (vertex_layers_[level] + vertex_layers_[level + 1]);
 
   auto centroid_projected = centroid;
   centroid_projected.z = z_location;
@@ -100,7 +100,7 @@ bool chi_mesh::VolumeMesherExtruder::
       return true;
   }
 
-  const size_t last_z_level = vertex_layers.size() - 1;
+  const size_t last_z_level = vertex_layers_.size() - 1;
   const size_t z_level_below = z_level - 1;
   const size_t z_level_above = z_level + 1;
 
@@ -115,7 +115,7 @@ bool chi_mesh::VolumeMesherExtruder::
   //======================================== Search template cell's
   //                                         lateral neighbors
   const auto& vertex_subs =
-    template_unpartitioned_mesh->vertex_cell_subscriptions;
+    template_unpartitioned_mesh_->GetVertextCellSubscriptions();
   for (uint64_t vid : template_cell.vertex_ids)
     for (uint64_t cid : vertex_subs[vid])
     {
@@ -181,10 +181,10 @@ std::unique_ptr<chi_mesh::Cell> chi_mesh::VolumeMesherExtruder::
   //========================================= Populate cell v-indices
   cell->vertex_ids.reserve(2*tc_num_verts);
   for (auto tc_vid : template_cell.vertex_ids)
-    cell->vertex_ids.push_back(tc_vid + z_level*node_z_index_incr);
+    cell->vertex_ids.push_back(tc_vid + z_level * node_z_index_incr_);
 
   for (auto tc_vid : template_cell.vertex_ids)
-    cell->vertex_ids.push_back(tc_vid + (z_level+1)*node_z_index_incr);
+    cell->vertex_ids.push_back(tc_vid + (z_level+1) * node_z_index_incr_);
 
 
   //========================================= Create side faces
@@ -193,10 +193,10 @@ std::unique_ptr<chi_mesh::Cell> chi_mesh::VolumeMesherExtruder::
     chi_mesh::CellFace newFace;
 
     newFace.vertex_ids.resize(4,-1);
-    newFace.vertex_ids[0] = face.vertex_ids[0] + z_level*node_z_index_incr;
-    newFace.vertex_ids[1] = face.vertex_ids[1] + z_level*node_z_index_incr;
-    newFace.vertex_ids[2] = face.vertex_ids[1] + (z_level+1)*node_z_index_incr;
-    newFace.vertex_ids[3] = face.vertex_ids[0] + (z_level+1)*node_z_index_incr;
+    newFace.vertex_ids[0] = face.vertex_ids[0] + z_level * node_z_index_incr_;
+    newFace.vertex_ids[1] = face.vertex_ids[1] + z_level * node_z_index_incr_;
+    newFace.vertex_ids[2] = face.vertex_ids[1] + (z_level+1) * node_z_index_incr_;
+    newFace.vertex_ids[3] = face.vertex_ids[0] + (z_level+1) * node_z_index_incr_;
 
     //Compute centroid
     const auto& v0 = grid.vertices[newFace.vertex_ids[0]];
@@ -240,7 +240,7 @@ std::unique_ptr<chi_mesh::Cell> chi_mesh::VolumeMesherExtruder::
     for (int tv=(static_cast<int>(tc_num_verts)-1); tv>=0; tv--)
     {
       newFace.vertex_ids.push_back(template_cell.vertex_ids[tv]
-                                   + z_level*node_z_index_incr);
+                                   + z_level * node_z_index_incr_);
       const auto& v = grid.vertices[newFace.vertex_ids.back()];
       vfc = vfc + v;
     }
@@ -280,7 +280,7 @@ std::unique_ptr<chi_mesh::Cell> chi_mesh::VolumeMesherExtruder::
     newFace.vertex_ids.reserve(tc_num_verts);
     for (auto tc_vid : template_cell.vertex_ids)
     {
-      newFace.vertex_ids.push_back(tc_vid + (z_level+1)*node_z_index_incr);
+      newFace.vertex_ids.push_back(tc_vid + (z_level+1) * node_z_index_incr_);
       const auto& v = grid.vertices[newFace.vertex_ids.back()];
       vfc = vfc + v;
     }
@@ -297,7 +297,7 @@ std::unique_ptr<chi_mesh::Cell> chi_mesh::VolumeMesherExtruder::
     newFace.normal = vn/vn.Norm();
 
     //Set neighbor
-    if (z_level==(vertex_layers.size()-2))
+    if (z_level==(vertex_layers_.size() - 2))
     {
       newFace.neighbor_id = 0;
       newFace.has_neighbor = false;

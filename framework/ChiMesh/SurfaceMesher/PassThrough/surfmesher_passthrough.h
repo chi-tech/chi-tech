@@ -1,5 +1,5 @@
-#ifndef _surfmesher_passthrough_h
-#define _surfmesher_passthrough_h
+#ifndef CHI_MESH_SURFACEMESHER_PASSTHROUGH_H
+#define CHI_MESH_SURFACEMESHER_PASSTHROUGH_H
 
 #include "../surfacemesher.h"
 

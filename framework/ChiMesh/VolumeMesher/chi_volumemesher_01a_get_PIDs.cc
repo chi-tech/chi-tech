@@ -122,14 +122,16 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
     std::get<1>(ijk_id) = ij_id.second;
     std::get<2>(ijk_id) = 0;
   }
-  else if (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherExtruder))
+//  else if (type/**/id(*vol_mesher) == typeid(chi_mesh::VolumeMesherExtruder))
+  else if (vol_mesher->Type() == VolumeMesherType::EXTRUDER)
   {
-    auto& extruder = (chi_mesh::VolumeMesherExtruder&)*vol_mesher;
-
+//    auto& extruder = (chi_mesh::VolumeMesherExtruder&)*vol_mesher;
+    auto extruder = dynamic_cast<chi_mesh::VolumeMesherExtruder&>(*vol_mesher);
+    const auto& vertex_layers = extruder.GetVertexLayers();
     //====================================== Create virtual cuts
     if (vol_mesher->options.zcuts.empty())
     {
-      size_t num_sub_layers = extruder.vertex_layers.size()-1;
+      size_t num_sub_layers = vertex_layers.size()-1;
 
       if ((num_sub_layers%vol_mesher->options.partition_z) != 0)
       {
@@ -144,19 +146,19 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
       for (int k=0; k<(vol_mesher->options.partition_z); k++)
       {
         int layer_index = k*delta_zk + delta_zk;
-        if (layer_index > (extruder.vertex_layers.size()-1))
+        if (layer_index > (vertex_layers.size()-1))
         {
-          layer_index = (int)extruder.vertex_layers.size()-1;
-          vol_mesher->options.zcuts.push_back(extruder.vertex_layers[layer_index]);
+          layer_index = (int)vertex_layers.size()-1;
+          vol_mesher->options.zcuts.push_back(vertex_layers[layer_index]);
         }
         else
         {
-          vol_mesher->options.zcuts.push_back(extruder.vertex_layers[layer_index]);
+          vol_mesher->options.zcuts.push_back(vertex_layers[layer_index]);
 
           if (chi::log.GetVerbosity() == chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2)
           {
             printf("Z-Cut %lu, %g\n",vol_mesher->options.zcuts.size(),
-                   extruder.vertex_layers[layer_index]);
+                   vertex_layers[layer_index]);
           }
         }
       }

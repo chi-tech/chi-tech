@@ -49,9 +49,9 @@ int chiUnpartitionedMeshUploadVertex(lua_State* L)
     chi::unpartitionedmesh_stack,
     handle, fname);
 
-  mesh.vertices.emplace_back(x,y,z);
+  mesh.GetVertices().emplace_back(x, y, z);
 
-  size_t vert_handle = mesh.vertices.size()-1;
+  size_t vert_handle = mesh.GetVertices().size() - 1;
 
   lua_pushinteger(L, static_cast<lua_Integer>(vert_handle));
   return 1;
@@ -205,7 +205,7 @@ int chiUnpartitionedMeshUploadCell(lua_State* L)
                      cell_num_faces, cell_material_id,
                      proxy_faces);
 
-  size_t cell_handle = mesh.raw_cells.size()-1;
+  size_t cell_handle = mesh.GetNumberOfCells() - 1;
 
   lua_pushinteger(L, static_cast<lua_Integer>(cell_handle));
   return 1;

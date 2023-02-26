@@ -40,8 +40,8 @@ namespace chi_mesh
 class chi_mesh::VolumeMesher
 {
 private:
-  chi_mesh::MeshContinuumPtr m_grid;
-  const VolumeMesherType     m_type;
+  chi_mesh::MeshContinuumPtr grid_ptr_;
+  const VolumeMesherType     type_;
 public:
   enum PartitionType
   {
@@ -66,6 +66,7 @@ public:
   explicit
   //01 Utils
   VolumeMesher(VolumeMesherType type);
+  virtual ~VolumeMesher() = default;
   void SetContinuum(MeshContinuumPtr& grid);
   MeshContinuumPtr& GetContinuum();
   void SetGridAttributes(MeshAttributes new_attribs,

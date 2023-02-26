@@ -31,13 +31,11 @@ Remesher types:\n
 When the mesher type is specified to be VOLUMEMESHER_EXTRUDER then two
 additional arguments are required. `TemplateType` and `handle`.\n
 
-- `TemplateType` can be either `ExtruderTemplateType.SURFACE_MESH` or
+- `TemplateType` can for now only be
  `ExtruderTemplateType.UNPARTITIONED_MESH`.\n
 - `handle` is a handle to the template mesh. When `TemplateType` is
- set to `ExtruderTemplateType.SURFACE_MESH` then this must be a handle to a valid
- surface mesh. Similarly, when `TemplateType` is set to
- `ExtruderTemplateType.UNPARTITIONED_MESH` then the handle must point to a valid
- unpartitioned mesh.
+  set to `ExtruderTemplateType.UNPARTITIONED_MESH` then the handle must point
+  to a valid unpartitioned mesh.
 
 \ingroup LuaVolumeMesher
 \author Jan*/
@@ -75,21 +73,10 @@ int chiVolumeMesherCreate(lua_State *L)
     int template_type   = lua_tonumber(L,2);
     int template_handle = lua_tonumber(L,3);
 
-    const auto SURFACE_MESH_TEMPLATE =
-      chi_mesh::VolumeMesherExtruder::TemplateType::SURFACE_MESH;
     const auto UNPART_MESH_TEMPLATE =
       chi_mesh::VolumeMesherExtruder::TemplateType::UNPARTITIONED_MESH;
 
-    auto& handler = chi_mesh::GetCurrentHandler();
-
-    if      (template_type == (int)SURFACE_MESH_TEMPLATE)
-    {
-      auto surface_mesh_ptr = chi::GetStackItemPtr(chi::surface_mesh_stack,
-                                                   template_handle, fname);
-
-      new_mesher = std::make_shared<chi_mesh::VolumeMesherExtruder>(surface_mesh_ptr);
-    }
-    else if (template_type == (int)UNPART_MESH_TEMPLATE)
+    if (template_type == (int)UNPART_MESH_TEMPLATE)
     {
       auto p_umesh = chi::GetStackItemPtr(chi::unpartitionedmesh_stack,
                                           template_handle, fname);

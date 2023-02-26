@@ -45,7 +45,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   }
 
   //======================================== Get unpartitioned mesh
-  auto umesh = m_umesh;
+  auto umesh = umesh_ptr_;
 
   chi::log.Log() << "Computed centroids";
   MPI_Barrier(MPI_COMM_WORLD);
@@ -61,17 +61,17 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
     cell_pids = PARMETIS(*umesh);
 
   //======================================== Load up the cells
-  auto& vertex_subs = umesh->vertex_cell_subscriptions;
+  auto& vertex_subs = umesh->GetVertextCellSubscriptions();
   size_t cell_globl_id = 0;
-  for (auto raw_cell : umesh->raw_cells)
+  for (auto raw_cell : umesh->GetRawCells())
   {
     if (CellHasLocalScope(*raw_cell, cell_globl_id, vertex_subs, cell_pids))
     {
       auto cell = MakeCell(*raw_cell, cell_globl_id,
-                           cell_pids[cell_globl_id], umesh->vertices);
+                           cell_pids[cell_globl_id], umesh->GetVertices());
 
       for (uint64_t vid : cell->vertex_ids)
-        grid->vertices.Insert(vid, umesh->vertices[vid]);
+        grid->vertices.Insert(vid, umesh->GetVertices()[vid]);
 
       grid->cells.push_back(std::move(cell));
     }
@@ -79,15 +79,16 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
     ++cell_globl_id;
   }//for raw_cell
 
-  grid->SetGlobalVertexCount(umesh->vertices.size());
+  grid->SetGlobalVertexCount(umesh->GetVertices().size());
 
   chi::log.Log() << "Cells loaded.";
   MPI_Barrier(MPI_COMM_WORLD);
 
   SetContinuum(grid);
-  SetGridAttributes(umesh->attributes, {umesh->mesh_options.ortho_Nx,
-                                        umesh->mesh_options.ortho_Ny,
-                                        umesh->mesh_options.ortho_Nz});
+  SetGridAttributes(umesh->GetMeshAttributes(),
+                    {umesh->GetMeshOptions().ortho_Nx,
+                     umesh->GetMeshOptions().ortho_Ny,
+                     umesh->GetMeshOptions().ortho_Nz});
 
   //======================================== Concluding messages
   chi::log.LogAllVerbose1()

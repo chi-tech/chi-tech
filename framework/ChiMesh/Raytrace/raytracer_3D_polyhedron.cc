@@ -55,17 +55,17 @@ void chi_mesh::RayTracer::TracePolyhedron(const Cell &cell,
 
         intersection_found = true;
         triangle_intersections.emplace_back(std::move(triangle_oi));
-        if (not perform_concavity_checks) break;
+        if (not perform_concavity_checks_) break;
       }//if intersects
     }//for side
 
-    if (intersection_found and (not perform_concavity_checks)) break;
+    if (intersection_found and (not perform_concavity_checks_)) break;
   }//for faces
 
   //======================================== Determine closest intersection
-  if (not perform_concavity_checks and not triangle_intersections.empty())
+  if (not perform_concavity_checks_ and not triangle_intersections.empty())
     oi = triangle_intersections.back();
-  else if (perform_concavity_checks and not triangle_intersections.empty())
+  else if (perform_concavity_checks_ and not triangle_intersections.empty())
   {
     auto closest_intersection = &triangle_intersections.back();
     for (auto& intersection : triangle_intersections)

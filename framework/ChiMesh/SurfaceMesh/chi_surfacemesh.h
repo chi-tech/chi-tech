@@ -1,5 +1,5 @@
-#ifndef _chi_surfacemesh_h
-#define _chi_surfacemesh_h
+#ifndef CHI_MESH_SURFACEMESH_H
+#define CHI_MESH_SURFACEMESH_H
 
 #include<stdio.h>
 #include <vector>
@@ -12,23 +12,29 @@ This class facilitates many functions within the mesh environment including
 logically determining volumes.*/
 class chi_mesh::SurfaceMesh
 {
-public:
-  std::vector<chi_mesh::Vertex>   vertices;
-  std::vector<chi_mesh::Vertex>   tex_vertices; ///< Texture vertices
-  std::vector<chi_mesh::Normal>   normals;
-  std::vector<chi_mesh::Face>     faces;
-  std::vector<chi_mesh::Edge>     lines;
-  /*
-   * DO NOT PLACE COMMENTS HERE UNLESS REALLY NECESSARY
-   */
-  std::vector<chi_mesh::PolyFace*> poly_faces; ///<Polygonal faces
+protected:
+  std::vector<chi_mesh::Vertex>   vertices_;
+  std::vector<chi_mesh::Vertex>   tex_vertices_; ///< Texture vertices
+  std::vector<chi_mesh::Normal>   normals_;
+  std::vector<chi_mesh::Face>     faces_;
+  std::vector<chi_mesh::Edge>     lines_;
+  std::vector<chi_mesh::PolyFace*> poly_faces_; ///<Polygonal faces
 
-  std::vector<int> physical_region_map;
+  std::vector<int> physical_region_map_;
 
 public:
+  const std::vector<chi_mesh::Vertex>&
+  GetVertices() const {return vertices_;}
+
+  const std::vector<chi_mesh::Face>&
+  GetTriangles() const {return faces_;}
+
+  const std::vector<chi_mesh::PolyFace*>&
+  GetPolygons() const {return poly_faces_;}
+
   //constrdestr.cc
-        SurfaceMesh();
-       ~SurfaceMesh();
+  SurfaceMesh();
+  ~SurfaceMesh();
   friend std::ostream& operator<<(std::ostream& os,  SurfaceMesh& dt);
   //loadexport.cc
   int   ImportFromOBJFile(const std::string& fileName,bool as_poly=false,
@@ -61,4 +67,4 @@ public:
 
 };
 
-#endif
+#endif//CHI_MESH_SURFACEMESH_H

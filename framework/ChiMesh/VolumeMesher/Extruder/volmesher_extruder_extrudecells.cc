@@ -13,7 +13,7 @@ void chi_mesh::VolumeMesherExtruder::
   const chi_mesh::Vector3 khat(0.0,0.0,1.0);
   //================================================== Start extrusion
   size_t num_global_cells = 0;
-  for (size_t iz=0; iz<(vertex_layers.size()-1); iz++)
+  for (size_t iz=0; iz<(vertex_layers_.size() - 1); iz++)
   {
     for (const auto& template_cell : template_grid.local_cells)
     {

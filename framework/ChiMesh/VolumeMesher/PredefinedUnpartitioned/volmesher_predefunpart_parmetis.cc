@@ -19,9 +19,9 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
 
   //================================================== Determine avg num faces
   //                                                   per cell
-  const size_t num_raw_cells = umesh.raw_cells.size();
+  const size_t num_raw_cells = umesh.GetNumberOfCells();
   size_t num_raw_faces = 0;
-  for (auto& cell : umesh.raw_cells)
+  for (auto& cell : umesh.GetRawCells())
     num_raw_faces += cell->faces.size();
   size_t avg_num_face_per_cell =
     std::ceil(static_cast<double>(num_raw_faces)/
@@ -40,7 +40,7 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
       {
         int64_t i=0;
         int64_t icount = 0;
-        for (auto cell : umesh.raw_cells)
+        for (auto cell : umesh.GetRawCells())
         {
           i_indices[i] = icount;
 

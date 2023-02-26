@@ -13,11 +13,11 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
   const chi_mesh::Vector3 khat(0.0,0.0,1.0);
 
   chi::log.Log() << "Computing cell-centroids.";
-  for (auto cell : raw_cells)
+  for (auto cell : raw_cells_)
   {
     cell->centroid = chi_mesh::Vertex(0.0,0.0,0.0);
     for (auto vid : cell->vertex_ids)
-      cell->centroid += vertices[vid];
+      cell->centroid += vertices_[vid];
 
     cell->centroid = cell->centroid/static_cast<double>(cell->vertex_ids.size());
   }
@@ -25,7 +25,7 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
 
   chi::log.Log() << "Checking cell-center-to-face orientations";
   size_t num_negative_volume_elements=0;
-  for (auto cell : raw_cells)
+  for (auto cell : raw_cells_)
   {
     if (cell->type == CellType::POLYGON)
     {
@@ -35,8 +35,8 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
       {
         size_t vp1 = (v<(num_verts-1))? v+1 : 0;
 
-        const auto& v0 = vertices[cell->vertex_ids[v]];
-        const auto& v1 = vertices[cell->vertex_ids[vp1]];
+        const auto& v0 = vertices_[cell->vertex_ids[v]];
+        const auto& v1 = vertices_[cell->vertex_ids[vp1]];
 
         auto E01 = v1 - v0;
         auto n   = E01.Cross(khat).Normalized();
@@ -58,7 +58,7 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
         // Compute centroid
         chi_mesh::Vector3 face_centroid;
         for (uint64_t vid : face.vertex_ids)
-          face_centroid += vertices[vid];
+          face_centroid += vertices_[vid];
         face_centroid /= static_cast<double>(face.vertex_ids.size());
 
         // Form tets for each face edge
@@ -67,8 +67,8 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
         {
           size_t fvp1 = (fv<(num_face_verts-1))? fv+1 : 0;
 
-          const auto& fv1 = vertices[face.vertex_ids[fv]];
-          const auto& fv2 = vertices[face.vertex_ids[fvp1]];
+          const auto& fv1 = vertices_[face.vertex_ids[fv]];
+          const auto& fv2 = vertices_[face.vertex_ids[fvp1]];
 
           auto E0 = fv1-face_centroid;
           auto E1 = fv2-face_centroid;

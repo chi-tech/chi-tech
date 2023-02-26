@@ -30,7 +30,7 @@ void chi_mesh::UnpartitionedMesh::
   file.close();
 
   //======================================== Read the file
-  mesh_options = options;
+  mesh_options_ = options;
   auto reader = vtkSmartPointer<vtkExodusIIReader>::New();
   reader->SetFileName(options.file_name.c_str());
 
@@ -92,7 +92,7 @@ void chi_mesh::UnpartitionedMesh::
     default: break;
   }
 
-  attributes = dimension | UNSTRUCTURED;
+  attributes_ = dimension | UNSTRUCTURED;
 
   ComputeCentroidsAndCheckQuality();
   BuildMeshConnectivity();

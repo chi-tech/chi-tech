@@ -17,12 +17,12 @@ CreatePolygonCells(const chi_mesh::UnpartitionedMesh& umesh,
   //=================================== Copy nodes
   {
     uint64_t id = 0;
-    for (const auto& vertex : umesh.vertices)
+    for (const auto& vertex : umesh.GetVertices())
       grid->vertices.Insert(id++, vertex);
   }
 
   size_t num_cells=0;
-  for (auto& raw_cell : umesh.raw_cells)
+  for (auto& raw_cell : umesh.GetRawCells())
   {
     // Check valid template cell
     if (raw_cell->type != chi_mesh::CellType::POLYGON)

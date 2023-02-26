@@ -17,7 +17,7 @@ void chi_mesh::RayTracer::TracePolygon(const Cell &cell,
 
   const double fabs_mu = std::fabs(omega_i.Dot(cell.faces[0].normal));
 
-  double d_extend = (fabs_mu<1.0e-15)? 1.0e15 : extension_distance/fabs_mu;
+  double d_extend = (fabs_mu<1.0e-15)? 1.0e15 : extension_distance_ / fabs_mu;
 
   chi_mesh::Vector3 pos_f_line = pos_i + omega_i * d_extend;
 
@@ -42,7 +42,7 @@ void chi_mesh::RayTracer::TracePolygon(const Cell &cell,
 
     double D = (ip - pos_i).Norm();
 
-    if ( (D > backward_tolerance) and intersects )
+    if ((D > backward_tolerance_) and intersects )
     {
       face_oi.distance_to_surface = D;
       face_oi.pos_f = ip;
@@ -51,16 +51,16 @@ void chi_mesh::RayTracer::TracePolygon(const Cell &cell,
       face_oi.destination_face_neighbor = cell.faces[f].neighbor_id;
       intersection_found = true;
       face_intersections.emplace_back(std::move(face_oi));
-      if (not perform_concavity_checks) break;
+      if (not perform_concavity_checks_) break;
     }//if intersects
-    if ( (D < backward_tolerance) and intersects )
+    if ((D < backward_tolerance_) and intersects )
       backward_tolerance_hit = true;
   }//for faces
 
   //======================================== Determine closest intersection
-  if (not perform_concavity_checks and not face_intersections.empty())
+  if (not perform_concavity_checks_ and not face_intersections.empty())
     oi = face_intersections.back();
-  else if (perform_concavity_checks and not face_intersections.empty())
+  else if (perform_concavity_checks_ and not face_intersections.empty())
   {
     auto closest_intersection = &face_intersections.back();
     for (auto& intersection : face_intersections)

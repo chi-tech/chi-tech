@@ -1,5 +1,5 @@
-#ifndef _surfmesher_predefined_h
-#define _surfmesher_predefined_h
+#ifndef CHI_MESH_SURFACEMESHER_PREDEFINED_H
+#define CHI_MESH_SURFACEMESHER_PREDEFINED_H
 
 #include "../surfacemesher.h"
 
@@ -16,4 +16,4 @@ public:
   void Execute() override;
 };
 
-#endif
+#endif//CHI_MESH_SURFACEMESHER_PREDEFINED_H
