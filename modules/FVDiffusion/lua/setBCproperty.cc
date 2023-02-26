@@ -111,7 +111,7 @@ int chiFVDiffusionSetBCProperty(lua_State *L)
       fv_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = fv_diffusion::BoundaryType::Reflecting;
 
-      solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
+      solver.boundary_preferences_.insert(std::make_pair(bound_index, bndry_info));
 
       chi::log.Log() << "Boundary " << bound_index << " set as "
                          << "Reflecting.";
@@ -133,7 +133,7 @@ int chiFVDiffusionSetBCProperty(lua_State *L)
       fv_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = fv_diffusion::BoundaryType::Dirichlet;
       bndry_info.second = {boundary_value};
-      solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
+      solver.boundary_preferences_.insert(std::make_pair(bound_index, bndry_info));
 
       chi::log.Log() << "Boundary " << bound_index << " set as "
                          << "Dirichlet with value " << boundary_value;
@@ -155,7 +155,7 @@ int chiFVDiffusionSetBCProperty(lua_State *L)
       fv_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = fv_diffusion::BoundaryType::Robin;
       bndry_info.second = {0.0,1.0,f_value};
-      solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
+      solver.boundary_preferences_.insert(std::make_pair(bound_index, bndry_info));
 
       chi::log.Log() << "Boundary " << bound_index << " set as "
                          << "Neumann with D grad(u) dot n = ("
@@ -176,7 +176,7 @@ int chiFVDiffusionSetBCProperty(lua_State *L)
       fv_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = fv_diffusion::BoundaryType::Robin;
       bndry_info.second = {0.25,0.5,0.0};
-      solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
+      solver.boundary_preferences_.insert(std::make_pair(bound_index, bndry_info));
 
       chi::log.Log() << "Boundary " << bound_index << " set as "
                          << "Vacuum.";
@@ -203,7 +203,7 @@ int chiFVDiffusionSetBCProperty(lua_State *L)
       fv_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = fv_diffusion::BoundaryType::Robin;
       bndry_info.second = {a_value,b_value,f_value};
-      solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
+      solver.boundary_preferences_.insert(std::make_pair(bound_index, bndry_info));
 
       chi::log.Log() << "Boundary " << bound_index << " set as "
                          << "Robin with a,b,f = ("
