@@ -45,9 +45,9 @@ public:
   Mat            A_ = nullptr;            // linear system matrix
 
   typedef std::pair<BoundaryType,std::vector<double>> BoundaryInfo;
-  typedef std::map<uint, BoundaryInfo> BoundaryPreferences;
+  typedef std::map<std::string, BoundaryInfo> BoundaryPreferences;
   BoundaryPreferences     boundary_preferences_;
-  std::vector<Boundary>   boundaries_;
+  std::map<uint64_t, Boundary>   boundaries_;
 
   explicit Solver(const std::string& in_solver_name);
   ~Solver() override;

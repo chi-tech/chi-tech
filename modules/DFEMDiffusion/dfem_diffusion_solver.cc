@@ -32,6 +32,7 @@ dfem_diffusion::Solver::~Solver()
 //============================================= Initialize
 void dfem_diffusion::Solver::Initialize()
 {
+  const std::string fname = "dfem_diffusion::Solver::Initialize";
   chi::log.Log() << "\n"
                  << chi::program_timer.GetTimeString() << " "
                  << TextName() << ": Initializing DFEM Diffusion solver ";
@@ -48,72 +49,76 @@ void dfem_diffusion::Solver::Initialize()
   //============================================= BIDs
   auto globl_unique_bndry_ids = grid.GetDomainUniqueBoundaryIDs();
 
-  uint64_t max_boundary_id = 0;
-  for (const auto& id : globl_unique_bndry_ids)
-    max_boundary_id = std::max(id,max_boundary_id);
-
-  chi::log.Log() << "Max boundary id identified: " << max_boundary_id;
-
-  for (int bndry=0; bndry<(max_boundary_id+1); bndry++)
+  const auto& grid_boundary_id_map = grid_ptr_->GetBoundaryIDMap();
+  for (uint64_t bndry_id : globl_unique_bndry_ids)
   {
-    if (boundary_preferences_.find(bndry) != boundary_preferences_.end())
+    if (grid_boundary_id_map.count(bndry_id) == 0)
+      throw std::logic_error(fname + ": Boundary id " +
+                             std::to_string(bndry_id) + " does not have a name-assignment.");
+
+    const auto& bndry_name = grid_boundary_id_map.at(bndry_id);
+    if (boundary_preferences_.find(bndry_name) != boundary_preferences_.end())
     {
-      BoundaryInfo bndry_info = boundary_preferences_.at(bndry);
+      BoundaryInfo bndry_info = boundary_preferences_.at(bndry_name);
       auto& bndry_vals = bndry_info.second;
       switch (bndry_info.first)
       {
         case BoundaryType::Reflecting:
         {
-          boundaries_.push_back(Boundary{BoundaryType::Reflecting, {0., 0., 0.}});
-          chi::log.Log() << "Boundary " << bndry << " set to reflecting.";
+          boundaries_.insert(std::make_pair(
+            bndry_id,Boundary{BoundaryType::Reflecting, {0., 0., 0.}}));
+          chi::log.Log() << "Boundary " << bndry_name << " set to reflecting.";
           break;
         }
         case BoundaryType::Dirichlet:
         {
           if (bndry_vals.empty()) bndry_vals.resize(1,0.0);
-          boundaries_.push_back(Boundary
-          {BoundaryType::Dirichlet, {bndry_vals[0],0.,0.}});
-          chi::log.Log() << "Boundary " << bndry << " set to dirichlet.";
+          boundaries_.insert(std::make_pair(
+            bndry_id,Boundary{BoundaryType::Dirichlet, {bndry_vals[0], 0., 0.}}));
+          chi::log.Log() << "Boundary " << bndry_name << " set to dirichlet.";
           break;
         }
         case BoundaryType::Robin:
         {
           if (bndry_vals.size()!=3)
             throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
-                           " Robin needs 3 values in bndry vals.");
-          boundaries_.push_back(Boundary
-          {BoundaryType::Robin, {bndry_vals[0],bndry_vals[1],bndry_vals[2]}});
-          chi::log.Log()
-          << "Boundary " << bndry << " set to robin."
-          << bndry_vals[0]<<","<<bndry_vals[1]<<","<<bndry_vals[2];
+                                   " Robin needs 3 values in bndry vals.");
+          boundaries_.insert(std::make_pair(
+            bndry_id,Boundary{BoundaryType::Robin, {bndry_vals[0],
+                                                    bndry_vals[1],
+                                                    bndry_vals[2]}}));
+          chi::log.Log() << "Boundary " << bndry_name
+                         << " set to robin." << bndry_vals[0]<<","
+                         << bndry_vals[1]<<","<<bndry_vals[2];
           break;
         }
         case BoundaryType::Vacuum:
         {
-          boundaries_.push_back(Boundary
-          {BoundaryType::Robin, {0.25,0.5,0.}});
-          chi::log.Log() << "Boundary " << bndry << " set to vacuum.";
+          boundaries_.insert(std::make_pair(
+            bndry_id,Boundary{BoundaryType::Robin, {0.25, 0.5, 0.}}));
+          chi::log.Log() << "Boundary " << bndry_name << " set to vacuum.";
           break;
         }
         case BoundaryType::Neumann:
         {
-          if (bndry_vals.size()!=3) 
+          if (bndry_vals.size()!=3)
             throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
-                           " Neumann needs 3 values in bndry vals.");
-          boundaries_.push_back(Boundary
-          {BoundaryType::Robin, {0.,bndry_vals[0],bndry_vals[1]}});
-          chi::log.Log()
-          << "Boundary " << bndry << " set to neumann." << bndry_vals[0];
+                                   " Neumann needs 3 values in bndry vals.");
+          boundaries_.insert(std::make_pair(
+            bndry_id,Boundary{BoundaryType::Robin, {0., bndry_vals[0],
+                                                    bndry_vals[1]}}));
+          chi::log.Log() << "Boundary " << bndry_name
+                         << " set to neumann." << bndry_vals[0];
           break;
         }
       }//switch boundary type
     }
     else
     {
-      boundaries_.push_back(Boundary
-      {BoundaryType::Dirichlet, {0.,0.,0.}});
+      boundaries_.insert(std::make_pair(
+        bndry_id,Boundary{BoundaryType::Dirichlet, {0., 0., 0.}}));
       chi::log.Log0Verbose1()
-        << "No boundary preference found for boundary index " << bndry
+        << "No boundary preference found for boundary index " << bndry_name
         << "Dirichlet boundary added with zero boundary value.";
     }
   }//for bndry
