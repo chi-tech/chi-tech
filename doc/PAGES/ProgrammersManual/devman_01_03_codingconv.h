@@ -101,8 +101,10 @@ public:
     accessor functions because `cell.vertex_ids_` is faster than
     `cell.GetVertexIDs()`
 - References to `private/protected` members should be obtained with a method
-  starting with `Get`, e.g., `object.member` should be referenced with
-  `object.GetMember()`
+  call. A recommended convention is starting the method call with `Get`, e.g.,
+  `object.member` should be referenced with
+  `object.GetMember()`. This is only guidance. It is perfectly fine to have
+  `object.Member()` or anything that makes sense for the given use case.
 - Use `const` and non-`const` getters judicially. Favor using setters over
   non-const reference if possible, e.g., setting a single value can be done
   with `GetSingleValue`/`SetSingleValue`, however, vector manipulation might
