@@ -44,6 +44,7 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
     auto P0_src = matid_to_src_map_[cell.material_id_];
 
     const auto& S = matid_to_S_transpose_[cell.material_id_];
+    const auto& F = matid_to_F_transpose_[cell.material_id_];
 
     //======================================== Loop over nodes
     const int num_nodes = full_cell_view.NumNodes();
@@ -82,7 +83,7 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
           //==================== Across groupset
           if (fission_avail and apply_ags_fission_src)
           {
-            const auto& prod = xs.production_matrix_[g];
+            const auto& prod = F[g];
             for (size_t gp = first_grp; gp <= last_grp; ++gp)
               if (gp < gs_i or gp > gs_f)
               {
@@ -90,9 +91,9 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
 
                 if (options_.use_precursors)
                   for (const auto& precursor: xs.precursors_)
-                    rhs += precursor.emission_spectrum[g] *
+                    rhs += precursor.emission_spectrum[gp] *
                            precursor.fractional_yield *
-                           xs.nu_delayed_sigma_f_[gp] *
+                           xs.nu_delayed_sigma_f_[g] *
                            phi[uk_map + gp];
               }
           }
@@ -100,16 +101,16 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
           //==================== Within groupset
           if (fission_avail and apply_wgs_fission_src)
           {
-            const auto& prod = xs.production_matrix_[g];
+            const auto& prod = F[g];
             for (size_t gp = gs_i; gp <= gs_f; ++gp)
             {
               rhs += prod[gp] * phi[uk_map + gp];
 
               if (options_.use_precursors)
                 for (const auto& precursor: xs.precursors_)
-                  rhs += precursor.emission_spectrum[g] *
+                  rhs += precursor.emission_spectrum[gp] *
                          precursor.fractional_yield *
-                         xs.nu_delayed_sigma_f_[gp] *
+                         xs.nu_delayed_sigma_f_[g] *
                          phi[uk_map + gp];
             }
           }
