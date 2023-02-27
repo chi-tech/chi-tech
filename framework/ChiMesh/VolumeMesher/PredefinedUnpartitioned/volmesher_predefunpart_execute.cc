@@ -55,6 +55,8 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   std::vector<int64_t> cell_pids;
   auto grid = chi_mesh::MeshContinuum::New();
 
+  grid->GetBoundaryIDMap() = umesh->GetMeshOptions().boundary_id_map;
+
   if (options.partition_type == PartitionType::KBA_STYLE_XYZ)
     cell_pids = KBA(*umesh);
   else

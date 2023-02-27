@@ -81,11 +81,15 @@ protected:
   static LightWeightCell* CreateCellFromVTKVertex(vtkCell* vtk_cell);
 
   typedef vtkSmartPointer<vtkUnstructuredGrid> vtkUGridPtr;
+  typedef std::pair<vtkUGridPtr, std::string> vtkUGridPtrAndName;
   void CopyUGridCellsAndPoints(vtkUnstructuredGrid& ugrid,
                                double scale);
 
   void SetMaterialIDsFromBlocks(const std::vector<uint64_t>& block_mat_ids);
   void SetMaterialIDsFromList(const std::vector<int>& material_ids);
+
+  void SetBoundaryIDsFromBlocks(
+    std::vector<vtkUGridPtrAndName>& bndry_grid_blocks);
 
 
 public:

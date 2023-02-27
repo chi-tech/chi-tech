@@ -42,11 +42,11 @@ private:
 public:
   typedef unsigned int uint;
   typedef std::pair<BoundaryType,std::vector<double>> BoundaryInfo;
-  typedef std::map<uint, BoundaryInfo> BoundaryPreferences;
+  typedef std::map<std::string, BoundaryInfo> BoundaryPreferences;
 
 public:
   BoundaryPreferences                      boundary_preferences_;
-  std::vector<chi_diffusion::Boundary*>    boundaries_;
+  std::map<uint64_t,chi_diffusion::Boundary*> boundaries_;
   chi_mesh::MeshContinuumPtr               grid_ = nullptr;
 
   std::shared_ptr<chi_math::SpatialDiscretization>  discretization_;

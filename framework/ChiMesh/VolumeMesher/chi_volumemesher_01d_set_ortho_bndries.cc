@@ -4,18 +4,13 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_log.h"
-;
 
 #include "ChiTimer/chi_timer.h"
 
-
-
-
 //###################################################################
 /**Sets boundary numbers on boundaries orthogonal to the cardinal directions
- * as xmax=0, xmin=1, ymax=2, ymin=3, zmax=4, zmin=5.*/
-void chi_mesh::VolumeMesher::
-SetupOrthogonalBoundaries()
+ * as "XMAX", "XMIN", "YMAX", "YMIN", "ZMAX", "ZMIN".*/
+void chi_mesh::VolumeMesher::SetupOrthogonalBoundaries()
 {
   chi::log.Log()
     << chi::program_timer.GetTimeString()
@@ -37,15 +32,19 @@ SetupOrthogonalBoundaries()
       {
         chi_mesh::Vector3& n = face.normal_;
 
-        int boundary_id = -1;
-        if      (n.Dot(ihat)>0.999)  boundary_id = 0;
-        else if (n.Dot(ihat)<-0.999) boundary_id = 1;
-        else if (n.Dot(jhat)> 0.999) boundary_id = 2;
-        else if (n.Dot(jhat)<-0.999) boundary_id = 3;
-        else if (n.Dot(khat)> 0.999) boundary_id = 4;
-        else if (n.Dot(khat)<-0.999) boundary_id = 5;
+        std::string boundary_name;
+        if      (n.Dot(ihat)>0.999)  boundary_name = "XMAX";
+        else if (n.Dot(ihat)<-0.999) boundary_name = "XMIN";
+        else if (n.Dot(jhat)> 0.999) boundary_name = "YMAX";
+        else if (n.Dot(jhat)<-0.999) boundary_name = "YMIN";
+        else if (n.Dot(khat)> 0.999) boundary_name = "ZMAX";
+        else if (n.Dot(khat)<-0.999) boundary_name = "ZMIN";
 
-        if (boundary_id >= 0) face.neighbor_id_ = boundary_id;
+        uint64_t bndry_id = vol_cont->MakeBoundaryID(boundary_name);
+
+        face.neighbor_id_ = bndry_id;
+
+        vol_cont->GetBoundaryIDMap()[bndry_id] = boundary_name;
       }//if bndry
 
   MPI_Barrier(MPI_COMM_WORLD);

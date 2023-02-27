@@ -28,13 +28,15 @@ namespace chi_mesh
   //01 Utils for Reading
   typedef vtkSmartPointer<vtkUnstructuredGrid> vtkUGridPtr;
   typedef std::pair<vtkUGridPtr, std::string> vtkUGridPtrAndName;
+
   int FindHighestDimension(std::vector<vtkUGridPtrAndName>& ugrid_blocks);
+
   vtkUGridPtr
-  ConsolidateAndCleanBlocks(std::vector<vtkUGridPtrAndName>& ugrid_blocks,
-                            int desired_dimension);
-  std::map<std::string, vtkUGridPtr>
-    SeparateBlocks(std::vector<vtkUGridPtrAndName>& ugrid_blocks,
-                   int desired_dimension);
+  ConsolidateAndCleanBlocks(std::vector<vtkUGridPtrAndName>& ugrid_blocks);
+
+  std::vector<vtkUGridPtrAndName>
+    GetBlocksOfDesiredDimension(std::vector<vtkUGridPtrAndName>& ugrid_blocks,
+                                int desired_dimension);
 
   std::vector<uint64_t>
   BuildBlockCellExtents(std::vector<vtkUGridPtrAndName>& ugrid_blocks,

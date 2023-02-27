@@ -89,7 +89,8 @@ public:
                                           bool sense, int mat_id);
   static
   void                SetBndryIDFromLogical(const chi_mesh::LogicalVolume& log_vol,
-                                          bool sense, int bndry_id);
+                                          bool sense,
+                                          const std::string& bndry_name);
   static
   void                SetMatIDToAll(int mat_id);
 

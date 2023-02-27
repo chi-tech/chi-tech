@@ -452,3 +452,25 @@ std::vector<chi_mesh::Vector3> chi_mesh::MeshContinuum::
 
   return cell_ortho_sizes;
 }
+
+
+//###################################################################
+/**Makes a bndry id given a name. If the bndry name already exists,
+ * the associated bndry id will be returned. Other the id will be set
+ * to one more than the maximum boundary id.*/
+uint64_t chi_mesh::MeshContinuum::
+  MakeBoundaryID(const std::string &boundary_name) const
+{
+  if (boundary_id_map_.empty())
+    return 0;
+
+  for (const auto& [id, name] : boundary_id_map_)
+    if (boundary_name == name)
+      return id;
+
+  uint64_t max_id = 0;
+  for (const auto& [id, name] : boundary_id_map_)
+    max_id = std::max(id, max_id);
+
+  return max_id + 1;
+}

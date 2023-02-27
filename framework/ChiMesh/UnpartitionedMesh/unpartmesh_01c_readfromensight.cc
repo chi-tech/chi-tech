@@ -2,6 +2,8 @@
 
 #include "ChiMesh/MeshContinuum/chi_grid_vtk_utils.h"
 
+#include "ChiMiscUtils/chi_misc_utils.h"
+
 #include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkEnSightGoldBinaryReader.h>
@@ -39,7 +41,7 @@ void chi_mesh::UnpartitionedMesh::
   reader->UpdateInformation();
   reader->Update();
 
-  //======================================== Separate the blocks
+  //======================================== Get all the grid blocks
   auto multiblock = reader->GetOutput();
 
   std::vector<vtkUGridPtrAndName> grid_blocks;
@@ -52,14 +54,21 @@ void chi_mesh::UnpartitionedMesh::
     if (block_a->GetDataObjectType() == VTK_UNSTRUCTURED_GRID)
       grid_blocks.emplace_back(
         vtkUnstructuredGrid::SafeDownCast(block_a),
-        iter_a->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME()));
+        chi_misc_utils::trim(
+        iter_a->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME())));
 
     iter_a->GoToNextItem();
   }
 
-  //======================================== Process blocks
+  //======================================== Get the main + bndry blocks
   const int max_dimension = chi_mesh::FindHighestDimension(grid_blocks);
-  auto ugrid = chi_mesh::ConsolidateAndCleanBlocks(grid_blocks, max_dimension);
+  std::vector<vtkUGridPtrAndName> domain_grid_blocks =
+    chi_mesh::GetBlocksOfDesiredDimension(grid_blocks, max_dimension);
+  std::vector<vtkUGridPtrAndName> bndry_grid_blocks =
+    chi_mesh::GetBlocksOfDesiredDimension(grid_blocks, max_dimension-1);
+
+  //======================================== Process blocks
+  auto ugrid = chi_mesh::ConsolidateAndCleanBlocks(domain_grid_blocks);
 
   //======================================== Copy Data
   CopyUGridCellsAndPoints(*ugrid, options.scale);
@@ -83,6 +92,9 @@ void chi_mesh::UnpartitionedMesh::
 
   ComputeCentroidsAndCheckQuality();
   BuildMeshConnectivity();
+
+  //======================================== Set boundary ids
+  SetBoundaryIDsFromBlocks(bndry_grid_blocks);
 
   chi::log.Log() << "Done reading Ensight-Gold file: "
                  << options.file_name << ".";

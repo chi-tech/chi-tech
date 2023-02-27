@@ -49,7 +49,7 @@
                      Sense:[bool](Optional, default:true)</B> Sets the material
                      id of cells that meet the sense requirement for the given
                      logical volume.\n
- BNDRYID_FROMLOGICAL = <B>LogicalVolumeHandle:[int],Bndry_id:[int],
+ BNDRYID_FROMLOGICAL = <B>LogicalVolumeHandle:[int],Bndry_name:[string],
                      Sense:[bool](Optional, default:true)</B> Sets the cell
                      boundary id to the specified value for cells
                      that meet the sense requirement for the given
@@ -223,15 +223,21 @@ int chiVolumeMesherSetProperty(lua_State *L)
                                  "BNDRYID_FROMLOGICAL...";
      chi::Exit(EXIT_FAILURE);
     }
+    LuaCheckNilValue(fname, L, 2);
+    LuaCheckStringValue(fname, L, 3);
     int volume_hndl = lua_tonumber(L,2);
-    int bndry_id = lua_tonumber(L,3);
+    std::string bndry_name = lua_tostring(L,3);
     int sense = true;
     if (num_args==4) sense = lua_toboolean(L,4);
+
+    if (bndry_name.empty())
+      throw std::invalid_argument(fname + ": argument 3 must not be"
+                                          "an empty string.");
 
     const auto& log_vol = chi::GetStackItem<chi_mesh::LogicalVolume>(
       chi::logicvolume_stack, volume_hndl, fname);
 
-    chi_mesh::VolumeMesher::SetBndryIDFromLogical(log_vol,sense,bndry_id);
+    chi_mesh::VolumeMesher::SetBndryIDFromLogical(log_vol,sense,bndry_name);
   }
   else if (property_index == VMP::MATID_FROM_LUA_FUNCTION)
   {

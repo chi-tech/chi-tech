@@ -57,6 +57,8 @@ private:
     size_t Nz = 0;
   }ortho_attributes;
 
+  std::map<uint64_t, std::string> boundary_id_map_;
+
 public:
   MeshContinuum() :
     local_cells(local_cells_),
@@ -69,6 +71,14 @@ public:
 
   void SetGlobalVertexCount(const uint64_t count) { global_vertex_count_ = count;}
   uint64_t GetGlobalVertexCount() const {return global_vertex_count_;}
+
+  std::map<uint64_t, std::string>&
+  GetBoundaryIDMap() {return boundary_id_map_;}
+
+  const std::map<uint64_t, std::string>&
+  GetBoundaryIDMap() const {return boundary_id_map_;}
+
+  uint64_t MakeBoundaryID(const std::string& boundary_name) const;
 
   static
   std::shared_ptr<MeshContinuum> New()

@@ -60,27 +60,29 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
   {
     if (not cell.faces_[f].has_neighbor_)
     {
-      int ir_boundary_index = cell.faces_[f].neighbor_id_;
-      auto ir_boundary_type  = boundaries_[ir_boundary_index]->type_;
+      uint64_t ir_boundary_index = cell.faces_[f].neighbor_id_;
+      auto ir_boundary_type  = boundaries_.at(ir_boundary_index)->type_;
 
       if (ir_boundary_type == BoundaryType::Dirichlet)
       {
-        auto dirichlet_bndry =
-          (chi_diffusion::BoundaryDirichlet*)boundaries_[ir_boundary_index];
+        auto& dirichlet_bndry =
+          (chi_diffusion::BoundaryDirichlet&)*boundaries_.at(ir_boundary_index);
 
         int num_face_dofs = cell.faces_[f].vertex_ids_.size();
         for (int fi=0; fi<num_face_dofs; fi++)
         {
           int i  = fe_intgrl_values.FaceDofMapping(f,fi);
           dirichlet_count[i] += 1;
-          dirichlet_value[i] += dirichlet_bndry->boundary_value;
+          dirichlet_value[i] += dirichlet_bndry.boundary_value;
         }
       }
 
       if (ir_boundary_type == BoundaryType::Robin)
       {
-        auto robin_bndry =
-          (chi_diffusion::BoundaryRobin*)boundaries_[ir_boundary_index];
+        auto& robin_bndry =
+          (chi_diffusion::BoundaryRobin&)*boundaries_.at(ir_boundary_index);
+
+        std::cout << robin_bndry.a << " " << robin_bndry.b << " " << robin_bndry.f << std::endl;
 
         int num_face_dofs = cell.faces_[f].vertex_ids_.size();
         for (int fi=0; fi<num_face_dofs; fi++)
@@ -91,14 +93,14 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
           {
             int j  = fe_intgrl_values.FaceDofMapping(f,fj);
 
-            double aij = robin_bndry->a* fe_intgrl_values.IntS_shapeI_shapeJ(f, i, j);
-            aij /= robin_bndry->b;
+            double aij = robin_bndry.a* fe_intgrl_values.IntS_shapeI_shapeJ(f, i, j);
+            aij /= robin_bndry.b;
 
             cell_matrix[i][j] += aij;
           }//for fj
 
-          double aii = robin_bndry->f* fe_intgrl_values.IntS_shapeI(f, i);
-          aii /= robin_bndry->b;
+          double aii = robin_bndry.f* fe_intgrl_values.IntS_shapeI(f, i);
+          aii /= robin_bndry.b;
 
           cell_matrix[i][i] += aii;
         }//for fi

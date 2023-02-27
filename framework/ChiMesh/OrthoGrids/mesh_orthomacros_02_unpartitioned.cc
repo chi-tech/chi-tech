@@ -35,6 +35,8 @@ size_t chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
   umesh->GetMeshOptions().ortho_Nx = 1;
   umesh->GetMeshOptions().ortho_Ny = 1;
   umesh->GetMeshOptions().ortho_Nz = Nz-1;
+  umesh->GetMeshOptions().boundary_id_map[4] = "ZMAX";
+  umesh->GetMeshOptions().boundary_id_map[5] = "ZMIN";
 
   umesh->GetVertices().reserve(Nz);
   for (auto& vertex : zverts)
@@ -53,6 +55,9 @@ size_t chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
 
     left_face.vertex_ids = {c};
     rite_face.vertex_ids = {c+1};
+
+    if (c == 0)                 left_face.neighbor = 5/*ZMIN*/;
+    if (c == (zverts.size()-2)) rite_face.neighbor = 4/*ZMAX*/;
 
     cell->faces.push_back(left_face);
     cell->faces.push_back(rite_face);
@@ -110,6 +115,10 @@ size_t chi_mesh::CreateUnpartitioned2DOrthoMesh(
   umesh->GetMeshOptions().ortho_Nx = Nx-1;
   umesh->GetMeshOptions().ortho_Ny = Ny-1;
   umesh->GetMeshOptions().ortho_Nz = 1;
+  umesh->GetMeshOptions().boundary_id_map[0] = "XMAX";
+  umesh->GetMeshOptions().boundary_id_map[1] = "XMIN";
+  umesh->GetMeshOptions().boundary_id_map[2] = "YMAX";
+  umesh->GetMeshOptions().boundary_id_map[3] = "YMIN";
 
   typedef std::vector<uint64_t> VecIDs;
   std::vector<VecIDs> vertex_ij_to_i_map(Ny,VecIDs(Nx));
@@ -136,6 +145,13 @@ size_t chi_mesh::CreateUnpartitioned2DOrthoMesh(
         new UnpartitionedMesh::LightWeightCell(CellType::POLYGON,
                                                CellType::QUADRILATERAL);
 
+      // vertex ids:   face ids:
+      //                 2
+      //    3---2      x---x
+      //    |   |     3|   |1
+      //    0---1      x---x
+      //                 0
+
       cell->vertex_ids = {vmap[i][j],vmap[i][j+1],vmap[i+1][j+1],vmap[i+1][j]};
 
       for (int v=0; v<4; ++v)
@@ -148,6 +164,12 @@ size_t chi_mesh::CreateUnpartitioned2DOrthoMesh(
         else
           face.vertex_ids = std::vector<uint64_t>{cell->vertex_ids[v],
                                                   cell->vertex_ids[0]};
+
+        //boundary logic
+        if (j == (Nx-2) and v == 1) face.neighbor = 0/*XMAX*/;
+        if (j == 0 and v == 3)      face.neighbor = 1/*XMIN*/;
+        if (i == (Ny-2) and v == 2) face.neighbor = 2/*YMAX*/;
+        if (i == 0 and v == 0)      face.neighbor = 3/*YMIN*/;
 
         cell->faces.push_back(face);
       }
@@ -210,6 +232,12 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
   umesh->GetMeshOptions().ortho_Nx = Nx-1;
   umesh->GetMeshOptions().ortho_Ny = Ny-1;
   umesh->GetMeshOptions().ortho_Nz = Nz-1;
+  umesh->GetMeshOptions().boundary_id_map[0] = "XMAX";
+  umesh->GetMeshOptions().boundary_id_map[1] = "XMIN";
+  umesh->GetMeshOptions().boundary_id_map[2] = "YMAX";
+  umesh->GetMeshOptions().boundary_id_map[3] = "YMIN";
+  umesh->GetMeshOptions().boundary_id_map[4] = "ZMAX";
+  umesh->GetMeshOptions().boundary_id_map[5] = "ZMIN";
 
   // i is j, and j is i, MADNESS explanation:
   // In math convention the i-index refers to the ith row
@@ -270,6 +298,7 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
                              vmap[i+1][j+1][k],
                              vmap[i+1][j+1][k+1],
                              vmap[i  ][j+1][k+1]};
+          face.neighbor = 0/*XMAX*/;
           cell->faces.push_back(face);
         }
         //West face
@@ -281,6 +310,7 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
                              vmap[i  ][j  ][k+1],
                              vmap[i+1][j  ][k+1],
                              vmap[i+1][j  ][k]};
+          face.neighbor = 1/*XMIN*/;
           cell->faces.push_back(face);
         }
         //North face
@@ -292,6 +322,7 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
                              vmap[i+1][j  ][k+1],
                              vmap[i+1][j+1][k+1],
                              vmap[i+1][j+1][k]};
+          face.neighbor = 2/*YMAX*/;
           cell->faces.push_back(face);
         }
         //South face
@@ -303,6 +334,7 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
                              vmap[i  ][j+1][k],
                              vmap[i  ][j+1][k+1],
                              vmap[i  ][j  ][k+1]};
+          face.neighbor = 3/*YMIN*/;
           cell->faces.push_back(face);
         }
         //Top face
@@ -314,6 +346,7 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
                              vmap[i  ][j+1][k+1],
                              vmap[i+1][j+1][k+1],
                              vmap[i+1][j  ][k+1]};
+          face.neighbor = 4/*ZMAX*/;
           cell->faces.push_back(face);
         }
         //Bottom face
@@ -325,6 +358,7 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
                              vmap[i+1][j  ][k],
                              vmap[i+1][j+1][k],
                              vmap[i  ][j+1][k]};
+          face.neighbor = 5/*ZMIN*/;
           cell->faces.push_back(face);
         }
 

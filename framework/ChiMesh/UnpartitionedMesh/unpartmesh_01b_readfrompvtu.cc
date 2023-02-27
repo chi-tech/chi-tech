@@ -41,15 +41,21 @@ void chi_mesh::UnpartitionedMesh::
   reader->UpdateInformation();
   reader->Update();
 
-  //======================================== Separate the blocks
+  //======================================== Get all the grid blocks
   // For vtu files this is very simple. The
   // output of the reader is an UnstructuredGrid.
   auto ugrid_main = vtkUGridPtr(reader->GetOutput());
   std::vector<vtkUGridPtrAndName> grid_blocks = {{ugrid_main,""}};
 
-  //======================================== Process blocks
+  //======================================== Get the main + bndry blocks
   const int max_dimension = chi_mesh::FindHighestDimension(grid_blocks);
-  auto ugrid = chi_mesh::ConsolidateAndCleanBlocks(grid_blocks, max_dimension);
+  std::vector<vtkUGridPtrAndName> domain_grid_blocks =
+    chi_mesh::GetBlocksOfDesiredDimension(grid_blocks, max_dimension);
+  std::vector<vtkUGridPtrAndName> bndry_grid_blocks =
+    chi_mesh::GetBlocksOfDesiredDimension(grid_blocks, max_dimension-1);
+
+  //======================================== Process blocks
+  auto ugrid = chi_mesh::ConsolidateAndCleanBlocks(domain_grid_blocks);
 
   //======================================== Copy Data
   CopyUGridCellsAndPoints(*ugrid, options.scale);

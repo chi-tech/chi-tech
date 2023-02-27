@@ -31,6 +31,9 @@ private:
   std::vector<double> vertex_layers_;
   size_t node_z_index_incr_=0;
 
+  uint64_t zmax_bndry_id = 4;
+  uint64_t zmin_bndry_id = 5;
+
 public:
   explicit
   VolumeMesherExtruder(std::shared_ptr<const chi_mesh::UnpartitionedMesh> in_unpartitioned_mesh) :

@@ -259,7 +259,7 @@ std::unique_ptr<chi_mesh::Cell> chi_mesh::VolumeMesherExtruder::
     //Set neighbor
     if (z_level==0)
     {
-      newFace.neighbor_id_ = 0;
+      newFace.neighbor_id_ = zmin_bndry_id;
       newFace.has_neighbor_ = false;
     }
     else
@@ -299,7 +299,7 @@ std::unique_ptr<chi_mesh::Cell> chi_mesh::VolumeMesherExtruder::
     //Set neighbor
     if (z_level==(vertex_layers_.size() - 2))
     {
-      newFace.neighbor_id_ = 0;
+      newFace.neighbor_id_ = zmax_bndry_id;
       newFace.has_neighbor_ = false;
     }
     else

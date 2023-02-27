@@ -185,13 +185,13 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
     }//if not bndry
     else
     {
-      int ir_boundary_index = face.neighbor_id_;
-      auto ir_boundary_type  = boundaries_[ir_boundary_index]->type_;
+      uint64_t ir_boundary_index = face.neighbor_id_;
+      auto ir_boundary_type  = boundaries_.at(ir_boundary_index)->type_;
 
       if (ir_boundary_type == BoundaryType::Dirichlet)
       {
         auto dc_boundary =
-          (chi_diffusion::BoundaryDirichlet*)boundaries_[ir_boundary_index];
+          (chi_diffusion::BoundaryDirichlet&)*boundaries_.at(ir_boundary_index);
 
         //========================= Compute penalty coefficient
         double hm = HPerpendicular(cell, fe_intgrl_values, f);
@@ -229,7 +229,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
             double aij = kappa* fe_intgrl_values.IntS_shapeI_shapeJ(f, i, j);
 
             MatSetValue(A_, ir    , jr, aij, ADD_VALUES);
-            VecSetValue(b_, ir, aij * dc_boundary->boundary_value, ADD_VALUES);
+            VecSetValue(b_, ir, aij * dc_boundary.boundary_value, ADD_VALUES);
           }//for fj
         }//for fi
 
@@ -249,14 +249,14 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
             double aij = -0.5*D_avg*gij;
 
             MatSetValue(A_, ir, jr, aij, ADD_VALUES);
-            VecSetValue(b_, ir, aij * dc_boundary->boundary_value, ADD_VALUES);
+            VecSetValue(b_, ir, aij * dc_boundary.boundary_value, ADD_VALUES);
           }//for j
         }//for i
       }//Dirichlet
       else if (ir_boundary_type == BoundaryType::Robin)
       {
         auto robin_bndry =
-          (chi_diffusion::BoundaryRobin*)boundaries_[ir_boundary_index];
+          (chi_diffusion::BoundaryRobin&)*boundaries_.at(ir_boundary_index);
 
         for (int fi=0; fi<num_face_dofs; fi++)
         {
@@ -268,14 +268,14 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
             int j  = fe_intgrl_values.FaceDofMapping(f,fj);
             int jr = pwl_sdm->MapDOF(cell, j, unknown_manager_, 0, component);
 
-            double aij = robin_bndry->a* fe_intgrl_values.IntS_shapeI_shapeJ(f, i, j);
-            aij /= robin_bndry->b;
+            double aij = robin_bndry.a* fe_intgrl_values.IntS_shapeI_shapeJ(f, i, j);
+            aij /= robin_bndry.b;
 
             MatSetValue(A_, ir , jr, aij, ADD_VALUES);
           }//for fj
 
-          double bi = robin_bndry->f* fe_intgrl_values.IntS_shapeI(f, i);
-          bi /= robin_bndry->b;
+          double bi = robin_bndry.f* fe_intgrl_values.IntS_shapeI(f, i);
+          bi /= robin_bndry.b;
 
           VecSetValue(b_, ir, bi, ADD_VALUES);
         }//for fi

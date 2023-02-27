@@ -29,19 +29,13 @@ int chi_mesh::FindHighestDimension(std::vector<vtkUGridPtrAndName> &ugrid_blocks
 /**Consolidates all blocks containing cells with the desired dimension.
  * Thereafter it removes duplicate vertices.*/
 chi_mesh::vtkUGridPtr chi_mesh::
-  ConsolidateAndCleanBlocks(std::vector<vtkUGridPtrAndName> &ugrid_blocks,
-                            const int desired_dimension)
+  ConsolidateAndCleanBlocks(std::vector<vtkUGridPtrAndName> &ugrid_blocks)
 {
   auto append = vtkSmartPointer<vtkAppendFilter>::New();
   for (auto& ugrid : ugrid_blocks)
   {
-    if (ugrid.first->GetNumberOfCells() == 0) continue;
-
-    if (ugrid.first->GetCell(0)->GetCellDimension() == desired_dimension)
-    {
-      append->AddInputData(ugrid.first);
-      append->Update();
-    }
+    append->AddInputData(ugrid.first);
+    append->Update();
   }
   chi::log.Log0Verbose1() << "Updating appended filter.";
 
@@ -67,21 +61,20 @@ chi_mesh::vtkUGridPtr chi_mesh::
 //###################################################################
 /**Provides a map of the different grids that have the
  * requested dimension.*/
-std::map<std::string, chi_mesh::vtkUGridPtr> chi_mesh::
-  SeparateBlocks(std::vector<vtkUGridPtrAndName> &ugrid_blocks,
-                 int desired_dimension)
+std::vector<chi_mesh::vtkUGridPtrAndName> chi_mesh::
+  GetBlocksOfDesiredDimension(std::vector<vtkUGridPtrAndName> &ugrid_blocks,
+                              int desired_dimension)
 {
+  std::vector<chi_mesh::vtkUGridPtrAndName> desired_blocks;
   for (auto& ugrid : ugrid_blocks)
   {
     if (ugrid.first->GetNumberOfCells() == 0) continue;
 
     if (ugrid.first->GetCell(0)->GetCellDimension() == desired_dimension)
-    {
-//      auto grid_name = ugrid->
-    }
+      desired_blocks.push_back(ugrid);
   }
 
-  return {};
+  return desired_blocks;
 }
 
 

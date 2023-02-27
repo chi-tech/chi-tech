@@ -44,18 +44,25 @@ void chi_mesh::VolumeMesher::
       cell.material_id_ = mat_id;
   }
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  int global_num_cells_modified;
+  MPI_Allreduce(&num_cells_modified,        //sendbuf
+                &global_num_cells_modified, //recvbuf
+                1, MPI_INT,                 //count + datatype
+                MPI_SUM,                    //operation
+                MPI_COMM_WORLD);            //comm
+
   chi::log.Log0Verbose1()
     << chi::program_timer.GetTimeString()
     << " Done setting material id from logical volume. "
-    << "Number of cells modified = " << num_cells_modified << ".";
+    << "Number of cells modified = " << global_num_cells_modified << ".";
 }
 
 //###################################################################
 /**Sets material id's using a logical volume.*/
 void chi_mesh::VolumeMesher::
   SetBndryIDFromLogical(const chi_mesh::LogicalVolume& log_vol,
-                        bool sense, int bndry_id)
+                        bool sense,
+                        const std::string& bndry_name)
 {
   chi::log.Log()
     << chi::program_timer.GetTimeString()
@@ -66,6 +73,11 @@ void chi_mesh::VolumeMesher::
   //============================================= Get back mesh
   chi_mesh::MeshContinuumPtr vol_cont = handler.GetGrid();
 
+  //============================================= Check if name already has id
+  auto& grid_bndry_id_map = vol_cont->GetBoundaryIDMap();
+  uint64_t bndry_id = vol_cont->MakeBoundaryID(bndry_name);
+
+  //============================================= Loop over cells
   int num_faces_modified = 0;
   for (auto& cell : vol_cont->local_cells)
   {
@@ -73,16 +85,28 @@ void chi_mesh::VolumeMesher::
     {
       if (face.has_neighbor_) continue;
       if (log_vol.Inside(face.centroid_) && sense){
-        face.neighbor_id_ = abs(bndry_id);
+        face.neighbor_id_ = bndry_id;
         ++num_faces_modified;
       }
     }
   }
 
+  int global_num_faces_modified;
+  MPI_Allreduce(&num_faces_modified,        //sendbuf
+                &global_num_faces_modified, //recvbuf
+                1, MPI_INT,                 //count + datatype
+                MPI_SUM,                    //operation
+                MPI_COMM_WORLD);            //comm
+
+
+  if (global_num_faces_modified > 0 and
+      grid_bndry_id_map.count(bndry_id) == 0)
+      grid_bndry_id_map[bndry_id] = bndry_name;
+
   chi::log.Log()
     << chi::program_timer.GetTimeString()
     << " Done setting boundary id from logical volume. "
-    << "Number of faces modified = " << num_faces_modified << ".";
+    << "Number of faces modified = " << global_num_faces_modified << ".";
 }
 
 //###################################################################
@@ -220,7 +244,8 @@ void chi_mesh::VolumeMesher::
 //###################################################################
 /**Sets boundary id's using a lua function. The lua function is called
 for each boundary face with 7 arguments, the face's centroid x,y,z values,
-the face's normal x,y,z values and the face's current boundary id.
+the face's normal x,y,z values and the face's current boundary id. The function
+must return a new_bndry_name (string).
 
 The lua function's prototype should be:
 \code
@@ -233,6 +258,9 @@ void chi_mesh::VolumeMesher::
   SetBndryIDFromLuaFunction(const std::string& lua_fname)
 {
   const std::string fname = "chi_mesh::VolumeMesher::SetBndryIDFromLuaFunction";
+
+  if (chi::mpi.process_count != 1)
+    throw std::logic_error(fname + ": Can for now only be used in serial.");
 
   chi::log.Log0Verbose1()
     << chi::program_timer.GetTimeString()
@@ -265,20 +293,21 @@ void chi_mesh::VolumeMesher::
     lua_pushinteger(L, static_cast<lua_Integer>(face.neighbor_id_));
 
     //============= Call lua function
-    //7 arguments, 1 result (double), 0=original error object
-    int lua_return;
+    //7 arguments, 1 result (string), 0=original error object
+    std::string lua_return_bname;
     if (lua_pcall(L,7,1,0) == 0)
     {
       LuaCheckNumberValue(fname, L, -1);
-      lua_return = lua_tointeger(L,-1);
+      LuaCheckStringValue(fname, L, -2);
+      lua_return_bname = lua_tostring(L,-1);
     }
     else
       throw std::logic_error(fname + " attempted to call lua-function, " +
                              lua_fname + ", but the call failed.");
 
-    lua_pop(L,1); //pop the int, or error code
+    lua_pop(L,1); //pop the string, or error code
 
-    return lua_return;
+    return lua_return_bname;
   };
 
   //============================================= Get current mesh handler
@@ -287,17 +316,24 @@ void chi_mesh::VolumeMesher::
   //============================================= Get back mesh
   chi_mesh::MeshContinuum& grid = *handler.GetGrid();
 
+  //============================================= Check if name already has id
+  auto& grid_bndry_id_map = grid.GetBoundaryIDMap();
+
   int local_num_faces_modified = 0;
   for (auto& cell : grid.local_cells)
     for (auto& face : cell.faces_)
       if (not face.has_neighbor_)
       {
-        int new_bndryid = CallLuaXYZFunction(face);
+        const std::string bndry_name = CallLuaXYZFunction(face);
+        const uint64_t bndry_id = grid.MakeBoundaryID(bndry_name);
 
-        if (face.neighbor_id_ != new_bndryid)
+        if (face.neighbor_id_ != bndry_id)
         {
-          face.neighbor_id_ = new_bndryid;
+          face.neighbor_id_ = bndry_id;
           ++local_num_faces_modified;
+
+          if (grid_bndry_id_map.count(bndry_id) == 0)
+            grid_bndry_id_map[bndry_id] = bndry_name;
         }
       }//for bndry face
 
@@ -308,12 +344,16 @@ void chi_mesh::VolumeMesher::
     for (auto& face : cell.faces_)
       if (not face.has_neighbor_)
       {
-        int new_bndryid = CallLuaXYZFunction(face);
+        const std::string bndry_name = CallLuaXYZFunction(face);
+        const uint64_t bndry_id = grid.MakeBoundaryID(bndry_name);
 
-        if (face.neighbor_id_ != new_bndryid)
+        if (face.neighbor_id_ != bndry_id)
         {
-          face.neighbor_id_ = new_bndryid;
+          face.neighbor_id_ = bndry_id;
           ++local_num_faces_modified;
+
+          if (grid_bndry_id_map.count(bndry_id) == 0)
+            grid_bndry_id_map[bndry_id] = bndry_name;
         }
       }//for bndry face
   }//for ghost cell id

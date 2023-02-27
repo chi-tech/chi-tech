@@ -59,6 +59,11 @@ void chi_mesh::VolumeMesherExtruder::Execute()
     chi::log.Log0Verbose1()
       << "VolumeMesherExtruder: Creating template cells" << std::endl;
     CreatePolygonCells(*template_unpartitioned_mesh_, temp_grid);
+
+    grid->GetBoundaryIDMap() =
+      template_unpartitioned_mesh_->GetMeshOptions().boundary_id_map;
+    temp_grid->GetBoundaryIDMap() =
+      template_unpartitioned_mesh_->GetMeshOptions().boundary_id_map;
   }
 
   chi::log.Log0Verbose1()
@@ -67,6 +72,15 @@ void chi_mesh::VolumeMesherExtruder::Execute()
 
   chi::log.Log0Verbose1()
     << "VolumeMesherExtruder: Done creating local nodes" << std::endl;
+
+  //================================== Insert top and bottom boundary
+  //                                   id map
+  auto& grid_bndry_id_map = grid->GetBoundaryIDMap();
+  zmax_bndry_id = grid->MakeBoundaryID("ZMAX");
+  grid_bndry_id_map[zmax_bndry_id] = "ZMAX";
+  zmin_bndry_id = grid->MakeBoundaryID("ZMIN");
+  grid_bndry_id_map[zmin_bndry_id] = "ZMIN";
+
 
   //================================== Create extruded item_id
   chi::log.Log()
