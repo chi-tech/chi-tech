@@ -52,8 +52,8 @@ chiSolverSetBasicOption(phys1,"discretization_method","PWLD_MIP")
 chiSolverSetBasicOption(phys1,"residual_tolerance",1.0e-6)
 
 --############################################### Set boundary conditions
-chiDiffusionSetProperty(phys1,"boundary_type",OrthoBoundaryID.ZMIN,"reflecting")
-chiDiffusionSetProperty(phys1,"boundary_type",OrthoBoundaryID.ZMAX,"reflecting")
+chiDiffusionSetProperty(phys1,"boundary_type","ZMIN","reflecting")
+chiDiffusionSetProperty(phys1,"boundary_type","ZMAX","reflecting")
 
 --############################################### Initialize and Execute Solver
 chiDiffusionInitialize(phys1)

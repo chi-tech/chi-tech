@@ -48,9 +48,9 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
       return locI;
     }
 
-  } dof_handler(sc_int64(local_block_address),
-                sc_int64(local_block_address + local_base_block_size),
-                locJ_block_address);
+  } dof_handler(sc_int64(local_block_address_),
+                sc_int64(local_block_address_ + local_base_block_size_),
+                locJ_block_address_);
 
   // Writes a message on ir error
   auto IR_MAP_ERROR = [] ()
@@ -83,15 +83,15 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
 
   //======================================== Build local sparsity pattern
   chi::log.Log0Verbose1() << "Building local sparsity pattern.";
-  std::vector<std::vector<int64_t>> nodal_connections(local_base_block_size);
+  std::vector<std::vector<int64_t>> nodal_connections(local_base_block_size_);
 
   nodal_nnz_in_diag.clear();
   nodal_nnz_off_diag.clear();
 
-  nodal_nnz_in_diag .resize(local_base_block_size, 0);
-  nodal_nnz_off_diag.resize(local_base_block_size, 0);
+  nodal_nnz_in_diag .resize(local_base_block_size_, 0);
+  nodal_nnz_off_diag.resize(local_base_block_size_, 0);
 
-  for (auto& cell : ref_grid->local_cells)
+  for (auto& cell : ref_grid_->local_cells)
   {
     const auto& cell_mapping = GetCellMapping(cell);
     for (unsigned int i=0; i<cell_mapping.NumNodes(); ++i)
@@ -129,7 +129,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   typedef std::pair<int64_t,std::vector<int64_t>> ROWJLINKS;
   std::vector<ROWJLINKS> ir_links;
 
-  for (auto& cell : ref_grid->local_cells)
+  for (auto& cell : ref_grid_->local_cells)
   {
     const auto& cell_mapping = GetCellMapping(cell);
 
@@ -314,13 +314,13 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   nodal_nnz_in_diag.clear();
   nodal_nnz_off_diag.clear();
 
-  nodal_nnz_in_diag.resize(local_base_block_size*N,0);
-  nodal_nnz_off_diag.resize(local_base_block_size*N,0);
+  nodal_nnz_in_diag.resize(local_base_block_size_ * N, 0);
+  nodal_nnz_off_diag.resize(local_base_block_size_ * N, 0);
 
-  if (unknown_manager.dof_storage_type == chi_math::UnknownStorageType::NODAL)
+  if (unknown_manager.dof_storage_type_ == chi_math::UnknownStorageType::NODAL)
   {
     int ir = -1;
-    for (int i=0; i<local_base_block_size; ++i)
+    for (int i=0; i < local_base_block_size_; ++i)
     {
       for (int j=0; j<N; ++j)
       {
@@ -330,12 +330,12 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
       }//for j
     }//for i
   }
-  else if (unknown_manager.dof_storage_type == chi_math::UnknownStorageType::BLOCK)
+  else if (unknown_manager.dof_storage_type_ == chi_math::UnknownStorageType::BLOCK)
   {
     int ir = -1;
     for (int j=0; j<N; ++j)
     {
-      for (int i=0; i<local_base_block_size; ++i)
+      for (int i=0; i < local_base_block_size_; ++i)
       {
         ++ir;
         nodal_nnz_in_diag[ir] = backup_nnz_in_diag[i];

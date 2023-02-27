@@ -8,29 +8,29 @@
 //###################################################################
 /**Performs non-local incident mapping for polyhedron cells.*/
 void chi_mesh::sweep_management::PRIMARY_FLUDS::
-  NonLocalIncidentMapping(chi_mesh::Cell *cell,
-                          SPDS_ptr spds)
+  NonLocalIncidentMapping(const chi_mesh::Cell& cell,
+                          const SPDS& spds)
 {
-  chi_mesh::MeshContinuumPtr         grid = spds->grid;
+  chi_mesh::MeshContinuumPtr         grid = spds.grid;
 
   //=================================================== Loop over faces
   //           INCIDENT                                 but process
   //                                                    only incident faces
-  for (short f=0; f < cell->faces.size(); f++)
+  for (short f=0; f < cell.faces_.size(); f++)
   {
-    CellFace&  face = cell->faces[f];
-    double     mu   = face.normal.Dot(spds->omega);
+    const CellFace&  face = cell.faces_[f];
+    double     mu         = face.normal_.Dot(spds.omega);
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face
     if (mu<(0.0-1.0e-16))
     {
 //      int neighbor = face.neighbor_id;
 
-      if ((face.has_neighbor) and (!face.IsNeighborLocal(*grid)) )
+      if ((face.has_neighbor_) and (!face.IsNeighborLocal(*grid)) )
       {
         //============================== Find prelocI
         int locJ = face.GetNeighborPartitionID(*grid);
-        int prelocI = spds->MapLocJToPrelocI(locJ);
+        int prelocI = spds.MapLocJToPrelocI(locJ);
 
         //###########################################################
         if (prelocI >= 0)
@@ -39,7 +39,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           int ass_cell = -1;
           for (int c=0; c<prelocI_cell_views[prelocI].size(); c++)
           {
-            if (prelocI_cell_views[prelocI][c].first == face.neighbor_id)
+            if (prelocI_cell_views[prelocI][c].first == face.neighbor_id_)
             {
               ass_cell = c;
               break;
@@ -51,13 +51,13 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
                 << "Required predecessor cell not located in call to"
                 << " InitializeBetaElements. locJ=" << locJ
                 << " prelocI=" << prelocI
-                << " cell=" << face.neighbor_id;
+                << " cell=" << face.neighbor_id_;
             chi::Exit(EXIT_FAILURE);
           }
 
           //============================== Find associated face
-          std::set<int> cfvids(face.vertex_ids.begin(),
-                               face.vertex_ids.end());
+          std::set<int> cfvids(face.vertex_ids_.begin(),
+                               face.vertex_ids_.end());
           CompactCellView* adj_cell_view =
               &prelocI_cell_views[prelocI][ass_cell];
           int ass_face = -1, af = -1;
@@ -85,12 +85,12 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           dof_mapping.first = adj_cell_view->second[ass_face].first;
           std::vector<uint64_t>* ass_face_verts =
               &adj_cell_view->second[ass_face].second;
-          for (int fv=0; fv < face.vertex_ids.size(); fv++)
+          for (int fv=0; fv < face.vertex_ids_.size(); fv++)
           {
             bool match_found = false;
             for (int afv=0; afv<ass_face_verts->size(); afv++)
             {
-              if (face.vertex_ids[fv] ==
+              if (face.vertex_ids_[fv] ==
                   ass_face_verts->operator[](afv))
               {
                 match_found = true;
@@ -127,7 +127,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           int ass_cell = -1;
           for (int c=0; c<delayed_prelocI_cell_views[delayed_preLocI].size(); c++)
           {
-            if (delayed_prelocI_cell_views[delayed_preLocI][c].first == face.neighbor_id)
+            if (delayed_prelocI_cell_views[delayed_preLocI][c].first == face.neighbor_id_)
             {
               ass_cell = c;
               break;
@@ -139,7 +139,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
                 << "Required predecessor cell not located in call to"
                 << " InitializeBetaElements. locJ=" << locJ
                 << " delayed prelocI=" << delayed_preLocI
-                << " cell=" << face.neighbor_id;
+                << " cell=" << face.neighbor_id_;
             chi::Exit(EXIT_FAILURE);
           }
 
@@ -153,10 +153,10 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
             for (int afv=0; afv<adj_cell_view->second[af].second.size(); afv++)
             {
               bool match_found = false;
-              for (int fv=0; fv < face.vertex_ids.size(); fv++)
+              for (int fv=0; fv < face.vertex_ids_.size(); fv++)
               {
                 if (adj_cell_view->second[af].second[afv] ==
-                    face.vertex_ids[fv])
+                    face.vertex_ids_[fv])
                 {
                   match_found = true;
                   break;
@@ -180,12 +180,12 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           dof_mapping.first = adj_cell_view->second[ass_face].first;
           std::vector<uint64_t>* ass_face_verts =
               &adj_cell_view->second[ass_face].second;
-          for (int fv=0; fv < face.vertex_ids.size(); fv++)
+          for (int fv=0; fv < face.vertex_ids_.size(); fv++)
           {
             bool match_found = false;
             for (int afv=0; afv<ass_face_verts->size(); afv++)
             {
-              if (face.vertex_ids[fv] ==
+              if (face.vertex_ids_[fv] ==
                   ass_face_verts->operator[](afv))
               {
                 match_found = true;

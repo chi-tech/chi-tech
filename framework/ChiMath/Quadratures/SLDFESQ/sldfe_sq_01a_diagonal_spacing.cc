@@ -44,5 +44,5 @@ void chi_math::SimplifiedLDFESQ::Quadrature::GenerateDiagonalSpacings(int level)
     tilde_points[i] = chi_mesh::Vector3(x_tilde,y_tilde,0.0);
   }
 
-  diagonal_vertices = tilde_points;
+  diagonal_vertices_ = tilde_points;
 }

@@ -69,74 +69,74 @@ void chi_unit_tests::Test_chi_data_types(bool verbose)
     chi_mesh::Cell poster_child_cell(chi_mesh::CellType::POLYHEDRON,
                                      chi_mesh::CellType::HEXAHEDRON);
     {
-      poster_child_cell.global_id    = 321;
-      poster_child_cell.local_id     = 123;
-      poster_child_cell.partition_id = 0;
-      poster_child_cell.centroid     = chi_mesh::Vector3(0.5, 0.5, 0.5);
-      poster_child_cell.material_id  = -2;
+      poster_child_cell.global_id_    = 321;
+      poster_child_cell.local_id_     = 123;
+      poster_child_cell.partition_id_ = 0;
+      poster_child_cell.centroid_     = chi_mesh::Vector3(0.5, 0.5, 0.5);
+      poster_child_cell.material_id_  = -2;
 
-      poster_child_cell.vertex_ids = {0, 1, 2, 3,
-                                      4, 5, 6, 7};
+      poster_child_cell.vertex_ids_ = {0, 1, 2, 3,
+                                       4, 5, 6, 7};
 
       //Bottom face
       {
         chi_mesh::CellFace face;
-        face.vertex_ids   = {0,3,2,1};
-        face.normal       = {0,0,-1};
-        face.centroid     = {0.5,0.5,0.0};
-        face.has_neighbor = false;
-        face.neighbor_id  = 0;
-        poster_child_cell.faces.push_back(std::move(face));
+        face.vertex_ids_   = {0, 3, 2, 1};
+        face.normal_       = {0, 0, -1};
+        face.centroid_     = {0.5, 0.5, 0.0};
+        face.has_neighbor_ = false;
+        face.neighbor_id_  = 0;
+        poster_child_cell.faces_.push_back(std::move(face));
       }
       //Top face
       {
         chi_mesh::CellFace face;
-        face.vertex_ids   = {4,5,6,7};
-        face.normal       = {0,0,1};
-        face.centroid     = {0.5,0.5,1.0};
-        face.has_neighbor = false;
-        face.neighbor_id  = 1;
-        poster_child_cell.faces.push_back(std::move(face));
+        face.vertex_ids_   = {4, 5, 6, 7};
+        face.normal_       = {0, 0, 1};
+        face.centroid_     = {0.5, 0.5, 1.0};
+        face.has_neighbor_ = false;
+        face.neighbor_id_  = 1;
+        poster_child_cell.faces_.push_back(std::move(face));
       }
       //Left face
       {
         chi_mesh::CellFace face;
-        face.vertex_ids   = {0,4,7,3};
-        face.normal       = {-1,0,0};
-        face.centroid     = {0.0,0.5,0.5};
-        face.has_neighbor = false;
-        face.neighbor_id  = 2;
-        poster_child_cell.faces.push_back(std::move(face));
+        face.vertex_ids_   = {0, 4, 7, 3};
+        face.normal_       = {-1, 0, 0};
+        face.centroid_     = {0.0, 0.5, 0.5};
+        face.has_neighbor_ = false;
+        face.neighbor_id_  = 2;
+        poster_child_cell.faces_.push_back(std::move(face));
       }
       //Right face
       {
         chi_mesh::CellFace face;
-        face.vertex_ids   = {1,2,6,5};
-        face.normal       = {1,0,0};
-        face.centroid     = {1.0,0.5,0.5};
-        face.has_neighbor = false;
-        face.neighbor_id  = 3;
-        poster_child_cell.faces.push_back(std::move(face));
+        face.vertex_ids_   = {1, 2, 6, 5};
+        face.normal_       = {1, 0, 0};
+        face.centroid_     = {1.0, 0.5, 0.5};
+        face.has_neighbor_ = false;
+        face.neighbor_id_  = 3;
+        poster_child_cell.faces_.push_back(std::move(face));
       }
       //Front face
       {
         chi_mesh::CellFace face;
-        face.vertex_ids   = {0,1,5,4};
-        face.normal       = {0,-1,0};
-        face.centroid     = {0.5,0.0,0.5};
-        face.has_neighbor = false;
-        face.neighbor_id  = 4;
-        poster_child_cell.faces.push_back(std::move(face));
+        face.vertex_ids_   = {0, 1, 5, 4};
+        face.normal_       = {0, -1, 0};
+        face.centroid_     = {0.5, 0.0, 0.5};
+        face.has_neighbor_ = false;
+        face.neighbor_id_  = 4;
+        poster_child_cell.faces_.push_back(std::move(face));
       }
       //Back face
       {
         chi_mesh::CellFace face;
-        face.vertex_ids   = {3,7,6,2};
-        face.normal       = {0,1,0};
-        face.centroid     = {0.5,1.0,0.5};
-        face.has_neighbor = false;
-        face.neighbor_id  = 5;
-        poster_child_cell.faces.push_back(std::move(face));
+        face.vertex_ids_   = {3, 7, 6, 2};
+        face.normal_       = {0, 1, 0};
+        face.centroid_     = {0.5, 1.0, 0.5};
+        face.has_neighbor_ = false;
+        face.neighbor_id_  = 5;
+        poster_child_cell.faces_.push_back(std::move(face));
       }
     }
 
@@ -171,22 +171,22 @@ void chi_unit_tests::Test_chi_data_types(bool verbose)
 
         if (rcell.Type()       != pcell.Type()      ) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
         if (rcell.SubType()    != pcell.SubType()   ) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
-        if (rcell.global_id    != pcell.global_id   ) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
-        if (rcell.local_id     != pcell.local_id    ) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
-        if (rcell.partition_id != pcell.partition_id) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
-        if (rcell.material_id  != pcell.material_id ) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
-        if (rcell.vertex_ids   != pcell.vertex_ids  ) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
+        if (rcell.global_id_ != pcell.global_id_   ) { passed = false; output << "Line: " << __LINE__ << "\n"; break;}
+        if (rcell.local_id_ != pcell.local_id_    ) { passed = false; output << "Line: " << __LINE__ << "\n"; break;}
+        if (rcell.partition_id_ != pcell.partition_id_) { passed = false; output << "Line: " << __LINE__ << "\n"; break;}
+        if (rcell.material_id_ != pcell.material_id_ ) { passed = false; output << "Line: " << __LINE__ << "\n"; break;}
+        if (rcell.vertex_ids_ != pcell.vertex_ids_  ) { passed = false; output << "Line: " << __LINE__ << "\n"; break;}
 
-        if (rcell.faces.size() != pcell.faces.size()) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
+        if (rcell.faces_.size() != pcell.faces_.size()) { passed = false; output << "Line: " << __LINE__ << "\n"; break;}
 
         size_t f = 0;
-        for (const auto& rface : rcell.faces)
+        for (const auto& rface : rcell.faces_)
         {
-          const auto& pface = pcell.faces[f];
+          const auto& pface = pcell.faces_[f];
 
-          if (rface.vertex_ids   != pface.vertex_ids)   {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
-          if (rface.has_neighbor != pface.has_neighbor) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
-          if (rface.neighbor_id  != pface.neighbor_id)  {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
+          if (rface.vertex_ids_ != pface.vertex_ids_)   { passed = false; output << "Line: " << __LINE__ << "\n"; break;}
+          if (rface.has_neighbor_ != pface.has_neighbor_) { passed = false; output << "Line: " << __LINE__ << "\n"; break;}
+          if (rface.neighbor_id_ != pface.neighbor_id_)  { passed = false; output << "Line: " << __LINE__ << "\n"; break;}
           ++f;
         }
       }

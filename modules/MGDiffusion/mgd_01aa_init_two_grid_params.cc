@@ -9,13 +9,13 @@ void mg_diffusion::Solver::Compute_TwoGrid_Params()
   for (const auto &mat_id_xs: matid_to_xs_map) {
 
     // get the P0 transfer matrix and total XS
-    const auto &isotropic_transfer_matrix = mat_id_xs.second->transfer_matrices[0];
-    const auto &sigma_t = mat_id_xs.second->sigma_t;
-    const auto &diffusion_coeff = mat_id_xs.second->diffusion_coeff;
+    const auto &isotropic_transfer_matrix = mat_id_xs.second->transfer_matrices_[0];
+    const auto &sigma_t = mat_id_xs.second->sigma_t_;
+    const auto &diffusion_coeff = mat_id_xs.second->diffusion_coeff_;
 
     // put P0 transfer matrix in nicer form
-    MatDbl S(num_groups, VecDbl(num_groups, 0.0));
-    for (unsigned int g = 0; g < num_groups; ++g)
+    MatDbl S(num_groups_, VecDbl(num_groups_, 0.0));
+    for (unsigned int g = 0; g < num_groups_; ++g)
       for (const auto &[row_g, gprime, sigma]: isotropic_transfer_matrix.Row(g))
         S[g][gprime] = sigma;
 
@@ -23,39 +23,39 @@ void mg_diffusion::Solver::Compute_TwoGrid_Params()
     // original matrix = diag(total) - scattering
     // so L+D = diag(removal) - tril(scattering)
     // and U = -triu(scattering)
-    MatDbl A_(num_groups, VecDbl(num_groups, 0.0));
-    MatDbl B_(num_groups, VecDbl(num_groups, 0.0));
-    for (unsigned int g = 0; g < num_groups; ++g)
+    MatDbl A_(num_groups_, VecDbl(num_groups_, 0.0));
+    MatDbl B_(num_groups_, VecDbl(num_groups_, 0.0));
+    for (unsigned int g = 0; g < num_groups_; ++g)
     {
       A_[g][g] = sigma_t[g] - S[g][g];
       for (unsigned int gp = 0; gp < g; ++gp)
         A_[g][gp] = -S[g][gp];
-      for (unsigned int gp = g + 1; gp < num_groups; ++gp)
+      for (unsigned int gp = g + 1; gp < num_groups_; ++gp)
         B_[g][gp] = S[g][gp];
     }
     MatDbl Ainv = chi_math::Inverse(A_);
     // finally, obtain the iteration matrix
     MatDbl C_ = chi_math::MatMul(Ainv, B_);
     // Perform power iteration
-    VecDbl E(num_groups, 1.0);
+    VecDbl E(num_groups_, 1.0);
     double rho = chi_math::PowerIteration(C_, E, 10000, 1.0e-12);
 
     // Compute two-grid diffusion quantities
     // normalize spectrum
-    std::vector<double> spectrum(num_groups, 1.0);
+    std::vector<double> spectrum(num_groups_, 1.0);
     double sum = 0.0;
-    for (unsigned int g = 0; g < num_groups; ++g)
+    for (unsigned int g = 0; g < num_groups_; ++g)
       sum += std::fabs(E[g]);
-    for (unsigned int g = 0; g < num_groups; ++g)
+    for (unsigned int g = 0; g < num_groups_; ++g)
       spectrum[g] = std::fabs(E[g]) / sum;
     // D ave and Sigma_a ave
     double collapsed_D = 0.0;
     double collapsed_sig_a = 0.0;
-    for (unsigned int g = last_fast_group; g < num_groups; ++g)
+    for (unsigned int g = last_fast_group_; g < num_groups_; ++g)
     {
       collapsed_D += diffusion_coeff[g] * spectrum[g];
       collapsed_sig_a += sigma_t[g] * spectrum[g];
-      for (unsigned int gp = last_fast_group; gp < num_groups; ++gp)
+      for (unsigned int gp = last_fast_group_; gp < num_groups_; ++gp)
         collapsed_sig_a -= S[g][gp] * spectrum[gp];
     }
     // Verbose output the spectrum

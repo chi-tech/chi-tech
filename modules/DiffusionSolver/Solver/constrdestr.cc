@@ -34,8 +34,8 @@ chi_diffusion::Solver::Solver(const std::string& in_solver_name):
 
 chi_diffusion::Solver::~Solver()
 {
-  VecDestroy(&x);
-  VecDestroy(&b);
-  MatDestroy(&A);
-  KSPDestroy(&ksp);
+  VecDestroy(&x_);
+  VecDestroy(&b_);
+  MatDestroy(&A_);
+  KSPDestroy(&ksp_);
 }

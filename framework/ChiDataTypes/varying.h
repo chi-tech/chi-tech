@@ -14,12 +14,12 @@ class Varying
 {
 private:
   /**Raw byte-value data*/
-  std::vector<std::byte>  m_raw_data;
+  std::vector<std::byte>  raw_data_;
   /**Flag indicating whether initialized or not*/
-  bool                    m_data_initialized = false;
+  bool                    data_initialized_ = false;
   /**Type specification*/
-  VaryingDataType         m_type      = VaryingDataType::VOID;
-  std::string             m_type_name = "VOID";
+  VaryingDataType         type_      = VaryingDataType::VOID;
+  std::string             type_name_ = "VOID";
 
 private:
   /**Utility that converts a type to a byte vector provided that
@@ -29,11 +29,11 @@ private:
     auto src = reinterpret_cast<const std::byte*>(&value);
 
     size_t num_bytes = sizeof(T);
-    m_raw_data.resize(num_bytes);
+    raw_data_.resize(num_bytes);
 
-    std::copy(src, src + num_bytes, &m_raw_data[0]);
+    std::copy(src, src + num_bytes, &raw_data_[0]);
 
-    m_data_initialized = true;
+    data_initialized_ = true;
   }
   /**Checks if two VaryingDataType values match.
    * Type A is matched against type B.*/
@@ -95,9 +95,9 @@ public:
 
 public:
   /**Returns the current-type of the variable.*/
-  VaryingDataType Type() const {return m_type;}
+  VaryingDataType Type() const {return type_;}
   /**Returns the string type name of the type.*/
-  std::string TypeName() const {return m_type_name;}
+  std::string TypeName() const {return type_name_;}
 
 public:
   ~Varying() = default;

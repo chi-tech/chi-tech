@@ -1,5 +1,5 @@
-#ifndef _chi_directed_graph_h
-#define _chi_directed_graph_h
+#ifndef CHI_DIRECTED_GRAPH_H
+#define CHI_DIRECTED_GRAPH_H
 
 #include "chi_directed_graph_vertex.h"
 #include <stack>
@@ -18,8 +18,8 @@ public:
   class VertexAccessor
   {
   private:
-    std::vector<GraphVertex> vertices;
-    std::vector<bool>        vertex_valid_flags;
+    std::vector<GraphVertex> vertices_;
+    std::vector<bool>        vertex_valid_flags_;
   public:
     void AddVertex(size_t id, void* context);
     void AddVertex(void* context);
@@ -43,23 +43,23 @@ public:
       {
         iterator i = *this;
         ++ref_element;
-        while (not ref_block.vertex_valid_flags[ref_element] and
-               ref_element<ref_block.vertices.size())
+        while (not ref_block.vertex_valid_flags_[ref_element] and
+               ref_element<ref_block.vertices_.size())
           ++ref_element;
         return i;
       }
       iterator operator++(int junk)
       {
         ++ref_element;
-        while (not ref_block.vertex_valid_flags[ref_element] and
-               ref_element<ref_block.vertices.size())
+        while (not ref_block.vertex_valid_flags_[ref_element] and
+               ref_element<ref_block.vertices_.size())
           ++ref_element;
         return *this;
       }
       GraphVertex& operator*()
-      { return ref_block.vertices[ref_element]; }
+      { return ref_block.vertices_[ref_element]; }
       GraphVertex* operator->()
-      { return &(ref_block.vertices[ref_element]); }
+      { return &(ref_block.vertices_[ref_element]); }
       bool operator==(const iterator& rhs) const
       { return ref_element == rhs.ref_element; }
       bool operator!=(const iterator& rhs) const
@@ -70,26 +70,26 @@ public:
     iterator begin()
     {
       size_t count=0;
-      while (not vertex_valid_flags[count] and
-             count<vertices.size())
+      while (not vertex_valid_flags_[count] and
+             count < vertices_.size())
         ++count;
       return {*this,count};
     }
 
-    iterator end(){return {*this,vertices.size()};}
+    iterator end(){return {*this, vertices_.size()};}
 
-    size_t size() {return vertices.size();}
+    size_t size() {return vertices_.size();}
 
     size_t GetNumValid()
     {
       size_t count=0;
-      for (bool val : vertex_valid_flags)
+      for (bool val : vertex_valid_flags_)
         if (val) ++count;
 
       return count;
     }
 
-    void clear() {vertices.clear(); vertex_valid_flags.clear();}
+    void clear() {vertices_.clear(); vertex_valid_flags_.clear();}
   };
   //============================================= End of Vertex accessor def
 
@@ -149,6 +149,6 @@ public:
   void Clear();
 
   ~DirectedGraph();
-};
+}; //CHI_DIRECTED_GRAPH_H
 
 #endif

@@ -51,7 +51,7 @@ void chi_mesh::mesh_cutting::
   //============================================= Create and set vertex and edge
   //                                              cut flags for the current cell.
   //                                              Also populate edge_cut_info
-  size_t num_verts = cell.vertex_ids.size();
+  size_t num_verts = cell.vertex_ids_.size();
   size_t num_edges = num_verts;
 
   std::vector<bool> vertex_cut_flags(num_verts,false);
@@ -60,9 +60,9 @@ void chi_mesh::mesh_cutting::
 
   for (size_t e=0; e<num_edges; ++e)
   {
-    vertex_cut_flags[e] = VertexIsCut(cell.vertex_ids[e]);
+    vertex_cut_flags[e] = VertexIsCut(cell.vertex_ids_[e]);
 
-    auto edge = MakeEdgeFromPolygonEdgeIndex(cell.vertex_ids, e);
+    auto edge = MakeEdgeFromPolygonEdgeIndex(cell.vertex_ids_, e);
     auto cut_nature = EdgeIsCut(edge);
     edge_cut_flags[e] = cut_nature.first;
     if (cut_nature.first) edge_cut_info[e] = cut_nature.second;
@@ -101,7 +101,7 @@ void chi_mesh::mesh_cutting::
     [&cell,&edge_cut_flags,&edge_cut_info,&VertexIsCut](
       CurCutInfo start_cut_info)
     {
-      size_t num_verts = cell.vertex_ids.size();
+      size_t num_verts = cell.vertex_ids_.size();
       std::vector<uint64_t> vertex_ids;
       vertex_ids.reserve(num_verts); //Ought to be more than enough
 

@@ -26,9 +26,6 @@ void chi_mesh::VolumeMesherExtruder::Execute()
     << chi_objects::ChiConsole::GetMemoryUsageInMB() << " MB"
     << std::endl;
 
-  //================================================== Get the current handler
-  auto& mesh_handler = chi_mesh::GetCurrentHandler();
-
   //================================================== Loop over all regions
   chi::log.Log0Verbose1()
     << "VolumeMesherExtruder: Processing Region"
@@ -48,25 +45,25 @@ void chi_mesh::VolumeMesherExtruder::Execute()
   SetupLayers();
 
   //================================== Process templates
-  if (template_type == TemplateType::SURFACE_MESH)
-  {
-    throw std::logic_error("VolumeMesherExtruder: Surfacemesh extrusions"
-                           " no longer supported.");
-  }
-  else if (template_type == TemplateType::UNPARTITIONED_MESH)
+  if (template_type_ == TemplateType::UNPARTITIONED_MESH)
   {
     chi::log.Log0Verbose1()
       << "VolumeMesherExtruder: Processing unpartitioned mesh"
       << std::endl;
 
     //================================== Get node_z_incr
-    node_z_index_incr = template_unpartitioned_mesh->vertices.size();
+    node_z_index_incr_ = template_unpartitioned_mesh_->GetVertices().size();
 
     //================================== Create baseline polygons in template
     //                                   continuum
     chi::log.Log0Verbose1()
       << "VolumeMesherExtruder: Creating template cells" << std::endl;
-    CreatePolygonCells(*template_unpartitioned_mesh, temp_grid);
+    CreatePolygonCells(*template_unpartitioned_mesh_, temp_grid);
+
+    grid->GetBoundaryIDMap() =
+      template_unpartitioned_mesh_->GetMeshOptions().boundary_id_map;
+    temp_grid->GetBoundaryIDMap() =
+      template_unpartitioned_mesh_->GetMeshOptions().boundary_id_map;
   }
 
   chi::log.Log0Verbose1()
@@ -75,6 +72,15 @@ void chi_mesh::VolumeMesherExtruder::Execute()
 
   chi::log.Log0Verbose1()
     << "VolumeMesherExtruder: Done creating local nodes" << std::endl;
+
+  //================================== Insert top and bottom boundary
+  //                                   id map
+  auto& grid_bndry_id_map = grid->GetBoundaryIDMap();
+  zmax_bndry_id = grid->MakeBoundaryID("ZMAX");
+  grid_bndry_id_map[zmax_bndry_id] = "ZMAX";
+  zmin_bndry_id = grid->MakeBoundaryID("ZMIN");
+  grid_bndry_id_map[zmin_bndry_id] = "ZMIN";
+
 
   //================================== Create extruded item_id
   chi::log.Log()
@@ -127,7 +133,7 @@ void chi_mesh::VolumeMesherExtruder::Execute()
   chi::log.LogAllVerbose1()
     << "### LOCATION[" << chi::mpi.location_id
     << "] amount of local cells="
-    << grid->local_cell_glob_indices.size();
+    << grid->local_cells.size();
 
 
   chi::log.Log()

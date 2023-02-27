@@ -50,7 +50,7 @@
       <packagestaticmethods title=""/>
       <packageattributes title=""/>
       <packagestaticattributes title=""/>
-      <properties title=""/>
+      <properties_ title=""/>
       <events title=""/>
       <privatetypes title=""/>
       <privateslots title=""/>
@@ -73,7 +73,7 @@
       <functions title=""/>
       <related title=""/>
       <variables title=""/>
-      <properties title=""/>
+      <properties_ title=""/>
       <events title=""/>
     </memberdef>
     <allmemberslink visible="yes"/>
@@ -156,7 +156,7 @@
       <protectedslots title=""/>
       <privateslots title=""/>
       <events title=""/>
-      <properties title=""/>
+      <properties_ title=""/>
       <friends title=""/>
       <membergroups visible="yes"/>
     </memberdecl>
@@ -175,7 +175,7 @@
       <protectedslots title=""/>
       <privateslots title=""/>
       <events title=""/>
-      <properties title=""/>
+      <properties_ title=""/>
       <friends title=""/>
     </memberdef>
     <authorsection visible="yes"/>

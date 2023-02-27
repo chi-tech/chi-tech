@@ -17,44 +17,44 @@ void chi_mesh::FieldFunctionInterpolationLine::
 {
   chi::log.Log0Verbose1() << "Initializing line interpolator.";
   //================================================== Check for empty FF-list
-  if (field_functions.empty())
+  if (field_functions_.empty())
     throw std::logic_error("Unassigned field function in line "
                            "field function interpolator.");
 
   //================================================== Create points;
-  const chi_mesh::Vector3 vif = pf - pi;
-  delta_d = vif.Norm()/(number_of_points-1);
+  const chi_mesh::Vector3 vif = pf_ - pi_;
+  delta_d_ = vif.Norm() / (number_of_points_ - 1);
 
   const auto omega = vif.Normalized();
 
-  interpolation_points.push_back(pi);
-  for (int k=1; k<(number_of_points); k++)
-    interpolation_points.push_back(pi + omega*delta_d*k);
+  interpolation_points_.push_back(pi_);
+  for (int k=1; k<(number_of_points_); k++)
+    interpolation_points_.push_back(pi_ + omega * delta_d_ * k);
 
   //====================================================== Loop over contexts
-  const size_t num_ff = field_functions.size();
+  const size_t num_ff = field_functions_.size();
   for (size_t ff=0; ff<num_ff; ff++)
   {
-    ff_contexts.emplace_back();
-    auto& ff_context = ff_contexts.back();
+    ff_contexts_.emplace_back();
+    auto& ff_context = ff_contexts_.back();
 
-    ff_context.ref_ff = field_functions[ff];
+    ff_context.ref_ff = field_functions_[ff];
     const auto& sdm = ff_context.ref_ff->SDM();
-    const auto& grid = *sdm.ref_grid;
+    const auto& grid = *sdm.ref_grid_;
 
-    ff_context.interpolation_points_ass_cell.assign(number_of_points,0);
-    ff_context.interpolation_points_has_ass_cell.assign(number_of_points,false);
+    ff_context.interpolation_points_ass_cell.assign(number_of_points_, 0);
+    ff_context.interpolation_points_has_ass_cell.assign(number_of_points_, false);
 
     //================================================== Find a home for each
     //                                                   point
     for (const auto& cell : grid.local_cells)
     {
-      for (int p=0; p<number_of_points; p++)
+      for (int p=0; p < number_of_points_; p++)
       {
-        const auto& point = interpolation_points[p];
+        const auto& point = interpolation_points_[p];
         if (grid.CheckPointInsideCell(cell, point))
         {
-          ff_context.interpolation_points_ass_cell[p] = cell.local_id;
+          ff_context.interpolation_points_ass_cell[p] = cell.local_id_;
           ff_context.interpolation_points_has_ass_cell[p] = true;
         }
       }//for point p

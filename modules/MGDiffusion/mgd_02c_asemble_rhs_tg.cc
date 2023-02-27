@@ -13,27 +13,27 @@ void mg_diffusion::Solver::Assemble_RHS_TwoGrid(const int64_t verbose)
   if (verbose > 2)
     chi::log.Log() << "\nAssemblying RHS for two-grid ";
 
-  VecSet(b, 0.0);
+  VecSet(b_, 0.0);
 
-  const auto& sdm  = *sdm_ptr;
+  const auto& sdm  = *sdm_ptr_;
   // compute inscattering term
-  for (const auto& cell :  grid_ptr->local_cells)
+  for (const auto& cell :  grid_ptr_->local_cells)
   {
     const auto &cell_mapping = sdm.GetCellMapping(cell);
     const auto qp_data = cell_mapping.MakeVolumeQuadraturePointData();
     const size_t num_nodes = cell_mapping.NumNodes();
 
-    const auto &S = matid_to_xs_map.at(cell.material_id)->transfer_matrices[0];
+    const auto &S = matid_to_xs_map.at(cell.material_id_)->transfer_matrices_[0];
 
-    for (unsigned g = last_fast_group; g < num_groups; ++g)
+    for (unsigned g = last_fast_group_; g < num_groups_; ++g)
     {
       for (const auto &[row_g, gprime, sigma_sm]: S.Row(g)) {
         if (gprime > g) // the upper part for the residual of two-grid accel
         {
           const double *xlocal;
           const double *xlocal_old;
-          VecGetArrayRead(x[gprime], &xlocal);
-          VecGetArrayRead(x_old[gprime], &xlocal_old);
+          VecGetArrayRead(x_[gprime], &xlocal);
+          VecGetArrayRead(x_old_[gprime], &xlocal_old);
 
           for (size_t i = 0; i < num_nodes; ++i) {
             const int64_t imap = sdm.MapDOF(cell, i);
@@ -50,17 +50,17 @@ void mg_diffusion::Solver::Assemble_RHS_TwoGrid(const int64_t verbose)
                                qp_data.JxW(qp);
             }//for j
             // add inscattering value to vector
-            VecSetValue(b, imap, inscatter_g, ADD_VALUES);
+            VecSetValue(b_, imap, inscatter_g, ADD_VALUES);
           }//for i
-          VecRestoreArrayRead(x[gprime]    , &xlocal);
-          VecRestoreArrayRead(x_old[gprime], &xlocal_old);
+          VecRestoreArrayRead(x_[gprime]    , &xlocal);
+          VecRestoreArrayRead(x_old_[gprime], &xlocal_old);
         }//if gp!=g
       }// for gprime
     }// for g
   }//for cell
 
-  VecAssemblyBegin(b);
-  VecAssemblyEnd(b);
+  VecAssemblyBegin(b_);
+  VecAssemblyEnd(b_);
 //  VecView(b, PETSC_VIEWER_STDERR_WORLD);
 //  chi::Exit(1234);
 

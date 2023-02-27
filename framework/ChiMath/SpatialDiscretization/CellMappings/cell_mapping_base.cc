@@ -12,12 +12,12 @@ chi_math::CellMapping::
               size_t in_num_nodes,
               std::vector<std::vector<int>> in_face_node_mappings,
               const VandAFunction& volume_area_function) :
-  m_grid_ptr(std::move(in_grid)),
-  m_cell(in_cell),
-  m_num_nodes(in_num_nodes),
-  face_node_mappings(std::move(in_face_node_mappings))
+    grid_ptr_(std::move(in_grid)),
+    cell_(in_cell),
+    num_nodes_(in_num_nodes),
+    face_node_mappings_(std::move(in_face_node_mappings))
 {
-  volume_area_function(*m_grid_ptr, in_cell, m_volume, m_areas);
+  volume_area_function(*grid_ptr_, in_cell, volume_, areas_);
 }
 
 void chi_math::CellMapping::ComputeCellVolumeAndAreas(
@@ -30,8 +30,8 @@ void chi_math::CellMapping::ComputeCellVolumeAndAreas(
   {
     case chi_mesh::CellType::SLAB:
     {
-      const auto& v0 = grid.vertices[cell.vertex_ids[0]];
-      const auto& v1 = grid.vertices[cell.vertex_ids[1]];
+      const auto& v0 = grid.vertices[cell.vertex_ids_[0]];
+      const auto& v1 = grid.vertices[cell.vertex_ids_[1]];
 
       volume = (v1-v0).Norm();
       areas = {1.0,1.0};
@@ -40,15 +40,15 @@ void chi_math::CellMapping::ComputeCellVolumeAndAreas(
     case chi_mesh::CellType::POLYGON:
     {
       volume = 0.0;
-      const auto& v2 = cell.centroid;
+      const auto& v2 = cell.centroid_;
 
-      size_t num_faces = cell.faces.size();
+      size_t num_faces = cell.faces_.size();
       areas.reserve(num_faces);
 
       for (size_t f=0; f<num_faces; ++f)
       {
-        const uint64_t v0i = cell.faces[f].vertex_ids[0];
-        const uint64_t v1i = cell.faces[f].vertex_ids[1];
+        const uint64_t v0i = cell.faces_[f].vertex_ids_[0];
+        const uint64_t v1i = cell.faces_[f].vertex_ids_[1];
 
         const auto& v0 = grid.vertices[v0i];
         const auto& v1 = grid.vertices[v1i];
@@ -69,22 +69,22 @@ void chi_math::CellMapping::ComputeCellVolumeAndAreas(
     case chi_mesh::CellType::POLYHEDRON:
     {
       volume = 0.0;
-      const auto& vcc = cell.centroid;
+      const auto& vcc = cell.centroid_;
 
-      size_t num_faces = cell.faces.size();
+      size_t num_faces = cell.faces_.size();
       areas.assign(num_faces, 0.0);
       for (size_t f=0; f<num_faces; f++)
       {
-        const auto& face = cell.faces[f];
-        const size_t num_edges = face.vertex_ids.size();
+        const auto& face = cell.faces_[f];
+        const size_t num_edges = face.vertex_ids_.size();
         for (size_t e=0; e<num_edges; ++e)
         {
           size_t ep1 = (e < (num_edges-1))? e+1 : 0;
-          uint64_t v0i = face.vertex_ids[e  ];
-          uint64_t v1i = face.vertex_ids[ep1];
+          uint64_t v0i = face.vertex_ids_[e  ];
+          uint64_t v1i = face.vertex_ids_[ep1];
 
           const auto& v0 = grid.vertices[v0i];
-          const auto& v1 = cell.faces[f].centroid;
+          const auto& v1 = cell.faces_[f].centroid_;
           const auto& v2 = grid.vertices[v1i];
           const auto& v3 = vcc;
 
@@ -113,7 +113,7 @@ void chi_math::CellMapping::ComputeCellVolumeAndAreas(
 int chi_math::CellMapping::
   MapFaceNode(size_t face_index, size_t face_node_index) const
 {
-  try {return face_node_mappings.at(face_index).at(face_node_index);}
+  try {return face_node_mappings_.at(face_index).at(face_node_index);}
   catch (const std::out_of_range& oor)
   {
     throw std::out_of_range("chi_math::CellMapping::MapFaceNode: "
@@ -128,7 +128,7 @@ chi_math::CellMapping::
   std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) const
 {
   InitializeVolumeQuadraturePointData(internal_data);
-  faces_qp_data.resize(face_node_mappings.size());
+  faces_qp_data.resize(face_node_mappings_.size());
   for (size_t f = 0; f < faces_qp_data.size(); ++f)
     InitializeFaceQuadraturePointData(f, faces_qp_data[f]);
 }
@@ -237,8 +237,8 @@ chi_math::CellMapping::
                      IntS_shapeI_shapeJ,
                      IntS_shapeI,
                      IntS_shapeI_gradshapeJ,
-                     face_node_mappings,
-                     m_num_nodes);
+                     face_node_mappings_,
+                     num_nodes_);
 }
 
 

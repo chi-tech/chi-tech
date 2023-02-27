@@ -10,9 +10,9 @@ void chi_math::SimplifiedLDFESQ::Quadrature::PrintQuadratureToFile()
   chi::log.Log() << "Printing SLDFE-Quadrature to file.";
 
   std::ofstream vert_file,cell_file,points_file,python_file;
-  vert_file.open(output_filename_prefix + "verts.txt");
+  vert_file.open(output_filename_prefix_ + "verts.txt");
   {
-    for (const auto& sq : deployed_SQs)
+    for (const auto& sq : deployed_SQs_)
       for (int v=0; v<4; ++v)
       {
         auto& v0 = sq.vertices_xyz_prime[v];
@@ -29,10 +29,10 @@ void chi_math::SimplifiedLDFESQ::Quadrature::PrintQuadratureToFile()
   }
   vert_file.close();
 
-  cell_file.open(output_filename_prefix + "cells.txt");
+  cell_file.open(output_filename_prefix_ + "cells.txt");
   {
     int vi=0;
-    for (const auto& sq : deployed_SQs)
+    for (const auto& sq : deployed_SQs_)
     {
       for (const auto& vert : sq.vertices_xyz)
         for (int d=0; d<=10; ++d)
@@ -43,9 +43,9 @@ void chi_math::SimplifiedLDFESQ::Quadrature::PrintQuadratureToFile()
   cell_file.close();
 
   double total_weight=0.0;
-  points_file.open(output_filename_prefix + "points.txt");
+  points_file.open(output_filename_prefix_ + "points.txt");
   {
-    for (auto& sq : deployed_SQs)
+    for (auto& sq : deployed_SQs_)
     {
       int ss=-1;
       for (const auto& point : sq.sub_sqr_points)
@@ -61,7 +61,7 @@ void chi_math::SimplifiedLDFESQ::Quadrature::PrintQuadratureToFile()
   }
   points_file.close();
 
-  python_file.open(output_filename_prefix+"python.py");
+  python_file.open(output_filename_prefix_ + "python.py");
   python_file <<
    "import matplotlib.pyplot as plt\n"
    "from mpl_toolkits import mplot3d\n"
@@ -74,7 +74,7 @@ void chi_math::SimplifiedLDFESQ::Quadrature::PrintQuadratureToFile()
    "\n"
    "#====================================== Read vertices\n"
    "verts = []\n"
-   "verts_file = open(\"" << output_filename_prefix << "verts.txt\")\n"
+   "verts_file = open(\"" << output_filename_prefix_ << "verts.txt\")\n"
    "for line in verts_file:\n"
    "    words = line.split()\n"
    "    verts.append(np.array([float(words[0]),float(words[1]),float(words[2])]))\n"
@@ -82,7 +82,7 @@ void chi_math::SimplifiedLDFESQ::Quadrature::PrintQuadratureToFile()
    "\n"
    "#====================================== Read cells\n"
    "cells = []\n"
-   "cells_file = open(\"" << output_filename_prefix << "cells.txt\")\n"
+   "cells_file = open(\"" << output_filename_prefix_ << "cells.txt\")\n"
    "for line in cells_file:\n"
    "    words = line.split()\n"
    "    cell = []\n"
@@ -94,7 +94,7 @@ void chi_math::SimplifiedLDFESQ::Quadrature::PrintQuadratureToFile()
    "#====================================== Read points\n"
    "points = []\n"
    "weightsum=0.0\n"
-   "points_file = open(\"" << output_filename_prefix << "points.txt\")\n"
+   "points_file = open(\"" << output_filename_prefix_ << "points.txt\")\n"
    "for line in points_file:\n"
    "    words = line.split()\n"
    "    point = []\n"

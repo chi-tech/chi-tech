@@ -23,7 +23,7 @@ void chi_mesh::mesh_cutting::
 {
   const auto& p = plane_point;
   const auto& n = plane_normal;
-  const size_t cell_num_faces = cell.faces.size();
+  const size_t cell_num_faces = cell.faces_.size();
 
   /**Utility lambda to check if a vertex is in generic set.*/
   auto NumberInSet = [](uint64_t number, const std::set<uint64_t>& the_set)
@@ -92,8 +92,8 @@ void chi_mesh::mesh_cutting::
   //============================================= Determine cut-edges relevant
   //                                              to this cell
   std::vector<ECI> local_cut_edges;
-  const std::set<uint64_t> local_vertex_id_set(cell.vertex_ids.begin(),
-                                               cell.vertex_ids.end());
+  const std::set<uint64_t> local_vertex_id_set(cell.vertex_ids_.begin(),
+                                               cell.vertex_ids_.end());
 
   for (auto& eci : global_cut_edges)
     if (NumberInSet(eci.vertex_ids.first , local_vertex_id_set) and
@@ -122,11 +122,11 @@ void chi_mesh::mesh_cutting::
   cut_faces_indices.reserve(cell_num_faces);
   {
     size_t face_index=0;
-    for (const auto& face : cell.faces)
+    for (const auto& face : cell.faces_)
     {
       size_t num_neg_senses = 0;
       size_t num_pos_senses = 0;
-      for (auto vid : face.vertex_ids)
+      for (auto vid : face.vertex_ids_)
       {
         const auto& x = mesh.vertices[vid];
         double new_sense = n.Dot(x-p);
@@ -175,17 +175,17 @@ void chi_mesh::mesh_cutting::
 
   for (const auto& cut_face_id : cut_faces_indices)
   {
-    const auto& cut_face = cell.faces[cut_face_id];
+    const auto& cut_face = cell.faces_[cut_face_id];
 
     if (verbose)  chi::log.Log() << "cut face " << cut_face_id;
 
     // First extract the edges that form the fragments
     std::vector<Edge> fragment_edges_A;
     std::vector<Edge> fragment_edges_B;
-    const size_t face_num_verts = cut_face.vertex_ids.size();
+    const size_t face_num_verts = cut_face.vertex_ids_.size();
     for (size_t e=0; e<face_num_verts; ++e)
     {
-      auto edge = MakeEdgeFromPolygonEdgeIndex(cut_face.vertex_ids, e);
+      auto edge = MakeEdgeFromPolygonEdgeIndex(cut_face.vertex_ids_, e);
 
       auto edge_cut_state = EdgeIsCut(edge, local_cut_edges);
       bool edge_is_cut   = edge_cut_state.first;
@@ -277,13 +277,13 @@ void chi_mesh::mesh_cutting::
     //================================= Build proxy faces based on uncut-faces
     //                                  and cut faces
     std::vector<std::vector<uint64_t>> proxy_faces;
-    proxy_faces.reserve(parent_cell.faces.size());
+    proxy_faces.reserve(parent_cell.faces_.size());
 
     size_t f=0;
-    for (const auto& face : parent_cell.faces)
+    for (const auto& face : parent_cell.faces_)
     {
       if (NumberInList_t(f, uncut_faces_indices))
-        proxy_faces.push_back(face.vertex_ids);
+        proxy_faces.push_back(face.vertex_ids_);
       else if (NumberInList_t(f, cut_faces_indices))
         proxy_faces.push_back(cut_face_fragments.at(f));
       ++f;
@@ -321,22 +321,22 @@ void chi_mesh::mesh_cutting::
   PopulatePolyhedronFromFaces(mesh, proxies_A, *cell_A_ptr);
   PopulatePolyhedronFromFaces(mesh, proxies_B, *cell_B_ptr);
 
-  cell_A_ptr->local_id = cell.local_id;
-  cell_A_ptr->global_id = cell.global_id;
+  cell_A_ptr->local_id_ = cell.local_id_;
+  cell_A_ptr->global_id_ = cell.global_id_;
 
-  cell_B_ptr->global_id = mesh.local_cells.size();
+  cell_B_ptr->global_id_ = mesh.local_cells.size();
 
-  cell_A_ptr->material_id = cell.material_id;
-  cell_B_ptr->material_id = cell.material_id;
+  cell_A_ptr->material_id_ = cell.material_id_;
+  cell_B_ptr->material_id_ = cell.material_id_;
 
   if (verbose)
   {
     std::set<uint64_t> verts;
-    for (uint64_t vid : cell_A_ptr->vertex_ids)
+    for (uint64_t vid : cell_A_ptr->vertex_ids_)
       verts.insert(vid);
-    for (uint64_t vid : cell_B_ptr->vertex_ids)
+    for (uint64_t vid : cell_B_ptr->vertex_ids_)
       verts.insert(vid);
-    for (uint64_t vid : cell.vertex_ids)
+    for (uint64_t vid : cell.vertex_ids_)
       verts.insert(vid);
     for (uint64_t vid : verts)
       chi::log.Log() << vid << " " << mesh.vertices[vid].PrintStr();

@@ -10,7 +10,7 @@ void chi_objects::ChiConsole::FlushConsole()
 {
   try
   {
-    for (auto& command : command_buffer)
+    for (auto& command : command_buffer_)
     {
       bool error = luaL_dostring(consoleState,command.c_str());
       if (error)

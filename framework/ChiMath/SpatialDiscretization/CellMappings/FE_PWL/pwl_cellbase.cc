@@ -8,7 +8,7 @@
 
 std::vector<chi_mesh::Vector3> chi_math::CellMappingFE_PWL::GetNodeLocations() const
 {
-  return m_node_locations;
+  return node_locations_;
 }
 
 /** This section just determines a mapping of face dofs
@@ -23,19 +23,19 @@ surface integrals of the shape functions.*/
 std::vector<std::vector<int>> chi_math::CellMappingFE_PWL::
   MakeFaceNodeMapping(const chi_mesh::Cell &cell)
 {
-  const size_t num_faces = cell.faces.size();
+  const size_t num_faces = cell.faces_.size();
   std::vector<std::vector<int>> mappings;
   mappings.reserve(num_faces);
-  for (auto& face : cell.faces)
+  for (auto& face : cell.faces_)
   {
     std::vector<int> face_dof_mapping;
-    face_dof_mapping.reserve(face.vertex_ids.size());
-    for (uint64_t fvid : face.vertex_ids)
+    face_dof_mapping.reserve(face.vertex_ids_.size());
+    for (uint64_t fvid : face.vertex_ids_)
     {
       int mapping = -1;
-      for (size_t ci=0; ci<cell.vertex_ids.size(); ci++)
+      for (size_t ci=0; ci<cell.vertex_ids_.size(); ci++)
       {
-        if (fvid == cell.vertex_ids[ci])
+        if (fvid == cell.vertex_ids_[ci])
         {
           mapping = static_cast<int>(ci);
           break;
@@ -182,8 +182,8 @@ chi_math::CellMappingFE_PWL::
                      IntS_shapeI_shapeJ,
                      IntS_shapeI,
                      IntS_shapeI_gradshapeJ,
-                     face_node_mappings,
-                     m_num_nodes);
+                     face_node_mappings_,
+                     num_nodes_);
 }
 
 std::vector<chi_mesh::Vector3>
@@ -192,9 +192,9 @@ chi_math::CellMappingFE_PWL::
                      const chi_mesh::Cell &cell)
 {
   std::vector<chi_mesh::Vector3> verts;
-  verts.reserve(cell.vertex_ids.size());
+  verts.reserve(cell.vertex_ids_.size());
 
-  for (const auto vid : cell.vertex_ids)
+  for (const auto vid : cell.vertex_ids_)
     verts.push_back(grid.vertices[vid]);
 
   return verts;

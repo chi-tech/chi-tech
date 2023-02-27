@@ -3,7 +3,9 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
+
+namespace chi_mesh::unpartition_mesh_lua_utils
+{
 
 //###################################################################
 /**Uploads a vertex.
@@ -43,12 +45,13 @@ int chiUnpartitionedMeshUploadVertex(lua_State* L)
   const double y = lua_tonumber(L, 3);
   const double z = lua_tonumber(L, 4);
 
-  auto& mesh = chi_mesh::unpartition_mesh_lua_utils::
-    GetUnpartitionedMeshByHandle(handle, fname);
+  auto& mesh = chi::GetStackItem<chi_mesh::UnpartitionedMesh>(
+    chi::unpartitionedmesh_stack,
+    handle, fname);
 
-  mesh.vertices.emplace_back(x,y,z);
+  mesh.GetVertices().emplace_back(x, y, z);
 
-  size_t vert_handle = mesh.vertices.size()-1;
+  size_t vert_handle = mesh.GetVertices().size() - 1;
 
   lua_pushinteger(L, static_cast<lua_Integer>(vert_handle));
   return 1;
@@ -124,8 +127,9 @@ int chiUnpartitionedMeshUploadCell(lua_State* L)
   bool verbose = false;
   if (num_args == 3) verbose = lua_toboolean(L, 3);
 
-  auto& mesh = chi_mesh::unpartition_mesh_lua_utils::
-    GetUnpartitionedMeshByHandle(handle, fname);
+  auto& mesh = chi::GetStackItem<chi_mesh::UnpartitionedMesh>(
+    chi::unpartitionedmesh_stack,
+    handle, fname);
 
   LuaCheckTableValue(fname, L, 2);
 
@@ -201,7 +205,7 @@ int chiUnpartitionedMeshUploadCell(lua_State* L)
                      cell_num_faces, cell_material_id,
                      proxy_faces);
 
-  size_t cell_handle = mesh.raw_cells.size()-1;
+  size_t cell_handle = mesh.GetNumberOfCells() - 1;
 
   lua_pushinteger(L, static_cast<lua_Integer>(cell_handle));
   return 1;
@@ -257,8 +261,9 @@ int chiUnpartitionedMeshFinalizeEmpty(lua_State* L)
 
   const int handle = lua_tointeger(L,1);
 
-  auto& mesh = chi_mesh::unpartition_mesh_lua_utils::
-    GetUnpartitionedMeshByHandle(handle, fname);
+  auto& mesh = chi::GetStackItem<chi_mesh::UnpartitionedMesh>(
+    chi::unpartitionedmesh_stack,
+    handle, fname);
 
   mesh.ComputeCentroidsAndCheckQuality();
   mesh.BuildMeshConnectivity();
@@ -266,3 +271,4 @@ int chiUnpartitionedMeshFinalizeEmpty(lua_State* L)
   return 0;
 }
 
+}//namespace chi_mesh::unpartition_mesh_lua_utils

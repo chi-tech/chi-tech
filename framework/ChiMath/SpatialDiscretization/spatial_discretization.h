@@ -18,23 +18,23 @@ namespace chi_math
   class SpatialDiscretization
   {
   public:
-    const SpatialDiscretizationType type;
+    const SpatialDiscretizationType type_;
 
-    const chi_mesh::MeshContinuumConstPtr ref_grid;
-    const CoordinateSystemType cs_type;
+    const chi_mesh::MeshContinuumConstPtr ref_grid_;
+    const CoordinateSystemType coord_sys_type_;
 
     const UnknownManager UNITARY_UNKNOWN_MANAGER;
 
   protected:
-    std::vector<std::unique_ptr<CellMapping>> cell_mappings;
-    std::map<uint64_t, std::shared_ptr<CellMapping>> nb_cell_mappings;
+    std::vector<std::unique_ptr<CellMapping>> cell_mappings_;
+    std::map<uint64_t, std::shared_ptr<CellMapping>> nb_cell_mappings_;
 
-    uint64_t              local_block_address = 0;
-    std::vector<uint64_t> locJ_block_address;
-    std::vector<uint64_t> locJ_block_size;
+    uint64_t              local_block_address_ = 0;
+    std::vector<uint64_t> locJ_block_address_;
+    std::vector<uint64_t> locJ_block_size_;
 
-    uint64_t local_base_block_size=0;
-    uint64_t globl_base_block_size=0;
+    uint64_t local_base_block_size_=0;
+    uint64_t globl_base_block_size_=0;
 
   protected:
     typedef SpatialDiscretizationType SDMType;
@@ -43,10 +43,10 @@ namespace chi_math
     SpatialDiscretization(chi_mesh::MeshContinuumPtr& in_grid,
                           CoordinateSystemType in_cs_type,
                           SDMType in_type = SDMType::UNDEFINED) :
-      type(in_type),
-      ref_grid(in_grid),
-      cs_type(in_cs_type),
-      UNITARY_UNKNOWN_MANAGER({std::make_pair(chi_math::UnknownType::SCALAR,0)})
+        type_(in_type),
+        ref_grid_(in_grid),
+        coord_sys_type_(in_cs_type),
+        UNITARY_UNKNOWN_MANAGER({std::make_pair(chi_math::UnknownType::SCALAR,0)})
     {
     }
 

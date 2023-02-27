@@ -16,32 +16,32 @@ namespace finite_element
     std::vector<std::vector<int>> in_face_dof_mappings,
     size_t in_num_nodes)
   {
-    m_IntV_gradShapeI_gradShapeJ = std::move(in_IntV_gradShapeI_gradShapeJ);
-    m_IntV_shapeI_gradshapeJ     = std::move(in_IntV_shapeI_gradshapeJ    );
-    m_IntV_shapeI_shapeJ         = std::move(in_IntV_shapeI_shapeJ        );
-    m_IntV_shapeI                = std::move(in_IntV_shapeI               );
-    m_IntV_gradshapeI            = std::move(in_IntV_gradshapeI           );
-    m_IntS_shapeI_shapeJ         = std::move(in_IntS_shapeI_shapeJ    );
-    m_IntS_shapeI                = std::move(in_IntS_shapeI           );
-    m_IntS_shapeI_gradshapeJ     = std::move(in_IntS_shapeI_gradshapeJ);
-    m_face_dof_mappings          = std::move(in_face_dof_mappings);
-    m_num_nodes                  = in_num_nodes;
+    IntV_gradShapeI_gradShapeJ_ = std::move(in_IntV_gradShapeI_gradShapeJ);
+    IntV_shapeI_gradshapeJ_     = std::move(in_IntV_shapeI_gradshapeJ    );
+    IntV_shapeI_shapeJ_         = std::move(in_IntV_shapeI_shapeJ        );
+    IntV_shapeI_                = std::move(in_IntV_shapeI               );
+    IntV_gradshapeI_            = std::move(in_IntV_gradshapeI           );
+    IntS_shapeI_shapeJ_         = std::move(in_IntS_shapeI_shapeJ    );
+    IntS_shapeI_                = std::move(in_IntS_shapeI           );
+    IntS_shapeI_gradshapeJ_     = std::move(in_IntS_shapeI_gradshapeJ);
+    face_dof_mappings_          = std::move(in_face_dof_mappings);
+    num_nodes_                  = in_num_nodes;
   }
 
   void UnitIntegralData::Reset()
   {
-    m_IntV_gradShapeI_gradShapeJ.clear();
-    m_IntV_shapeI_gradshapeJ.clear();
-    m_IntV_shapeI_shapeJ.clear();
-    m_IntV_shapeI.clear();
-    m_IntV_gradshapeI.clear();
+    IntV_gradShapeI_gradShapeJ_.clear();
+    IntV_shapeI_gradshapeJ_.clear();
+    IntV_shapeI_shapeJ_.clear();
+    IntV_shapeI_.clear();
+    IntV_gradshapeI_.clear();
 
-    m_IntS_shapeI_shapeJ.clear();
-    m_IntS_shapeI.clear();
-    m_IntS_shapeI_gradshapeJ.clear();
+    IntS_shapeI_shapeJ_.clear();
+    IntS_shapeI_.clear();
+    IntS_shapeI_gradshapeJ_.clear();
 
-    m_face_dof_mappings.clear();
-    m_num_nodes=0;
+    face_dof_mappings_.clear();
+    num_nodes_=0;
   }
 
   double UnitIntegralData::
@@ -49,7 +49,7 @@ namespace finite_element
                                unsigned int j) const
   {
     double value;
-    auto& row_I = m_IntV_gradShapeI_gradShapeJ.at(i);
+    auto& row_I = IntV_gradShapeI_gradShapeJ_.at(i);
     value = row_I.at(j);
     return value;
   }
@@ -58,7 +58,7 @@ namespace finite_element
                            unsigned int j) const
   {
     chi_mesh::Vector3 value;
-    auto & row_I = m_IntV_shapeI_gradshapeJ.at(i);
+    auto & row_I = IntV_shapeI_gradshapeJ_.at(i);
     value = row_I.at(j);
     return value;
   }
@@ -67,28 +67,28 @@ namespace finite_element
                        unsigned int j) const
   {
     double value;
-    auto& row_I = m_IntV_shapeI_shapeJ.at(i);
+    auto& row_I = IntV_shapeI_shapeJ_.at(i);
     value = row_I.at(j);
     return value;
   }
   double UnitIntegralData::
     IntV_shapeI(unsigned int i) const
   {
-    double value = m_IntV_shapeI.at(i);
+    double value = IntV_shapeI_.at(i);
     return value;
   }
   chi_mesh::Vector3 UnitIntegralData::
     IntV_gradshapeI(unsigned int i) const
   {
     chi_mesh::Vector3 value;
-    value = m_IntV_gradshapeI.at(i);
+    value = IntV_gradshapeI_.at(i);
     return value;
   }
   double UnitIntegralData::
     IntS_shapeI_shapeJ(unsigned int face, unsigned int i, unsigned int j) const
   {
     double value;
-    auto& face_data = m_IntS_shapeI_shapeJ.at(face);
+    auto& face_data = IntS_shapeI_shapeJ_.at(face);
     auto& rowI      = face_data.at(i);
     value = rowI.at(j);
     return value;
@@ -98,7 +98,7 @@ namespace finite_element
     IntS_shapeI(unsigned int face, unsigned int i) const
   {
     double value;
-    auto& face_data = m_IntS_shapeI.at(face);
+    auto& face_data = IntS_shapeI_.at(face);
     value = face_data.at(i);
     return value;
   }
@@ -109,7 +109,7 @@ namespace finite_element
                            unsigned int j) const
   {
     chi_mesh::Vector3 value;
-    auto& face_data = m_IntS_shapeI_gradshapeJ.at(face);
+    auto& face_data = IntS_shapeI_gradshapeJ_.at(face);
     auto& rowI      = face_data.at(i);
     value = rowI.at(j);
     return value;

@@ -19,10 +19,10 @@
 #endif
 
 //=============================================== Global variables
-chi_objects::ChiConsole  chi_objects::ChiConsole::instance;
+chi_objects::ChiConsole  chi_objects::ChiConsole::instance_;
 chi_objects::ChiConsole& chi::console = chi_objects::ChiConsole::GetInstance();
 
-chi_objects::ChiLog      chi_objects::ChiLog::instance;
+chi_objects::ChiLog      chi_objects::ChiLog::instance_;
 chi_objects::ChiLog&      chi::log = chi_objects::ChiLog::GetInstance();
 
 /** Global stack of handlers */
@@ -43,10 +43,10 @@ std::vector<chi_math::QuadraturePtr>        chi::quadrature_stack;
 std::vector<chi_math::AngularQuadraturePtr> chi::angular_quadrature_stack;
 
 //================================ run_time quantities
-bool        chi::run_time::termination_posted = false;
-std::string chi::run_time::input_file_name;
-bool        chi::run_time::sim_option_interactive = true;
-bool        chi::run_time::allow_petsc_error_handler = false;
+bool        chi::run_time::termination_posted_ = false;
+std::string chi::run_time::input_file_name_;
+bool        chi::run_time::sim_option_interactive_ = true;
+bool        chi::run_time::allow_petsc_error_handler_ = false;
 
 //================================ mpi
 chi_objects::MPI_Info chi_objects::MPI_Info::instance;
@@ -78,16 +78,16 @@ void chi::run_time::ParseArguments(int argc, char** argv)
         << "     -allow_petsc_error_handler Allow petsc error handler.\n\n\n";
 
       chi::log.Log() << "PETSc options:";
-      chi::run_time::termination_posted = true;
+      chi::run_time::termination_posted_ = true;
     }
     else if (argument.find("-allow_petsc_error_handler")!=std::string::npos)
     {
-      chi::run_time::allow_petsc_error_handler = true;
+      chi::run_time::allow_petsc_error_handler_ = true;
     }
     //================================================ No-graphics option
     else if (argument.find("-b")!=std::string::npos)
     {
-      chi::run_time::sim_option_interactive = false;
+      chi::run_time::sim_option_interactive_ = false;
     }//-b
     //================================================ Verbosity
     else if (argument.find("-v") != std::string::npos)
@@ -116,13 +116,13 @@ void chi::run_time::ParseArguments(int argc, char** argv)
     }//-v
     else if ((argument.find('=') == std::string::npos) && (!input_file_found) )
     {
-      chi::run_time::input_file_name = argument;
+      chi::run_time::input_file_name_ = argument;
       input_file_found = true;
-      chi::run_time::sim_option_interactive = false;
+      chi::run_time::sim_option_interactive_ = false;
     }//no =
     else if (argument.find('=') != std::string::npos)
     {
-      chi::console.command_buffer.push_back(argument);
+      chi::console.GetCommandBuffer().push_back(argument);
     }//=
 
   }//for argument
@@ -160,7 +160,7 @@ int chi::run_time::InitPetSc(int argc, char** argv)
   PetscMPIInt    size;
 
   PetscOptionsInsertString(nullptr,"-error_output_stderr");
-  if (not chi::run_time::allow_petsc_error_handler)
+  if (not chi::run_time::allow_petsc_error_handler_)
     PetscOptionsInsertString(nullptr,"-no_signal_handler");
 //  PetscOptionsInsertString(NULL,"-on_error_abort");
 //TODO: Investigate this, causes cfem methods to fail
@@ -213,7 +213,7 @@ int chi::RunInteractive(int argc, char** argv)
 
   chi::console.FlushConsole();
 
-  const auto& input_fname = chi::run_time::input_file_name;
+  const auto& input_fname = chi::run_time::input_file_name_;
 
   if ( not input_fname.empty() )
   {
@@ -277,7 +277,7 @@ int chi::RunBatch(int argc, char** argv)
   MPI_Barrier(MPI_COMM_WORLD);
 #endif
 
-  const auto& input_fname = chi::run_time::input_file_name;
+  const auto& input_fname = chi::run_time::input_file_name_;
   int error_code = 0;
 
   if ( not input_fname.empty() )
@@ -295,7 +295,7 @@ int chi::RunBatch(int argc, char** argv)
 
   chi::log.Log()
     << chi_objects::ChiTimer::GetLocalDateTimeString()
-    << " ChiTech finished execution of " << chi::run_time::input_file_name;
+    << " ChiTech finished execution of " << chi::run_time::input_file_name_;
 
   return error_code;
 }

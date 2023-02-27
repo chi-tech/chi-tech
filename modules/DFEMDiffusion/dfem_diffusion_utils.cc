@@ -22,13 +22,13 @@
 double dfem_diffusion::Solver::HPerpendicular(const chi_mesh::Cell& cell,
                unsigned int f)
 {
-  const auto& sdm = *sdm_ptr;
+  const auto& sdm = *sdm_ptr_;
 
   const auto& cell_mapping = sdm.GetCellMapping(cell);
   double hp;
 
-  const size_t num_faces = cell.faces.size();
-  const size_t num_vertices = cell.vertex_ids.size();
+  const size_t num_faces = cell.faces_.size();
+  const size_t num_vertices = cell.vertex_ids_.size();
 
   const double volume = cell_mapping.CellVolume();
   const double face_area = cell_mapping.FaceArea(f);
@@ -97,7 +97,7 @@ int dfem_diffusion::Solver::MapFaceNodeDisc(const chi_mesh::Cell& cur_cell,
                 size_t ccfi,
                 double epsilon/*=1.0e-12*/)
 {
-  const auto& sdm = *sdm_ptr;
+  const auto& sdm = *sdm_ptr_;
 
   const auto& cur_cell_mapping = sdm.GetCellMapping(cur_cell);
   const auto& adj_cell_mapping = sdm.GetCellMapping(adj_cell);
@@ -170,6 +170,6 @@ double dfem_diffusion::Solver::CallLua_iXYZFunction(
 /**Updates the field functions with the latest data.*/
 void dfem_diffusion::Solver::UpdateFieldFunctions()
 {
-  auto& ff = *field_functions.front();
-  ff.UpdateFieldVector(x);
+  auto& ff = *field_functions_.front();
+  ff.UpdateFieldVector(x_);
 }

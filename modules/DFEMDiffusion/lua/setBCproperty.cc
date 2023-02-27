@@ -88,8 +88,8 @@ int chiDFEMDiffusionSetBCProperty(lua_State *L)
       << " At least 4 arguments are expected.";
       chi::Exit(EXIT_FAILURE);
     }
-    LuaCheckNumberValue(fname, L, 3);
-    const int bound_index = lua_tonumber(L,3);
+    LuaCheckStringValue(fname, L, 3);
+    const std::string bound_name = lua_tostring(L, 3);
 
     LuaCheckStringValue(fname, L, 4);
     const std::string type_name = lua_tostring(L, 4);
@@ -101,7 +101,7 @@ int chiDFEMDiffusionSetBCProperty(lua_State *L)
         chi::log.Log0Error()
           << "Invalid amount of arguments used in"
           << " chiDFEMDiffusionsetBCproperty(...,\"boundary_type\","
-          << bound_index << ",\"reflecting\". "
+          << bound_name << ",\"reflecting\". "
           << " 4 arguments are expected.";
         chi::Exit(EXIT_FAILURE);
       }
@@ -109,9 +109,9 @@ int chiDFEMDiffusionSetBCProperty(lua_State *L)
       dfem_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = dfem_diffusion::BoundaryType::Reflecting;
 
-      solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
+      solver.boundary_preferences_.insert(std::make_pair(bound_name, bndry_info));
 
-      chi::log.Log() << "Boundary " << bound_index << " set as "
+      chi::log.Log() << "Boundary " << bound_name << " set as "
                          << "Reflecting.";
     }
     else if (type_name == "dirichlet")
@@ -121,7 +121,7 @@ int chiDFEMDiffusionSetBCProperty(lua_State *L)
         chi::log.Log0Error()
           << "Invalid amount of arguments used in"
           << " chiDFEMDiffusionsetBCproperty(...,\"boundary_type\","
-          << bound_index << ",\"dirichlet\". "
+          << bound_name << ",\"dirichlet\". "
           << " 5 arguments are expected.";
         chi::Exit(EXIT_FAILURE);
       }
@@ -131,9 +131,9 @@ int chiDFEMDiffusionSetBCProperty(lua_State *L)
       dfem_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = dfem_diffusion::BoundaryType::Dirichlet;
       bndry_info.second = {boundary_value};
-      solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
+      solver.boundary_preferences_.insert(std::make_pair(bound_name, bndry_info));
 
-      chi::log.Log() << "Boundary " << bound_index << " set as "
+      chi::log.Log() << "Boundary " << bound_name << " set as "
                          << "Dirichlet with value " << boundary_value;
     }
     else if (type_name == "neumann")
@@ -143,7 +143,7 @@ int chiDFEMDiffusionSetBCProperty(lua_State *L)
         chi::log.Log0Error()
           << "Invalid amount of arguments used in"
           << " chiDFEMDiffusionsetBCproperty(...,\"boundary_type\","
-          << bound_index << ",\"neumann\". "
+          << bound_name << ",\"neumann\". "
           << " 5 arguments are expected.";
         chi::Exit(EXIT_FAILURE);
       }
@@ -153,9 +153,9 @@ int chiDFEMDiffusionSetBCProperty(lua_State *L)
       dfem_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = dfem_diffusion::BoundaryType::Robin;
       bndry_info.second = {0.0,1.0,f_value};
-      solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
+      solver.boundary_preferences_.insert(std::make_pair(bound_name, bndry_info));
 
-      chi::log.Log() << "Boundary " << bound_index << " set as "
+      chi::log.Log() << "Boundary " << bound_name << " set as "
                          << "Neumann with D grad(u) dot n = ("
                          << f_value << ") ";
     }
@@ -166,7 +166,7 @@ int chiDFEMDiffusionSetBCProperty(lua_State *L)
         chi::log.Log0Error()
           << "Invalid amount of arguments used in"
           << " chiDFEMDiffusionsetBCproperty(...,\"boundary_type\","
-          << bound_index << ",\"vacuum\". "
+          << bound_name << ",\"vacuum\". "
           << " 4 arguments are expected.";
         chi::Exit(EXIT_FAILURE);
       }
@@ -174,9 +174,9 @@ int chiDFEMDiffusionSetBCProperty(lua_State *L)
       dfem_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = dfem_diffusion::BoundaryType::Robin;
       bndry_info.second = {0.25,0.5,0.0};
-      solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
+      solver.boundary_preferences_.insert(std::make_pair(bound_name, bndry_info));
 
-      chi::log.Log() << "Boundary " << bound_index << " set as "
+      chi::log.Log() << "Boundary " << bound_name << " set as "
                          << "Vacuum.";
     }
     else if (type_name == "robin")
@@ -186,7 +186,7 @@ int chiDFEMDiffusionSetBCProperty(lua_State *L)
         chi::log.Log0Error()
           << "Invalid amount of arguments used in"
           << " chiDFEMDiffusionsetBCproperty(...,\"boundary_type\","
-          << bound_index << ",\"robin\". "
+          << bound_name << ",\"robin\". "
           << " 7 arguments are expected.";
         chi::Exit(EXIT_FAILURE);
       }
@@ -201,9 +201,9 @@ int chiDFEMDiffusionSetBCProperty(lua_State *L)
       dfem_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = dfem_diffusion::BoundaryType::Robin;
       bndry_info.second = {a_value,b_value,f_value};
-      solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
+      solver.boundary_preferences_.insert(std::make_pair(bound_name, bndry_info));
 
-      chi::log.Log() << "Boundary " << bound_index << " set as "
+      chi::log.Log() << "Boundary " << bound_name << " set as "
                          << "Robin with a,b,f = ("
                          << a_value << ","
                          << b_value << ","

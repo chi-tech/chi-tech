@@ -6,7 +6,6 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
 
 //#############################################################################
 /** Adds a material to the problem. Materials are added to the global
@@ -37,7 +36,7 @@ int chiPhysicsAddMaterial(lua_State *L)
   if (numArgs==1)
   {
     const char* temp = lua_tostring(L, 1);
-    new_material->name = std::string(temp);
+    new_material->name_ = std::string(temp);
   }
 
   chi::material_stack.push_back(new_material);
@@ -46,7 +45,7 @@ int chiPhysicsAddMaterial(lua_State *L)
   lua_pushnumber(L,static_cast<lua_Number>(index));
 
   chi::log.Log0Verbose1() << "New material added at index " << index
-                            << " with name \"" << new_material->name << "\"";
+                            << " with name \"" << new_material->name_ << "\"";
 
   return 1;
 }

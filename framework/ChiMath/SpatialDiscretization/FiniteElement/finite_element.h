@@ -34,18 +34,18 @@ namespace chi_math::finite_element
     typedef std::vector<VecVec3> MatVec3;
 
   private:
-    MatDbl   m_IntV_gradShapeI_gradShapeJ;
-    MatVec3  m_IntV_shapeI_gradshapeJ    ;
-    MatDbl   m_IntV_shapeI_shapeJ        ;
-    VecDbl   m_IntV_shapeI               ;
-    VecVec3  m_IntV_gradshapeI           ;
+    MatDbl   IntV_gradShapeI_gradShapeJ_;
+    MatVec3  IntV_shapeI_gradshapeJ_    ;
+    MatDbl   IntV_shapeI_shapeJ_        ;
+    VecDbl   IntV_shapeI_               ;
+    VecVec3  IntV_gradshapeI_           ;
 
-    std::vector<MatDbl>  m_IntS_shapeI_shapeJ    ;
-    std::vector<VecDbl>  m_IntS_shapeI           ;
-    std::vector<MatVec3> m_IntS_shapeI_gradshapeJ;
+    std::vector<MatDbl>  IntS_shapeI_shapeJ_    ;
+    std::vector<VecDbl>  IntS_shapeI_           ;
+    std::vector<MatVec3> IntS_shapeI_gradshapeJ_;
 
-    std::vector<std::vector<int>> m_face_dof_mappings;
-    size_t m_num_nodes=0;
+    std::vector<std::vector<int>> face_dof_mappings_;
+    size_t num_nodes_ = 0;
 
   public:
     void Initialize(MatDbl   in_IntV_gradShapeI_gradShapeJ,
@@ -63,11 +63,14 @@ namespace chi_math::finite_element
 
     double IntV_gradShapeI_gradShapeJ(unsigned int i,
                                       unsigned int j) const;
+
     chi_mesh::Vector3 IntV_shapeI_gradshapeJ(unsigned int i,
                                              unsigned int j) const;
     double IntV_shapeI_shapeJ(unsigned int i,
                               unsigned int j) const;
+
     double IntV_shapeI(unsigned int i) const;
+
     chi_mesh::Vector3 IntV_gradshapeI(unsigned int i) const;
 
     double IntS_shapeI_shapeJ(unsigned int face, unsigned int i, unsigned int j) const;
@@ -77,25 +80,24 @@ namespace chi_math::finite_element
     chi_mesh::Vector3 IntS_shapeI_gradshapeJ(unsigned int face,
                                              unsigned int i,
                                              unsigned int j) const;
+
     int FaceDofMapping(size_t face, size_t face_node_index) const
     {
-      auto& face_data = m_face_dof_mappings.at(face);
+      auto& face_data = face_dof_mappings_.at(face);
       return face_data.at(face_node_index);
     }
-    size_t NumNodes() const
-    {
-      return m_num_nodes;
-    }
 
-    const MatDbl  & GetIntV_gradShapeI_gradShapeJ() const {return m_IntV_gradShapeI_gradShapeJ;}
-    const MatVec3 & GetIntV_shapeI_gradshapeJ()     const {return m_IntV_shapeI_gradshapeJ    ;}
-    const MatDbl  & GetIntV_shapeI_shapeJ()         const {return m_IntV_shapeI_shapeJ        ;}
-    const VecDbl  & GetIntV_shapeI()                const {return m_IntV_shapeI               ;}
-    const VecVec3 & GetIntV_gradshapeI()            const {return m_IntV_gradshapeI           ;}
+    size_t NumNodes() const { return num_nodes_; }
 
-    const std::vector<MatDbl>&  GetIntS_shapeI_shapeJ()    const  {return m_IntS_shapeI_shapeJ    ;}
-    const std::vector<VecDbl>&  GetIntS_shapeI()           const  {return m_IntS_shapeI           ;}
-    const std::vector<MatVec3>& GetIntS_shapeI_gradshapeJ()const  {return m_IntS_shapeI_gradshapeJ;}
+    const MatDbl  & GetIntV_gradShapeI_gradShapeJ() const {return IntV_gradShapeI_gradShapeJ_;}
+    const MatVec3 & GetIntV_shapeI_gradshapeJ()     const {return IntV_shapeI_gradshapeJ_    ;}
+    const MatDbl  & GetIntV_shapeI_shapeJ()         const {return IntV_shapeI_shapeJ_        ;}
+    const VecDbl  & GetIntV_shapeI()                const {return IntV_shapeI_               ;}
+    const VecVec3 & GetIntV_gradshapeI()            const {return IntV_gradshapeI_           ;}
+
+    const std::vector<MatDbl>&  GetIntS_shapeI_shapeJ()    const  {return IntS_shapeI_shapeJ_    ;}
+    const std::vector<VecDbl>&  GetIntS_shapeI()           const  {return IntS_shapeI_           ;}
+    const std::vector<MatVec3>& GetIntS_shapeI_gradshapeJ()const  {return IntS_shapeI_gradshapeJ_;}
   };
 
   //#############################################
@@ -109,15 +111,15 @@ namespace chi_math::finite_element
                                  "without being initialized. Set flag"
                                  " INIT_QP_DATA.");}
   protected:
-    std::vector<unsigned int>     m_quadrature_point_indices; ///< qp index only
-    VecVec3                       m_qpoints_xyz             ; ///< qp index only
-    std::vector<VecDbl>           m_shape_value             ; ///< Node i, then qp
-    std::vector<VecVec3>          m_shape_grad              ; ///< Node i, then qp
-    VecDbl                        m_JxW                     ; ///< qp index only
-    std::vector<std::vector<int>> m_face_dof_mappings       ; ///< Face f,then fi
-    size_t                        m_num_nodes                =0;
+    std::vector<unsigned int>     quadrature_point_indices_; ///< qp index only
+    VecVec3                       qpoints_xyz_             ; ///< qp index only
+    std::vector<VecDbl>           shape_value_             ; ///< Node i, then qp
+    std::vector<VecVec3>          shape_grad_              ; ///< Node i, then qp
+    VecDbl                        JxW_                     ; ///< qp index only
+    std::vector<std::vector<int>> face_dof_mappings_       ; ///< Face f,then fi
+    size_t                        num_nodes_ = 0;
 
-    bool                          m_initialized=false;
+    bool                          initialized_ = false;
 
   public:
     void InitializeData(std::vector<unsigned int> quadrature_point_indices,
@@ -149,7 +151,7 @@ namespace chi_math::finite_element
   class FaceQuadraturePointData : public InternalQuadraturePointData
   {
   protected:
-    VecVec3                   m_normals;                  ///< node i, then qp
+    VecVec3                   normals_;                  ///< node i, then qp
   public:
     void InitializeData(std::vector<unsigned int>     quadrature_point_indices,
                         VecVec3                       qpoints_xyz,

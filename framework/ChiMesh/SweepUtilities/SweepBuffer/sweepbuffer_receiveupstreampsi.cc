@@ -4,6 +4,8 @@
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 #include "ChiMesh/SweepUtilities/FLUDS/FLUDS.h"
 
+#include "ChiMPI/chi_mpi_commset.h"
+
 #include "chi_log.h"
 #include "chi_mpi.h"
 
@@ -13,14 +15,14 @@
 chi_mesh::sweep_management::AngleSetStatus
 chi_mesh::sweep_management::SweepBuffer::ReceiveUpstreamPsi(int angle_set_num)
 {
-  auto  spds =  angleset->GetSPDS();
+  const auto& spds = angleset->GetSPDS();
   auto fluds =  angleset->fluds;
 
   const auto num_grps   = angleset->GetNumGrps();
   const auto num_angles = angleset->angles.size();
 
   //============================== Resize FLUDS non-local incoming Data
-  const size_t num_loc_deps = spds->location_dependencies.size();
+  const size_t num_loc_deps = spds.location_dependencies.size();
   if (!upstream_data_initialized)
   {
     angleset->prelocI_outgoing_psi.resize(num_loc_deps, std::vector<double>());
@@ -38,7 +40,7 @@ chi_mesh::sweep_management::SweepBuffer::ReceiveUpstreamPsi(int angle_set_num)
   bool ready_to_execute = true;
   for (size_t prelocI=0; prelocI<num_loc_deps; prelocI++)
   {
-    int locJ = spds->location_dependencies[prelocI];
+    int locJ = spds.location_dependencies[prelocI];
 
     size_t num_mess = prelocI_message_count[prelocI];
     for (int m=0; m<num_mess; m++)
@@ -46,9 +48,9 @@ chi_mesh::sweep_management::SweepBuffer::ReceiveUpstreamPsi(int angle_set_num)
       if (!prelocI_message_received[prelocI][m])
       {
         int message_available = 0;
-        MPI_Iprobe(comm_set->MapIonJ(locJ,chi::mpi.location_id),
+        MPI_Iprobe(comm_set.MapIonJ(locJ,chi::mpi.location_id),
                    max_num_mess*angle_set_num + m, //tag
-                   comm_set->communicators[chi::mpi.location_id],
+                   comm_set.LocICommunicator(chi::mpi.location_id),
                    &message_available, MPI_STATUS_IGNORE);
 
         if (not message_available)
@@ -67,9 +69,9 @@ chi_mesh::sweep_management::SweepBuffer::ReceiveUpstreamPsi(int angle_set_num)
           MPI_Recv(&upstream_psi[block_addr],
                    static_cast<int>(message_size),
                    MPI_DOUBLE,
-                   comm_set->MapIonJ(locJ,chi::mpi.location_id),
+                   comm_set.MapIonJ(locJ,chi::mpi.location_id),
                    max_num_mess*angle_set_num + m, //tag
-                   comm_set->communicators[chi::mpi.location_id],
+                   comm_set.LocICommunicator(chi::mpi.location_id),
                    MPI_STATUS_IGNORE);
 
         prelocI_message_received[prelocI][m] = true;

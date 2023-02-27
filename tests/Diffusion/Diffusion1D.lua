@@ -47,8 +47,8 @@ chiSolverSetBasicOption(phys1,"discretization_method","PWLC")
 chiSolverSetBasicOption(phys1,"residual_tolerance",1.0e-4)
 
 --############################################### Set boundary conditions
-chiDiffusionSetProperty(phys1,"boundary_type",OrthoBoundaryID.ZMIN,"vacuum")
-chiDiffusionSetProperty(phys1,"boundary_type",OrthoBoundaryID.ZMAX,"vacuum")
+chiDiffusionSetProperty(phys1,"boundary_type","ZMIN","vacuum")
+chiDiffusionSetProperty(phys1,"boundary_type","ZMAX","vacuum")
 
 --############################################### Initialize and Execute Solver
 chiDiffusionInitialize(phys1)

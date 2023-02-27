@@ -32,8 +32,8 @@ struct chi_mesh::sweep_management::SPDS
   //======================================== Default constructor
   SPDS() = default;
 
-  int MapLocJToPrelocI(int locJ);
-  int MapLocJToDeplocI(int locJ);
+  int MapLocJToPrelocI(int locJ) const;
+  int MapLocJToDeplocI(int locJ) const;
 
   void BuildTaskDependencyGraph(bool cycle_allowance_flag);
 };

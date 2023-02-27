@@ -11,18 +11,19 @@ namespace chi_mesh
   class FieldFunctionInterpolationPoint :
     public FieldFunctionInterpolation
   {
-  public:
-    chi_mesh::Vector3 m_point_of_interest;
-
   protected:
-    bool m_locally_owned = false;
-    uint64_t m_owning_cell_gid = 0;
-    double m_point_value = 0.0;
+    chi_mesh::Vector3 point_of_interest_;
+
+    bool locally_owned_ = false;
+    uint64_t owning_cell_gid_ = 0;
+    double point_value_ = 0.0;
 
   public:
     FieldFunctionInterpolationPoint() :
       FieldFunctionInterpolation(ff_interpolation::Type::POINT)
     {  }
+
+    chi_mesh::Vector3& GetPointOfInterest() {return point_of_interest_;}
 
     void Initialize() override;
     void Execute() override;

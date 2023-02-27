@@ -68,7 +68,7 @@ void chi_objects::ChiConsole::RunConsoleLoop(char*) const
 
   const bool HOME = chi::mpi.location_id == 0;
 
-  while (not chi::run_time::termination_posted)
+  while (not chi::run_time::termination_posted_)
   {
     std::string console_input;
 
@@ -95,7 +95,7 @@ void chi_objects::ChiConsole::RunConsoleLoop(char*) const
     }
   }//while not termination posted
 
-  chi::run_time::termination_posted = true;
+  chi::run_time::termination_posted_ = true;
 
   chi::log.Log() << "Console loop stopped successfully.";
 }

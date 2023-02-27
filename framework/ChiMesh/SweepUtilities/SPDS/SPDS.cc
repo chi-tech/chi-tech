@@ -13,7 +13,7 @@
 
 //###################################################################
 /** Given a location J index, maps to a predecessor location.*/
-int chi_mesh::sweep_management::SPDS::MapLocJToPrelocI(int locJ)
+int chi_mesh::sweep_management::SPDS::MapLocJToPrelocI(int locJ) const
 {
   for (int i=0; i<location_dependencies.size(); i++)
   {
@@ -39,7 +39,7 @@ int chi_mesh::sweep_management::SPDS::MapLocJToPrelocI(int locJ)
 
 //###################################################################
 /** Given a location J index, maps to a dependent location.*/
-int chi_mesh::sweep_management::SPDS::MapLocJToDeplocI(int locJ)
+int chi_mesh::sweep_management::SPDS::MapLocJToDeplocI(int locJ) const
 {
   for (int i=0; i<location_successors.size(); i++)
   {

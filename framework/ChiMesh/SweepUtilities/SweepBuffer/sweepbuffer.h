@@ -6,6 +6,11 @@
 
 typedef unsigned long long int u_ll_int;
 
+namespace chi_objects
+{
+  class ChiMPICommunicatorSet;
+}
+
 namespace chi_mesh::sweep_management
 {
 
@@ -16,7 +21,7 @@ class SweepBuffer
 {
 private:
   chi_mesh::sweep_management::AngleSet* const angleset;
-  chi_objects::ChiMPICommunicatorSet* const                comm_set;
+  const chi_objects::ChiMPICommunicatorSet&   comm_set;
 
   bool done_sending;
   bool data_initialized;
@@ -48,7 +53,7 @@ public:
 
   SweepBuffer(chi_mesh::sweep_management::AngleSet* ref_angleset,
               int sweep_eager_limit,
-              chi_objects::ChiMPICommunicatorSet* in_comm_set);
+              const chi_objects::ChiMPICommunicatorSet& in_comm_set);
   bool DoneSending() const;
   void BuildMessageStructure();
   void InitializeDelayedUpstreamData();

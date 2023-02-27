@@ -201,14 +201,14 @@ namespace chi_objects
       LOG_ALLVERBOSE_2=12};   ///< Used only if verbosity level equals 2
 
   private:
-    DummyStream dummy_stream;
-    int verbosity;
+    DummyStream dummy_stream_;
+    int verbosity_;
 
-    static ChiLog instance;
+    static ChiLog instance_;
 
   public:
     static ChiLog& GetInstance() noexcept
-    { return instance;}
+    { return instance_;}
   private:
     //00
                     ChiLog() noexcept;

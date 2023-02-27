@@ -90,12 +90,12 @@ void chi_math::SimplifiedLDFESQ::Quadrature::
   auto ref_dir_n = ref_dir.Normalized();
   double mu_cone = cos(cone_size);
   std::vector<SphericalQuadrilateral> new_deployment;
-  new_deployment.reserve(deployed_SQs.size());
+  new_deployment.reserve(deployed_SQs_.size());
 
   chi_math::QuadratureGaussLegendre legendre(QuadratureOrder::THIRTYSECOND);
 
   int num_refined = 0;
-  for (auto& sq : deployed_SQs)
+  for (auto& sq : deployed_SQs_)
   {
     bool sq_to_be_split = false;
 
@@ -116,9 +116,9 @@ void chi_math::SimplifiedLDFESQ::Quadrature::
     }
   }
 
-  deployed_SQs.clear();
-  deployed_SQs = new_deployment;
-  deployed_SQs_history.push_back(new_deployment);
+  deployed_SQs_.clear();
+  deployed_SQs_ = new_deployment;
+  deployed_SQs_history_.push_back(new_deployment);
 
   PopulateQuadratureAbscissae();
 

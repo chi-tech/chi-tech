@@ -9,10 +9,10 @@
 //###################################################################
 /**Receives and send predecessor data.*/
 void chi_mesh::sweep_management::PRIMARY_FLUDS::
-InitializeBetaElements(SPDS_ptr spds, int tag_index)
+  InitializeBetaElements(const SPDS& spds, int tag_index)
 {
-  chi_mesh::MeshContinuumPtr         grid = spds->grid;
-  chi_mesh::sweep_management::SPLS& spls = spds->spls;
+  chi_mesh::MeshContinuumPtr         grid = spds.grid;
+  const chi_mesh::sweep_management::SPLS& spls = spds.spls;
 
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
   // The first two major steps here are: Send delayed successor information
@@ -23,18 +23,18 @@ InitializeBetaElements(SPDS_ptr spds, int tag_index)
 
   //=============================================== Send delayed successor information
   std::vector<MPI_Request>  send_requests;
-  send_requests.resize(spds->location_successors.size(),MPI_Request());
+  send_requests.resize(spds.location_successors.size(),MPI_Request());
   std::vector<std::vector<int>>
-      multi_face_indices(spds->location_successors.size(),std::vector<int>());
-  for (int deplocI=0; deplocI<spds->location_successors.size(); deplocI++)
+      multi_face_indices(spds.location_successors.size(),std::vector<int>());
+  for (int deplocI=0; deplocI<spds.location_successors.size(); deplocI++)
   {
-    int locJ = spds->location_successors[deplocI];
+    int locJ = spds.location_successors[deplocI];
 
-    std::vector<int>::iterator delayed_successor =
-        std::find(spds->delayed_location_successors.begin(),
-                  spds->delayed_location_successors.end(),
+    std::vector<int>::const_iterator delayed_successor =
+        std::find(spds.delayed_location_successors.begin(),
+                  spds.delayed_location_successors.end(),
                   locJ);
-    if ((delayed_successor == spds->delayed_location_successors.end()))
+    if ((delayed_successor == spds.delayed_location_successors.end()))
       continue;
 
     std::vector<CompactCellView>* cell_views = &deplocI_cell_views[deplocI];
@@ -56,12 +56,12 @@ InitializeBetaElements(SPDS_ptr spds, int tag_index)
 
   //=============================================== Receive delayed predecessor
   //                                                information
-  delayed_prelocI_cell_views.resize(spds->delayed_location_dependencies.size(),
+  delayed_prelocI_cell_views.resize(spds.delayed_location_dependencies.size(),
                                     std::vector<CompactCellView>());
-  delayed_prelocI_face_dof_count.resize(spds->delayed_location_dependencies.size(),0);
-  for (int prelocI=0; prelocI<spds->delayed_location_dependencies.size(); prelocI++)
+  delayed_prelocI_face_dof_count.resize(spds.delayed_location_dependencies.size(),0);
+  for (int prelocI=0; prelocI<spds.delayed_location_dependencies.size(); prelocI++)
   {
-    int locJ = spds->delayed_location_dependencies[prelocI];
+    int locJ = spds.delayed_location_dependencies[prelocI];
 
     MPI_Status probe_status;
     MPI_Probe(locJ,101+tag_index,MPI_COMM_WORLD,&probe_status);
@@ -87,12 +87,12 @@ InitializeBetaElements(SPDS_ptr spds, int tag_index)
 
   //=============================================== Receive predecessor
   //                                                information
-  prelocI_cell_views.resize(spds->location_dependencies.size(),
+  prelocI_cell_views.resize(spds.location_dependencies.size(),
                             std::vector<CompactCellView>());
-  prelocI_face_dof_count.resize(spds->location_dependencies.size(),0);
-  for (int prelocI=0; prelocI<spds->location_dependencies.size(); prelocI++)
+  prelocI_face_dof_count.resize(spds.location_dependencies.size(),0);
+  for (int prelocI=0; prelocI<spds.location_dependencies.size(); prelocI++)
   {
-    int locJ = spds->location_dependencies[prelocI];
+    int locJ = spds.location_dependencies[prelocI];
 
     MPI_Status probe_status;
     MPI_Probe(locJ,101+tag_index,MPI_COMM_WORLD,&probe_status);
@@ -115,14 +115,14 @@ InitializeBetaElements(SPDS_ptr spds, int tag_index)
   }
 
   //=============================================== Send successor information
-  for (int deplocI=0; deplocI<spds->location_successors.size(); deplocI++)
+  for (int deplocI=0; deplocI<spds.location_successors.size(); deplocI++)
   {
-    int locJ = spds->location_successors[deplocI];
+    int locJ = spds.location_successors[deplocI];
 
-    auto delayed_successor = std::find(spds->delayed_location_successors.begin(),
-                                       spds->delayed_location_successors.end(),
+    auto delayed_successor = std::find(spds.delayed_location_successors.begin(),
+                                       spds.delayed_location_successors.end(),
                                        locJ);
-    if ((delayed_successor != spds->delayed_location_successors.end()))
+    if ((delayed_successor != spds.delayed_location_successors.end()))
       continue;
 
     std::vector<CompactCellView>* cell_views = &deplocI_cell_views[deplocI];
@@ -143,7 +143,7 @@ InitializeBetaElements(SPDS_ptr spds, int tag_index)
   }
 
   //================================================== Verify sends completed
-  for (int deplocI=0; deplocI<spds->location_successors.size(); deplocI++)
+  for (int deplocI=0; deplocI<spds.location_successors.size(); deplocI++)
     MPI_Wait(&send_requests[deplocI],MPI_STATUS_IGNORE);
   multi_face_indices.clear();
   multi_face_indices.shrink_to_fit();
@@ -159,7 +159,7 @@ InitializeBetaElements(SPDS_ptr spds, int tag_index)
   for (int csoi=0; csoi<spls.item_id.size(); csoi++)
   {
     int cell_local_index = spls.item_id[csoi];
-    auto cell = &grid->local_cells[cell_local_index];
+    const auto& cell = grid->local_cells[cell_local_index];
 
     NonLocalIncidentMapping(cell, spds);
   }//for csoi

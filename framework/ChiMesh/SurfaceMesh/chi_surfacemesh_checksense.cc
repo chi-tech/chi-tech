@@ -7,13 +7,13 @@ bool chi_mesh::SurfaceMesh::CheckNegativeSense(double x, double y, double z)
 
   //======================================================= Loop through each face
   std::vector<chi_mesh::Face>::iterator cur_face;
-  for (cur_face = this->faces.begin();
-          cur_face != this->faces.end(); cur_face++)
+  for (cur_face = this->faces_.begin();
+          cur_face != this->faces_.end(); cur_face++)
   {
     //=========================================== Get a vertex (first one)
     chi_mesh::Vertex p;
     try{
-      p = this->vertices.at(cur_face->v_index[0]);
+      p = this->vertices_.at(cur_face->v_index[0]);
     }
     catch(const std::out_of_range& o){
       std::cout << "Invalid vertex handle" << std::endl;

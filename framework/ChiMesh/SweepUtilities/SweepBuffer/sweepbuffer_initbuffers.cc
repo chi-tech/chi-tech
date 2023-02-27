@@ -19,7 +19,7 @@ void chi_mesh::sweep_management::SweepBuffer::
 {
   if (!data_initialized)
   {
-    auto spds =  angleset->GetSPDS();
+    const auto& spds = angleset->GetSPDS();
     auto fluds=  angleset->fluds;
 
     const auto num_grps   = angleset->GetNumGrps();
@@ -37,8 +37,8 @@ void chi_mesh::sweep_management::SweepBuffer::
 
     //============================ Resize FLUDS non-local outgoing Data
     angleset->deplocI_outgoing_psi.resize(
-      spds->location_successors.size(),std::vector<double>());
-    for (size_t deplocI=0; deplocI<spds->location_successors.size(); deplocI++)
+      spds.location_successors.size(),std::vector<double>());
+    for (size_t deplocI=0; deplocI<spds.location_successors.size(); deplocI++)
     {
       angleset->deplocI_outgoing_psi[deplocI].resize(
         fluds->deplocI_face_dof_count[deplocI]*num_grps*num_angles,0.0);

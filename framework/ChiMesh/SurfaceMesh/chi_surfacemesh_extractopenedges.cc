@@ -11,7 +11,7 @@
 void chi_mesh::SurfaceMesh::ExtractOpenEdgesToObj(const char *fileName)
 {
   std::vector<std::pair<int,int>> edges;
-  for (auto face : poly_faces)
+  for (auto face : poly_faces_)
   {
     for (auto edge : face->edges)
     {
@@ -38,8 +38,8 @@ void chi_mesh::SurfaceMesh::ExtractOpenEdgesToObj(const char *fileName)
 
   for (auto vert_pair : edges)
   {
-    chi_mesh::Vertex& v0 = vertices[vert_pair.first];
-    chi_mesh::Vertex& v1 = vertices[vert_pair.second];
+    chi_mesh::Vertex& v0 = vertices_[vert_pair.first];
+    chi_mesh::Vertex& v1 = vertices_[vert_pair.second];
     outfile
       << "v " << v0.x << " " << v0.y << " " << v0.z << "\n"
       << "v " << v1.x << " " << v1.y << " " << v1.z << "\n";

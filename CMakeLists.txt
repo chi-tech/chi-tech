@@ -91,6 +91,7 @@ include_directories("${CHI_TECH_DIR}/framework/ChiLog")
 include_directories("${CHI_TECH_DIR}/framework/ChiMiscUtils")
 include_directories("${CHI_TECH_DIR}/resources")
 include_directories("${CHI_TECH_DIR}/modules")
+include_directories("${CHI_TECH_DIR}/modules/LinearBoltzmannSolvers")
 
 #================================================ Library directories
 link_directories("${LUA_ROOT}/lib")
@@ -121,6 +122,7 @@ else ()
             IOXML ParallelCore IOParallelXML
             FiltersCore
             IOEnSight
+            IOExodus
             REQUIRED PATHS ${VTK_DIR})
     # vtk_module_autoinit is needed
     vtk_module_autoinit(TARGETS ${TARGET} MODULES ${VTK_LIBRARIES})

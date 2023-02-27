@@ -8,12 +8,12 @@
 double chi_math::PolygonMappingFE_PWL::
   ShapeValue(const int i, const chi_mesh::Vector3& xyz) const
 {
-  for (int s=0; s<num_of_subtris; s++)
+  for (int s=0; s < num_of_subtris_; s++)
   {
-    const auto& p0 = m_grid_ptr->vertices[sides[s].v_index[0]];
+    const auto& p0 = grid_ptr_->vertices[sides_[s].v_index[0]];
     chi_mesh::Vector3 xyz_ref = xyz - p0;
 
-    chi_mesh::Vector3 xi_eta_zeta   = sides[s].Jinv * xyz_ref;
+    chi_mesh::Vector3 xi_eta_zeta   = sides_[s].Jinv * xyz_ref;
 
     double xi  = xi_eta_zeta.x;
     double eta = xi_eta_zeta.y;
@@ -22,7 +22,7 @@ double chi_math::PolygonMappingFE_PWL::
     if ((xi>=-1.0e-12) and (eta>=-1.0e-12) and
         ((xi + eta)<=(1.0+1.0e-12)))
     {
-      int index = node_to_side_map[i][s];
+      int index = node_to_side_map_[i][s];
       double value = 0.0;
 
       if (index==0)
@@ -34,7 +34,7 @@ double chi_math::PolygonMappingFE_PWL::
         value = xi;
       }
 
-      value += beta*eta;
+      value += beta_ * eta;
 
       return value;
     }
@@ -50,11 +50,11 @@ void chi_math::PolygonMappingFE_PWL::
   ShapeValues(const chi_mesh::Vector3 &xyz,
               std::vector<double> &shape_values) const
 {
-  shape_values.resize(m_num_nodes, 0.0);
-  for (int s=0; s<num_of_subtris; s++)
+  shape_values.resize(num_nodes_, 0.0);
+  for (int s=0; s < num_of_subtris_; s++)
   {
-    const auto& p0 = m_grid_ptr->vertices[sides[s].v_index[0]];
-    chi_mesh::Vector3 xi_eta_zeta   = sides[s].Jinv * (xyz - p0);
+    const auto& p0 = grid_ptr_->vertices[sides_[s].v_index[0]];
+    chi_mesh::Vector3 xi_eta_zeta   = sides_[s].Jinv * (xyz - p0);
 
     double xi  = xi_eta_zeta.x;
     double eta = xi_eta_zeta.y;
@@ -63,9 +63,9 @@ void chi_math::PolygonMappingFE_PWL::
     if ((xi>=-1.0e-12) and (eta>=-1.0e-12) and
         ((xi + eta)<=(1.0+1.0e-12)))
     {
-      for (int i=0; i < m_num_nodes; i++)
+      for (int i=0; i < num_nodes_; i++)
       {
-        int index = node_to_side_map[i][s];
+        int index = node_to_side_map_[i][s];
         double value = 0.0;
 
         if (index==0)
@@ -77,7 +77,7 @@ void chi_math::PolygonMappingFE_PWL::
           value = xi;
         }
 
-        value += beta*eta;
+        value += beta_ * eta;
 
         shape_values[i] = value;
       }
@@ -95,12 +95,12 @@ chi_mesh::Vector3 chi_math::PolygonMappingFE_PWL::
   chi_mesh::Vector3 grad_r;
   chi_mesh::Vector3 grad;
 
-  for (int e=0; e<num_of_subtris; e++)
+  for (int e=0; e < num_of_subtris_; e++)
   {
-    const auto& p0 = m_grid_ptr->vertices[sides[e].v_index[0]];
+    const auto& p0 = grid_ptr_->vertices[sides_[e].v_index[0]];
     chi_mesh::Vector3 xyz_ref = xyz - p0;
 
-    chi_mesh::Vector3 xi_eta_zeta = sides[e].Jinv * xyz_ref;
+    chi_mesh::Vector3 xi_eta_zeta = sides_[e].Jinv * xyz_ref;
 
     double xi  = xi_eta_zeta.x;
     double eta = xi_eta_zeta.y;
@@ -108,7 +108,7 @@ chi_mesh::Vector3 chi_math::PolygonMappingFE_PWL::
     if ((xi>=-1.0e-12) and (eta>=-1.0e-12)  and
         ((xi + eta)<=(1.0+1.0e-12)))
     {
-      int index = node_to_side_map[i][e];
+      int index = node_to_side_map_[i][e];
 
       if (index == 0)
       {
@@ -121,9 +121,9 @@ chi_mesh::Vector3 chi_math::PolygonMappingFE_PWL::
         grad_r.y += 0.0;
       }
 
-      grad_r.y += beta*1.0;
+      grad_r.y += beta_ * 1.0;
 
-      grad = sides[e].JTinv*grad_r;
+      grad = sides_[e].JTinv * grad_r;
 
       return grad;
     }
@@ -140,6 +140,6 @@ void chi_math::PolygonMappingFE_PWL::GradShapeValues(
   std::vector<chi_mesh::Vector3> &gradshape_values) const
 {
   gradshape_values.clear();
-  for (int i=0; i < m_num_nodes; ++i)
+  for (int i=0; i < num_nodes_; ++i)
     gradshape_values.emplace_back(GradShapeValue(i,xyz));
 }

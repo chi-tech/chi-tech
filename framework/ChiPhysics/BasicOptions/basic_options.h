@@ -10,34 +10,34 @@ namespace chi_physics
 class BasicOption
 {
 private:
-  std::string     name;
-  chi_data_types::Varying         value;
+  std::string             name_;
+  chi_data_types::Varying value_;
 
 public:
   BasicOption(const std::string& name, const std::string& string_value) :
-    name(name), value(string_value) {}
+    name_(name), value_(string_value) {}
 
   BasicOption(const std::string& name, const bool& bool_value) :
-    name(name), value(bool_value) {}
+    name_(name), value_(bool_value) {}
 
   BasicOption(const std::string& name, const int64_t& integer_value) :
-    name(name), value(integer_value) {}
+    name_(name), value_(integer_value) {}
 
   BasicOption(const std::string& name, const double& float_value) :
-    name(name), value(float_value) {}
+    name_(name), value_(float_value) {}
 
-  chi_data_types::VaryingDataType Type() const {return value.Type();}
+  chi_data_types::VaryingDataType Type() const {return value_.Type();}
 
-  std::string Name() const {return name;}
-  std::string StringValue() const  {return value.StringValue();}
-  bool        BoolValue() const    {return value.BoolValue();}
-  int64_t     IntegerValue() const {return value.IntegerValue();}
-  double      FloatValue() const   {return value.FloatValue();}
+  std::string Name() const {return name_;}
+  std::string StringValue() const  {return value_.StringValue();}
+  bool        BoolValue() const    {return value_.BoolValue();}
+  int64_t     IntegerValue() const {return value_.IntegerValue();}
+  double      FloatValue() const   {return value_.FloatValue();}
 
-  void SetStringValue(const std::string& in_string_value) {value = in_string_value;}
-  void SetBoolValue(const bool& in_bool_value)            {value = in_bool_value;}
-  void SetIntegerValue(const int64_t& in_integer_value)   {value = in_integer_value;}
-  void SetFloatValue(const double& in_float_value)        {value = in_float_value;}
+  void SetStringValue(const std::string& in_string_value) { value_ = in_string_value;}
+  void SetBoolValue(const bool& in_bool_value)            { value_ = in_bool_value;}
+  void SetIntegerValue(const int64_t& in_integer_value)   { value_ = in_integer_value;}
+  void SetFloatValue(const double& in_float_value)        { value_ = in_float_value;}
 
 };
 
@@ -46,14 +46,14 @@ public:
 class BasicOptions
 {
 private:
-  std::vector<BasicOption> options;
+  std::vector<BasicOption> options_;
 
 public:
   BasicOptions() = default;
 
   /**Constructor with initializer list.*/
   BasicOptions(std::initializer_list<BasicOption> in_options) :
-    options(in_options)
+    options_(in_options)
   {  }
 
   //Operators

@@ -36,17 +36,17 @@ ExportPython(std::string base_name)
       ofile << "import " << submod_name << "\n\n";
     }
 
-    for (int ff=0; ff<field_functions.size(); ff++)
+    for (int ff=0; ff < field_functions_.size(); ff++)
     {
       ofile
-        << "data" << ff<< "=np.zeros([" << interpolation_points.size()
+        << "data" << ff << "=np.zeros([" << interpolation_points_.size()
         << ",5])\n";
     }
-    for (int ca=0; ca<custom_arrays.size(); ca++)
+    for (int ca=0; ca < custom_arrays_.size(); ca++)
     {
-      int ff = ca + field_functions.size();
+      int ff = ca + field_functions_.size();
       ofile
-        << "data" << ff<< "=np.zeros([" << interpolation_points.size()
+        << "data" << ff << "=np.zeros([" << interpolation_points_.size()
         << ",5])\n";
     }
 
@@ -66,9 +66,9 @@ ExportPython(std::string base_name)
 
   }
 
-  for (int ff=0; ff<field_functions.size(); ff++)
+  for (int ff=0; ff < field_functions_.size(); ff++)
   {
-    const auto& ff_ctx = ff_contexts[ff];
+    const auto& ff_ctx = ff_contexts_[ff];
 
     if (chi::mpi.process_count>1 and chi::mpi.location_id!=0)
     {
@@ -77,7 +77,7 @@ ExportPython(std::string base_name)
 
       offset = std::string("  ");
     }
-    for (int p=0; p<interpolation_points.size(); p++)
+    for (int p=0; p < interpolation_points_.size(); p++)
     {
       if ((not ff_ctx.interpolation_points_has_ass_cell[p])  &&
           (chi::mpi.location_id != 0))
@@ -86,13 +86,13 @@ ExportPython(std::string base_name)
       }
 
       ofile << offset << "data" << ff << "[" << p << ",0] = "
-            << interpolation_points[p].x << "\n";
+            << interpolation_points_[p].x << "\n";
       ofile << offset << "data" << ff << "[" << p << ",1] = "
-            << interpolation_points[p].y << "\n";
+            << interpolation_points_[p].y << "\n";
       ofile << offset << "data" << ff << "[" << p << ",2] = "
-            << interpolation_points[p].z << "\n";
+            << interpolation_points_[p].z << "\n";
 
-      double d = delta_d*p;
+      double d = delta_d_ * p;
 
       ofile << offset << "data" << ff << "[" << p << ",3] = "
             << d << "\n";
@@ -114,9 +114,9 @@ ExportPython(std::string base_name)
 
   }
 
-  for (int ca=0; ca<custom_arrays.size(); ca++)
+  for (int ca=0; ca < custom_arrays_.size(); ca++)
   {
-    int ff = ca + field_functions.size();
+    int ff = ca + field_functions_.size();
 
     if (chi::mpi.process_count>1 and chi::mpi.location_id!=0)
     {
@@ -129,20 +129,20 @@ ExportPython(std::string base_name)
     std::string op("= ");
     if (chi::mpi.location_id != 0) op = std::string("+= ");
 
-    for (int p=0; p<interpolation_points.size(); p++)
+    for (int p=0; p < interpolation_points_.size(); p++)
     {
       ofile << offset << "data" << ff << "[" << p << ",0] = "
-            << interpolation_points[p].x << "\n";
+            << interpolation_points_[p].x << "\n";
       ofile << offset << "data" << ff << "[" << p << ",1] = "
-            << interpolation_points[p].y << "\n";
+            << interpolation_points_[p].y << "\n";
       ofile << offset << "data" << ff << "[" << p << ",2] = "
-            << interpolation_points[p].z << "\n";
+            << interpolation_points_[p].z << "\n";
 
-      double d = delta_d*p;
+      double d = delta_d_ * p;
       double value = 0.0;
 
-      if (p<custom_arrays[ca].size())
-        value = custom_arrays[ca][p];
+      if (p < custom_arrays_[ca].size())
+        value = custom_arrays_[ca][p];
 
       ofile << offset << "data" << ff << "[" << p << ",3] = "
             << d << "\n";
@@ -163,16 +163,16 @@ ExportPython(std::string base_name)
   if (chi::mpi.location_id == 0)
   {
     ofile << "plt.figure(1)\n";
-    for (int ff=0; ff<field_functions.size(); ff++)
+    for (int ff=0; ff < field_functions_.size(); ff++)
     {
       ofile << "plt.plot(data" << ff << "[:,3],data"
-      << ff << "[:,4]"
-      << ",label=\"" << field_functions[ff]->TextName() << "\""
-      << ")\n";
+            << ff << "[:,4]"
+            << ",label=\"" << field_functions_[ff]->TextName() << "\""
+            << ")\n";
     }
-    for (int ca=0; ca<custom_arrays.size(); ca++)
+    for (int ca=0; ca < custom_arrays_.size(); ca++)
     {
-      int ff = ca + field_functions.size();
+      int ff = ca + field_functions_.size();
       ofile << "plt.plot(data" << ff << "[:,3],data"
             << ff << "[:,4]"
             << ",label=\"CustomArray" << ca << "\""
@@ -188,7 +188,7 @@ ExportPython(std::string base_name)
 
   chi::log.Log()
     << "Exported Python files for field func \""
-    << field_functions[0]->TextName()
+    << field_functions_[0]->TextName()
     << "\" to base name \""
     << base_name << "\" Successfully";
 

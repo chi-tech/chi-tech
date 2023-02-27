@@ -5,19 +5,17 @@
 
 typedef std::vector<std::pair<int,short>> LockBox;
 
-#include <chi_log.h>
-
-;
+#include "chi_log.h"
 
 //###################################################################
 /**Performs Incident mapping for Polyhedron cell.*/
 void chi_mesh::sweep_management::PRIMARY_FLUDS::
-LocalIncidentMapping(chi_mesh::Cell *cell,
-                     SPDS_ptr spds,
+LocalIncidentMapping(const chi_mesh::Cell& cell,
+                     const SPDS& spds,
                      std::vector<int>&  local_so_cell_mapping)
 {
-  chi_mesh::MeshContinuumPtr grid = spds->grid;
-  auto& cell_nodal_mapping = grid_nodal_mappings[cell->local_id];
+  chi_mesh::MeshContinuumPtr grid = spds.grid;
+  auto& cell_nodal_mapping = grid_nodal_mappings[cell.local_id_];
   std::vector<std::pair<int,std::vector<short>>> inco_face_dof_mapping;
 
   short        incoming_face_count=-1;
@@ -25,10 +23,10 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
   //=================================================== Loop over faces
   //           INCIDENT                                 but process
   //                                                    only incident faces
-  for (short f=0; f < cell->faces.size(); f++)
+  for (short f=0; f < cell.faces_.size(); f++)
   {
-    CellFace& face = cell->faces[f];
-    double     mu  = face.normal.Dot(spds->omega);
+    const CellFace& face = cell.faces_[f];
+    double     mu  = face.normal_.Dot(spds.omega);
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face
     if (mu<(0.0-1.0e-16))
@@ -45,14 +43,14 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
 
         //======================================== Find associated face
         //                                         counter for slot lookup
-        auto adj_cell     = &grid->local_cells[face.GetNeighborLocalID(*grid)];
-        int  adj_so_index = local_so_cell_mapping[adj_cell->local_id];
+        const auto& adj_cell = grid->local_cells[face.GetNeighborLocalID(*grid)];
+        int  adj_so_index = local_so_cell_mapping[adj_cell.local_id_];
         int  ass_f_counter=-1;
 
         int out_f = -1;
-        for (short af=0; af < adj_cell->faces.size(); af++)
+        for (short af=0; af < adj_cell.faces_.size(); af++)
         {
-          double mur = adj_cell->faces[af].normal.Dot(spds->omega);
+          double mur = adj_cell.faces_[af].normal_.Dot(spds.omega);
 
           if (mur>=(0.0+1.0e-16)) {out_f++;}
           if (af == ass_face)
@@ -65,7 +63,7 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
         {
           chi::log.LogAllError()
             << "Associated face counter not found"
-            << ass_face << " " << face.neighbor_id;
+            << ass_face << " " << face.neighbor_id_;
           face.GetNeighborAssociatedFace(*grid);
           chi::Exit(EXIT_FAILURE);
         }

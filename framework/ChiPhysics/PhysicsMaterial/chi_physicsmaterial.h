@@ -15,8 +15,8 @@ namespace chi_physics
 class Material
 {
 public:
-  std::vector<std::shared_ptr<MaterialProperty>> properties{};
-  std::string name="Unnamed Material";
+  std::vector<std::shared_ptr<MaterialProperty>> properties_{};
+  std::string name_="Unnamed Material";
 
 };
 

@@ -33,11 +33,11 @@ struct chi_math::QuadraturePointPhiTheta
 class chi_math::AngularQuadrature
 {
 public:
-  const chi_math::AngularQuadratureType type;
+  const chi_math::AngularQuadratureType type_;
 public:
-  std::vector<chi_math::QuadraturePointPhiTheta> abscissae;
-  std::vector<double>                            weights;
-  std::vector<chi_mesh::Vector3>                 omegas;
+  std::vector<chi_math::QuadraturePointPhiTheta> abscissae_;
+  std::vector<double>                            weights_;
+  std::vector<chi_mesh::Vector3>                 omegas_;
 
   struct HarmonicIndices
   {
@@ -54,20 +54,20 @@ public:
   };
 
 protected:
-  std::vector<std::vector<double>> d2m_op;
-  std::vector<std::vector<double>> m2d_op;
-  std::vector<HarmonicIndices>     m_to_ell_em_map;
-  bool                             d2m_op_built = false;
-  bool                             m2d_op_built = false;
+  std::vector<std::vector<double>> d2m_op_;
+  std::vector<std::vector<double>> m2d_op_;
+  std::vector<HarmonicIndices>     m_to_ell_em_map_;
+  bool                             d2m_op_built_ = false;
+  bool                             m2d_op_built_ = false;
 
 public:
   AngularQuadrature() :
-  type(chi_math::AngularQuadratureType::Arbitrary)
+      type_(chi_math::AngularQuadratureType::Arbitrary)
   {}
 
   explicit
   AngularQuadrature(chi_math::AngularQuadratureType in_type) :
-    type(in_type)
+      type_(in_type)
   {}
 
   virtual ~AngularQuadrature() = default;

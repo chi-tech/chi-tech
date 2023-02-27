@@ -47,7 +47,7 @@ int chiSurfaceMesherCreate(lua_State *L)
     chi::Exit(EXIT_FAILURE);
   }
 
-  cur_hndlr.surface_mesher = new_mesher;
+  cur_hndlr.SetSurfaceMesher(new_mesher);
 
   chi::log.LogAllVerbose2()
     << "chiSurfaceMesherCreate: Surface remesher created."

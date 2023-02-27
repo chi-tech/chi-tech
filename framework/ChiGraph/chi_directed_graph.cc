@@ -12,8 +12,8 @@
 void chi_graph::DirectedGraph::
   VertexAccessor::AddVertex(size_t id, void* context)
 {
-  vertices.emplace_back(id, context);
-  vertex_valid_flags.push_back(true);
+  vertices_.emplace_back(id, context);
+  vertex_valid_flags_.push_back(true);
 }
 
 /** Adds a vertex to the graph where the ID is assigned to
@@ -24,8 +24,8 @@ void chi_graph::DirectedGraph::
 void chi_graph::DirectedGraph::
 VertexAccessor::AddVertex(void* context)
 {
-  vertices.emplace_back(vertices.size(), context);
-  vertex_valid_flags.push_back(true);
+  vertices_.emplace_back(vertices_.size(), context);
+  vertex_valid_flags_.push_back(true);
 }
 
 
@@ -34,9 +34,9 @@ VertexAccessor::AddVertex(void* context)
 void chi_graph::DirectedGraph::
   VertexAccessor::RemoveVertex(size_t v)
 {
-  ChiLogicalError(v>=vertices.size(),"Error removing vertex.")
+  ChiLogicalError(v >= vertices_.size(), "Error removing vertex.")
 
-  auto& vertex = vertices[v];
+  auto& vertex = vertices_[v];
 
   //=================================== Get adjacent vertices
   auto num_us = vertex.us_edge.size();
@@ -53,11 +53,11 @@ void chi_graph::DirectedGraph::
   //=================================== Remove v from all u
   for (size_t u : adj_verts)
   {
-    vertices[u].us_edge.erase(v);
-    vertices[u].ds_edge.erase(v);
+    vertices_[u].us_edge.erase(v);
+    vertices_[u].ds_edge.erase(v);
   }
 
-  vertex_valid_flags[v] = false;
+  vertex_valid_flags_[v] = false;
 }
 
 //###################################################################
@@ -65,11 +65,11 @@ void chi_graph::DirectedGraph::
 chi_graph::GraphVertex& chi_graph::DirectedGraph::
   VertexAccessor::operator[](size_t v)
 {
-  if (not vertex_valid_flags[v])
+  if (not vertex_valid_flags_[v])
     chi::log.LogAllError()
       << "chi_graph::DirectedGraph::VertexAccessor: "
          "Invalid vertex accessed. Vertex may have been removed.";
-  return vertices[v];
+  return vertices_[v];
 }
 
 //###################################################################

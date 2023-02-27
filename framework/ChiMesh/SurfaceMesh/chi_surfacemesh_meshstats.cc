@@ -30,14 +30,14 @@ void chi_mesh::SurfaceMesh::CheckCyclicDependencies(int num_angles)
 
     //================================= Add all polyfaces to graph
     chi_graph::DirectedGraph G;
-    size_t num_loc_cells = poly_faces.size();
+    size_t num_loc_cells = poly_faces_.size();
     for (size_t c=0; c<num_loc_cells; c++)
       G.AddVertex();
 
     //================================= Now construct dependencies
     for (size_t c=0; c<num_loc_cells; c++)
     {
-      chi_mesh::PolyFace* face = poly_faces[c];
+      chi_mesh::PolyFace* face = poly_faces_[c];
 
       size_t num_edges = face->edges.size();
       for (size_t e=0; e<num_edges; e++)
@@ -45,7 +45,7 @@ void chi_mesh::SurfaceMesh::CheckCyclicDependencies(int num_angles)
         int v0i = face->edges[e][0];
         int v1i = face->edges[e][1];
 
-        chi_mesh::Vector3 v01 = vertices[v1i] - vertices[v0i];
+        chi_mesh::Vector3 v01 = vertices_[v1i] - vertices_[v0i];
         chi_mesh::Vector3 n = v01.Cross(khat); n= n / n.Norm();
 
         double mu = omega.Dot(n);
@@ -109,12 +109,12 @@ void chi_mesh::SurfaceMesh::GetMeshStats()
 
   //============================================= Compute areas for
   //                                              each polyface
-  size_t num_loc_cells = poly_faces.size();
+  size_t num_loc_cells = poly_faces_.size();
   areas.resize(num_loc_cells);
   double max_area = 0.0;
   for (size_t c=0; c<num_loc_cells; c++)
   {
-    chi_mesh::PolyFace* face = poly_faces[c];
+    chi_mesh::PolyFace* face = poly_faces_[c];
 
     size_t num_edges = face->edges.size();
     double area = 0.0;
@@ -123,8 +123,8 @@ void chi_mesh::SurfaceMesh::GetMeshStats()
       int v0i = face->edges[e][0];
       int v1i = face->edges[e][1];
 
-      chi_mesh::Vector3 v01 = vertices[v1i] - vertices[v0i];
-      chi_mesh::Vector3 v02 = face->face_centroid - vertices[v0i];
+      chi_mesh::Vector3 v01 = vertices_[v1i] - vertices_[v0i];
+      chi_mesh::Vector3 v02 = face->face_centroid - vertices_[v0i];
 
       //This is essentially the combine of the triangle for each side
 
@@ -201,7 +201,7 @@ void chi_mesh::SurfaceMesh::ComputeLoadBalancing(
 
   std::vector<std::vector<int>> IJ_bins(I+1,std::vector<int>(J+1,0));
 
-  for (auto& poly_face : poly_faces)
+  for (auto& poly_face : poly_faces_)
   {
     int ref_i = 0;
     int ref_j = 0;

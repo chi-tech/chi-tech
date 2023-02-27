@@ -135,17 +135,17 @@ phys1name = chiSolverGetName(phys1);
 --    chiLog(LOG_0, string.format("%s time=%10.3g dt=%10.3g period=%10.3g", phys1name,t,dt,period))
 --end
 
---time = 0.0
---time_stop = 20.0
---k=0
---while (time < time_stop) do
---    k = k + 1
---    chiSolverStep(phys1)
---    FRf = chiLBSComputeFissionRate(phys1,"NEW")
---    FRi = chiLBSComputeFissionRate(phys1,"OLD")
---    dt = chiLBTSGetProperty(phys1, "TIMESTEP")
---    time = chiLBTSGetProperty(phys1, "TIME")
---    period = dt/math.log(FRf/FRi)
---    chiLog(LOG_0, string.format("%s %4d time=%10.3g dt=%10.4g period=%10.3g FR=%10.3e",
---            phys1name,k,time,dt,period,FRf))
---end
+time = 0.0
+time_stop = 20.0
+k=0
+while (time < time_stop) do
+    k = k + 1
+    chiSolverStep(phys1)
+    FRf = chiLBSComputeFissionRate(phys1,"NEW")
+    FRi = chiLBSComputeFissionRate(phys1,"OLD")
+    dt = chiLBTSGetProperty(phys1, "TIMESTEP")
+    time = chiLBTSGetProperty(phys1, "TIME")
+    period = dt/math.log(FRf/FRi)
+    chiLog(LOG_0, string.format("%s %4d time=%10.3g dt=%10.4g period=%10.3g FR=%10.3e",
+            phys1name,k,time,dt,period,FRf))
+end

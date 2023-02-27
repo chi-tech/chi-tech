@@ -7,7 +7,7 @@
 namespace chi_physics
 {
   class FieldFunction;
-  typedef std::shared_ptr<FieldFunction> FieldFunction2CPtr;
+  typedef std::shared_ptr<FieldFunction> FieldFunctionPtr;
 }
 
 namespace chi_mesh::ff_interpolation
@@ -58,17 +58,19 @@ namespace chi_mesh
 class FieldFunctionInterpolation
 {
 protected:
-  ff_interpolation::Type m_type;
-  unsigned int m_ref_component = 0;
-public:
-  std::vector<chi_physics::FieldFunction2CPtr> field_functions;
+  ff_interpolation::Type type_;
+  unsigned int ref_component_ = 0;
+  std::vector<chi_physics::FieldFunctionPtr> field_functions_;
 
 public:
   explicit
   FieldFunctionInterpolation(ff_interpolation::Type type) :
-    m_type(type) {}
+    type_(type) {}
 
-  ff_interpolation::Type Type() const {return m_type;}
+  std::vector<chi_physics::FieldFunctionPtr>& GetFieldFunctions()
+  {return field_functions_;}
+
+  ff_interpolation::Type Type() const {return type_;}
 
   virtual void Initialize(){};
   virtual void Execute(){};

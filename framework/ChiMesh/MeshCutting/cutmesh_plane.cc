@@ -82,7 +82,7 @@ void chi_mesh::mesh_cutting::
   {
     size_t num_neg_senses = 0;
     size_t num_pos_senses = 0;
-    for (auto vid : cell.vertex_ids)
+    for (auto vid : cell.vertex_ids_)
     {
       const auto& x = mesh.vertices[vid];
       double new_sense = n.Dot(x-p);
@@ -106,7 +106,7 @@ void chi_mesh::mesh_cutting::
     std::set<uint64_t> cut_vertices;
     {
       for (auto& cell_ptr : cells_to_cut)
-        for (uint64_t vid : cell_ptr->vertex_ids)
+        for (uint64_t vid : cell_ptr->vertex_ids_)
         {
           const auto vertex = mesh.vertices[vid];
           double dv = std::fabs((vertex-p).Dot(n));
@@ -123,11 +123,11 @@ void chi_mesh::mesh_cutting::
     for (auto& cell_ptr : cells_to_cut)
     {
       const auto& cell = *cell_ptr;
-      const size_t num_edges = cell.vertex_ids.size();
+      const size_t num_edges = cell.vertex_ids_.size();
 
       for (size_t e=0; e<num_edges; ++e)
       {
-        auto edge = MakeEdgeFromPolygonEdgeIndex(cell.vertex_ids,e);
+        auto edge = MakeEdgeFromPolygonEdgeIndex(cell.vertex_ids_, e);
         edges_set.insert(std::make_pair(std::min(edge.first,edge.second),
                                         std::max(edge.first,edge.second)));
       }
@@ -177,7 +177,7 @@ void chi_mesh::mesh_cutting::
     std::set<uint64_t> cut_vertices;
     {
       for (auto& cell_ptr : cells_to_cut)
-        for (uint64_t vid : cell_ptr->vertex_ids)
+        for (uint64_t vid : cell_ptr->vertex_ids_)
         {
           const auto& vertex = mesh.vertices[vid];
           double dv = std::fabs((vertex-p).Dot(n));
@@ -193,13 +193,13 @@ void chi_mesh::mesh_cutting::
     {
       const auto& cell = *cell_ptr;
 
-      for (auto& face : cell.faces)
+      for (auto& face : cell.faces_)
       {
-        const size_t num_edges = face.vertex_ids.size();
+        const size_t num_edges = face.vertex_ids_.size();
 
         for (size_t e=0; e<num_edges; ++e)
         {
-          auto edge = MakeEdgeFromPolygonEdgeIndex(face.vertex_ids,e);
+          auto edge = MakeEdgeFromPolygonEdgeIndex(face.vertex_ids_, e);
           edges_set.insert(std::make_pair(std::min(edge.first,edge.second),
                                           std::max(edge.first,edge.second)));
         }

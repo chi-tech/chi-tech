@@ -14,7 +14,7 @@ chi_mesh::SurfaceMeshLogicalVolume::
   zbounds({1.0e6,-1.0e6}),
   surf_mesh(std::move(in_surf_mesh))
 {
-  for (auto & vertice : surf_mesh->vertices)
+  for (auto & vertice : surf_mesh->GetVertices())
   {
     double x = vertice.x;
     double y = vertice.y;
@@ -55,7 +55,7 @@ bool chi_mesh::SurfaceMeshLogicalVolume::
   // If it does then .. bonus .. we don't need to do
   // anything more because the surface is probably convex.
   bool cheap_pass = true; // now try to disprove
-  for (auto & face : surf_mesh->faces)
+  for (auto & face : surf_mesh->GetTriangles())
   {
     chi_mesh::Vector3 fc      = face.face_centroid;
     chi_mesh::Vector3 p_to_fc = fc - point;
@@ -77,9 +77,9 @@ bool chi_mesh::SurfaceMeshLogicalVolume::
   //============================================= Expensive pass
   // Getting to here means the cheap pass produced
   // a negative and now we need to do more work.
-  for (size_t f=0; f<surf_mesh->faces.size(); f++)
+  for (size_t f=0; f<surf_mesh->GetTriangles().size(); f++)
   {
-    chi_mesh::Vector3 fc      = surf_mesh->faces[f].face_centroid;
+    chi_mesh::Vector3 fc      = surf_mesh->GetTriangles()[f].face_centroid;
     chi_mesh::Vector3 p_to_fc = fc - point;
     double distance_to_face = p_to_fc.Norm();
     double closest_distance = 1.0e16;
@@ -88,23 +88,23 @@ bool chi_mesh::SurfaceMeshLogicalVolume::
 
     p_to_fc = p_to_fc/p_to_fc.Norm();
 
-    double sense = p_to_fc.Dot(surf_mesh->faces[f].geometric_normal);
+    double sense = p_to_fc.Dot(surf_mesh->GetTriangles()[f].geometric_normal);
 
     bool good_to_go = true;
     if (sense < (0.0-tolerance))
     {
       good_to_go = false;
-      for (size_t fi=0; fi<surf_mesh->faces.size(); fi++)
+      for (size_t fi=0; fi<surf_mesh->GetTriangles().size(); fi++)
       {
         if (fi==f) continue;  //Skip same face
 
         //Get all the vertices
-        int v0_i = surf_mesh->faces[fi].v_index[0];
-        int v1_i = surf_mesh->faces[fi].v_index[1];
-        int v2_i = surf_mesh->faces[fi].v_index[2];
-        chi_mesh::Vertex v0 = surf_mesh->vertices[v0_i];
-        chi_mesh::Vertex v1 = surf_mesh->vertices[v1_i];
-        chi_mesh::Vertex v2 = surf_mesh->vertices[v2_i];
+        int v0_i = surf_mesh->GetTriangles()[fi].v_index[0];
+        int v1_i = surf_mesh->GetTriangles()[fi].v_index[1];
+        int v2_i = surf_mesh->GetTriangles()[fi].v_index[2];
+        chi_mesh::Vertex v0 = surf_mesh->GetVertices()[v0_i];
+        chi_mesh::Vertex v1 = surf_mesh->GetVertices()[v1_i];
+        chi_mesh::Vertex v2 = surf_mesh->GetVertices()[v2_i];
 
 
 
@@ -112,7 +112,7 @@ bool chi_mesh::SurfaceMeshLogicalVolume::
         chi_mesh::Vertex         intp;           //Intersection point
         std::pair<double,double> weights;
         bool intersects_plane = chi_mesh::
-               CheckPlaneLineIntersect(surf_mesh->faces[fi].geometric_normal,v0,
+               CheckPlaneLineIntersect(surf_mesh->GetTriangles()[fi].geometric_normal,v0,
                                        point,fc,intp,
                                        &weights);
         if (!intersects_plane) continue;
@@ -140,8 +140,8 @@ bool chi_mesh::SurfaceMeshLogicalVolume::
         x1p = x1p/x1p.Norm();
         x2p = x2p/x2p.Norm();
 
-        chi_mesh::Vector3 face_norm = surf_mesh->faces[fi].geometric_normal /
-                                      surf_mesh->faces[fi].geometric_normal.Norm();
+        chi_mesh::Vector3 face_norm = surf_mesh->GetTriangles()[fi].geometric_normal /
+                                      surf_mesh->GetTriangles()[fi].geometric_normal.Norm();
 
         if (x0p.Dot(face_norm)<0.0) intersects_triangle = false;
         if (x1p.Dot(face_norm)<0.0) intersects_triangle = false;
@@ -154,7 +154,7 @@ bool chi_mesh::SurfaceMeshLogicalVolume::
 
         //============================ Determine the sense with the triangle
         double sense_with_this_tri =
-          p_to_fc.Dot(surf_mesh->faces[fi].geometric_normal);
+          p_to_fc.Dot(surf_mesh->GetTriangles()[fi].geometric_normal);
         double distance_to_triangle = weights.second*distance_to_face;
 
         if (distance_to_triangle < closest_distance)

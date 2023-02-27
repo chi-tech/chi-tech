@@ -21,10 +21,10 @@ namespace cfem_diffusion
 /**Parent class for diffusion boundaries*/
 class cfem_diffusion::Boundary
 {
-  public :
-  BoundaryType type = BoundaryType::Dirichlet;
+public:
+  BoundaryType type_ = BoundaryType::Dirichlet;
 
-  std::array<double, 3> values = {0.,0.,0.};
+  std::array<double, 3> values_ = {0.,0.,0.};
 };
 
 

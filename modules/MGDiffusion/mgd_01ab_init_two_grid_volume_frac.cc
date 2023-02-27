@@ -7,11 +7,11 @@
 //============================================= assemble matrix A
 void mg_diffusion::Solver::Compute_TwoGrid_VolumeFractions()
 {
-  const auto& grid = *grid_ptr;
-  const auto& sdm  = *sdm_ptr;
+  const auto& grid = *grid_ptr_;
+  const auto& sdm  = *sdm_ptr_;
 
   const size_t ncells = grid.local_cells.size();
-  VF.resize(ncells);
+  VF_.resize(ncells);
 
   int counter = 0;
   for (const auto& cell : grid.local_cells)
@@ -20,7 +20,7 @@ void mg_diffusion::Solver::Compute_TwoGrid_VolumeFractions()
     const auto  qp_data      = cell_mapping.MakeVolumeQuadraturePointData();
     const size_t num_nodes   = cell_mapping.NumNodes();
 
-    VF[counter].resize(num_nodes, 0.0);
+    VF_[counter].resize(num_nodes, 0.0);
 
     for (size_t i=0; i < num_nodes; ++i)
     {
@@ -28,7 +28,7 @@ void mg_diffusion::Solver::Compute_TwoGrid_VolumeFractions()
       for (size_t qp : qp_data.QuadraturePointIndices())
         vol_frac_shape_i +=  qp_data.ShapeValue(i, qp) * qp_data.JxW(qp);
       vol_frac_shape_i /= cell_mapping.CellVolume();
-      VF[counter][i] = vol_frac_shape_i;
+      VF_[counter][i] = vol_frac_shape_i;
     }//for i
 
     counter++;

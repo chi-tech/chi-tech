@@ -101,7 +101,6 @@ int chiFFInterpolationSetProperty(lua_State *L)
 {
   const std::string fname = "chiFFInterpolationSetProperty";
   int numArgs = lua_gettop(L);
-  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //================================================== Get handle to field function
   const size_t ffihandle = lua_tonumber(L,1);
@@ -139,7 +138,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
     int ffhandle = lua_tonumber(L,3);
     auto cur_ff = chi::GetStackItemPtr(chi::field_function_stack, ffhandle, fname);
 
-    p_ffi->field_functions.push_back(cur_ff);
+    p_ffi->GetFieldFunctions().push_back(cur_ff);
   }
   else if (property == Property::SET_FIELD_FUNCTIONS)
   {
@@ -152,7 +151,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
       const auto ffhandle = static_cast<int>(handle_d);
       auto cur_ff = chi::GetStackItemPtr(chi::field_function_stack, ffhandle, fname);
 
-      p_ffi->field_functions.push_back(cur_ff);
+      p_ffi->GetFieldFunctions().push_back(cur_ff);
     }//for handle
   }
   else if (property == Property::PROBEPOINT)
@@ -163,7 +162,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
     double y = lua_tonumber(L,4);
     double z = lua_tonumber(L,5);
 
-    cur_ffi.m_point_of_interest = chi_mesh::Vector3(x, y, z);
+    cur_ffi.GetPointOfInterest() = chi_mesh::Vector3(x, y, z);
   }
   else if (property == Property::SLICEPOINT)
   {
@@ -173,7 +172,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
     double y = lua_tonumber(L,4);
     double z = lua_tonumber(L,5);
 
-    cur_ffi_slice.plane_point = chi_mesh::Vector3(x, y, z);
+    cur_ffi_slice.GetPlanePoint() = chi_mesh::Vector3(x, y, z);
   }
   else if (property == Property::SLICENORMAL)
   {
@@ -183,9 +182,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
     double y = lua_tonumber(L,4);
     double z = lua_tonumber(L,5);
 
-    cur_ffi_slice.normal = chi_mesh::Vector3(x, y, z);
-    cur_ffi_slice.normal = cur_ffi_slice.normal/
-                            cur_ffi_slice.normal.Norm();
+    cur_ffi_slice.GetNormal() = chi_mesh::Vector3(x, y, z).Normalized();
   }
   else if (property == Property::SLICETANGENT)
   {
@@ -195,9 +192,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
     double y = lua_tonumber(L,4);
     double z = lua_tonumber(L,5);
 
-    cur_ffi_slice.tangent = chi_mesh::Vector3(x, y, z);
-    cur_ffi_slice.tangent = cur_ffi_slice.tangent/
-                            cur_ffi_slice.tangent.Norm();
+    cur_ffi_slice.GetTangent() = chi_mesh::Vector3(x, y, z).Normalized();
   }
   else if (property == Property::SLICEBINORM)
   {
@@ -207,9 +202,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
     double y = lua_tonumber(L,4);
     double z = lua_tonumber(L,5);
 
-    cur_ffi_slice.binorm = chi_mesh::Vector3(x, y, z);
-    cur_ffi_slice.binorm = cur_ffi_slice.binorm/
-                            cur_ffi_slice.binorm.Norm();
+    cur_ffi_slice.GetBiNorm() = chi_mesh::Vector3(x, y, z).Normalized();
   }
   else if (property == Property::FIRSTPOINT)
   {
@@ -218,9 +211,10 @@ int chiFFInterpolationSetProperty(lua_State *L)
 
     auto& cur_ffi_line = dcastLine(*p_ffi);
 
-    cur_ffi_line.pi.x = lua_tonumber(L,3);
-    cur_ffi_line.pi.y = lua_tonumber(L,4);
-    cur_ffi_line.pi.z = lua_tonumber(L,5);
+    chi_mesh::Vector3 point(lua_tonumber(L,3),
+                            lua_tonumber(L,4),
+                            lua_tonumber(L,5));
+    cur_ffi_line.GetInitialPoint() = point;
 
   }
   else if (property == Property::SECONDPOINT)
@@ -230,9 +224,10 @@ int chiFFInterpolationSetProperty(lua_State *L)
 
     auto& cur_ffi_line = dcastLine(*p_ffi);
 
-    cur_ffi_line.pf.x = lua_tonumber(L,3);
-    cur_ffi_line.pf.y = lua_tonumber(L,4);
-    cur_ffi_line.pf.z = lua_tonumber(L,5);
+    chi_mesh::Vector3 point(lua_tonumber(L,3),
+                            lua_tonumber(L,4),
+                            lua_tonumber(L,5));
+    cur_ffi_line.GetFinalPoint() = point;
   }
   else if (property == Property::NUMBEROFPOINTS)
   {
@@ -251,7 +246,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
         << " be greater than or equal to 2.";
       chi::Exit(EXIT_FAILURE);
     }
-    cur_ffi_line.number_of_points = num_points;
+    cur_ffi_line.GetNumberOfPoints() = num_points;
   }
   else if (property == Property::CUSTOM_ARRAY)
   {
@@ -280,7 +275,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
       lua_pop(L,1);
     }
 
-    cur_ffi_line.custom_arrays.push_back(new_array);
+    cur_ffi_line.GetCustomArrays().push_back(new_array);
   }
   else if (property == Property::OPERATION)
   {
@@ -316,10 +311,10 @@ int chiFFInterpolationSetProperty(lua_State *L)
         LuaPostArgAmountError("chiFFInterpolationSetProperty",4,numArgs);
 
       const char* func_name = lua_tostring(L,4);
-      cur_ffi_volume.op_lua_func = std::string(func_name);
+      cur_ffi_volume.GetOperationLuaFunction() = std::string(func_name);
     }
 
-    cur_ffi_volume.op_type = static_cast<Operation>(op_type);
+    cur_ffi_volume.GetOperationType() = static_cast<Operation>(op_type);
   }
   else if (property == Property::LOGICAL_VOLUME)
   {
@@ -339,7 +334,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
 
     auto& cur_ffi_volume = dcastVolume(*p_ffi);
 
-    cur_ffi_volume.logical_volume = p_logical_volume;
+    cur_ffi_volume.GetLogicalVolume() = p_logical_volume;
   }
   else                                              //Fall back
   {

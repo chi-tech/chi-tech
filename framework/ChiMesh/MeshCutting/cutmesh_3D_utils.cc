@@ -23,16 +23,16 @@ bool chi_mesh::mesh_cutting::
                          const chi_mesh::Cell& cell,
                          const bool check_convexity/*=false*/)
 {
-  const auto& C = cell.centroid;
+  const auto& C = cell.centroid_;
 
-  for (auto& face : cell.faces)
+  for (auto& face : cell.faces_)
   {
-    const auto& v0 = face.centroid;
-    const size_t num_edges = face.vertex_ids.size();
+    const auto& v0 = face.centroid_;
+    const size_t num_edges = face.vertex_ids_.size();
 
     for (size_t e=0; e<num_edges; ++e)
     {
-      auto edge = MakeEdgeFromPolygonEdgeIndex(face.vertex_ids,e);
+      auto edge = MakeEdgeFromPolygonEdgeIndex(face.vertex_ids_, e);
 
       const auto& v1 = mesh.vertices[edge.first];
       const auto& v2 = mesh.vertices[edge.second];
@@ -53,21 +53,21 @@ bool chi_mesh::mesh_cutting::
   if (check_convexity)
   {
     std::vector<std::vector<uint64_t>> proxy_faces;
-    for (const auto& face : cell.faces)
-      proxy_faces.push_back(face.vertex_ids);
+    for (const auto& face : cell.faces_)
+      proxy_faces.push_back(face.vertex_ids_);
 
     size_t f=0;
-    for (const auto& face : cell.faces)
+    for (const auto& face : cell.faces_)
     {
       std::set<size_t> neighbor_face_indices =
         FindNeighborFaceIndices(proxy_faces, f);
 
       for (size_t ofi : neighbor_face_indices)
       {
-        auto& other_face = cell.faces[ofi];
-        auto CFC_OFC = other_face.centroid - face.centroid;
+        auto& other_face = cell.faces_[ofi];
+        auto CFC_OFC = other_face.centroid_ - face.centroid_;
 
-        if (CFC_OFC.Dot(other_face.normal) < 0.0)
+        if (CFC_OFC.Dot(other_face.normal_) < 0.0)
           return false;
       }
       ++f;
@@ -251,8 +251,8 @@ void chi_mesh::mesh_cutting::
   };
 
   //======================================== Build faces
-  cell.faces.clear();
-  cell.faces.reserve(raw_faces.size());
+  cell.faces_.clear();
+  cell.faces_.reserve(raw_faces.size());
   for (auto& raw_face : raw_faces)
   {
     chi_mesh::Vector3 face_centroid;
@@ -264,10 +264,10 @@ void chi_mesh::mesh_cutting::
     face_centroid /= static_cast<double>(raw_face.size());
 
     chi_mesh::CellFace new_face;
-    new_face.centroid = face_centroid;
-    new_face.vertex_ids = raw_face;
+    new_face.centroid_ = face_centroid;
+    new_face.vertex_ids_ = raw_face;
 
-    cell.faces.push_back(std::move(new_face));
+    cell.faces_.push_back(std::move(new_face));
   }//for raw face
 
   //======================================== Compute cell centroid
@@ -276,6 +276,6 @@ void chi_mesh::mesh_cutting::
     cell_centroid += mesh.vertices[vid];
   cell_centroid /= static_cast<double>(cell_vertex_ids.size());
 
-  cell.centroid = cell_centroid;
-  cell.vertex_ids = cell_vertex_ids;
+  cell.centroid_ = cell_centroid;
+  cell.vertex_ids_ = cell_vertex_ids;
 }

@@ -52,37 +52,37 @@ struct TwoGridCollapsedInfo
 class Solver : public chi_physics::Solver
 {
 public:
-  chi_mesh::MeshContinuumPtr grid_ptr = nullptr;
+  chi_mesh::MeshContinuumPtr grid_ptr_ = nullptr;
 
-  chi_math::SDMPtr sdm_ptr = nullptr;
+  chi_math::SDMPtr sdm_ptr_ = nullptr;
 
-  uint num_groups = 0;
-  uint last_fast_group = 0;
-  bool do_two_grid = false;
+  uint num_groups_ = 0;
+  uint last_fast_group_ = 0;
+  bool do_two_grid_ = false;
 
-  size_t num_local_dofs = 0;
-  size_t num_globl_dofs = 0;
+  size_t num_local_dofs_ = 0;
+  size_t num_globl_dofs_ = 0;
 
-  std::vector<Mat> A;     // linear system matrix for each group
-  std::vector<Vec> bext;  // external source vector for each group
-  std::vector<Vec> x;     // solution vector for each group
-  std::vector<Vec> x_old; // vector of old fluxes
+  std::vector<Mat> A_;     // linear system matrix for each group
+  std::vector<Vec> bext_;  // external source vector for each group
+  std::vector<Vec> x_;     // solution vector for each group
+  std::vector<Vec> x_old_; // vector of old fluxes
 
-  Vec thermal_dphi = nullptr; // error vector for thermal fluxes
-  Vec b = nullptr; // actual rhs vector for the linear system A[g] x[g] = b
+  Vec thermal_dphi_ = nullptr; // error vector for thermal fluxes
+  Vec b_ = nullptr; // actual rhs vector for the linear system A[g] x[g] = b
 
-  chi_math::PETScUtils::PETScSolverSetup petsc_solver;
-  KSPAppContext my_app_context;
+  chi_math::PETScUtils::PETScSolverSetup petsc_solver_;
+  KSPAppContext my_app_context_;
 
-  std::vector< std::vector<double> > VF;
+  std::vector< std::vector<double> > VF_;
 
 //  typedef std::pair<BoundaryType,std::vector<double>> BoundaryInfo;
   typedef std::pair<BoundaryType,std::array<std::vector<double>, 3>>
                                                   BoundaryInfo;
 
   typedef std::map<uint, BoundaryInfo> BoundaryPreferences;
-  BoundaryPreferences     boundary_preferences;
-  std::vector<Boundary>   boundaries;
+  BoundaryPreferences     boundary_preferences_;
+  std::vector<Boundary>   boundaries_;
 
   explicit Solver(const std::string& in_solver_name);
   ~Solver() override;
@@ -108,6 +108,7 @@ public:
 protected:
   std::map<int,std::shared_ptr<chi_physics::TransportCrossSections>>
   matid_to_xs_map;
+
   std::map<int,std::shared_ptr<chi_physics::IsotropicMultiGrpSource>>
   matid_to_src_map;
 

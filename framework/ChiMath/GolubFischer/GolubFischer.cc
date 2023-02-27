@@ -22,10 +22,10 @@ Tvecdbl_vecdbl& chi_math::GolubFischer::GetDiscreteScatAngles(Tvecdbl& mell)
   int N = in_mell.size()-1;
   int n = (N+1)/2;
 
-  xn_wn.resize(n,std::pair<double,double>(0.0,0.0));
+  xn_wn_.resize(n, std::pair<double,double>(0.0, 0.0));
 
   if (N==0)
-    return xn_wn;
+    return xn_wn_;
 
   /* Legendre recurrence coefficients */
   Tvecdbl a;   a.resize(2*n,0.0);
@@ -48,16 +48,16 @@ Tvecdbl_vecdbl& chi_math::GolubFischer::GetDiscreteScatAngles(Tvecdbl& mell)
 
   MCA(in_mell, a,  b,  c);
 
-  RootsOrtho(n, alpha, beta);
+  RootsOrtho(n, alpha_, beta_);
 
   for (int i=0; i<n; i++)
   {
-    chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "i " << xn_wn[i].first << " " << xn_wn[i].second << '\n';
+    chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "i " << xn_wn_[i].first << " " << xn_wn_[i].second << '\n';
   }
 
   chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Done" << '\n';
 
-  return xn_wn;
+  return xn_wn_;
 }
 
 /**Applies the Modified Chebyshev Algorithm contained in [1] to find the
@@ -72,8 +72,8 @@ void chi_math::GolubFischer::MCA(Tvecdbl& in_mell, Tvecdbl& a, Tvecdbl& b, Tvecd
   chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "N " << N << " n " << n << '\n';
   chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "alpha, beta" << '\n';
 
-  alpha.resize(n+1, 0.0);
-  beta.resize(n+1, 0.0);
+  alpha_.resize(n + 1, 0.0);
+  beta_.resize(n + 1, 0.0);
 
   std::vector<std::vector<double>> sigma(n+1,std::vector<double>(2*n+1,0.0));
 
@@ -83,10 +83,10 @@ void chi_math::GolubFischer::MCA(Tvecdbl& in_mell, Tvecdbl& a, Tvecdbl& b, Tvecd
     sigma[0][ell] = in_mell[ell];
   }
 
-  alpha[0] = a[0]+c[0]*sigma[0][1]/sigma[0][0];
-  beta[0] = in_mell[0];
+  alpha_[0] = a[0] + c[0] * sigma[0][1] / sigma[0][0];
+  beta_[0] = in_mell[0];
 
-  chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << 0 << " " << alpha[0] << " " << beta[0] << "\n";
+  chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << 0 << " " << alpha_[0] << " " << beta_[0] << "\n";
 
 
   for(int k=1; k<n+1; k++)
@@ -104,16 +104,16 @@ void chi_math::GolubFischer::MCA(Tvecdbl& in_mell, Tvecdbl& a, Tvecdbl& b, Tvecd
         sigmakm2ell = sigma[k-2][ell];
       }
       sigma[k][ell] = c[ell]*sigma[k-1][ell+1]
-                      -(alpha[k-1]-a[ell])*sigma[k-1][ell]
-                      -beta[k-1]*sigmakm2ell
+                      - (alpha_[k - 1] - a[ell]) * sigma[k - 1][ell]
+                      - beta_[k - 1] * sigmakm2ell
                       +b[ell]*sigma[k-1][ell-1];
     }
-    alpha[k] = a[k]
-               -c[k-1]*(sigma[k-1][k]/sigma[k-1][k-1])
-               +c[k]*(sigma[k][k+1]/sigma[k][k]);
-    beta[k] = c[k-1]*sigma[k][k]/sigma[k-1][k-1];
+    alpha_[k] = a[k]
+                -c[k-1]*(sigma[k-1][k]/sigma[k-1][k-1])
+                +c[k]*(sigma[k][k+1]/sigma[k][k]);
+    beta_[k] = c[k - 1] * sigma[k][k] / sigma[k - 1][k - 1];
 
-    chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << k << " " << alpha[k] << " " << beta[k] << "\n";
+    chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << k << " " << alpha_[k] << " " << beta_[k] << "\n";
   }
 
   chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Done" << '\n';
@@ -222,8 +222,8 @@ void chi_math::GolubFischer::RootsOrtho(int& N, Tvecdbl& in_alpha, Tvecdbl& in_b
   }
   for (int i=0; i<N; i++)
   {
-    xn_wn[i].first = xn[i];
-    xn_wn[i].second = wn[i];
+    xn_wn_[i].first = xn[i];
+    xn_wn_[i].second = wn[i];
   }
 
 

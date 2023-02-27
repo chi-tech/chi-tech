@@ -9,27 +9,27 @@
 //###################################################################
 /**Constructor with number of rows and columns constructor.*/
 chi_math::SparseMatrix::SparseMatrix(size_t num_rows, size_t num_cols) :
-  row_size(num_rows),
-  col_size(num_cols)
+    row_size_(num_rows),
+    col_size_(num_cols)
 {
-  rowI_values.resize(num_rows, std::vector<double>());
-  rowI_indices.resize(num_rows, std::vector<size_t>());
+  rowI_values_.resize(num_rows, std::vector<double>());
+  rowI_indices_.resize(num_rows, std::vector<size_t>());
 }
 
 //###################################################################
 /**Copy constructor.*/
 chi_math::SparseMatrix::
   SparseMatrix(const chi_math::SparseMatrix& in_matrix) :
-  row_size(in_matrix.NumRows()),
-  col_size(in_matrix.NumCols())
+    row_size_(in_matrix.NumRows()),
+    col_size_(in_matrix.NumCols())
 {
-  rowI_values.resize(row_size, std::vector<double>());
-  rowI_indices.resize(row_size, std::vector<size_t>());
+  rowI_values_.resize(row_size_, std::vector<double>());
+  rowI_indices_.resize(row_size_, std::vector<size_t>());
 
-  for (size_t i=0; i<in_matrix.rowI_values.size(); i++)
+  for (size_t i=0; i<in_matrix.rowI_values_.size(); i++)
   {
-    rowI_values[i] = (in_matrix.rowI_values[i]);
-    rowI_indices[i] = (in_matrix.rowI_indices[i]);
+    rowI_values_[i] = (in_matrix.rowI_values_[i]);
+    rowI_indices_[i] = (in_matrix.rowI_indices_[i]);
   }
 }
 
@@ -39,28 +39,28 @@ void chi_math::SparseMatrix::Insert(size_t i, size_t j, double value)
 {
   CheckInitialized();
 
-  if ((i<0) || (i>=row_size) || (j<0) || (j>=col_size))
+  if ((i<0) || (i >= row_size_) || (j < 0) || (j >= col_size_))
   {
     chi::log.LogAllError()
-      << "SparseMatrix::Insert encountered out of bounds,"
-      << " i=" << i << " j=" << j
-      << " bounds(" << row_size << "," << col_size << ")";
+        << "SparseMatrix::Insert encountered out of bounds,"
+        << " i=" << i << " j=" << j
+        << " bounds(" << row_size_ << "," << col_size_ << ")";
    chi::Exit(EXIT_FAILURE);
   }
 
-  auto relative_location = std::find(rowI_indices[i].begin(),
-                                     rowI_indices[i].end(), j);
-  bool already_there = (relative_location != rowI_indices[i].end());
+  auto relative_location = std::find(rowI_indices_[i].begin(),
+                                     rowI_indices_[i].end(), j);
+  bool already_there = (relative_location != rowI_indices_[i].end());
 
   if (already_there)
   {
-    size_t jr = relative_location - rowI_indices[i].begin();
-    rowI_values[i][jr] = value;
+    size_t jr = relative_location - rowI_indices_[i].begin();
+    rowI_values_[i][jr] = value;
   }
   else
   {
-    rowI_values[i].push_back(value);
-    rowI_indices[i].push_back(j);
+    rowI_values_[i].push_back(value);
+    rowI_indices_[i].push_back(j);
   }
 }
 
@@ -70,28 +70,28 @@ void chi_math::SparseMatrix::InsertAdd(size_t i, size_t j, double value)
 {
   CheckInitialized();
 
-  if ((i<0) || (i>=row_size) || (j<0) || (j>=col_size))
+  if ((i<0) || (i >= row_size_) || (j < 0) || (j >= col_size_))
   {
     chi::log.LogAllError()
-      << "SparseMatrix::Insert encountered out of bounds,"
-      << " i=" << i << " j=" << j
-      << " bounds(" << row_size << "," << col_size << ")";
+        << "SparseMatrix::Insert encountered out of bounds,"
+        << " i=" << i << " j=" << j
+        << " bounds(" << row_size_ << "," << col_size_ << ")";
    chi::Exit(EXIT_FAILURE);
   }
 
-  auto relative_location = std::find(rowI_indices[i].begin(),
-                                     rowI_indices[i].end(), j);
-  bool already_there = (relative_location != rowI_indices[i].end());
+  auto relative_location = std::find(rowI_indices_[i].begin(),
+                                     rowI_indices_[i].end(), j);
+  bool already_there = (relative_location != rowI_indices_[i].end());
 
   if (already_there)
   {
-    size_t jr = relative_location - rowI_indices[i].begin();
-    rowI_values[i][jr] += value;
+    size_t jr = relative_location - rowI_indices_[i].begin();
+    rowI_values_[i][jr] += value;
   }
   else
   {
-    rowI_values[i].push_back(value);
-    rowI_indices[i].push_back(j);
+    rowI_values_[i].push_back(value);
+    rowI_indices_[i].push_back(j);
   }
 }
 
@@ -101,9 +101,9 @@ void chi_math::SparseMatrix::SetDiagonal(const std::vector<double>& diag)
 {
   CheckInitialized();
 
-  size_t num_rows = rowI_values.size();
+  size_t num_rows = rowI_values_.size();
   //============================================= Check size
-  if (diag.size() != rowI_values.size())
+  if (diag.size() != rowI_values_.size())
   {
     chi::log.LogAllError()
     << "Incompatible matrix-vector size encountered "
@@ -114,19 +114,19 @@ void chi_math::SparseMatrix::SetDiagonal(const std::vector<double>& diag)
   //============================================= Assign values
   for (size_t i=0; i<num_rows; i++)
   {
-    auto relative_location = std::find(rowI_indices[i].begin(),
-                                       rowI_indices[i].end(), i);
-    bool already_there = (relative_location != rowI_indices[i].end());
+    auto relative_location = std::find(rowI_indices_[i].begin(),
+                                       rowI_indices_[i].end(), i);
+    bool already_there = (relative_location != rowI_indices_[i].end());
 
     if (already_there)
     {
-      size_t jr = relative_location - rowI_indices[i].begin();
-      rowI_values[i][jr] = diag[i];
+      size_t jr = relative_location - rowI_indices_[i].begin();
+      rowI_values_[i][jr] = diag[i];
     }
     else
     {
-      rowI_values[i].push_back(diag[i]);
-      rowI_indices[i].push_back(i);
+      rowI_values_[i].push_back(diag[i]);
+      rowI_indices_[i].push_back(i);
     }
   }//for i
 }
@@ -138,7 +138,7 @@ void chi_math::SparseMatrix::SetDiagonal(const std::vector<double>& diag)
 double chi_math::SparseMatrix::ValueIJ(size_t i, size_t j) const
 {
   double retval = 0.0;
-  if ((i<0) || (i >= rowI_indices.size()))
+  if ((i<0) || (i >= rowI_indices_.size()))
   {
     chi::log.LogAllError()
       << "Index i out of bounds"
@@ -147,15 +147,15 @@ double chi_math::SparseMatrix::ValueIJ(size_t i, size_t j) const
    chi::Exit(EXIT_FAILURE);
   }
 
-  if (not rowI_indices[i].empty())
+  if (not rowI_indices_[i].empty())
   {
-    auto relative_location = std::find(rowI_indices[i].begin(),
-                                       rowI_indices[i].end(), j);
-    bool non_zero = (relative_location != rowI_indices[i].end());
+    auto relative_location = std::find(rowI_indices_[i].begin(),
+                                       rowI_indices_[i].end(), j);
+    bool non_zero = (relative_location != rowI_indices_[i].end());
     if (non_zero)
     {
-      size_t jr = relative_location - rowI_indices[i].begin();
-      retval = rowI_values[i][jr];
+      size_t jr = relative_location - rowI_indices_[i].begin();
+      retval = rowI_values_[i][jr];
     }
   }
   return retval;
@@ -165,10 +165,10 @@ double chi_math::SparseMatrix::ValueIJ(size_t i, size_t j) const
 /**Sorts the column indices of each row for faster lookup.*/
 void chi_math::SparseMatrix::Compress()
 {
-  for (size_t i=0; i < rowI_indices.size(); ++i)
+  for (size_t i=0; i < rowI_indices_.size(); ++i)
   {
-    auto& indices = rowI_indices[i];
-    auto& values  = rowI_values[i];
+    auto& indices = rowI_indices_[i];
+    auto& values  = rowI_values_[i];
 
     //====================================== Copy row indexes and values into
     //                                       vector of pairs
@@ -213,22 +213,22 @@ std::string chi_math::SparseMatrix::PrintStr() const
   std::stringstream out;
 
 
-  for (size_t i=0; i<row_size; i++)
+  for (size_t i=0; i < row_size_; i++)
   {
-    for (size_t j=0; j<col_size; j++)
+    for (size_t j=0; j < col_size_; j++)
     {
-      auto relative_location = std::find(rowI_indices[i].begin(),
-                                         rowI_indices[i].end(), j);
-      bool non_zero = (relative_location != rowI_indices[i].end());
+      auto relative_location = std::find(rowI_indices_[i].begin(),
+                                         rowI_indices_[i].end(), j);
+      bool non_zero = (relative_location != rowI_indices_[i].end());
 
       if (non_zero)
       {
-        size_t jr = relative_location - rowI_indices[i].begin();
+        size_t jr = relative_location - rowI_indices_[i].begin();
         out
-          << std::setprecision(2)
-          << std::scientific
-          << std::setw(9)
-          << rowI_values[i][jr] << " ";
+            << std::setprecision(2)
+            << std::scientific
+            << std::setw(9)
+            << rowI_values_[i][jr] << " ";
       }
       else
       {
@@ -249,7 +249,7 @@ std::string chi_math::SparseMatrix::PrintStr() const
 /**Constructor with number of rows constructor.*/
 void chi_math::SparseMatrix::CheckInitialized() const
 {
-  if (rowI_values.empty())
+  if (rowI_values_.empty())
   {
     chi::log.LogAllError()
       << "Illegal call to unitialized SparseMatrix matrix.";
@@ -270,16 +270,16 @@ namespace chi_math
   SparseMatrix::EntriesIterator SparseMatrix::begin()
   {
     //Find first non-empty row
-    size_t nerow = row_size; //nerow = non-empty row
-    for (size_t r=0; r<row_size; ++r)
-      if (not rowI_indices[r].empty())
+    size_t nerow = row_size_; //nerow = non-empty row
+    for (size_t r=0; r < row_size_; ++r)
+      if (not rowI_indices_[r].empty())
       { nerow = r;break;}
 
     return EntriesIterator(*this, nerow);
   }
 
   SparseMatrix::EntriesIterator SparseMatrix::end()
-  {return EntriesIterator(*this, row_size);}
+  {return EntriesIterator(*this, row_size_);}
 }
 
 

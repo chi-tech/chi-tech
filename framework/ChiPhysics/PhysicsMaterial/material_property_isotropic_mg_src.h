@@ -11,7 +11,7 @@ namespace chi_physics
 class IsotropicMultiGrpSource : public chi_physics::MaterialProperty
 {
 public:
-  std::vector<double> source_value_g;
+  std::vector<double> source_value_g_;
 
   IsotropicMultiGrpSource() :
     MaterialProperty(PropertyType::ISOTROPIC_MG_SOURCE) {}
@@ -24,13 +24,13 @@ public:
     lua_settable(L,-3);
 
     lua_pushstring(L,"G");
-    lua_pushnumber(L,source_value_g.size());
+    lua_pushnumber(L, source_value_g_.size());
     lua_settable(L,-3);
 
     lua_pushstring(L,"source_value_g");
     lua_newtable(L);
     int g=0;
-    for (auto val : source_value_g)
+    for (auto val : source_value_g_)
     {
       ++g;
       lua_pushnumber(L,g);

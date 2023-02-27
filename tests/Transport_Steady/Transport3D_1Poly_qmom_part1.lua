@@ -96,12 +96,12 @@ chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
 --chiLBSGroupsetSetAngleAggregationType(phys1,cur_gs,LBSGroupset.ANGLE_AGG_SINGLE)
 chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
 chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
-chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_CLASSICRICHARDSON)
+chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_RICHARDSON)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
 if (master_export == nil) then
     --chiLBSGroupsetSetEnableSweepLog(phys1,cur_gs,true)
 end
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,1)
+chiLBSGroupsetSetMaxIterations(phys1,cur_gs,0)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
 
 --############################################### Set boundary conditions
