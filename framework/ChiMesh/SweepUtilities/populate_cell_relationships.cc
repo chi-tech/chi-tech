@@ -24,14 +24,14 @@ void chi_mesh::sweep_management::PopulateCellRelationships(
   //============================================= Make directed connections
   for (auto& cell : grid->local_cells)
   {
-    int c = cell.local_id;
+    int c = cell.local_id_;
 
-    for (auto& face : cell.faces)
+    for (auto& face : cell.faces_)
     {
       //======================================= Determine if the face
       //                                        is incident
       bool is_outgoing = false;
-      double dot_normal = omega.Dot(face.normal);
+      double dot_normal = omega.Dot(face.normal_);
       if (dot_normal>(0.0+tolerance)) {is_outgoing = true;}
 
       //======================================= If outgoing determine if
@@ -39,7 +39,7 @@ void chi_mesh::sweep_management::PopulateCellRelationships(
       if (is_outgoing)
       {
         //================================ If it is a cell and not bndry
-        if (face.has_neighbor)
+        if (face.has_neighbor_)
         {
           //========================= If it is in the current location
           if (face.IsNeighborLocal(*grid))
@@ -58,7 +58,7 @@ void chi_mesh::sweep_management::PopulateCellRelationships(
       else
       {
         //================================if it is a cell and not bndry
-        if (face.has_neighbor and not face.IsNeighborLocal(*grid))
+        if (face.has_neighbor_ and not face.IsNeighborLocal(*grid))
           location_dependencies.insert(face.GetNeighborPartitionID(*grid));
       }
 

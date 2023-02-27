@@ -12,11 +12,11 @@ namespace chi_physics
 class ScalarValue : public chi_physics::MaterialProperty
 {
 public:
-  double value=1.0;
+  double value_=1.0;
 
   ScalarValue() : MaterialProperty(PropertyType::SCALAR_VALUE) {}
 
-  double GetScalarValue() override {return value;}
+  double GetScalarValue() override {return value_;}
   void PushLuaTable(lua_State* L) override
   {
     lua_newtable(L);
@@ -25,7 +25,7 @@ public:
     lua_settable(L,-3);
 
     lua_pushstring(L,"value");
-    lua_pushnumber(L,value);
+    lua_pushnumber(L, value_);
     lua_settable(L,-3);
   }
 

@@ -1,6 +1,8 @@
 -- 3D Transport test with Vacuum BCs.
 -- SDM: PWLD
--- Test: Max-value=1.02943
+-- Test: Max-value1=6.55387e+00
+--       Max-value2=1.02940e+00
+
 num_procs = 4
 
 
@@ -147,15 +149,12 @@ chiLog(LOG_0,string.format("Max-value2=%.5e", maxval))
 
 --############################################### Exports
 if (master_export == nil) then
-    chiExportFieldFunctionToVTKG(fflist[1],"ZPhi3D","Phi")
+    chiExportMultiFieldFunctionToVTK(fflist,"ZPhi3D")
+    chiExportFieldFunctionToVTK(fflist[1],"ZPhi3D_g0")
 end
 
 --############################################### Plots
 if (chi_location_id == 0 and master_export == nil) then
-
-    --os.execute("python ZPFFI00.py")
-    ----os.execute("python ZPFFI11.py")
-    --local handle = io.popen("python ZPFFI00.py")
     print("Execution completed")
 end
 

@@ -2,12 +2,12 @@
 
 chi_objects::LogStream::~LogStream()
 {
-  if (dummy) return;
+  if (dummy_) return;
 
   std::string line, oline;
   while (std::getline(*this, line))
-    oline += log_header + line + '\n';
+    oline += log_header_ + line + '\n';
 
   if (!oline.empty())
-    *log_stream << oline << std::flush;
+    *log_stream_ << oline << std::flush;
 }

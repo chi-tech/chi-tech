@@ -11,28 +11,28 @@ chi_math::PolygonMappingFE_PWL::
     const chi_mesh::MeshContinuumConstPtr& ref_grid,
     const chi_math::QuadratureTriangle& volume_quadrature,
     const chi_math::QuadratureLine&     surface_quadrature) :
-  chi_math::CellMappingFE_PWL(ref_grid,
+    chi_math::CellMappingFE_PWL(ref_grid,
                               poly_cell,
-                              poly_cell.vertex_ids.size(), //num_nodes
+                              poly_cell.vertex_ids_.size(), //num_nodes
                               GetVertexLocations(*ref_grid, poly_cell),
                               MakeFaceNodeMapping(poly_cell)),
-  volume_quadrature(volume_quadrature),
-  surface_quadrature(surface_quadrature)
+    volume_quadrature_(volume_quadrature),
+    surface_quadrature_(surface_quadrature)
 {
-  num_of_subtris = static_cast<int>(poly_cell.faces.size());
-  beta = 1.0/num_of_subtris;
+  num_of_subtris_ = static_cast<int>(poly_cell.faces_.size());
+  beta_ = 1.0/num_of_subtris_;
 
   //=========================================== Get raw vertices
-  vc = poly_cell.centroid;
+  vc_ = poly_cell.centroid_;
 
   //=========================================== Calculate legs and determinants
-  for (int side=0;side<num_of_subtris;side++)
+  for (int side=0; side < num_of_subtris_; side++)
   {
-    const chi_mesh::CellFace& face = poly_cell.faces[side];
+    const chi_mesh::CellFace& face = poly_cell.faces_[side];
 
-    const auto& v0 = m_grid_ptr->vertices[face.vertex_ids[0]];
-    const auto& v1 = m_grid_ptr->vertices[face.vertex_ids[1]];
-    chi_mesh::Vertex v2 = vc;
+    const auto& v0 = grid_ptr_->vertices[face.vertex_ids_[0]];
+    const auto& v1 = grid_ptr_->vertices[face.vertex_ids_[1]];
+    chi_mesh::Vertex v2 = vc_;
 
     chi_mesh::Vector3 sidev01 = v1 - v0;
     chi_mesh::Vector3 sidev02 = v2 - v0;
@@ -43,8 +43,8 @@ chi_math::PolygonMappingFE_PWL::
     triangle_data.detJ = sidedetJ;
     triangle_data.detJ_surf = sidev01.Norm();
 
-    triangle_data.v_index[0] = face.vertex_ids[0];
-    triangle_data.v_index[1] = face.vertex_ids[1];
+    triangle_data.v_index[0] = face.vertex_ids_[0];
+    triangle_data.v_index[1] = face.vertex_ids_[1];
 
     triangle_data.v0 = v0;
 
@@ -70,31 +70,31 @@ chi_math::PolygonMappingFE_PWL::
     triangle_data.JTinv.SetIJ(2,2,0.0);
 
     //Set face normal
-    triangle_data.normal = face.normal;
+    triangle_data.normal = face.normal_;
 
-    sides.push_back(triangle_data);
+    sides_.push_back(triangle_data);
   }
 
   //=========================================== Compute node to side mapping
-  for (int v=0; v<poly_cell.vertex_ids.size(); v++)
+  for (int v=0; v<poly_cell.vertex_ids_.size(); v++)
   {
-    const uint64_t vindex = poly_cell.vertex_ids[v];
-    std::vector<int> side_mapping(num_of_subtris);
-    for (int side=0;side<num_of_subtris;side++)
+    const uint64_t vindex = poly_cell.vertex_ids_[v];
+    std::vector<int> side_mapping(num_of_subtris_);
+    for (int side=0;side<num_of_subtris_;side++)
     {
       side_mapping[side] = -1;
 
-      const chi_mesh::CellFace& face = poly_cell.faces[side];
-      if (face.vertex_ids[0] == vindex)
+      const chi_mesh::CellFace& face = poly_cell.faces_[side];
+      if (face.vertex_ids_[0] == vindex)
       {
         side_mapping[side] = 0;
       }
-      if (face.vertex_ids[1] == vindex)
+      if (face.vertex_ids_[1] == vindex)
       {
         side_mapping[side] = 1;
       }
     }
-    node_to_side_map.push_back(side_mapping);
+    node_to_side_map_.push_back(side_mapping);
   }
 
 //  //============================================= Compute edge dof mappings

@@ -39,18 +39,18 @@ void chi_math::SpatialDiscretization_PWLBase::CreateCellMappings()
     {
       case chi_mesh::CellType::SLAB:
       {
-        const auto& vol_quad = line_quad_order_arbitrary;
+        const auto& vol_quad = line_quad_order_arbitrary_;
 
-        switch (cs_type)
+        switch (coord_sys_type_)
         {
           case CoordinateSystemType::CARTESIAN:
-            mapping = make_unique<SlabSlab>(cell, ref_grid, vol_quad);
+            mapping = make_unique<SlabSlab>(cell, ref_grid_, vol_quad);
             break;
           case CoordinateSystemType::CYLINDRICAL:
-            mapping = make_unique<SlabCyli>(cell, ref_grid, vol_quad);
+            mapping = make_unique<SlabCyli>(cell, ref_grid_, vol_quad);
             break;
           case CoordinateSystemType::SPHERICAL:
-            mapping = make_unique<SlabSphr>(cell, ref_grid, vol_quad);
+            mapping = make_unique<SlabSphr>(cell, ref_grid_, vol_quad);
             break;
           default:
             throw InvalidCoordinateSystem(std::string(fname))
@@ -59,16 +59,16 @@ void chi_math::SpatialDiscretization_PWLBase::CreateCellMappings()
       }
       case chi_mesh::CellType::POLYGON:
       {
-        const auto& vol_quad = tri_quad_order_arbitrary;
-        const auto& area_quad = line_quad_order_arbitrary;
+        const auto& vol_quad = tri_quad_order_arbitrary_;
+        const auto& area_quad = line_quad_order_arbitrary_;
 
-        switch (cs_type)
+        switch (coord_sys_type_)
         {
           case CoordinateSystemType::CARTESIAN:
-            mapping = make_unique<Polygon>(cell, ref_grid, vol_quad, area_quad);
+            mapping = make_unique<Polygon>(cell, ref_grid_, vol_quad, area_quad);
             break;
           case CoordinateSystemType::CYLINDRICAL:
-            mapping = make_unique<PolygonCyli>(cell, ref_grid, vol_quad,area_quad);
+            mapping = make_unique<PolygonCyli>(cell, ref_grid_, vol_quad, area_quad);
             break;
           default:
             throw InvalidCoordinateSystem(std::string(fname))
@@ -77,13 +77,13 @@ void chi_math::SpatialDiscretization_PWLBase::CreateCellMappings()
       }
       case chi_mesh::CellType::POLYHEDRON:
       {
-        const auto& vol_quad = tet_quad_order_arbitrary;
-        const auto& area_quad = tri_quad_order_arbitrary;
+        const auto& vol_quad = tet_quad_order_arbitrary_;
+        const auto& area_quad = tri_quad_order_arbitrary_;
 
-        switch (cs_type)
+        switch (coord_sys_type_)
         {
           case CoordinateSystemType::CARTESIAN:
-            mapping = make_unique<Polyhedron>(cell,ref_grid,vol_quad,area_quad);
+            mapping = make_unique<Polyhedron>(cell, ref_grid_, vol_quad, area_quad);
             break;
           default:
             throw InvalidCoordinateSystem(std::string(fname))
@@ -96,13 +96,13 @@ void chi_math::SpatialDiscretization_PWLBase::CreateCellMappings()
     return mapping;
   };
 
-  for (const auto& cell : ref_grid->local_cells)
-    cell_mappings.push_back(MakeCellMapping(cell));
+  for (const auto& cell : ref_grid_->local_cells)
+    cell_mappings_.push_back(MakeCellMapping(cell));
 
-  const auto ghost_ids = ref_grid->cells.GetGhostGlobalIDs();
+  const auto ghost_ids = ref_grid_->cells.GetGhostGlobalIDs();
   for (uint64_t ghost_id : ghost_ids)
   {
-    auto ghost_mapping = MakeCellMapping(ref_grid->cells[ghost_id]);
-    nb_cell_mappings.insert(std::make_pair(ghost_id, std::move(ghost_mapping)));
+    auto ghost_mapping = MakeCellMapping(ref_grid_->cells[ghost_id]);
+    nb_cell_mappings_.insert(std::make_pair(ghost_id, std::move(ghost_mapping)));
   }
 }

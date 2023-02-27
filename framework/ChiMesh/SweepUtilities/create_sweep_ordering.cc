@@ -11,12 +11,7 @@
 #include "ChiConsole/chi_console.h"
 #include "ChiTimer/chi_timer.h"
 
-
-;
-
 #include "ChiGraph/chi_directed_graph.h"
-
-
 
 //###################################################################
 /**Develops a sweep ordering for a given angle for locally owned
@@ -30,7 +25,7 @@ chi_mesh::sweep_management::
   auto sweep_order  = std::make_shared<chi_mesh::sweep_management::SPDS>();
   sweep_order->grid = grid;
 
-  size_t num_loc_cells = grid->local_cell_glob_indices.size();
+  size_t num_loc_cells = grid->local_cells.size();
 
   //============================================= Assign direction vector
   sweep_order->omega = omega;

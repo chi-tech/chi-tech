@@ -20,7 +20,7 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
 {
   chi::log.Log() << "Partitioning mesh KBA-style.";
 
-  const size_t num_raw_cells = umesh.raw_cells.size();
+  const size_t num_raw_cells = umesh.GetNumberOfCells();
 
   //======================================== Lambda to get partition-id
   //                                         from centroid
@@ -28,11 +28,11 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
   {
     auto& handler = chi_mesh::GetCurrentHandler();
 
-    int Px = handler.volume_mesher->options.partition_x;
-    int Py = handler.volume_mesher->options.partition_y;
+    int Px = handler.GetVolumeMesher().options.partition_x;
+    int Py = handler.GetVolumeMesher().options.partition_y;
 
     chi_mesh::Cell temp_cell(CellType::GHOST, CellType::GHOST);
-    temp_cell.centroid = centroid;
+    temp_cell.centroid_ = centroid;
 
     auto xyz = GetCellXYZPartitionID(&temp_cell);
 
@@ -49,7 +49,7 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
   if (chi::mpi.location_id == 0)
   {
     uint64_t cell_id = 0;
-    for (auto& raw_cell : umesh.raw_cells)
+    for (auto& raw_cell : umesh.GetRawCells())
       cell_pids[cell_id++] = GetPIDFromCentroid(raw_cell->centroid);
   }//if home location
 

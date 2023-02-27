@@ -36,13 +36,13 @@ namespace chi_physics
 class FieldFunction
 {
 protected:
-  std::string                     m_text_name;
-  chi_math::SMDPtr                m_sdm;
-  chi_math::Unknown               m_unknown;
+  std::string                     text_name_;
+  chi_math::SMDPtr                sdm_;
+  chi_math::Unknown               unknown_;
 
-  std::vector<double>             m_field_vector;
+  std::vector<double>             field_vector_;
 
-  chi_math::UnknownManager        m_unknown_manager;
+  chi_math::UnknownManager        unknown_manager_;
 
 public:
   FieldFunction(std::string                      text_name,
@@ -65,32 +65,24 @@ public:
                 const std::vector<double>&       field_component_value);
 
   //Getters
-  const std::string& TextName() const {return m_text_name;}
-  const chi_math::SpatialDiscretization& SDM() const {return *m_sdm;}
-  const chi_math::Unknown& Unknown() const {return m_unknown;}
-  const std::vector<double>& FieldVectorRead() const {return m_field_vector;}
-  const chi_math::UnknownManager& UnkManager() const {return m_unknown_manager;}
+  const std::string& TextName() const {return text_name_;}
+  const chi_math::SpatialDiscretization& SDM() const {return *sdm_;}
+  const chi_math::Unknown& Unknown() const {return unknown_;}
+  const std::vector<double>& FieldVectorRead() const {return field_vector_;}
+  const chi_math::UnknownManager& UnkManager() const {return unknown_manager_;}
 
   //01 Updates
   void UpdateFieldVector(const std::vector<double>& field_vector);
   void UpdateFieldVector(const Vec& field_vector);
 
   //03 Export VTK
-  void ExportToVTK(const std::string& file_base_name) const;
   typedef std::vector<std::shared_ptr<const FieldFunction>> FFList;
   static
   void ExportMultipleToVTK(const std::string& file_base_name,
                            const FFList& ff_list);
 
-protected:
-  //04 Utils
-  static void UploadCellGeometry(const chi_mesh::MeshContinuum& grid,
-                          const chi_mesh::Cell &cell,
-                          int64_t& node_counter,
-                          vtkNew<vtkPoints>& points,
-                          vtkNew<vtkUnstructuredGrid> &ugrid);
-
 public:
+  //04 Utils
   std::vector<double> GetGhostedFieldVector() const;
 };
 

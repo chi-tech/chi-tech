@@ -126,13 +126,13 @@ int chiSimTest04_PWLC(lua_State* L)
 
     //======================= Flag nodes for being on dirichlet boundary
     std::vector<bool> node_boundary_flag(num_nodes, false);
-    const size_t num_faces = cell.faces.size();
+    const size_t num_faces = cell.faces_.size();
     for (size_t f=0; f<num_faces; ++f)
     {
-      const auto& face = cell.faces[f];
-      if (face.has_neighbor) continue;
+      const auto& face = cell.faces_[f];
+      if (face.has_neighbor_) continue;
 
-      const size_t num_face_nodes = face.vertex_ids.size();
+      const size_t num_face_nodes = face.vertex_ids_.size();
       for (size_t fi=0; fi<num_face_nodes; ++fi)
       {
         const uint i = cell_mapping.MapFaceNode(f,fi);
@@ -218,7 +218,7 @@ int chiSimTest04_PWLC(lua_State* L)
 
   ff->UpdateFieldVector(field);
 
-  ff->ExportToVTK("CodeTut4_PWLC");
+  chi_physics::FieldFunction::ExportMultipleToVTK("CodeTut4_PWLC", {ff});
 
   //============================================= Compute error
   //First get ghosted values

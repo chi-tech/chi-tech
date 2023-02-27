@@ -14,10 +14,10 @@ namespace chi_math
   class SpatialDiscretization_PWLBase : public chi_math::SpatialDiscretization_FE
   {
   protected:
-    QuadratureLine          line_quad_order_arbitrary;
-    QuadratureTriangle      tri_quad_order_arbitrary;
-    QuadratureQuadrilateral quad_quad_order_arbitrary;
-    QuadratureTetrahedron   tet_quad_order_arbitrary;
+    QuadratureLine          line_quad_order_arbitrary_;
+    QuadratureTriangle      tri_quad_order_arbitrary_;
+    QuadratureQuadrilateral quad_quad_order_arbitrary_;
+    QuadratureTetrahedron   tet_quad_order_arbitrary_;
 
   protected:
     explicit

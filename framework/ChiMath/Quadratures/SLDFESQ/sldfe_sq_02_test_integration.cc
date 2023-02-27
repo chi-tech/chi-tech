@@ -39,7 +39,7 @@ double chi_math::SimplifiedLDFESQ::Quadrature::
 QuadratureSSIntegral(BaseFunctor *F)
 {
   double I_quadrature = 0.0;
-  for (const auto& sq : initial_octant_SQs)
+  for (const auto& sq : initial_octant_SQs_)
     for (int i=0; i<4; ++i)
     {
       double mu = sq.sub_sqr_points[i][2];
@@ -98,7 +98,7 @@ TestIntegration(int test_case, double ref_solution, int RiemannN)
     default: F = &case1;
   }
 
-  const int Nd = initial_octant_SQs.size() * 4;
+  const int Nd = initial_octant_SQs_.size() * 4;
   const int NR = RiemannN;
 
   double h = 1.0/sqrt(8.0*Nd);
@@ -111,8 +111,8 @@ TestIntegration(int test_case, double ref_solution, int RiemannN)
   char buff0[200],buff1[200],buff2[200];
   snprintf(buff0,200,"Riemann integral: %.20e\n",I_riemann);
   snprintf(buff1,200,"Quadrature integral: %.10e\n",I_quadrature);
-  snprintf(buff2,200,"Error_RQ%05d_%06d: %2d %f %e\n",Nd,Nd*8,
-         initial_level,h,std::fabs((I_riemann - I_quadrature)/ref_solution));
+  snprintf(buff2, 200, "Error_RQ%05d_%06d: %2d %f %e\n", Nd,Nd*8,
+           initial_level_, h, std::fabs((I_riemann - I_quadrature) / ref_solution));
 
   chi::log.Log() << buff0;
   chi::log.Log() << buff1;

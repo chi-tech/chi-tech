@@ -33,35 +33,33 @@ namespace fv_diffusion
   class Solver : public chi_physics::Solver
   {
   public:
-    chi_mesh::MeshContinuumPtr grid_ptr=nullptr;
+    chi_mesh::MeshContinuumPtr grid_ptr_ = nullptr;
 
-    chi_math::SDMPtr sdm_ptr =nullptr;
+    chi_math::SDMPtr sdm_ptr_ = nullptr;
 
-    size_t num_local_dofs = 0;
-    size_t num_globl_dofs = 0;
+    size_t num_local_dofs_ = 0;
+    size_t num_globl_dofs_ = 0;
 
-    Vec            x = nullptr;            // approx solution
-    Vec            b = nullptr;            // RHS
-    Mat            A = nullptr;            // linear system matrix
+    Vec            x_ = nullptr;            // approx solution
+    Vec            b_ = nullptr;            // RHS
+    Mat            A_ = nullptr;            // linear system matrix
 
     typedef std::pair<fv_diffusion::BoundaryType,std::vector<double>> BoundaryInfo;
-    typedef std::map<uint, BoundaryInfo> BoundaryPreferences;
-    BoundaryPreferences      boundary_preferences;
-    std::vector<Boundary>   boundaries;
+    typedef std::map<std::string, BoundaryInfo> BoundaryPreferences;
+    BoundaryPreferences      boundary_preferences_;
+    std::map<uint64_t, Boundary>    boundaries_;
 
     explicit Solver(const std::string& in_solver_name);
     ~Solver() override;
 
     // void Initialize() override;
     void Initialize() override;
-
     void Execute() override;
 
-    static
-    double CallLua_iXYZFunction(lua_State* L,
-                                const std::string&,
-                                int,
-                                const chi_mesh::Vector3&);
+    static double CallLua_iXYZFunction(lua_State* L,
+                                       const std::string&,
+                                       int,
+                                       const chi_mesh::Vector3&);
 
     void UpdateFieldFunctions();
   };

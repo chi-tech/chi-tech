@@ -16,7 +16,7 @@ namespace chi_math
 class SpatialDiscretization_FV : public chi_math::SpatialDiscretization
 {
 private:
-  std::map<uint64_t, uint64_t> neighbor_cell_local_ids;
+  std::map<uint64_t, uint64_t> neighbor_cell_local_ids_;
 private:
   explicit
   SpatialDiscretization_FV(chi_mesh::MeshContinuumPtr& in_grid,
@@ -77,7 +77,7 @@ public:
   std::vector<chi_mesh::Vector3>
     GetCellNodeLocations(const chi_mesh::Cell& cell) const override
   {
-    std::vector<chi_mesh::Vector3> node_locations(1,cell.centroid);
+    std::vector<chi_mesh::Vector3> node_locations(1,cell.centroid_);
 
     return node_locations;
   }

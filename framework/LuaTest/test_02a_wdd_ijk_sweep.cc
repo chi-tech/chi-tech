@@ -39,7 +39,7 @@ IJKArrayDbl WDD_IJK_Sweep(const std::array<size_t, 3>& mesh_divs,
   const auto& D2M = quad.GetDiscreteToMomentOperator();
 
   int n = 0;
-  for (const auto& omega_n : quad.omegas)
+  for (const auto& omega_n : quad.omegas_)
   {
     if (chi::mpi.location_id == 0 and verbose)
       std::cout << "Sweep angle " << n << " " << omega_n.PrintStr() << std::endl;

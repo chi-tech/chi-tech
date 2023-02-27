@@ -16,35 +16,35 @@ void chi_math::SpatialDiscretization_FV::
   OrderNodes()
 {
   //============================================= Communicate node counts
-  const uint64_t local_num_nodes = ref_grid->local_cells.size();
-  locJ_block_size.assign(chi::mpi.process_count,0);
+  const uint64_t local_num_nodes = ref_grid_->local_cells.size();
+  locJ_block_size_.assign(chi::mpi.process_count, 0);
   MPI_Allgather(&local_num_nodes,       // sendbuf
                 1, MPI_UINT64_T,        // sendcount, sendtype
-                locJ_block_size.data(), // recvbuf
+                locJ_block_size_.data(), // recvbuf
                 1, MPI_UINT64_T,        // recvcount, recvtype
                 MPI_COMM_WORLD);        // comm
 
   //============================================= Build block addresses
-  locJ_block_address.assign(chi::mpi.process_count,0);
+  locJ_block_address_.assign(chi::mpi.process_count, 0);
   uint64_t global_num_nodes = 0;
   for (int j=0; j<chi::mpi.process_count; ++j)
   {
-    locJ_block_address[j] = global_num_nodes;
-    global_num_nodes += locJ_block_size[j];
+    locJ_block_address_[j] = global_num_nodes;
+    global_num_nodes += locJ_block_size_[j];
   }
 
-  local_block_address = locJ_block_address[chi::mpi.location_id];
+  local_block_address_ = locJ_block_address_[chi::mpi.location_id];
 
-  local_base_block_size = local_num_nodes;
-  globl_base_block_size = global_num_nodes;
+  local_base_block_size_ = local_num_nodes;
+  globl_base_block_size_ = global_num_nodes;
 
   //============================================= Sort neigbor ids
-  const auto neighbor_gids = ref_grid->cells.GetGhostGlobalIDs();
+  const auto neighbor_gids = ref_grid_->cells.GetGhostGlobalIDs();
   std::map<uint64_t, std::vector<uint64_t>> sorted_nb_gids;
   for (uint64_t gid : neighbor_gids)
   {
-    const auto& cell = ref_grid->cells[gid];
-    sorted_nb_gids[cell.partition_id].push_back(gid);
+    const auto& cell = ref_grid_->cells[gid];
+    sorted_nb_gids[cell.partition_id_].push_back(gid);
   }
 
   //============================================= Communicate neighbor ids
@@ -65,11 +65,11 @@ void chi_math::SpatialDiscretization_FV::
     local_ids.reserve(gids.size());
     for (uint64_t gid : gids)
     {
-      if (not ref_grid->IsCellLocal(gid))
+      if (not ref_grid_->IsCellLocal(gid))
         throw std::logic_error(MappingError);
 
-      const auto& local_cell = ref_grid->cells[gid];
-      local_ids.push_back(local_cell.local_id);
+      const auto& local_cell = ref_grid_->cells[gid];
+      local_ids.push_back(local_cell.local_id_);
     }//for gid
   }//for pid_list_pair
 
@@ -82,7 +82,7 @@ void chi_math::SpatialDiscretization_FV::
 
   //============================================= Create the neighbor cell
   //                                              mapping
-  neighbor_cell_local_ids.clear();
+  neighbor_cell_local_ids_.clear();
   for (const auto& pid_list_pair : sorted_nb_gids)
   {
     try
@@ -95,7 +95,7 @@ void chi_math::SpatialDiscretization_FV::
         throw std::logic_error(MappingError + std::string(" Size-mismatch."));
 
       for (size_t i=0; i<gid_list.size(); ++i)
-        neighbor_cell_local_ids.insert(
+        neighbor_cell_local_ids_.insert(
           std::make_pair(gid_list[i],lid_list[i]));
     }
     catch (const std::out_of_range& oor)

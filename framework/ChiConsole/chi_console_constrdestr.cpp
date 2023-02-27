@@ -14,10 +14,10 @@
 
 //############################################################################# Default constructor
 /** Default constructor for the console*/
-chi_objects::ChiConsole::ChiConsole() noexcept
+chi_objects::ChiConsole::ChiConsole() noexcept :
+  consoleState(luaL_newstate())
 {
 	//========================================== Initializing console
-	consoleState = luaL_newstate();
   auto& L = this->consoleState;
 
 	luaL_openlibs(L);
@@ -29,8 +29,6 @@ chi_objects::ChiConsole::ChiConsole() noexcept
   lua_pushinteger(L, PROJECT_PATCH_VERSION); lua_setglobal(L, "chi_patch_version");
 
 	//========================================== Registering functions
-//	#include"../ChiLua/chi_lua_register.h"
-
   chi_math::lua_utils::RegisterLuaEntities(L);
   chi_mesh::lua_utils::RegisterLuaEntities(L);
   chi_mpi_utils::lua_utils::RegisterLuaEntities(L);

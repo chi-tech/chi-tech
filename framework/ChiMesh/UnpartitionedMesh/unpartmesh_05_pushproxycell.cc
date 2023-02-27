@@ -47,12 +47,12 @@ void chi_mesh::UnpartitionedMesh::
   for (auto& proxy_face : proxy_faces)
     cell->faces.emplace_back(proxy_face);
 
-  raw_cells.push_back(cell);
+  raw_cells_.push_back(cell);
 
   chi_mesh::MeshAttributes dimension;
   if (type == CellType::SLAB      ) dimension = DIMENSION_1;
   if (type == CellType::POLYGON   ) dimension = DIMENSION_2;
   if (type == CellType::POLYHEDRON) dimension = DIMENSION_3;
 
-  attributes = dimension | UNSTRUCTURED;
+  attributes_ = dimension | UNSTRUCTURED;
 }

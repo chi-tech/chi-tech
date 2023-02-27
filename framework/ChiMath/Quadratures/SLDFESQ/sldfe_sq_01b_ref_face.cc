@@ -22,8 +22,8 @@ void chi_math::SimplifiedLDFESQ::Quadrature::
   vertices_xy_tilde_ij.resize(Np, VertList(Np));
   for (int i=0; i<Np; ++i)
     for (int j=0; j<Np; ++j)
-      vertices_xy_tilde_ij[i][j] = chi_mesh::Vertex(diagonal_vertices[i].x,
-                                                    diagonal_vertices[j].y,
+      vertices_xy_tilde_ij[i][j] = chi_mesh::Vertex(diagonal_vertices_[i].x,
+                                                    diagonal_vertices_[j].y,
                                                     0.0);
 
   //============================================= Generate SQs
@@ -78,7 +78,7 @@ void chi_math::SimplifiedLDFESQ::Quadrature::
       //==================================== Develop LDFE values
       DevelopSQLDFEValues(sq,legendre);
 
-      initial_octant_SQs.push_back(sq);
+      initial_octant_SQs_.push_back(sq);
     }//for j
   }//for i
 }

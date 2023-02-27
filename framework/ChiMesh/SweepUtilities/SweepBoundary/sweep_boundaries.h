@@ -23,12 +23,12 @@ class BoundaryBase
 {
 public:
   const chi_mesh::sweep_management::BoundaryType type;
-  std::vector<double>& boundary_flux;
+  const std::vector<double> boundary_flux;
   std::vector<double>  zero_boundary_flux;
 
 public:
   explicit BoundaryBase(BoundaryType bndry_type,
-                        std::vector<double>& ref_boundary_flux) :
+                        const std::vector<double>& ref_boundary_flux) :
                         type(bndry_type),
                         boundary_flux(ref_boundary_flux)
   {
@@ -68,7 +68,7 @@ class BoundaryVacuum : public BoundaryBase
 {
 public:
   explicit
-  BoundaryVacuum(std::vector<double>& ref_boundary_flux) :
+  BoundaryVacuum(const std::vector<double>& ref_boundary_flux) :
   BoundaryBase(BoundaryType::VACUUM,ref_boundary_flux)
   {}
 };
@@ -79,7 +79,7 @@ class BoundaryIncidentHomogenous : public BoundaryBase
 {
 public:
   explicit
-  BoundaryIncidentHomogenous(std::vector<double>& ref_boundary_flux) :
+  BoundaryIncidentHomogenous(const std::vector<double>& ref_boundary_flux) :
     BoundaryBase(BoundaryType::INCIDENT_HOMOGENOUS,ref_boundary_flux)
   {}
 };
@@ -90,7 +90,7 @@ class BoundaryIncidentHeterogenous : public BoundaryBase
 {
 public:
   explicit
-  BoundaryIncidentHeterogenous(std::vector<double>& ref_boundary_flux) :
+  BoundaryIncidentHeterogenous(const std::vector<double>& ref_boundary_flux) :
     BoundaryBase(BoundaryType::INCIDENT_HETEROGENOUS,ref_boundary_flux)
   {}
 };
@@ -118,7 +118,7 @@ public:
   std::vector<std::vector<bool>>   angle_readyflags;
 
 public:
-  BoundaryReflecting(std::vector<double>& ref_boundary_flux,
+  BoundaryReflecting(const std::vector<double>& ref_boundary_flux,
                      const chi_mesh::Normal& in_normal) :
   BoundaryBase(BoundaryType::REFLECTING,ref_boundary_flux),
   normal(in_normal)

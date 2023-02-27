@@ -10,8 +10,8 @@ namespace chi_math
 class RandomNumberGenerator
 {
 private:
-  std::mt19937_64    mt1993764_generator;
-  std::uniform_real_distribution<double> distribution;
+  std::mt19937_64    mt1993764_generator_;
+  std::uniform_real_distribution<double> distribution_;
 
 public:
   RandomNumberGenerator();

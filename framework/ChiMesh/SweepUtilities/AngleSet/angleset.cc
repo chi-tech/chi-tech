@@ -12,12 +12,12 @@
 chi_mesh::sweep_management::AngleSet::
 AngleSet(size_t in_numgrps,
          size_t in_ref_subset,
-         std::shared_ptr<SPDS>& in_spds,
+         const SPDS& in_spds,
          FLUDS* in_fluds,
          std::vector<size_t>& angle_indices,
-         std::vector<std::shared_ptr<SweepBndry>>& sim_boundaries,
+         std::map<uint64_t, std::shared_ptr<SweepBndry>>& sim_boundaries,
          int sweep_eager_limit,
-         chi_objects::ChiMPICommunicatorSet* in_comm_set):
+         const chi_objects::ChiMPICommunicatorSet& in_comm_set):
   num_grps(in_numgrps),
   spds(in_spds),
   sweep_buffer(this,sweep_eager_limit,in_comm_set),
@@ -60,7 +60,7 @@ chi_mesh::sweep_management::AngleSet::
   Status status = sweep_buffer.ReceiveUpstreamPsi(angle_set_num);
 
   //Also check boundaries
-  for (auto& bndry : ref_boundaries)
+  for (auto& [bid,bndry] : ref_boundaries)
     if (not bndry->CheckAnglesReadyStatus(angles,ref_subset))
       {status = Status::RECEIVING; break;}
 
@@ -79,7 +79,7 @@ chi_mesh::sweep_management::AngleSet::
     sweep_buffer.ClearLocalAndReceiveBuffers();
 
     //Update boundary readiness
-    for (auto& bndry : ref_boundaries)
+    for (auto& [bid,bndry] : ref_boundaries)
       bndry->UpdateAnglesReadyStatus(angles,ref_subset);
 
     executed = true;
@@ -105,8 +105,8 @@ chi_mesh::sweep_management::AngleSetStatus
 
 //###################################################################
 /**Returns a reference to the associated spds.*/
-std::shared_ptr<chi_mesh::sweep_management::SPDS>
-  chi_mesh::sweep_management::AngleSet::GetSPDS()
+const chi_mesh::sweep_management::SPDS&
+  chi_mesh::sweep_management::AngleSet::GetSPDS() const
 {
   return spds;
 }
@@ -149,7 +149,7 @@ bool chi_mesh::sweep_management::AngleSet::ReceiveDelayedData(size_t angle_set_n
 
 //###################################################################
 /**Returns a pointer to a boundary flux data.*/
-double* chi_mesh::sweep_management::AngleSet::
+const double* chi_mesh::sweep_management::AngleSet::
 PsiBndry(uint64_t bndry_map,
          int angle_num,
          uint64_t cell_local_id,

@@ -13,10 +13,8 @@ class GlobalCellHandler
 {
   friend class MeshContinuum;
 private:
-  std::vector<uint64_t>& local_cell_glob_indices;
-
-  std::vector<std::unique_ptr<chi_mesh::Cell>>& native_cells;
-  std::vector<std::unique_ptr<chi_mesh::Cell>>& foreign_cells;
+  std::vector<std::unique_ptr<chi_mesh::Cell>>& local_cells_ref_;
+  std::vector<std::unique_ptr<chi_mesh::Cell>>& ghost_cells_ref_;
 
   std::map<uint64_t,uint64_t>& global_cell_id_to_native_id_map;
   std::map<uint64_t,uint64_t>& global_cell_id_to_foreign_id_map;
@@ -24,14 +22,12 @@ private:
 
 private:
   explicit GlobalCellHandler(
-    std::vector<uint64_t>& in_local_cell_glob_indices,
     std::vector<std::unique_ptr<chi_mesh::Cell>>& in_native_cells,
     std::vector<std::unique_ptr<chi_mesh::Cell>>& in_foreign_cells,
     std::map<uint64_t,uint64_t>& in_global_cell_id_to_native_id_map,
     std::map<uint64_t,uint64_t>& in_global_cell_id_to_foreign_id_map) :
-    local_cell_glob_indices(in_local_cell_glob_indices),
-    native_cells(in_native_cells),
-    foreign_cells(in_foreign_cells),
+    local_cells_ref_(in_native_cells),
+    ghost_cells_ref_(in_foreign_cells),
     global_cell_id_to_native_id_map(in_global_cell_id_to_native_id_map),
     global_cell_id_to_foreign_id_map(in_global_cell_id_to_foreign_id_map)
   {}

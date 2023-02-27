@@ -20,15 +20,15 @@ enum class PropertyType
 class MaterialProperty
 {
 private:
-  const PropertyType type;
+  const PropertyType type_;
 public:
   std::string property_name;
 
-  explicit MaterialProperty(PropertyType in_type) : type(in_type) {}
+  explicit MaterialProperty(PropertyType in_type) : type_(in_type) {}
 
   virtual ~MaterialProperty() = default;
 
-  PropertyType Type() { return type; }
+  PropertyType Type() { return type_; }
 
   virtual double GetScalarValue() { return 0.0; }
 

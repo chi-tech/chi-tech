@@ -1,5 +1,5 @@
-#ifndef _chi_mesh_logicalvolume_h
-#define _chi_mesh_logicalvolume_h
+#ifndef CHI_MESH_LOGICALVOLUME_H
+#define CHI_MESH_LOGICALVOLUME_H
 
 #include "../chi_mesh.h"
 #include <chi_log.h>
@@ -237,4 +237,4 @@ public:
 };
 
 
-#endif
+#endif//CHI_MESH_LOGICALVOLUME_H

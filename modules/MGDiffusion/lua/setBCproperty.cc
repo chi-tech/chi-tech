@@ -106,7 +106,7 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
       mg_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = mg_diffusion::BoundaryType::Reflecting;
 
-      solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
+      solver.boundary_preferences_.insert(std::make_pair(bound_index, bndry_info));
 
       chi::log.Log() << "Boundary " << bound_index << " set as "
                      << "Reflecting.";
@@ -141,7 +141,7 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
       mg_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = mg_diffusion::BoundaryType::Neumann;
       bndry_info.second = {a_values,b_values,f_values};
-      solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
+      solver.boundary_preferences_.insert(std::make_pair(bound_index, bndry_info));
 
       chi::log.Log() << "Boundary " << bound_index << " set as "
                      << "Neumann with D_g grad(u_g) dot n = f_g";
@@ -165,7 +165,7 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
       mg_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = mg_diffusion::BoundaryType::Vacuum;
       bndry_info.second = {a_values,b_values,f_values};
-      solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
+      solver.boundary_preferences_.insert(std::make_pair(bound_index, bndry_info));
 
       chi::log.Log() << "Boundary " << bound_index << " set as "
                      << "Vacuum.";
@@ -193,7 +193,7 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
       mg_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = mg_diffusion::BoundaryType::Robin;
       bndry_info.second = {a_values,b_values,f_values};
-      solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
+      solver.boundary_preferences_.insert(std::make_pair(bound_index, bndry_info));
 
       chi::log.Log() << "Boundary " << bound_index << " set as Robin";
     }

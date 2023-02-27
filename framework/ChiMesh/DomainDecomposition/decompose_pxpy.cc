@@ -74,10 +74,10 @@ void chi_mesh::DecomposeSurfaceMeshPxPy(const chi_mesh::SurfaceMesh& smesh,
                                         int px, int py)
 {
   //================================================== Collect centroids
-  int num_pfaces = smesh.poly_faces.size();
+  size_t num_pfaces = smesh.GetPolygons().size();
   std::vector<chi_mesh::Vector3> centroids(num_pfaces);
   for (int pf=0; pf<num_pfaces; pf++)
-    centroids[pf] = smesh.poly_faces[pf]->face_centroid;
+    centroids[pf] = smesh.GetPolygons()[pf]->face_centroid;
 
 
   //================================================== Define sort operators

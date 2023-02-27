@@ -57,7 +57,7 @@ double cfem_diffusion::Solver::CallLua_iXYZFunction(
 /**Updates the field functions with the latest data.*/
 void cfem_diffusion::Solver::UpdateFieldFunctions()
 {
-  auto& ff = *field_functions.front();
+  auto& ff = *field_functions_.front();
 
-  ff.UpdateFieldVector(x);
+  ff.UpdateFieldVector(x_);
 }

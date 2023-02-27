@@ -21,19 +21,27 @@
 class chi_mesh::FieldFunctionInterpolationVolume :
   public chi_mesh::FieldFunctionInterpolation
 {
-public:
-  std::shared_ptr<chi_mesh::LogicalVolume> logical_volume = nullptr;
-  ff_interpolation::Operation op_type = ff_interpolation::Operation::OP_SUM;
-  std::string op_lua_func;
-  double op_value = 0.0;
+protected:
+  std::shared_ptr<chi_mesh::LogicalVolume> logical_volume_ = nullptr;
+  ff_interpolation::Operation op_type_ = ff_interpolation::Operation::OP_SUM;
+  std::string op_lua_func_;
+  double op_value_ = 0.0;
 
 private:
-  std::vector<uint64_t> cell_local_ids_inside_logvol;
+  std::vector<uint64_t> cell_local_ids_inside_logvol_;
 
 public:
   FieldFunctionInterpolationVolume() :
     FieldFunctionInterpolation(ff_interpolation::Type::VOLUME)
   {  }
+  std::shared_ptr<chi_mesh::LogicalVolume>&
+  GetLogicalVolume() {return logical_volume_;}
+
+  ff_interpolation::Operation& GetOperationType() {return op_type_;}
+
+  std::string& GetOperationLuaFunction() {return op_lua_func_;}
+
+  double& GetOpValue() {return op_value_;}
 
   //01
   void Initialize() override;

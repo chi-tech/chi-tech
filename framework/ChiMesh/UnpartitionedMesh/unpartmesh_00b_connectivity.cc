@@ -2,24 +2,21 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
 
 #include "ChiTimer/chi_timer.h"
 
-
 #include "chi_mpi.h"
-
 
 //###################################################################
 /**Establishes neighbor connectivity for the light-weight mesh.*/
 void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
 {
-  const size_t num_raw_cells = raw_cells.size();
-  const size_t num_raw_vertices = vertices.size();
+  const size_t num_raw_cells = raw_cells_.size();
+  const size_t num_raw_vertices = vertices_.size();
 
   //======================================== Reset all cell neighbors
   int num_bndry_faces = 0;
-  for (auto& cell : raw_cells)
+  for (auto& cell : raw_cells_)
     for (auto& face : cell->faces)
       if (not face.has_neighbor) ++num_bndry_faces;
 
@@ -32,13 +29,13 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
 
   //======================================== Establish internal connectivity
   // Populate vertex subscriptions to internal cells
-  vertex_cell_subscriptions.resize(num_raw_vertices);
+  vertex_cell_subscriptions_.resize(num_raw_vertices);
   {
     uint64_t cur_cell_id=0;
-    for (const auto& cell : raw_cells)
+    for (const auto& cell : raw_cells_)
     {
       for (auto vid : cell->vertex_ids)
-        vertex_cell_subscriptions.at(vid).insert(cur_cell_id);
+        vertex_cell_subscriptions_.at(vid).insert(cur_cell_id);
       ++cur_cell_id;
     }
   }
@@ -50,7 +47,7 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
   {
     uint64_t aux_counter = 0;
     uint64_t cur_cell_id=0;
-    for (auto& cell : raw_cells)
+    for (auto& cell : raw_cells_)
     {
       for (auto& cur_cell_face : cell->faces)
       {
@@ -60,13 +57,13 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
 
         std::set<size_t> cells_to_search;
         for (uint64_t vid : cfvids)
-          for (uint64_t cell_id : vertex_cell_subscriptions.at(vid))
+          for (uint64_t cell_id : vertex_cell_subscriptions_.at(vid))
             if (cell_id != cur_cell_id)
               cells_to_search.insert(cell_id);
 
         for (uint64_t adj_cell_id : cells_to_search)
         {
-          auto adj_cell = raw_cells.at(adj_cell_id);
+          auto adj_cell = raw_cells_.at(adj_cell_id);
 
           for (auto& adj_cell_face : adj_cell->faces)
           {
@@ -109,7 +106,7 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
   //======================================== Establish boundary connectivity
   // Make list of internal cells on the boundary
   std::vector<LightWeightCell*> internal_cells_on_boundary;
-  for (auto& cell : raw_cells)
+  for (auto& cell : raw_cells_)
   {
     bool cell_on_boundary = false;
     for (auto& face : cell->faces)
@@ -120,10 +117,10 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
   }
 
   // Populate vertex subscriptions to boundary cells
-  std::vector<std::set<uint64_t>> vertex_bndry_cell_subscriptions(vertices.size());
+  std::vector<std::set<uint64_t>> vertex_bndry_cell_subscriptions(vertices_.size());
   {
     uint64_t cur_cell_id=0;
-    for (auto& cell : raw_boundary_cells)
+    for (auto& cell : raw_boundary_cells_)
     {
       for (auto vid : cell->vertex_ids)
         vertex_bndry_cell_subscriptions.at(vid).insert(cur_cell_id);
@@ -146,7 +143,7 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
 
       for (uint64_t adj_cell_id : cells_to_search)
       {
-        auto& adj_cell = raw_boundary_cells[adj_cell_id];
+        auto& adj_cell = raw_boundary_cells_[adj_cell_id];
 
         std::set<uint64_t> afvids(adj_cell->vertex_ids.begin(),
                                   adj_cell->vertex_ids.end());
@@ -160,7 +157,7 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
     }//for face
 
   num_bndry_faces = 0;
-  for (auto cell : raw_cells)
+  for (auto cell : raw_cells_)
     for (auto& face : cell->faces)
       if (not face.has_neighbor) ++num_bndry_faces;
 

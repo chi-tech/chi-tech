@@ -1,8 +1,10 @@
-add_subdirectory("LBSSteadyState")
-add_subdirectory("LBSKEigenvalue")
-add_subdirectory("LBSTransient")
-add_subdirectory("LBSSteadyStateAdjoint")
-add_subdirectory("LBSCurvilinearSteadyState")
+add_subdirectory("A_LBSSolver")
+add_subdirectory("B_DO_SteadyState")
+add_subdirectory("C_DO_KEigenvalue")
+add_subdirectory("D_DO_Transient")
+add_subdirectory("C_DO_SteadyState_Adjoint")
+add_subdirectory("C_DO_RZ_SteadyState")
+add_subdirectory("B_MIP_SteadyState")
 
 
 set(SOURCES ${SOURCES} ${MORE_SOURCES} PARENT_SCOPE)

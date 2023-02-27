@@ -22,9 +22,9 @@ namespace fv_diffusion
 class fv_diffusion::Boundary
 {
   public :
-  BoundaryType type = BoundaryType::Dirichlet;
+  BoundaryType type_ = BoundaryType::Dirichlet;
 
-  std::array<double, 3> values = {0.,0.,0.};
+  std::array<double, 3> values_ = {0.,0.,0.};
 };
 
 #endif //FV_DIFFUSION_BOUNDARY_H

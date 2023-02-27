@@ -29,14 +29,14 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
     chi::Exit(EXIT_FAILURE);
   }
 
-  auto spds =  angleset->GetSPDS();
+  const auto& spds =  angleset->GetSPDS();
   auto fluds=  angleset->fluds;
 
   const auto num_grps   = angleset->GetNumGrps();
   const auto num_angles = angleset->angles.size();
 
   //============================================= Predecessor locations
-  size_t num_dependencies = spds->location_dependencies.size();
+  size_t num_dependencies = spds.location_dependencies.size();
 
   prelocI_message_count.resize(num_dependencies,0);
   prelocI_message_size.resize(num_dependencies);
@@ -81,7 +81,7 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
   }//for prelocI
 
   //============================================= Delayed Predecessor locations
-  size_t num_delayed_dependencies = spds->delayed_location_dependencies.size();
+  size_t num_delayed_dependencies = spds.delayed_location_dependencies.size();
 
   delayed_prelocI_message_count.resize(num_delayed_dependencies,0);
   delayed_prelocI_message_size.resize(num_delayed_dependencies);
@@ -127,7 +127,7 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
 
 
   //============================================= Successor locations
-  size_t num_successors = spds->location_successors.size();
+  size_t num_successors = spds.location_successors.size();
 
   deplocI_message_count.resize(num_successors,0);
   deplocI_message_size.resize(num_successors);

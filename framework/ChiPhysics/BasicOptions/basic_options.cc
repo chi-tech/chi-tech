@@ -6,7 +6,7 @@
 const chi_physics::BasicOption& chi_physics::BasicOptions::
   operator()(const std::string& option_name) const
 {
-  for (const auto& option : options)
+  for (const auto& option : options_)
   {
     if (option.Name() == option_name)
       return option;
@@ -23,8 +23,8 @@ const chi_physics::BasicOption& chi_physics::BasicOptions::
 const chi_physics::BasicOption& chi_physics::BasicOptions::
   operator()(size_t index) const
 {
-  if (index < options.size())
-    return options[index];
+  if (index < options_.size())
+    return options_[index];
 
   throw std::out_of_range("Basic option with index " + std::to_string(index) +
                           " does not appear to exist.");
@@ -36,7 +36,7 @@ const chi_physics::BasicOption& chi_physics::BasicOptions::
 chi_physics::BasicOption& chi_physics::BasicOptions::
   operator[](const std::string& option_name)
 {
-  for (auto& option : options)
+  for (auto& option : options_)
   {
     if (option.Name() == option_name)
       return option;
@@ -53,8 +53,8 @@ chi_physics::BasicOption& chi_physics::BasicOptions::
 chi_physics::BasicOption& chi_physics::BasicOptions::
   operator[](size_t index)
 {
-  if (index < options.size())
-    return options[index];
+  if (index < options_.size())
+    return options_[index];
 
   throw std::out_of_range("Basic option with index " + std::to_string(index) +
                           " does not appear to exist.");
@@ -66,28 +66,28 @@ void chi_physics::BasicOptions::
   AddOption<std::string>(const std::string &option_name,
                          const std::string& value)
 {
-  options.emplace_back(option_name, value);
+  options_.emplace_back(option_name, value);
 }
 
 template<>
 void chi_physics::BasicOptions::
   AddOption<bool>(const std::string &option_name, const bool& value)
 {
-  options.emplace_back(option_name, value);
+  options_.emplace_back(option_name, value);
 }
 
 template<>
 void chi_physics::BasicOptions::
   AddOption<int64_t>(const std::string &option_name, const int64_t& value)
 {
-  options.emplace_back(option_name, value);
+  options_.emplace_back(option_name, value);
 }
 
 template<>
 void chi_physics::BasicOptions::
   AddOption<double>(const std::string &option_name, const double& value)
 {
-  options.emplace_back(option_name, value);
+  options_.emplace_back(option_name, value);
 }
 
 /**Attempts to find an option that matches the requested name.
@@ -98,7 +98,7 @@ size_t chi_physics::BasicOptions::
   GetOptionIndexFromName(const std::string& option_name) const
 {
   size_t index=0;
-  for (const auto& option : options)
+  for (const auto& option : options_)
   {
     if (option.Name() == option_name)
       return index;

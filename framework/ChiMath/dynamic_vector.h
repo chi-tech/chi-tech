@@ -22,7 +22,7 @@ template<class NumberFormat>
 class chi_math::DynamicVector
 {
 public:
-  std::vector<NumberFormat> elements;
+  std::vector<NumberFormat> elements_;
 
   /**Default constructor. Does nothing.*/
   DynamicVector()
@@ -34,7 +34,7 @@ public:
 
   /**Constructor with number of entries. Value defaults.*/
   DynamicVector(size_t N) :
-    elements(N)
+      elements_(N)
   {
     static_assert(std::is_floating_point<NumberFormat>::value,
                   "Only floating point number formats are "
@@ -43,7 +43,7 @@ public:
 
   /**Constructor with number of entries and default value.*/
   DynamicVector(size_t N, NumberFormat value) :
-    elements(N, value)
+      elements_(N, value)
   {
     static_assert(std::is_floating_point<NumberFormat>::value,
                   "Only floating point number formats are "
@@ -51,80 +51,80 @@ public:
   }
 
   /**Copy constructor.*/
-  DynamicVector(const DynamicVector& other) { elements = other.elements;}
+  DynamicVector(const DynamicVector& other) { elements_ = other.elements_;}
 
   /**Assignment operator.*/
   DynamicVector& operator=(const DynamicVector& other)
   {
-    elements = other.elements;
+    elements_ = other.elements_;
     return *this;
   }
 
   /**Move constructor.*/
-  DynamicVector(DynamicVector&& other) { elements = std::move(other.elements);}
+  DynamicVector(DynamicVector&& other) { elements_ = std::move(other.elements_);}
 
   /**Move assignment operator.*/
   DynamicVector& operator=(DynamicVector&& other)
   {
-    elements = std::move(other.elements);
+    elements_ = std::move(other.elements_);
     return *this;
   }
 
   /**Constructor with vector.*/
-  DynamicVector(const std::vector<double>& in) { elements = in;}
+  DynamicVector(const std::vector<double>& in) { elements_ = in;}
 
   /**Copy constructor with vector.*/
   DynamicVector& operator=(const std::vector<double>& in)
   {
-    elements = in;
+    elements_ = in;
     return *this;
   }
 
   /**Constructor with vector.*/
-  DynamicVector(std::initializer_list<NumberFormat> in) { elements = in;}
+  DynamicVector(std::initializer_list<NumberFormat> in) { elements_ = in;}
 
   /**Copy constructor with vector.*/
   DynamicVector& operator=(std::initializer_list<NumberFormat> in)
   {
-    elements = in;
+    elements_ = in;
     return *this;
   }
 
   //============================================= Element access
-  NumberFormat& operator[](size_t i) {return elements[i];}
-  const NumberFormat& operator[](size_t i) const {return elements[i];}
+  NumberFormat& operator[](size_t i) {return elements_[i];}
+  const NumberFormat& operator[](size_t i) const {return elements_[i];}
 
-  NumberFormat& at(size_t i) {return elements.at(i);}
+  NumberFormat& at(size_t i) {return elements_.at(i);}
 
-  NumberFormat& back() {return elements.back();}
+  NumberFormat& back() {return elements_.back();}
 
-  NumberFormat& front() {return elements.front();}
+  NumberFormat& front() {return elements_.front();}
 
-  NumberFormat* data() {return elements.data();}
+  NumberFormat* data() {return elements_.data();}
 
-  void clear() {elements.clear();}
+  void clear() {elements_.clear();}
 
-  void resize(size_t dim) {elements.resize(dim); }
+  void resize(size_t dim) {elements_.resize(dim); }
   void resize(size_t dim, const NumberFormat& val)
   {
-    elements.resize(dim, val);
-    for (auto& entry : elements)
+    elements_.resize(dim, val);
+    for (auto& entry : elements_)
       entry = val;
   }
 
-  void reserve(size_t dim) {elements.reserve(dim);}
+  void reserve(size_t dim) {elements_.reserve(dim);}
 
-  void push_back(const NumberFormat& val) {elements.push_back(val);}
-  void pop_back() {elements.pop_back();}
+  void push_back(const NumberFormat& val) {elements_.push_back(val);}
+  void pop_back() {elements_.pop_back();}
 
-  bool empty() const noexcept {return elements.empty();}
+  bool empty() const noexcept {return elements_.empty();}
 
   //============================================= Iterator access
-  typename std::vector<NumberFormat>::iterator begin() {return elements.begin();}
+  typename std::vector<NumberFormat>::iterator begin() {return elements_.begin();}
 
-  typename std::vector<NumberFormat>::iterator end() {return elements.end();}
+  typename std::vector<NumberFormat>::iterator end() {return elements_.end();}
 
-  size_t size() const {return elements.size();}
+  size_t size() const {return elements_.size();}
 
   void bounds_check(const size_t a, const size_t b) const
   {
@@ -143,7 +143,7 @@ public:
     bounds_check(size(),rhs.size());
     DynamicVector<NumberFormat> newVector(size());
     for (int i = 0; i<size();++i)
-      newVector.elements[i] = elements[i] + rhs.elements[i];
+      newVector.elements_[i] = elements_[i] + rhs.elements_[i];
 
     return newVector;
   }
@@ -154,7 +154,7 @@ public:
   {
     bounds_check(size(),rhs.size());
     for (int i = 0; i<size();++i)
-      elements[i] += rhs.elements[i];
+      elements_[i] += rhs.elements_[i];
 
     return *this;
   }
@@ -167,7 +167,7 @@ public:
     bounds_check(size(),rhs.size());
     DynamicVector<NumberFormat> newVector(size());
     for (int i = 0; i<size();++i)
-      newVector.elements[i] = elements[i] - rhs.elements[i];
+      newVector.elements_[i] = elements_[i] - rhs.elements_[i];
 
     return newVector;
   }
@@ -178,7 +178,7 @@ public:
   {
     bounds_check(size(),rhs.size());
     for (int i = 0; i<size();++i)
-      elements[i] -= rhs.elements[i];
+      elements_[i] -= rhs.elements_[i];
 
     return *this;
   }
@@ -190,7 +190,7 @@ public:
   {
     DynamicVector<NumberFormat> newVector(size());
     for (int i = 0;i<size();++i)
-      newVector.elements[i] = elements[i] * value;
+      newVector.elements_[i] = elements_[i] * value;
 
     return newVector;
   }
@@ -200,7 +200,7 @@ public:
   DynamicVector& operator*=(const NumberFormat value)
   {
     for (int i = 0;i<size();++i)
-      elements[i] *= value;
+      elements_[i] *= value;
 
     return *this;
   }
@@ -212,7 +212,7 @@ public:
     bounds_check(size(),rhs.size());
     DynamicVector<NumberFormat> newVector(size());
     for (int i = 0; i<size(); ++i)
-      newVector.elements[i] = elements[i] * rhs.elements[i];
+      newVector.elements_[i] = elements_[i] * rhs.elements_[i];
 
     return newVector;
   }
@@ -223,7 +223,7 @@ public:
   {
     bounds_check(size(),rhs.size());
     for (int i = 0; i<size(); ++i)
-      elements[i] *= rhs.elements[i];
+      elements_[i] *= rhs.elements_[i];
 
     return *this;
   }
@@ -235,7 +235,7 @@ public:
   {
     DynamicVector<NumberFormat> newVector(size());
     for (int i = 0;i<size();++i)
-      newVector.elements[i] = elements[i] / value;
+      newVector.elements_[i] = elements_[i] / value;
 
     return newVector;
   }
@@ -245,7 +245,7 @@ public:
   DynamicVector& operator/=(const NumberFormat value)
   {
     for (int i = 0;i<size();++i)
-      elements[i] /= value;
+      elements_[i] /= value;
 
     return *this;
   }
@@ -257,7 +257,7 @@ public:
     bounds_check(size(),rhs.size());
     DynamicVector<NumberFormat> newVector(size());
     for (int i = 0; i<size(); ++i)
-      newVector.elements[i] = elements[i] / rhs.elements[i];
+      newVector.elements_[i] = elements_[i] / rhs.elements_[i];
 
     return newVector;
   }
@@ -268,7 +268,7 @@ public:
   {
     bounds_check(size(),rhs.size());
     for (int i = 0; i<size(); ++i)
-      elements[i] /= rhs.elements[i];
+      elements_[i] /= rhs.elements_[i];
 
     return *this;
   }
@@ -281,7 +281,7 @@ public:
     bounds_check(size(),rhs.size());
     NumberFormat value = 0.0;
     for (int i = 0; i<size(); ++i)
-      value += elements[i]*rhs.elements[i];
+      value += elements_[i] * rhs.elements_[i];
 
     return value;
   }
@@ -292,7 +292,7 @@ public:
   {
     NumberFormat value = 0.0;
     for (int i = 0; i<size();++i)
-      value += elements[i]*elements[i];
+      value += elements_[i] * elements_[i];
 
     value = sqrt(value);
     return value;
@@ -305,7 +305,7 @@ public:
   {
     NumberFormat value = 0.0;
     for (int i = 0; i<size();++i)
-      value += elements[i]*elements[i];
+      value += elements_[i] * elements_[i];
 
     return value;
   }
@@ -315,7 +315,7 @@ public:
   {
     NumberFormat norm = this->Norm();
     for (int i = 0;i<size();++i)
-      elements[i] = elements[i]/norm;
+      elements_[i] = elements_[i] / norm;
   }
 
   /**Returns a normalized version of the vector.*/
@@ -324,7 +324,7 @@ public:
     NumberFormat norm = this->Norm();
     DynamicVector<NumberFormat> newVector(size());
     for (int i = 0;i<size();++i)
-      newVector.elements[i] = elements[i]/norm;
+      newVector.elements_[i] = elements_[i] / norm;
 
     return newVector;
   }
@@ -335,8 +335,8 @@ public:
     std::stringstream out;
     out<<"[";
     for (int i = 0; i<(size()-1); ++i)
-      out<<elements[i]<<" ";
-    out<<elements[size()-1]<<"]";
+      out << elements_[i] << " ";
+    out << elements_[size() - 1] << "]";
 
     return out.str();
   }
@@ -349,7 +349,7 @@ operator*(const double value,const chi_math::DynamicVector<NumberFormat>& that)
 {
   chi_math::DynamicVector<NumberFormat> newVector(that.size());
   for (int i = 0; i<that.size();++i)
-    newVector.elements[i] = that.elements[i]*value;
+    newVector.elements_[i] = that.elements_[i] * value;
   return newVector;
 }
 

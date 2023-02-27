@@ -27,18 +27,20 @@ size_t chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
   //======================================== Create unpartitioned mesh
   auto umesh = std::make_shared<chi_mesh::UnpartitionedMesh>();
 
-  umesh->attributes = DIMENSION_1 | ORTHOGONAL;
+  umesh->GetMeshAttributes() = DIMENSION_1 | ORTHOGONAL;
 
   //======================================== Create vertices
   size_t Nz = vertices.size();
 
-  umesh->mesh_options.ortho_Nx = 1;
-  umesh->mesh_options.ortho_Ny = 1;
-  umesh->mesh_options.ortho_Nz = Nz-1;
+  umesh->GetMeshOptions().ortho_Nx = 1;
+  umesh->GetMeshOptions().ortho_Ny = 1;
+  umesh->GetMeshOptions().ortho_Nz = Nz-1;
+  umesh->GetMeshOptions().boundary_id_map[4] = "ZMAX";
+  umesh->GetMeshOptions().boundary_id_map[5] = "ZMIN";
 
-  umesh->vertices.reserve(Nz);
+  umesh->GetVertices().reserve(Nz);
   for (auto& vertex : zverts)
-    umesh->vertices.push_back(vertex);
+    umesh->GetVertices().push_back(vertex);
 
   //======================================== Create cells
   for (size_t c=0; c<(zverts.size()-1); ++c)
@@ -54,10 +56,13 @@ size_t chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
     left_face.vertex_ids = {c};
     rite_face.vertex_ids = {c+1};
 
+    if (c == 0)                 left_face.neighbor = 5/*ZMIN*/;
+    if (c == (zverts.size()-2)) rite_face.neighbor = 4/*ZMAX*/;
+
     cell->faces.push_back(left_face);
     cell->faces.push_back(rite_face);
 
-    umesh->raw_cells.push_back(cell);
+    umesh->AddCell(cell);
   }
 
   umesh->ComputeCentroidsAndCheckQuality();
@@ -66,11 +71,11 @@ size_t chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
   chi::unpartitionedmesh_stack.push_back(umesh);
 
   //======================================== Create meshers
-  handler.surface_mesher = std::make_shared<chi_mesh::SurfaceMesherPredefined>();
-  handler.volume_mesher = std::make_shared<
-    chi_mesh::VolumeMesherPredefinedUnpartitioned>(umesh);
+  handler.SetSurfaceMesher(std::make_shared<chi_mesh::SurfaceMesherPredefined>());
+  handler.SetVolumeMesher(std::make_shared<
+    chi_mesh::VolumeMesherPredefinedUnpartitioned>(umesh));
 
-  handler.surface_mesher->Execute();
+  handler.GetVolumeMesher().Execute();
 
   return chi::unpartitionedmesh_stack.size()-1;
 }
@@ -101,28 +106,32 @@ size_t chi_mesh::CreateUnpartitioned2DOrthoMesh(
   //======================================== Create unpartitioned mesh
   auto umesh = std::make_shared<chi_mesh::UnpartitionedMesh>();
 
-  umesh->attributes = DIMENSION_2 | ORTHOGONAL;
+  umesh->GetMeshAttributes() = DIMENSION_2 | ORTHOGONAL;
 
   //======================================== Create vertices
   size_t Nx = vertices_1d_x.size();
   size_t Ny = vertices_1d_y.size();
 
-  umesh->mesh_options.ortho_Nx = Nx-1;
-  umesh->mesh_options.ortho_Ny = Ny-1;
-  umesh->mesh_options.ortho_Nz = 1;
+  umesh->GetMeshOptions().ortho_Nx = Nx-1;
+  umesh->GetMeshOptions().ortho_Ny = Ny-1;
+  umesh->GetMeshOptions().ortho_Nz = 1;
+  umesh->GetMeshOptions().boundary_id_map[0] = "XMAX";
+  umesh->GetMeshOptions().boundary_id_map[1] = "XMIN";
+  umesh->GetMeshOptions().boundary_id_map[2] = "YMAX";
+  umesh->GetMeshOptions().boundary_id_map[3] = "YMIN";
 
   typedef std::vector<uint64_t> VecIDs;
   std::vector<VecIDs> vertex_ij_to_i_map(Ny,VecIDs(Nx));
-  umesh->vertices.reserve(Nx*Ny);
+  umesh->GetVertices().reserve(Nx * Ny);
   uint64_t k=0;
   for (size_t i=0; i<Ny; ++i)
   {
     for (size_t j=0; j<Nx; ++j)
     {
       vertex_ij_to_i_map[i][j] = k++;
-      umesh->vertices.emplace_back(vertices_1d_x[j],
-                                   vertices_1d_y[i],
-                                   0.0);
+      umesh->GetVertices().emplace_back(vertices_1d_x[j],
+                                        vertices_1d_y[i],
+                                        0.0);
     }//for j
   }//for i
 
@@ -135,6 +144,13 @@ size_t chi_mesh::CreateUnpartitioned2DOrthoMesh(
       auto cell =
         new UnpartitionedMesh::LightWeightCell(CellType::POLYGON,
                                                CellType::QUADRILATERAL);
+
+      // vertex ids:   face ids:
+      //                 2
+      //    3---2      x---x
+      //    |   |     3|   |1
+      //    0---1      x---x
+      //                 0
 
       cell->vertex_ids = {vmap[i][j],vmap[i][j+1],vmap[i+1][j+1],vmap[i+1][j]};
 
@@ -149,10 +165,16 @@ size_t chi_mesh::CreateUnpartitioned2DOrthoMesh(
           face.vertex_ids = std::vector<uint64_t>{cell->vertex_ids[v],
                                                   cell->vertex_ids[0]};
 
+        //boundary logic
+        if (j == (Nx-2) and v == 1) face.neighbor = 0/*XMAX*/;
+        if (j == 0 and v == 3)      face.neighbor = 1/*XMIN*/;
+        if (i == (Ny-2) and v == 2) face.neighbor = 2/*YMAX*/;
+        if (i == 0 and v == 0)      face.neighbor = 3/*YMIN*/;
+
         cell->faces.push_back(face);
       }
 
-      umesh->raw_cells.push_back(cell);
+      umesh->AddCell(cell);
     }//for j
   }//for i
 
@@ -162,11 +184,11 @@ size_t chi_mesh::CreateUnpartitioned2DOrthoMesh(
   chi::unpartitionedmesh_stack.push_back(umesh);
 
   //======================================== Create meshers
-  handler.surface_mesher = std::make_shared<chi_mesh::SurfaceMesherPredefined>();
-  handler.volume_mesher = std::make_shared<
-    chi_mesh::VolumeMesherPredefinedUnpartitioned>(umesh);
+  handler.SetSurfaceMesher(std::make_shared<chi_mesh::SurfaceMesherPredefined>());
+  handler.SetVolumeMesher(std::make_shared<
+    chi_mesh::VolumeMesherPredefinedUnpartitioned>(umesh));
 
-  handler.surface_mesher->Execute();
+  handler.GetSurfaceMesher().Execute();
 
   return chi::unpartitionedmesh_stack.size()-1;
 }
@@ -200,16 +222,22 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
   //======================================== Create unpartitioned mesh
   auto umesh = std::make_shared<chi_mesh::UnpartitionedMesh>();
 
-  umesh->attributes = DIMENSION_3 | ORTHOGONAL;
+  umesh->GetMeshAttributes() = DIMENSION_3 | ORTHOGONAL;
 
   //======================================== Create vertices
   size_t Nx = vertices_1d_x.size();
   size_t Ny = vertices_1d_y.size();
   size_t Nz = vertices_1d_z.size();
 
-  umesh->mesh_options.ortho_Nx = Nx-1;
-  umesh->mesh_options.ortho_Ny = Ny-1;
-  umesh->mesh_options.ortho_Nz = Nz-1;
+  umesh->GetMeshOptions().ortho_Nx = Nx-1;
+  umesh->GetMeshOptions().ortho_Ny = Ny-1;
+  umesh->GetMeshOptions().ortho_Nz = Nz-1;
+  umesh->GetMeshOptions().boundary_id_map[0] = "XMAX";
+  umesh->GetMeshOptions().boundary_id_map[1] = "XMIN";
+  umesh->GetMeshOptions().boundary_id_map[2] = "YMAX";
+  umesh->GetMeshOptions().boundary_id_map[3] = "YMIN";
+  umesh->GetMeshOptions().boundary_id_map[4] = "ZMAX";
+  umesh->GetMeshOptions().boundary_id_map[5] = "ZMIN";
 
   // i is j, and j is i, MADNESS explanation:
   // In math convention the i-index refers to the ith row
@@ -222,7 +250,7 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
   for (auto& vec : vertex_ijk_to_i_map)
     vec.resize(Nx,VecIDs(Nz));
 
-  umesh->vertices.reserve(Nx*Ny*Nz);
+  umesh->GetVertices().reserve(Nx * Ny * Nz);
   uint64_t c=0;
   for (size_t i=0; i<Ny; ++i)
   {
@@ -231,9 +259,9 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
       for (size_t k=0; k<Nz; ++k)
       {
         vertex_ijk_to_i_map[i][j][k] = c++;
-        umesh->vertices.emplace_back(vertices_1d_x[j],
-                                     vertices_1d_y[i],
-                                     vertices_1d_z[k]);
+        umesh->GetVertices().emplace_back(vertices_1d_x[j],
+                                          vertices_1d_y[i],
+                                          vertices_1d_z[k]);
       }//for k
     }//for j
   }//for i
@@ -270,6 +298,7 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
                              vmap[i+1][j+1][k],
                              vmap[i+1][j+1][k+1],
                              vmap[i  ][j+1][k+1]};
+          face.neighbor = 0/*XMAX*/;
           cell->faces.push_back(face);
         }
         //West face
@@ -281,6 +310,7 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
                              vmap[i  ][j  ][k+1],
                              vmap[i+1][j  ][k+1],
                              vmap[i+1][j  ][k]};
+          face.neighbor = 1/*XMIN*/;
           cell->faces.push_back(face);
         }
         //North face
@@ -292,6 +322,7 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
                              vmap[i+1][j  ][k+1],
                              vmap[i+1][j+1][k+1],
                              vmap[i+1][j+1][k]};
+          face.neighbor = 2/*YMAX*/;
           cell->faces.push_back(face);
         }
         //South face
@@ -303,6 +334,7 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
                              vmap[i  ][j+1][k],
                              vmap[i  ][j+1][k+1],
                              vmap[i  ][j  ][k+1]};
+          face.neighbor = 3/*YMIN*/;
           cell->faces.push_back(face);
         }
         //Top face
@@ -314,6 +346,7 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
                              vmap[i  ][j+1][k+1],
                              vmap[i+1][j+1][k+1],
                              vmap[i+1][j  ][k+1]};
+          face.neighbor = 4/*ZMAX*/;
           cell->faces.push_back(face);
         }
         //Bottom face
@@ -325,10 +358,11 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
                              vmap[i+1][j  ][k],
                              vmap[i+1][j+1][k],
                              vmap[i  ][j+1][k]};
+          face.neighbor = 5/*ZMIN*/;
           cell->faces.push_back(face);
         }
 
-        umesh->raw_cells.push_back(cell);
+        umesh->AddCell(cell);
       }//for k
     }//for j
   }//for i
@@ -339,11 +373,11 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
   chi::unpartitionedmesh_stack.push_back(umesh);
 
   //======================================== Create meshers
-  handler.surface_mesher = std::make_shared<chi_mesh::SurfaceMesherPredefined>();
-  handler.volume_mesher = std::make_shared<
-    chi_mesh::VolumeMesherPredefinedUnpartitioned>(umesh);
+  handler.SetSurfaceMesher(std::make_shared<chi_mesh::SurfaceMesherPredefined>());
+  handler.SetVolumeMesher(std::make_shared<
+    chi_mesh::VolumeMesherPredefinedUnpartitioned>(umesh));
 
-  handler.surface_mesher->Execute();
+  handler.GetSurfaceMesher().Execute();
 
   return chi::unpartitionedmesh_stack.size()-1;
 }

@@ -3,16 +3,6 @@
 #include <chi_log.h>
 #include <chi_mpi.h>
 
-////###################################################################
-///**Returns a flag indicating whether this bndry is reflecting or not.*/
-//bool chi_mesh::sweep_management::BoundaryBase::IsReflecting()
-//{
-//  if (this->Type() == BoundaryType::REFLECTING)
-//    return true;
-//  else
-//    return false;
-//}
-
 //###################################################################
 /**Returns a pointer to a heterogenous flux storage location.*/
 double* chi_mesh::sweep_management::BoundaryBase::

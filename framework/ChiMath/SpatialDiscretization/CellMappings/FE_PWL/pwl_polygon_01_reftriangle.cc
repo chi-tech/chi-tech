@@ -35,12 +35,12 @@ double chi_math::PolygonMappingFE_PWL::SideShape(unsigned int side,
                                                  const chi_mesh::Vector3& qpoint,
                                                  bool on_surface/*=false*/) const
 {
-  int index = node_to_side_map[i][side];
+  int index = node_to_side_map_[i][side];
   double value = 0.0;
   if (index == 0 or index == 1)
     value = TriShape(index,qpoint,on_surface);
 
-  value += beta*TriShape(2,qpoint,on_surface);
+  value += beta_ * TriShape(2, qpoint, on_surface);
 
   return value;
 }
@@ -50,23 +50,23 @@ double chi_math::PolygonMappingFE_PWL::SideShape(unsigned int side,
  * shape function at a quadrature point.*/
 double chi_math::PolygonMappingFE_PWL::SideGradShape_x(unsigned int side, int i) const
 {
-  int index = node_to_side_map[i][side];
+  int index = node_to_side_map_[i][side];
   double value = 0;
   if (index==0)
   {
 
-    value = sides[side].JTinv.GetIJ(0, 0) * -1.0 +
-            sides[side].JTinv.GetIJ(0, 1) * -1.0;
+    value = sides_[side].JTinv.GetIJ(0, 0) * -1.0 +
+            sides_[side].JTinv.GetIJ(0, 1) * -1.0;
   }
   if (index==1)
   {
 
-    value = sides[side].JTinv.GetIJ(0, 0) * 1.0 +
-            sides[side].JTinv.GetIJ(0, 1) * 0.0;
+    value = sides_[side].JTinv.GetIJ(0, 0) * 1.0 +
+            sides_[side].JTinv.GetIJ(0, 1) * 0.0;
   }
 
-  value += beta*(sides[side].JTinv.GetIJ(0, 0) * 0.0 +
-                 sides[side].JTinv.GetIJ(0, 1) * 1.0);
+  value += beta_ * (sides_[side].JTinv.GetIJ(0, 0) * 0.0 +
+                 sides_[side].JTinv.GetIJ(0, 1) * 1.0);
 
 
   return value;
@@ -77,23 +77,23 @@ double chi_math::PolygonMappingFE_PWL::SideGradShape_x(unsigned int side, int i)
  * shape function at a quadrature point.*/
 double chi_math::PolygonMappingFE_PWL::SideGradShape_y(unsigned int side, int i) const
 {
-  int index = node_to_side_map[i][side];
+  int index = node_to_side_map_[i][side];
   double value = 0;
   if (index==0)
   {
 
-    value = sides[side].JTinv.GetIJ(1, 0) * -1.0 +
-            sides[side].JTinv.GetIJ(1, 1) * -1.0;
+    value = sides_[side].JTinv.GetIJ(1, 0) * -1.0 +
+            sides_[side].JTinv.GetIJ(1, 1) * -1.0;
   }
   if (index==1)
   {
 
-    value = sides[side].JTinv.GetIJ(1, 0) * 1.0 +
-            sides[side].JTinv.GetIJ(1, 1) * 0.0;
+    value = sides_[side].JTinv.GetIJ(1, 0) * 1.0 +
+            sides_[side].JTinv.GetIJ(1, 1) * 0.0;
   }
 
-  value += beta*(sides[side].JTinv.GetIJ(1, 0) * 0.0 +
-                 sides[side].JTinv.GetIJ(1, 1) * 1.0);
+  value += beta_ * (sides_[side].JTinv.GetIJ(1, 0) * 0.0 +
+                 sides_[side].JTinv.GetIJ(1, 1) * 1.0);
 
 
   return value;

@@ -9,11 +9,11 @@ void mg_diffusion::Solver::SolveOneGroupProblem(const unsigned int g,
   if (verbose > 1)
     chi::log.Log() << "Solving group: " << g;
 
-  KSPSetOperators(petsc_solver.ksp, A[g], A[g]);
-  KSPSolve(petsc_solver.ksp,b,x[g]);
+  KSPSetOperators(petsc_solver_.ksp, A_[g], A_[g]);
+  KSPSolve(petsc_solver_.ksp, b_, x_[g]);
 
   // this is required to compute the inscattering RHS correctly in parallel
-  chi_math::PETScUtils::CommunicateGhostEntries(x[g]);
+  chi_math::PETScUtils::CommunicateGhostEntries(x_[g]);
 
   if (verbose > 1)
     chi::log.Log() << "Done solving group " << g;

@@ -27,7 +27,7 @@ int chiGetProductQuadrature(lua_State *L)
   std::shared_ptr<chi_math::ProductQuadrature> quad;
   try{
     auto ang_quad = chi::angular_quadrature_stack.at(handle);
-    if (ang_quad->type == chi_math::AngularQuadratureType::ProductQuadrature)
+    if (ang_quad->type_ == chi_math::AngularQuadratureType::ProductQuadrature)
       quad = std::static_pointer_cast<chi_math::ProductQuadrature>(ang_quad);
     else
     {
@@ -44,21 +44,21 @@ int chiGetProductQuadrature(lua_State *L)
   }
 
   lua_newtable(L);
-  for (size_t n=0; n<quad->weights.size(); ++n)
+  for (size_t n=0; n<quad->weights_.size(); ++n)
   {
     lua_pushnumber(L,n+1);
     lua_newtable(L);
 
     lua_pushstring(L,"weight");
-    lua_pushnumber(L,quad->weights[n]);
+    lua_pushnumber(L,quad->weights_[n]);
     lua_settable(L,-3);
 
     lua_pushstring(L,"polar");
-    lua_pushnumber(L,quad->abscissae[n].theta);
+    lua_pushnumber(L,quad->abscissae_[n].theta);
     lua_settable(L,-3);
 
     lua_pushstring(L,"azimuthal");
-    lua_pushnumber(L,quad->abscissae[n].phi);
+    lua_pushnumber(L,quad->abscissae_[n].phi);
     lua_settable(L,-3);
 
     lua_settable(L,-3);

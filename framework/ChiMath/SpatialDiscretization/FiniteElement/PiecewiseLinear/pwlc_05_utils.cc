@@ -11,7 +11,7 @@ size_t chi_math::SpatialDiscretization_PWLC::
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
-  return m_ghost_node_mapping.size()*N;
+  return m_ghost_node_mapping_.size() * N;
 }
 
 //###################################################################
@@ -23,16 +23,16 @@ std::vector<int64_t> chi_math::SpatialDiscretization_PWLC::
   dof_ids.reserve(GetNumGhostDOFs(unknown_manager));
 
   size_t num_unknowns = unknown_manager.GetTotalUnknownStructureSize();
-  auto   storage      = unknown_manager.dof_storage_type;
+  auto   storage      = unknown_manager.dof_storage_type_;
 
-  for (const auto& vid_gnid : m_ghost_node_mapping)
+  for (const auto& vid_gnid : m_ghost_node_mapping_)
   {
     const int64_t global_id = vid_gnid.second;
 
     for (size_t u=0; u<num_unknowns; ++u)
     {
-      const auto& unkn = unknown_manager.unknowns[u];
-      const size_t num_comps = unkn.num_components;
+      const auto& unkn = unknown_manager.unknowns_[u];
+      const size_t num_comps = unkn.num_components_;
       for (size_t c=0; c<num_comps; ++c)
       {
         size_t block_id     = unknown_manager.MapUnknown(u, c);
@@ -41,12 +41,12 @@ std::vector<int64_t> chi_math::SpatialDiscretization_PWLC::
         {
           for (int locJ=0; locJ<chi::mpi.process_count; ++locJ)
           {
-            const int64_t local_id = global_id - sc_int64(locJ_block_address[locJ]);
+            const int64_t local_id = global_id - sc_int64(locJ_block_address_[locJ]);
 
-            if (local_id < 0 or local_id >= locJ_block_size[locJ]) continue;
+            if (local_id < 0 or local_id >= locJ_block_size_[locJ]) continue;
 
-            address = sc_int64(locJ_block_address[locJ]*num_unknowns) +
-                      sc_int64(locJ_block_size[locJ]*block_id) +
+            address = sc_int64(locJ_block_address_[locJ] * num_unknowns) +
+                      sc_int64(locJ_block_size_[locJ] * block_id) +
                       local_id;
             break;
           }

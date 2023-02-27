@@ -11,24 +11,24 @@ chi_mesh::SurfaceMesh::SurfaceMesh()
 /**Default destructor.*/
 chi_mesh::SurfaceMesh::~SurfaceMesh()
 {
-  for (auto poly_face : poly_faces)
+  for (auto poly_face : poly_faces_)
   {
     delete poly_face;
   }
 
-  poly_faces.clear();
+  poly_faces_.clear();
 }
 
 //#########################################################
 std::ostream& operator<<(std::ostream& os,
    chi_mesh::SurfaceMesh& that)
 {
-  std::vector<chi_mesh::Face>::iterator curface;
-  for (curface = that.faces.begin();
-       curface != that.faces.end();
+  std::vector<chi_mesh::Face>::const_iterator curface;
+  for (curface = that.GetTriangles().begin();
+       curface != that.GetTriangles().end();
        curface++)
   {
-    int index = std::distance(that.faces.begin(),curface);
+    long index = std::distance(that.GetTriangles().begin(),curface);
     os << "Face " << index << " v:";
     os << curface->v_index[0] << "->";
     os << curface->v_index[1] << "->";

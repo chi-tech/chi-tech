@@ -14,8 +14,8 @@ namespace chi_math
   class SpatialDiscretization_PWLD : public SpatialDiscretization_PWLBase
   {
   protected:
-    std::vector<int64_t> cell_local_block_address;
-    std::vector<std::pair<uint64_t, int64_t>> neighbor_cell_block_address;
+    std::vector<int64_t> cell_local_block_address_;
+    std::vector<std::pair<uint64_t, int64_t>> neighbor_cell_block_address_;
 
   private:
     //00
@@ -56,6 +56,7 @@ namespace chi_math
                    const UnknownManager& unknown_manager,
                    unsigned int unknown_id,
                    unsigned int component) const override;
+
     int64_t MapDOFLocal(const chi_mesh::Cell& cell,
                         unsigned int node,
                         const UnknownManager& unknown_manager,
@@ -64,6 +65,7 @@ namespace chi_math
 
     int64_t MapDOF(const chi_mesh::Cell& cell, unsigned int node) const override
     { return MapDOF(cell,node,UNITARY_UNKNOWN_MANAGER,0,0); }
+
     int64_t MapDOFLocal(const chi_mesh::Cell& cell, unsigned int node) const override
     { return MapDOFLocal(cell,node,UNITARY_UNKNOWN_MANAGER,0,0); }
 
@@ -73,6 +75,7 @@ namespace chi_math
     //GetNumGlobalDOFs
 
     size_t GetNumGhostDOFs(const UnknownManager& unknown_manager) const override;
+
     std::vector<int64_t>
     GetGhostDOFIndices(const UnknownManager& unknown_manager) const override;
 

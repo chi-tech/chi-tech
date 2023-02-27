@@ -4,21 +4,13 @@
 #include "chi_log.h"
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "ChiMesh/MeshContinuum/chi_grid_vtk_utils.h"
 
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
-
-#include <vtkUnstructuredGrid.h>
-#include <vtkUnstructuredGridWriter.h>
-#include <vtkXMLUnstructuredGridWriter.h>
-#include <vtkXMLPUnstructuredGridWriter.h>
 
 #include <vtkCellData.h>
 #include <vtkPointData.h>
 #include <vtkDoubleArray.h>
-#include <vtkIntArray.h>
-#include <vtkUnsignedIntArray.h>
-
-#include <vtkInformation.h>
 
 //###################################################################
 /**Export multiple field functions to VTK.*/
@@ -41,36 +33,14 @@ void chi_physics::FieldFunction::
 
   for (const auto& ff_ptr : ff_list)
     if (ff_ptr != master_ff_ptr)
-      if (ff_ptr->m_sdm->ref_grid != master_ff_ptr->m_sdm->ref_grid)
+      if (ff_ptr->sdm_->ref_grid_ != master_ff_ptr->sdm_->ref_grid_)
         throw std::logic_error(fname +
         ": Cannot be used with field functions based on different grids.");
 
   //============================================= Get grid
-  const auto& grid = *master_ff.m_sdm->ref_grid;
+  const auto& grid = *master_ff.sdm_->ref_grid_;
 
-  //============================================= Instantiate VTK items
-  vtkNew<vtkUnstructuredGrid>         ugrid;
-  vtkNew<vtkPoints>                   points;
-  vtkNew<vtkIntArray>                 material_array;
-  vtkNew<vtkUnsignedIntArray>         partition_id_array;
-
-  //============================================= Set names
-  material_array->SetName("Material");
-  partition_id_array->SetName("Partition");
-
-  //############################################# Populate cell information
-  int64_t node_count=0;
-  for (const auto& cell : grid.local_cells)
-  {
-    UploadCellGeometry(grid, cell, node_count, points, ugrid);
-
-    material_array->InsertNextValue(cell.material_id);
-    partition_id_array->InsertNextValue(cell.partition_id);
-  }//for local cells
-  ugrid->SetPoints(points);
-
-  ugrid->GetCellData()->AddArray(material_array);
-  ugrid->GetCellData()->AddArray(partition_id_array);
+  auto ugrid = chi_mesh::PrepareVtkUnstructuredGrid(grid);
 
   //============================================= Upload cell/point data
   auto cell_data = ugrid->GetCellData();
@@ -79,15 +49,15 @@ void chi_physics::FieldFunction::
   {
     const auto field_vector = ff_ptr->GetGhostedFieldVector();
 
-    const auto& uk_man = ff_ptr->m_unknown_manager;
-    const auto& unknown = ff_ptr->m_unknown;
-    const auto& sdm = ff_ptr->m_sdm;
+    const auto& uk_man = ff_ptr->unknown_manager_;
+    const auto& unknown = ff_ptr->unknown_;
+    const auto& sdm = ff_ptr->sdm_;
 
-    for (uint c=0; c<unknown.num_components; ++c)
+    for (uint c=0; c<unknown.num_components_; ++c)
     {
-      const std::string component_name = ff_ptr->m_text_name +
-                                         unknown.text_name +
-                                         unknown.component_text_names[c];
+      const std::string component_name = ff_ptr->text_name_ +
+                                         unknown.text_name_ +
+                                         unknown.component_text_names_[c];
       vtkNew<vtkDoubleArray> point_array;
       vtkNew<vtkDoubleArray> cell_array;
 
@@ -99,7 +69,7 @@ void chi_physics::FieldFunction::
       {
         const size_t num_nodes = sdm->GetCellNumNodes(cell);
 
-        if (num_nodes == cell.vertex_ids.size())
+        if (num_nodes == cell.vertex_ids_.size())
         {
           double node_average = 0.0;
           for (int n=0; n<num_nodes; ++n)
@@ -126,7 +96,7 @@ void chi_physics::FieldFunction::
           }//for node
           node_average /= static_cast<double>(num_nodes);
           cell_array->InsertNextValue(node_average);
-          for (int n=0; n<cell.vertex_ids.size(); ++n)
+          for (int n=0; n<cell.vertex_ids_.size(); ++n)
           {
             point_array->InsertNextValue(node_average);
           }//for vertex
@@ -139,38 +109,7 @@ void chi_physics::FieldFunction::
     }//for component
   }//for ff_ptr
 
-  //============================================= Construct file name
-  std::string base_filename     = std::string(file_base_name);
-  std::string location_filename = base_filename +
-                                  std::string("_") +
-                                  std::to_string(chi::mpi.location_id) +
-                                  std::string(".vtu");
-
-  //============================================= Write master file
-  if (chi::mpi.location_id == 0)
-  {
-    std::string pvtu_file_name = base_filename + std::string(".pvtu");
-
-    auto pgrid_writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
-
-    pgrid_writer->EncodeAppendedDataOff();
-    pgrid_writer->SetFileName(pvtu_file_name.c_str());
-    pgrid_writer->SetNumberOfPieces(chi::mpi.process_count);
-    pgrid_writer->SetStartPiece(chi::mpi.location_id);
-    pgrid_writer->SetEndPiece(chi::mpi.process_count-1);
-    pgrid_writer->SetInputData(ugrid);
-
-    pgrid_writer->Write();
-  }
-  MPI_Barrier(MPI_COMM_WORLD);
-
-  //============================================= Serial output each piece
-  auto grid_writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
-
-  grid_writer->SetInputData(ugrid);
-  grid_writer->SetFileName(location_filename.c_str());
-
-  grid_writer->Write();
+  chi_mesh::WritePVTUFiles(ugrid, file_base_name);
 
   chi::log.Log() << "Done exporting field functions to VTK.";
 }

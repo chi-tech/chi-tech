@@ -18,9 +18,9 @@ std::vector<uint64_t> chi_mesh::MeshContinuum::GetDomainUniqueBoundaryIDs() cons
   //====================================== Develop local bndry-id set
   std::set<uint64_t> local_bndry_ids_set;
   for (auto& cell : local_cells)
-    for (auto& face : cell.faces)
-      if (not face.has_neighbor)
-        local_bndry_ids_set.insert(face.neighbor_id);
+    for (auto& face : cell.faces_)
+      if (not face.has_neighbor_)
+        local_bndry_ids_set.insert(face.neighbor_id_);
 
   //====================================== Vectorify it and get local count
   std::vector<uint64_t> local_bndry_ids(local_bndry_ids_set.begin(),

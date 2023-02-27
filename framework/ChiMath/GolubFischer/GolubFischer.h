@@ -53,9 +53,9 @@ namespace chi_math
   class GolubFischer
   {
   public:
-    Tvecdbl_vecdbl xn_wn;
-    Tvecdbl alpha;
-    Tvecdbl beta;
+    Tvecdbl_vecdbl xn_wn_;
+    Tvecdbl alpha_;
+    Tvecdbl beta_;
   public:
     Tvecdbl_vecdbl& GetDiscreteScatAngles(Tvecdbl& mell);
   private:

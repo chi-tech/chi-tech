@@ -1,5 +1,5 @@
-#ifndef _chi_graph_h
-#define _chi_graph_h
+#ifndef CHI_GRAPH_H
+#define CHI_GRAPH_H
 
 #include "ChiMesh/chi_mesh.h"
 
@@ -9,5 +9,4 @@ namespace chi_graph
   class DirectedGraph;
 }
 
-
-#endif
+#endif //CHI_GRAPH_H

@@ -115,7 +115,7 @@ int chiSimTest06_WDD(lua_State* L)
   const auto& m_ell_em_map = quadrature->GetMomentToHarmonicsIndexMap();
 
   const size_t num_moments = m_ell_em_map.size();
-  const size_t num_dirs = quadrature->omegas.size();
+  const size_t num_dirs = quadrature->omegas_.size();
 
   chi::log.Log() << "End Set/Get params." << std::endl;
   chi::log.Log() << "Num Moments: " << num_moments << std::endl;
@@ -151,7 +151,7 @@ int chiSimTest06_WDD(lua_State* L)
   //============================================= Make material source term
   for (const auto& cell : grid.local_cells)
   {
-    const auto& cc = cell.centroid;
+    const auto& cc = cell.centroid_;
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
 
@@ -188,7 +188,7 @@ int chiSimTest06_WDD(lua_State* L)
   {
     const auto   cell_global_id = ijk_mapping.MapNDtoLin(ijk[1],ijk[0],ijk[2]);
     const auto&  cell           = grid.cells[cell_global_id];
-    const auto   cell_local_id  = cell.local_id;
+    const auto   cell_local_id  = cell.local_id_;
     const auto&  cell_mapping   = sdm.GetCellMapping(cell);
 
     const auto& cell_ortho_size = cell_ortho_sizes[cell_local_id];
@@ -227,7 +227,7 @@ int chiSimTest06_WDD(lua_State* L)
       if (Ny > 1) rhs += 2.0*std::fabs(omega.y)*psi_us_y[g]/dy;
       if (Nz > 1) rhs += 2.0*std::fabs(omega.z)*psi_us_z[g]/dz;
 
-      double lhs = cell_xs.sigma_t[g];
+      double lhs = cell_xs.sigma_t_[g];
       if (Nx > 1) lhs += 2.0*std::fabs(omega.x)/dx;
       if (Ny > 1) lhs += 2.0*std::fabs(omega.y)/dy;
       if (Nz > 1) lhs += 2.0*std::fabs(omega.z)/dz;
@@ -257,8 +257,8 @@ int chiSimTest06_WDD(lua_State* L)
   {
     for (size_t d=0; d<num_dirs; ++d)
     {
-      const auto &omega = quadrature->omegas[d];
-      const auto &weight = quadrature->weights[d];
+      const auto &omega = quadrature->omegas_[d];
+      const auto &weight = quadrature->weights_[d];
 
       std::vector<int64_t> iorder, jorder, korder;
       if (omega.x > 0.0) iorder = chi_math::Range<int64_t>(0, Nx);
@@ -328,7 +328,8 @@ int chiSimTest06_WDD(lua_State* L)
   );
 
   phi_ff->UpdateFieldVector(m0_phi);
-  phi_ff->ExportToVTK("SimTest_06_WDD");
+
+  chi_physics::FieldFunction::ExportMultipleToVTK("SimTest_06_WDD", {phi_ff});
 
   return 0;
 }
@@ -343,8 +344,8 @@ double ComputeRelativePWChange(
   )
 {
   double pw_change = 0.0;
-  const size_t num_moments = phi_uk_man.unknowns.size();
-  const size_t num_groups = phi_uk_man.unknowns.front().num_components;
+  const size_t num_moments = phi_uk_man.unknowns_.size();
+  const size_t num_groups = phi_uk_man.unknowns_.front().num_components_;
 
   for (const auto& cell : grid.local_cells)
   {
@@ -401,14 +402,14 @@ std::vector<double> SetSource(
   const size_t num_local_phi_dofs = sdm.GetNumLocalDOFs(phi_uk_man);
   std::vector<double> source_moments(num_local_phi_dofs, 0.0);
 
-  const size_t num_moments = phi_uk_man.unknowns.size();
-  const size_t num_groups = phi_uk_man.unknowns.front().num_components;
+  const size_t num_moments = phi_uk_man.unknowns_.size();
+  const size_t num_groups = phi_uk_man.unknowns_.front().num_components_;
 
   for (const auto& cell : grid.local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
-    const auto& S = xs.transfer_matrices;
+    const auto& S = xs.transfer_matrices_;
 
     for (size_t i=0; i<num_nodes; ++i)
     {

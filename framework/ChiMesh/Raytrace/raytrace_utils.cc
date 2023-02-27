@@ -285,11 +285,11 @@ void chi_mesh::PopulateRaySegmentLengths(
   if (cell.Type() == chi_mesh::CellType::POLYGON)
   {
     int f=-1;
-    for (auto& face : cell.faces) //edges
+    for (auto& face : cell.faces_) //edges
     {
       f++;
-      const auto& v0 = grid.vertices[face.vertex_ids[0]];
-      const auto& vc = cell.centroid;
+      const auto& v0 = grid.vertices[face.vertex_ids_[0]];
+      const auto& vc = cell.centroid_;
 
       auto n0 = (vc-v0).Cross(khat).Normalized();
 
@@ -310,16 +310,16 @@ void chi_mesh::PopulateRaySegmentLengths(
   }
   else if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
   {
-    auto& vcc = cell.centroid;
+    auto& vcc = cell.centroid_;
 
     int f=-1;
-    for (auto& face : cell.faces)
+    for (auto& face : cell.faces_)
     {
       f++;
-      auto& vfc  = face.centroid;
+      auto& vfc  = face.centroid_;
 
       //===================== Face center to vertex segments
-      for (auto vi : face.vertex_ids)
+      for (auto vi : face.vertex_ids_)
       {
         auto& vert = grid.vertices[vi];
 
@@ -337,12 +337,12 @@ void chi_mesh::PopulateRaySegmentLengths(
       }//for edge
 
       //===================== Face edge to cell center segments
-      for (int v=0; v<face.vertex_ids.size(); ++v)
+      for (int v=0; v<face.vertex_ids_.size(); ++v)
       {
-        uint64_t vid_0 = face.vertex_ids[v];
-        uint64_t vid_1 = (v<(face.vertex_ids.size()-1))?
-                         face.vertex_ids[v+1] :
-                         face.vertex_ids[0];
+        uint64_t vid_0 = face.vertex_ids_[v];
+        uint64_t vid_1 = (v<(face.vertex_ids_.size() - 1)) ?
+                         face.vertex_ids_[v + 1] :
+                         face.vertex_ids_[0];
 
         auto& v0 = grid.vertices[vid_0];
         auto& v1 = grid.vertices[vid_1];

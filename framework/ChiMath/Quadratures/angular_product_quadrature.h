@@ -30,11 +30,11 @@ namespace chi_math
 class chi_math::ProductQuadrature : public chi_math::AngularQuadrature
 {
 public:
-  std::vector<double>           polar_ang;
-  std::vector<double>           azimu_ang;
+  std::vector<double>           polar_ang_;
+  std::vector<double>           azimu_ang_;
 protected:
   /** Linear indices of ordered directions mapped to polar level. */
-  std::map<unsigned int, std::vector<unsigned int>> map_directions;
+  std::map<unsigned int, std::vector<unsigned int>> map_directions_;
 
 protected:
   ProductQuadrature() :
@@ -54,11 +54,11 @@ public:
    * polar angle index and the azimuthal angle index.*/
   unsigned int GetAngleNum(const unsigned int polar_angle_index,
                            const unsigned int azimu_angle_index) const
-  { return map_directions.at(polar_angle_index)[azimu_angle_index]; }
+  { return map_directions_.at(polar_angle_index)[azimu_angle_index]; }
   /** Return constant reference to map_directions. */
   const std::map<unsigned int,
                  std::vector<unsigned int>>& GetDirectionMap() const
-  { return map_directions; }
+  { return map_directions_; }
 };
 
 //######################################################### Class def

@@ -36,18 +36,23 @@ struct FFICellIntersection
  * computing the centroid of that cut. This can be done cell by cell.*/
 class chi_mesh::FieldFunctionInterpolationSlice : public chi_mesh::FieldFunctionInterpolation
 {
-public:
-  chi_mesh::Normal normal =chi_mesh::Normal(0.0,0.0,1.0);
-  chi_mesh::Normal binorm =chi_mesh::Normal(0.0,1.0,0.0);
-  chi_mesh::Normal tangent=chi_mesh::Normal(1.0,0.0,0.0);
-  chi_mesh::Vector3 plane_point;
+protected:
+  chi_mesh::Normal normal_ =chi_mesh::Normal(0.0, 0.0, 1.0);
+  chi_mesh::Normal binorm_ =chi_mesh::Normal(0.0, 1.0, 0.0);
+  chi_mesh::Normal tangent_=chi_mesh::Normal(1.0, 0.0, 0.0);
+  chi_mesh::Vector3 plane_point_;
 
 private:
-  std::vector<FFICellIntersection>    cell_intersections;
+  std::vector<FFICellIntersection>    cell_intersections_;
 public:
   FieldFunctionInterpolationSlice() :
     FieldFunctionInterpolation(ff_interpolation::Type::SLICE)
   {  }
+
+  chi_mesh::Normal& GetNormal() {return normal_;}
+  chi_mesh::Normal& GetBiNorm() {return binorm_;}
+  chi_mesh::Normal& GetTangent() {return tangent_;}
+  chi_mesh::Vector3& GetPlanePoint() {return plane_point_;}
   //01
   void Initialize() override;
 

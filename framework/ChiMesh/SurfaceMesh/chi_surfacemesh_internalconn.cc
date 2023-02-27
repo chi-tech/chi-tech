@@ -19,7 +19,7 @@ void chi_mesh::SurfaceMesh::UpdateInternalConnectivity()
   std::vector<std::vector<size_t >> vertex_subscriptions;
 
   //======================================== Initialize vertex subscription
-  size_t num_verts = vertices.size();
+  size_t num_verts = vertices_.size();
   vertex_subscriptions.resize(num_verts);
 
   for (auto& vert_sub : vertex_subscriptions)
@@ -28,18 +28,18 @@ void chi_mesh::SurfaceMesh::UpdateInternalConnectivity()
   //======================================== Loop over cells and determine
   //                                         which cells subscribe to a vertex
   //%%%%%% TRIANGLES %%%%%
-  size_t num_tri_faces = faces.size();
+  size_t num_tri_faces = faces_.size();
   for (size_t tf=0; tf<num_tri_faces; tf++)
   {
-    auto& try_face = faces[tf];
+    auto& try_face = faces_[tf];
     for (int v=0; v<3; ++v)
       vertex_subscriptions[v].push_back(tf);
   }
   //%%%%% POLYGONS %%%%%
-  size_t num_poly_faces = poly_faces.size();
+  size_t num_poly_faces = poly_faces_.size();
   for (size_t pf=0; pf<num_poly_faces; pf++)
   {
-    auto poly_face = poly_faces[pf];
+    auto poly_face = poly_faces_[pf];
     for (auto v : poly_face->v_indices)
       vertex_subscriptions[v].push_back(pf);
   }
@@ -47,7 +47,7 @@ void chi_mesh::SurfaceMesh::UpdateInternalConnectivity()
   //======================================== Loop over cells and determine
   //                                         connectivity
   //%%%%%% TRIANGLES %%%%%
-  for (auto curFace : faces)
+  for (auto curFace : faces_)
   {
     for (int e=0;e<3;e++)
     {
@@ -58,7 +58,7 @@ void chi_mesh::SurfaceMesh::UpdateInternalConnectivity()
       //=============================== Search cells subscribing to vi
       for (auto ofi : vertex_subscriptions[vi])
       {
-        auto& other_face = faces[ofi];
+        auto& other_face = faces_[ofi];
 
         for (size_t e2=0;e2<3;e2++)
         {
@@ -74,7 +74,7 @@ void chi_mesh::SurfaceMesh::UpdateInternalConnectivity()
       //=============================== Search cells subscribing to vf
       for (auto ofi : vertex_subscriptions[vf])
       {
-        auto& other_face = faces[ofi];
+        auto& other_face = faces_[ofi];
 
         for (size_t e2=0;e2<3;e2++)
         {
@@ -92,7 +92,7 @@ void chi_mesh::SurfaceMesh::UpdateInternalConnectivity()
   //======================================== Loop over cells and determine
   //                                         connectivity
   //%%%%% POLYGONS %%%%%
-  for (auto curFace : poly_faces)
+  for (auto curFace : poly_faces_)
   {
     for (auto& curface_edge : curFace->edges)
     {
@@ -102,7 +102,7 @@ void chi_mesh::SurfaceMesh::UpdateInternalConnectivity()
       //=============================== Search cells subscribing to vi
       for (auto ofi : vertex_subscriptions[vi])
       {
-        auto other_face = poly_faces[ofi];
+        auto other_face = poly_faces_[ofi];
 
         for (size_t e2=0;e2<other_face->edges.size();e2++)
         {
@@ -118,7 +118,7 @@ void chi_mesh::SurfaceMesh::UpdateInternalConnectivity()
       //=============================== Search cells subscribing to vf
       for (auto ofi : vertex_subscriptions[vf])
       {
-        auto other_face = poly_faces[ofi];
+        auto other_face = poly_faces_[ofi];
 
         for (size_t e2=0;e2<other_face->edges.size();e2++)
         {

@@ -22,8 +22,8 @@ chi_math::QuadratureTetrahedron::
       x = 0.25;
       y = 0.25;
       z = 0.25;
-      qpoints.emplace_back(x,y,z);
-      weights.push_back(1.0/6.0);
+      qpoints_.emplace_back(x, y, z);
+      weights_.push_back(1.0 / 6.0);
       break;
     }
     case QuadratureOrder::SECOND:
@@ -34,34 +34,34 @@ chi_math::QuadratureTetrahedron::
       x = a;
       y = b;
       z = b;
-      qpoints.emplace_back(x,y,z);
-      weights.push_back(1.0/24.0);
+      qpoints_.emplace_back(x, y, z);
+      weights_.push_back(1.0 / 24.0);
 
       x = b;
       y = a;
       z = b;
-      qpoints.emplace_back(x,y,z);
-      weights.push_back(1.0/24.0);
+      qpoints_.emplace_back(x, y, z);
+      weights_.push_back(1.0 / 24.0);
 
       x = b;
       y = b;
       z = a;
-      qpoints.emplace_back(x,y,z);
-      weights.push_back(1.0/24.0);
+      qpoints_.emplace_back(x, y, z);
+      weights_.push_back(1.0 / 24.0);
 
       x = b;
       y = b;
       z = b;
-      qpoints.emplace_back(x,y,z);
-      weights.push_back(1.0/24.0);
+      qpoints_.emplace_back(x, y, z);
+      weights_.push_back(1.0 / 24.0);
       break;
     }
     case QuadratureOrder::THIRD:
     {
       chi_math::QuadratureConical conical(order);
       conical.Initialize_Conical_Product_Tet();
-      qpoints.swap(conical.qpoints);
-      weights.swap(conical.weights);
+      qpoints_.swap(conical.qpoints_);
+      weights_.swap(conical.weights_);
       break;
     }
     case QuadratureOrder::FOURTH:
@@ -70,8 +70,8 @@ chi_math::QuadratureTetrahedron::
     // "Quadrature on Simplices of Arbitrary Dimension"
     case QuadratureOrder::FIFTH:
     {
-      qpoints.resize(14);
-      weights.resize(14);
+      qpoints_.resize(14);
+      weights_.resize(14);
 
       // permutations of these points and suitably-modified versions of
       // these points are the quadrature point locations
@@ -96,14 +96,14 @@ chi_math::QuadratureTetrahedron::
 
         // Here are the permutations.  Order of these is not important,
         // all have the same weight
-        qpoints[offset + 0] = chi_mesh::Vector3(a[i], a[i], a[i]);
-        qpoints[offset + 1] = chi_mesh::Vector3(a[i],    b, a[i]);
-        qpoints[offset + 2] = chi_mesh::Vector3(   b, a[i], a[i]);
-        qpoints[offset + 3] = chi_mesh::Vector3(a[i], a[i],    b);
+        qpoints_[offset + 0] = chi_mesh::Vector3(a[i], a[i], a[i]);
+        qpoints_[offset + 1] = chi_mesh::Vector3(a[i], b, a[i]);
+        qpoints_[offset + 2] = chi_mesh::Vector3(b, a[i], a[i]);
+        qpoints_[offset + 3] = chi_mesh::Vector3(a[i], a[i], b);
 
         // These 4 points all have the same weights
         for (unsigned int j=0; j<4; ++j)
-          weights[offset + j] = wt[i];
+          weights_[offset + j] = wt[i];
       } // end for
 
 
@@ -114,16 +114,16 @@ chi_math::QuadratureTetrahedron::
 
         // Here are the permutations.  Order of these is not important,
         // all have the same weight
-        qpoints[offset + 0] = chi_mesh::Vector3(b   ,    b, a[2]);
-        qpoints[offset + 1] = chi_mesh::Vector3(b   , a[2], a[2]);
-        qpoints[offset + 2] = chi_mesh::Vector3(a[2], a[2],    b);
-        qpoints[offset + 3] = chi_mesh::Vector3(a[2],    b, a[2]);
-        qpoints[offset + 4] = chi_mesh::Vector3(   b, a[2],    b);
-        qpoints[offset + 5] = chi_mesh::Vector3(a[2],    b,    b);
+        qpoints_[offset + 0] = chi_mesh::Vector3(b   , b, a[2]);
+        qpoints_[offset + 1] = chi_mesh::Vector3(b   , a[2], a[2]);
+        qpoints_[offset + 2] = chi_mesh::Vector3(a[2], a[2], b);
+        qpoints_[offset + 3] = chi_mesh::Vector3(a[2], b, a[2]);
+        qpoints_[offset + 4] = chi_mesh::Vector3(b, a[2], b);
+        qpoints_[offset + 5] = chi_mesh::Vector3(a[2], b, b);
 
         // These 6 points all have the same weights
         for (unsigned int j=0; j<6; ++j)
-          weights[offset + j] = wt[2];
+          weights_[offset + j] = wt[2];
       }
       break;
     }
@@ -141,8 +141,8 @@ chi_math::QuadratureTetrahedron::
       // http://people.scs.fsu.edu/~burkardt/f_src/keast/keast.f90
     case QuadratureOrder::SIXTH:
     {
-      qpoints.resize (24);
-      weights.resize(24);
+      qpoints_.resize (24);
+      weights_.resize(24);
 
       // The raw data for the quadrature rule.
       const std::vector<std::vector<double>> rule_data =
@@ -162,8 +162,8 @@ chi_math::QuadratureTetrahedron::
     {
       chi_math::QuadratureConical conical(order);
       conical.Initialize_Conical_Product_Tet();
-      qpoints.swap(conical.qpoints);
-      weights.swap(conical.weights);
+      qpoints_.swap(conical.qpoints_);
+      weights_.swap(conical.weights_);
     }
   }//switch order
 
@@ -175,8 +175,8 @@ _points and _weights vectors.*/
 void chi_math::QuadratureTetrahedron::KeastRule(const std::vector<std::vector<double>>& rule_data,
                                                 const unsigned int n_pts)
 {
-  auto& _points = qpoints;
-  auto& _weights = weights;
+  auto& _points = qpoints_;
+  auto& _weights = weights_;
 
   typedef chi_mesh::Vector3 Point;
 

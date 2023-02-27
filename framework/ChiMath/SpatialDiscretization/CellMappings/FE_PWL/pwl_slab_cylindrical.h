@@ -16,15 +16,17 @@ namespace chi_math
     SlabMappingFE_PWL_Cylindrical(
       const chi_mesh::Cell& slab_cell,
       const chi_mesh::MeshContinuumConstPtr& ref_grid,
-      const QuadratureLine& volume_quadrature)
-    : SlabMappingFE_PWL(slab_cell, ref_grid, volume_quadrature)
+      const QuadratureLine& volume_quadrature) :
+        SlabMappingFE_PWL(slab_cell, ref_grid, volume_quadrature)
     {}
+
   private:
     double SpatialWeightFunction(const chi_mesh::Vector3& pt) const override
     { return pt[2]; }
+
   public:
-    void
-    ComputeUnitIntegrals(finite_element::UnitIntegralData& ui_data) const override
+    void ComputeUnitIntegrals(
+        finite_element::UnitIntegralData& ui_data) const override
     { ComputeWeightedUnitIntegrals(ui_data); }
   };
 }
