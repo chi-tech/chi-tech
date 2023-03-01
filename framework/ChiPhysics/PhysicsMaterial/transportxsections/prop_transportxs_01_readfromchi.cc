@@ -449,37 +449,39 @@ void chi_physics::TransportCrossSections::
 
   //##################################################
   /// Lambda for checking for all non-negative values.
-  auto is_nonnegative =
+  auto IsNonNegative =
       [](const std::vector<double>& vec)
       {
-        return not vec.empty() and
-               std::all_of(vec.begin(), vec.end(),
-                           [](double x) { return x >= 0.0; });
+        return not std::any_of(vec.begin(), vec.end(),
+                               [](double x) { return x < 0.0; });
       };
 
   //##################################################
   /// Lambda for checking for all strictly positive values.
-  auto is_positive =
+  auto IsPositive =
       [](const std::vector<double>& vec)
       {
-        return not vec.empty() and
-               std::all_of(vec.begin(), vec.end(),
-                           [](double x) { return x > 0.0; });
+        return not std::any_of(vec.begin(), vec.end(),
+                               [](double x) { return x <= 0.0; });
       };
 
   //##################################################
   /// Lambda for checking for any non-zero values.
-  auto has_nonzero =
+  auto HasNonZero =
       [](const std::vector<double> & vec)
       {
-        return not vec.empty() and
-               std::any_of(vec.begin(), vec.end(),
+        return std::any_of(vec.begin(), vec.end(),
                            [](double x) { return x > 0.0; });
       };
 
   //============================================================
   // Read the Chi XS file
   //============================================================
+
+  //TODO: Determine whether or not to allow specification of a
+  //      data block without any data. Currently, if a data block
+  //      is specified and no values are present, the std::any_of
+  //      checks will evaluate false if expeceted data is not present.
 
   std::vector<double> decay_constants;
   std::vector<double> fractional_yields;
@@ -551,7 +553,7 @@ void chi_physics::TransportCrossSections::
       {
         Read1DData("INV_VELOCITY", inv_velocity_, num_groups_, f, ls, ln);
 
-        if (not is_positive(inv_velocity_))
+        if (not IsPositive(inv_velocity_))
           throw std::logic_error(
               "Invalid inverse velocity value encountered.\n"
               "Only strictly positive values are permitted.");
@@ -560,7 +562,7 @@ void chi_physics::TransportCrossSections::
       {
         Read1DData("VELOCITY", inv_velocity_, num_groups_, f, ls, ln);
 
-        if (not is_positive(inv_velocity_))
+        if (not IsPositive(inv_velocity_))
           throw std::logic_error(
               "Invalid velocity value encountered.\n"
               "Only strictly positive values are permitted.");
@@ -578,7 +580,7 @@ void chi_physics::TransportCrossSections::
       {
         Read1DData("SIGMA_T", sigma_t_, num_groups_, f, ls, ln);
 
-        if (not is_nonnegative(sigma_t_))
+        if (not IsNonNegative(sigma_t_))
           throw std::logic_error(
               "Invalid total cross section value encountered.\n"
               "Negative values are not permitted.");
@@ -588,7 +590,7 @@ void chi_physics::TransportCrossSections::
       {
         Read1DData("SIGMA_A", sigma_a_, num_groups_, f, ls, ln);
 
-        if (not is_nonnegative(sigma_a_))
+        if (not IsNonNegative(sigma_a_))
           throw std::logic_error(
               "Invalid absorption cross section value encountered.\n"
               "Negative values are not permitted.");
@@ -598,7 +600,7 @@ void chi_physics::TransportCrossSections::
       {
         Read1DData("SIGMA_F", sigma_f_, num_groups_, f, ls, ln);
 
-        if (not has_nonzero(sigma_f_))
+        if (not HasNonZero(sigma_f_))
         {
           chi::log.Log0Warning()
               << "The fission cross section specified in "
@@ -606,7 +608,7 @@ void chi_physics::TransportCrossSections::
               << "Clearing it.";
           sigma_f_.clear();
         }
-        if (not is_nonnegative(sigma_f_))
+        else if (not IsNonNegative(sigma_f_))
           throw std::logic_error(
               "Invalid fission cross section value encountered.\n"
               "Negative values are not permitted.");
@@ -616,7 +618,7 @@ void chi_physics::TransportCrossSections::
       {
         Read1DData("NU_SIGMA_F", nu_sigma_f_, num_groups_, f, ls, ln);
 
-        if (not has_nonzero(nu_sigma_f_))
+        if (not HasNonZero(nu_sigma_f_))
         {
           chi::log.Log0Warning()
               << "The production cross-section specified in "
@@ -624,7 +626,7 @@ void chi_physics::TransportCrossSections::
               << "Clearing it.";
           nu_sigma_f_.clear();
         }
-        if (not is_nonnegative(nu_sigma_f_))
+        else if (not IsNonNegative(nu_sigma_f_))
           throw std::logic_error(
               "Invalid production cross section value encountered.\n"
               "Negative values are not permitted.");
@@ -638,7 +640,7 @@ void chi_physics::TransportCrossSections::
       {
         Read1DData("NU", nu, num_groups_, f, ls, ln);
 
-        if (not has_nonzero(nu))
+        if (not HasNonZero(nu))
         {
           chi::log.Log0Warning()
               << "The total fission neutron yield specified in "
@@ -646,9 +648,9 @@ void chi_physics::TransportCrossSections::
               << "Clearing it.";
           nu.clear();
         }
-        if (not std::all_of(nu.begin(), nu.end(),
-                            [](double x)
-                            { return x == 0.0 or x > 1.0; }))
+        else if (std::any_of(nu.begin(), nu.end(),
+                             [](double x)
+                             { return not (x == 0.0 or x > 1.0); }))
           throw std::logic_error(
               "Invalid total fission neutron yield value encountered.\n"
               "Only values strictly greater than one, or zero, are "
@@ -673,7 +675,7 @@ void chi_physics::TransportCrossSections::
       {
         Read1DData("NU_PROMPT", nu_prompt, num_groups_, f, ls, ln);
 
-        if (not has_nonzero(nu_prompt))
+        if (not HasNonZero(nu_prompt))
         {
           chi::log.Log0Warning()
               << "The prompt fission neutron yield specified in "
@@ -681,9 +683,9 @@ void chi_physics::TransportCrossSections::
               << "Clearing it.";
           nu_prompt.clear();
         }
-        if (not std::all_of(nu_prompt.begin(), nu_prompt.end(),
-                            [](double x)
-                            { return x == 0.0 or x > 1.0; }))
+        else if (std::any_of(nu_prompt.begin(), nu_prompt.end(),
+                             [](double x)
+                             { return not (x == 0.0 or x > 1.0); }))
           throw std::logic_error(
               "Invalid prompt fission neutron yield value encountered.\n"
               "Only values strictly greater than one, or zero, are "
@@ -694,7 +696,7 @@ void chi_physics::TransportCrossSections::
       {
         Read1DData("NU_DELAYED", nu_delayed, num_groups_, f, ls, ln);
 
-        if (not has_nonzero(nu_delayed))
+        if (not HasNonZero(nu_delayed))
         {
           chi::log.Log0Warning()
               << "The delayed fission neutron yield specified in "
@@ -702,7 +704,7 @@ void chi_physics::TransportCrossSections::
               << "Clearing it.";
           nu_prompt.clear();
         }
-        if (not is_nonnegative(nu_delayed))
+        else if (not IsNonNegative(nu_delayed))
           throw std::logic_error(
               "Invalid delayed fission neutron yield value encountered.\n"
               "Only non-negative values are permitted.");
@@ -712,7 +714,7 @@ void chi_physics::TransportCrossSections::
       {
         Read1DData("BETA", beta, num_groups_, f, ls, ln);
 
-        if (not has_nonzero(beta))
+        if (not HasNonZero(beta))
         {
           chi::log.Log0Warning()
               << "The delayed neutron fraction specified in "
@@ -720,9 +722,9 @@ void chi_physics::TransportCrossSections::
               << "Clearing it.";
           beta.clear();
         }
-        if (not std::all_of(beta.begin(), beta.end(),
-                            [](double x)
-                            { return x >= 0.0 and x <= 1.0; }))
+        else if (std::any_of(beta.begin(), beta.end(),
+                             [](double x)
+                             { return not (x >= 0.0 and x <= 1.0); }))
           throw std::logic_error(
               "Invalid delayed neutron fraction value encountered.\n"
               "Only values in the range [0.0, 1.0] are permitted.");
@@ -750,11 +752,11 @@ void chi_physics::TransportCrossSections::
       {
         Read1DData("CHI", chi, num_groups_, f, ls, ln);
 
-        if (not has_nonzero(chi))
+        if (not HasNonZero(chi))
           throw std::logic_error(
               "Invalid steady-state fission spectrum encountered.\n"
               "No non-zero values found.");
-        if (not is_nonnegative(chi))
+        if (not IsNonNegative(chi))
           throw std::logic_error(
               "Invalid steady-state fission spectrum value encountered.\n"
               "Only non-negative values are permitted.");
@@ -769,11 +771,11 @@ void chi_physics::TransportCrossSections::
       {
         Read1DData("CHI_PROMPT", chi_prompt, num_groups_, f, ls, ln);
 
-        if (not has_nonzero(chi_prompt))
+        if (not HasNonZero(chi_prompt))
           throw std::logic_error(
               "Invalid prompt fission spectrum encountered.\n"
               "No non-zero values found.");
-        if (not is_nonnegative(chi_prompt))
+        if (not IsNonNegative(chi_prompt))
           throw std::logic_error(
               "Invalid prompt fission spectrum value encountered.\n"
               "Only non-negative values are permitted.");
@@ -795,12 +797,12 @@ void chi_physics::TransportCrossSections::
 
         for (unsigned int j = 0; j < num_precursors_; ++j)
         {
-          if (not has_nonzero(emission_spectra[j]))
+          if (not HasNonZero(emission_spectra[j]))
             throw std::logic_error(
                 "Invalid delayed emission spectrum encountered for "
                 "precursor species " + std::to_string(j) + ".\n" +
                 "No non-zero values found.");
-          if (not is_nonnegative(emission_spectra[j]))
+          if (not IsNonNegative(emission_spectra[j]))
             throw std::logic_error(
                 "Invalid delayed emission spectrum value encountered "
                 "for precursor species " + std::to_string(j) + ".\n" +
@@ -827,7 +829,7 @@ void chi_physics::TransportCrossSections::
           Read1DData("PRECURSOR_DECAY_CONSTANTS",
                      decay_constants, num_precursors_, f, ls, ln);
 
-          if (not is_positive(decay_constants))
+          if (not IsPositive(decay_constants))
             throw std::logic_error(
                 "Invalid precursor decay constant value encountered.\n"
                 "Only strictly positive values are permitted.");
@@ -838,13 +840,13 @@ void chi_physics::TransportCrossSections::
           Read1DData("PRECURSOR_FRACTIONAL_YIELDS",
                      fractional_yields, num_precursors_, f, ls, ln);
 
-          if (not has_nonzero(fractional_yields))
+          if (not HasNonZero(fractional_yields))
             throw std::logic_error(
                 "Invalid precursor fractional yields encountered.\n"
                 "No non-zero values found.");
-          if (not std::all_of(fractional_yields.begin(),
-                              fractional_yields.end(),
-                              [](double x) { return x >= 0.0 and x <= 1.0; }))
+          if (std::any_of(fractional_yields.begin(),
+                          fractional_yields.end(),
+                          [](double x) { return not (x >= 0.0 and x <= 1.0); }))
             throw std::logic_error(
                 "Invalid precursor fractional yield value encountered.\n"
                 "Only values in the range [0.0, 1.0] are permitted.");
@@ -856,8 +858,6 @@ void chi_physics::TransportCrossSections::
                          fractional_yields.end(),
                          fractional_yields.begin(),
                          [sum](double& x) { return x / sum; });
-
-
         }
       }
 
@@ -1070,6 +1070,7 @@ void chi_physics::TransportCrossSections::
       //      neutron data. The primary challenge in this is that
       //      different precursor species exist for neutron-induced
       //      fission than for photo-fission.
+
       //throw error if precursors are present
       if (num_precursors_ > 0)
         throw std::runtime_error(
@@ -1096,9 +1097,9 @@ void chi_physics::TransportCrossSections::
         if (sigma_f_[g] > 0.0)
           nu[g] = nu_sigma_f_[g] / sigma_f_[g];
 
-      if (not std::all_of(nu.begin(), nu.end(),
-                          [](double x)
-                          { return x == 0.0 or (x > 1.0 and x < 10.0);}))
+      if (std::any_of(nu.begin(), nu.end(),
+                      [](double x)
+                      { return not (x == 0.0 or (x > 1.0 and x < 10.0));}))
         throw std::logic_error(
             "Incompatible fission data encountered.\n"
             "The estimated fission neutron yield must be either zero "
