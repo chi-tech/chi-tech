@@ -29,8 +29,13 @@ resources/Dependencies/glew-2.1.0/
 *.toc
 
 # All vtk mesh files
-*.vtu
-*.pvtu
+/*.vtu
+/*.pvtu
+
+tests/BigTests/*/solutions/
+
+# All exodus files
+/*.e
 
 resources/Dependencies/\.DS_Store
 

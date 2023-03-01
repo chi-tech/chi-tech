@@ -111,6 +111,7 @@ if (VTK_VERSION VERSION_LESS "8.90.0")
             vtkIOXML vtkParallelCore vtkIOParallelXML
             vtkFiltersCore
             vtkIOEnSight
+            vtkIOExodus
             REQUIRED PATHS ${VTK_DIR})
     # old system
     include(${VTK_USE_FILE})
