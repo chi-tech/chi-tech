@@ -34,12 +34,12 @@ materials["1"] = chiPhysicsAddMaterial("Test Material");
 chiPhysicsMaterialAddProperty(materials["0"],SCALAR_VALUE, "D")
 chiPhysicsMaterialAddProperty(materials["0"],SCALAR_VALUE, "q")
 chiPhysicsMaterialSetProperty(materials["0"],"D",SINGLE_VALUE,1.0)
-chiPhysicsMaterialSetProperty(materials["0"],"q",SINGLE_VALUE,100.0)
+chiPhysicsMaterialSetProperty(materials["0"],"q",SINGLE_VALUE,1.0)
 
 chiPhysicsMaterialAddProperty(materials["1"],SCALAR_VALUE, "D")
 chiPhysicsMaterialAddProperty(materials["1"],SCALAR_VALUE, "q")
-chiPhysicsMaterialSetProperty(materials["1"],"D",SINGLE_VALUE,10.0)
-chiPhysicsMaterialSetProperty(materials["1"],"q",SINGLE_VALUE,0.0)
+chiPhysicsMaterialSetProperty(materials["1"],"D",SINGLE_VALUE,1.0)
+chiPhysicsMaterialSetProperty(materials["1"],"q",SINGLE_VALUE,1.0)
 
 --############################################### Setup Physics
 phys1 = chiDiffusionCreateSolver()
@@ -47,11 +47,11 @@ chiSolverSetBasicOption(phys1,"discretization_method","PWLC")
 chiSolverSetBasicOption(phys1,"residual_tolerance",1.0e-8)
 
 --############################################### Set boundary conditions
-chiDiffusionSetProperty(phys1,"boundary_type","BndryTop","dirichlet",0.0)
-chiDiffusionSetProperty(phys1,"boundary_type","BndryBottom","dirichlet",0.0)
-chiDiffusionSetProperty(phys1,"boundary_type","BndryLeftA","dirichlet",0.0)
-chiDiffusionSetProperty(phys1,"boundary_type","BndryLeftB","dirichlet",1.0)
-chiDiffusionSetProperty(phys1,"boundary_type","BndryRight","dirichlet",0.0)
+chiDiffusionSetProperty(phys1,"boundary_type","BndryTop"   ,"dirichlet",1.0)
+chiDiffusionSetProperty(phys1,"boundary_type","BndryBottom","dirichlet",1.0)
+chiDiffusionSetProperty(phys1,"boundary_type","BndryLeftA" ,"dirichlet",10.0)
+chiDiffusionSetProperty(phys1,"boundary_type","BndryLeftB" ,"dirichlet",1.0)
+chiDiffusionSetProperty(phys1,"boundary_type","BndryRight" ,"dirichlet",1.0)
 
 --############################################### Initialize and Execute Solver
 chiDiffusionInitialize(phys1)
