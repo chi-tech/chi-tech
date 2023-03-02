@@ -11,9 +11,9 @@ void lbs::LBSSolver::InitWGDSA(LBSGroupset& groupset)
   if (groupset.apply_wgdsa_)
   {
     //=========================================== Make UnknownManager
-    const size_t gs_G = groupset.groups_.size();
+    const size_t num_gs_groups = groupset.groups_.size();
     chi_math::UnknownManager uk_man;
-    uk_man.AddUnknown(chi_math::UnknownType::VECTOR_N, gs_G);
+    uk_man.AddUnknown(chi_math::UnknownType::VECTOR_N, num_gs_groups);
 
     //=========================================== Make boundary conditions
     typedef chi_mesh::sweep_management::BoundaryType SwpBndryType;
@@ -38,19 +38,21 @@ void lbs::LBSSolver::InitWGDSA(LBSGroupset& groupset)
       const auto& mat_id = matid_xs_pair.first;
       const auto& xs     = matid_xs_pair.second;
 
-      std::vector<double> Dg  (gs_G, 0.0);
-      std::vector<double> sigR(gs_G, 0.0);
+      std::vector<double> D  (num_gs_groups, 0.0);
+      std::vector<double> sigma_r(num_gs_groups, 0.0);
 
       size_t g = 0;
+      const auto& diffusion_coeff = xs->DiffusionCoefficient();
+      const auto& sigma_removal = xs->SigmaRemoval();
       for (size_t gprime = groupset.groups_.front().id_;
            gprime <= groupset.groups_.back().id_; ++gprime)
       {
-        Dg[g]   = xs->diffusion_coeff_[gprime];
-        sigR[g] = xs->sigma_removal_[gprime];
+        D[g]   = diffusion_coeff[gprime];
+        sigma_r[g] = sigma_removal[gprime];
         ++g;
       }//for g
 
-      matid_2_mgxs_map.insert(std::make_pair(mat_id, MGXS{Dg, sigR}));
+      matid_2_mgxs_map.insert(std::make_pair(mat_id, MGXS{D, sigma_r}));
     }
 
     //=========================================== Create solver
@@ -110,7 +112,7 @@ void lbs::LBSSolver::
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
-    const auto& sigma_s = matid_to_xs_map_[cell.material_id_]->sigma_s_gtog_;
+    const auto& sigma_s = matid_to_xs_map_[cell.material_id_]->SigmaSGtoG();
 
     for (size_t i=0; i < num_nodes; i++)
     {

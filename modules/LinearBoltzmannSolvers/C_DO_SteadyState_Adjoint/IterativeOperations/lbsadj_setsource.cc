@@ -46,6 +46,9 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
     const auto& S = matid_to_S_transpose_[cell.material_id_];
     const auto& F = matid_to_F_transpose_[cell.material_id_];
 
+    const auto& precursors = xs.Precursors();
+    const auto& nu_delayed_sigma_f = xs.NuDelayedSigmaF();
+
     //======================================== Loop over nodes
     const int num_nodes = full_cell_view.NumNodes();
     for (int i = 0; i < num_nodes; ++i)
@@ -78,7 +81,7 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
                 rhs += sigma_sm * phi[uk_map + gp];
 
           //============================== Apply fission sources
-          const bool fission_avail = xs.is_fissionable_ and ell == 0;
+          const bool fission_avail = xs.IsFissionable() and ell == 0;
 
           //==================== Across groupset
           if (fission_avail and apply_ags_fission_src)
@@ -90,10 +93,10 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
                 rhs += prod[gp] * phi[uk_map + gp];
 
                 if (options_.use_precursors)
-                  for (const auto& precursor: xs.precursors_)
+                  for (const auto& precursor: xs.Precursors())
                     rhs += precursor.emission_spectrum[gp] *
                            precursor.fractional_yield *
-                           xs.nu_delayed_sigma_f_[g] *
+                           nu_delayed_sigma_f[g] *
                            phi[uk_map + gp];
               }
           }
@@ -107,10 +110,10 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
               rhs += prod[gp] * phi[uk_map + gp];
 
               if (options_.use_precursors)
-                for (const auto& precursor: xs.precursors_)
+                for (const auto& precursor : precursors)
                   rhs += precursor.emission_spectrum[gp] *
                          precursor.fractional_yield *
-                         xs.nu_delayed_sigma_f_[g] *
+                         nu_delayed_sigma_f[g] *
                          phi[uk_map + gp];
             }
           }

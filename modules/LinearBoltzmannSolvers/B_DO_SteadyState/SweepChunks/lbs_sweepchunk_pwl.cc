@@ -122,7 +122,7 @@ Sweep(chi_mesh::sweep_management::AngleSet *angle_set)
     const auto& fe_intgrl_values = unit_cell_matrices_[cell_local_id];
     const int num_nodes = static_cast<int>(cell_mapping.NumNodes());
     auto& transport_view = grid_transport_view[cell.local_id_];
-    const auto& sigma_tg = transport_view.XS().sigma_t_;
+    const auto& sigma_tg = transport_view.XS().SigmaTotal();
     std::vector<bool> face_incident_flags(num_faces, false);
     std::vector<double> face_mu_values(num_faces, 0.0);
 

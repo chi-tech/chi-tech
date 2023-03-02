@@ -24,6 +24,9 @@ void mg_diffusion::Solver::Assemble_A_bext()
     const size_t num_nodes   = cell_mapping.NumNodes();
 
     const auto& xs   = matid_to_xs_map.at(cell.material_id_);
+    const auto& D = xs->DiffusionCoefficient();
+    const auto& sigma_r = xs->SigmaRemoval();
+
     const auto& qext = matid_to_src_map.at(cell.material_id_);
     double collapsed_D=0.,collapsed_sig_a=0.;
     if (do_two_grid_)
@@ -51,17 +54,16 @@ void mg_diffusion::Solver::Assemble_A_bext()
         double entry_kij = 0.0;
         for (size_t qp : qp_data.QuadraturePointIndices())
         {
-          entry_mij +=  qp_data.ShapeValue(i, qp) * qp_data.ShapeValue(j, qp)
-                        * qp_data.JxW(qp);
-          entry_kij +=  qp_data.ShapeGrad(i, qp).Dot(qp_data.ShapeGrad(j, qp))
-                        * qp_data.JxW(qp);
+          entry_mij +=  qp_data.ShapeValue(i, qp) *
+                        qp_data.ShapeValue(j, qp) *
+                        qp_data.JxW(qp);
+
+          entry_kij +=  qp_data.ShapeGrad(i, qp).Dot(qp_data.ShapeGrad(j, qp)) *
+                        qp_data.JxW(qp);
         }//for qp
         for (uint g=0; g < num_groups_; ++g)
-        {
-          const double Dg     = xs->diffusion_coeff_[g];
-          const double sigr_g = xs->sigma_removal_[g];
-          Acell[g][i][j] = entry_mij * sigr_g + entry_kij * Dg;
-        }
+          Acell[g][i][j] = entry_mij * sigma_r[g] + entry_kij * D[g];
+
         if (do_two_grid_)
           Acell[num_groups_][i][j] = entry_mij * collapsed_sig_a
                                      + entry_kij * collapsed_D;
@@ -87,7 +89,7 @@ void mg_diffusion::Solver::Assemble_A_bext()
       //   for two-grid, it is homogenous Robin
       if (bndry.type_ == BoundaryType::Robin)
       {
-        const auto  qp_face_data = cell_mapping.MakeFaceQuadraturePointData( f );
+        const auto  qp_face_data = cell_mapping.MakeFaceQuadraturePointData(f);
         const size_t num_face_nodes = face.vertex_ids_.size();
 
         auto& aval = bndry.mg_values_[0];

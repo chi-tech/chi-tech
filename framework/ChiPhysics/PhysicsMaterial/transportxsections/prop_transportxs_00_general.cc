@@ -7,21 +7,7 @@
 
 
 //######################################################################
-/** Default constructor. */
-chi_physics::TransportCrossSections::TransportCrossSections() :
-  chi_physics::MaterialProperty(PropertyType::TRANSPORT_XSECTIONS)
-{
-  num_groups_ = 0;
-  scattering_order_ = 0;
-
-  diffusion_initialized_ = false;
-  scattering_initialized_ = false;
-}
-
-
-//######################################################################
-void chi_physics::TransportCrossSections::
-Reset()
+void chi_physics::TransportCrossSections::Reset()
 {
   num_groups_ = 0;
   scattering_order_ = 0;
@@ -59,13 +45,13 @@ Reset()
 //######################################################################
 /** Makes a simple material with no transfer matrix just sigma_t. */
 void chi_physics::TransportCrossSections::
-MakeSimple0(int n_grps, double sigma)
+MakeSimple0(unsigned int num_groups, double sigma_t)
 {
   Reset();
 
-  num_groups_ = n_grps;
-  sigma_t_.resize(n_grps, sigma);
-  sigma_a_.resize(n_grps, sigma);
+  num_groups_ = num_groups;
+  sigma_t_.resize(num_groups, sigma_t);
+  sigma_a_.resize(num_groups, sigma_t);
 
   ComputeDiffusionParameters();
 }
@@ -78,13 +64,13 @@ MakeSimple0(int n_grps, double sigma)
  * subject to up-scattering.
  */
 void chi_physics::TransportCrossSections::
-MakeSimple1(int n_grps, double sigma, double c)
+MakeSimple1(unsigned int num_groups, double sigma_t, double c)
 {
   Reset();
 
-  num_groups_ = n_grps;
-  sigma_t_.resize(n_grps, sigma);
-  transfer_matrices_.emplace_back(n_grps, n_grps);
+  num_groups_ = num_groups;
+  sigma_t_.resize(num_groups, sigma_t);
+  transfer_matrices_.emplace_back(num_groups, num_groups);
 
   // When multi-group, assign half the scattering cross section
   // to within-group scattering. The other half will be used for
@@ -92,7 +78,7 @@ MakeSimple1(int n_grps, double sigma, double c)
 
   auto& S = transfer_matrices_.back();
   double scale = (num_groups_ == 1) ? 1.0 : 0.5;
-  S.SetDiagonal(std::vector<double>(n_grps, sigma * c * scale));
+  S.SetDiagonal(std::vector<double>(num_groups, sigma_t * c * scale));
 
   // Set the up/down-scattering cross sections.
   // Summary:
@@ -109,18 +95,18 @@ MakeSimple1(int n_grps, double sigma, double c)
   {
     //downscattering
     if (g > 0)
-      S.Insert(g, g - 1, sigma * c * 0.5);
+      S.Insert(g, g - 1, sigma_t * c * 0.5);
 
     //upscattering
     if (g > num_groups_ / 2)
     {
       if (g < num_groups_ - 1)
       {
-        S.Insert(g, g - 1, sigma * c * 0.25);
-        S.Insert(g, g + 1, sigma * c * 0.25);
+        S.Insert(g, g - 1, sigma_t * c * 0.25);
+        S.Insert(g, g + 1, sigma_t * c * 0.25);
       }
       else
-        S.Insert(g, g - 1, sigma * c * 0.5);
+        S.Insert(g, g - 1, sigma_t * c * 0.5);
     }
   }//for g
 
@@ -211,7 +197,7 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
                   [](const XSPtr& x)
                   { return !x->transfer_matrices_.empty(); }))
     transfer_matrices_.assign(scattering_order_ + 1,
-                              TransferMatrix(num_groups_, num_groups_));
+                              chi_math::SparseMatrix(num_groups_, num_groups_));
 
   //init fission data
   if (is_fissionable_)

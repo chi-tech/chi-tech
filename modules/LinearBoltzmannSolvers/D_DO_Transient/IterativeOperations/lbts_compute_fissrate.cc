@@ -28,6 +28,7 @@ double DiscOrdTransientSolver::ComputeFissionRate(const bool previous)
 
     //====================================== Obtain xs
     const auto& xs = transport_view.XS();
+    const auto& sigma_f = xs.SigmaFission();
 
     //====================================== Loop over nodes
     const int num_nodes = transport_view.NumNodes();
@@ -38,7 +39,7 @@ double DiscOrdTransientSolver::ComputeFissionRate(const bool previous)
 
       //=============================== Loop over groups
       for (size_t g = first_grp; g <= last_grp; ++g)
-        local_production += xs.sigma_f_[g] *
+        local_production += sigma_f[g] *
                             phi[uk_map + g] *
                             IntV_ShapeI;
     }//for node

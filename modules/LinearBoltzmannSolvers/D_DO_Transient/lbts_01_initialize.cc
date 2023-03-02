@@ -25,7 +25,7 @@ void lbs::DiscOrdTransientSolver::Initialize()
   //       flagging mechanism to tag materials for fission scaling.
   if (transient_options_.scale_fission_xs)
     for (const auto& xs : chi::trnsprt_xs_stack)
-      if (!xs->is_fission_scaled_)
+      if (not xs->IsFissionScaled())
         xs->ScaleFissionData(k_eff_);
 
   if (transient_options_.verbosity_level >= 1)

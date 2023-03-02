@@ -32,7 +32,7 @@
 #include <iomanip>
 #include <cmath>
 
-typedef std::vector<std::pair<double,double>> Tvecdbl_vecdbl;
+typedef std::vector<std::pair<double,double>> AnglePairs;
 typedef std::vector<double> Tvecdbl;
 
 //###################################################################
@@ -53,11 +53,11 @@ namespace chi_math
   class GolubFischer
   {
   public:
-    Tvecdbl_vecdbl xn_wn_;
+    AnglePairs xn_wn_;
     Tvecdbl alpha_;
     Tvecdbl beta_;
   public:
-    Tvecdbl_vecdbl& GetDiscreteScatAngles(Tvecdbl& mell);
+    AnglePairs& GetDiscreteScatAngles(Tvecdbl& mell);
   private:
     void MCA(Tvecdbl& in_mell, Tvecdbl& a, Tvecdbl& b, Tvecdbl& c);
     void RootsOrtho(int& N, Tvecdbl& in_alpha, Tvecdbl& in_beta);

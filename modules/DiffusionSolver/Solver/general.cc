@@ -15,13 +15,14 @@
 
 //###################################################################
 /**Gets material properties various sources.*/
-void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
-                                                  int cell_dofs,
-                                                  std::vector<double>& diffCoeff,
-                                                  std::vector<double>& sourceQ,
-                                                  std::vector<double>& sigmaa,
-                                                  int group,
-                                                  int moment)
+void chi_diffusion::Solver::GetMaterialProperties(
+    const chi_mesh::Cell& cell,
+    int cell_dofs,
+    std::vector<double>& diffCoeff,
+    std::vector<double>& sourceQ,
+    std::vector<double>& sigmaa,
+    int group,
+    int moment)
 {
   uint64_t cell_glob_index = cell.global_id_;
   bool cell_is_local = (cell.partition_id_ == chi::mpi.location_id);
@@ -67,7 +68,7 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
       chi::Exit(EXIT_FAILURE);
     }
 
-    //For now we can only support scalar values so lets check that
+    //For now, we can only support scalar values so lets check that
     if (std::dynamic_pointer_cast<chi_physics::ScalarValue>
         (material->properties_[property_map_D]))
     {
@@ -132,11 +133,11 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
         auto xs = std::static_pointer_cast<chi_physics::TransportCrossSections>(
           material->properties_[p]);
 
-        if (!xs->diffusion_initialized_)
+        if (not xs->DiffusionInitialized())
           xs->ComputeDiffusionParameters();
 
-        diffCoeff.assign(cell_dofs,xs->diffusion_coeff_[group]);
-        sigmaa.assign(cell_dofs,xs->sigma_removal_[group]);
+        diffCoeff.assign(cell_dofs, xs->DiffusionCoefficient()[group]);
+        sigmaa.assign(cell_dofs, xs->SigmaRemoval()[group]);
         transportxs_found = true;
       }
     }//for properties
