@@ -206,7 +206,7 @@ private:
   std::vector<std::vector<double>> transposed_production_matrices_;
 
 public:
-  AdjointMultiGroupXS(const MultiGroupXS& xs);
+  explicit AdjointMultiGroupXS(const MultiGroupXS& xs);
 
   //Accessors
   const unsigned int NumGroups() const override { return xs_.NumGroups(); }

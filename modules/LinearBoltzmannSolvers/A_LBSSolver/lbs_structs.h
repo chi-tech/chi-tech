@@ -19,7 +19,7 @@ typedef std::vector<VecDbl> MatDbl;
 typedef std::vector<chi_mesh::Vector3> VecVec3;
 typedef std::vector<VecVec3> MatVec3;
 
-typedef std::shared_ptr<chi_physics::MultiGroupXS> XSPtr;
+typedef std::shared_ptr<chi_physics::MultiGroupXSBase> XSPtr;
 typedef std::shared_ptr<chi_physics::IsotropicMultiGrpSource> IsotropicSrcPtr;
 
 enum class GeometryType

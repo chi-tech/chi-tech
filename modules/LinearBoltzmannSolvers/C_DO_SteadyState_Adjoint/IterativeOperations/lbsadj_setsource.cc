@@ -43,9 +43,8 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
     auto xs     = full_cell_view.XS();
     auto P0_src = matid_to_src_map_[cell.material_id_];
 
-    const auto& S = matid_to_S_transpose_[cell.material_id_];
-    const auto& F = matid_to_F_transpose_[cell.material_id_];
-
+    const auto& S = xs.TransferMatrices();
+    const auto& F = xs.ProductionMatrix();
     const auto& precursors = xs.Precursors();
     const auto& nu_delayed_sigma_f = xs.NuDelayedSigmaF();
 
@@ -66,7 +65,7 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
           double rhs = 0.0;
 
           //============================== Apply scattering sources
-          const bool moment_avail = ell < S.size();
+          const bool moment_avail = ell <= xs.ScatteringOrder();
 
           //==================== Across groupset
           if (moment_avail and apply_ags_scatter_src)
