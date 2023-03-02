@@ -1,4 +1,4 @@
-#include "material_property_transportxsections.h"
+#include "multigroup_xs.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -244,7 +244,7 @@ CHI_DELAYED_END
 //###################################################################
 /**This method populates a transport cross section from
  * a Chi cross section file.*/
-void chi_physics::TransportCrossSections::
+void chi_physics::MultiGroupXS::
   MakeFromChiXSFile(const std::string &file_name)
 {
   Reset();

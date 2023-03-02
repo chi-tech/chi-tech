@@ -1,4 +1,4 @@
-#include "material_property_transportxsections.h"
+#include "multigroup_xs.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -7,7 +7,7 @@
 
 
 //######################################################################
-void chi_physics::TransportCrossSections::Reset()
+void chi_physics::MultiGroupXS::Reset()
 {
   num_groups_ = 0;
   scattering_order_ = 0;
@@ -44,7 +44,7 @@ void chi_physics::TransportCrossSections::Reset()
 
 //######################################################################
 /** Makes a simple material with no transfer matrix just sigma_t. */
-void chi_physics::TransportCrossSections::
+void chi_physics::MultiGroupXS::
 MakeSimple0(unsigned int num_groups, double sigma_t)
 {
   Reset();
@@ -63,7 +63,7 @@ MakeSimple0(unsigned int num_groups, double sigma_t)
  * and mostly down scattering but with a few of the last groups
  * subject to up-scattering.
  */
-void chi_physics::TransportCrossSections::
+void chi_physics::MultiGroupXS::
 MakeSimple1(unsigned int num_groups, double sigma_t, double c)
 {
   Reset();
@@ -117,13 +117,13 @@ MakeSimple1(unsigned int num_groups, double sigma_t, double c)
 
 //######################################################################
 /** Populates the cross section from a combination of others. */
-void chi_physics::TransportCrossSections::
+void chi_physics::MultiGroupXS::
 MakeCombined(std::vector<std::pair<int, double> > &combinations)
 {
   Reset();
 
   //pickup all xs and make sure valid
-  std::vector<std::shared_ptr<chi_physics::TransportCrossSections>> xsecs;
+  std::vector<std::shared_ptr<chi_physics::MultiGroupXS>> xsecs;
   xsecs.reserve(combinations.size());
 
   unsigned int n_grps = 0;
@@ -134,7 +134,7 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
   for (auto combo : combinations)
   {
     //get the cross section from the lua stack
-    std::shared_ptr<chi_physics::TransportCrossSections> xs;
+    std::shared_ptr<chi_physics::MultiGroupXS> xs;
     xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, combo.first,
                               std::string(__FUNCTION__));
     xsecs.push_back(xs);
@@ -333,8 +333,7 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
 
 
 //######################################################################
-void chi_physics::TransportCrossSections::
-ComputeAbsorption()
+void chi_physics::MultiGroupXS::ComputeAbsorption()
 {
   sigma_a_.assign(num_groups_, 0.0);
 
@@ -381,8 +380,7 @@ ComputeAbsorption()
 
 //######################################################################
 /**Scale the fission data by a constant.*/
-void chi_physics::TransportCrossSections::
-ScaleFissionData(const double k)
+void chi_physics::MultiGroupXS::ScaleFissionData(const double k)
 {
   if (is_fission_scaled_)
   {

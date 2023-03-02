@@ -6,7 +6,7 @@
 //################################################################### Fwd decls
 namespace chi_physics
 {
-  class TransportCrossSections;
+  class MultiGroupXS;
 }
 
 
@@ -38,7 +38,7 @@ struct TwoGridCollapsedInfo
 };
 
 TwoGridCollapsedInfo
-MakeTwoGridCollapsedInfo(const chi_physics::TransportCrossSections& xs,
+MakeTwoGridCollapsedInfo(const chi_physics::MultiGroupXS& xs,
                          EnergyCollapseScheme scheme);
 
 }//namespace lbs::acceleration

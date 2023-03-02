@@ -1,6 +1,6 @@
 #include "acceleration.h"
 
-#include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
+#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -8,7 +8,7 @@
 //###################################################################
 /***/
 lbs::acceleration::TwoGridCollapsedInfo lbs::acceleration::
-  MakeTwoGridCollapsedInfo(const chi_physics::TransportCrossSections &xs,
+  MakeTwoGridCollapsedInfo(const chi_physics::MultiGroupXS &xs,
                            EnergyCollapseScheme scheme)
 {
   const std::string fname = "lbs::acceleration::MakeTwoGridCollapsedInfo";

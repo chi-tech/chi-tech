@@ -9,7 +9,7 @@
 
 #include "ChiConsole/chi_console.h"
 
-#include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
+#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
 #include "ChiPhysics/PhysicsMaterial/material_property_isotropic_mg_src.h"
 
 #include <map>
@@ -106,7 +106,7 @@ public:
   void UpdateFieldFunctions();
 
 protected:
-  std::map<int,std::shared_ptr<chi_physics::TransportCrossSections>>
+  std::map<int,std::shared_ptr<chi_physics::MultiGroupXS>>
   matid_to_xs_map;
 
   std::map<int,std::shared_ptr<chi_physics::IsotropicMultiGrpSource>>

@@ -7,7 +7,7 @@
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 #include "ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h"
-#include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
+#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
 #include "ChiPhysics/PhysicsMaterial/material_property_isotropic_mg_src.h"
 
 #include <algorithm>
@@ -43,7 +43,7 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
       if (property->Type() == MatProperty::TRANSPORT_XSECTIONS)
       {
         auto transp_xs =
-          std::static_pointer_cast<chi_physics::TransportCrossSections>(property);
+          std::static_pointer_cast<chi_physics::MultiGroupXS>(property);
         matid_to_xs_map[mat_id] = transp_xs;
         found_transport_xs = true;
         if (first_material_read)

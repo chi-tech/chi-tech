@@ -1,4 +1,4 @@
-#include "material_property_transportxsections.h"
+#include "multigroup_xs.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -8,8 +8,8 @@
 
 //###################################################################
 /**Exports the cross section information to ChiTech format.*/
-void chi_physics::TransportCrossSections::
-  ExportToChiXSFile(const std::string &file_name)
+void chi_physics::MultiGroupXS::
+ExportToChiXSFile(const std::string &file_name)
 {
   chi::log.Log() << "Exporting transport cross section to file: " << file_name;
 

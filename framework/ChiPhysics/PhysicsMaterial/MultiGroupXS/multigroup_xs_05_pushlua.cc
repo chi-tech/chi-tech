@@ -1,10 +1,10 @@
-#include "material_property_transportxsections.h"
+#include "multigroup_xs.h"
 
 #include "chi_log.h"
 
 //###################################################################
 /**Pushes all of the relevant items of the transport xs to a lua table.*/
-void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
+void chi_physics::MultiGroupXS::PushLuaTable(lua_State *L)
 {
   //================================================== General data
   lua_newtable(L);
