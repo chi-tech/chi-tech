@@ -13,16 +13,16 @@ lbs::acceleration::TwoGridCollapsedInfo lbs::acceleration::
 {
   const std::string fname = "lbs::acceleration::MakeTwoGridCollapsedInfo";
 
-  const size_t num_groups               = xs.num_groups_;
-  const auto& sigma_t                   = xs.sigma_t_;
-  const auto& diffusion_coeff           = xs.diffusion_coeff_;
+  const size_t num_groups               = xs.NumGroups();
+  const auto& sigma_t                   = xs.SigmaTotal();
+  const auto& diffusion_coeff           = xs.DiffusionCoefficient();
 
   //============================================= Make a Dense matrix from
   //                                              sparse transfer matrix
-  if (xs.transfer_matrices_.empty())
+  if (xs.TransferMatrices().empty())
     throw std::logic_error(fname + ": list of scattering matrices empty.");
 
-  const auto& isotropic_transfer_matrix = xs.transfer_matrices_[0];
+  const auto& isotropic_transfer_matrix = xs.TransferMatrix(0);
 
   MatDbl S(num_groups, VecDbl(num_groups, 0.0));
   for (int g=0; g < num_groups; g++)

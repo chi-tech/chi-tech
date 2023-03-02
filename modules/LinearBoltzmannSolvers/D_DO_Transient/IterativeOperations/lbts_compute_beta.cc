@@ -3,7 +3,7 @@
 /**Computes the delayed neutron factor.*/
 double lbs::DiscOrdTransientSolver::ComputeBeta()
 {
-  if (num_precursors_ == 0 || !options_.use_precursors)
+  if (num_precursors_ == 0 or not options_.use_precursors)
     return 0.0;
 
   //compute total fission neutron production
@@ -18,9 +18,10 @@ double lbs::DiscOrdTransientSolver::ComputeBeta()
     const size_t dof_map = cell.local_id_ + max_precursors_per_material_;
 
     auto xs = transport_view.XS();
+    const auto& precursors = xs.Precursors();
 
     //skip cell if not fissionable
-    if (!xs.is_fissionable_)
+    if (not xs.IsFissionable())
       continue;
 
     //============================= Loop over groupsets
@@ -31,9 +32,9 @@ double lbs::DiscOrdTransientSolver::ComputeBeta()
 
       //============================= Loop over groupset groups
       for (size_t g = gs_i; g <= gs_f; ++g)
-        for (unsigned int j = 0; j < xs.num_precursors_; ++j)
+        for (unsigned int j = 0; j < xs.NumPrecursors(); ++j)
         {
-          const auto& precursor = xs.precursors_[j];
+          const auto& precursor = precursors[j];
 
           //TODO: Verify that this is correct.
           localDNPR += precursor.emission_spectrum[g] *

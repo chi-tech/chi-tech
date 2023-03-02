@@ -15,7 +15,7 @@ int chiPhysicsAddMaterial(lua_State* L);
 int chiPhysicsMaterialAddProperty(lua_State* L);
 int chiPhysicsMaterialSetProperty(lua_State* L);
 int chiPhysicsMaterialGetProperty(lua_State* L);
-int chiPhysicsMaterialModifyTotalCrossSection(lua_State* L);
+//int chiPhysicsMaterialModifyTotalCrossSection(lua_State* L);
 
 
 namespace chi_physics::lua_utils

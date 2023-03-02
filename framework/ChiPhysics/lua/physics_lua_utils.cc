@@ -23,7 +23,7 @@ void chi_physics::lua_utils::RegisterLuaEntities(lua_State *L)
   LUA_FMACRO1(chiPhysicsMaterialAddProperty);
   LUA_FMACRO1(chiPhysicsMaterialSetProperty);
   LUA_FMACRO1(chiPhysicsMaterialGetProperty);
-  LUA_FMACRO1(chiPhysicsMaterialModifyTotalCrossSection);
+//  LUA_FMACRO1(chiPhysicsMaterialModifyTotalCrossSection);
 
   //=================================== Field functions
   chi_physics::field_function_lua_utils::RegisterLuaEntities(L);

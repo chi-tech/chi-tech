@@ -46,7 +46,7 @@ void lbs::DiscOrdSteadyStateSolver::ComputeBalance()
   for (const auto& mat_id_xs : matid_to_xs_map_)
   {
     const auto& xs = mat_id_xs.second;
-    if (not xs->diffusion_initialized_)
+    if (not xs->DiffusionInitialized())
       xs->ComputeDiffusionParameters();
   }
 
@@ -113,6 +113,7 @@ void lbs::DiscOrdSteadyStateSolver::ComputeBalance()
     //====================================== Absorption and Src
     //Isotropic flux based absorption and source
     auto& xs = transport_view.XS();
+    const auto& sigma_a = xs.SigmaAbsorption();
     for (int i=0; i<num_nodes; ++i)
       for (int g=0; g < num_groups_; ++g)
       {
@@ -120,7 +121,7 @@ void lbs::DiscOrdSteadyStateSolver::ComputeBalance()
         double phi_0g = phi_old_local_[imap];
         double q_0g   = mat_src[imap];
 
-        local_absorption += xs.sigma_a_[g] * phi_0g * IntV_shapeI[i];
+        local_absorption += sigma_a[g] * phi_0g * IntV_shapeI[i];
         local_production += q_0g * IntV_shapeI[i];
       }//for g
   }//for cell

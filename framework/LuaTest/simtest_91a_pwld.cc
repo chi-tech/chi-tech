@@ -280,6 +280,7 @@ int chiSimTest91_PWLD(lua_State* L)
       }//if internal incident face
     }//for face
 
+    const auto& sigma_t = cell_xs.SigmaTotal();
     for (size_t g=0; g<num_groups; ++g)
     {
       auto Atemp = A;
@@ -298,8 +299,7 @@ int chiSimTest91_PWLD(lua_State* L)
 
 
       //Mass Matrix and Source
-      const double sigma_tg = cell_xs.sigma_t_[g];
-
+      const double sigma_tg = sigma_t[g];
       for (int i = 0; i < num_nodes; ++i)
       {
         double temp = 0.0;
@@ -370,7 +370,7 @@ int chiSimTest91_PWLD(lua_State* L)
     {
       const auto& cell_mapping = sdm.GetCellMapping(cell);
       const size_t num_nodes = cell_mapping.NumNodes();
-      const auto& S = xs.transfer_matrices_;
+      const auto& S = xs.TransferMatrices();
 
       for (size_t i=0; i<num_nodes; ++i)
       {

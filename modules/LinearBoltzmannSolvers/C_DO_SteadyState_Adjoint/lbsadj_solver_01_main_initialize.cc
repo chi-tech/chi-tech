@@ -14,8 +14,8 @@ void lbs::DiscOrdSteadyStateAdjointSolver::Initialize()
   for (const auto& matid_xs_pair : matid_to_xs_map_)
   {
     const auto  matid = matid_xs_pair.first;
-    const auto& S = matid_xs_pair.second->transfer_matrices_;
-    const auto& F = matid_xs_pair.second->production_matrix_;
+    const auto& S = matid_xs_pair.second->TransferMatrices();
+    const auto& F = matid_xs_pair.second->ProductionMatrix();
 
     //======================================== Scattering
     std::vector<chi_math::SparseMatrix> S_transpose;
@@ -41,7 +41,7 @@ void lbs::DiscOrdSteadyStateAdjointSolver::Initialize()
 
     //======================================== Fission
     std::vector<std::vector<double>> F_transpose;
-    if (matid_xs_pair.second->is_fissionable_)
+    if (matid_xs_pair.second->IsFissionable())
     {
       if (F.empty())
         throw std::logic_error(

@@ -62,6 +62,9 @@ void lbs::MIPSteadyStateSolver::InitializeWGSSolvers()
       const auto& mat_id = matid_xs_pair.first;
       const auto& xs     = matid_xs_pair.second;
 
+      const auto& diffusion_coeff = xs->DiffusionCoefficient();
+      const auto& sigma_r = xs->SigmaRemoval();
+
       std::vector<double> Dg  (gs_G, 0.0);
       std::vector<double> sigR(gs_G, 0.0);
 
@@ -69,8 +72,8 @@ void lbs::MIPSteadyStateSolver::InitializeWGSSolvers()
       for (size_t gprime=groupset.groups_.front().id_;
            gprime<=groupset.groups_.back().id_; ++gprime)
       {
-        Dg[g]   = xs->diffusion_coeff_[gprime];
-        sigR[g] = xs->sigma_removal_[gprime];
+        Dg[g]   = diffusion_coeff[gprime];
+        sigR[g] = sigma_r[gprime];
         ++g;
       }//for g
 

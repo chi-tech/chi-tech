@@ -7,7 +7,7 @@
 
 /**Master callable function that will return a reference to the abscissae and
  * weights of the discrete angles.*/
-Tvecdbl_vecdbl& chi_math::GolubFischer::GetDiscreteScatAngles(Tvecdbl& mell)
+AnglePairs& chi_math::GolubFischer::GetDiscreteScatAngles(Tvecdbl& mell)
 {
   chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Getting Discrete Scattering Angles" << '\n';
 

@@ -52,7 +52,10 @@ void lbs::LBSSolver::
     auto xs = transport_view.XS();
     auto P0_src = matid_to_src_map_[cell.material_id_];
 
-    const auto& S = xs.transfer_matrices_;
+    const auto& S = xs.TransferMatrices();
+    const auto& F = xs.ProductionMatrix();
+    const auto& precursors = xs.Precursors();
+    const auto& nu_delayed_sigma_f = xs.NuDelayedSigmaF();
 
     //==================== Obtain src
     double* src = default_zero_src.data();
@@ -100,22 +103,22 @@ void lbs::LBSSolver::
               }
 
           //============================== Apply fission sources
-          const bool fission_avail = xs.is_fissionable_ and ell == 0;
+          const bool fission_avail = xs.IsFissionable() and ell == 0;
 
           //==================== Across groupset
           if (fission_avail and apply_ags_fission_src)
           {
-            const auto& prod = xs.production_matrix_[g];
+            const auto& prod = F[g];
             for (size_t gp = first_grp; gp <= last_grp; ++gp)
               if (gp < gs_i or gp > gs_f)
               {
                 rhs += prod[gp] * phi[uk_map + gp];
 
                 if (options_.use_precursors)
-                  for (const auto& precursor : xs.precursors_)
+                  for (const auto& precursor : precursors)
                     rhs += precursor.emission_spectrum[g] *
                            precursor.fractional_yield *
-                           xs.nu_delayed_sigma_f_[gp] *
+                           nu_delayed_sigma_f[gp] *
                            phi[uk_map + gp];
               }
           }
@@ -123,16 +126,16 @@ void lbs::LBSSolver::
           //==================== Within groupset
           if (fission_avail and apply_wgs_fission_src)
           {
-            const auto& prod = xs.production_matrix_[g];
+            const auto& prod = F[g];
             for (size_t gp = gs_i; gp <= gs_f; ++gp)
             {
               rhs += prod[gp] * phi[uk_map + gp];
 
               if (options_.use_precursors)
-                for (const auto& precursor : xs.precursors_)
+                for (const auto& precursor : precursors)
                   rhs += precursor.emission_spectrum[g] *
                          precursor.fractional_yield *
-                         xs.nu_delayed_sigma_f_[gp] *
+                         nu_delayed_sigma_f[gp] *
                          phi[uk_map + gp];
             }
           }

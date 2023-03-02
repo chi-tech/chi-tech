@@ -6,6 +6,8 @@
 #include "ChiTimer/chi_timer.h"
 
 //###################################################################
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCDFAInspection"
 /**Sets the source moments for the groups in the current group set.
  *
  * \param groupset The groupset the under consideration.
@@ -57,7 +59,6 @@ void lbs::DiscOrdTransientSolver::
   // Apply all nodal sources
   for (const auto& cell : grid_ptr_->local_cells)
   {
-    const auto& fe_values = unit_cell_matrices_[cell.local_id_];
     auto& transport_view = cell_transport_views_[cell.local_id_];
     const double cell_volume = transport_view.Volume();
 
@@ -65,7 +66,10 @@ void lbs::DiscOrdTransientSolver::
     auto xs = transport_view.XS();
     auto P0_src = matid_to_src_map_[cell.material_id_];
 
-    const auto& S = xs.transfer_matrices_;
+    const auto& S = xs.TransferMatrices();
+    const auto& F = xs.ProductionMatrix();
+    const auto& precursors = xs.Precursors();
+    const auto& nu_delayed_sigma_f = xs.NuDelayedSigmaF();
 
     //==================== Obtain src
     double* src = default_zero_src.data();
@@ -110,19 +114,19 @@ void lbs::DiscOrdTransientSolver::
                 rhs += sigma_sm * phi[uk_map + gp];
 
           //============================== Apply fission sources
-          const bool fission_avail = xs.is_fissionable_ and ell == 0;
+          const bool fission_avail = xs.IsFissionable() and ell == 0;
 
           //==================== Across groupset
           if (fission_avail and apply_ags_fission_src)
           {
-            const auto& prod = xs.production_matrix_[g];
+            const auto& prod = F[g];
             for (size_t gp = first_grp; gp <= last_grp; ++gp)
               if (gp < gs_i or gp > gs_f)
               {
                 rhs += prod[gp] * phi[uk_map + gp];
 
                 if (options_.use_precursors)
-                  for (const auto& precursor : xs.precursors_)
+                  for (const auto& precursor : precursors)
                   {
                     const double coeff =
                         precursor.emission_spectrum[g] *
@@ -131,7 +135,7 @@ void lbs::DiscOrdTransientSolver::
 
                     rhs += coeff * eff_dt *
                            precursor.fractional_yield *
-                           xs.nu_delayed_sigma_f_[gp] *
+                           nu_delayed_sigma_f[gp] *
                            phi[uk_map + gp] /
                            cell_volume;
                   }
@@ -141,13 +145,13 @@ void lbs::DiscOrdTransientSolver::
           //==================== Within groupset
           if (fission_avail and apply_wgs_fission_src)
           {
-            const auto& prod = xs.production_matrix_[g];
+            const auto& prod = F[g];
             for (size_t gp = gs_i; gp <= gs_f; ++gp)
             {
               rhs += prod[gp] * phi[uk_map + gp];
 
               if (options_.use_precursors)
-                for (const auto& precursor : xs.precursors_)
+                for (const auto& precursor : precursors)
                 {
                   const double coeff =
                       precursor.emission_spectrum[g] *
@@ -156,7 +160,7 @@ void lbs::DiscOrdTransientSolver::
 
                   rhs += coeff * eff_dt *
                          precursor.fractional_yield *
-                         xs.nu_delayed_sigma_f_[gp] *
+                         nu_delayed_sigma_f[gp] *
                          phi[uk_map + gp] /
                          cell_volume;
                 }
@@ -168,10 +172,9 @@ void lbs::DiscOrdTransientSolver::
           {
             const auto& J = max_precursors_per_material_;
             const size_t dof_map = cell.local_id_ * J;
-            for (unsigned int j = 0; j < xs.num_precursors_; ++j)
+            for (unsigned int j = 0; j < xs.NumPrecursors(); ++j)
             {
-              const auto& precursor = xs.precursors_[j];
-
+              const auto& precursor = precursors[j];
               const double coeff =
                   precursor.emission_spectrum[g] *
                   precursor.decay_constant /
@@ -214,3 +217,4 @@ void lbs::DiscOrdTransientSolver::
 
   chi::log.LogEvent(source_event_tag_, chi_objects::ChiLog::EventType::EVENT_END);
 }
+#pragma clang diagnostic pop

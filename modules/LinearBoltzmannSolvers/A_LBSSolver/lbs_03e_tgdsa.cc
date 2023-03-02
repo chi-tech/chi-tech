@@ -111,7 +111,7 @@ void lbs::LBSSolver::
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
-    const auto& S = matid_to_xs_map_[cell.material_id_]->transfer_matrices_[0];
+    const auto& S = matid_to_xs_map_[cell.material_id_]->TransferMatrix(0);
 
     for (size_t i=0; i < num_nodes; ++i)
     {

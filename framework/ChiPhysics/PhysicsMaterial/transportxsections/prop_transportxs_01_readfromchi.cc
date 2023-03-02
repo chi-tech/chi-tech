@@ -282,7 +282,7 @@ void chi_physics::TransportCrossSections::
         //init storage
         destination.assign(G, std::vector<double>(2, 0.0));
 
-        //book-keeping
+        //bookkeeping
         std::string line;
         int group;
         double high;
@@ -325,7 +325,7 @@ void chi_physics::TransportCrossSections::
         //init storage
         destination.assign(N, 0.0);
 
-        //book-keeping
+        //bookkeeping
         std::string line;
         int i;
         double value;
@@ -370,7 +370,7 @@ void chi_physics::TransportCrossSections::
         for (unsigned int i = 0; i < n_rows; ++i)
           destination.emplace_back(n_cols, 0.0);
 
-        //book-keeping
+        //bookkeeping
         std::string word, line;
         double value;
         unsigned int i;
@@ -406,7 +406,7 @@ void chi_physics::TransportCrossSections::
   /// Lambda for reading transfer matrix data.
   auto ReadTransferMatrices =
       [](const std::string& keyword,
-         std::vector<TransferMatrix>& destination,
+         std::vector<chi_math::SparseMatrix>& destination,
          const unsigned int M,  //# of moments
          const unsigned int G,  //# of groups
          std::ifstream& file,
@@ -418,7 +418,7 @@ void chi_physics::TransportCrossSections::
         for (unsigned int i = 0; i < M; ++i)
           destination.emplace_back(G, G);
 
-        //book-keeping
+        //bookkeeping
         std::string word, line;
         double value;
         unsigned int ell;
@@ -481,7 +481,7 @@ void chi_physics::TransportCrossSections::
   //TODO: Determine whether or not to allow specification of a
   //      data block without any data. Currently, if a data block
   //      is specified and no values are present, the std::any_of
-  //      checks will evaluate false if expeceted data is not present.
+  //      checks will evaluate false if expected data is not present.
 
   std::vector<double> decay_constants;
   std::vector<double> fractional_yields;
