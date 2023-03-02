@@ -10,57 +10,20 @@ void lbs::DiscOrdSteadyStateAdjointSolver::Initialize()
 {
   lbs::DiscOrdSteadyStateSolver::Initialize();
 
-  //============================================= Transpose transfer operators
+  //============================================= Create adjoint cross sections
+  using AdjXSPtr = std::shared_ptr<chi_physics::AdjointMultiGroupXS>;
+
+  std::map<int, XSPtr> matid_to_adj_xs_map;
   for (const auto& matid_xs_pair : matid_to_xs_map_)
   {
-    const auto  matid = matid_xs_pair.first;
-    const auto& S = matid_xs_pair.second->TransferMatrices();
-    const auto& F = matid_xs_pair.second->ProductionMatrix();
+    const auto matid = matid_xs_pair.first;
+    const auto fwd_xs = std::dynamic_pointer_cast<
+        chi_physics::AdjointMultiGroupXS>(matid_xs_pair.second);
 
-    //======================================== Scattering
-    std::vector<chi_math::SparseMatrix> S_transpose;
-    for (const auto& S_ell : S)
-    {
-      chi_math::SparseMatrix S_ell_transpose(S_ell.NumRows(), S_ell.NumCols());
-
-      for (size_t g=0; g<S_ell.NumRows(); ++g)
-      {
-        size_t num_col_indices = S_ell.rowI_indices_[g].size();
-        for (size_t j=0; j<num_col_indices; ++j)
-        {
-          size_t gprime = S_ell.rowI_indices_[g][j];
-          double value  = S_ell.rowI_values_[g][j];
-
-          S_ell_transpose.Insert(gprime, g, value);
-        }
-      }
-      S_transpose.push_back(std::move(S_ell_transpose));
-    }//for each S
-
-    matid_to_S_transpose_[matid] = std::move(S_transpose);
-
-    //======================================== Fission
-    std::vector<std::vector<double>> F_transpose;
-    if (matid_xs_pair.second->IsFissionable())
-    {
-      if (F.empty())
-        throw std::logic_error(
-            "No production matrix found on fissionable material with "
-            "material ID " + std::to_string(matid) + ".");
-
-      // resize the transpose fission matrix
-      F_transpose.resize(num_groups_, std::vector<double>(num_groups_, 0.0));
-
-      // define the transpose fission matrix
-      for (size_t g = 0; g < num_groups_; ++g)
-        for (size_t gp = 0; gp < num_groups_; ++gp)
-          F_transpose[g][gp] = F[gp][g];
-    }
-
-    // set the transpose, which may be empty
-    matid_to_F_transpose_[matid] = std::move(F_transpose);
-
+    AdjXSPtr adj_xs_ptr(new chi_physics::AdjointMultiGroupXS(*fwd_xs));
+    matid_to_adj_xs_map[matid] = adj_xs_ptr;
   }//for each mat
+  matid_to_xs_map_ = std::move(matid_to_adj_xs_map);
 
   //============================================= Initialize QOIs
   for (auto& qoi_pair : response_functions_)
