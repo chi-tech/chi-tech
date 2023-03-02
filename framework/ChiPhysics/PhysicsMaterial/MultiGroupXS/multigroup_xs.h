@@ -64,7 +64,7 @@ public:
 
 //######################################################################
 /** Class for handling Transport-Theory related cross sections.*/
-class TransportCrossSections : public MultiGroupXSBase
+class MultiGroupXS : public MultiGroupXSBase
 {
 protected:
   typedef std::vector<std::pair<double,double>> AnglePairs;
@@ -109,7 +109,7 @@ private:
 
 public:
   //00
-  TransportCrossSections() :
+  MultiGroupXS() :
       MultiGroupXSBase(),
       num_groups_(0), scattering_order_(0), num_precursors_(0),
       diffusion_initialized_(false), scattering_initialized_(false)
@@ -201,12 +201,12 @@ public:
 class AdjointMultiGroupXS : public MultiGroupXSBase
 {
 private:
-  const TransportCrossSections& xs_;
+  const MultiGroupXS& xs_;
   std::vector<chi_math::SparseMatrix> transposed_transfer_matrices_;
   std::vector<std::vector<double>> transposed_production_matrices_;
 
 public:
-  AdjointMultiGroupXS(const TransportCrossSections& xs);
+  AdjointMultiGroupXS(const MultiGroupXS& xs);
 
   //Accessors
   const unsigned int NumGroups() const override { return xs_.NumGroups(); }

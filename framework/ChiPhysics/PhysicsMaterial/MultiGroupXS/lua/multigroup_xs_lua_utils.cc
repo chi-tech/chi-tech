@@ -4,7 +4,7 @@
 #include "chi_runtime.h"
 
 #include "ChiPhysics/chi_physics_namespace.h"
-#include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
+#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -33,7 +33,7 @@ chiPhysicsMaterialSetProperty(materials[2],
  */
 int chiPhysicsTransportXSCreate(lua_State* L)
 {
-  auto xs = std::make_shared<chi_physics::TransportCrossSections>();
+  auto xs = std::make_shared<chi_physics::MultiGroupXS>();
 
   chi::trnsprt_xs_stack.push_back(xs);
 
@@ -113,7 +113,7 @@ int chiPhysicsTransportXSSet(lua_State* L)
   int handle = lua_tonumber(L,1);
   int operation_index = lua_tonumber(L,2);
 
-  std::shared_ptr<chi_physics::TransportCrossSections> xs;
+  std::shared_ptr<chi_physics::MultiGroupXS> xs;
   try {
     xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle);
   }
@@ -197,7 +197,7 @@ int chiPhysicsTransportXSGet(lua_State* L)
 
   int handle = lua_tonumber(L,1);
 
-  std::shared_ptr<chi_physics::TransportCrossSections> xs;
+  std::shared_ptr<chi_physics::MultiGroupXS> xs;
   try {
     xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle);
   }
@@ -307,7 +307,7 @@ int chiPhysicsTransportXSMakeCombined(lua_State* L)
                        << " scalar value: " << elem.second;
 
   //======================================== Make the new cross section
-  auto new_xs = std::make_shared<chi_physics::TransportCrossSections>();
+  auto new_xs = std::make_shared<chi_physics::MultiGroupXS>();
 
   new_xs->MakeCombined(combinations);
 
@@ -367,7 +367,7 @@ int chiPhysicsTransportXSSetCombined(lua_State* L)
   //======================================== Process handle
   int xs_handle = lua_tonumber(L,1);
 
-  std::shared_ptr<chi_physics::TransportCrossSections> xs;
+  std::shared_ptr<chi_physics::MultiGroupXS> xs;
   try {
     xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, xs_handle);
   }
@@ -447,7 +447,7 @@ int chiPhysicsTransportXSExportToChiTechFormat(lua_State* L)
   //======================================== Process handle
   int handle = lua_tonumber(L,1);
 
-  std::shared_ptr<chi_physics::TransportCrossSections> xs;
+  std::shared_ptr<chi_physics::MultiGroupXS> xs;
   try {
     xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle);
   }

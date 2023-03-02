@@ -10,7 +10,7 @@
 
 #include "ChiMesh/SweepUtilities/sweepchunk_base.h"
 
-typedef std::map<int,std::shared_ptr<chi_physics::TransportCrossSections>> TCrossSections;
+typedef std::map<int,std::shared_ptr<chi_physics::MultiGroupXS>> TCrossSections;
 
 namespace lbs
 {

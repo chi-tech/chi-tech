@@ -10,7 +10,7 @@
 #include "B_DO_SteadyState/lbs_DO_steady_state.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
-typedef std::map<int,std::shared_ptr<chi_physics::TransportCrossSections>> TCrossSections;
+typedef std::map<int,std::shared_ptr<chi_physics::MultiGroupXS>> TCrossSections;
 
 namespace lbs
 {

@@ -1,7 +1,7 @@
 #include "physics_lua_utils.h"
 
 #include "ChiPhysics/FieldFunction/lua/fieldfunctions_lua.h"
-#include "../PhysicsMaterial/transportxsections/lua/xsections_lua_utils.h"
+#include "../PhysicsMaterial/MultiGroupXS/lua/multigroup_xs_lua_utils.h"
 
 #define LUA_FMACRO1(x) lua_register(L, #x, x)
 #define LUA_CMACRO1(x,y) \

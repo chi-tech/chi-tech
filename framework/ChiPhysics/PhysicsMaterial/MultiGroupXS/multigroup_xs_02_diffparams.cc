@@ -1,11 +1,10 @@
-#include "material_property_transportxsections.h"
+#include "multigroup_xs.h"
 #include "chi_runtime.h"
 #include "chi_log.h"
 
 
 //######################################################################
-void chi_physics::TransportCrossSections::
-ComputeDiffusionParameters()
+void chi_physics::MultiGroupXS::ComputeDiffusionParameters()
 {
   if (diffusion_initialized_)
     return;
