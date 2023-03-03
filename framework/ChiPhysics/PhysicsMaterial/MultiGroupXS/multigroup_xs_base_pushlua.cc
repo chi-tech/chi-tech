@@ -4,7 +4,7 @@
 
 //###################################################################
 /**Pushes all of the relevant items of the transport xs to a lua table.*/
-void chi_physics::MultiGroupXSBase::PushLuaTable(lua_State *L)
+void chi_physics::MultiGroupXSBase::PushLuaTable(lua_State *L) const
 {
   //================================================== General data
   lua_newtable(L);
