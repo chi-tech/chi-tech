@@ -328,63 +328,35 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
 }
 
 
-////######################################################################
-///** Scale the fission data by a constant. */
-//void chi_physics::MultiGroupXS::ScaleFissionData(const double k)
-//{
-//  if (is_fission_scaled_)
-//  {
-//    chi::log.Log0Warning()
-//        << "An attempt was made to scale fission data after "
-//           "it had already been scaled... Nothing will be done.";
-//    return;
-//  }
-//
-//  for (unsigned int g = 0; g < num_groups_; ++g)
-//  {
-//    nu_sigma_f_[g] /= k;
-//    nu_prompt_sigma_f_[g] /= k;
-//    nu_delayed_sigma_f_[g] /= k;
-//
-//    auto& prod = production_matrix_[g];
-//    for (auto& val : prod)
-//      val /= k;
-//  }
-//  is_fission_scaled_ = true;
-//}
-
-
 //######################################################################
-chi_physics::AdjointMultiGroupXS::
-AdjointMultiGroupXS(const MultiGroupXS& xs) : xs_(xs)
+/**
+ * To avoid the need to make copies of the fission data on each query, when
+ * the fission scaling factor is changed, the old fission scaling is undone,
+ * and the new scaling applied directly to the data.
+ */
+void chi_physics::MultiGroupXS::
+SetFissionScalingFactor(const double factor)
 {
-  // transpose transfer matrices
-  for (unsigned int ell = 0; ell <= xs_.ScatteringOrder(); ++ell)
-  {
-    const auto& S_ell = xs_.TransferMatrix(ell);
-    chi_math::SparseMatrix S_ell_transpose(xs_.NumGroups(), xs_.NumGroups());
-    for (size_t g = 0; g < xs_.NumGroups(); ++g)
-    {
-      const size_t row_len = S_ell.rowI_indices_[g].size();
-      const size_t* col_ptr = S_ell.rowI_indices_[g].data();
-      const double* val_ptr = S_ell.rowI_values_[g].data();
+  if (not is_fissionable_)
+    return;
 
-      for (size_t j = 0; j < row_len; ++j)
-        S_ell_transpose.Insert(*col_ptr++, g, *val_ptr++);
-    }
-    transposed_transfer_matrices_.push_back(S_ell_transpose);
-  }//for ell
-
-  // transpose production matrices
-  if (xs_.IsFissionable())
+  // undo the previous scaling and rescale by multiplying by
+  // the quotient of the new factor and the old factor
+  const double old_factor = fission_scaling_factor_;
+  const double rescale = factor / old_factor;
+  for (unsigned int g = 0; g < num_groups_; ++g)
   {
-    const auto& F = xs_.ProductionMatrix();
-    for (size_t g = 0; g < xs_.NumGroups(); ++g)
-    {
-      std::vector<double> F_g_transpose;
-      for (size_t gp = 0; gp < xs_.NumGroups(); ++gp)
-        F_g_transpose.emplace_back(F[gp][g]);
-      transposed_production_matrices_.push_back(F_g_transpose);
-    }
+    sigma_f_[g] *= rescale;
+    nu_sigma_f_[g] *= rescale;
+    if (not nu_prompt_sigma_f_.empty())
+      nu_prompt_sigma_f_[g] *= rescale;
+    if (not nu_delayed_sigma_f_.empty())
+      nu_delayed_sigma_f_[g] *= rescale;
+
+    for (auto& val : production_matrix_[g])
+      val *= rescale;
   }
+
+  // set the new fission scaling factor
+  fission_scaling_factor_ = factor;
 }
