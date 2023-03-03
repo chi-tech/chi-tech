@@ -13,6 +13,7 @@ void lbs::DiscOrdSteadyStateAdjointSolver::Initialize()
   //============================================= Create adjoint cross sections
   using AdjXS = chi_physics::AdjointMultiGroupXS;
 
+  // define the actual cross sections
   std::map<int, XSPtr> matid_to_adj_xs_map;
   for (const auto& matid_xs_pair : matid_to_xs_map_)
   {
@@ -22,6 +23,16 @@ void lbs::DiscOrdSteadyStateAdjointSolver::Initialize()
     matid_to_adj_xs_map[matid] = std::make_shared<AdjXS>(*fwd_xs);
   }//for each mat
   matid_to_xs_map_ = std::move(matid_to_adj_xs_map);
+
+  // reassign transport view to adjoint cross sections
+  if (grid_ptr_->local_cells.size() == cell_transport_views_.size())
+    for (const auto& cell : grid_ptr_->local_cells)
+    {
+      const auto& xs_ptr = matid_to_xs_map_[cell.material_id_];
+      auto& transport_view = cell_transport_views_[cell.local_id_];
+
+      transport_view.ReassingXS(*xs_ptr);
+    }
 
   //============================================= Initialize QOIs
   for (auto& qoi_pair : response_functions_)

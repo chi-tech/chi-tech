@@ -18,26 +18,26 @@ namespace lbs
 class SweepChunkPWL : public chi_mesh::sweep_management::SweepChunk
 {
 protected:
-  const std::shared_ptr<chi_mesh::MeshContinuum> grid_view;
-  const chi_math::SpatialDiscretization& grid_fe_view;
+  const std::shared_ptr<chi_mesh::MeshContinuum> grid_view_;
+  const chi_math::SpatialDiscretization& grid_fe_view_;
   const std::vector<UnitCellMatrices>& unit_cell_matrices_;
-  std::vector<lbs::CellLBSView>& grid_transport_view;
-  const std::vector<double>& q_moments;
-  LBSGroupset& groupset;
-  const std::map<int, XSPtr>& xsections;
-  const int num_moms;
-  const size_t num_grps;
-  const int max_num_cell_dofs;
-  const bool save_angular_flux;
+  std::vector<lbs::CellLBSView>& grid_transport_view_;
+  const std::vector<double>& q_moments_;
+  LBSGroupset& groupset_;
+  const std::map<int, XSPtr>& xs_;
+  const int num_moments_;
+  const size_t num_groups_;
+  const int max_num_cell_dofs_;
+  const bool save_angular_flux_;
 
   //Runtime params
-  bool a_and_b_initialized;
-  std::vector<std::vector<double>> Amat;
-  std::vector<std::vector<double>> Atemp;
-  std::vector<double> source;
+  bool a_and_b_initialized_;
+  std::vector<std::vector<double>> Amat_;
+  std::vector<std::vector<double>> Atemp_;
+  std::vector<double> source_;
 
 public:
-  std::vector<std::vector<double>> b;
+  std::vector<std::vector<double>> b_;
 
   SweepChunkPWL(std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,
                 const chi_math::SpatialDiscretization& discretization,
@@ -46,10 +46,10 @@ public:
                 std::vector<double>& destination_phi,
                 std::vector<double>& destination_psi,
                 const std::vector<double>& source_moments,
-                LBSGroupset& in_groupset,
-                const std::map<int, XSPtr>& in_xsections,
-                int in_num_moms,
-                int in_max_num_cell_dofs);
+                LBSGroupset& groupset,
+                const std::map<int, XSPtr>& xs,
+                int num_moments,
+                int max_num_cell_dofs);
 
   void Sweep(chi_mesh::sweep_management::AngleSet* angle_set) override;
 
