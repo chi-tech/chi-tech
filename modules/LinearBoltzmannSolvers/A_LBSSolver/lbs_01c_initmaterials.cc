@@ -166,24 +166,6 @@ void lbs::LBSSolver::InitMaterials()
     }
   }
 
-
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Initialize Diffusion
-  //                                                   properties
-  bool develop_diffusion_properties = false;
-  for (auto& group_set : groupsets_)
-  {
-    if (group_set.apply_wgdsa_ || group_set.apply_tgdsa_)
-      develop_diffusion_properties = true;
-  }
-
-  if (develop_diffusion_properties)
-  {
-    chi::log.Log() << "Computing diffusion parameters.";
-
-    for (const auto& mat_id_xs : matid_to_xs_map_)
-      mat_id_xs.second->ComputeDiffusionParameters();
-  }
-
   //================================================== Update transport views
   //                                                   if available
   if (grid_ptr_->local_cells.size() == cell_transport_views_.size())

@@ -11,17 +11,15 @@ void lbs::DiscOrdSteadyStateAdjointSolver::Initialize()
   lbs::DiscOrdSteadyStateSolver::Initialize();
 
   //============================================= Create adjoint cross sections
-  using AdjXSPtr = std::shared_ptr<chi_physics::AdjointMultiGroupXS>;
+  using AdjXS = chi_physics::AdjointMultiGroupXS;
 
   std::map<int, XSPtr> matid_to_adj_xs_map;
   for (const auto& matid_xs_pair : matid_to_xs_map_)
   {
     const auto matid = matid_xs_pair.first;
     const auto fwd_xs = std::dynamic_pointer_cast<
-        chi_physics::AdjointMultiGroupXS>(matid_xs_pair.second);
-
-    AdjXSPtr adj_xs_ptr(new chi_physics::AdjointMultiGroupXS(*fwd_xs));
-    matid_to_adj_xs_map[matid] = adj_xs_ptr;
+        chi_physics::MultiGroupXS>(matid_xs_pair.second);
+    matid_to_adj_xs_map[matid] = std::make_shared<AdjXS>(*fwd_xs);
   }//for each mat
   matid_to_xs_map_ = std::move(matid_to_adj_xs_map);
 

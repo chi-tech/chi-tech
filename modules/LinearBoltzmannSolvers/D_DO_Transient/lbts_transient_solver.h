@@ -68,7 +68,7 @@ public:
                           std::vector<double>&  destination_q,
                           const std::vector<double>& phi,
                           SourceFlags source_flags);
-  double ComputeFissionRate(bool previous) override;
+
   double ComputeBeta();
   void   PostStepCallBackFunction() const;
 

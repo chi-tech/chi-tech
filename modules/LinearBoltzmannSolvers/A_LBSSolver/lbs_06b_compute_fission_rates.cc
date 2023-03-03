@@ -62,20 +62,11 @@ double LBSSolver::ComputeFissionProduction(const std::vector<double>& phi)
 
 //###################################################################
 /**Computes the total fission rate in the problem.
-
-\param previous bool Optional. If true and the solver is a transient solver
-                     then the rate will be based on the previous timestep's
-                     fluxes.
-
-\return the_rate The fission rate as a double.
-
 \author Zachary Hardy.*/
-double LBSSolver::ComputeFissionRate(const bool previous)
+double LBSSolver::ComputeFissionRate(const std::vector<double>& phi)
 {
   const int first_grp = groups_.front().id_;
   const int last_grp = groups_.back().id_;
-
-  const auto& phi = phi_old_local_;
 
   //============================================= Loop over local cells
   double local_fission_rate = 0.0;

@@ -40,16 +40,6 @@ void lbs::DiscOrdSteadyStateSolver::ComputeBalance()
     LBSSolver::GSScopedCopyPrimarySTLvectors(groupset,q_moments_local_,mat_src);
   }
 
-  //======================================== Initialize diffusion params
-  //                                         for xs
-  // This populates sigma_a
-  for (const auto& mat_id_xs : matid_to_xs_map_)
-  {
-    const auto& xs = mat_id_xs.second;
-    if (not xs->DiffusionInitialized())
-      xs->ComputeDiffusionParameters();
-  }
-
   //======================================== Compute absorption, material-source
   //                                         and in-flow
   double local_out_flow   = 0.0;
@@ -112,7 +102,7 @@ void lbs::DiscOrdSteadyStateSolver::ComputeBalance()
 
     //====================================== Absorption and Src
     //Isotropic flux based absorption and source
-    auto& xs = transport_view.XS();
+    const auto& xs = transport_view.XS();
     const auto& sigma_a = xs.SigmaAbsorption();
     for (int i=0; i<num_nodes; ++i)
       for (int g=0; g < num_groups_; ++g)

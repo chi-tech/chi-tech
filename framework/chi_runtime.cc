@@ -36,7 +36,7 @@ std::vector<chi_mesh::UnpartMeshPtr>    chi::unpartitionedmesh_stack;
 
 std::vector<chi_physics::SolverPtr>                 chi::solver_stack;
 std::vector<chi_physics::MaterialPtr>               chi::material_stack;
-std::vector<chi_physics::TransportCrossSectionsPtr> chi::trnsprt_xs_stack;
+std::vector<chi_physics::MultiGroupXSPtr> chi::trnsprt_xs_stack;
 std::vector<chi_physics::FieldFunctionPtr>         chi::field_function_stack;
 
 std::vector<chi_math::QuadraturePtr>        chi::quadrature_stack;

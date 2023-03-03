@@ -49,7 +49,7 @@ void lbs::LBSSolver::
     auto& transport_view = cell_transport_views_[cell.local_id_];
 
     //==================== Obtain xs
-    auto xs = transport_view.XS();
+    const auto& xs = transport_view.XS();
     auto P0_src = matid_to_src_map_[cell.material_id_];
 
     const auto& S = xs.TransferMatrices();
@@ -103,7 +103,7 @@ void lbs::LBSSolver::
               }
 
           //============================== Apply fission sources
-          const bool fission_avail = xs.IsFissionable() and ell == 0;
+          const bool fission_avail = ell == 0 and xs.IsFissionable();
 
           //==================== Across groupset
           if (fission_avail and apply_ags_fission_src)

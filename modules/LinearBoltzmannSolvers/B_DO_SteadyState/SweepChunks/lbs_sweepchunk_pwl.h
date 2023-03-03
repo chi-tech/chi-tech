@@ -10,7 +10,6 @@
 
 #include "ChiMesh/SweepUtilities/sweepchunk_base.h"
 
-typedef std::map<int,std::shared_ptr<chi_physics::MultiGroupXS>> TCrossSections;
 
 namespace lbs
 {
@@ -25,7 +24,7 @@ protected:
   std::vector<lbs::CellLBSView>& grid_transport_view;
   const std::vector<double>& q_moments;
   LBSGroupset& groupset;
-  const TCrossSections& xsections;
+  const std::map<int, XSPtr>& xsections;
   const int num_moms;
   const size_t num_grps;
   const int max_num_cell_dofs;
@@ -48,7 +47,7 @@ public:
                 std::vector<double>& destination_psi,
                 const std::vector<double>& source_moments,
                 LBSGroupset& in_groupset,
-                const TCrossSections& in_xsections,
+                const std::map<int, XSPtr>& in_xsections,
                 int in_num_moms,
                 int in_max_num_cell_dofs);
 

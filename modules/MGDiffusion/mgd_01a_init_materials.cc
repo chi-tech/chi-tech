@@ -114,13 +114,6 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
 
   MPI_Barrier(MPI_COMM_WORLD);
 
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Initialize Diffusion
-  //                                                   properties
-  chi::log.Log() << "Computing diffusion parameters.";
-
-  for (const auto& mat_id_xs : matid_to_xs_map)
-    mat_id_xs.second->ComputeDiffusionParameters();
-
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Compute last fast group
   // initialize last fast group
   chi::log.Log() << "Computing last fast group.";

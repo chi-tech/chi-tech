@@ -130,11 +130,8 @@ void chi_diffusion::Solver::GetMaterialProperties(
       if (std::dynamic_pointer_cast<chi_physics::MultiGroupXS>
           (material->properties_[p]))
       {
-        auto xs = std::static_pointer_cast<chi_physics::MultiGroupXS>(
-          material->properties_[p]);
-
-        if (not xs->DiffusionInitialized())
-          xs->ComputeDiffusionParameters();
+        auto xs = std::static_pointer_cast<
+            chi_physics::MultiGroupXS>(material->properties_[p]);
 
         diffCoeff.assign(cell_dofs, xs->DiffusionCoefficient()[group]);
         sigmaa.assign(cell_dofs, xs->SigmaRemoval()[group]);

@@ -247,7 +247,7 @@ CHI_DELAYED_END
 void chi_physics::MultiGroupXS::
   MakeFromChiXSFile(const std::string &file_name)
 {
-  Reset();
+  Clear();
 
   //============================================================
   // Open Chi XS file
@@ -903,13 +903,8 @@ void chi_physics::MultiGroupXS::
   }//while not EOF, read each lines
   file.close();
 
-  //============================================================
-  // Compute auxiliary data
-  //============================================================
-
   if (sigma_a_.empty())
     ComputeAbsorption();
-
   ComputeDiffusionParameters();
 
   //============================================================

@@ -7,7 +7,7 @@
 
 
 //######################################################################
-void chi_physics::MultiGroupXS::Reset()
+void chi_physics::MultiGroupXS::Clear()
 {
   num_groups_ = 0;
   scattering_order_ = 0;
@@ -47,7 +47,7 @@ void chi_physics::MultiGroupXS::Reset()
 void chi_physics::MultiGroupXS::
 MakeSimple0(unsigned int num_groups, double sigma_t)
 {
-  Reset();
+  Clear();
 
   num_groups_ = num_groups;
   sigma_t_.resize(num_groups, sigma_t);
@@ -66,7 +66,7 @@ MakeSimple0(unsigned int num_groups, double sigma_t)
 void chi_physics::MultiGroupXS::
 MakeSimple1(unsigned int num_groups, double sigma_t, double c)
 {
-  Reset();
+  Clear();
 
   num_groups_ = num_groups;
   sigma_t_.resize(num_groups, sigma_t);
@@ -120,7 +120,7 @@ MakeSimple1(unsigned int num_groups, double sigma_t, double c)
 void chi_physics::MultiGroupXS::
 MakeCombined(std::vector<std::pair<int, double> > &combinations)
 {
-  Reset();
+  Clear();
 
   //pickup all xs and make sure valid
   std::vector<std::shared_ptr<chi_physics::MultiGroupXS>> xsecs;
@@ -192,7 +192,7 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
   sigma_a_.assign(n_grps, 0.0);
 
   //init transfer matrices only if at least one exists
-  using XSPtr = chi_physics::TransportCrossSectionsPtr;
+  using XSPtr = chi_physics::MultiGroupXSPtr;
   if (std::any_of(xsecs.begin(), xsecs.end(),
                   [](const XSPtr& x)
                   { return !x->transfer_matrices_.empty(); }))
@@ -324,84 +324,34 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
     }
   }//for cross sections
 
-  //============================================================
-  // Compute auxiliary data
-  //============================================================
-
   ComputeDiffusionParameters();
 }
 
 
-//######################################################################
-void chi_physics::MultiGroupXS::ComputeAbsorption()
-{
-  sigma_a_.assign(num_groups_, 0.0);
-
-  // compute for a pure absorber
-  if (transfer_matrices_.empty())
-    for (size_t g = 0; g < num_groups_; ++g)
-      sigma_a_[g] = sigma_t_[g];
-
-  // estimate from a transfer matrix
-  else
-  {
-    chi::log.Log0Warning()
-        << "Estimating absorption from the transfer matrices.";
-
-    const auto& S0 = transfer_matrices_[0];
-    for (size_t g = 0; g < num_groups_; ++g)
-    {
-      // estimate the scattering cross section
-      double sig_s = 0.0;
-      for (size_t row = 0; row < S0.NumRows(); ++row)
-      {
-        const auto& cols = S0.rowI_indices_[row];
-        const auto& vals = S0.rowI_values_[row];
-        for (size_t t = 0; t < cols.size(); ++t)
-          if (cols[t] == g)
-          {
-            sig_s += vals[t];
-            break;
-          }
-      }
-
-      sigma_a_[g] = sigma_t_[g] - sig_s;
-
-      // TODO: Should negative absorption be allowed?
-      if (sigma_a_[g] < 0.0)
-        chi::log.Log0Warning()
-            << "Negative absorption cross section encountered "
-            << "in group " << g << " when estimating from the "
-            << "transfer matrices";
-    }//for g
-  }//if scattering present
-}
-
-
-//######################################################################
-/** Scale the fission data by a constant. */
-void chi_physics::MultiGroupXS::ScaleFissionData(const double k)
-{
-  if (is_fission_scaled_)
-  {
-    chi::log.Log0Warning()
-        << "An attempt was made to scale fission data after "
-           "it had already been scaled... Nothing will be done.";
-    return;
-  }
-  
-  for (unsigned int g = 0; g < num_groups_; ++g)
-  {
-    nu_sigma_f_[g] /= k;
-    nu_prompt_sigma_f_[g] /= k;
-    nu_delayed_sigma_f_[g] /= k;
-
-    auto& prod = production_matrix_[g];
-    for (auto& val : prod)
-      val /= k;
-  }
-  is_fission_scaled_ = true;
-}
+////######################################################################
+///** Scale the fission data by a constant. */
+//void chi_physics::MultiGroupXS::ScaleFissionData(const double k)
+//{
+//  if (is_fission_scaled_)
+//  {
+//    chi::log.Log0Warning()
+//        << "An attempt was made to scale fission data after "
+//           "it had already been scaled... Nothing will be done.";
+//    return;
+//  }
+//
+//  for (unsigned int g = 0; g < num_groups_; ++g)
+//  {
+//    nu_sigma_f_[g] /= k;
+//    nu_prompt_sigma_f_[g] /= k;
+//    nu_delayed_sigma_f_[g] /= k;
+//
+//    auto& prod = production_matrix_[g];
+//    for (auto& val : prod)
+//      val /= k;
+//  }
+//  is_fission_scaled_ = true;
+//}
 
 
 //######################################################################

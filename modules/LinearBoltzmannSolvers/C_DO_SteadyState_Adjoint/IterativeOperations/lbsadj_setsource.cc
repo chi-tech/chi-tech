@@ -40,7 +40,7 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
     auto& full_cell_view = cell_transport_views_[cell.local_id_];
 
     //==================== Obtain xs
-    auto xs     = full_cell_view.XS();
+    const auto& xs = full_cell_view.XS();
     auto P0_src = matid_to_src_map_[cell.material_id_];
 
     const auto& S = xs.TransferMatrices();
@@ -92,7 +92,7 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
                 rhs += prod[gp] * phi[uk_map + gp];
 
                 if (options_.use_precursors)
-                  for (const auto& precursor: xs.Precursors())
+                  for (const auto& precursor: precursors)
                     rhs += precursor.emission_spectrum[gp] *
                            precursor.fractional_yield *
                            nu_delayed_sigma_f[g] *

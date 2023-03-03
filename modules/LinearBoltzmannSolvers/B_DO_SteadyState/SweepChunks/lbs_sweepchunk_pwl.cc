@@ -16,7 +16,7 @@ lbs::SweepChunkPWL::
                 std::vector<double>& destination_psi,
                 const std::vector<double>& source_moments,
                 LBSGroupset& in_groupset,
-                const TCrossSections& in_xsections,
+                const std::map<int, XSPtr>& in_xsections,
                 const int in_num_moms,
                 const int in_max_num_cell_dofs)
                     : SweepChunk(destination_phi, destination_psi,

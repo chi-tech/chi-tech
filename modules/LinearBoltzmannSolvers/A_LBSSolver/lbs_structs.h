@@ -130,7 +130,7 @@ private:
   int num_nodes;
   int num_grps;
   int num_grps_moms;
-  const chi_physics::MultiGroupXS* xs;
+  const chi_physics::MultiGroupXSBase* xs;
   double volume;
   std::vector<bool> face_local_flags = {};
   std::vector<double> outflow;
@@ -140,7 +140,7 @@ public:
               int in_num_nodes,
               int in_num_grps,
               int in_num_moms,
-              const chi_physics::MultiGroupXS& in_xs_mapping,
+              const chi_physics::MultiGroupXSBase& in_xs_mapping,
               double in_volume,
               const std::vector<bool>& in_face_local_flags,
               bool cell_on_boundary) :
@@ -161,8 +161,7 @@ public:
     return phi_address + node * num_grps_moms + num_grps * moment + grp;
   }
 
-   const chi_physics::MultiGroupXS& XS() const
-  {return *xs;}
+  const chi_physics::MultiGroupXSBase& XS() const{ return *xs; }
 
   bool IsFaceLocal(int f) const {return face_local_flags[f];}
 
@@ -182,7 +181,7 @@ public:
     else return 0.0;
   }
 
-  void ReassingXS(const chi_physics::MultiGroupXS& xs_mapped)
+  void ReassingXS(const chi_physics::MultiGroupXSBase& xs_mapped)
   {
     xs = &xs_mapped;
   }
