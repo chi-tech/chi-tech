@@ -42,6 +42,8 @@ void chi_mesh::UnpartitionedMesh::
   reader->UpdateInformation();
   //Exodus ships boundary-ids via SideSets. This allows
   //it to be read from the file
+  reader->SetAllArrayStatus(reader->NODE_SET, 1);
+  reader->SetAllArrayStatus(reader->NODE_SET_CONN, 1);
   reader->SetAllArrayStatus(reader->SIDE_SET, 1);
   reader->SetAllArrayStatus(reader->SIDE_SET_CONN, 1);
   reader->Update();
@@ -64,11 +66,19 @@ void chi_mesh::UnpartitionedMesh::
   {
     auto block_a = iter_a->GetCurrentDataObject();
 
+    const std::string block_name = chi_misc_utils::trim(
+      iter_a->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME()));
+
     if (block_a->GetDataObjectType() == VTK_UNSTRUCTURED_GRID)
+    {
       grid_blocks.emplace_back(
-        vtkUnstructuredGrid::SafeDownCast(block_a),
-        chi_misc_utils::trim(
-        iter_a->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME())));
+        vtkUnstructuredGrid::SafeDownCast(block_a),block_name);
+
+      chi::log.Log()
+      << "Reading block " << block_name
+      << " Number of cells: " << grid_blocks.back().first->GetNumberOfCells()
+      << " Number of points: " << grid_blocks.back().first->GetNumberOfPoints();
+    }
 
     iter_a->GoToNextItem();
   }

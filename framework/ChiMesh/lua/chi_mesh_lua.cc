@@ -51,6 +51,7 @@ void chi_mesh::lua_utils::RegisterLuaEntities(lua_State *L)
   LUA_FMACRO1(chiMeshHandlerSetCurrent);
   LUA_FMACRO1(chiMeshHandlerExportMeshToObj);
   LUA_FMACRO1(chiMeshHandlerExportMeshToVTK);
+  LUA_FMACRO1(chiMeshHandlerExportMeshToExodus);
 
   //=================================== Surface Mesher
   LUA_FMACRO1(chiSurfaceMesherCreate);

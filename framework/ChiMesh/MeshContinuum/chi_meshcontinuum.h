@@ -98,6 +98,7 @@ public:
                            bool per_material=false,
                            int options = 0) const;
   void ExportCellsToVTK(const std::string& file_base_name) const;
+  void ExportCellsToExodus(const std::string& file_base_name) const;
 
   std::shared_ptr<GridFaceHistogram>
   MakeGridFaceHistogram(double master_tolerance=100.0,

@@ -5,16 +5,19 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
+
 void lbs::DiscOrdSteadyStateAdjointSolver::Initialize()
 {
   lbs::DiscOrdSteadyStateSolver::Initialize();
 
-  //============================================= Transpose Scattering operators
+  //============================================= Transpose transfer operators
   for (const auto& matid_xs_pair : matid_to_xs_map_)
   {
     const auto  matid = matid_xs_pair.first;
     const auto& S = matid_xs_pair.second->transfer_matrices_;
+    const auto& F = matid_xs_pair.second->production_matrix_;
 
+    //======================================== Scattering
     std::vector<chi_math::SparseMatrix> S_transpose;
     for (const auto& S_ell : S)
     {
@@ -31,11 +34,32 @@ void lbs::DiscOrdSteadyStateAdjointSolver::Initialize()
           S_ell_transpose.Insert(gprime, g, value);
         }
       }
-
       S_transpose.push_back(std::move(S_ell_transpose));
     }//for each S
 
     matid_to_S_transpose_[matid] = std::move(S_transpose);
+
+    //======================================== Fission
+    std::vector<std::vector<double>> F_transpose;
+    if (matid_xs_pair.second->is_fissionable_)
+    {
+      if (F.empty())
+        throw std::logic_error(
+            "No production matrix found on fissionable material with "
+            "material ID " + std::to_string(matid) + ".");
+
+      // resize the transpose fission matrix
+      F_transpose.resize(num_groups_, std::vector<double>(num_groups_, 0.0));
+
+      // define the transpose fission matrix
+      for (size_t g = 0; g < num_groups_; ++g)
+        for (size_t gp = 0; gp < num_groups_; ++gp)
+          F_transpose[g][gp] = F[gp][g];
+    }
+
+    // set the transpose, which may be empty
+    matid_to_F_transpose_[matid] = std::move(F_transpose);
+
   }//for each mat
 
   //============================================= Initialize QOIs
