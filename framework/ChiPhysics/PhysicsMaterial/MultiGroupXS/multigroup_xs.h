@@ -32,7 +32,6 @@ public:
   virtual const unsigned int NumPrecursors() const = 0;
 
   virtual const bool IsFissionable() const = 0;
-  virtual const bool IsFissionScaled() const = 0;
   virtual const bool DiffusionInitialized() const  = 0;
   virtual const bool ScatteringInitialized() const = 0;
 
@@ -75,7 +74,7 @@ protected:
   unsigned int num_precursors_ = 0;   ///< Number of precursors
 
   bool is_fissionable_ = false;
-  bool is_fission_scaled_ = false;
+  double fission_scaling_factor_ = 1.0;  ///< Usually k_eff
 
   std::vector<std::vector<double>> e_bounds_; ///< Energy bin boundaries in MeV
 
@@ -115,32 +114,31 @@ public:
       diffusion_initialized_(false), scattering_initialized_(false)
   {}
 
-private:
-  void Reset();
-
-public:
+  //00
   void MakeSimple0(unsigned int num_groups, double sigma_t);
   void MakeSimple1(unsigned int num_groups, double sigma_t, double c);
   void MakeCombined(std::vector<std::pair<int,double>>& combinations);
 
 private:
-  void ComputeAbsorption();
+  void Clear();
 
 public:
-  void ScaleFissionData(double k);
+//  void ScaleFissionData(const double k);
 
-public:
   //01
   void MakeFromChiXSFile(const std::string &file_name);
 
+private:
   //02
+  void ComputeAbsorption();
   void ComputeDiffusionParameters();
 
+public:
   //05
   void PushLuaTable(lua_State* L) override;
 
   //06
-  void ExportToChiXSFile(const std::string& file_name);
+  void ExportToChiXSFile(const std::string& file_name) const;
 
   //Accessors
   const unsigned int NumGroups() const override { return num_groups_; }
@@ -151,7 +149,10 @@ public:
   const unsigned int NumPrecursors() const override { return num_precursors_; }
 
   const bool IsFissionable() const override { return is_fissionable_; }
-  const bool IsFissionScaled() const override { return is_fission_scaled_; }
+  double FissionScalingFactor() const { return fission_scaling_factor_; }
+
+  void SetFissionScalingFactor(const double factor)
+  { fission_scaling_factor_ = factor; }
 
   const bool DiffusionInitialized() const override
   { return diffusion_initialized_; }
@@ -218,7 +219,6 @@ public:
   { return xs_.NumPrecursors(); }
 
   const bool IsFissionable() const override { return xs_.IsFissionable(); }
-  const bool IsFissionScaled() const override { return xs_.IsFissionScaled(); }
 
   const bool DiffusionInitialized() const override
   { return xs_.DiffusionInitialized(); }
@@ -248,13 +248,13 @@ public:
   { return xs_.InverseVelocity(); }
 
   const std::vector<chi_math::SparseMatrix>& TransferMatrices() const override
-  { return xs_.TransferMatrices(); }
+  { return transposed_transfer_matrices_; }
 
   const chi_math::SparseMatrix& TransferMatrix(unsigned int ell) const override
-  { return xs_.TransferMatrix(ell); }
+  { return transposed_transfer_matrices_.at(ell); }
 
   const std::vector<std::vector<double>> ProductionMatrix() const override
-  { return xs_.ProductionMatrix(); }
+  { return transposed_production_matrices_; }
 
   const std::vector<Precursor>& Precursors() const override
   { return xs_.Precursors(); }

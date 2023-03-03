@@ -74,7 +74,7 @@ void chi_mesh::sweep_management::SweepBuffer::
 }
 
 //###################################################################
-/**Reset flags in preperation for another sweep.*/
+/**Clear flags in preperation for another sweep.*/
 void chi_mesh::sweep_management::SweepBuffer::Reset()
 {
   done_sending = false;

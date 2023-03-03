@@ -9,7 +9,7 @@
 //###################################################################
 /**Exports the cross section information to ChiTech format.*/
 void chi_physics::MultiGroupXS::
-ExportToChiXSFile(const std::string &file_name)
+ExportToChiXSFile(const std::string &file_name) const
 {
   chi::log.Log() << "Exporting transport cross section to file: " << file_name;
 

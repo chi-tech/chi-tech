@@ -19,7 +19,7 @@ void lbs::LBSSolver::ComputePrecursors()
     const double cell_volume = transport_view.Volume();
 
     //==================== Obtain xs
-    auto xs = transport_view.XS();
+    const auto& xs = transport_view.XS();
     const auto& precursors = xs.Precursors();
     const auto& nu_delayed_sigma_f = xs.NuDelayedSigmaF();
 

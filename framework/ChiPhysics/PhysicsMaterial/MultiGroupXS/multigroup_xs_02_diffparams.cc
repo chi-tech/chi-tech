@@ -4,6 +4,52 @@
 
 
 //######################################################################
+void chi_physics::MultiGroupXS::ComputeAbsorption()
+{
+  sigma_a_.assign(num_groups_, 0.0);
+
+  // compute for a pure absorber
+  if (transfer_matrices_.empty())
+    for (size_t g = 0; g < num_groups_; ++g)
+      sigma_a_[g] = sigma_t_[g];
+
+    // estimate from a transfer matrix
+  else
+  {
+    chi::log.Log0Warning()
+        << "Estimating absorption from the transfer matrices.";
+
+    const auto& S0 = transfer_matrices_[0];
+    for (size_t g = 0; g < num_groups_; ++g)
+    {
+      // estimate the scattering cross section
+      double sig_s = 0.0;
+      for (size_t row = 0; row < S0.NumRows(); ++row)
+      {
+        const auto& cols = S0.rowI_indices_[row];
+        const auto& vals = S0.rowI_values_[row];
+        for (size_t t = 0; t < cols.size(); ++t)
+          if (cols[t] == g)
+          {
+            sig_s += vals[t];
+            break;
+          }
+      }
+
+      sigma_a_[g] = sigma_t_[g] - sig_s;
+
+      // TODO: Should negative absorption be allowed?
+      if (sigma_a_[g] < 0.0)
+        chi::log.Log0Warning()
+            << "Negative absorption cross section encountered "
+            << "in group " << g << " when estimating from the "
+            << "transfer matrices";
+    }//for g
+  }//if scattering present
+}
+
+
+//######################################################################
 void chi_physics::MultiGroupXS::ComputeDiffusionParameters()
 {
   if (diffusion_initialized_)

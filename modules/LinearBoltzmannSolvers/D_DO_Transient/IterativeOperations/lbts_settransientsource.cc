@@ -63,7 +63,7 @@ void lbs::DiscOrdTransientSolver::
     const double cell_volume = transport_view.Volume();
 
     //==================== Obtain xs
-    auto xs = transport_view.XS();
+    const auto& xs = transport_view.XS();
     auto P0_src = matid_to_src_map_[cell.material_id_];
 
     const auto& S = xs.TransferMatrices();
@@ -99,7 +99,7 @@ void lbs::DiscOrdTransientSolver::
            rhs += ext_src_moments_local_[uk_map + g];
 
           //============================== Apply scattering sources
-          const bool moment_avail = (ell < S.size());
+          const bool moment_avail = ell <= xs.ScatteringOrder();
 
           //==================== Across groupset
           if (moment_avail and apply_ags_scatter_src)

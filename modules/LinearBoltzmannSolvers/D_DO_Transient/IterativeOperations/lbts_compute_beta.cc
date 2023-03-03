@@ -17,7 +17,8 @@ double lbs::DiscOrdTransientSolver::ComputeBeta()
     const double cell_volume = transport_view.Volume();
     const size_t dof_map = cell.local_id_ + max_precursors_per_material_;
 
-    auto xs = transport_view.XS();
+    const auto& xs = transport_view.XS();
+    const auto& num_precursors = xs.NumPrecursors();
     const auto& precursors = xs.Precursors();
 
     //skip cell if not fissionable
@@ -32,7 +33,7 @@ double lbs::DiscOrdTransientSolver::ComputeBeta()
 
       //============================= Loop over groupset groups
       for (size_t g = gs_i; g <= gs_f; ++g)
-        for (unsigned int j = 0; j < xs.NumPrecursors(); ++j)
+        for (unsigned int j = 0; j < num_precursors; ++j)
         {
           const auto& precursor = precursors[j];
 

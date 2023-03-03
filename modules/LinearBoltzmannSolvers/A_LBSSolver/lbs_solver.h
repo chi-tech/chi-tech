@@ -218,7 +218,7 @@ public:
 protected:
   double ComputeFissionProduction(const std::vector<double>& phi);
 public:
-  virtual double ComputeFissionRate(bool previous);
+  double ComputeFissionRate(const std::vector<double>& phi);
 
   //06c
 protected:

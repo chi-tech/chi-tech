@@ -25,12 +25,11 @@ void lbs::DiscOrdTransientSolver::Initialize()
   //       flagging mechanism to tag materials for fission scaling.
   if (transient_options_.scale_fission_xs)
     for (const auto& xs : chi::trnsprt_xs_stack)
-      if (not xs->IsFissionScaled())
-        xs->ScaleFissionData(k_eff_);
+      xs->SetFissionScalingFactor(k_eff_);
 
   if (transient_options_.verbosity_level >= 1)
   {
-    const double FR = ComputeFissionRate(false);
+    const double FR = ComputeFissionRate(phi_new_local_);
     char buff[200];
     snprintf(buff,200, " Initial Fission Rate FR=%12.6g", FR);
     chi::log.Log() << TextName() << buff;
