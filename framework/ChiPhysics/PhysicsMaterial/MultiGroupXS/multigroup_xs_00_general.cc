@@ -359,7 +359,7 @@ chi_physics::AdjointMultiGroupXS::
 AdjointMultiGroupXS(const MultiGroupXS& xs) : xs_(xs)
 {
   // transpose transfer matrices
-  for (unsigned int ell = 0; ell < xs_.ScatteringOrder() + 1; ++ell)
+  for (unsigned int ell = 0; ell <= xs_.ScatteringOrder(); ++ell)
   {
     const auto& S_ell = xs_.TransferMatrix(ell);
     chi_math::SparseMatrix S_ell_transpose(xs_.NumGroups(), xs_.NumGroups());
@@ -371,9 +371,8 @@ AdjointMultiGroupXS(const MultiGroupXS& xs) : xs_(xs)
 
       for (size_t j = 0; j < row_len; ++j)
         S_ell_transpose.Insert(*col_ptr++, g, *val_ptr++);
-
-      transposed_transfer_matrices_.push_back(S_ell_transpose);
     }
+    transposed_transfer_matrices_.push_back(S_ell_transpose);
   }//for ell
 
   // transpose production matrices
