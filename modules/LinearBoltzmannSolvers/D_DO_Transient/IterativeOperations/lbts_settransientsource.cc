@@ -6,8 +6,6 @@
 #include "ChiTimer/chi_timer.h"
 
 //###################################################################
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "OCDFAInspection"
 /**Sets the source moments for the groups in the current group set.
  *
  * \param groupset The groupset the under consideration.
@@ -20,10 +18,10 @@
  *
  * */
 void lbs::DiscOrdTransientSolver::
-  SetTransientSource(LBSGroupset& groupset,
-                     std::vector<double>& destination_q,
-                     const std::vector<double>& phi,
-                     SourceFlags source_flags)
+SetTransientSource(LBSGroupset& groupset,
+                   std::vector<double>& destination_q,
+                   const std::vector<double>& phi,
+                   SourceFlags source_flags)
 {
   chi::log.LogEvent(source_event_tag_, chi_objects::ChiLog::EventType::EVENT_BEGIN);
 
@@ -217,4 +215,3 @@ void lbs::DiscOrdTransientSolver::
 
   chi::log.LogEvent(source_event_tag_, chi_objects::ChiLog::EventType::EVENT_END);
 }
-#pragma clang diagnostic pop

@@ -12,29 +12,29 @@ lbs_curvilinear::SweepChunkPWL::
                 std::vector<double>& destination_phi,
                 std::vector<double>& destination_psi,
                 const std::vector<double>& source_moments,
-                lbs::LBSGroupset& in_groupset,
-                const std::map<int, lbs::XSPtr>& in_xsections,
-                const int in_num_moms,
-                const int in_max_num_cell_dofs)
+                lbs::LBSGroupset& groupset,
+                const std::map<int, lbs::XSPtr>& xs,
+                const int num_moments,
+                const int max_num_cell_dofs)
   : lbs::SweepChunkPWL(
-                     std::move(grid_ptr),
-                     discretization_primary,
-                     unit_cell_matrices,
-                     cell_transport_views,
-                     destination_phi,
-                     destination_psi,
-                     source_moments,
-                     in_groupset,
-                     in_xsections,
-                     in_num_moms,
-                     in_max_num_cell_dofs)
+    std::move(grid_ptr),
+    discretization_primary,
+    unit_cell_matrices,
+    cell_transport_views,
+    destination_phi,
+    destination_psi,
+    source_moments,
+    groupset,
+    xs,
+    num_moments,
+    max_num_cell_dofs)
   , secondary_unit_cell_matrices_(secondary_unit_cell_matrices)
-  , unknown_manager()
-  , psi_sweep()
-  , normal_vector_boundary()
+  , unknown_manager_()
+  , psi_sweep_()
+  , normal_vector_boundary_()
 {
   const auto curvilinear_product_quadrature =
-    std::dynamic_pointer_cast<chi_math::CurvilinearAngularQuadrature>(groupset.quadrature_);
+    std::dynamic_pointer_cast<chi_math::CurvilinearAngularQuadrature>(groupset_.quadrature_);
 
   if (!curvilinear_product_quadrature)
     throw std::invalid_argument("C_DO_RZ_SteadyState::SweepChunkPWL::SweepChunkPWL : "
@@ -42,37 +42,37 @@ lbs_curvilinear::SweepChunkPWL::
 
   //  configure unknown manager for quantities that depend on polar level
   for (const auto& dir_set : curvilinear_product_quadrature->GetDirectionMap())
-    unknown_manager.AddUnknown(chi_math::UnknownType::VECTOR_N,
-                               groupset.groups_.size());
+    unknown_manager_.AddUnknown(chi_math::UnknownType::VECTOR_N,
+                                groupset_.groups_.size());
 
   //  allocate storage for sweeping dependency
   const unsigned int n_dof =
-    discretization_primary.GetNumLocalDOFs(unknown_manager);
-  psi_sweep.resize(n_dof);
+    discretization_primary.GetNumLocalDOFs(unknown_manager_);
+  psi_sweep_.resize(n_dof);
 
   //  initialise mappings from direction linear index
   for (const auto& dir_set : curvilinear_product_quadrature->GetDirectionMap())
     for (const auto& dir_idx : dir_set.second)
-      map_polar_level.emplace(dir_idx, dir_set.first);
+      map_polar_level_.emplace(dir_idx, dir_set.first);
 
   //  set normal vector for symmetric boundary condition
   const int d =
-    (grid_view->local_cells[0].Type() == chi_mesh::CellType::SLAB) ? 2 : 0;
-  normal_vector_boundary = chi_mesh::Vector3(0.0, 0.0, 0.0);
-  normal_vector_boundary(d) = 1;
+      (grid_view_->local_cells[0].Type() == chi_mesh::CellType::SLAB) ? 2 : 0;
+  normal_vector_boundary_ = chi_mesh::Vector3(0.0, 0.0, 0.0);
+  normal_vector_boundary_(d) = 1;
 }
 
 
 void
 lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
 {
-  if (!a_and_b_initialized)
+  if (!a_and_b_initialized_)
   {
-    Amat.resize(max_num_cell_dofs, std::vector<double>(max_num_cell_dofs));
-    Atemp.resize(max_num_cell_dofs, std::vector<double>(max_num_cell_dofs));
-    b.resize(num_grps, std::vector<double>(max_num_cell_dofs, 0.0));
-    source.resize(max_num_cell_dofs, 0.0);
-    a_and_b_initialized = true;
+    Amat_.resize(max_num_cell_dofs_, std::vector<double>(max_num_cell_dofs_));
+    Atemp_.resize(max_num_cell_dofs_, std::vector<double>(max_num_cell_dofs_));
+    b_.resize(num_groups_, std::vector<double>(max_num_cell_dofs_, 0.0));
+    source_.resize(max_num_cell_dofs_, 0.0);
+    a_and_b_initialized_ = true;
   }
 
   const auto& spds = angle_set->GetSPDS();
@@ -82,35 +82,35 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
   std::vector<double>& output_psi = GetDestinationPsi();
 
   const lbs::SubSetInfo& grp_ss_info =
-    groupset.grp_subset_infos_[angle_set->ref_subset];
+    groupset_.grp_subset_infos_[angle_set->ref_subset];
 
   const size_t gs_ss_size  = grp_ss_info.ss_size;
   const size_t gs_ss_begin = grp_ss_info.ss_begin;
 
   // first groupset subset group
-  const size_t gs_gi = groupset.groups_[gs_ss_begin].id_;
+  const size_t gs_gi = groupset_.groups_[gs_ss_begin].id_;
 
   int deploc_face_counter = -1;
   int preloc_face_counter = -1;
 
-  const auto& d2m_op = groupset.quadrature_->GetDiscreteToMomentOperator();
-  const auto& m2d_op = groupset.quadrature_->GetMomentToDiscreteOperator();
+  const auto& d2m_op = groupset_.quadrature_->GetDiscreteToMomentOperator();
+  const auto& m2d_op = groupset_.quadrature_->GetMomentToDiscreteOperator();
 
   const auto curvilinear_product_quadrature =
-    std::dynamic_pointer_cast<chi_math::CurvilinearAngularQuadrature>(groupset.quadrature_);
+    std::dynamic_pointer_cast<chi_math::CurvilinearAngularQuadrature>(groupset_.quadrature_);
 
   //========================================================== Loop over each cell
   size_t num_loc_cells = spds.spls.item_id.size();
   for (size_t spls_index = 0; spls_index < num_loc_cells; ++spls_index)
   {
     const int cell_local_id = spds.spls.item_id[spls_index];
-    const auto& cell = grid_view->local_cells[cell_local_id];
+    const auto& cell = grid_view_->local_cells[cell_local_id];
     const auto num_faces = cell.faces_.size();
-    const auto& cell_mapping = grid_fe_view.GetCellMapping(cell);
+    const auto& cell_mapping = grid_fe_view_.GetCellMapping(cell);
     const auto& fe_intgrl_values = unit_cell_matrices_[cell_local_id];
     const auto& fe_intgrl_values_secondary = secondary_unit_cell_matrices_[cell_local_id];
     const int num_nodes = static_cast<int>(cell_mapping.NumNodes());
-    auto& transport_view = grid_transport_view[cell.local_id_];
+    auto& transport_view = grid_transport_view_[cell.local_id_];
     const auto& sigma_tg = transport_view.XS().SigmaTotal();
     std::vector<bool> face_incident_flags(num_faces, false);
     std::vector<double> face_mu_values(num_faces, 0.0);
@@ -131,9 +131,9 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
       deploc_face_counter = ni_deploc_face_counter;
       preloc_face_counter = ni_preloc_face_counter;
       const auto& angle_num = angle_set->angles[angle_set_index];
-      const auto& omega = groupset.quadrature_->omegas_[angle_num];
+      const auto& omega = groupset_.quadrature_->omegas_[angle_num];
 
-      const auto polar_level = map_polar_level[angle_num];
+      const auto polar_level = map_polar_level_[angle_num];
 
       const auto& fac_diamond_difference =
         curvilinear_product_quadrature->GetDiamondDifferenceFactor()[angle_num];
@@ -144,19 +144,19 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
       // ============================================ Gradient matrix
       for (size_t i = 0; i < num_nodes; ++i)
         for (size_t j = 0; j < num_nodes; ++j)
-          Amat[i][j] = omega.Dot(G[i][j]) + fac_streaming_operator * Maux[i][j];
+          Amat_[i][j] = omega.Dot(G[i][j]) + fac_streaming_operator * Maux[i][j];
 
 
       // ============================================ Source initialization
       for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-        b[gsg].assign(num_nodes, 0);
+        b_[gsg].assign(num_nodes, 0);
 
       for (size_t i = 0; i < num_nodes; ++i)
         for (size_t j = 0; j < num_nodes; ++j)
         {
-          const auto jr = grid_fe_view.MapDOFLocal(cell, j, unknown_manager, polar_level, gs_gi);
+          const auto jr = grid_fe_view_.MapDOFLocal(cell, j, unknown_manager_, polar_level, gs_gi);
           for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-            b[gsg][i] += fac_streaming_operator * Maux[i][j] * psi_sweep[jr+gsg];
+            b_[gsg][i] += fac_streaming_operator * Maux[i][j] * psi_sweep_[jr + gsg];
         }
 
 
@@ -184,9 +184,9 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
                 const int j = cell_mapping.MapFaceNode(f,fj);
                 const double *psi = fluds->UpwindPsi(spls_index,in_face_counter,fj,0,angle_set_index);
                 const double mu_Nij = -mu * M_surf[f][i][j];
-                Amat[i][j] += mu_Nij;
+                Amat_[i][j] += mu_Nij;
                 for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-                  b[gsg][i] += psi[gsg]*mu_Nij;
+                  b_[gsg][i] += psi[gsg] * mu_Nij;
               }
             }
           }
@@ -201,9 +201,9 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
                 const int j = cell_mapping.MapFaceNode(f,fj);
                 const double *psi = fluds->NLUpwindPsi(preloc_face_counter,fj,0,angle_set_index);
                 const double mu_Nij = -mu * M_surf[f][i][j];
-                Amat[i][j] += mu_Nij;
+                Amat_[i][j] += mu_Nij;
                 for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-                  b[gsg][i] += psi[gsg]*mu_Nij;
+                  b_[gsg][i] += psi[gsg] * mu_Nij;
               }
             }
           }
@@ -220,7 +220,7 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
             //  Thanks to the verifications performed during initialisation,
             //  at this point it is necessary to confirm only the orientation.
             const bool incident_on_symmetric_boundary =
-              (face.normal_.Dot(normal_vector_boundary) < -0.999999);
+              (face.normal_.Dot(normal_vector_boundary_) < -0.999999);
             if (!incident_on_symmetric_boundary)
             {
               const uint64_t bndry_index = face.neighbor_id_;
@@ -236,9 +236,9 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
                                                           f, fj, gs_gi, gs_ss_begin,
                                                           surface_source_active);
                   const double mu_Nij = -mu * M_surf[f][i][j];
-                  Amat[i][j] += mu_Nij;
+                  Amat_[i][j] += mu_Nij;
                   for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-                    b[gsg][i] += psi[gsg]*mu_Nij;
+                    b_[gsg][i] += psi[gsg] * mu_Nij;
                 }
               }
             }
@@ -257,11 +257,11 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
         // ============================= Contribute source moments
         for (int i = 0; i < num_nodes; ++i)
         {
-          source[i] = 0;
-          for (int m = 0; m < num_moms; ++m)
+          source_[i] = 0;
+          for (int m = 0; m < num_moments_; ++m)
           {
             const size_t ir = transport_view.MapDOF(i, m, g);
-            source[i] += m2d_op[m][angle_num] * q_moments[ir];
+            source_[i] += m2d_op[m][angle_num] * q_moments_[ir];
           }
         }
 
@@ -270,24 +270,24 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
         for (size_t i = 0; i < num_nodes; ++i)
           for (size_t j = 0; j < num_nodes; ++j)
           {
-            Atemp[i][j] = Amat[i][j] + M[i][j] * sigma_tgr;
-            b[gsg][i] += M[i][j] * source[j];
+            Atemp_[i][j] = Amat_[i][j] + M[i][j] * sigma_tgr;
+            b_[gsg][i] += M[i][j] * source_[j];
           }
 
         // ============================= Solve system
-        chi_math::GaussElimination(Atemp, b[gsg], num_nodes);
+        chi_math::GaussElimination(Atemp_, b_[gsg], num_nodes);
       }
 
 
       // ============================= Accumulate flux
-      for (int m = 0; m < num_moms; ++m)
+      for (int m = 0; m < num_moments_; ++m)
       {
         const double wn_d2m = d2m_op[m][angle_num];
         for (int i = 0; i < num_nodes; ++i)
         {
           const size_t ir = transport_view.MapDOF(i, m, gs_gi);
           for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-            output_phi[ir + gsg] += wn_d2m * b[gsg][i];
+            output_phi[ir + gsg] += wn_d2m * b_[gsg][i];
         }
       }
 
@@ -298,14 +298,14 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
 
 
       // ============================= Save angular fluxes if needed
-      if (save_angular_flux)
+      if (save_angular_flux_)
       {
-        const auto& psi_uk_man = groupset.psi_uk_man_;
+        const auto& psi_uk_man = groupset_.psi_uk_man_;
         for (int i = 0; i < num_nodes; ++i)
         {
-          int64_t ir = grid_fe_view.MapDOFLocal(cell,i,psi_uk_man,angle_num,0);
+          int64_t ir = grid_fe_view_.MapDOFLocal(cell, i, psi_uk_man, angle_num, 0);
           for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-            output_psi[ir + gsg] = b[gsg][i];
+            output_psi[ir + gsg] = b_[gsg][i];
         }
       }//if save psi
 
@@ -330,7 +330,7 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
             const int i = cell_mapping.MapFaceNode(f,fi);
             double *psi = fluds->OutgoingPsi(spls_index, out_face_counter, fi, angle_set_index);
             for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-              psi[gsg] = b[gsg][i];
+              psi[gsg] = b_[gsg][i];
           }
         }
         else if (not boundary)
@@ -341,7 +341,7 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
             const int i = cell_mapping.MapFaceNode(f,fi);
             double *psi = fluds->NLOutgoingPsi(deploc_face_counter, fi, angle_set_index);
             for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-              psi[gsg] = b[gsg][i];
+              psi[gsg] = b_[gsg][i];
           }
         }
         else // Store outgoing reflecting Psi
@@ -356,7 +356,7 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
                                                                   cell.local_id_, f,
                                                                   fi, gs_ss_begin);
               for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-                psi[gsg] = b[gsg][i];
+                psi[gsg] = b_[gsg][i];
             }
           }
         }
@@ -369,9 +369,9 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
       const auto f1 = f0 - 1;
       for (size_t i = 0; i < num_nodes; ++i)
       {
-        const auto ir = grid_fe_view.MapDOFLocal(cell, i, unknown_manager, polar_level, gs_gi);
+        const auto ir = grid_fe_view_.MapDOFLocal(cell, i, unknown_manager_, polar_level, gs_gi);
         for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-          psi_sweep[ir+gsg] = f0 * b[gsg][i] - f1 * psi_sweep[ir+gsg];
+          psi_sweep_[ir + gsg] = f0 * b_[gsg][i] - f1 * psi_sweep_[ir + gsg];
       }
 
 
