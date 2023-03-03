@@ -17,13 +17,20 @@ namespace chi_mesh
 {
   class MeshContinuum;
   class Cell;
+  class CellFace;
 
   //00
-  void UploadCellGeometry(const chi_mesh::MeshContinuum& grid,
-                          const chi_mesh::Cell &cell,
-                          int64_t& node_counter,
-                          vtkNew<vtkPoints>& points,
-                          vtkNew<vtkUnstructuredGrid>& ugrid);
+  void UploadCellGeometryDiscontinuous(const chi_mesh::MeshContinuum& grid,
+                                       const chi_mesh::Cell &cell,
+                                       int64_t& node_counter,
+                                       vtkNew<vtkPoints>& points,
+                                       vtkNew<vtkUnstructuredGrid>& ugrid);
+  void UploadCellGeometryContinuous(const chi_mesh::Cell &cell,
+                                    const std::vector<uint64_t>& vertex_map,
+                                    vtkNew<vtkUnstructuredGrid>& ugrid);
+  void UploadFaceGeometry(const chi_mesh::CellFace& cell_face,
+                          const std::vector<uint64_t>& vertex_map,
+                          vtkNew<vtkUnstructuredGrid> &ugrid);
 
   //01 Utils for Reading
   typedef vtkSmartPointer<vtkUnstructuredGrid> vtkUGridPtr;

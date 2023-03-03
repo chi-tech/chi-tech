@@ -3,12 +3,10 @@
 #include "../chi_meshhandler.h"
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "chi_log.h"
-;
 
 //###################################################################
 /**Exports the mesh to a wavefront.obj format.
-\param FileName char Name of the file to be used.
+\param FileName char Base name of the file to be used.
 \param ExportByMaterial bool Default: False. Flag indicating whether to export
                      the extruder's surface mesh by material.
 \ingroup LuaMeshHandler
@@ -38,7 +36,7 @@ int chiMeshHandlerExportMeshToObj(lua_State* L)
 
 //###################################################################
 /**Exports the mesh to vtu format.
-\param FileName char Name of the file to be used.
+\param FileName char Base name of the file to be used.
 \ingroup LuaMeshHandler
 */
 int chiMeshHandlerExportMeshToVTK(lua_State* L)
@@ -55,7 +53,31 @@ int chiMeshHandlerExportMeshToVTK(lua_State* L)
   auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   auto& grid = cur_hndlr.GetGrid();
-  grid->ExportCellsToVTK(file_name.c_str());
+  grid->ExportCellsToVTK(file_name);
+
+  return 0;
+}
+
+//###################################################################
+/**Exports the mesh to exodus format (.e extensions).
+\param FileName char Base name of the file to be used.
+\ingroup LuaMeshHandler
+*/
+int chiMeshHandlerExportMeshToExodus(lua_State* L)
+{
+  //============================================= Check arguments
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
+  if (num_args != 1)
+    LuaPostArgAmountError(fname, 1, num_args);
+
+  const std::string file_name = lua_tostring(L,1);
+
+  //============================================= Get current handler
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
+
+  auto& grid = cur_hndlr.GetGrid();
+  grid->ExportCellsToExodus(file_name);
 
   return 0;
 }

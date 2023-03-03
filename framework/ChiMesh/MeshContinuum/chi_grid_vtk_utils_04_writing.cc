@@ -30,7 +30,7 @@ vtkNew<vtkUnstructuredGrid> chi_mesh::
   int64_t node_count=0;
   for (const auto& cell : grid.local_cells)
   {
-    chi_mesh::UploadCellGeometry(grid, cell, node_count, points, ugrid);
+    chi_mesh::UploadCellGeometryDiscontinuous(grid, cell, node_count, points, ugrid);
 
     material_array->InsertNextValue(cell.material_id_);
     partition_id_array->InsertNextValue(cell.partition_id_);

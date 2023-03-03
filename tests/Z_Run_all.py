@@ -325,7 +325,7 @@ def run_test(file_name, comment, num_procs, search_strings_vals_tols):
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 # Tests 1 - 1
 run_test(
-    file_name="MeshIO/ReadWavefrontObj",
+    file_name="MeshIO/ReadWavefrontObj1",
     comment="Mesh reading 2D Wavefront.obj",
     num_procs=4,
     search_strings_vals_tols=[
