@@ -1,8 +1,7 @@
 #ifndef CHI_PHYSICS_TRANSPORT_CROSS_SECTIONS_H
 #define CHI_PHYSICS_TRANSPORT_CROSS_SECTIONS_H
 
-#include "ChiPhysics/PhysicsMaterial/material_property_base.h"
-#include "ChiMath/SparseMatrix/chi_math_sparse_matrix.h"
+#include "multigroup_xs_base.h"
 
 
 /**\defgroup LuaTransportXSs Transport Cross Sections
@@ -11,58 +10,11 @@
 namespace chi_physics
 {
 
-//######################################################################
-class MultiGroupXSBase : public MaterialProperty
-{
-public:
-  /**
-   * A struct containing data for a delayed neutron precursor.
-   */
-  struct Precursor
-  {
-    double decay_constant = 0.0;
-    double fractional_yield = 0.0;
-    std::vector<double> emission_spectrum;
-  };
-
-  MultiGroupXSBase() : MaterialProperty(PropertyType::TRANSPORT_XSECTIONS) {}
-
-  virtual const unsigned int NumGroups() const = 0;
-  virtual const unsigned int ScatteringOrder() const = 0;
-  virtual const unsigned int NumPrecursors() const = 0;
-
-  virtual const bool IsFissionable() const = 0;
-  virtual const bool DiffusionInitialized() const  = 0;
-  virtual const bool ScatteringInitialized() const = 0;
-
-  virtual const std::vector<double>& SigmaTotal() const = 0;
-  virtual const std::vector<double>& SigmaAbsorption() const = 0;
-  virtual const std::vector<double>& SigmaFission() const = 0;
-
-  virtual const std::vector<double>& NuSigmaF() const = 0;
-  virtual const std::vector<double>& NuPromptSigmaF() const = 0;
-  virtual const std::vector<double>& NuDelayedSigmaF() const = 0;
-
-  virtual const std::vector<double>& InverseVelocity() const = 0;
-
-  virtual const std::vector<chi_math::SparseMatrix>&
-  TransferMatrices() const = 0;
-
-  virtual const chi_math::SparseMatrix&
-  TransferMatrix(unsigned int ell) const = 0;
-
-  virtual const std::vector<std::vector<double>> ProductionMatrix() const = 0;
-
-  virtual const std::vector<Precursor>& Precursors() const = 0;
-
-  virtual const std::vector<double>& DiffusionCoefficient() const = 0;
-  virtual const std::vector<double>& SigmaRemoval() const = 0;
-  virtual const std::vector<double>& SigmaSGtoG() const = 0;
-};
-
 
 //######################################################################
-/** Class for handling Transport-Theory related cross sections.*/
+/**
+ * A class for handling forward multi-group cross sections.
+ */
 class MultiGroupXS : public MultiGroupXSBase
 {
 protected:
@@ -123,7 +75,7 @@ private:
   void Clear();
 
 public:
-//  void ScaleFissionData(const double k);
+  void SetFissionScalingFactor(const double factor);
 
   //01
   void MakeFromChiXSFile(const std::string &file_name);
@@ -150,9 +102,6 @@ public:
 
   const bool IsFissionable() const override { return is_fissionable_; }
   double FissionScalingFactor() const { return fission_scaling_factor_; }
-
-  void SetFissionScalingFactor(const double factor)
-  { fission_scaling_factor_ = factor; }
 
   const bool DiffusionInitialized() const override
   { return diffusion_initialized_; }
@@ -196,80 +145,6 @@ public:
   const std::vector<double>& SigmaSGtoG() const override
   { return sigma_s_gtog_; }
 };
-
-
-//######################################################################
-class AdjointMultiGroupXS : public MultiGroupXSBase
-{
-private:
-  const MultiGroupXS& xs_;
-  std::vector<chi_math::SparseMatrix> transposed_transfer_matrices_;
-  std::vector<std::vector<double>> transposed_production_matrices_;
-
-public:
-  explicit AdjointMultiGroupXS(const MultiGroupXS& xs);
-
-  //Accessors
-  const unsigned int NumGroups() const override { return xs_.NumGroups(); }
-
-  const unsigned int ScatteringOrder() const override
-  { return xs_.ScatteringOrder(); }
-
-  const unsigned int NumPrecursors() const override
-  { return xs_.NumPrecursors(); }
-
-  const bool IsFissionable() const override { return xs_.IsFissionable(); }
-
-  const bool DiffusionInitialized() const override
-  { return xs_.DiffusionInitialized(); }
-
-  const bool ScatteringInitialized() const override
-  { return xs_.ScatteringInitialized(); }
-
-  const std::vector<double>& SigmaTotal() const override
-  { return xs_.SigmaTotal(); }
-
-  const std::vector<double>& SigmaAbsorption() const override
-  { return xs_.SigmaAbsorption(); }
-
-  const std::vector<double>& SigmaFission() const override
-  { return xs_.SigmaFission(); }
-
-  const std::vector<double>& NuSigmaF() const override
-  { return xs_.NuSigmaF(); }
-
-  const std::vector<double>& NuPromptSigmaF() const override
-  { return xs_.NuPromptSigmaF(); }
-
-  const std::vector<double>& NuDelayedSigmaF() const override
-  { return xs_.NuDelayedSigmaF(); }
-
-  const std::vector<double>& InverseVelocity() const override
-  { return xs_.InverseVelocity(); }
-
-  const std::vector<chi_math::SparseMatrix>& TransferMatrices() const override
-  { return transposed_transfer_matrices_; }
-
-  const chi_math::SparseMatrix& TransferMatrix(unsigned int ell) const override
-  { return transposed_transfer_matrices_.at(ell); }
-
-  const std::vector<std::vector<double>> ProductionMatrix() const override
-  { return transposed_production_matrices_; }
-
-  const std::vector<Precursor>& Precursors() const override
-  { return xs_.Precursors(); }
-
-  const std::vector<double>& DiffusionCoefficient() const override
-  { return xs_.DiffusionCoefficient(); }
-
-  const std::vector<double>& SigmaRemoval() const override
-  { return xs_.SigmaRemoval(); }
-
-  const std::vector<double>& SigmaSGtoG() const override
-  { return xs_.SigmaSGtoG(); }
-
-};
-
 
 }//namespace chi_physics
 
