@@ -32,9 +32,9 @@ public:
 
   virtual double GetScalarValue() { return 0.0; }
 
-  virtual void PushLuaTable(lua_State *L);
+  virtual void PushLuaTable(lua_State *L) const;
 };
 
 }
 
-#endif //CHI_PHYSICS_MATERIAL_PROPERTY_H
+#endif //CHI_PHYSICS_MATERIAL_PROPERTY_BASE_H

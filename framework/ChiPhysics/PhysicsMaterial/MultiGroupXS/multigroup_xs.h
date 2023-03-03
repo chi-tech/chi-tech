@@ -86,12 +86,6 @@ private:
   void ComputeDiffusionParameters();
 
 public:
-  //05
-  void PushLuaTable(lua_State* L) override;
-
-  //06
-  void ExportToChiXSFile(const std::string& file_name) const;
-
   //Accessors
   const unsigned int NumGroups() const override { return num_groups_; }
 

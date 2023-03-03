@@ -26,6 +26,9 @@ public:
       : MaterialProperty(PropertyType::TRANSPORT_XSECTIONS)
   {}
 
+  void ExportToChiXSFile(const std::string& file_name) const;
+  void PushLuaTable(lua_State* L) override;
+
   virtual const unsigned int NumGroups() const = 0;
 
   virtual const unsigned int ScatteringOrder() const = 0;
