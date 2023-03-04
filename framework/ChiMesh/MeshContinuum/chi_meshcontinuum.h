@@ -106,6 +106,7 @@ public:
 
   bool IsCellLocal(uint64_t cell_global_index) const;
   bool IsCellBndry(uint64_t cell_global_index) const;
+  static int GetCellDimension(const chi_mesh::Cell& cell);
 
   void FindAssociatedVertices(const chi_mesh::CellFace& cur_face,
                               std::vector<short>& dof_mapping) const;

@@ -39,7 +39,7 @@ namespace chi_mesh
   int FindHighestDimension(std::vector<vtkUGridPtrAndName>& ugrid_blocks);
 
   vtkUGridPtr
-  ConsolidateAndCleanBlocks(std::vector<vtkUGridPtrAndName>& ugrid_blocks);
+  ConsolidateGridBlocks(std::vector<vtkUGridPtrAndName>& ugrid_blocks);
 
   std::vector<vtkUGridPtrAndName>
     GetBlocksOfDesiredDimension(std::vector<vtkUGridPtrAndName>& ugrid_blocks,
@@ -48,6 +48,9 @@ namespace chi_mesh
   std::vector<uint64_t>
   BuildBlockCellExtents(std::vector<vtkUGridPtrAndName>& ugrid_blocks,
                         int desired_dimension);
+
+  void SetBlockIDArrays(std::vector<vtkUGridPtrAndName>& ugrid_blocks);
+
   std::vector<int>
   BuildCellMaterialIDsFromField(vtkUGridPtr &ugrid,
                                 const std::string& field_name,
