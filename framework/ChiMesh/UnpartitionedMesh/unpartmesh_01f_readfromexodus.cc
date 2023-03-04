@@ -40,12 +40,24 @@ void chi_mesh::UnpartitionedMesh::
     throw std::logic_error("Unable to read file-type with this routine");
 
   reader->UpdateInformation();
-  //Exodus ships boundary-ids via SideSets. This allows
-  //it to be read from the file
+  //Exodus ships boundary-ids via SideSets and NodeSets. This allows
+  //it to be read from the file. Here we have to enable the reader
+  //to process this because it does not do it by default.
   reader->SetAllArrayStatus(reader->NODE_SET, 1);
   reader->SetAllArrayStatus(reader->NODE_SET_CONN, 1);
   reader->SetAllArrayStatus(reader->SIDE_SET, 1);
   reader->SetAllArrayStatus(reader->SIDE_SET_CONN, 1);
+
+  //The exodusII file format ships blocks of elements
+  //together with their points/vertices as self-contained (localized)
+  //unstructured meshes. To relate these localized blocks to the original
+  //mesh, where are the blocks formed a whole, we need to know the mapping
+  //from block-local ids to the original ids. This information can
+  //be derived from the GlobalNodeID arrays loaded onto point-data and
+  //cell-data. Again, this information is not read by default so we have to
+  //turn this on.
+  reader->SetGenerateGlobalNodeIdArray(true);
+  reader->SetGenerateGlobalElementIdArray(true);
   reader->Update();
 
   //======================================== Get all the grid blocks
@@ -54,7 +66,7 @@ void chi_mesh::UnpartitionedMesh::
   // https://public.kitware.com/pipermail/vtkusers/2010-December/064921.html
   // It indicated that all exodus formats are read with a single
   // top level vtkMultiBlockDataSet (Level 1). Each of the blocks in
-  // level 2 is also of type vtkMultiBlockDataSet. The level 2block that has
+  // level 2 is also of type vtkMultiBlockDataSet. The level 2 block that has
   // the actual elements is also split into blocks but these, level 3,
   // blocks each contain a structure castable to vtkUnstructuredGrid.
   auto multiblock = reader->GetOutput();
@@ -91,15 +103,12 @@ void chi_mesh::UnpartitionedMesh::
     chi_mesh::GetBlocksOfDesiredDimension(grid_blocks, max_dimension-1);
 
   //======================================== Process blocks
-  auto ugrid = chi_mesh::ConsolidateAndCleanBlocks(domain_grid_blocks);
+  chi_mesh::SetBlockIDArrays(domain_grid_blocks);
+  auto ugrid = chi_mesh::ConsolidateGridBlocks(domain_grid_blocks);
 
   //======================================== Copy Data
+  // Material-IDs will get set form block-id arrays
   CopyUGridCellsAndPoints(*ugrid, options.scale);
-
-  //======================================== Set material ids
-  const auto block_mat_ids =
-    chi_mesh::BuildBlockCellExtents(grid_blocks, max_dimension);
-  SetMaterialIDsFromBlocks(block_mat_ids);
 
   //======================================== Always do this
   chi_mesh::MeshAttributes dimension = NONE;

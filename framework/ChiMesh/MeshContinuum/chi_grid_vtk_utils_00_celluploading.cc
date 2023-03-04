@@ -132,26 +132,6 @@ void chi_mesh::
     // Build polyhedron faces
     std::vector<vtkIdType> faces_vids;
 
-    size_t num_faces = cell.faces_.size();
-    for (auto& face : cell.faces_)
-    {
-      size_t num_fverts = face.vertex_ids_.size();
-      std::vector<vtkIdType> face_info(num_fverts);
-      for (size_t fv=0; fv<num_fverts; fv++)
-      {
-        size_t v = 0;
-        for (size_t cv=0; cv<num_verts; ++cv)
-          if (cell.vertex_ids_[cv] == face.vertex_ids_[fv])
-          { v = cv; break; }
-
-        face_info[fv] = cell_vids[v];
-      }
-
-      faces_vids.push_back(static_cast<vtkIdType>(num_fverts));
-      for (auto vid : face_info)
-        faces_vids.push_back(vid);
-    }//for f
-
     int vtk_subtype;
     switch (cell.SubType())
     {
@@ -163,11 +143,45 @@ void chi_mesh::
       default: vtk_subtype = VTK_POLYHEDRON; break;
     }
 
-    ugrid->InsertNextCell(vtk_subtype,
-                          static_cast<vtkIdType>(num_verts),
-                          cell_vids.data(),
-                          static_cast<vtkIdType>(num_faces),
-                          faces_vids.data());
+    switch (cell.SubType())
+    {
+      case CellType::POLYHEDRON:
+      {
+        size_t num_faces = cell.faces_.size();
+        for (auto &face: cell.faces_)
+        {
+          size_t num_fverts = face.vertex_ids_.size();
+          std::vector<vtkIdType> face_info(num_fverts);
+          for (size_t fv = 0; fv < num_fverts; fv++)
+          {
+            size_t v = 0;
+            for (size_t cv = 0; cv < num_verts; ++cv)
+              if (cell.vertex_ids_[cv] == face.vertex_ids_[fv])
+              {
+                v = cv;
+                break;
+              }
+
+            face_info[fv] = cell_vids[v];
+          }
+
+          faces_vids.push_back(static_cast<vtkIdType>(num_fverts));
+          for (auto vid: face_info)
+            faces_vids.push_back(vid);
+        }//for f
+
+        ugrid->InsertNextCell(vtk_subtype,
+                              static_cast<vtkIdType>(num_verts),
+                              cell_vids.data(),
+                              static_cast<vtkIdType>(num_faces),
+                              faces_vids.data());
+        break;
+      }
+      default:
+        ugrid->InsertNextCell(vtk_subtype,
+                              static_cast<vtkIdType>(num_verts),
+                              cell_vids.data());
+    }
   }//polyhedron
 }
 

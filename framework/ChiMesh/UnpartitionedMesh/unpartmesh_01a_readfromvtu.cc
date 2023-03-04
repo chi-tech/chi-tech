@@ -55,7 +55,7 @@ void chi_mesh::UnpartitionedMesh::
     chi_mesh::GetBlocksOfDesiredDimension(grid_blocks, max_dimension-1);
 
   //======================================== Process blocks
-  auto ugrid = chi_mesh::ConsolidateAndCleanBlocks(domain_grid_blocks);
+  auto ugrid = chi_mesh::ConsolidateGridBlocks(domain_grid_blocks);
 
   //======================================== Copy Data
   CopyUGridCellsAndPoints(*ugrid, options.scale);

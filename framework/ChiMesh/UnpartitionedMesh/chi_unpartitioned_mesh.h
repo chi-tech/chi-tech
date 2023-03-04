@@ -85,7 +85,6 @@ protected:
   void CopyUGridCellsAndPoints(vtkUnstructuredGrid& ugrid,
                                double scale);
 
-  void SetMaterialIDsFromBlocks(const std::vector<uint64_t>& block_mat_ids);
   void SetMaterialIDsFromList(const std::vector<int>& material_ids);
 
   void SetBoundaryIDsFromBlocks(
