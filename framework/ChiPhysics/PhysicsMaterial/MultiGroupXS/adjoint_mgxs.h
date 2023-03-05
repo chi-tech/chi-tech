@@ -1,5 +1,5 @@
-#ifndef ADJOINT_MULTIGROUP_XS_H
-#define ADJOINT_MULTIGROUP_XS_H
+#ifndef ADJOINT_MGXS_H
+#define ADJOINT_MGXS_H
 
 #include "multigroup_xs.h"
 
@@ -97,4 +97,4 @@ public:
 
 }
 
-#endif //ADJOINT_MULTIGROUP_XS_H
+#endif //ADJOINT_MGXS_H

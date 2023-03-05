@@ -1,7 +1,7 @@
 #include "lbsadj_solver.h"
 
 #include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
-#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/adjoint_multigroup_xs.h"
+#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/adjoint_mgxs.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
