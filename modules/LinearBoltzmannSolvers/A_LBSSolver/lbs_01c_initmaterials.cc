@@ -74,7 +74,7 @@ void lbs::LBSSolver::InitMaterials()
       if (property->Type() == MatProperty::TRANSPORT_XSECTIONS)
       {
         auto transp_xs =
-          std::static_pointer_cast<chi_physics::MultiGroupXS>(property);
+          std::static_pointer_cast<chi_physics::SingleStateMGXS>(property);
         matid_to_xs_map_[mat_id] = transp_xs;
         found_transport_xs = true;
       }//transport xs

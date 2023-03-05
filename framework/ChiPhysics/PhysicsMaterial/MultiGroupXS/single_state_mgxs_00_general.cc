@@ -1,4 +1,4 @@
-#include "multigroup_xs.h"
+#include "single_state_mgxs.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -7,7 +7,7 @@
 
 
 //######################################################################
-void chi_physics::MultiGroupXS::Clear()
+void chi_physics::SingleStateMGXS::Clear()
 {
   num_groups_ = 0;
   scattering_order_ = 0;
@@ -44,7 +44,7 @@ void chi_physics::MultiGroupXS::Clear()
 
 //######################################################################
 /** Makes a simple material with no transfer matrix just sigma_t. */
-void chi_physics::MultiGroupXS::
+void chi_physics::SingleStateMGXS::
 MakeSimple0(unsigned int num_groups, double sigma_t)
 {
   Clear();
@@ -63,7 +63,7 @@ MakeSimple0(unsigned int num_groups, double sigma_t)
  * and mostly down scattering but with a few of the last groups
  * subject to up-scattering.
  */
-void chi_physics::MultiGroupXS::
+void chi_physics::SingleStateMGXS::
 MakeSimple1(unsigned int num_groups, double sigma_t, double c)
 {
   Clear();
@@ -117,13 +117,13 @@ MakeSimple1(unsigned int num_groups, double sigma_t, double c)
 
 //######################################################################
 /** Populates the cross section from a combination of others. */
-void chi_physics::MultiGroupXS::
+void chi_physics::SingleStateMGXS::
 MakeCombined(std::vector<std::pair<int, double> > &combinations)
 {
   Clear();
 
   //pickup all xs and make sure valid
-  std::vector<std::shared_ptr<chi_physics::MultiGroupXS>> xsecs;
+  std::vector<std::shared_ptr<chi_physics::SingleStateMGXS>> xsecs;
   xsecs.reserve(combinations.size());
 
   unsigned int n_grps = 0;
@@ -134,7 +134,7 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
   for (auto combo : combinations)
   {
     //get the cross section from the lua stack
-    std::shared_ptr<chi_physics::MultiGroupXS> xs;
+    std::shared_ptr<chi_physics::SingleStateMGXS> xs;
     xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, combo.first,
                               std::string(__FUNCTION__));
     xsecs.push_back(xs);
@@ -325,38 +325,4 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
   }//for cross sections
 
   ComputeDiffusionParameters();
-}
-
-
-//######################################################################
-/**
- * To avoid the need to make copies of the fission data on each query, when
- * the fission scaling factor is changed, the old fission scaling is undone,
- * and the new scaling applied directly to the data.
- */
-void chi_physics::MultiGroupXS::
-SetFissionScalingFactor(const double factor)
-{
-  if (not is_fissionable_)
-    return;
-
-  // undo the previous scaling and rescale by multiplying by
-  // the quotient of the new factor and the old factor
-  const double old_factor = fission_scaling_factor_;
-  const double rescale = factor / old_factor;
-  for (unsigned int g = 0; g < num_groups_; ++g)
-  {
-    sigma_f_[g] *= rescale;
-    nu_sigma_f_[g] *= rescale;
-    if (not nu_prompt_sigma_f_.empty())
-      nu_prompt_sigma_f_[g] *= rescale;
-    if (not nu_delayed_sigma_f_.empty())
-      nu_delayed_sigma_f_[g] *= rescale;
-
-    for (auto& val : production_matrix_[g])
-      val *= rescale;
-  }
-
-  // set the new fission scaling factor
-  fission_scaling_factor_ = factor;
 }

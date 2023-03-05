@@ -20,7 +20,7 @@ void lbs::DiscOrdSteadyStateAdjointSolver::Initialize()
   {
     const auto matid = matid_xs_pair.first;
     const auto fwd_xs = std::dynamic_pointer_cast<
-        chi_physics::MultiGroupXS>(matid_xs_pair.second);
+        chi_physics::SingleStateMGXS>(matid_xs_pair.second);
     matid_to_adj_xs_map[matid] = std::make_shared<AdjXS>(*fwd_xs);
   }//for each mat
   matid_to_xs_map_ = std::move(matid_to_adj_xs_map);

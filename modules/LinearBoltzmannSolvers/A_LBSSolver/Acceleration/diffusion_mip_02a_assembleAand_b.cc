@@ -6,7 +6,7 @@
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "ChiMath/SpatialDiscretization/FiniteElement/finite_element.h"
 
-#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
+#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/single_state_mgxs.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

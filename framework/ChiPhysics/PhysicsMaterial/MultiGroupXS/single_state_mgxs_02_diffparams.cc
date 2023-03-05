@@ -1,10 +1,10 @@
-#include "multigroup_xs.h"
+#include "single_state_mgxs.h"
 #include "chi_runtime.h"
 #include "chi_log.h"
 
 
 //######################################################################
-void chi_physics::MultiGroupXS::ComputeAbsorption()
+void chi_physics::SingleStateMGXS::ComputeAbsorption()
 {
   sigma_a_.assign(num_groups_, 0.0);
 
@@ -50,7 +50,7 @@ void chi_physics::MultiGroupXS::ComputeAbsorption()
 
 
 //######################################################################
-void chi_physics::MultiGroupXS::ComputeDiffusionParameters()
+void chi_physics::SingleStateMGXS::ComputeDiffusionParameters()
 {
   if (diffusion_initialized_)
     return;

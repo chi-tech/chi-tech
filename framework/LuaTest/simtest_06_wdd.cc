@@ -12,7 +12,7 @@
 #include "ChiMath/chi_math_range.h"
 
 #include "ChiPhysics/FieldFunction/fieldfunction.h"
-#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
+#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/single_state_mgxs.h"
 
 #include "ChiDataTypes/ndarray.h"
 
@@ -33,7 +33,7 @@ namespace chi_unit_sim_tests
     const chi_math::UnknownManager& phi_uk_man,
     const std::vector<double>& q_source,
     const std::vector<double>& phi_old,
-    const chi_physics::MultiGroupXS& xs,
+    const chi_physics::SingleStateMGXS& xs,
     const std::vector<YlmIndices>& m_ell_em_map);
 }
 
@@ -136,7 +136,7 @@ int chiSimTest06_WDD(lua_State* L)
   chi::log.Log() << "End ukmanagers." << std::endl;
 
   //============================================= Make XSs
-  chi_physics::MultiGroupXS xs;
+  chi_physics::SingleStateMGXS xs;
   xs.MakeFromChiXSFile("tests/xs_graphite_pure.cxs");
 
   //============================================= Initializes vectors
@@ -184,7 +184,7 @@ int chiSimTest06_WDD(lua_State* L)
     (const std::array<int64_t,3>& ijk,
      const Vec3& omega,
      const size_t d,
-     const chi_physics::MultiGroupXS& cell_xs)
+     const chi_physics::SingleStateMGXS& cell_xs)
   {
     const auto   cell_global_id = ijk_mapping.MapNDtoLin(ijk[1],ijk[0],ijk[2]);
     const auto&  cell           = grid.cells[cell_global_id];
@@ -397,7 +397,7 @@ std::vector<double> SetSource(
     const chi_math::UnknownManager& phi_uk_man,
     const std::vector<double>& q_source,
     const std::vector<double>& phi_old,
-    const chi_physics::MultiGroupXS& xs,
+    const chi_physics::SingleStateMGXS& xs,
     const std::vector<YlmIndices>& m_ell_em_map)
 {
   const size_t num_local_phi_dofs = sdm.GetNumLocalDOFs(phi_uk_man);

@@ -1,6 +1,6 @@
 #include "acceleration.h"
 
-#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
+#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/single_state_mgxs.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

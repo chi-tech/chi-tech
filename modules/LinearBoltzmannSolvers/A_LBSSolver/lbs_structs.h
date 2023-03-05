@@ -2,7 +2,7 @@
 #define LBS_STRUCTS_H
 
 #include "ChiMath/chi_math.h"
-#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
+#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/single_state_mgxs.h"
 #include "ChiPhysics/PhysicsMaterial/material_property_isotropic_mg_src.h"
 
 #include <functional>

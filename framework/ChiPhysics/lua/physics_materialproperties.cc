@@ -4,7 +4,7 @@
 
 #include "ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h"
 #include "ChiPhysics/PhysicsMaterial/material_property_scalarvalue.h"
-#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
+#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/single_state_mgxs.h"
 #include "ChiPhysics/PhysicsMaterial/material_property_isotropic_mg_src.h"
 
 #include "chi_runtime.h"
@@ -117,7 +117,7 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
       }
     }
 
-    auto prop = std::make_shared<chi_physics::MultiGroupXS>();
+    auto prop = std::make_shared<chi_physics::SingleStateMGXS>();
 
     prop->property_name = std::string("Property ") +
                           std::to_string(cur_material->properties_.size());
@@ -402,7 +402,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
     //================================= If the property is valid
     if (location_of_prop>=0)
     {
-      auto prop = std::static_pointer_cast<chi_physics::MultiGroupXS>(
+      auto prop = std::static_pointer_cast<chi_physics::SingleStateMGXS>(
                   cur_material->properties_[location_of_prop]);
 
       //========================== Process operation
@@ -444,7 +444,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
         LuaCheckNilValue("chiPhysicsMaterialSetProperty",L,4);
         int handle = lua_tonumber(L,4);
 
-        std::shared_ptr<chi_physics::MultiGroupXS> xs;
+        std::shared_ptr<chi_physics::SingleStateMGXS> xs;
         try {
           xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle, fname);
         }

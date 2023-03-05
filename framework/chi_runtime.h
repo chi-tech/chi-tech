@@ -31,12 +31,12 @@ namespace chi_physics
 {
   class Solver;
   class Material;
-  class MultiGroupXS;
+  class SingleStateMGXS;
   class FieldFunction;
 
   typedef std::shared_ptr<Solver>                 SolverPtr;
   typedef std::shared_ptr<Material>               MaterialPtr;
-  typedef std::shared_ptr<MultiGroupXS>           MultiGroupXSPtr;
+  typedef std::shared_ptr<SingleStateMGXS>           MultiGroupXSPtr;
   typedef std::shared_ptr<FieldFunction>          FieldFunctionPtr;
 }//namespace chi_physics
 

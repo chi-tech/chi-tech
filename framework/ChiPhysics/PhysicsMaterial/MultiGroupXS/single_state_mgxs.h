@@ -13,9 +13,9 @@ namespace chi_physics
 
 //######################################################################
 /**
- * A class for handling forward multi-group cross sections.
+ * A class for handling multi-group cross sections.
  */
-class MultiGroupXS : public MultiGroupXSBase
+class SingleStateMGXS : public MultiGroupXSBase
 {
 protected:
   typedef std::vector<std::pair<double,double>> AnglePairs;
@@ -59,7 +59,7 @@ private:
 
 public:
   //00
-  MultiGroupXS() :
+  SingleStateMGXS() :
       MultiGroupXSBase(),
       num_groups_(0), scattering_order_(0), num_precursors_(0),
       diffusion_initialized_(false), scattering_initialized_(false)
@@ -92,7 +92,6 @@ public:
   const unsigned int NumPrecursors() const override { return num_precursors_; }
 
   const bool IsFissionable() const override { return is_fissionable_; }
-  double FissionScalingFactor() const { return fission_scaling_factor_; }
 
   const bool DiffusionInitialized() const override
   { return diffusion_initialized_; }
