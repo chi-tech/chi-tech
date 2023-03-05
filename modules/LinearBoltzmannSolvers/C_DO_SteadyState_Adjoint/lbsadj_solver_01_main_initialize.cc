@@ -12,7 +12,7 @@ void lbs::DiscOrdSteadyStateAdjointSolver::Initialize()
   lbs::DiscOrdSteadyStateSolver::Initialize();
 
   //============================================= Create adjoint cross sections
-  using AdjXS = chi_physics::AdjointMultiGroupXS;
+  using AdjXS = chi_physics::AdjointMGXS;
 
   // define the actual cross sections
   std::map<int, XSPtr> matid_to_adj_xs_map;

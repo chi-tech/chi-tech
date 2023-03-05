@@ -1,28 +1,38 @@
 #ifndef ADJOINT_MULTIGROUP_XS_H
 #define ADJOINT_MULTIGROUP_XS_H
 
-#include "multigroup_xs.h"
+#include "multigroup_xs_base.h"
 
 
 namespace chi_physics
 {
 
 /**
- * A class for accessing multi-group cross sections for adjoint problems.
+ * A wrapper class for obtaining multi-group cross section data for
+ * adjoint simulations.
+ *
+ * In adjoint simulations, the transfer and production matrices are transposed.
+ * While the respective matrices could be queried by simply flipping the
+ * indices, access attempts in this fashion are quite costly. Rather, this
+ * class precomputes and stores these transpose operators. Along with this, a
+ * reference to an instance of MultiGroupXS is stored. In this class, accessors
+ * for vector data call the respective accessor from MultiGroupXS and accessors
+ * for transfer and production matrices access the respective transposed data
+ * stored in this class.
  */
-class AdjointMultiGroupXS : public MultiGroupXSBase
+class AdjointMGXS : public MultiGroupXSBase
 {
 private:
-  const MultiGroupXS& xs_;
+  const MultiGroupXSBase& xs_;
   std::vector<chi_math::SparseMatrix> transposed_transfer_matrices_;
   std::vector<std::vector<double>> transposed_production_matrices_;
 
 public:
-  AdjointMultiGroupXS() = delete;
-  AdjointMultiGroupXS(const AdjointMultiGroupXS&) = delete;
-  AdjointMultiGroupXS(AdjointMultiGroupXS&&) = delete;
+  AdjointMGXS() = delete;
+  AdjointMGXS(const AdjointMGXS&) = delete;
+  AdjointMGXS(AdjointMGXS&&) = delete;
 
-  explicit AdjointMultiGroupXS(const MultiGroupXS& xs);
+  explicit AdjointMGXS(const MultiGroupXSBase& xs);
 
   //Accessors
   const unsigned int NumGroups() const override { return xs_.NumGroups(); }

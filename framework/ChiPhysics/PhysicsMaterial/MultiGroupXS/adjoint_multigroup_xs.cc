@@ -1,8 +1,8 @@
 #include "adjoint_multigroup_xs.h"
 
 
-chi_physics::AdjointMultiGroupXS::
-AdjointMultiGroupXS(const MultiGroupXS& xs) : xs_(xs)
+chi_physics::AdjointMGXS::
+AdjointMGXS(const MultiGroupXSBase& xs) : xs_(xs)
 {
   // transpose transfer matrices
   for (unsigned int ell = 0; ell <= xs_.ScatteringOrder(); ++ell)
