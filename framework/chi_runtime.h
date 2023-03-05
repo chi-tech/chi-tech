@@ -77,9 +77,9 @@ public:
   static std::vector<chi_mesh::FFInterpPtr>      field_func_interpolation_stack;
   static std::vector<chi_mesh::UnpartMeshPtr>    unpartitionedmesh_stack;
 
-  static std::vector<chi_physics::SolverPtr>                 solver_stack;
-  static std::vector<chi_physics::MaterialPtr>               material_stack;
-  static std::vector<chi_physics::MultiGroupXSPtr> trnsprt_xs_stack;
+  static std::vector<chi_physics::SolverPtr>                solver_stack;
+  static std::vector<chi_physics::MaterialPtr>              material_stack;
+  static std::vector<chi_physics::MultiGroupXSPtr>          trnsprt_xs_stack;
   static std::vector<chi_physics::FieldFunctionPtr>         field_function_stack;
 
   static std::vector<chi_math::QuadraturePtr>        quadrature_stack;
