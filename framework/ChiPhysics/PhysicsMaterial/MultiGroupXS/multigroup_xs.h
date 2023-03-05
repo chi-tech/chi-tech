@@ -26,7 +26,6 @@ protected:
   unsigned int num_precursors_ = 0;   ///< Number of precursors
 
   bool is_fissionable_ = false;
-  double fission_scaling_factor_ = 1.0;  ///< Usually k_eff
 
   std::vector<std::vector<double>> e_bounds_; ///< Energy bin boundaries in MeV
 
@@ -75,8 +74,6 @@ private:
   void Clear();
 
 public:
-  void SetFissionScalingFactor(const double factor);
-
   //01
   void MakeFromChiXSFile(const std::string &file_name);
 

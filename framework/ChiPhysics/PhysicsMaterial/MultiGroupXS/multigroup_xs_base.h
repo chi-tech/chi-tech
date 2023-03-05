@@ -26,7 +26,8 @@ public:
       : MaterialProperty(PropertyType::TRANSPORT_XSECTIONS)
   {}
 
-  void ExportToChiXSFile(const std::string& file_name) const;
+  void ExportToChiXSFile(const std::string& file_name,
+                         const double fission_scaling = 1.0) const;
   void PushLuaTable(lua_State* L) const override;
 
   virtual const unsigned int NumGroups() const = 0;

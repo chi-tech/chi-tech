@@ -7,9 +7,18 @@
 #include <iostream>
 
 //###################################################################
-/**Exports the cross section information to ChiTech format.*/
+/**
+ * Exports the cross section information to ChiTech format.
+ *
+ * \param file_name The name of the file to save the cross sections to.
+ * \param fission_scaling A factor to scale fission data to. This is
+ *      generally equal to \f$ 1/k_{eff} \f$. Generally, this is done to
+ *      create exactly critical cross sections for a transient initial
+ *      condition.
+ */
 void chi_physics::MultiGroupXSBase::
-ExportToChiXSFile(const std::string &file_name) const
+ExportToChiXSFile(const std::string &file_name,
+                  const double fission_scaling /* = 1.0 */) const
 {
   chi::log.Log() << "Exporting transport cross section to file: " << file_name;
 
@@ -96,7 +105,14 @@ ExportToChiXSFile(const std::string &file_name) const
   //fission data
   if (not SigmaFission().empty())
   {
-    Print1DXS(ofile, "SIGMA_F", SigmaFission(), 1.0e-20);
+    std::vector<double> scaled_sigma_f = SigmaFission();
+    if (fission_scaling != 1.0)
+    {
+      for (auto& val: scaled_sigma_f)
+        val *= fission_scaling;
+    }
+
+    Print1DXS(ofile, "SIGMA_F", scaled_sigma_f, 1.0e-20);
     if (NumPrecursors() > 0)
     {
       Print1DXS(ofile, "NU_PROMPT", nu_prompt, 1.0e-20);
@@ -171,10 +187,16 @@ ExportToChiXSFile(const std::string &file_name) const
     {
       const auto& prod = F[g];
       for (unsigned int gp = 0; gp < NumGroups(); ++gp)
+      {
+        const double value =
+            fission_scaling != 1.0 ?
+            prod[gp] * fission_scaling : prod[gp];
+
         ofile << "G_GPRIME_VAL "
               << g << " "
               << gp << " "
-              << prod[gp] << "\n";
+              << value << "\n";
+      }
     }
   }
 
