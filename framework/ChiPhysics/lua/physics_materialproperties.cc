@@ -446,7 +446,8 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
 
         std::shared_ptr<chi_physics::SingleStateMGXS> xs;
         try {
-          xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle, fname);
+          xs = std::dynamic_pointer_cast<chi_physics::SingleStateMGXS>(
+              chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle, fname));
         }
         catch(const std::out_of_range& o){
           chi::log.LogAllError()

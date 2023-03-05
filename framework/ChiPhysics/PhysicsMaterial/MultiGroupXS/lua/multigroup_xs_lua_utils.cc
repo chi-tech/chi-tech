@@ -115,7 +115,8 @@ int chiPhysicsTransportXSSet(lua_State* L)
 
   std::shared_ptr<chi_physics::SingleStateMGXS> xs;
   try {
-    xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle);
+    xs = std::dynamic_pointer_cast<chi_physics::SingleStateMGXS>(
+        chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle));
   }
   catch(const std::out_of_range& o){
     chi::log.LogAllError()
@@ -199,7 +200,8 @@ int chiPhysicsTransportXSGet(lua_State* L)
 
   std::shared_ptr<chi_physics::SingleStateMGXS> xs;
   try {
-    xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle);
+    xs = std::dynamic_pointer_cast<chi_physics::SingleStateMGXS>(
+        chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle));
   }
   catch(const std::out_of_range& o){
     chi::log.LogAllError()
@@ -369,7 +371,8 @@ int chiPhysicsTransportXSSetCombined(lua_State* L)
 
   std::shared_ptr<chi_physics::SingleStateMGXS> xs;
   try {
-    xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, xs_handle);
+    xs = std::dynamic_pointer_cast<chi_physics::SingleStateMGXS>(
+        chi::GetStackItemPtr(chi::trnsprt_xs_stack, xs_handle));
   }
   catch(const std::out_of_range& o){
     chi::log.LogAllError()
@@ -447,7 +450,7 @@ int chiPhysicsTransportXSExportToChiTechFormat(lua_State* L)
   //======================================== Process handle
   int handle = lua_tonumber(L,1);
 
-  std::shared_ptr<chi_physics::SingleStateMGXS> xs;
+  std::shared_ptr<chi_physics::MultiGroupXS> xs;
   try {
     xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle);
   }

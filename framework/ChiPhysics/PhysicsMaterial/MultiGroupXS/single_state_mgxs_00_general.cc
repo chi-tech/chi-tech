@@ -123,7 +123,7 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
   Clear();
 
   //pickup all xs and make sure valid
-  std::vector<std::shared_ptr<chi_physics::SingleStateMGXS>> xsecs;
+  std::vector<std::shared_ptr<MultiGroupXS>> xsecs;
   xsecs.reserve(combinations.size());
 
   unsigned int n_grps = 0;
@@ -134,13 +134,13 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
   for (auto combo : combinations)
   {
     //get the cross section from the lua stack
-    std::shared_ptr<chi_physics::SingleStateMGXS> xs;
+    std::shared_ptr<MultiGroupXS> xs;
     xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, combo.first,
                               std::string(__FUNCTION__));
     xsecs.push_back(xs);
 
     //increment densities
-    if (xs->is_fissionable_)
+    if (xs->IsFissionable())
     {
       is_fissionable_ = true;
       Nf_total += combo.second;
@@ -148,15 +148,15 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
 
     //define and check number of groups
     if (xsecs.size() == 1)
-      n_grps = xs->num_groups_;
-    else if (xs->num_groups_ != n_grps)
+      n_grps = xs->NumGroups();
+    else if (xs->NumGroups() != n_grps)
       throw std::logic_error(
           "Incompatible cross sections encountered.\n"
           "All cross sections being combined must have the "
           "same number of energy groups.");
 
     //increment number of precursors
-    n_precs += xs->num_precursors_;
+    n_precs += xs->NumPrecursors();
   }//for cross section
 
   // Check that the fissile and precursor densities are greater than
@@ -169,7 +169,7 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
   // prompt/delayed fission data or total fission data
   if (n_precs > 0)
     for (const auto& xs : xsecs)
-      if (xs->is_fissionable_ && xs->num_precursors_ == 0)
+      if (xs->IsFissionable() and xs->NumPrecursors() == 0)
         throw std::logic_error(
             "Incompatible cross sections encountered.\n"
             "If any fissionable cross sections specify delayed neutron "
@@ -185,7 +185,7 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
   scattering_order_ = 0;
   for (const auto& xs : xsecs)
     scattering_order_ = std::max(scattering_order_,
-                                 xs->scattering_order_);
+                                 xs->ScatteringOrder());
 
   //mandatory cross sections
   sigma_t_.assign(n_grps, 0.0);
@@ -195,7 +195,7 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
   using XSPtr = chi_physics::MultiGroupXSPtr;
   if (std::any_of(xsecs.begin(), xsecs.end(),
                   [](const XSPtr& x)
-                  { return !x->transfer_matrices_.empty(); }))
+                  { return not x->TransferMatrices().empty(); }))
     transfer_matrices_.assign(scattering_order_ + 1,
                               chi_math::SparseMatrix(num_groups_, num_groups_));
 
@@ -228,32 +228,38 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
 
     //fraction of fissile density
     double ff_i = 0.0;
-    if (xsecs[x]->is_fissionable_)
+    if (xsecs[x]->IsFissionable())
       ff_i = N_i / Nf_total;
 
     //============================================================
     // Combine cross sections
     //============================================================
 
+    const auto& sig_t = xsecs[x]->SigmaTotal();
+    const auto& sig_a = xsecs[x]->SigmaAbsorption();
+    const auto& sig_f = xsecs[x]->SigmaFission();
+    const auto& nu_p_sig_f = xsecs[x]->NuPromptSigmaF();
+    const auto& nu_d_sig_f = xsecs[x]->NuDelayedSigmaF();
+    const auto& F = xsecs[x]->ProductionMatrix();
+
     // Here, raw cross sections are scaled by densities and spectra by
     // fractional densities. The latter is done to preserve a unit spectra.
     for (unsigned int g = 0; g < n_grps; ++g)
     {
-      sigma_t_[g] += xsecs[x]->sigma_t_[g] * N_i;
-      sigma_a_[g] += xsecs[x]->sigma_a_[g] * N_i;
+      sigma_t_[g] += sig_t[g] * N_i;
+      sigma_a_[g] += sig_a[g] * N_i;
 
-      if (xsecs[x]->is_fissionable_)
+      if (xsecs[x]->IsFissionable())
       {
-        sigma_f_[g] += xsecs[x]->sigma_f_[g] * N_i;
-        nu_sigma_f_[g] += xsecs[x]->sigma_f_[g] * N_i;
+        sigma_f_[g] += sig_f[g] * N_i;
+        nu_sigma_f_[g] += sig_f[g] * N_i;
         for (unsigned int gp = 0; gp < num_groups_; ++gp)
-          production_matrix_[g][gp] +=
-              xsecs[x]->production_matrix_[g][gp] * N_i;
+          production_matrix_[g][gp] += F[g][gp] * N_i;
 
         if (n_precs > 0)
         {
-          nu_prompt_sigma_f_[g] += xsecs[g]->nu_prompt_sigma_f_[g] * N_i;
-          nu_delayed_sigma_f_[g] += xsecs[g]->nu_delayed_sigma_f_[g] * N_i;
+          nu_prompt_sigma_f_[g] += nu_p_sig_f[g] * N_i;
+          nu_delayed_sigma_f_[g] += nu_d_sig_f[g] * N_i;
         }
       }
     }//for g
@@ -271,27 +277,28 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
     // the fraction of the total density of materials with precursors
     // they make up.
 
-    if (xsecs[x]->num_precursors_ > 0)
+    if (xsecs[x]->NumPrecursors() > 0)
     {
-      for (unsigned int j = 0; j < xsecs[x]->num_precursors_; ++j)
+      const auto& precursors = xsecs[x]->Precursors();
+      for (unsigned int j = 0; j < xsecs[x]->NumPrecursors(); ++j)
       {
         unsigned int count = precursor_count + j;
-        const auto& precursor = xsecs[x]->precursors_[j];
+        const auto& precursor = precursors[j];
         precursors_[count].decay_constant = precursor.decay_constant;
         precursors_[count].fractional_yield = precursor.fractional_yield * ff_i;
         precursors_[count].emission_spectrum = precursor.emission_spectrum;
       }//for j
 
-      precursor_count += xsecs[x]->num_precursors_;
+      precursor_count += xsecs[x]->NumPrecursors();
     }
 
     //============================================================
     // Set inverse velocity data
     //============================================================
 
-    if (x == 0 && !xsecs[x]->inv_velocity_.empty())
-      inv_velocity_ = xsecs[x]->inv_velocity_;
-    else if (xsecs[x]->inv_velocity_ != inv_velocity_)
+    if (x == 0 && !xsecs[x]->InverseVelocity().empty())
+      inv_velocity_ = xsecs[x]->InverseVelocity();
+    else if (xsecs[x]->InverseVelocity() != inv_velocity_)
       throw std::logic_error(
           "Invalid cross sections encountered.\n"
           "All cross sections being combined must share a group "
@@ -307,12 +314,12 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
     // together has to take the sparse matrix's protection mechanisms into
     // account.
 
-    if (!xsecs[x]->transfer_matrices_.empty())
+    if (not xsecs[x]->TransferMatrices().empty())
     {
-      for (unsigned int m = 0; m < xsecs[x]->scattering_order_ + 1; ++m)
+      for (unsigned int m = 0; m < xsecs[x]->ScatteringOrder() + 1; ++m)
       {
         auto& Sm = transfer_matrices_[m];
-        const auto& Sm_other = xsecs[x]->transfer_matrices_[m];
+        const auto& Sm_other = xsecs[x]->TransferMatrix(m);
         for (unsigned int g = 0; g < num_groups_; ++g)
         {
           const auto& cols = Sm_other.rowI_indices_[g];
