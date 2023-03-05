@@ -19,7 +19,7 @@ typedef std::vector<VecDbl> MatDbl;
 typedef std::vector<chi_mesh::Vector3> VecVec3;
 typedef std::vector<VecVec3> MatVec3;
 
-typedef std::shared_ptr<chi_physics::MultiGroupXSBase> XSPtr;
+typedef std::shared_ptr<chi_physics::MultiGroupXS> XSPtr;
 typedef std::shared_ptr<chi_physics::IsotropicMultiGrpSource> IsotropicSrcPtr;
 
 enum class GeometryType
@@ -130,7 +130,7 @@ private:
   int num_nodes_;
   int num_groups_;
   int num_grps_moms_;
-  const chi_physics::MultiGroupXSBase* xs_;
+  const chi_physics::MultiGroupXS* xs_;
   double volume_;
   std::vector<bool> face_local_flags_ = {};
   std::vector<double> outflow_;
@@ -140,7 +140,7 @@ public:
               int num_nodes,
               int num_groups,
               int num_moments,
-              const chi_physics::MultiGroupXSBase& xs_mapping,
+              const chi_physics::MultiGroupXS& xs_mapping,
               double volume,
               const std::vector<bool>& face_local_flags,
               bool cell_on_boundary) :
@@ -161,7 +161,7 @@ public:
     return phi_address_ + node * num_grps_moms_ + num_groups_ * moment + grp;
   }
 
-  const chi_physics::MultiGroupXSBase& XS() const{ return *xs_; }
+  const chi_physics::MultiGroupXS& XS() const{ return *xs_; }
 
   bool IsFaceLocal(int f) const {return face_local_flags_[f];}
 
@@ -182,7 +182,7 @@ public:
     else return 0.0;
   }
 
-  void ReassingXS(const chi_physics::MultiGroupXSBase& xs_mapped)
+  void ReassingXS(const chi_physics::MultiGroupXS& xs_mapped)
   { xs_ = &xs_mapped; }
 };
 

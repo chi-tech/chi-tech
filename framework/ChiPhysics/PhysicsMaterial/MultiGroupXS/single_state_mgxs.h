@@ -1,7 +1,7 @@
 #ifndef CHI_PHYSICS_TRANSPORT_CROSS_SECTIONS_H
 #define CHI_PHYSICS_TRANSPORT_CROSS_SECTIONS_H
 
-#include "multigroup_xs_base.h"
+#include "multigroup_xs.h"
 
 
 /**\defgroup LuaTransportXSs Transport Cross Sections
@@ -15,7 +15,7 @@ namespace chi_physics
 /**
  * A class for handling multi-group cross sections.
  */
-class SingleStateMGXS : public MultiGroupXSBase
+class SingleStateMGXS : public MultiGroupXS
 {
 protected:
   typedef std::vector<std::pair<double,double>> AnglePairs;
@@ -60,7 +60,7 @@ private:
 public:
   //00
   SingleStateMGXS() :
-      MultiGroupXSBase(),
+      MultiGroupXS(),
       num_groups_(0), scattering_order_(0), num_precursors_(0),
       diffusion_initialized_(false), scattering_initialized_(false)
   {}

@@ -1,4 +1,4 @@
-#include "multigroup_xs_base.h"
+#include "multigroup_xs.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -16,7 +16,7 @@
  *      create exactly critical cross sections for a transient initial
  *      condition.
  */
-void chi_physics::MultiGroupXSBase::
+void chi_physics::MultiGroupXS::
 ExportToChiXSFile(const std::string &file_name,
                   const double fission_scaling /* = 1.0 */) const
 {

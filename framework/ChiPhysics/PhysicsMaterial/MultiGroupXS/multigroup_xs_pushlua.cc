@@ -1,10 +1,10 @@
-#include "multigroup_xs_base.h"
+#include "multigroup_xs.h"
 
 #include "chi_log.h"
 
 //###################################################################
 /**Pushes all of the relevant items of the transport xs to a lua table.*/
-void chi_physics::MultiGroupXSBase::PushLuaTable(lua_State *L) const
+void chi_physics::MultiGroupXS::PushLuaTable(lua_State *L) const
 {
   //================================================== General data
   lua_newtable(L);

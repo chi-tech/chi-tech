@@ -1,7 +1,7 @@
 #ifndef ADJOINT_MULTIGROUP_XS_H
 #define ADJOINT_MULTIGROUP_XS_H
 
-#include "multigroup_xs_base.h"
+#include "multigroup_xs.h"
 
 
 namespace chi_physics
@@ -20,10 +20,10 @@ namespace chi_physics
  * for transfer and production matrices access the respective transposed data
  * stored in this class.
  */
-class AdjointMGXS : public MultiGroupXSBase
+class AdjointMGXS : public MultiGroupXS
 {
 private:
-  const MultiGroupXSBase& xs_;
+  const MultiGroupXS& xs_;
   std::vector<chi_math::SparseMatrix> transposed_transfer_matrices_;
   std::vector<std::vector<double>> transposed_production_matrices_;
 
@@ -32,7 +32,7 @@ public:
   AdjointMGXS(const AdjointMGXS&) = delete;
   AdjointMGXS(AdjointMGXS&&) = delete;
 
-  explicit AdjointMGXS(const MultiGroupXSBase& xs);
+  explicit AdjointMGXS(const MultiGroupXS& xs);
 
   //Accessors
   const unsigned int NumGroups() const override { return xs_.NumGroups(); }

@@ -1,5 +1,5 @@
-#ifndef MULTIGROUP_XS_BASE_H
-#define MULTIGROUP_XS_BASE_H
+#ifndef MULTIGROUP_XS_H
+#define MULTIGROUP_XS_H
 
 #include "ChiPhysics/PhysicsMaterial/material_property_base.h"
 #include "ChiMath/SparseMatrix/chi_math_sparse_matrix.h"
@@ -9,7 +9,7 @@ namespace chi_physics
 {
 
 //######################################################################
-class MultiGroupXSBase : public MaterialProperty
+class MultiGroupXS : public MaterialProperty
 {
 public:
   /**
@@ -22,7 +22,7 @@ public:
     std::vector<double> emission_spectrum;
   };
 
-  MultiGroupXSBase()
+  MultiGroupXS()
       : MaterialProperty(PropertyType::TRANSPORT_XSECTIONS)
   {}
 
@@ -75,4 +75,4 @@ public:
 
 }//namespace chi_physics
 
-#endif //MULTIGROUP_XS_BASE_H
+#endif //MULTIGROUP_XS_H
