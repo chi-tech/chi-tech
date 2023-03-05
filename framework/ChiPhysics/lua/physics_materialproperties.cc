@@ -129,9 +129,9 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
     chi::log.Log0Verbose1() << "Transport cross-sections added to material"
                                  " at index " << material_index;
 
-    chi::trnsprt_xs_stack.push_back(prop);
+    chi::multigroup_xs_stack.push_back(prop);
 
-    const size_t index = chi::trnsprt_xs_stack.size()-1;
+    const size_t index = chi::multigroup_xs_stack.size() - 1;
 
     lua_pushnumber(L,static_cast<lua_Number>(index));
     return 1;
@@ -447,7 +447,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
         std::shared_ptr<chi_physics::SingleStateMGXS> xs;
         try {
           xs = std::dynamic_pointer_cast<chi_physics::SingleStateMGXS>(
-              chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle, fname));
+              chi::GetStackItemPtr(chi::multigroup_xs_stack, handle, fname));
         }
         catch(const std::out_of_range& o){
           chi::log.LogAllError()

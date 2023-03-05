@@ -135,7 +135,7 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
   {
     //get the cross section from the lua stack
     std::shared_ptr<MultiGroupXS> xs;
-    xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, combo.first,
+    xs = chi::GetStackItemPtr(chi::multigroup_xs_stack, combo.first,
                               std::string(__FUNCTION__));
     xsecs.push_back(xs);
 

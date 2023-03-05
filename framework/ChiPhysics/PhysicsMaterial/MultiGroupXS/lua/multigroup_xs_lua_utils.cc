@@ -35,9 +35,9 @@ int chiPhysicsTransportXSCreate(lua_State* L)
 {
   auto xs = std::make_shared<chi_physics::SingleStateMGXS>();
 
-  chi::trnsprt_xs_stack.push_back(xs);
+  chi::multigroup_xs_stack.push_back(xs);
 
-  const size_t index = chi::trnsprt_xs_stack.size()-1;
+  const size_t index = chi::multigroup_xs_stack.size() - 1;
 
   lua_pushinteger(L,static_cast<lua_Integer>(index));
   return 1;
@@ -116,7 +116,7 @@ int chiPhysicsTransportXSSet(lua_State* L)
   std::shared_ptr<chi_physics::SingleStateMGXS> xs;
   try {
     xs = std::dynamic_pointer_cast<chi_physics::SingleStateMGXS>(
-        chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle));
+        chi::GetStackItemPtr(chi::multigroup_xs_stack, handle));
   }
   catch(const std::out_of_range& o){
     chi::log.LogAllError()
@@ -201,7 +201,7 @@ int chiPhysicsTransportXSGet(lua_State* L)
   std::shared_ptr<chi_physics::SingleStateMGXS> xs;
   try {
     xs = std::dynamic_pointer_cast<chi_physics::SingleStateMGXS>(
-        chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle));
+        chi::GetStackItemPtr(chi::multigroup_xs_stack, handle));
   }
   catch(const std::out_of_range& o){
     chi::log.LogAllError()
@@ -313,9 +313,9 @@ int chiPhysicsTransportXSMakeCombined(lua_State* L)
 
   new_xs->MakeCombined(combinations);
 
-  chi::trnsprt_xs_stack.push_back(new_xs);
+  chi::multigroup_xs_stack.push_back(new_xs);
   lua_pushinteger(L,
-      static_cast<lua_Integer>(chi::trnsprt_xs_stack.size())-1);
+                  static_cast<lua_Integer>(chi::multigroup_xs_stack.size()) - 1);
 
   return 1;
 }
@@ -372,7 +372,7 @@ int chiPhysicsTransportXSSetCombined(lua_State* L)
   std::shared_ptr<chi_physics::SingleStateMGXS> xs;
   try {
     xs = std::dynamic_pointer_cast<chi_physics::SingleStateMGXS>(
-        chi::GetStackItemPtr(chi::trnsprt_xs_stack, xs_handle));
+        chi::GetStackItemPtr(chi::multigroup_xs_stack, xs_handle));
   }
   catch(const std::out_of_range& o){
     chi::log.LogAllError()
@@ -452,7 +452,7 @@ int chiPhysicsTransportXSExportToChiTechFormat(lua_State* L)
 
   std::shared_ptr<chi_physics::MultiGroupXS> xs;
   try {
-    xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle);
+    xs = chi::GetStackItemPtr(chi::multigroup_xs_stack, handle);
   }
   catch(const std::out_of_range& o){
     chi::log.LogAllError()
