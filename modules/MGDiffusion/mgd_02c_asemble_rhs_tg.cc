@@ -23,7 +23,7 @@ void mg_diffusion::Solver::Assemble_RHS_TwoGrid(const int64_t verbose)
     const auto qp_data = cell_mapping.MakeVolumeQuadraturePointData();
     const size_t num_nodes = cell_mapping.NumNodes();
 
-    const auto &S = matid_to_xs_map.at(cell.material_id_)->transfer_matrices_[0];
+    const auto &S = matid_to_xs_map.at(cell.material_id_)->TransferMatrix(0);
 
     for (unsigned g = last_fast_group_; g < num_groups_; ++g)
     {

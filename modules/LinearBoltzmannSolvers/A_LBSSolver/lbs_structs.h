@@ -2,7 +2,7 @@
 #define LBS_STRUCTS_H
 
 #include "ChiMath/chi_math.h"
-#include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
+#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
 #include "ChiPhysics/PhysicsMaterial/material_property_isotropic_mg_src.h"
 
 #include <functional>
@@ -19,7 +19,7 @@ typedef std::vector<VecDbl> MatDbl;
 typedef std::vector<chi_mesh::Vector3> VecVec3;
 typedef std::vector<VecVec3> MatVec3;
 
-typedef std::shared_ptr<chi_physics::TransportCrossSections> XSPtr;
+typedef std::shared_ptr<chi_physics::MultiGroupXS> XSPtr;
 typedef std::shared_ptr<chi_physics::IsotropicMultiGrpSource> IsotropicSrcPtr;
 
 enum class GeometryType
@@ -126,66 +126,64 @@ struct Options
 class CellLBSView
 {
 private:
-  size_t phi_address;
-  int num_nodes;
-  int num_grps;
-  int num_grps_moms;
-  const chi_physics::TransportCrossSections* xs;
-  double volume;
-  std::vector<bool> face_local_flags = {};
-  std::vector<double> outflow;
+  size_t phi_address_;
+  int num_nodes_;
+  int num_groups_;
+  int num_grps_moms_;
+  const chi_physics::MultiGroupXS* xs_;
+  double volume_;
+  std::vector<bool> face_local_flags_ = {};
+  std::vector<double> outflow_;
 
 public:
-  CellLBSView(size_t in_phi_address,
-              int in_num_nodes,
-              int in_num_grps,
-              int in_num_moms,
-              const chi_physics::TransportCrossSections& in_xs_mapping,
-              double in_volume,
-              const std::vector<bool>& in_face_local_flags,
+  CellLBSView(size_t phi_address,
+              int num_nodes,
+              int num_groups,
+              int num_moments,
+              const chi_physics::MultiGroupXS& xs_mapping,
+              double volume,
+              const std::vector<bool>& face_local_flags,
               bool cell_on_boundary) :
-    phi_address(in_phi_address),
-    num_nodes(in_num_nodes),
-    num_grps(in_num_grps),
-    num_grps_moms(in_num_grps*in_num_moms),
-    xs(&in_xs_mapping),
-    volume(in_volume),
-    face_local_flags(in_face_local_flags)
+      phi_address_(phi_address),
+      num_nodes_(num_nodes),
+      num_groups_(num_groups),
+      num_grps_moms_(num_groups * num_moments),
+      xs_(&xs_mapping),
+      volume_(volume),
+      face_local_flags_(face_local_flags)
   {
     if (cell_on_boundary)
-      outflow.resize(num_grps,0.0);
+      outflow_.resize(num_groups_, 0.0);
   }
 
   size_t MapDOF(int node, int moment, int grp) const
   {
-    return phi_address + node * num_grps_moms + num_grps * moment + grp;
+    return phi_address_ + node * num_grps_moms_ + num_groups_ * moment + grp;
   }
 
-   const chi_physics::TransportCrossSections& XS() const
-  {return *xs;}
+  const chi_physics::MultiGroupXS& XS() const{ return *xs_; }
 
-  bool IsFaceLocal(int f) const {return face_local_flags[f];}
+  bool IsFaceLocal(int f) const {return face_local_flags_[f];}
 
-  int NumNodes() const {return num_nodes;}
+  int NumNodes() const {return num_nodes_;}
 
-  double Volume() const {return volume;}
+  double Volume() const {return volume_;}
 
-  void ZeroOutflow(     ) {outflow.assign(outflow.size(),0.0);}
-  void ZeroOutflow(int g) {if (g<outflow.size()) outflow[g]=0.0;}
+  void ZeroOutflow(     ) {outflow_.assign(outflow_.size(), 0.0);}
+  void ZeroOutflow(int g) {if (g < outflow_.size()) outflow_[g]=0.0;}
   void AddOutflow(int g, double intS_mu_psi)
   {
-    if (g<outflow.size()) outflow[g] += intS_mu_psi;
+    if (g < outflow_.size()) outflow_[g] += intS_mu_psi;
   }
+
   double GetOutflow(int g) const
   {
-    if (g<outflow.size()) return outflow[g];
+    if (g < outflow_.size()) return outflow_[g];
     else return 0.0;
   }
 
-  void ReassingXS(const chi_physics::TransportCrossSections& xs_mapped)
-  {
-    xs = &xs_mapped;
-  }
+  void ReassingXS(const chi_physics::MultiGroupXS& xs_mapped)
+  { xs_ = &xs_mapped; }
 };
 
 

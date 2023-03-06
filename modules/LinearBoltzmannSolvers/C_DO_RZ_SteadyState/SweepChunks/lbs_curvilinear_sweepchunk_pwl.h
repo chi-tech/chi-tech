@@ -19,13 +19,13 @@ class lbs_curvilinear::SweepChunkPWL : public lbs::SweepChunkPWL
 private:
   const std::vector<lbs::UnitCellMatrices>& secondary_unit_cell_matrices_;
   /** Unknown manager. */
-  chi_math::UnknownManager unknown_manager;
+  chi_math::UnknownManager unknown_manager_;
   /** Sweeping dependency angular intensity (for each polar level). */
-  std::vector<double> psi_sweep;
+  std::vector<double> psi_sweep_;
   /** Mapping from direction linear index to direction polar level. */
-  std::map<unsigned int, unsigned int> map_polar_level;
+  std::map<unsigned int, unsigned int> map_polar_level_;
   /** Normal vector to determine symmetric boundary condition. */
-  chi_mesh::Vector3 normal_vector_boundary;
+  chi_mesh::Vector3 normal_vector_boundary_;
 
 //  Methods
 public:
@@ -38,10 +38,10 @@ public:
                 std::vector<double>& destination_phi,
                 std::vector<double>& destination_psi,
                 const std::vector<double>& source_moments,
-                lbs::LBSGroupset& in_groupset,
-                const TCrossSections& in_xsections,
-                int in_num_moms,
-                int in_max_num_cell_dofs);
+                lbs::LBSGroupset& groupset,
+                const std::map<int, lbs::XSPtr>& xs,
+                int num_moments,
+                int max_num_cell_dofs);
 
   void Sweep(chi_mesh::sweep_management::AngleSet* angle_set) override;
 };

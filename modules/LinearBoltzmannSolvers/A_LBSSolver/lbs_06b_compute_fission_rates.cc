@@ -19,7 +19,10 @@ double LBSSolver::ComputeFissionProduction(const std::vector<double>& phi)
 
     //====================================== Obtain xs
     const auto& xs = transport_view.XS();
-    if (not xs.is_fissionable_) continue;
+    const auto& F = xs.ProductionMatrix();
+    const auto& nu_delayed_sigma_f = xs.NuDelayedSigmaF();
+
+    if (not xs.IsFissionable()) continue;
 
     //====================================== Loop over nodes
     const int num_nodes = transport_view.NumNodes();
@@ -31,15 +34,15 @@ double LBSSolver::ComputeFissionProduction(const std::vector<double>& phi)
       //=============================== Loop over groups
       for (size_t g = first_grp; g <= last_grp; ++g)
       {
-        const auto& prod = xs.production_matrix_[g];
+        const auto& prod = F[g];
         for (size_t gp = 0; gp <= last_grp; ++gp)
           local_production += prod[gp] *
                               phi[uk_map + gp] *
                               IntV_ShapeI;
 
         if (options_.use_precursors)
-          for (unsigned int j = 0; j < xs.num_precursors_; ++j)
-            local_production += xs.nu_delayed_sigma_f_[g] *
+          for (unsigned int j = 0; j < xs.NumPrecursors(); ++j)
+            local_production += nu_delayed_sigma_f[g] *
                                 phi[uk_map + g] *
                                 IntV_ShapeI;
       }
@@ -59,20 +62,11 @@ double LBSSolver::ComputeFissionProduction(const std::vector<double>& phi)
 
 //###################################################################
 /**Computes the total fission rate in the problem.
-
-\param previous bool Optional. If true and the solver is a transient solver
-                     then the rate will be based on the previous timestep's
-                     fluxes.
-
-\return the_rate The fission rate as a double.
-
 \author Zachary Hardy.*/
-double LBSSolver::ComputeFissionRate(const bool previous)
+double LBSSolver::ComputeFissionRate(const std::vector<double>& phi)
 {
   const int first_grp = groups_.front().id_;
   const int last_grp = groups_.back().id_;
-
-  const auto& phi = phi_old_local_;
 
   //============================================= Loop over local cells
   double local_fission_rate = 0.0;
@@ -83,7 +77,10 @@ double LBSSolver::ComputeFissionRate(const bool previous)
 
     //====================================== Obtain xs
     const auto& xs = transport_view.XS();
-    if (not xs.is_fissionable_) continue;
+    const auto& sigma_f = xs.SigmaFission();
+
+    // skip non-fissionable material
+    if (not xs.IsFissionable()) continue;
 
     //====================================== Loop over nodes
     const int num_nodes = transport_view.NumNodes();
@@ -94,9 +91,7 @@ double LBSSolver::ComputeFissionRate(const bool previous)
 
       //=============================== Loop over groups
       for (size_t g = first_grp; g <= last_grp; ++g)
-        local_fission_rate += xs.sigma_f_[g] *
-                              phi[uk_map + g] *
-                              IntV_ShapeI;
+        local_fission_rate += sigma_f[g] * phi[uk_map + g] * IntV_ShapeI;
     }//for node
   }//for cell
 

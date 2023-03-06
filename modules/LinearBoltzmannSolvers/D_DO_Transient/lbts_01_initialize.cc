@@ -12,25 +12,9 @@ void lbs::DiscOrdTransientSolver::Initialize()
   DiscOrdKEigenvalueSolver::Initialize();
   DiscOrdKEigenvalueSolver::Execute();
 
-  //======================================== Scale fission data
-  //TODO: Determine a better methodology to handle fission scaling.
-
-  // NOTE: This is done to ensure consistency between cross sections
-  //       that may be swapped mid-simulation. For example, if one
-  //       seeks to swap to cross sections with more or less absorption,
-  //       then if this loop is over material_xs instead of the global
-  //       stack, the two cross section sets will have different fission
-  //       cross sections despite that not being intended.
-  // NOTE: A potentially better way to handle this is to develop a
-  //       flagging mechanism to tag materials for fission scaling.
-  if (transient_options_.scale_fission_xs)
-    for (const auto& xs : chi::trnsprt_xs_stack)
-      if (!xs->is_fission_scaled_)
-        xs->ScaleFissionData(k_eff_);
-
   if (transient_options_.verbosity_level >= 1)
   {
-    const double FR = ComputeFissionRate(false);
+    const double FR = ComputeFissionRate(phi_new_local_);
     char buff[200];
     snprintf(buff,200, " Initial Fission Rate FR=%12.6g", FR);
     chi::log.Log() << TextName() << buff;

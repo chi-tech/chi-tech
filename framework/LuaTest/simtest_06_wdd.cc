@@ -12,7 +12,7 @@
 #include "ChiMath/chi_math_range.h"
 
 #include "ChiPhysics/FieldFunction/fieldfunction.h"
-#include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
+#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/single_state_mgxs.h"
 
 #include "ChiDataTypes/ndarray.h"
 
@@ -33,7 +33,7 @@ namespace chi_unit_sim_tests
     const chi_math::UnknownManager& phi_uk_man,
     const std::vector<double>& q_source,
     const std::vector<double>& phi_old,
-    const chi_physics::TransportCrossSections& xs,
+    const chi_physics::SingleStateMGXS& xs,
     const std::vector<YlmIndices>& m_ell_em_map);
 }
 
@@ -136,7 +136,7 @@ int chiSimTest06_WDD(lua_State* L)
   chi::log.Log() << "End ukmanagers." << std::endl;
 
   //============================================= Make XSs
-  chi_physics::TransportCrossSections xs;
+  chi_physics::SingleStateMGXS xs;
   xs.MakeFromChiXSFile("tests/xs_graphite_pure.cxs");
 
   //============================================= Initializes vectors
@@ -184,7 +184,7 @@ int chiSimTest06_WDD(lua_State* L)
     (const std::array<int64_t,3>& ijk,
      const Vec3& omega,
      const size_t d,
-     const chi_physics::TransportCrossSections& cell_xs)
+     const chi_physics::SingleStateMGXS& cell_xs)
   {
     const auto   cell_global_id = ijk_mapping.MapNDtoLin(ijk[1],ijk[0],ijk[2]);
     const auto&  cell           = grid.cells[cell_global_id];
@@ -213,6 +213,7 @@ int chiSimTest06_WDD(lua_State* L)
     if (omega.z > 0.0 and k > 0     ) psi_us_z = &psi_ds_z(i  ,j  ,k-1,0);
     if (omega.z < 0.0 and k < (Nz-1)) psi_us_z = &psi_ds_z(i  ,j  ,k+1,0);
 
+    const auto& sigma_t = cell_xs.SigmaTotal();
     for (size_t g=0; g<num_groups; ++g)
     {
       double rhs = 0.0;
@@ -227,7 +228,7 @@ int chiSimTest06_WDD(lua_State* L)
       if (Ny > 1) rhs += 2.0*std::fabs(omega.y)*psi_us_y[g]/dy;
       if (Nz > 1) rhs += 2.0*std::fabs(omega.z)*psi_us_z[g]/dz;
 
-      double lhs = cell_xs.sigma_t_[g];
+      double lhs = sigma_t[g];
       if (Nx > 1) lhs += 2.0*std::fabs(omega.x)/dx;
       if (Ny > 1) lhs += 2.0*std::fabs(omega.y)/dy;
       if (Nz > 1) lhs += 2.0*std::fabs(omega.z)/dz;
@@ -396,7 +397,7 @@ std::vector<double> SetSource(
     const chi_math::UnknownManager& phi_uk_man,
     const std::vector<double>& q_source,
     const std::vector<double>& phi_old,
-    const chi_physics::TransportCrossSections& xs,
+    const chi_physics::SingleStateMGXS& xs,
     const std::vector<YlmIndices>& m_ell_em_map)
 {
   const size_t num_local_phi_dofs = sdm.GetNumLocalDOFs(phi_uk_man);
@@ -409,7 +410,7 @@ std::vector<double> SetSource(
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
-    const auto& S = xs.transfer_matrices_;
+    const auto& S = xs.TransferMatrices();
 
     for (size_t i=0; i<num_nodes; ++i)
     {

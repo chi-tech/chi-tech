@@ -2,10 +2,8 @@
 
 #include "ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h"
 #include "ChiPhysics/PhysicsMaterial/material_property_scalarvalue.h"
-#include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
+#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
 #include "ChiPhysics/FieldFunction/fieldfunction.h"
-
-#include "chi_runtime.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -15,13 +13,14 @@
 
 //###################################################################
 /**Gets material properties various sources.*/
-void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
-                                                  int cell_dofs,
-                                                  std::vector<double>& diffCoeff,
-                                                  std::vector<double>& sourceQ,
-                                                  std::vector<double>& sigmaa,
-                                                  int group,
-                                                  int moment)
+void chi_diffusion::Solver::GetMaterialProperties(
+    const chi_mesh::Cell& cell,
+    int cell_dofs,
+    std::vector<double>& diffCoeff,
+    std::vector<double>& sourceQ,
+    std::vector<double>& sigmaa,
+    int group,
+    int moment)
 {
   uint64_t cell_glob_index = cell.global_id_;
   bool cell_is_local = (cell.partition_id_ == chi::mpi.location_id);
@@ -67,7 +66,7 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
       chi::Exit(EXIT_FAILURE);
     }
 
-    //For now we can only support scalar values so lets check that
+    //For now, we can only support scalar values so lets check that
     if (std::dynamic_pointer_cast<chi_physics::ScalarValue>
         (material->properties_[property_map_D]))
     {
@@ -126,17 +125,14 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
     bool transportxs_found = false;
     for (int p=0; p<material->properties_.size(); p++)
     {
-      if (std::dynamic_pointer_cast<chi_physics::TransportCrossSections>
+      if (std::dynamic_pointer_cast<chi_physics::MultiGroupXS>
           (material->properties_[p]))
       {
-        auto xs = std::static_pointer_cast<chi_physics::TransportCrossSections>(
-          material->properties_[p]);
+        auto xs = std::static_pointer_cast<
+            chi_physics::MultiGroupXS>(material->properties_[p]);
 
-        if (!xs->diffusion_initialized_)
-          xs->ComputeDiffusionParameters();
-
-        diffCoeff.assign(cell_dofs,xs->diffusion_coeff_[group]);
-        sigmaa.assign(cell_dofs,xs->sigma_removal_[group]);
+        diffCoeff.assign(cell_dofs, xs->DiffusionCoefficient()[group]);
+        sigmaa.assign(cell_dofs, xs->SigmaRemoval()[group]);
         transportxs_found = true;
       }
     }//for properties

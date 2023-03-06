@@ -16,7 +16,7 @@ public:
   IsotropicMultiGrpSource() :
     MaterialProperty(PropertyType::ISOTROPIC_MG_SOURCE) {}
 
-  void PushLuaTable(lua_State* L) override
+  void PushLuaTable(lua_State* L) const override
   {
     lua_newtable(L);
     lua_pushstring(L,"is_empty");

@@ -40,11 +40,13 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
     auto& full_cell_view = cell_transport_views_[cell.local_id_];
 
     //==================== Obtain xs
-    auto xs     = full_cell_view.XS();
+    const auto& xs = full_cell_view.XS();
     auto P0_src = matid_to_src_map_[cell.material_id_];
 
-    const auto& S = matid_to_S_transpose_[cell.material_id_];
-    const auto& F = matid_to_F_transpose_[cell.material_id_];
+    const auto& S = xs.TransferMatrices();
+    const auto& F = xs.ProductionMatrix();
+    const auto& precursors = xs.Precursors();
+    const auto& nu_delayed_sigma_f = xs.NuDelayedSigmaF();
 
     //======================================== Loop over nodes
     const int num_nodes = full_cell_view.NumNodes();
@@ -63,7 +65,7 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
           double rhs = 0.0;
 
           //============================== Apply scattering sources
-          const bool moment_avail = ell < S.size();
+          const bool moment_avail = ell <= xs.ScatteringOrder();
 
           //==================== Across groupset
           if (moment_avail and apply_ags_scatter_src)
@@ -78,7 +80,7 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
                 rhs += sigma_sm * phi[uk_map + gp];
 
           //============================== Apply fission sources
-          const bool fission_avail = xs.is_fissionable_ and ell == 0;
+          const bool fission_avail = xs.IsFissionable() and ell == 0;
 
           //==================== Across groupset
           if (fission_avail and apply_ags_fission_src)
@@ -90,10 +92,10 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
                 rhs += prod[gp] * phi[uk_map + gp];
 
                 if (options_.use_precursors)
-                  for (const auto& precursor: xs.precursors_)
+                  for (const auto& precursor: precursors)
                     rhs += precursor.emission_spectrum[gp] *
                            precursor.fractional_yield *
-                           xs.nu_delayed_sigma_f_[g] *
+                           nu_delayed_sigma_f[g] *
                            phi[uk_map + gp];
               }
           }
@@ -107,10 +109,10 @@ void lbs::DiscOrdSteadyStateAdjointSolver::
               rhs += prod[gp] * phi[uk_map + gp];
 
               if (options_.use_precursors)
-                for (const auto& precursor: xs.precursors_)
+                for (const auto& precursor : precursors)
                   rhs += precursor.emission_spectrum[gp] *
                          precursor.fractional_yield *
-                         xs.nu_delayed_sigma_f_[g] *
+                         nu_delayed_sigma_f[g] *
                          phi[uk_map + gp];
             }
           }

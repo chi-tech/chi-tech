@@ -19,27 +19,27 @@ SweepChunkPWLTransientTheta(
   const double input_theta,
   const double time_step,
   const std::vector<double>& source_moments,
-  LBSGroupset& in_groupset,
-  const TCrossSections& in_xsections,
-  const int in_num_moms,
-  const int in_max_num_cell_dofs)
+  LBSGroupset& groupset,
+  const std::map<int, XSPtr>& xs,
+  const int num_moments,
+  const int max_num_cell_dofs)
                     : SweepChunk(destination_phi, destination_psi,
-                                 in_groupset.angle_agg_, false),
-                      grid_view(std::move(grid_ptr)),
-                      grid_fe_view(discretization),
+                                 groupset.angle_agg_, false),
+                      grid_view_(std::move(grid_ptr)),
+                      grid_fe_view_(discretization),
                       unit_cell_matrices_(unit_cell_matrices),
-                      grid_transport_view(cell_transport_views),
-                      q_moments(source_moments),
-                      groupset(in_groupset),
-                      xsections(in_xsections),
-                      num_moms(in_num_moms),
-                      num_grps(in_groupset.groups_.size()),
-                      max_num_cell_dofs(in_max_num_cell_dofs),
-                      save_angular_flux(!destination_psi.empty()),
-                      psi_prev(psi_prev_ref),
-                      theta(input_theta),
-                      dt(time_step),
-                      a_and_b_initialized(false)
+                      grid_transport_view_(cell_transport_views),
+                      q_moments_(source_moments),
+                      groupset_(groupset),
+                      xs_(xs),
+                      num_moments_(num_moments),
+                      num_groups_(groupset.groups_.size()),
+                      max_num_cell_dofs_(max_num_cell_dofs),
+                      save_angular_flux_(!destination_psi.empty()),
+                      psi_prev_(psi_prev_ref),
+                      theta_(input_theta),
+                      dt_(time_step),
+                      a_and_b_initialized_(false)
 {
 
 }
@@ -87,13 +87,13 @@ GetDownwindPsi(int fi, bool local, bool boundary, bool reflecting_bndry) const
 void lbs::SweepChunkPWLTransientTheta::
   Sweep(chi_mesh::sweep_management::AngleSet *angle_set)
 {
-  if (!a_and_b_initialized)
+  if (!a_and_b_initialized_)
   {
-    Amat.resize(max_num_cell_dofs, std::vector<double>(max_num_cell_dofs));
-    Atemp.resize(max_num_cell_dofs, std::vector<double>(max_num_cell_dofs));
-    b.resize(num_grps, std::vector<double>(max_num_cell_dofs, 0.0));
-    source.resize(max_num_cell_dofs, 0.0);
-    a_and_b_initialized = true;
+    Amat_.resize(max_num_cell_dofs_, std::vector<double>(max_num_cell_dofs_));
+    Atemp_.resize(max_num_cell_dofs_, std::vector<double>(max_num_cell_dofs_));
+    b_.resize(num_groups_, std::vector<double>(max_num_cell_dofs_, 0.0));
+    source_.resize(max_num_cell_dofs_, 0.0);
+    a_and_b_initialized_ = true;
   }
 
   const auto& spds = angle_set->GetSPDS();
@@ -103,21 +103,21 @@ void lbs::SweepChunkPWLTransientTheta::
   std::vector<double>& output_psi = GetDestinationPsi();
 
   const SubSetInfo& grp_ss_info =
-      groupset.grp_subset_infos_[angle_set->ref_subset];
+      groupset_.grp_subset_infos_[angle_set->ref_subset];
 
   const size_t gs_ss_size  = grp_ss_info.ss_size;
   const size_t gs_ss_begin = grp_ss_info.ss_begin;
 
   // first groupset subset group
-  const int    gs_gi = groupset.groups_[gs_ss_begin].id_;
+  const int    gs_gi = groupset_.groups_[gs_ss_begin].id_;
 
   int deploc_face_counter = -1;
   int preloc_face_counter = -1;
 
-  auto const& d2m_op = groupset.quadrature_->GetDiscreteToMomentOperator();
-  auto const& m2d_op = groupset.quadrature_->GetMomentToDiscreteOperator();
+  auto const& d2m_op = groupset_.quadrature_->GetDiscreteToMomentOperator();
+  auto const& m2d_op = groupset_.quadrature_->GetMomentToDiscreteOperator();
 
-  const auto& psi_uk_man = groupset.psi_uk_man_;
+  const auto& psi_uk_man = groupset_.psi_uk_man_;
   typedef const int64_t cint64_t;
 
   const bool fixed_src_active = surface_source_active;
@@ -128,20 +128,20 @@ void lbs::SweepChunkPWLTransientTheta::
   for (size_t spls_index = 0; spls_index < num_loc_cells; ++spls_index)
   {
     const int cell_local_id = spds.spls.item_id[spls_index];
-    const auto& cell = grid_view->local_cells[cell_local_id];
+    const auto& cell = grid_view_->local_cells[cell_local_id];
     const auto num_faces = cell.faces_.size();
-    const auto& cell_mapping = grid_fe_view.GetCellMapping(cell);
+    const auto& cell_mapping = grid_fe_view_.GetCellMapping(cell);
     const auto& fe_intgrl_values = unit_cell_matrices_[cell_local_id];
     const int num_nodes = static_cast<int>(cell_mapping.NumNodes());
-    auto& transport_view = grid_transport_view[cell.local_id_];
-    const auto& sigma_tg = transport_view.XS().sigma_t_;
+    auto& transport_view = grid_transport_view_[cell.local_id_];
+    const auto& sigma_tg = transport_view.XS().SigmaTotal();
     std::vector<bool> face_incident_flags(num_faces, false);
     std::vector<double> face_mu_values(num_faces, 0.0);
 
-    //Transient parameters
-    const auto& inv_velg = transport_view.XS().inv_velocity_;
-    const double inv_theta = 1.0/theta;
-    const double inv_dt    = 1.0/dt;
+    //time-dependent parameters
+    const auto& inv_velg = transport_view.XS().InverseVelocity();
+    const double inv_theta = 1.0 / theta_;
+    const double inv_dt    = 1.0 / dt_;
     std::vector<double> tau_gsg(gs_ss_size, 0.0);
     for (size_t gsg = 0; gsg < gs_ss_size; ++gsg)
       tau_gsg[gsg] = inv_velg[gs_gi+gsg]*inv_theta*inv_dt;
@@ -161,16 +161,16 @@ void lbs::SweepChunkPWLTransientTheta::
       deploc_face_counter = ni_deploc_face_counter;
       preloc_face_counter = ni_preloc_face_counter;
       const int angle_num = angle_set->angles[angle_set_index];
-      const chi_mesh::Vector3& omega = groupset.quadrature_->omegas_[angle_num];
-      const double wt = groupset.quadrature_->weights_[angle_num];
+      const chi_mesh::Vector3& omega = groupset_.quadrature_->omegas_[angle_num];
+      const double wt = groupset_.quadrature_->weights_[angle_num];
 
       // ============================================ Gradient matrix
       for (int i = 0; i < num_nodes; ++i)
         for (int j = 0; j < num_nodes; ++j)
-          Amat[i][j] = omega.Dot(G[i][j]);
+          Amat_[i][j] = omega.Dot(G[i][j]);
 
       for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-        b[gsg].assign(num_nodes, 0.0);
+        b_[gsg].assign(num_nodes, 0.0);
 
       // ============================================ Upwinding structure
       Upwinder upwind{fluds, angle_set, spls_index, angle_set_index,
@@ -216,9 +216,9 @@ void lbs::SweepChunkPWLTransientTheta::
             const double* psi = upwind.GetUpwindPsi(fj, local, boundary);
 
             const double mu_Nij = -mu * M_surf[f][i][j];
-            Amat[i][j] += mu_Nij;
+            Amat_[i][j] += mu_Nij;
             for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-              b[gsg][i] += psi[gsg]*mu_Nij;
+              b_[gsg][i] += psi[gsg] * mu_Nij;
 
           }//for face j
         }//for face i
@@ -234,15 +234,15 @@ void lbs::SweepChunkPWLTransientTheta::
         for (int i = 0; i < num_nodes; ++i)
         {
           double temp_src = 0.0;
-          for (int m = 0; m < num_moms; ++m)
+          for (int m = 0; m < num_moments_; ++m)
           {
             const size_t ir = transport_view.MapDOF(i, m, g);
-            temp_src += m2d_op[m][angle_num]*q_moments[ir];
+            temp_src += m2d_op[m][angle_num] * q_moments_[ir];
           }//for m
-          cint64_t imap = grid_fe_view.MapDOFLocal(cell,i,psi_uk_man,angle_num,0);
+          cint64_t imap = grid_fe_view_.MapDOFLocal(cell, i, psi_uk_man, angle_num, 0);
           if (fixed_src_active)
-            temp_src += tau_gsg[gsg] * psi_prev[imap + gsg];
-          source[i] = temp_src;
+            temp_src += tau_gsg[gsg] * psi_prev_[imap + gsg];
+          source_[i] = temp_src;
         }//for i
 
         // ============================= Mass Matrix and Source
@@ -255,25 +255,25 @@ void lbs::SweepChunkPWLTransientTheta::
           for (int j = 0; j < num_nodes; ++j)
           {
             const double Mij = M[i][j];
-            Atemp[i][j] = Amat[i][j] + Mij*sigma_tgr;
-            temp += Mij*source[j];
+            Atemp_[i][j] = Amat_[i][j] + Mij * sigma_tgr;
+            temp += Mij * source_[j];
           }//for j
-          b[gsg][i] += temp;
+          b_[gsg][i] += temp;
         }//for i
 
         // ============================= Solve system
-        chi_math::GaussElimination(Atemp, b[gsg], num_nodes);
+        chi_math::GaussElimination(Atemp_, b_[gsg], num_nodes);
       }
 
       // ============================= Accumulate flux
-      for (int m = 0; m < num_moms; ++m)
+      for (int m = 0; m < num_moments_; ++m)
       {
         const double wn_d2m = d2m_op[m][angle_num];
         for (int i = 0; i < num_nodes; ++i)
         {
           const size_t ir = transport_view.MapDOF(i, m, gs_gi);
           for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-            output_phi[ir + gsg] += wn_d2m * b[gsg][i];
+            output_phi[ir + gsg] += wn_d2m * b_[gsg][i];
         }
       }
 
@@ -281,14 +281,14 @@ void lbs::SweepChunkPWLTransientTheta::
         callback(this, angle_set);
 
       // ============================= Save angular fluxes if needed
-      if (save_angular_flux)
+      if (save_angular_flux_)
       {
         for (int i = 0; i < num_nodes; ++i)
         {
-          cint64_t imap = grid_fe_view.MapDOFLocal(cell,i,psi_uk_man,angle_num,0);
+          cint64_t imap = grid_fe_view_.MapDOFLocal(cell, i, psi_uk_man, angle_num, 0);
           for (int gsg = 0; gsg < gs_ss_size; ++gsg)
             output_psi[imap + gsg] =
-              inv_theta*(b[gsg][i] + (theta-1.0) * psi_prev[imap + gsg]);
+              inv_theta*(b_[gsg][i] + (theta_ - 1.0) * psi_prev_[imap + gsg]);
         }//for i
       }//if save psi
 
@@ -327,11 +327,11 @@ void lbs::SweepChunkPWLTransientTheta::
 
           if (not boundary or reflecting_bndry)
             for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-              psi[gsg] = b[gsg][i];
+              psi[gsg] = b_[gsg][i];
           if (boundary and not reflecting_bndry)
             for (int gsg = 0; gsg < gs_ss_size; ++gsg)
               transport_view.AddOutflow(gs_gi + gsg,
-                                        wt*mu*b[gsg][i]*IntF_shapeI[i]);
+                                        wt * mu * b_[gsg][i] * IntF_shapeI[i]);
         }//for fi
       }//for face
     } // for n
