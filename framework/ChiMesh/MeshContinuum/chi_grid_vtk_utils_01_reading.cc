@@ -2,9 +2,9 @@
 
 #include <vtkUnstructuredGrid.h>
 #include <vtkAppendFilter.h>
-#include <vtkCleanUnstructuredGrid.h>
 
 #include <vtkCellData.h>
+#include <vtkPointData.h>
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -29,32 +29,66 @@ int chi_mesh::FindHighestDimension(std::vector<vtkUGridPtrAndName> &ugrid_blocks
 /**Consolidates all blocks containing cells with the desired dimension.
  * Thereafter it removes duplicate vertices.*/
 chi_mesh::vtkUGridPtr chi_mesh::
-  ConsolidateAndCleanBlocks(std::vector<vtkUGridPtrAndName> &ugrid_blocks)
+  ConsolidateGridBlocks(std::vector<vtkUGridPtrAndName> &ugrid_blocks)
 {
+  const std::string fname = "chi_mesh::ConsolidateGridBlocks";
+
+  //======================================== Determine if all blocks have
+  //                                         global-ids
+  bool has_global_ids = true;
+  for (auto& ugrid_name : ugrid_blocks)
+  {
+    auto& ugrid = ugrid_name.first;
+    const bool has_cell_gids = ugrid->GetCellData()->GetGlobalIds();
+    const bool has_pnts_gids = ugrid->GetPointData()->GetGlobalIds();
+    const bool has_block_ids = ugrid->GetCellData()->GetArray("BlockID");
+
+    if ((not has_cell_gids) or (not has_pnts_gids))
+      has_global_ids = false;
+
+    if (not has_block_ids)
+      throw std::logic_error(fname + ": Grid block " + ugrid_name.second +
+      " has not \"BlockID\" array.");
+  }//for grid_name pairs
+
+  if (has_global_ids)
+    chi::log.Log() << fname << ": blocks have global-id arrays";
+
+  //======================================== Consolidate the blocks
   auto append = vtkSmartPointer<vtkAppendFilter>::New();
   for (auto& ugrid : ugrid_blocks)
-  {
     append->AddInputData(ugrid.first);
-    append->Update();
-  }
-  chi::log.Log0Verbose1() << "Updating appended filter.";
 
-  chi::log.Log0Verbose1() << "Getting dirty grid.";
-  auto dirty_ugrid = vtkSmartPointer<vtkUnstructuredGrid>(
+  append->MergePointsOn();
+  append->Update();
+
+  auto consolidated_ugrid = vtkSmartPointer<vtkUnstructuredGrid>(
     vtkUnstructuredGrid::SafeDownCast(append->GetOutput()));
 
   chi::log.Log0Verbose1()
-    << "Dirty grid num cells and points: "
-    << dirty_ugrid->GetNumberOfCells() << " "
-    << dirty_ugrid->GetNumberOfPoints();
+    << "Consolidated grid num cells and points: "
+    << consolidated_ugrid->GetNumberOfCells() << " "
+    << consolidated_ugrid->GetNumberOfPoints();
 
-  //======================================== Remove duplicate vertices
-  auto cleaner = vtkSmartPointer<vtkCleanUnstructuredGrid>::New();
-  cleaner->SetInputData(dirty_ugrid);
-  cleaner->Update();
-  auto ugrid = vtkUGridPtr(cleaner->GetOutput());
+  if (has_global_ids)
+  {
+    const vtkIdType num_points = consolidated_ugrid->GetNumberOfPoints();
+    vtkIdType min_id = num_points;
+    vtkIdType max_id = 0;
+    for (vtkIdType p=0; p<num_points; ++p)
+    {
+      auto point_gids = vtkIdTypeArray::SafeDownCast(consolidated_ugrid->GetPointData()->GetGlobalIds());
+      auto point_gid = point_gids->GetValue(p);
 
-  return ugrid;
+      min_id = std::min(min_id, point_gid);
+      max_id = std::max(max_id, point_gid);
+    }
+
+    chi::log.Log()
+    << "Minimum and Maximum node-ids " << min_id << " " << max_id;
+  }
+
+  return consolidated_ugrid;
 }
 
 
@@ -101,6 +135,35 @@ std::vector<uint64_t> chi_mesh::
     }
   }
   return block_mat_ids;
+}
+
+//###################################################################
+/**Given several unstructured grid blocks, each denoting a material id,
+ * this function creates a VTK cell-data array called "BlockID" that holds
+ * this information.*/
+void chi_mesh::
+  SetBlockIDArrays(std::vector<vtkUGridPtrAndName> &ugrid_blocks)
+{
+  int block_id = 0;
+  for (auto& ugrid : ugrid_blocks)
+  {
+    const vtkIdType num_cells  = ugrid.first->GetNumberOfCells();
+
+    if (num_cells == 0) continue;
+
+    vtkNew<vtkIntArray> block_id_list;
+    block_id_list->SetName("BlockID");
+
+    for (vtkIdType c=0; c<num_cells; ++c)
+      block_id_list->InsertNextValue(block_id);
+
+    auto arr = ugrid.first->GetCellData()->GetArray("BlockID");
+    if (not arr)
+      ugrid.first->GetCellData()->RemoveArray("BlockID");
+
+    ugrid.first->GetCellData()->AddArray(block_id_list);
+    ++block_id;
+  }
 }
 
 

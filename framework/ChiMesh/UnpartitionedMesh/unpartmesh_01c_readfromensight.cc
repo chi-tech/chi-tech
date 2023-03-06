@@ -51,11 +51,21 @@ void chi_mesh::UnpartitionedMesh::
   {
     auto block_a = iter_a->GetCurrentDataObject();
 
+    const std::string block_name = chi_misc_utils::trim(
+      iter_a->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME()));
+
     if (block_a->GetDataObjectType() == VTK_UNSTRUCTURED_GRID)
+    {
       grid_blocks.emplace_back(
         vtkUnstructuredGrid::SafeDownCast(block_a),
         chi_misc_utils::trim(
-        iter_a->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME())));
+          iter_a->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME())));
+
+      chi::log.Log()
+        << "Reading block " << block_name
+        << " Number of cells: " << grid_blocks.back().first->GetNumberOfCells()
+        << " Number of points: " << grid_blocks.back().first->GetNumberOfPoints();
+    }
 
     iter_a->GoToNextItem();
   }
@@ -67,16 +77,15 @@ void chi_mesh::UnpartitionedMesh::
   std::vector<vtkUGridPtrAndName> bndry_grid_blocks =
     chi_mesh::GetBlocksOfDesiredDimension(grid_blocks, max_dimension-1);
 
+
+
   //======================================== Process blocks
-  auto ugrid = chi_mesh::ConsolidateAndCleanBlocks(domain_grid_blocks);
+  chi_mesh::SetBlockIDArrays(domain_grid_blocks);
+  auto ugrid = chi_mesh::ConsolidateGridBlocks(domain_grid_blocks);
 
   //======================================== Copy Data
+  // Material-IDs will get set form block-id arrays
   CopyUGridCellsAndPoints(*ugrid, options.scale);
-
-  //======================================== Set material ids
-  const auto block_mat_ids =
-    chi_mesh::BuildBlockCellExtents(grid_blocks, max_dimension);
-  SetMaterialIDsFromBlocks(block_mat_ids);
 
   //======================================== Always do this
   chi_mesh::MeshAttributes dimension = NONE;
