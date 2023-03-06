@@ -2,10 +2,8 @@
 
 #include "ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h"
 #include "ChiPhysics/PhysicsMaterial/material_property_scalarvalue.h"
-#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/single_state_mgxs.h"
+#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
 #include "ChiPhysics/FieldFunction/fieldfunction.h"
-
-#include "chi_runtime.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -127,11 +125,11 @@ void chi_diffusion::Solver::GetMaterialProperties(
     bool transportxs_found = false;
     for (int p=0; p<material->properties_.size(); p++)
     {
-      if (std::dynamic_pointer_cast<chi_physics::SingleStateMGXS>
+      if (std::dynamic_pointer_cast<chi_physics::MultiGroupXS>
           (material->properties_[p]))
       {
         auto xs = std::static_pointer_cast<
-            chi_physics::SingleStateMGXS>(material->properties_[p]);
+            chi_physics::MultiGroupXS>(material->properties_[p]);
 
         diffCoeff.assign(cell_dofs, xs->DiffusionCoefficient()[group]);
         sigmaa.assign(cell_dofs, xs->SigmaRemoval()[group]);
