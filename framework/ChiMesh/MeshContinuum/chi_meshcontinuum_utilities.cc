@@ -149,6 +149,31 @@ bool chi_mesh::MeshContinuum::IsCellBndry(uint64_t cell_global_index) const
 }
 
 
+//###################################################################
+/**Check whether a cell is a boundary by checking if the key is
+ * found in the native or foreign cell maps.*/
+int chi_mesh::MeshContinuum::GetCellDimension(const chi_mesh::Cell& cell)
+{
+  switch (cell.Type())
+  {
+    case CellType::POINT:
+    case CellType::GHOST: return 0;
+    case CellType::SLAB: return 1;
+    case CellType::TRIANGLE:
+    case CellType::QUADRILATERAL:
+    case CellType::POLYGON: return 2;
+    case CellType::TETRAHEDRON:
+    case CellType::HEXAHEDRON:
+    case CellType::WEDGE:
+    case CellType::PYRAMID:
+    case CellType::POLYHEDRON: return 3;
+    default:
+      throw std::logic_error("chi_mesh::MeshContinuum::GetCellDimension: "
+                             "Dimension mapping unavailable for cell type.");
+  }
+  return false;
+}
+
 
 //###################################################################
 /**General map vertices*/

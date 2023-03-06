@@ -4,6 +4,7 @@
 #include <vtkAppendFilter.h>
 
 #include <vtkCellData.h>
+#include <vtkPointData.h>
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -17,81 +18,172 @@ void chi_mesh::UnpartitionedMesh::
 {
   const std::string fname =
     "chi_mesh::UnpartitionedMesh::CopyUGridCellsAndPoints";
+  typedef chi_mesh::Vector3 Vec3;
+  typedef Vec3* Vec3Ptr;
+  typedef LightWeightCell* CellPtr;
 
-  uint64_t total_cell_count  = ugrid.GetNumberOfCells();
-  uint64_t total_point_count = ugrid.GetNumberOfPoints();
+  const vtkIdType total_cell_count  = ugrid.GetNumberOfCells();
+  const vtkIdType total_point_count = ugrid.GetNumberOfPoints();
 
-  chi::log.Log()
-    << "Clean grid num cells and points: "
-    << total_cell_count << " "
-    << total_point_count;
+  bool has_cell_gids = ugrid.GetCellData()->GetGlobalIds();
+  bool has_pnts_gids = ugrid.GetPointData()->GetGlobalIds();
+  bool has_global_ids = has_cell_gids and has_pnts_gids;
 
-  //======================================== Push cells
-  for (size_t c=0; c<total_cell_count; ++c)
+  if (not ugrid.GetCellData()->GetArray("BlockID"))
+    throw std::logic_error(fname + ": grid had not \"BlockID\" array.");
+
+  auto block_id_array =
+    vtkIntArray::SafeDownCast(ugrid.GetCellData()->GetArray("BlockID"));
+
+  if (has_global_ids)
   {
-    auto vtk_cell = ugrid.GetCell(static_cast<vtkIdType>(c));
-    auto vtk_celldim = vtk_cell->GetCellDimension();
+    std::vector<CellPtr> cells(total_cell_count, nullptr);
+    std::vector<Vec3Ptr> vertices(total_point_count, nullptr);
 
-    if (vtk_celldim == 3)
-      raw_cells_.push_back(CreateCellFromVTKPolyhedron(vtk_cell));
-    else if (vtk_celldim == 2)
-      raw_cells_.push_back(CreateCellFromVTKPolygon(vtk_cell));
-    else if (vtk_celldim == 1)
-      raw_cells_.push_back(CreateCellFromVTKLine(vtk_cell));
-    else if (vtk_celldim == 0)
-      raw_cells_.push_back(CreateCellFromVTKVertex(vtk_cell));
-    else
-      throw std::logic_error(fname + ": Unsupported cell dimension.");
-  }//for c
+    auto cell_gids_ptr = ugrid.GetCellData()->GetGlobalIds();
+    auto pnts_gids_ptr = ugrid.GetPointData()->GetGlobalIds();
 
-  //======================================== Push points
+    auto cell_gids = vtkIdTypeArray::SafeDownCast(cell_gids_ptr);
+    auto pnts_gids = vtkIdTypeArray::SafeDownCast(pnts_gids_ptr);
+
+    //=========================================== Determine id offset
+    // We do this because some mesh formats (like ExodusII)
+    // are indexed with a 1 base instead of 0
+    int cid_offset = 0, pid_offset = 0;
+    {
+      vtkIdType min_cid = total_point_count; //Minimum cell-id
+      vtkIdType min_pid = total_point_count; //Minimum point-id
+
+      for (vtkIdType c=0; c<total_cell_count; ++c)
+        min_cid = std::min(min_cid, cell_gids->GetValue(c));
+
+      for (vtkIdType p=0; p<total_point_count; ++p)
+        min_pid = std::min(min_pid, pnts_gids->GetValue(p));
+
+      cid_offset -= static_cast<int>(min_cid);
+      pid_offset -= static_cast<int>(min_pid);
+    }//build offset
+
+    //=========================================== Build node map
+    std::vector<vtkIdType> node_map(total_point_count, 0);
+    for (vtkIdType p=0; p<total_point_count; ++p)
+      node_map[p] = pnts_gids->GetValue(p) + pid_offset;
+
+    //=========================================== Load cells
+    for (vtkIdType c=0; c<total_cell_count; ++c)
+    {
+      auto vtk_cell = ugrid.GetCell(static_cast<vtkIdType>(c));
+      auto vtk_celldim = vtk_cell->GetCellDimension();
+      const vtkIdType cell_gid = cell_gids->GetValue(c) + cid_offset;
+
+      CellPtr raw_cell;
+      if (vtk_celldim == 3)
+        raw_cell = CreateCellFromVTKPolyhedron(vtk_cell);
+      else if (vtk_celldim == 2)
+        raw_cell = CreateCellFromVTKPolygon(vtk_cell);
+      else if (vtk_celldim == 1)
+        raw_cell = CreateCellFromVTKLine(vtk_cell);
+      else if (vtk_celldim == 0)
+        raw_cell = CreateCellFromVTKVertex(vtk_cell);
+      else
+        throw std::logic_error(fname + ": Unsupported cell dimension.");
+
+      //Map the cell vertex-ids
+      for (uint64_t& vid : raw_cell->vertex_ids)
+        vid = node_map[vid];
+
+      //Map face vertex-ids
+      for (auto& face : raw_cell->faces)
+        for (uint64_t& vid : face.vertex_ids)
+          vid = node_map[vid];
+
+
+      raw_cell->material_id = block_id_array->GetValue(c);
+
+      cells[cell_gid] = raw_cell;
+    }//for cell c
+
+    //=========================================== Load points
+    for (vtkIdType p=0; p<total_point_count; ++p)
+    {
+      auto point = ugrid.GetPoint(static_cast<vtkIdType>(p));
+      const vtkIdType point_gid = pnts_gids->GetValue(p) + pid_offset;
+
+      auto vertex = new Vec3(point[0], point[1], point[2]);
+
+      *vertex *= scale;
+
+      vertices.at(point_gid) = vertex;
+    }//for point p
+
+    //=========================================== Check all cells assigned
+    for (vtkIdType c=0; c<total_cell_count; ++c)
+      if (cells[c] == nullptr)
+        throw std::logic_error(fname + ": Cell pointer not assigned ");
+
+    //=========================================== Check all points assigned
+    for (vtkIdType p=0; p<total_point_count; ++p)
+      if (vertices[p] == nullptr)
+        throw std::logic_error(fname + ": Vertex pointer not assigned");
+
+    raw_cells_ = cells;
+    vertices_.reserve(total_point_count);
+    for (auto& vertex_ptr : vertices)
+      vertices_.push_back(*vertex_ptr);
+  }//If global-ids available
+  else
+  {
+    //======================================== Push cells
+    for (vtkIdType c=0; c<total_cell_count; ++c)
+    {
+      auto vtk_cell = ugrid.GetCell(static_cast<vtkIdType>(c));
+      auto vtk_celldim = vtk_cell->GetCellDimension();
+
+      if (vtk_celldim == 3)
+        raw_cells_.push_back(CreateCellFromVTKPolyhedron(vtk_cell));
+      else if (vtk_celldim == 2)
+        raw_cells_.push_back(CreateCellFromVTKPolygon(vtk_cell));
+      else if (vtk_celldim == 1)
+        raw_cells_.push_back(CreateCellFromVTKLine(vtk_cell));
+      else if (vtk_celldim == 0)
+        raw_cells_.push_back(CreateCellFromVTKVertex(vtk_cell));
+      else
+        throw std::logic_error(fname + ": Unsupported cell dimension.");
+
+      raw_cells_.back()->material_id = block_id_array->GetValue(c);
+    }//for c
+
+    //======================================== Push points
+    for (size_t p=0; p<total_point_count; ++p)
+    {
+      auto point = ugrid.GetPoint(static_cast<vtkIdType>(p));
+
+      Vec3 vertex(point[0], point[1], point[2]);
+
+      vertex *= scale;
+
+      vertices_.emplace_back(point[0], point[1], point[2]);
+    }
+  }//if no global-ids
+
+  //================================================== Determine bound box
   for (size_t p=0; p<total_point_count; ++p)
   {
-    auto point = ugrid.GetPoint(static_cast<vtkIdType>(p));
-
-    point[0] = point[0]*scale;
-    point[1] = point[1]*scale;
-    point[2] = point[2]*scale;
-
-    vertices_.emplace_back(point[0], point[1], point[2]);
-
+    const auto& vertex = vertices_[p];
     if (not bound_box_)
-      bound_box_ = std::shared_ptr<BoundBox>(new BoundBox{point[0],point[0],
-                                                          point[1],point[1],
-                                                          point[2],point[2]});
+      bound_box_ = std::shared_ptr<BoundBox>(new BoundBox{vertex.x,vertex.x,
+                                                          vertex.y,vertex.y,
+                                                          vertex.z,vertex.z});
 
-    bound_box_->xmin = std::min(bound_box_->xmin, point[0]);
-    bound_box_->xmax = std::max(bound_box_->xmax, point[0]);
-    bound_box_->ymin = std::min(bound_box_->ymin, point[1]);
-    bound_box_->ymax = std::max(bound_box_->ymax, point[1]);
-    bound_box_->zmin = std::min(bound_box_->zmin, point[2]);
-    bound_box_->zmax = std::max(bound_box_->zmax, point[2]);
+    bound_box_->xmin = std::min(bound_box_->xmin, vertex.x);
+    bound_box_->xmax = std::max(bound_box_->xmax, vertex.x);
+    bound_box_->ymin = std::min(bound_box_->ymin, vertex.y);
+    bound_box_->ymax = std::max(bound_box_->ymax, vertex.y);
+    bound_box_->zmin = std::min(bound_box_->zmin, vertex.z);
+    bound_box_->zmax = std::max(bound_box_->zmax, vertex.z);
   }
-}
 
-
-//###################################################################
-/**Set material-ids based on block-wise material ids.*/
-void chi_mesh::UnpartitionedMesh::
-  SetMaterialIDsFromBlocks(const std::vector<uint64_t> &block_mat_ids)
-{
-  size_t total_cell_count = raw_cells_.size();
-  for (size_t c=0; c<total_cell_count; ++c)
-  {
-    auto cell = raw_cells_[c];
-
-    int mat_id=-1;
-    uint64_t prev_block_lim = 0;
-    for (auto block_lim : block_mat_ids)
-    {
-      ++mat_id;
-      if (c<block_lim and c>=prev_block_lim) break;
-
-      prev_block_lim=block_lim;
-    }
-
-    cell->material_id = mat_id;
-  }
+  chi::log.Log() << fname + ": Done";
 }
 
 
