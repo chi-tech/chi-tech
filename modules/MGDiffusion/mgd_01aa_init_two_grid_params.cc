@@ -9,9 +9,9 @@ void mg_diffusion::Solver::Compute_TwoGrid_Params()
   for (const auto &mat_id_xs: matid_to_xs_map) {
 
     // get the P0 transfer matrix and total XS
-    const auto &isotropic_transfer_matrix = mat_id_xs.second->transfer_matrices_[0];
-    const auto &sigma_t = mat_id_xs.second->sigma_t_;
-    const auto &diffusion_coeff = mat_id_xs.second->diffusion_coeff_;
+    const auto &isotropic_transfer_matrix = mat_id_xs.second->TransferMatrix(0);
+    const auto &sigma_t = mat_id_xs.second->SigmaTotal();
+    const auto &diffusion_coeff = mat_id_xs.second->DiffusionCoefficient();
 
     // put P0 transfer matrix in nicer form
     MatDbl S(num_groups_, VecDbl(num_groups_, 0.0));
@@ -23,19 +23,19 @@ void mg_diffusion::Solver::Compute_TwoGrid_Params()
     // original matrix = diag(total) - scattering
     // so L+D = diag(removal) - tril(scattering)
     // and U = -triu(scattering)
-    MatDbl A_(num_groups_, VecDbl(num_groups_, 0.0));
-    MatDbl B_(num_groups_, VecDbl(num_groups_, 0.0));
+    MatDbl A(num_groups_, VecDbl(num_groups_, 0.0));
+    MatDbl B(num_groups_, VecDbl(num_groups_, 0.0));
     for (unsigned int g = 0; g < num_groups_; ++g)
     {
-      A_[g][g] = sigma_t[g] - S[g][g];
+      A[g][g] = sigma_t[g] - S[g][g];
       for (unsigned int gp = 0; gp < g; ++gp)
-        A_[g][gp] = -S[g][gp];
+        A[g][gp] = -S[g][gp];
       for (unsigned int gp = g + 1; gp < num_groups_; ++gp)
-        B_[g][gp] = S[g][gp];
+        B[g][gp] = S[g][gp];
     }
-    MatDbl Ainv = chi_math::Inverse(A_);
+    MatDbl Ainv = chi_math::Inverse(A);
     // finally, obtain the iteration matrix
-    MatDbl C_ = chi_math::MatMul(Ainv, B_);
+    MatDbl C_ = chi_math::MatMul(Ainv, B);
     // Perform power iteration
     VecDbl E(num_groups_, 1.0);
     double rho = chi_math::PowerIteration(C_, E, 10000, 1.0e-12);

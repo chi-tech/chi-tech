@@ -59,8 +59,8 @@ protected:
   std::vector<LBSGroupset> groupsets_;
   std::vector<PointSource> point_sources_;
 
-  std::map<int,XSPtr>           matid_to_xs_map_;
-  std::map<int,IsotropicSrcPtr> matid_to_src_map_;
+  std::map<int, XSPtr>           matid_to_xs_map_;
+  std::map<int, IsotropicSrcPtr> matid_to_src_map_;
 
   std::shared_ptr<chi_math::SpatialDiscretization> discretization_ = nullptr;
   chi_mesh::MeshContinuumPtr grid_ptr_;
@@ -218,7 +218,7 @@ public:
 protected:
   double ComputeFissionProduction(const std::vector<double>& phi);
 public:
-  virtual double ComputeFissionRate(bool previous);
+  double ComputeFissionRate(const std::vector<double>& phi);
 
   //06c
 protected:

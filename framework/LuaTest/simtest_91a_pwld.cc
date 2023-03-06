@@ -12,7 +12,7 @@
 #include "ChiMath/chi_math_range.h"
 
 #include "ChiPhysics/FieldFunction/fieldfunction.h"
-#include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
+#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/single_state_mgxs.h"
 
 #include "ChiDataTypes/ndarray.h"
 
@@ -115,7 +115,7 @@ int chiSimTest91_PWLD(lua_State* L)
   chi::log.Log() << "End ukmanagers." << std::endl;
 
   //============================================= Make XSs
-  chi_physics::TransportCrossSections xs;
+  chi_physics::SingleStateMGXS xs;
   xs.MakeFromChiXSFile("tests/xs_graphite_pure.cxs");
 
   //============================================= Initializes vectors
@@ -222,7 +222,7 @@ int chiSimTest91_PWLD(lua_State* L)
     (const std::array<int64_t,3>& ijk,
      const Vec3& omega,
      const size_t d,
-     const chi_physics::TransportCrossSections& cell_xs)
+     const chi_physics::SingleStateMGXS& cell_xs)
   {
     const auto cell_global_id = ijk_mapping.MapNDtoLin(ijk[1],ijk[0],ijk[2]);
     const auto& cell = grid.cells[cell_global_id];
@@ -280,6 +280,7 @@ int chiSimTest91_PWLD(lua_State* L)
       }//if internal incident face
     }//for face
 
+    const auto& sigma_t = cell_xs.SigmaTotal();
     for (size_t g=0; g<num_groups; ++g)
     {
       auto Atemp = A;
@@ -298,8 +299,7 @@ int chiSimTest91_PWLD(lua_State* L)
 
 
       //Mass Matrix and Source
-      const double sigma_tg = cell_xs.sigma_t_[g];
-
+      const double sigma_tg = sigma_t[g];
       for (int i = 0; i < num_nodes; ++i)
       {
         double temp = 0.0;
@@ -370,7 +370,7 @@ int chiSimTest91_PWLD(lua_State* L)
     {
       const auto& cell_mapping = sdm.GetCellMapping(cell);
       const size_t num_nodes = cell_mapping.NumNodes();
-      const auto& S = xs.transfer_matrices_;
+      const auto& S = xs.TransferMatrices();
 
       for (size_t i=0; i<num_nodes; ++i)
       {

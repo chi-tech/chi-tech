@@ -16,11 +16,8 @@ namespace lbs
 class DiscOrdSteadyStateAdjointSolver : public lbs::DiscOrdSteadyStateSolver
 {
 protected:
-  std::map<int, std::vector<chi_math::SparseMatrix>> matid_to_S_transpose_;
-  std::map<int, std::vector<std::vector<double>>> matid_to_F_transpose_;
-
   typedef std::vector<size_t> VecSize_t;
-  typedef std::pair<ResponseFunctionDesignation,VecSize_t> RespFuncAndSubs;
+  typedef std::pair<ResponseFunctionDesignation, VecSize_t> RespFuncAndSubs;
   std::vector<RespFuncAndSubs> response_functions_;
 
 public:

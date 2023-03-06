@@ -18,10 +18,10 @@
  *
  * */
 void lbs::DiscOrdTransientSolver::
-  SetTransientSource(LBSGroupset& groupset,
-                     std::vector<double>& destination_q,
-                     const std::vector<double>& phi,
-                     SourceFlags source_flags)
+SetTransientSource(LBSGroupset& groupset,
+                   std::vector<double>& destination_q,
+                   const std::vector<double>& phi,
+                   SourceFlags source_flags)
 {
   chi::log.LogEvent(source_event_tag_, chi_objects::ChiLog::EventType::EVENT_BEGIN);
 
@@ -57,15 +57,17 @@ void lbs::DiscOrdTransientSolver::
   // Apply all nodal sources
   for (const auto& cell : grid_ptr_->local_cells)
   {
-    const auto& fe_values = unit_cell_matrices_[cell.local_id_];
     auto& transport_view = cell_transport_views_[cell.local_id_];
     const double cell_volume = transport_view.Volume();
 
     //==================== Obtain xs
-    auto xs = transport_view.XS();
+    const auto& xs = transport_view.XS();
     auto P0_src = matid_to_src_map_[cell.material_id_];
 
-    const auto& S = xs.transfer_matrices_;
+    const auto& S = xs.TransferMatrices();
+    const auto& F = xs.ProductionMatrix();
+    const auto& precursors = xs.Precursors();
+    const auto& nu_delayed_sigma_f = xs.NuDelayedSigmaF();
 
     //==================== Obtain src
     double* src = default_zero_src.data();
@@ -95,7 +97,7 @@ void lbs::DiscOrdTransientSolver::
            rhs += ext_src_moments_local_[uk_map + g];
 
           //============================== Apply scattering sources
-          const bool moment_avail = (ell < S.size());
+          const bool moment_avail = ell <= xs.ScatteringOrder();
 
           //==================== Across groupset
           if (moment_avail and apply_ags_scatter_src)
@@ -110,19 +112,19 @@ void lbs::DiscOrdTransientSolver::
                 rhs += sigma_sm * phi[uk_map + gp];
 
           //============================== Apply fission sources
-          const bool fission_avail = xs.is_fissionable_ and ell == 0;
+          const bool fission_avail = xs.IsFissionable() and ell == 0;
 
           //==================== Across groupset
           if (fission_avail and apply_ags_fission_src)
           {
-            const auto& prod = xs.production_matrix_[g];
+            const auto& prod = F[g];
             for (size_t gp = first_grp; gp <= last_grp; ++gp)
               if (gp < gs_i or gp > gs_f)
               {
                 rhs += prod[gp] * phi[uk_map + gp];
 
                 if (options_.use_precursors)
-                  for (const auto& precursor : xs.precursors_)
+                  for (const auto& precursor : precursors)
                   {
                     const double coeff =
                         precursor.emission_spectrum[g] *
@@ -131,7 +133,7 @@ void lbs::DiscOrdTransientSolver::
 
                     rhs += coeff * eff_dt *
                            precursor.fractional_yield *
-                           xs.nu_delayed_sigma_f_[gp] *
+                           nu_delayed_sigma_f[gp] *
                            phi[uk_map + gp] /
                            cell_volume;
                   }
@@ -141,13 +143,13 @@ void lbs::DiscOrdTransientSolver::
           //==================== Within groupset
           if (fission_avail and apply_wgs_fission_src)
           {
-            const auto& prod = xs.production_matrix_[g];
+            const auto& prod = F[g];
             for (size_t gp = gs_i; gp <= gs_f; ++gp)
             {
               rhs += prod[gp] * phi[uk_map + gp];
 
               if (options_.use_precursors)
-                for (const auto& precursor : xs.precursors_)
+                for (const auto& precursor : precursors)
                 {
                   const double coeff =
                       precursor.emission_spectrum[g] *
@@ -156,7 +158,7 @@ void lbs::DiscOrdTransientSolver::
 
                   rhs += coeff * eff_dt *
                          precursor.fractional_yield *
-                         xs.nu_delayed_sigma_f_[gp] *
+                         nu_delayed_sigma_f[gp] *
                          phi[uk_map + gp] /
                          cell_volume;
                 }
@@ -168,10 +170,9 @@ void lbs::DiscOrdTransientSolver::
           {
             const auto& J = max_precursors_per_material_;
             const size_t dof_map = cell.local_id_ * J;
-            for (unsigned int j = 0; j < xs.num_precursors_; ++j)
+            for (unsigned int j = 0; j < xs.NumPrecursors(); ++j)
             {
-              const auto& precursor = xs.precursors_[j];
-
+              const auto& precursor = precursors[j];
               const double coeff =
                   precursor.emission_spectrum[g] *
                   precursor.decay_constant /

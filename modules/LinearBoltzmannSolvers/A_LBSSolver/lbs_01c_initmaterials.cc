@@ -74,7 +74,7 @@ void lbs::LBSSolver::InitMaterials()
       if (property->Type() == MatProperty::TRANSPORT_XSECTIONS)
       {
         auto transp_xs =
-          std::static_pointer_cast<chi_physics::TransportCrossSections>(property);
+          std::static_pointer_cast<chi_physics::MultiGroupXS>(property);
         matid_to_xs_map_[mat_id] = transp_xs;
         found_transport_xs = true;
       }//transport xs
@@ -107,31 +107,31 @@ void lbs::LBSSolver::InitMaterials()
       chi::Exit(EXIT_FAILURE);
     }
     //====================================== Check number of groups legal
-    if (matid_to_xs_map_[mat_id]->num_groups_ < groups_.size())
+    if (matid_to_xs_map_[mat_id]->NumGroups() < groups_.size())
     {
       chi::log.LogAllError()
           << fname + ": Found material \"" << current_material->name_ << "\" has "
-          << matid_to_xs_map_[mat_id]->num_groups_ << " groups and"
+          << matid_to_xs_map_[mat_id]->NumGroups() << " groups and"
           << " the simulation has " << groups_.size() << " groups."
           << " The material must have a greater or equal amount of groups.";
       chi::Exit(EXIT_FAILURE);
     }
 
     //====================================== Check number of moments
-    if (matid_to_xs_map_[mat_id]->scattering_order_ < options_.scattering_order)
+    if (matid_to_xs_map_[mat_id]->ScatteringOrder() < options_.scattering_order)
     {
       chi::log.Log0Warning()
-          << fname + ": Found material \"" << current_material->name_ << "\" has "
-          << "a scattering order of "
-          << matid_to_xs_map_[mat_id]->scattering_order_ << " and"
-          << " the simulation has a scattering order of "
-          << options_.scattering_order << "."
-          << " The higher moments will therefore not be used.";
+          << fname + ": Found material \"" << current_material->name_
+          << "\" has a scattering order of "
+          << matid_to_xs_map_[mat_id]->ScatteringOrder()
+          << " and the simulation has a scattering order of "
+          << options_.scattering_order
+          << ". The higher moments will therefore not be used.";
     }
 
     materials_list
         << " number of moments "
-        << matid_to_xs_map_[mat_id]->transfer_matrices_.size() << "\n";
+        << matid_to_xs_map_[mat_id]->ScatteringOrder() + 1 << "\n";
   }//for material id
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Initialize precursor
@@ -142,9 +142,9 @@ void lbs::LBSSolver::InitMaterials()
   for (const auto& mat_id_xs : matid_to_xs_map_)
   {
     const auto& xs = mat_id_xs.second;
-    num_precursors_ += xs->num_precursors_;
-    if (xs->num_precursors_ > max_precursors_per_material_)
-      max_precursors_per_material_ = xs->num_precursors_;
+    num_precursors_ += xs->NumPrecursors();
+    if (xs->NumPrecursors() > max_precursors_per_material_)
+      max_precursors_per_material_ = xs->NumPrecursors();
   }
 
   //if no precursors, turn off precursors
@@ -157,31 +157,13 @@ void lbs::LBSSolver::InitMaterials()
     for (const auto& mat_id_xs: matid_to_xs_map_)
     {
       const auto& xs = mat_id_xs.second;
-      if (xs->is_fissionable_ && num_precursors_ == 0)
+      if (xs->IsFissionable() && num_precursors_ == 0)
         throw std::logic_error(
             "Incompatible cross section data encountered."
             "When delayed neutron data is present for one "
             "fissionable material, it must be present for "
             "all fissionable materials.");
     }
-  }
-
-
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Initialize Diffusion
-  //                                                   properties
-  bool develop_diffusion_properties = false;
-  for (auto& group_set : groupsets_)
-  {
-    if (group_set.apply_wgdsa_ || group_set.apply_tgdsa_)
-      develop_diffusion_properties = true;
-  }
-
-  if (develop_diffusion_properties)
-  {
-    chi::log.Log() << "Computing diffusion parameters.";
-
-    for (const auto& mat_id_xs : matid_to_xs_map_)
-      mat_id_xs.second->ComputeDiffusionParameters();
   }
 
   //================================================== Update transport views

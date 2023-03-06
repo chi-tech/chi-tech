@@ -1,7 +1,7 @@
 #include "physics_lua_utils.h"
 
 #include "ChiPhysics/FieldFunction/lua/fieldfunctions_lua.h"
-#include "../PhysicsMaterial/transportxsections/lua/xsections_lua_utils.h"
+#include "../PhysicsMaterial/MultiGroupXS/lua/multigroup_xs_lua_utils.h"
 
 #define LUA_FMACRO1(x) lua_register(L, #x, x)
 #define LUA_CMACRO1(x,y) \
@@ -23,7 +23,7 @@ void chi_physics::lua_utils::RegisterLuaEntities(lua_State *L)
   LUA_FMACRO1(chiPhysicsMaterialAddProperty);
   LUA_FMACRO1(chiPhysicsMaterialSetProperty);
   LUA_FMACRO1(chiPhysicsMaterialGetProperty);
-  LUA_FMACRO1(chiPhysicsMaterialModifyTotalCrossSection);
+//  LUA_FMACRO1(chiPhysicsMaterialModifyTotalCrossSection);
 
   //=================================== Field functions
   chi_physics::field_function_lua_utils::RegisterLuaEntities(L);

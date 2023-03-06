@@ -7,7 +7,7 @@
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 #include "ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h"
-#include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
+#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
 #include "ChiPhysics/PhysicsMaterial/material_property_isotropic_mg_src.h"
 
 #include <algorithm>
@@ -43,11 +43,11 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
       if (property->Type() == MatProperty::TRANSPORT_XSECTIONS)
       {
         auto transp_xs =
-          std::static_pointer_cast<chi_physics::TransportCrossSections>(property);
+          std::static_pointer_cast<chi_physics::MultiGroupXS>(property);
         matid_to_xs_map[mat_id] = transp_xs;
         found_transport_xs = true;
         if (first_material_read)
-          mg_diffusion::Solver::num_groups_ = transp_xs->num_groups_;
+          num_groups_ = transp_xs->NumGroups();
 
       }//transport xs
       if (property->Type() == MatProperty::ISOTROPIC_MG_SOURCE)
@@ -55,7 +55,7 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
         auto mg_source =
           std::static_pointer_cast<chi_physics::IsotropicMultiGrpSource>(property);
 
-        if (mg_source->source_value_g_.size() < mg_diffusion::Solver::num_groups_)
+        if (mg_source->source_value_g_.size() < num_groups_)
         {
           chi::log.LogAllWarning()
             << "MG-Diff-InitMaterials: Isotropic Multigroup source specified in "
@@ -79,30 +79,31 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
       chi::Exit(EXIT_FAILURE);
     }
     //====================================== Check number of groups legal
-    if (matid_to_xs_map[mat_id]->num_groups_ != mg_diffusion::Solver::num_groups_)
+    if (matid_to_xs_map[mat_id]->NumGroups() != num_groups_)
     {
       chi::log.LogAllError()
-          << "MG-Diff-InitMaterials: Found material \"" << current_material->name_ << "\" has "
-          << matid_to_xs_map[mat_id]->num_groups_ << " groups and"
-          << " the simulation has " << mg_diffusion::Solver::num_groups_ << " groups."
-          << " The material must have the same number of groups.";
+          << "MG-Diff-InitMaterials: Found material \""
+          << current_material->name_ << "\" has "
+          << matid_to_xs_map[mat_id]->NumGroups() << " groups and "
+          << "the simulation has " << num_groups_ << " groups. The material "
+          << "must have the same number of groups.";
       chi::Exit(EXIT_FAILURE);
     }
 
     //====================================== Check number of moments
-    if (matid_to_xs_map[mat_id]->scattering_order_ > 1)
+    if (matid_to_xs_map[mat_id]->ScatteringOrder() > 1)
     {
       chi::log.Log0Warning()
-          << "MG-Diff-InitMaterials: Found material \"" << current_material->name_ << "\" has "
-          << "a scattering order of "
-          << matid_to_xs_map[mat_id]->scattering_order_ << " and"
+          << "MG-Diff-InitMaterials: Found material \""
+          << current_material->name_ << "\" has a scattering order of "
+          << matid_to_xs_map[mat_id]->ScatteringOrder() << " and"
           << " the simulation has a scattering order of One (MG-Diff)"
           << " The higher moments will therefore not be used.";
     }
 
     materials_list
         << " number of moments "
-        << matid_to_xs_map[mat_id]->transfer_matrices_.size() << "\n";
+        << matid_to_xs_map[mat_id]->ScatteringOrder() + 1 << "\n";
 
     first_material_read = false;
   }//for material id
@@ -113,27 +114,20 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
 
   MPI_Barrier(MPI_COMM_WORLD);
 
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Initialize Diffusion
-  //                                                   properties
-  chi::log.Log() << "Computing diffusion parameters.";
-
-  for (const auto& mat_id_xs : matid_to_xs_map)
-    mat_id_xs.second->ComputeDiffusionParameters();
-
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Compute last fast group
   // initialize last fast group
   chi::log.Log() << "Computing last fast group.";
-  unsigned int lfg = mg_diffusion::Solver::num_groups_;
+  unsigned int lfg = num_groups_;
 
-  if (mg_diffusion::Solver::num_groups_ > 1)
+  if (num_groups_ > 1)
   {
     // loop over all materials
     for (const auto &mat_id_xs: matid_to_xs_map)
     {
       // get the P0 transfer matrix
-      const auto &S = mat_id_xs.second->transfer_matrices_[0];
+      const auto &S = mat_id_xs.second->TransferMatrix(0);
       // loop over all row of the transfer matrix
-      const int G = static_cast<int>(mg_diffusion::Solver::num_groups_);
+      const int G = static_cast<int>(num_groups_);
       for (int g = G-1; g >=0 ; --g)
       {
         for (const auto &[row_g, gp, sigma_sm]: S.Row(g))
@@ -145,7 +139,7 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
     }// loop on materials
   }//if num_groups>1
 
-  mg_diffusion::Solver::last_fast_group_ = lfg;
+  last_fast_group_ = lfg;
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Compute two-grid params
   do_two_grid_ = basic_options_("do_two_grid").BoolValue();
@@ -158,7 +152,7 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
   if (do_two_grid_)
   {
     chi::log.Log() << "Compute_TwoGrid_Params";
-    mg_diffusion::Solver::Compute_TwoGrid_Params();
+    Compute_TwoGrid_Params();
   }
 
 }
