@@ -1,5 +1,5 @@
-#ifndef CHI_PHYSICS_TRANSPORT_CROSS_SECTIONS_H
-#define CHI_PHYSICS_TRANSPORT_CROSS_SECTIONS_H
+#ifndef CHI_PHYSICS_SINGLE_STATE_MGXS_H
+#define CHI_PHYSICS_SINGLE_STATE_MGXS_H
 
 #include "multigroup_xs.h"
 
@@ -139,4 +139,4 @@ public:
 }//namespace chi_physics
 
 
-#endif
+#endif //CHI_PHYSICS_SINGLE_STATE_MGXS_H
