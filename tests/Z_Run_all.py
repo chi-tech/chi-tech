@@ -261,7 +261,7 @@ def run_test_tacc(file_name, comment, num_procs, search_strings_vals_tols):
             #SBATCH -J {file_name} # Job name
             #SBATCH -o tests/{file_name}.o # output file
             #SBATCH -e tests/{file_name}.e # error file
-            #SBATCH -p skx-normal # Queue (partition) name
+            #SBATCH -p skx-normal_ # Queue (partition) name
             #SBATCH -N {num_procs // 48 + 1} # Total # of nodes
             #SBATCH -n {num_procs} # Total # of mpi tasks
             #SBATCH -t 00:05:00 # Runtime (hh:mm:ss)
@@ -482,7 +482,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                     Steady State Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 24 - 39
+# Tests 24 - 40
 
 run_test(
     file_name="Transport_Steady/Transport1D_1",
@@ -550,6 +550,12 @@ run_test(
          4.97136e-07, 1.0e-9],
         ["NumCompare", "WGS groups [63-167] Iteration    57", 6, "float",
          6.88134e-07, 1.0e-9]])
+
+run_test(
+    file_name="Transport_Steady/Transport2D_5PolyA_AniHeteroBndry",
+    comment="2D LinearBSolver Test Anisotropic Hetero BC - PWLD",
+    num_procs=4,
+    search_strings_vals_tols=[["[0]  Max-value1=", 3.18785, 1.0e-5]])
 
 run_test(
     file_name="Transport_Steady/Transport3D_1a_Extruder",
@@ -623,7 +629,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                     k-Eigenvalue Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 40
+# Tests 41
 
 run_test(
     file_name="Transport_Keigen/KEigenvalueTransport1D_1G",
@@ -635,7 +641,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #         Steady-State Cylindrical Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 41 - 42
+# Tests 42 - 43
 
 run_test(
     file_name="Transport_Steady_Cyl/Transport2DCyl_1Monoenergetic",
@@ -653,7 +659,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #             Steady-State Adjoint Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 43 - 51
+# Tests 44 - 52
 
 run_test(
     file_name="Transport_Adjoint/Adjoint2D_1a_forward",
