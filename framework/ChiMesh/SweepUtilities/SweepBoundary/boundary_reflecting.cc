@@ -1,69 +1,35 @@
 #include "sweep_boundaries.h"
 
-#include <chi_log.h>
-#include <chi_mpi.h>
-
-//###################################################################
-/**Returns a pointer to a heterogenous flux storage location.*/
-double* chi_mesh::sweep_management::BoundaryBase::
-HeterogenousPsiIncoming(
-                int angle_num,
-                uint64_t cell_local_id,
-                int face_num,
-                int fi,
-                int gs_ss_begin)
-{
-  chi::log.LogAllError()
-    << "HeterogenousPsiIncoming call made to boundary "
-       "that has no such information.";
-  chi::Exit(EXIT_FAILURE);
-  return nullptr;
-}
-
-//###################################################################
-/**Returns a pointer to a heterogenous flux storage location.*/
-double* chi_mesh::sweep_management::BoundaryBase::
-HeterogenousPsiOutgoing(
-                int angle_num,
-                uint64_t cell_local_id,
-                int face_num,
-                int fi,
-                int gs_ss_begin)
-{
-  chi::log.LogAllError()
-    << "HeterogenousPsiOutgoing call made to boundary "
-       "that has no such information.";
-  chi::Exit(EXIT_FAILURE);
-  return nullptr;
-}
+#include "chi_log.h"
+#include "chi_mpi.h"
 
 //###################################################################
 /**Returns a pointer to a heterogenous flux storage location.*/
 double* chi_mesh::sweep_management::BoundaryReflecting::
-HeterogenousPsiIncoming(
-                int angle_num,
-                uint64_t cell_local_id,
-                int face_num,
-                int fi,
-                int gs_ss_begin)
+HeterogenousPsiIncoming(uint64_t cell_local_id,
+                        int face_num,
+                        int fi,
+                        int angle_num,
+                        int group_num,
+                        int gs_ss_begin)
 {
-  double* Psi = zero_boundary_flux.data();
+  double* Psi;
 
   int reflected_angle_num = reflected_anglenum[angle_num];
 
   if (opposing_reflected)
   {
     Psi = &hetero_boundary_flux_old[reflected_angle_num]
-                                   [cell_local_id]
-                                   [face_num]
-                                   [fi][gs_ss_begin];
+    [cell_local_id]
+    [face_num]
+    [fi][gs_ss_begin];
   }
   else
   {
     Psi = &hetero_boundary_flux[reflected_angle_num]
-                               [cell_local_id]
-                               [face_num]
-                               [fi][gs_ss_begin];
+    [cell_local_id]
+    [face_num]
+    [fi][gs_ss_begin];
   }
 
   return Psi;
@@ -72,24 +38,23 @@ HeterogenousPsiIncoming(
 //###################################################################
 /**Returns a pointer to a heterogenous flux storage location.*/
 double* chi_mesh::sweep_management::BoundaryReflecting::
-HeterogenousPsiOutgoing(
-  int angle_num,
-  uint64_t cell_local_id,
-  int face_num,
-  int fi,
-  int gs_ss_begin)
+HeterogenousPsiOutgoing(uint64_t cell_local_id,
+                        int face_num,
+                        int fi,
+                        int angle_num,
+                        int gs_ss_begin)
 {
   return &hetero_boundary_flux[angle_num]
-                              [cell_local_id]
-                              [face_num]
-                              [fi][gs_ss_begin];
+  [cell_local_id]
+  [face_num]
+  [fi][gs_ss_begin];
 }
 
 
 //###################################################################
 /**Sets flags indicating reflected angles are ready to execute.*/
 void chi_mesh::sweep_management::BoundaryReflecting::
-  UpdateAnglesReadyStatus(const std::vector<size_t>& angles, size_t gs_ss)
+UpdateAnglesReadyStatus(const std::vector<size_t>& angles, size_t gs_ss)
 {
   for (auto& n : angles)
     angle_readyflags[reflected_anglenum[n]][gs_ss] = true;
@@ -98,7 +63,7 @@ void chi_mesh::sweep_management::BoundaryReflecting::
 //###################################################################
 /**Checks to see if angles are ready to execute.*/
 bool chi_mesh::sweep_management::BoundaryReflecting::
-  CheckAnglesReadyStatus(const std::vector<size_t>& angles, size_t gs_ss)
+CheckAnglesReadyStatus(const std::vector<size_t>& angles, size_t gs_ss)
 {
   if (opposing_reflected) return true;
   bool ready_flag = true;
@@ -112,7 +77,7 @@ bool chi_mesh::sweep_management::BoundaryReflecting::
 //###################################################################
 /**Resets angle ready flags to false.*/
 void chi_mesh::sweep_management::BoundaryReflecting::
-  ResetAnglesReadyStatus()
+ResetAnglesReadyStatus()
 {
   double local_pw_change = 0.0;
   if (opposing_reflected)

@@ -2,6 +2,8 @@
 
 #include "chi_log.h"
 
+#define mk_shrd(x) std::make_shared<x>
+
 //###################################################################
 /**Initializes transport related boundaries. */
 void lbs::LBSSolver::InitializeBoundaries()
@@ -56,11 +58,11 @@ void lbs::LBSSolver::InitializeBoundaries()
 
   //================================================== Initialize default
   //                                                   incident boundary
-  typedef chi_mesh::sweep_management::BoundaryVacuum SweepVacuumBndry;
-  typedef chi_mesh::sweep_management::BoundaryIncidentHomogenous SweepIncHomoBndry;
+  typedef chi_mesh::sweep_management::BoundaryIsotropicHomogenous SweepIncHomoBndry;
   typedef chi_mesh::sweep_management::BoundaryReflecting SweepReflectingBndry;
 
   const std::vector<double> zero_Gvec(num_groups_, 0.0);
+  const size_t G = num_groups_;
 
   const chi_mesh::Vector3 ihat(1.0, 0.0, 0.0);
   const chi_mesh::Vector3 jhat(0.0, 1.0, 0.0);
@@ -68,20 +70,22 @@ void lbs::LBSSolver::InitializeBoundaries()
 
   sweep_boundaries_.clear();
   for (uint64_t bid : globl_unique_bids_set)
-    if (boundary_preferences_.count(bid) == 0 and
-        sweep_boundaries_.count(bid) == 0)
+  {
+    const bool has_no_preference = boundary_preferences_.count(bid) == 0;
+    const bool has_not_been_set = sweep_boundaries_.count(bid) == 0;
+    if (has_no_preference and has_not_been_set)
     {
-      sweep_boundaries_[bid] = std::make_shared<SweepVacuumBndry>(zero_Gvec);
+      sweep_boundaries_[bid] = mk_shrd(SweepIncHomoBndry)(G, zero_Gvec);
     }//defaulted
-    else if (sweep_boundaries_.count(bid) == 0)
+    else if (has_not_been_set)
     {
       const auto& bndry_pref = boundary_preferences_.at(bid);
+      const auto& mg_q = bndry_pref.isotropic_mg_source;
+
       if (bndry_pref.type == lbs::BoundaryType::VACUUM)
-        sweep_boundaries_[bid] =
-          std::make_shared<SweepVacuumBndry>(zero_Gvec);
+        sweep_boundaries_[bid] = mk_shrd(SweepIncHomoBndry)(G, zero_Gvec);
       else if (bndry_pref.type == lbs::BoundaryType::INCIDENT_ISOTROPIC)
-        sweep_boundaries_[bid] =
-          std::make_shared<SweepIncHomoBndry>(bndry_pref.isotropic_mg_source);
+        sweep_boundaries_[bid] =mk_shrd(SweepIncHomoBndry)(G, mg_q);
       else if (bndry_pref.type == lbs::BoundaryType::REFLECTING)
       {
         chi_mesh::Normal normal;
@@ -92,9 +96,8 @@ void lbs::LBSSolver::InitializeBoundaries()
         if (bid == 4) normal = khat;
         if (bid == 5) normal = khat * -1.0;
 
-        sweep_boundaries_[bid] =
-          std::make_shared<SweepReflectingBndry>(zero_Gvec, normal);
+        sweep_boundaries_[bid] = mk_shrd(SweepReflectingBndry)(G, normal);
       }
     }//non-defaulted
-
+  }//for bndry id
 }

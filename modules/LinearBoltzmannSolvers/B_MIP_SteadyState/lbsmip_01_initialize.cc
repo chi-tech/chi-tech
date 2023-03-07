@@ -49,8 +49,20 @@ void lbs::MIPSteadyStateSolver::InitializeWGSSolvers()
     {
       if (lbs_bndry->Type() == SwpBndryType::REFLECTING)
         bcs[bid] = {BCType::ROBIN,{0.0,1.0,0.0}};
-      else if (lbs_bndry->Type() == SwpBndryType::VACUUM)
-        bcs[bid] = {BCType::ROBIN,{0.25,0.5}};
+      else if (lbs_bndry->Type() == SwpBndryType::INCIDENT_ISOTROPIC_HOMOGENOUS)
+      {
+        const bool has_bndry_preference = boundary_preferences_.count(bid) > 0;
+        if (not has_bndry_preference)
+          bcs[bid] = {BCType::ROBIN,{0.25,0.5}};
+
+        const auto& bpref = boundary_preferences_.at(bid);
+        const bool is_vaccuum = bpref.type == BoundaryType::VACUUM;
+        if (is_vaccuum)
+          bcs[bid] = {BCType::ROBIN,{0.25,0.5}};
+        else
+          throw std::logic_error("Dirichlet boundary conditions not supported"
+                                 "for diffusion solvers.");
+      }
     }//for sweep-boundary
 
     //=========================================== Make xs map

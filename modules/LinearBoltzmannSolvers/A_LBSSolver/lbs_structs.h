@@ -45,7 +45,8 @@ enum class BoundaryType
 {
   VACUUM = 1,
   INCIDENT_ISOTROPIC = 2,
-  REFLECTING = 3
+  REFLECTING = 3,
+  INCIDENT_ANISTROPIC_HETEROGENOUS = 4
 };
 
 struct BoundaryPreference

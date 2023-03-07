@@ -19,6 +19,9 @@ void chi_mesh::sweep_management::AngleAggregation::
   quadrature = in_quadrature;
   grid = in_grid;
 
+  for (auto& bndry_id_cond : sim_boundaries)
+    bndry_id_cond.second->Setup(*grid, *quadrature);
+
   is_setup = true;
 }
 
