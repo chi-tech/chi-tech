@@ -16,7 +16,7 @@ HeterogenousPsiIncoming(uint64_t cell_local_id,
                         int group_num,
                         int gs_ss_begin)
 {
-  if (local_cell_data.empty())
+  if (local_cell_data_.empty())
   {
     chi::log.LogAllError()
       << "HeterogenousPsiIncoming call made to a heterogeneous boundary "
@@ -24,10 +24,10 @@ HeterogenousPsiIncoming(uint64_t cell_local_id,
     exit(EXIT_FAILURE);
   }
 
-  const size_t dof_offset = num_groups*angle_num + group_num;
+  const size_t dof_offset = num_groups_ * angle_num + group_num;
 
 //  return &local_cell_data[cell_local_id][face_num][fi][dof_offset];
-  return &local_cell_data.at(cell_local_id).at(face_num).at(fi).at(dof_offset);
+  return &local_cell_data_.at(cell_local_id).at(face_num).at(fi).at(dof_offset);
 }
 
 //###################################################################
@@ -37,8 +37,8 @@ Setup(const chi_mesh::MeshContinuum &grid,
       const chi_math::AngularQuadrature &quadrature)
 {
   const size_t num_local_cells = grid.local_cells.size();
-  local_cell_data.clear();
-  local_cell_data.reserve(num_local_cells);
+  local_cell_data_.clear();
+  local_cell_data_.reserve(num_local_cells);
 
   std::vector<bool> cell_bndry_flags(num_local_cells,false);
   for (const auto& cell : grid.local_cells)
@@ -61,7 +61,7 @@ Setup(const chi_mesh::MeshContinuum &grid,
   angle_indices.reserve(num_angles);
   angle_vectors.reserve(num_angles);
   phi_theta_angles.reserve(num_angles);
-  group_indices.reserve(num_groups);
+  group_indices.reserve(num_groups_);
 
   int num_angles_int = static_cast<int>(num_angles);
   for (int n=0; n<num_angles_int; ++n)
@@ -75,7 +75,7 @@ Setup(const chi_mesh::MeshContinuum &grid,
     double theta = abscissae.theta;
     phi_theta_angles.emplace_back(std::make_pair(phi, theta));
   }
-  for (int g=0; g<static_cast<int>(num_groups); ++g)
+  for (int g=0; g<static_cast<int>(num_groups_); ++g)
     group_indices.emplace_back(g);
 
   for (const auto& cell : grid.local_cells)
@@ -90,21 +90,21 @@ Setup(const chi_mesh::MeshContinuum &grid,
         size_t face_num_nodes = face.vertex_ids_.size();
         FaceData face_data;
 
-        if (not face.has_neighbor_ and face.neighbor_id_ == ref_boundary_id)
+        if (not face.has_neighbor_ and face.neighbor_id_ == ref_boundary_id_)
         {
           face_data.reserve(face_num_nodes);
           for (size_t i=0; i<face_num_nodes; ++i)
           {
             std::vector<double> face_node_data =
-              boundary_function->Evaluate(cell.global_id_,
-                                          cell.material_id_,
-                                          f, i,
-                                          grid.vertices[face.vertex_ids_[i]],
-                                          face.normal_,
-                                          angle_indices,
-                                          angle_vectors,
-                                          phi_theta_angles,
-                                          group_indices);
+              boundary_function_->Evaluate(cell.global_id_,
+                                           cell.material_id_,
+                                           f, i,
+                                           grid.vertices[face.vertex_ids_[i]],
+                                           face.normal_,
+                                           angle_indices,
+                                           angle_vectors,
+                                           phi_theta_angles,
+                                           group_indices);
 
             face_data.push_back(std::move(face_node_data));
           }//for face node-i
@@ -113,10 +113,10 @@ Setup(const chi_mesh::MeshContinuum &grid,
         cell_data[f] = std::move(face_data);
       }//for face f
 
-      local_cell_data.push_back(std::move(cell_data));
+      local_cell_data_.push_back(std::move(cell_data));
     }//if bndry cell
     else
-      local_cell_data.emplace_back();
+      local_cell_data_.emplace_back();
 
   }//for cell
 }

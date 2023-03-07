@@ -33,6 +33,27 @@ enum class GeometryType
   THREED_CARTESIAN = 6
 };
 
+inline
+chi_math::CoordinateSystemType
+  MapGeometryTypeToCoordSys(const GeometryType gtype)
+{
+  using namespace chi_math;
+  switch (gtype)
+  {
+    case GeometryType::ONED_SLAB:
+    case GeometryType::TWOD_CARTESIAN:
+    case GeometryType::THREED_CARTESIAN:
+      return CoordinateSystemType::CARTESIAN;
+    case GeometryType::ONED_SPHERICAL:
+      return CoordinateSystemType::SPHERICAL;
+    case GeometryType::ONED_CYLINDRICAL:
+    case GeometryType::TWOD_CYLINDRICAL:
+      return CoordinateSystemType::CYLINDRICAL;
+    default:
+      return CoordinateSystemType::CARTESIAN;
+  }
+}
+
 enum class AngleAggregationType
 {
   UNDEFINED = 0,

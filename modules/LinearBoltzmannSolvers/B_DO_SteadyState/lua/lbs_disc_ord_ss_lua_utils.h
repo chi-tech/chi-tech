@@ -5,8 +5,10 @@
 
 namespace lbs::disc_ord_steady_state_lua_utils
 {
-  int chiLBSCreateSolver(lua_State *L);
-  int chiLBSComputeBalance(lua_State *L);
+  int chiLBSCreateSolver(lua_State* L);
+  int chiLBSComputeBalance(lua_State* L);
+  int chiLBSComputeLeakage(lua_State* L);
+
   void RegisterLuaEntities(lua_State* L);
 }
 
