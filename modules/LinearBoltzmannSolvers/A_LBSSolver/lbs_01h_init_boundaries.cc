@@ -12,7 +12,7 @@ chi_mesh::sweep_management::BoundaryIsotropicHomogenous
 #define SweepReflectingBndry \
 chi_mesh::sweep_management::BoundaryReflecting
 #define SweepAniHeteroBndry \
-chi_mesh::sweep_management::BoundaryIncidentHeterogenous
+chi_mesh::sweep_management::BoundaryIncidentHeterogeneous
 
 #define ExceptionLocalFaceNormalsDiffer \
 std::logic_error(fname + ": Not all face normals are," \
@@ -99,7 +99,7 @@ void lbs::LBSSolver::InitializeBoundaries()
         sweep_boundaries_[bid] = mk_shrd(SweepVaccuumBndry)(G);
       else if (bndry_pref.type == lbs::BoundaryType::INCIDENT_ISOTROPIC)
         sweep_boundaries_[bid] = mk_shrd(SweepIncHomoBndry)(G, mg_q);
-      else if (bndry_pref.type == BoundaryType::INCIDENT_ANISTROPIC_HETEROGENOUS)
+      else if (bndry_pref.type == BoundaryType::INCIDENT_ANISTROPIC_HETEROGENEOUS)
       {
         sweep_boundaries_[bid] = mk_shrd(SweepAniHeteroBndry)(G,
           std::make_unique<BoundaryFunctionToLua>(bndry_pref.source_function),

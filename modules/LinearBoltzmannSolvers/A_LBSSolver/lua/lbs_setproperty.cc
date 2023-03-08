@@ -156,7 +156,7 @@ chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,
                       LBSBoundaryTypes.REFLECTING);
 \endcode
 \n
-LBSBoundaryTypes.INCIDENT_ANISTROPIC_HETEROGENOUS\n
+LBSBoundaryTypes.INCIDENT_ANISTROPIC_HETEROGENEOUS\n
 Expects to be followed by the name of a lua function. The lua function will get
 called with the following parameters:
 ```
@@ -207,7 +207,7 @@ function luaBoundaryFunctionA(cell_global_id,
 end
 
 chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,
-                      LBSBoundaryTypes.INCIDENT_ANISTROPIC_HETEROGENOUS,
+                      LBSBoundaryTypes.INCIDENT_ANISTROPIC_HETEROGENEOUS,
                       "luaBoundaryFunctionA");
 \endcode
 
@@ -345,13 +345,13 @@ int chiLBSSetProperty(lua_State *L)
       lbs_solver.BoundaryPreferences()[bid] = {lbs::BoundaryType::REFLECTING};
       chi::log.Log() << "Boundary " << bid << " set to Reflecting.";
     }
-    else if (btype == (int)lbs::BoundaryType::INCIDENT_ANISTROPIC_HETEROGENOUS)
+    else if (btype == (int)lbs::BoundaryType::INCIDENT_ANISTROPIC_HETEROGENEOUS)
     {
       LuaCheckNilValue(fname, L, 5);
 
       const std::string lua_func_name = lua_tostring(L, 5);
       lbs_solver.BoundaryPreferences()[bid] =
-        {lbs::BoundaryType::INCIDENT_ANISTROPIC_HETEROGENOUS,{},lua_func_name};
+        {lbs::BoundaryType::INCIDENT_ANISTROPIC_HETEROGENEOUS,{},lua_func_name};
       chi::log.Log() << "Boundary " << bid << " set to Incident anistoropic"
                                               " heterogeneous.";
     }

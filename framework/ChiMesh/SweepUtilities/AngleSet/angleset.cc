@@ -160,14 +160,14 @@ PsiBndry(uint64_t bndry_map,
          bool surface_source_active)
 {
   if (ref_boundaries[bndry_map]->IsReflecting())
-    return ref_boundaries[bndry_map]->HeterogenousPsiIncoming(
-      cell_local_id, face_num, fi, angle_num, g, gs_ss_begin);
+    return ref_boundaries[bndry_map]->HeterogeneousPsiIncoming(
+        cell_local_id, face_num, fi, angle_num, g, gs_ss_begin);
 
   if (not surface_source_active)
     return ref_boundaries[bndry_map]->ZeroFlux(g);
 
-  return ref_boundaries[bndry_map]->HeterogenousPsiIncoming(
-    cell_local_id, face_num, fi, angle_num, g, gs_ss_begin);
+  return ref_boundaries[bndry_map]->HeterogeneousPsiIncoming(
+      cell_local_id, face_num, fi, angle_num, g, gs_ss_begin);
 }
 
 //###################################################################
@@ -180,9 +180,9 @@ ReflectingPsiOutBoundBndry(uint64_t bndry_map,
                            int fi,
                            int gs_ss_begin)
 {
-  return ref_boundaries[bndry_map]->HeterogenousPsiOutgoing(cell_local_id,
-                                                            face_num,
-                                                            fi,
-                                                            angle_num,
-                                                            gs_ss_begin);
+  return ref_boundaries[bndry_map]->HeterogeneousPsiOutgoing(cell_local_id,
+                                                             face_num,
+                                                             fi,
+                                                             angle_num,
+                                                             gs_ss_begin);
 }
