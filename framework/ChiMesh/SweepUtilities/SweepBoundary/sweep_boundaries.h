@@ -15,7 +15,7 @@ enum class BoundaryType
   INCIDENT_VACCUUM                  = 0, ///< Zero for all angles, space
   INCIDENT_ISOTROPIC_HOMOGENOUS     = 1, ///< One value for all angles, homogenous in space
   REFLECTING                        = 2, ///< Reflecting boundary condition about a normal
-  INCIDENT_ANISOTROPIC_HETEROGENOUS = 3  ///< Complex different for each angle and face node
+  INCIDENT_ANISOTROPIC_HETEROGENEOUS = 3  ///< Complex different for each angle and face node
 };
 
 //###################################################################
@@ -51,17 +51,19 @@ public:
   void SetEvaluationTime(double time) { evaluation_time_ = time;}
 
 
-  virtual double* HeterogenousPsiIncoming(uint64_t cell_local_id,
-                                          int face_num,
-                                          int fi,
-                                          int angle_num,
-                                          int group_num,
-                                          int gs_ss_begin);
-  virtual double* HeterogenousPsiOutgoing(uint64_t cell_local_id,
-                                          int face_num,
-                                          int fi,
-                                          int angle_num,
-                                          int gs_ss_begin);
+  virtual double* HeterogeneousPsiIncoming(uint64_t cell_local_id,
+                                           int face_num,
+                                           int fi,
+                                           int angle_num,
+                                           int group_num,
+                                           int gs_ss_begin);
+
+  virtual double* HeterogeneousPsiOutgoing(uint64_t cell_local_id,
+                                           int face_num,
+                                           int fi,
+                                           int angle_num,
+                                           int gs_ss_begin);
+
   virtual void UpdateAnglesReadyStatus(const std::vector<size_t>& angles,
                                        size_t gs_ss)
   {}
@@ -89,7 +91,7 @@ public:
     boundary_flux_(in_num_groups, 0.0)
   {}
 
-  double* HeterogenousPsiIncoming(
+  double* HeterogeneousPsiIncoming(
     uint64_t cell_local_id,
     int face_num,
     int fi,
@@ -116,7 +118,7 @@ public:
     boundary_flux(std::move(ref_boundary_flux))
   {}
 
-  double* HeterogenousPsiIncoming(
+  double* HeterogeneousPsiIncoming(
     uint64_t cell_local_id,
     int face_num,
     int fi,
@@ -166,17 +168,17 @@ public:
   std::vector<std::vector<bool>>&
   GetAngleReadyFlags() {return angle_readyflags_;}
 
-  double* HeterogenousPsiIncoming(uint64_t cell_local_id,
-                                  int face_num,
-                                  int fi,
-                                  int angle_num,
-                                  int group_num,
-                                  int gs_ss_begin) override;
-  double* HeterogenousPsiOutgoing(uint64_t cell_local_id,
-                                  int face_num,
-                                  int fi,
-                                  int angle_num,
-                                  int gs_ss_begin) override;
+  double* HeterogeneousPsiIncoming(uint64_t cell_local_id,
+                                   int face_num,
+                                   int fi,
+                                   int angle_num,
+                                   int group_num,
+                                   int gs_ss_begin) override;
+  double* HeterogeneousPsiOutgoing(uint64_t cell_local_id,
+                                   int face_num,
+                                   int fi,
+                                   int angle_num,
+                                   int gs_ss_begin) override;
 
   void UpdateAnglesReadyStatus(const std::vector<size_t>& angles,
                                size_t gs_ss) override;
@@ -209,7 +211,7 @@ public:
 
 //###################################################################
 /** Specified incident fluxes homogenous on a boundary.*/
-class BoundaryIncidentHeterogenous : public SweepBoundary
+class BoundaryIncidentHeterogeneous : public SweepBoundary
 {
 private:
   std::unique_ptr<BoundaryFunction> boundary_function_;
@@ -222,23 +224,23 @@ private:
   std::vector<CellData> local_cell_data_;
 public:
   explicit
-  BoundaryIncidentHeterogenous(size_t in_num_groups,
+  BoundaryIncidentHeterogeneous(size_t in_num_groups,
                                std::unique_ptr<BoundaryFunction> in_bndry_function,
                                uint64_t in_ref_boundary_id,
                                chi_math::CoordinateSystemType coord_type =
                                chi_math::CoordinateSystemType::CARTESIAN) :
-    SweepBoundary(BoundaryType::INCIDENT_ANISOTROPIC_HETEROGENOUS, in_num_groups,
+    SweepBoundary(BoundaryType::INCIDENT_ANISOTROPIC_HETEROGENEOUS, in_num_groups,
                   coord_type),
     boundary_function_(std::move(in_bndry_function)),
     ref_boundary_id_(in_ref_boundary_id)
   {}
 
-  double* HeterogenousPsiIncoming(uint64_t cell_local_id,
-                                  int face_num,
-                                  int fi,
-                                  int angle_num,
-                                  int group_num,
-                                  int gs_ss_begin) override;
+  double* HeterogeneousPsiIncoming(uint64_t cell_local_id,
+                                   int face_num,
+                                   int fi,
+                                   int angle_num,
+                                   int group_num,
+                                   int gs_ss_begin) override;
 
   void Setup(const chi_mesh::MeshContinuum &grid,
              const chi_math::AngularQuadrature &quadrature) override;

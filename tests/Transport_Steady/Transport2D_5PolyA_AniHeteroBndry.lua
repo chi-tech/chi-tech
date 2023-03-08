@@ -133,7 +133,7 @@ bsrc[1] = 1.0
 --chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,
 --        LBSBoundaryTypes.INCIDENT_ISOTROPIC, bsrc);
 chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,
-        LBSBoundaryTypes.INCIDENT_ANISTROPIC_HETEROGENOUS,
+        LBSBoundaryTypes.INCIDENT_ANISTROPIC_HETEROGENEOUS,
         "luaBoundaryFunctionA");
 
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
