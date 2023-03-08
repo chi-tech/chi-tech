@@ -83,6 +83,8 @@ public:
   //compute_balance
   void ZeroOutflowBalanceVars(LBSGroupset& groupset);
   void ComputeBalance();
+  std::vector<double>
+  ComputeLeakage(int groupset_id, uint64_t boundary_id) const;
 
 };
 

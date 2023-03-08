@@ -1,11 +1,34 @@
 #include "lbs_solver.h"
 
+#include "Tools/lbs_bndry_func_lua.h"
+
 #include "chi_log.h"
+
+#define mk_shrd(x) std::make_shared<x>
+#define SweepVaccuumBndry \
+chi_mesh::sweep_management::BoundaryVaccuum
+#define SweepIncHomoBndry \
+chi_mesh::sweep_management::BoundaryIsotropicHomogenous
+#define SweepReflectingBndry \
+chi_mesh::sweep_management::BoundaryReflecting
+#define SweepAniHeteroBndry \
+chi_mesh::sweep_management::BoundaryIncidentHeterogenous
+
+#define ExceptionLocalFaceNormalsDiffer \
+std::logic_error(fname + ": Not all face normals are," \
+" within tolerance, locally the same for the reflecting boundary" \
+" condition requested.")
+
+#define ExceptionGlobalFaceNormalsDiffer \
+std::logic_error(fname + ": Not all face normals are," \
+" within tolerance, globally the same for the reflecting boundary" \
+" condition requested.")
 
 //###################################################################
 /**Initializes transport related boundaries. */
 void lbs::LBSSolver::InitializeBoundaries()
 {
+  const std::string fname = "lbs::LBSSolver::InitializeBoundaries";
   //================================================== Determine boundary-ids
   //                                                   involved in the problem
   std::set<uint64_t> globl_unique_bids_set;
@@ -56,45 +79,88 @@ void lbs::LBSSolver::InitializeBoundaries()
 
   //================================================== Initialize default
   //                                                   incident boundary
-  typedef chi_mesh::sweep_management::BoundaryVacuum SweepVacuumBndry;
-  typedef chi_mesh::sweep_management::BoundaryIncidentHomogenous SweepIncHomoBndry;
-  typedef chi_mesh::sweep_management::BoundaryReflecting SweepReflectingBndry;
-
-  const std::vector<double> zero_Gvec(num_groups_, 0.0);
-
-  const chi_mesh::Vector3 ihat(1.0, 0.0, 0.0);
-  const chi_mesh::Vector3 jhat(0.0, 1.0, 0.0);
-  const chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
+  const size_t G = num_groups_;
 
   sweep_boundaries_.clear();
   for (uint64_t bid : globl_unique_bids_set)
-    if (boundary_preferences_.count(bid) == 0 and
-        sweep_boundaries_.count(bid) == 0)
+  {
+    const bool has_no_preference = boundary_preferences_.count(bid) == 0;
+    const bool has_not_been_set = sweep_boundaries_.count(bid) == 0;
+    if (has_no_preference and has_not_been_set)
     {
-      sweep_boundaries_[bid] = std::make_shared<SweepVacuumBndry>(zero_Gvec);
+      sweep_boundaries_[bid] = mk_shrd(SweepVaccuumBndry)(G);
     }//defaulted
-    else if (sweep_boundaries_.count(bid) == 0)
+    else if (has_not_been_set)
     {
       const auto& bndry_pref = boundary_preferences_.at(bid);
+      const auto& mg_q = bndry_pref.isotropic_mg_source;
+
       if (bndry_pref.type == lbs::BoundaryType::VACUUM)
-        sweep_boundaries_[bid] =
-          std::make_shared<SweepVacuumBndry>(zero_Gvec);
+        sweep_boundaries_[bid] = mk_shrd(SweepVaccuumBndry)(G);
       else if (bndry_pref.type == lbs::BoundaryType::INCIDENT_ISOTROPIC)
-        sweep_boundaries_[bid] =
-          std::make_shared<SweepIncHomoBndry>(bndry_pref.isotropic_mg_source);
+        sweep_boundaries_[bid] = mk_shrd(SweepIncHomoBndry)(G, mg_q);
+      else if (bndry_pref.type == BoundaryType::INCIDENT_ANISTROPIC_HETEROGENOUS)
+      {
+        sweep_boundaries_[bid] = mk_shrd(SweepAniHeteroBndry)(G,
+          std::make_unique<BoundaryFunctionToLua>(bndry_pref.source_function),
+          bid);
+      }
       else if (bndry_pref.type == lbs::BoundaryType::REFLECTING)
       {
-        chi_mesh::Normal normal;
-        if (bid == 0) normal = ihat;
-        if (bid == 1) normal = ihat * -1.0;
-        if (bid == 2) normal = jhat;
-        if (bid == 3) normal = jhat * -1.0;
-        if (bid == 4) normal = khat;
-        if (bid == 5) normal = khat * -1.0;
+        //Locally check all faces, that subscribe to this boundary,
+        //have the same normal
+        typedef chi_mesh::Vector3 Vec3;
+        const double EPSILON = 1.0e-12;
+        std::unique_ptr<Vec3> n_ptr = nullptr;
+        for (const auto& cell : grid_ptr_->local_cells)
+          for (const auto &face: cell.faces_)
+            if (not face.has_neighbor_ and face.neighbor_id_ == bid)
+            {
+              if (not n_ptr) n_ptr = std::make_unique<Vec3>(face.normal_);
+              if (std::fabs(face.normal_.Dot(*n_ptr) - 1.0) > EPSILON)
+                throw ExceptionLocalFaceNormalsDiffer;
+            }
+
+        //Now check globally
+        const int local_has_bid = n_ptr != nullptr ? 1 : 0;
+        const Vec3 local_normal = local_has_bid ? *n_ptr : Vec3(0.0,0.0,0.0);
+
+        std::vector<int> locJ_has_bid(chi::mpi.process_count, 1);
+        std::vector<double> locJ_n_val(chi::mpi.process_count*3, 0.0);
+
+        MPI_Allgather(&local_has_bid,       //sendbuf
+                      1, MPI_INT,           //sendcount + datatype
+                      locJ_has_bid.data(),  //recvbuf
+                      1, MPI_INT,           //recvcount + datatype
+                      MPI_COMM_WORLD);      //communicator
+
+        MPI_Allgather(&local_normal,     //sendbuf
+                      3, MPI_DOUBLE,     //sendcount + datatype
+                      locJ_n_val.data(), //recvbuf
+                      3, MPI_DOUBLE,     //recvcount + datatype
+                      MPI_COMM_WORLD);   //communicator
+
+        Vec3 global_normal;
+        for (int j=0; j<chi::mpi.process_count; ++j)
+        {
+          if (locJ_has_bid[j])
+          {
+            int offset = 3*j;
+            const double* n = &locJ_n_val[offset];
+            const Vec3 locJ_normal(n[0], n[1], n[2]);
+
+            if (local_has_bid)
+              if (std::fabs(local_normal.Dot(locJ_normal) - 1.0) > EPSILON)
+                throw ExceptionGlobalFaceNormalsDiffer;
+
+            global_normal = locJ_normal;
+          }
+        }
 
         sweep_boundaries_[bid] =
-          std::make_shared<SweepReflectingBndry>(zero_Gvec, normal);
+          mk_shrd(SweepReflectingBndry)(G, global_normal,
+            MapGeometryTypeToCoordSys(options_.geometry_type));
       }
     }//non-defaulted
-
+  }//for bndry id
 }

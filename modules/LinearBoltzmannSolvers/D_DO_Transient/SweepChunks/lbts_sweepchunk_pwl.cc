@@ -285,7 +285,8 @@ void lbs::SweepChunkPWLTransientTheta::
       {
         for (int i = 0; i < num_nodes; ++i)
         {
-          cint64_t imap = grid_fe_view_.MapDOFLocal(cell, i, psi_uk_man, angle_num, 0);
+          cint64_t imap = grid_fe_view_.MapDOFLocal(cell, i, psi_uk_man,
+                                                    angle_num, gs_ss_begin);
           for (int gsg = 0; gsg < gs_ss_size; ++gsg)
             output_psi[imap + gsg] =
               inv_theta*(b_[gsg][i] + (theta_ - 1.0) * psi_prev_[imap + gsg]);

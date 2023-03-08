@@ -67,6 +67,10 @@ READ_RESTART_DATA\n
  absolute, and the second is the file base name. These are defaulted to
  "YRestart" and "restart" respectively.\n\n
 
+SAVE_ANGULAR_FLUX\n
+Sets the flag for saving the angular flux. Expects to be followed by true/false.
+[Default=false]\n\n
+
 USE_SOURCE_MOMENTS\n
  Flag for using a vector of source moments instead the regular material/boundary
   source. Default false. This expects
@@ -124,18 +128,88 @@ type VACUUM.\n
 \n
 LBSBoundaryTypes.VACUUM\n
 Specifies a vaccuum boundary condition. It is not followed by any value.\n
-\n
+\code
+chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,
+                      LBSBoundaryTypes.VACUUM);
+\endcode
 \n
 LBSBoundaryTypes.INCIDENT_ISOTROPIC\n
 Incident isotropic flux. This argument needs to be followed by a lua table
 index 1 to G where G is the amount of energy groups. Note internally this
 is mapped as 0 to G-1.\n
+\code
+bsrc={}
+for g=1,num_groups do
+    bsrc[g] = 0.0
+end
+bsrc[1] = 1.0
+chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,
+                      LBSBoundaryTypes.INCIDENT_ISOTROPIC, bsrc);
+\endcode
 \n
 LBSBoundaryTypes.REFLECTING\n
 Reflecting boundary condition. Beware, when opposing reflecting boundary
 conditions are used this enduces a cyclic dependency which will increase the
-iteration convergence behavior.
+iteration convergence behavior.\n
+\code
+chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,
+                      LBSBoundaryTypes.REFLECTING);
+\endcode
+\n
+LBSBoundaryTypes.INCIDENT_ANISTROPIC_HETEROGENOUS\n
+Expects to be followed by the name of a lua function. The lua function will get
+called with the following parameters:
+```
+size_t        cell_global_id,
+int           cell_material_id,
+unsigned int  face_index,
+unsigned int  face_node_index,
+const chi_mesh::Vector3& face_node_location,
+const chi_mesh::Vector3& face_node_normal,
+const std::vector<int>& quadrature_angle_indices,
+const std::vector<chi_mesh::Vector3>& quadrature_angle_vectors,
+const std::vector<std::pair<double,double>>& quadrature_phi_theta_angles,
+const std::vector<int>& group_indices,
+double evaluation_time;
+```
+and must return a 1D array of data-values ordered first by angle index, then
+by group index, e.g., n0g0, n0g1, n0g2, n1g0, n1g1, n1g2, etc.
 
+Example lua function:
+\code
+function luaBoundaryFunctionA(cell_global_id,
+                              material_id,
+                              location,
+                              normal,
+                              quadrature_angle_indices,
+                              quadrature_angle_vectors,
+                              quadrature_phi_theta_angles,
+                              group_indices)
+    num_angles = rawlen(quadrature_angle_vectors)
+    num_groups = rawlen(group_indices)
+    psi = {}
+    dof_count = 0
+
+    for ni=1,num_angles do
+        omega = quadrature_angle_vectors[ni]
+        phi_theta = quadrature_phi_theta_angles[ni]
+        for gi=1,num_groups do
+            g = group_indices[gi]
+
+            value = 1.0
+
+            dof_count = dof_count + 1
+            psi[dof_count] = value
+        end
+    end
+
+    return psi
+end
+
+chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,
+                      LBSBoundaryTypes.INCIDENT_ANISTROPIC_HETEROGENOUS,
+                      "luaBoundaryFunctionA");
+\endcode
 
 
 ###Note on the Eager limit
@@ -270,6 +344,16 @@ int chiLBSSetProperty(lua_State *L)
     {
       lbs_solver.BoundaryPreferences()[bid] = {lbs::BoundaryType::REFLECTING};
       chi::log.Log() << "Boundary " << bid << " set to Reflecting.";
+    }
+    else if (btype == (int)lbs::BoundaryType::INCIDENT_ANISTROPIC_HETEROGENOUS)
+    {
+      LuaCheckNilValue(fname, L, 5);
+
+      const std::string lua_func_name = lua_tostring(L, 5);
+      lbs_solver.BoundaryPreferences()[bid] =
+        {lbs::BoundaryType::INCIDENT_ANISTROPIC_HETEROGENOUS,{},lua_func_name};
+      chi::log.Log() << "Boundary " << bid << " set to Incident anistoropic"
+                                              " heterogeneous.";
     }
     else
     {

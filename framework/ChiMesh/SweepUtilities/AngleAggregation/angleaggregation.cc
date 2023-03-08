@@ -3,6 +3,14 @@
 #include "chi_log.h"
 #include "chi_mpi.h"
 
+#define ExceptionReflectedAngleError \
+std::logic_error(fname + \
+"Reflected angle not found for angle " + std::to_string(n) + \
+" with direction " + quadrature->omegas_[n].PrintStr() + \
+". This can happen for two reasons: i) A quadrature is used" \
+" that is not symmetric about the axis associated with the " \
+"reflected boundary, or ii) the reflecting boundary is not " \
+"aligned with any reflecting axis of the quadrature.")
 
 //###################################################################
 /** Sets up the angle-aggregation object. */
@@ -18,6 +26,9 @@ void chi_mesh::sweep_management::AngleAggregation::
   number_of_group_subsets = in_number_of_group_subsets;
   quadrature = in_quadrature;
   grid = in_grid;
+
+  for (auto& bndry_id_cond : sim_boundaries)
+    bndry_id_cond.second->Setup(*grid, *quadrature);
 
   is_setup = true;
 }
@@ -49,8 +60,8 @@ void chi_mesh::sweep_management::AngleAggregation::ZeroIncomingDelayedPsi()
     {
       auto& rbndry = (BoundaryReflecting&)(*bndry);
 
-      if (rbndry.opposing_reflected)
-        for (auto& angle : rbndry.hetero_boundary_flux_old)
+      if (rbndry.IsOpposingReflected())
+        for (auto& angle : rbndry.GetHeteroBoundaryFluxOld())
           for (auto& cellvec : angle)
             for (auto& facevec : cellvec)
               for (auto& dofvec : facevec)
@@ -78,11 +89,14 @@ void chi_mesh::sweep_management::AngleAggregation::ZeroIncomingDelayedPsi()
 /** Initializes reflecting boundary conditions. */
 void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
 {
+  const std::string fname = "chi_mesh::sweep_management::AngleAggregation";
   const double epsilon = 1.0e-8;
 
   bool reflecting_bcs_initialized=false;
 
-  int bndry_id=0;
+  const chi_mesh::Vector3 ihat(1.0,0.0,0.0);
+  const chi_mesh::Vector3 jhat(0.0,1.0,0.0);
+
   for (auto& [bid, bndry] : sim_boundaries)
   {
     if (bndry->IsReflecting())
@@ -91,45 +105,75 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
       size_t num_local_cells = grid->local_cells.size();
       auto& rbndry = (BoundaryReflecting&)(*bndry);
 
-      rbndry.reflected_anglenum.resize(tot_num_angles,-1);
-      rbndry.angle_readyflags.resize(tot_num_angles,
+      const auto& normal = rbndry.Normal();
+
+      rbndry.GetReflectedAngleIndexMap().resize(tot_num_angles,-1);
+      rbndry.GetAngleReadyFlags().resize(tot_num_angles,
                         std::vector<bool>(number_of_group_subsets,false));
 
       //========================================= Determine reflected angle
+      //                                          and check that it is within
+      //                                          the quadrature
+      typedef chi_mesh::Vector3 Vec3;
       for (int n=0; n<tot_num_angles; ++n)
       {
-        auto omega_reflected = (quadrature->omegas_[n]) -
-                               rbndry.normal *
-                               quadrature->omegas_[n].Dot(rbndry.normal) * 2.0;
+        const Vec3& omega_n = quadrature->omegas_[n];
+        Vec3 omega_reflected;
+
+        switch (rbndry.CoordType())
+        {
+          case chi_math::CoordinateSystemType::SPHERICAL:
+            omega_reflected = -1.0*omega_n;
+            break;
+          case chi_math::CoordinateSystemType::CYLINDRICAL:
+            {
+              //left, top and bottom is regular reflecting
+              if (std::fabs(normal.Dot(jhat)) > 0.999999 or
+                  normal.Dot(ihat) < -0.999999)
+                omega_reflected = omega_n - 2.0 * normal * omega_n.Dot(normal);
+              //right derive their normal from omega_n
+              else if (normal.Dot(ihat) > 0.999999)
+              {
+                Vec3 normal_star;
+                if (omega_n.Dot(normal) > 0.0)
+                  normal_star = Vec3(omega_n.x, 0.0, omega_n.z).Normalized();
+                else
+                  normal_star = Vec3(-omega_n.x, 0.0, -omega_n.y).Normalized();
+
+                omega_reflected = omega_n -
+                  2.0 * normal_star * omega_n.Dot(normal_star);
+              }
+            }
+            break;
+          case chi_math::CoordinateSystemType::CARTESIAN:
+          default:
+            omega_reflected = omega_n - 2.0 * normal * omega_n.Dot(normal);
+            break;
+        }
+
+        auto& index_map = rbndry.GetReflectedAngleIndexMap();
         for (int nstar=0; nstar<tot_num_angles; ++nstar)
           if (omega_reflected.Dot(quadrature->omegas_[nstar]) > (1.0 - epsilon))
-            {rbndry.reflected_anglenum[n] = nstar;break;}
+            {index_map[n] = nstar;break;}
 
-        if (rbndry.reflected_anglenum[n]<0)
-        {
-          chi::log.LogAllError()
-            << "Reflected angle not found for angle " << n
-            << " with direction " << quadrature->omegas_[n].PrintS()
-            << ". This can happen for two reasons: i) A quadrature is used"
-               " that is not symmetric about the axis associated with the "
-               "reflected boundary, or ii) the reflecting boundary is not "
-               "aligned with any reflecting axis of the quadrature.";
-          chi::Exit(EXIT_FAILURE);
-        }
+        if (index_map[n]<0) throw ExceptionReflectedAngleError;
       }
 
-      //========================================= For angles
-      rbndry.hetero_boundary_flux.clear();
-      rbndry.hetero_boundary_flux_old.clear();
-      rbndry.hetero_boundary_flux.resize(tot_num_angles);
+      //========================================= Initialize storage for all
+      //                                          outbound directions
+      auto& heteroflux_new = rbndry.GetHeteroBoundaryFluxNew();
+      auto& heteroflux_old = rbndry.GetHeteroBoundaryFluxOld();
+      heteroflux_new.clear();
+      heteroflux_old.clear();
+      heteroflux_new.resize(tot_num_angles);
       for (int n=0; n<tot_num_angles; ++n)
       {
         //Only continue if omega is outgoing
-        if (quadrature->omegas_[n].Dot(rbndry.normal) < 0.0 )
+        if (quadrature->omegas_[n].Dot(rbndry.Normal()) < 0.0 )
           continue;
 
         //================================== For cells
-        auto& cell_vec = rbndry.hetero_boundary_flux[n];
+        auto& cell_vec = heteroflux_new[n];
         cell_vec.resize(num_local_cells);
         for (const auto& cell : grid->local_cells)
         {
@@ -139,7 +183,7 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
           bool on_ref_bndry = false;
           for (const auto& face : cell.faces_){
             if ((not face.has_neighbor_) and
-                (face.normal_.Dot(rbndry.normal) > 0.999999) )
+                (face.normal_.Dot(rbndry.Normal()) > 0.999999) )
             {
               on_ref_bndry = true;
               break;
@@ -153,7 +197,7 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
           for (const auto& face : cell.faces_)
           {
             if ((not face.has_neighbor_) and
-                (face.normal_.Dot(rbndry.normal) > 0.999999) )
+                (face.normal_.Dot(rbndry.Normal()) > 0.999999) )
             {
               cell_vec[c][f].clear();
               cell_vec[c][f].resize(face.vertex_ids_.size(),
@@ -166,29 +210,28 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
 
       //========================================= Determine if boundary is
       //                                          opposing reflecting
-      const double sqrt_1div3 = 1.0/sqrt(3.0);
-      const Vector3 median = Vector3(sqrt_1div3,sqrt_1div3,sqrt_1div3);
+      // The boundary with the smallest bid will
+      // be marked as "opposing-reflecting" while
+      // the other one will be just a regular
+      // reflecting boundary
+      for (const auto& [otherbid, otherbndry] : sim_boundaries)
+      {
+        if (bid == otherbid) continue;
+        if (not otherbndry->IsReflecting()) continue;
 
-      if (rbndry.normal.Dot(median) >= 0.0)
-        for (const auto& [otherbid, otherbndry] : sim_boundaries)
-        {
-          if (otherbid == bndry_id) continue;
-          if (not otherbndry->IsReflecting()) continue;
+        const auto& otherRbndry =
+          dynamic_cast<const BoundaryReflecting&>(*otherbndry);
 
-          const auto& otherRbndry =
-            dynamic_cast<const BoundaryReflecting&>(*otherbndry);
+        if (rbndry.Normal().Dot(otherRbndry.Normal()) < (0.0-epsilon))
+          if (bid < otherbid)
+            rbndry.SetOpposingReflected(true);
+      }
 
-          if (rbndry.normal.Dot(otherRbndry.normal) < (0.0-epsilon))
-            rbndry.opposing_reflected = true;
-        }
-
-      if (rbndry.opposing_reflected)
-        rbndry.hetero_boundary_flux_old = rbndry.hetero_boundary_flux;
+      if (rbndry.IsOpposingReflected())
+        rbndry.GetHeteroBoundaryFluxOld() = rbndry.GetHeteroBoundaryFluxNew();
 
       reflecting_bcs_initialized = true;
     }//if reflecting
-
-    ++bndry_id;
   }//for bndry
 
   if (reflecting_bcs_initialized)
@@ -216,8 +259,8 @@ std::pair<size_t,size_t> chi_mesh::sweep_management::AngleAggregation::
     {
       auto& rbndry = (BoundaryReflecting&)(*bndry);
 
-      if (rbndry.opposing_reflected)
-        for (auto& angle : rbndry.hetero_boundary_flux)
+      if (rbndry.IsOpposingReflected())
+        for (auto& angle : rbndry.GetHeteroBoundaryFluxNew())
           for (auto& cellvec : angle)
             for (auto& facevec : cellvec)
               for (auto& dofvec : facevec)
@@ -265,8 +308,8 @@ void chi_mesh::sweep_management::AngleAggregation::
     {
       auto& rbndry = (BoundaryReflecting&)(*bndry);
 
-      if (rbndry.opposing_reflected)
-        for (auto& angle : rbndry.hetero_boundary_flux)
+      if (rbndry.IsOpposingReflected())
+        for (auto& angle : rbndry.GetHeteroBoundaryFluxNew())
           for (auto& cellvec : angle)
             for (auto& facevec : cellvec)
               for (auto& dofvec : facevec)
@@ -302,8 +345,8 @@ AppendOldDelayedAngularDOFsToArray(int &index, double* x_ref)
     {
       auto& rbndry = (BoundaryReflecting&)(*bndry);
 
-      if (rbndry.opposing_reflected)
-        for (auto& angle : rbndry.hetero_boundary_flux_old)
+      if (rbndry.IsOpposingReflected())
+        for (auto& angle : rbndry.GetHeteroBoundaryFluxOld())
           for (auto& cellvec : angle)
             for (auto& facevec : cellvec)
               for (auto& dofvec : facevec)
@@ -339,8 +382,8 @@ void chi_mesh::sweep_management::AngleAggregation::
     {
       auto& rbndry = (BoundaryReflecting&)(*bndry);
 
-      if (rbndry.opposing_reflected)
-        for (auto& angle : rbndry.hetero_boundary_flux_old)
+      if (rbndry.IsOpposingReflected())
+        for (auto& angle : rbndry.GetHeteroBoundaryFluxOld())
           for (auto& cellvec : angle)
             for (auto& facevec : cellvec)
               for (auto& dofvec : facevec)
@@ -376,8 +419,8 @@ void chi_mesh::sweep_management::AngleAggregation::
     {
       auto& rbndry = (BoundaryReflecting&)(*bndry);
 
-      if (rbndry.opposing_reflected)
-        for (auto& angle : rbndry.hetero_boundary_flux)
+      if (rbndry.IsOpposingReflected())
+        for (auto& angle : rbndry.GetHeteroBoundaryFluxNew())
           for (auto& cellvec : angle)
             for (auto& facevec : cellvec)
               for (auto& dofvec : facevec)
@@ -418,8 +461,8 @@ std::vector<double> chi_mesh::sweep_management::AngleAggregation::
     {
       auto& rbndry = (BoundaryReflecting&)(*bndry);
 
-      if (rbndry.opposing_reflected)
-        for (auto& angle : rbndry.hetero_boundary_flux)
+      if (rbndry.IsOpposingReflected())
+        for (auto& angle : rbndry.GetHeteroBoundaryFluxNew())
           for (auto& cellvec : angle)
             for (auto& facevec : cellvec)
               for (auto& dofvec : facevec)
@@ -465,8 +508,8 @@ void chi_mesh::sweep_management::AngleAggregation::
     {
       auto& rbndry = (BoundaryReflecting&)(*bndry);
 
-      if (rbndry.opposing_reflected)
-        for (auto& angle : rbndry.hetero_boundary_flux_old)
+      if (rbndry.IsOpposingReflected())
+        for (auto& angle : rbndry.GetHeteroBoundaryFluxOld())
           for (auto& cellvec : angle)
             for (auto& facevec : cellvec)
               for (auto& dofvec : facevec)
@@ -502,8 +545,8 @@ void chi_mesh::sweep_management::AngleAggregation::
     {
       auto& rbndry = (BoundaryReflecting&)(*bndry);
 
-      if (rbndry.opposing_reflected)
-        rbndry.hetero_boundary_flux = rbndry.hetero_boundary_flux_old;
+      if (rbndry.IsOpposingReflected())
+        rbndry.GetHeteroBoundaryFluxNew() = rbndry.GetHeteroBoundaryFluxOld();
 
     }//if reflecting
   }//for bndry
@@ -532,8 +575,8 @@ void chi_mesh::sweep_management::AngleAggregation::
     {
       auto& rbndry = (BoundaryReflecting&)(*bndry);
 
-      if (rbndry.opposing_reflected)
-        rbndry.hetero_boundary_flux_old = rbndry.hetero_boundary_flux;
+      if (rbndry.IsOpposingReflected())
+        rbndry.GetHeteroBoundaryFluxOld() = rbndry.GetHeteroBoundaryFluxNew();
 
     }//if reflecting
   }//for bndry
