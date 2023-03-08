@@ -52,6 +52,7 @@ namespace lbs::common_lua_utils
     RegisterNumberValueToTable(VACUUM            ,1,LBSBoundaryTypes);
     RegisterNumberValueToTable(INCIDENT_ISOTROPIC,2,LBSBoundaryTypes);
     RegisterNumberValueToTable(REFLECTING        ,3,LBSBoundaryTypes);
+    RegisterNumberValueToTable(INCIDENT_ANISTROPIC_HETEROGENOUS,4,LBSBoundaryTypes);
 
     RegisterTable(LBSGroupset);
     RegisterFunction(chiLBSCreateGroupset);

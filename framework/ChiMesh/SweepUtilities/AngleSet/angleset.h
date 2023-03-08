@@ -8,7 +8,7 @@
 
 #include <chi_mpi.h>
 
-typedef chi_mesh::sweep_management::BoundaryBase SweepBndry;
+typedef chi_mesh::sweep_management::SweepBoundary SweepBndry;
 
 #include <memory>
 

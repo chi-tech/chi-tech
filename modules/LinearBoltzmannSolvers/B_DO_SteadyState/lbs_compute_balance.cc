@@ -83,7 +83,8 @@ void lbs::DiscOrdSteadyStateSolver::ComputeBalance()
               for (const auto& group : groupset.groups_)
               {
                 const int g = group.id_;
-                const double psi = bndry->boundary_flux[g];
+                const double psi = *bndry->HeterogenousPsiIncoming(
+                  cell.local_id_, f, fi, n, g, 0);
                 local_in_flow -= mu * wt * psi * IntFi_shapeI;
               }//for g
             }//for fi
