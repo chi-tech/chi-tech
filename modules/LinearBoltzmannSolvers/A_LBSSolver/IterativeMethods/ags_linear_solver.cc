@@ -88,6 +88,11 @@ void AGSLinearSolver<Mat,Vec,KSP>::Solve()
 
   for (int iter = 0; iter < tolerance_options_.maximum_iterations; ++iter)
   {
+    //Save qmoms to be restored after the iteration.
+    //This is necessary for multiple ags iterations to function
+    //and for keigen-value problems
+    const auto saved_qmoms = lbs_solver.QMomentsLocal();
+
     lbs_solver.SetGroupScopedPETScVecFromPrimarySTLvector(gid_i,gid_f,x_old,phi);
 
     for (auto& solver : ags_context_ptr->sub_solvers_list_)
@@ -111,6 +116,8 @@ void AGSLinearSolver<Mat,Vec,KSP>::Solve()
 
     if (error_norm < tolerance_options_.residual_absolute)
       break;
+
+    lbs_solver.QMomentsLocal() = saved_qmoms; //Restore qmoms
   }//for iteration
 
   VecDestroy(&x_old);
