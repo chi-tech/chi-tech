@@ -28,7 +28,8 @@ public:
     const std::vector<int>& quadrature_angle_indices,
     const std::vector<chi_mesh::Vector3>& quadrature_angle_vectors,
     const std::vector<std::pair<double,double>>& quadrature_phi_theta_angles,
-    const std::vector<int>& group_indices) override;
+    const std::vector<int>& group_indices,
+    double time) override;
 };
 
 }//namespace LinearBoltzmann

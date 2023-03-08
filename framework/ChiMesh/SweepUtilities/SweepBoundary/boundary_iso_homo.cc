@@ -1,7 +1,7 @@
 #include "sweep_boundaries.h"
 
 //###################################################################
-/**Returns a pointer to a heterogenous flux storage location.*/
+/**Returns a pointer to a homogeneous flux storage location.*/
 double* chi_mesh::sweep_management::BoundaryIsotropicHomogenous::
 HeterogenousPsiIncoming(uint64_t cell_local_id,
                         int face_num,

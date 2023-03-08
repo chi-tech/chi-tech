@@ -89,6 +89,7 @@ chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
 --array<PhiTheta> quadrature_phi_theta_angles (PhiTheta.phi and PhiTheta.theta)
 --array<int>      group_indices
 
+--double          evaluation_time
 function luaBoundaryFunctionA(cell_global_id,
                               material_id,
                               location,
@@ -96,7 +97,8 @@ function luaBoundaryFunctionA(cell_global_id,
                               quadrature_angle_indices,
                               quadrature_angle_vectors,
                               quadrature_phi_theta_angles,
-                              group_indices)
+                              group_indices,
+                              time)
     num_angles = rawlen(quadrature_angle_vectors)
     num_groups = rawlen(group_indices)
     psi = {}

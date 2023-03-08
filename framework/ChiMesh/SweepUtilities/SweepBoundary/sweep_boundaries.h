@@ -20,19 +20,20 @@ enum class BoundaryType
 
 //###################################################################
 /**Base class for sweep related boundaries.*/
-class BoundaryBase
+class SweepBoundary
 {
 private:
   const chi_mesh::sweep_management::BoundaryType type_;
   const chi_math::CoordinateSystemType coord_type_;
+  double evaluation_time_ = 0.0; ///< Time value passed to boundary functions
 protected:
   std::vector<double>  zero_boundary_flux_;
   size_t num_groups_;
 
 public:
-  explicit BoundaryBase(BoundaryType bndry_type,
-                        size_t in_num_groups,
-                        chi_math::CoordinateSystemType coord_type) :
+  explicit SweepBoundary(BoundaryType bndry_type,
+                         size_t in_num_groups,
+                         chi_math::CoordinateSystemType coord_type) :
     type_(bndry_type),
     coord_type_(coord_type),
     num_groups_(in_num_groups)
@@ -40,11 +41,14 @@ public:
     zero_boundary_flux_.resize(num_groups_, 0.0);
   }
 
-  virtual ~BoundaryBase() = default;
+  virtual ~SweepBoundary() = default;
   BoundaryType Type() const {return type_;}
   chi_math::CoordinateSystemType CoordType() const {return coord_type_;}
   bool     IsReflecting() const
   { return type_ == BoundaryType::REFLECTING; }
+
+  double GetEvaluationTime() const {return evaluation_time_;}
+  void SetEvaluationTime(double time) { evaluation_time_ = time;}
 
 
   virtual double* HeterogenousPsiIncoming(uint64_t cell_local_id,
@@ -72,7 +76,7 @@ public:
 
 //###################################################################
 /** Zero fluxes homogenous on a boundary and in angle.*/
-class BoundaryVaccuum : public BoundaryBase
+class BoundaryVaccuum : public SweepBoundary
 {
 private:
   std::vector<double> boundary_flux_;
@@ -81,7 +85,7 @@ public:
   BoundaryVaccuum(size_t in_num_groups,
                   chi_math::CoordinateSystemType coord_type =
                     chi_math::CoordinateSystemType::CARTESIAN) :
-    BoundaryBase(BoundaryType::INCIDENT_VACCUUM, in_num_groups, coord_type),
+    SweepBoundary(BoundaryType::INCIDENT_VACCUUM, in_num_groups, coord_type),
     boundary_flux_(in_num_groups, 0.0)
   {}
 
@@ -97,7 +101,7 @@ public:
 
 //###################################################################
 /** Specified incident fluxes homogenous on a boundary.*/
-class BoundaryIsotropicHomogenous : public BoundaryBase
+class BoundaryIsotropicHomogenous : public SweepBoundary
 {
 private:
   std::vector<double> boundary_flux;
@@ -107,8 +111,8 @@ public:
                               std::vector<double> ref_boundary_flux,
                               chi_math::CoordinateSystemType coord_type =
                               chi_math::CoordinateSystemType::CARTESIAN) :
-    BoundaryBase(BoundaryType::INCIDENT_ISOTROPIC_HOMOGENOUS, in_num_groups,
-                 coord_type),
+    SweepBoundary(BoundaryType::INCIDENT_ISOTROPIC_HOMOGENOUS, in_num_groups,
+                  coord_type),
     boundary_flux(std::move(ref_boundary_flux))
   {}
 
@@ -123,7 +127,7 @@ public:
 
 //###################################################################
 /** Reflective boundary condition.*/
-class BoundaryReflecting : public BoundaryBase
+class BoundaryReflecting : public SweepBoundary
 {
 protected:
   const chi_mesh::Normal normal_;
@@ -147,7 +151,7 @@ public:
                      const chi_mesh::Normal& in_normal,
                      chi_math::CoordinateSystemType coord_type =
                      chi_math::CoordinateSystemType::CARTESIAN) :
-    BoundaryBase(BoundaryType::REFLECTING,in_num_groups,coord_type),
+    SweepBoundary(BoundaryType::REFLECTING, in_num_groups, coord_type),
     normal_(in_normal)
   {}
 
@@ -197,22 +201,15 @@ public:
     const std::vector<int>& quadrature_angle_indices,
     const std::vector<chi_mesh::Vector3>& quadrature_angle_vectors,
     const std::vector<std::pair<double,double>>& quadrature_phi_theta_angles,
-    const std::vector<int>& group_indices)
-  {
-    size_t num_angles = quadrature_angle_indices.size();
-    size_t num_groups = group_indices.size();
-
-    std::vector<double> psi(num_angles * num_groups, 0.0);
-
-    return psi;
-  }
+    const std::vector<int>& group_indices,
+    double time) = 0;
 
   virtual ~BoundaryFunction() = default;
 };
 
 //###################################################################
 /** Specified incident fluxes homogenous on a boundary.*/
-class BoundaryIncidentHeterogenous : public BoundaryBase
+class BoundaryIncidentHeterogenous : public SweepBoundary
 {
 private:
   std::unique_ptr<BoundaryFunction> boundary_function_;
@@ -230,8 +227,8 @@ public:
                                uint64_t in_ref_boundary_id,
                                chi_math::CoordinateSystemType coord_type =
                                chi_math::CoordinateSystemType::CARTESIAN) :
-    BoundaryBase(BoundaryType::INCIDENT_ANISOTROPIC_HETEROGENOUS, in_num_groups,
-                 coord_type),
+    SweepBoundary(BoundaryType::INCIDENT_ANISOTROPIC_HETEROGENOUS, in_num_groups,
+                  coord_type),
     boundary_function_(std::move(in_bndry_function)),
     ref_boundary_id_(in_ref_boundary_id)
   {}

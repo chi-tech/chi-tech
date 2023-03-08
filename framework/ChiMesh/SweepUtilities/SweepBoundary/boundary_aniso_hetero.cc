@@ -26,8 +26,7 @@ HeterogenousPsiIncoming(uint64_t cell_local_id,
 
   const size_t dof_offset = num_groups_ * angle_num + group_num;
 
-//  return &local_cell_data[cell_local_id][face_num][fi][dof_offset];
-  return &local_cell_data_.at(cell_local_id).at(face_num).at(fi).at(dof_offset);
+  return &local_cell_data_[cell_local_id][face_num][fi][dof_offset];
 }
 
 //###################################################################
@@ -78,6 +77,8 @@ Setup(const chi_mesh::MeshContinuum &grid,
   for (int g=0; g<static_cast<int>(num_groups_); ++g)
     group_indices.emplace_back(g);
 
+  const double eval_time = GetEvaluationTime();
+
   for (const auto& cell : grid.local_cells)
   {
     if (cell_bndry_flags[cell.local_id_])
@@ -104,7 +105,8 @@ Setup(const chi_mesh::MeshContinuum &grid,
                                            angle_indices,
                                            angle_vectors,
                                            phi_theta_angles,
-                                           group_indices);
+                                           group_indices,
+                                           eval_time);
 
             face_data.push_back(std::move(face_node_data));
           }//for face node-i

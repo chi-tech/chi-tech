@@ -4,7 +4,7 @@
 #include "chi_mpi.h"
 
 //###################################################################
-/**Returns a pointer to a heterogenous flux storage location.*/
+/**Returns a pointer to a reflected flux storage location.*/
 double* chi_mesh::sweep_management::BoundaryReflecting::
 HeterogenousPsiIncoming(uint64_t cell_local_id,
                         int face_num,

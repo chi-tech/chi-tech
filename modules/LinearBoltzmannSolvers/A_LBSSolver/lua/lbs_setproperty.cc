@@ -169,7 +169,8 @@ const chi_mesh::Vector3& face_node_normal,
 const std::vector<int>& quadrature_angle_indices,
 const std::vector<chi_mesh::Vector3>& quadrature_angle_vectors,
 const std::vector<std::pair<double,double>>& quadrature_phi_theta_angles,
-const std::vector<int>& group_indices) override;
+const std::vector<int>& group_indices,
+double evaluation_time;
 ```
 and must return a 1D array of data-values ordered first by angle index, then
 by group index, e.g., n0g0, n0g1, n0g2, n1g0, n1g1, n1g2, etc.

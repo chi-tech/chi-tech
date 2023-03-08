@@ -5,7 +5,7 @@
 
 //###################################################################
 /**Returns a pointer to a heterogenous flux storage location.*/
-double* chi_mesh::sweep_management::BoundaryBase::
+double* chi_mesh::sweep_management::SweepBoundary::
 HeterogenousPsiIncoming(uint64_t cell_local_id,
                         int face_num,
                         int fi,
@@ -22,7 +22,7 @@ HeterogenousPsiIncoming(uint64_t cell_local_id,
 
 //###################################################################
 /**Returns a pointer to a heterogenous flux storage location.*/
-double* chi_mesh::sweep_management::BoundaryBase::
+double* chi_mesh::sweep_management::SweepBoundary::
 HeterogenousPsiOutgoing(uint64_t cell_local_id,
                         int face_num,
                         int fi,

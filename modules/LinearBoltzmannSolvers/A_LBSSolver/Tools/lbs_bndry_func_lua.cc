@@ -18,7 +18,8 @@ Evaluate(size_t cell_global_id,
          const std::vector<int>& quadrature_angle_indices,
          const std::vector<chi_mesh::Vector3>& quadrature_angle_vectors,
          const std::vector<std::pair<double, double>>& quadrature_phi_theta_angles,
-         const std::vector<int>& group_indices)
+         const std::vector<int>& group_indices,
+         double time)
 {
   const std::string fname = "LinearBoltzmann::BoundaryFunctionToLua";
   //======================================== Utility lambdas
@@ -109,9 +110,11 @@ Evaluate(size_t cell_global_id,
 
   PushVecIntAsTable(L, group_indices);
 
+  lua_pushnumber(L, time);
+
   std::vector<double> psi;
-  //8 arguments, 1 result (table), 0=original error object
-  if (lua_pcall(L,8,1,0) == 0)
+  //9 arguments, 1 result (table), 0=original error object
+  if (lua_pcall(L,9,1,0) == 0)
   {
     LuaCheckTableValue(fname, L, -1);
     size_t table_length = lua_rawlen(L, -1);
