@@ -7,19 +7,19 @@
 #include "chi_log.h"
 
 //###################################################################
-/**Returns a pointer to a heterogenous flux storage location.*/
-double* chi_mesh::sweep_management::BoundaryIncidentHeterogenous::
-HeterogenousPsiIncoming(uint64_t cell_local_id,
-                        int face_num,
-                        int fi,
-                        int angle_num,
-                        int group_num,
-                        int gs_ss_begin)
+/**Returns a pointer to a heterogeneous flux storage location.*/
+double* chi_mesh::sweep_management::BoundaryIncidentHeterogeneous::
+HeterogeneousPsiIncoming(uint64_t cell_local_id,
+                         int face_num,
+                         int fi,
+                         int angle_num,
+                         int group_num,
+                         int gs_ss_begin)
 {
   if (local_cell_data_.empty())
   {
     chi::log.LogAllError()
-      << "HeterogenousPsiIncoming call made to a heterogeneous boundary "
+      << "HeterogeneousPsiIncoming call made to a heterogeneous boundary "
          "with that information not yet set up.";
     exit(EXIT_FAILURE);
   }
@@ -31,7 +31,7 @@ HeterogenousPsiIncoming(uint64_t cell_local_id,
 
 //###################################################################
 /**Performs the setup for a particular quadrature.*/
-void chi_mesh::sweep_management::BoundaryIncidentHeterogenous::
+void chi_mesh::sweep_management::BoundaryIncidentHeterogeneous::
 Setup(const chi_mesh::MeshContinuum &grid,
       const chi_math::AngularQuadrature &quadrature)
 {
