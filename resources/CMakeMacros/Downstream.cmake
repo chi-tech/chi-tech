@@ -49,7 +49,8 @@ endif()
 message(STATUS "VTK_DIR set to ${VTK_DIR}")
 
 find_package(MPI)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CHI_TECH_DIR}/resources/Macros")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
+    "${CHI_TECH_DIR}/resources/CMakeMacros")
 
 #================================================ Include macros
 include(GNUInstallDirs)
@@ -70,8 +71,10 @@ include_directories("${CHI_TECH_DIR}/framework")
 include_directories("${CHI_TECH_DIR}/framework/ChiLua")
 include_directories("${CHI_TECH_DIR}/framework/ChiMPI")
 include_directories("${CHI_TECH_DIR}/framework/ChiLog")
+include_directories("${CHI_TECH_DIR}/framework/ChiMiscUtils")
 include_directories("${CHI_TECH_DIR}/resources")
 include_directories("${CHI_TECH_DIR}/modules")
+include_directories("${CHI_TECH_DIR}/modules/LinearBoltzmannSolvers")
 
 #================================================ Library directories
 link_directories("${LUA_ROOT}/lib")
@@ -92,6 +95,7 @@ if (VTK_VERSION VERSION_LESS "8.90.0")
             vtkIOXML vtkParallelCore vtkIOParallelXML
             vtkFiltersCore
             vtkIOEnSight
+            vtkIOExodus
             REQUIRED PATHS ${VTK_DIR})
     # old system
     include(${VTK_USE_FILE})
@@ -103,6 +107,7 @@ else ()
             IOXML ParallelCore IOParallelXML
             FiltersCore
             IOEnSight
+            IOExodus
             REQUIRED PATHS ${VTK_DIR})
     # vtk_module_autoinit is needed
     vtk_module_autoinit(TARGETS ${TARGET} MODULES ${VTK_LIBRARIES})
