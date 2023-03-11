@@ -2,7 +2,8 @@
 
 #include "A_LBSSolver/Acceleration/diffusion_mip.h"
 #include "IterativeOperations/mip_wgs_context.h"
-#include "LinearBoltzmannSolvers/A_LBSSolver/IterativeMethods/wgs_linear_solver.h"
+#include "A_LBSSolver/IterativeMethods/wgs_linear_solver.h"
+#include "A_LBSSolver/SourceFunctions/source_function.h"
 
 /**Initializing.*/
 void lbs::MIPSteadyStateSolver::Initialize()
@@ -10,10 +11,12 @@ void lbs::MIPSteadyStateSolver::Initialize()
   options_.scattering_order = 0; //overwrite any setting otherwise
   LBSSolver::Initialize();
 
+  auto src_function = std::make_shared<SourceFunction>(*this);
+
   // Initialize source func
   using namespace std::placeholders;
   active_set_source_function_ =
-    std::bind(&LBSSolver::SetSource, this, _1, _2, _3, _4);
+    std::bind(&SourceFunction::operator(), src_function, _1, _2, _3, _4);
 
   //================================================== Initialize groupsets
   //                                                   preconditioning
@@ -26,7 +29,6 @@ void lbs::MIPSteadyStateSolver::Initialize()
 /**Initializes Within-GroupSet solvers.*/
 void lbs::MIPSteadyStateSolver::InitializeWGSSolvers()
 {
-  std::cout<<"InitializeWGSSolvers" << std::endl;
   //============================================= Initialize groupset solvers
   gs_mip_solvers_.assign(groupsets_.size(), nullptr);
   const size_t num_groupsets = groupsets_.size();

@@ -3,47 +3,66 @@
 
 #include "LinearBoltzmannSolvers/A_LBSSolver/lbs_structs.h"
 
+#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
+
 #include <memory>
 #include <utility>
-
-namespace chi_mesh
-{
-  class MeshContinuum;
-  class Cell;
-}
-typedef std::shared_ptr<const chi_mesh::MeshContinuum> ConstGridPtr;
-
-namespace chi_math
-{
-  class AngularQuadrature;
-}
 
 namespace lbs
 {
 class LBSSolver;
 class LBSGroupset;
 
-class SourceContext;
-
 //###################################################################
-/**Implements a customizable source function using virtual methods and
- * an additionally customizable source context.*/
+/**Implements a customizable source function using virtual methods.
+ * This base class will function well for steady simulations and kEigenvalue
+ * simulations. It needs some customization for adjoint and transient.*/
 class SourceFunction
 {
 protected:
   const LBSSolver& lbs_solver_;
-  const chi_mesh::MeshContinuum& grid_;
-  std::vector<chi_math::AngularQuadrature::HarmonicIndices> m_to_ell_em_map_;
-  std::shared_ptr<SourceContext> context_;
+
+  bool apply_fixed_src_         = false;
+  bool apply_wgs_scatter_src_   = false;
+  bool apply_ags_scatter_src_   = false;
+  bool apply_wgs_fission_src_   = false;
+  bool apply_ags_fission_src_   = false;
+  bool suppress_wg_scatter_src_ = false;
+
+  size_t gs_i_      = 0;
+  size_t gs_f_      = 0;
+  size_t first_grp_ = 0;
+  size_t last_grp_  = 0;
+
+  double        cell_volume_       = 0.0;
+  size_t        g_                 = 0;
+  const double* fixed_src_moments_ = nullptr;
+  std::vector<double> default_zero_src_;
 
 public:
-  SourceFunction(const LBSSolver& lbs_solver,
-                 std::shared_ptr<SourceContext>& context);
+  explicit
+  SourceFunction(const LBSSolver& lbs_solver);
+  virtual ~SourceFunction() = default;
 
   virtual void operator()(LBSGroupset& groupset,
                           std::vector<double>& destination_q,
                           const std::vector<double>& phi,
                           SourceFlags source_flags);
+
+  virtual double AddSourceMoments() const;
+  virtual
+  double AddScattering(const chi_math::SparseMatrix& S,
+                       const double* phi) const;
+
+  virtual
+  double AddPromptFission(const std::vector<double>& F_g,
+                          const double* phi) const;
+
+  typedef std::vector<chi_physics::MultiGroupXS::Precursor> PrecursorList;
+  virtual
+  double AddDelayedFission(const PrecursorList& precursors,
+                           const std::vector<double>& nu_delayed_sigma_f,
+                           const double* phi) const;
 
   virtual void AddAdditionalSources(LBSGroupset& groupset,
                                     std::vector<double>& destination_q,

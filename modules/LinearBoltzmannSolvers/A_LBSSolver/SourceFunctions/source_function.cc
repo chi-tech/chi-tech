@@ -2,8 +2,6 @@
 
 #include "A_LBSSolver/lbs_solver.h"
 
-#include "source_context.h"
-
 #include "chi_runtime.h"
 #include "chi_log.h"
 
@@ -12,11 +10,8 @@ namespace lbs
 
 //###################################################################
 /**Constructor.*/
-SourceFunction::SourceFunction(const LBSSolver &lbs_solver,
-                               std::shared_ptr<SourceContext>& context) :
-  lbs_solver_(lbs_solver),
-  grid_(lbs_solver_.Grid()),
-  context_(context)
+SourceFunction::SourceFunction(const LBSSolver &lbs_solver) :
+  lbs_solver_(lbs_solver)
 {}
 
 
@@ -40,31 +35,21 @@ void SourceFunction::operator()(LBSGroupset &groupset,
   const size_t source_event_tag = lbs_solver_.GetSourceEventTag();
   chi::log.LogEvent(source_event_tag, chi_objects::ChiLog::EventType::EVENT_BEGIN);
 
-  const bool apply_fixed_src       = (source_flags & APPLY_FIXED_SOURCES);
-  const bool apply_wgs_scatter_src = (source_flags & APPLY_WGS_SCATTER_SOURCES);
-  const bool apply_ags_scatter_src = (source_flags & APPLY_AGS_SCATTER_SOURCES);
-  const bool apply_wgs_fission_src = (source_flags & APPLY_WGS_FISSION_SOURCES);
-  const bool apply_ags_fission_src = (source_flags & APPLY_AGS_FISSION_SOURCES);
-  const bool suppress_wg_scatter_src = (source_flags & SUPPRESS_WG_SCATTER);
-
-  context_->SetFlags(apply_wgs_scatter_src,
-                     apply_ags_scatter_src,
-                     apply_wgs_fission_src,
-                     apply_ags_fission_src,
-                     suppress_wg_scatter_src);
+  apply_fixed_src_       = (source_flags & APPLY_FIXED_SOURCES);
+  apply_wgs_scatter_src_ = (source_flags & APPLY_WGS_SCATTER_SOURCES);
+  apply_ags_scatter_src_ = (source_flags & APPLY_AGS_SCATTER_SOURCES);
+  apply_wgs_fission_src_ = (source_flags & APPLY_WGS_FISSION_SOURCES);
+  apply_ags_fission_src_ = (source_flags & APPLY_AGS_FISSION_SOURCES);
+  suppress_wg_scatter_src_ = (source_flags & SUPPRESS_WG_SCATTER);
 
   //================================================== Get group setup
-  const auto gs_i = static_cast<size_t>(groupset.groups_.front().id_);
-  const auto gs_f = static_cast<size_t>(groupset.groups_.back().id_);
+  gs_i_ = static_cast<size_t>(groupset.groups_.front().id_);
+  gs_f_ = static_cast<size_t>(groupset.groups_.back().id_);
 
-  context_->SetGroupsetBounds(gs_i, gs_f);
+  first_grp_ = static_cast<size_t>(lbs_solver_.Groups().front().id_);
+  last_grp_ = static_cast<size_t>(lbs_solver_.Groups().back().id_);
 
-  const auto first_grp = static_cast<size_t>(lbs_solver_.Groups().front().id_);
-  const auto last_grp = static_cast<size_t>(lbs_solver_.Groups().back().id_);
-
-  context_->SetGroupBounds(first_grp, last_grp);
-
-  std::vector<double> default_zero_src(lbs_solver_.Groups().size(), 0.0);
+  default_zero_src_.assign(lbs_solver_.Groups().size(), 0.0);
 
   const auto& cell_transport_views = lbs_solver_.GetCellTransportViews();
   const auto& matid_to_src_map = lbs_solver_.GetMatID2IsoSrcMap();
@@ -76,15 +61,19 @@ void SourceFunction::operator()(LBSGroupset &groupset,
     groupset.quadrature_->GetMomentToHarmonicsIndexMap();
 
   //================================================== Loop over local cells
+  const auto& grid = lbs_solver_.Grid();
   // Apply all nodal sources
-  for (const auto& cell : grid_.local_cells)
+  for (const auto& cell : grid.local_cells)
   {
     auto& transport_view = cell_transport_views[cell.local_id_];
-    context_->SetCellVolume(transport_view.Volume());
+    cell_volume_ = transport_view.Volume();
 
     //==================== Obtain xs
     const auto& xs = transport_view.XS();
-    auto P0_src = matid_to_src_map.at(cell.material_id_);
+
+      std::shared_ptr<chi_physics::IsotropicMultiGrpSource> P0_src = nullptr;
+    if (matid_to_src_map.count(cell.material_id_ > 0))
+      P0_src = matid_to_src_map.at(cell.material_id_);
 
     const auto& S = xs.TransferMatrices();
     const auto& F = xs.ProductionMatrix();
@@ -103,38 +92,35 @@ void SourceFunction::operator()(LBSGroupset &groupset,
         size_t uk_map = transport_view.MapDOF(i, m, 0); //unknown map
 
         //==================== Declare moment src
-        const double* src;
         if (P0_src and ell == 0)
-          src = P0_src->source_value_g_.data();
+          fixed_src_moments_ = P0_src->source_value_g_.data();
         else
-          src = default_zero_src.data();
+          fixed_src_moments_ = default_zero_src_.data();
 
         if (lbs_solver_.Options().use_src_moments)
-          src = &ext_src_moments_local[uk_map];
-
-        context_->SetFixedSrcMomentsData(src);
+          fixed_src_moments_ = &ext_src_moments_local[uk_map];
 
         //============================= Loop over groupset groups
-        for (size_t g = gs_i; g <= gs_f; ++g)
+        for (size_t g = gs_i_; g <= gs_f_; ++g)
         {
-          context_->SetGroupIndex(g);
+          g_ = g;
 
           double rhs = 0.0;
 
           //============================== Apply fixed sources
-          if (apply_fixed_src) rhs += context_->AddSourceMoments();
+          if (apply_fixed_src_) rhs += this->AddSourceMoments();
 
           //============================== Apply scattering sources
-          if (ell < S.size()) rhs += context_->AddScattering(S[ell], &phi[uk_map]);
+          if (ell < S.size()) rhs += this->AddScattering(S[ell], &phi[uk_map]);
 
           //============================== Apply fission sources
           const bool fission_avail = ell == 0 and xs.IsFissionable();
 
           if (fission_avail)
           {
-            rhs += context_->AddPromptFission(F[g], &phi[uk_map]);
+            rhs += this->AddPromptFission(F[g], &phi[uk_map]);
             if (lbs_solver_.Options().use_precursors)
-              rhs += context_->AddDelayedFission(
+              rhs += this->AddDelayedFission(
                 precursors, nu_delayed_sigma_f, &phi[uk_map]);
           }
 
@@ -150,6 +136,83 @@ void SourceFunction::operator()(LBSGroupset &groupset,
 
   chi::log.LogEvent(source_event_tag, chi_objects::ChiLog::EventType::EVENT_END);
 }
+
+double SourceFunction::AddSourceMoments() const
+{
+  return fixed_src_moments_[g_];
+}
+
+//###################################################################
+/**Adds scattering sources.*/
+double SourceFunction::
+AddScattering(const chi_math::SparseMatrix& S,
+              const double* phi) const
+{
+  double value = 0.0;
+  //==================== Add Across GroupSet Scattering (AGS)
+  if (apply_ags_scatter_src_)
+    for (const auto& [_, gp, sigma_sm] : S.Row(g_))
+      if (gp < gs_i_ or gp > gs_f_)
+        value += sigma_sm * phi[gp];
+
+  //==================== Add Within GroupSet Scattering (WGS)
+  if (apply_wgs_scatter_src_)
+    for (const auto& [_, gp, sigma_sm] : S.Row(g_))
+      if (gp >= gs_i_ and gp <= gs_f_)
+      {
+        if (suppress_wg_scatter_src_ and g_ == gp) continue;
+        value += sigma_sm * phi[gp];
+      }
+
+  return value;
+}
+
+//###################################################################
+/**Adds prompt fission sources.*/
+double SourceFunction::
+AddPromptFission(const std::vector<double>& F_g,
+                 const double* phi) const
+{
+  double value = 0.0;
+  //==================== Add Across GroupSet Fission (AGS)
+  if (apply_ags_fission_src_)
+    for (size_t gp = first_grp_; gp <= last_grp_; ++gp)
+      if (gp < gs_i_ or gp > gs_f_)
+        value += F_g[gp] * phi[gp];
+
+  if (apply_wgs_fission_src_)
+    for (size_t gp = gs_i_; gp <= gs_f_; ++gp)
+      value += F_g[gp] * phi[gp];
+
+  return value;
+}
+
+//###################################################################
+/**Adds delayed particle precursor sources.*/
+double SourceFunction::
+  AddDelayedFission(const PrecursorList &precursors,
+                    const std::vector<double> &nu_delayed_sigma_f,
+                    const double *phi) const
+{
+  double value = 0.0;
+  if (apply_ags_fission_src_)
+    for (size_t gp = first_grp_; gp <= last_grp_; ++gp)
+      if (gp < gs_i_ or gp > gs_f_)
+        for (const auto& precursor : precursors)
+          value += precursor.emission_spectrum[g_] *
+                   precursor.fractional_yield *
+                   nu_delayed_sigma_f[gp] * phi[gp];
+
+  if (apply_wgs_fission_src_)
+    for (size_t gp = gs_i_; gp <= gs_f_; ++gp)
+      for (const auto& precursor : precursors)
+        value += precursor.emission_spectrum[g_] *
+                 precursor.fractional_yield *
+                 nu_delayed_sigma_f[gp] * phi[gp];
+
+  return value;
+}
+
 
 //###################################################################
 /**Adds point sources to the source moments.*/

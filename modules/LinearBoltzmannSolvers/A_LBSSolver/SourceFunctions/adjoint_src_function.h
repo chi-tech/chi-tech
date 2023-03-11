@@ -6,17 +6,23 @@
 namespace lbs
 {
 
+/**The adjoint source function removes volumetric fixed source moments
+ * as well as point sources, whilst adding volumetric QOI sources.*/
 class AdjointSourceFunction : public SourceFunction
 {
 public:
-  AdjointSourceFunction(const LBSSolver& lbs_solver,
-                        std::shared_ptr<SourceContext>& context);
+  explicit
+  AdjointSourceFunction(const LBSSolver& lbs_solver);
+
+  double AddSourceMoments() const override {return 0.0;}
 
   void AddAdditionalSources(LBSGroupset& groupset,
                             std::vector<double>& destination_q,
                             const std::vector<double>& phi,
                             SourceFlags source_flags) override
   {
+    //Inhibit -> AddPointSources
+    //Add     -> AddVolumetricQOISources
     AddVolumetricQOISources(groupset, destination_q, phi, source_flags);
   }
 

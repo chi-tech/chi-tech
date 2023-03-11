@@ -148,7 +148,6 @@ public:
   std::vector<double>& PhiNewLocal();
   const std::vector<double>& PhiNewLocal() const;
 
-
   //01
   void Initialize() override;
 protected:
@@ -225,12 +224,6 @@ public:
 
   //05a
   void UpdateFieldFunctions();
-
-  //06a
-  void SetSource(LBSGroupset& groupset,
-                 std::vector<double>& destination_q,
-                 const std::vector<double>& phi,
-                 SourceFlags source_flags);
 
   //06b
 protected:

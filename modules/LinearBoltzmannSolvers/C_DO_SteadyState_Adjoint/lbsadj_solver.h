@@ -29,11 +29,6 @@ public:
 
   explicit DiscOrdSteadyStateAdjointSolver(const std::string& solver_name);
 
-  void SetAdjointSource(lbs::LBSGroupset& groupset,
-                        std::vector<double>& destination_q,
-                        const std::vector<double>& phi,
-                        lbs::SourceFlags source_flags);
-
   double ComputeInnerProduct();
   const std::vector<RespFuncAndSubs>& GetResponseFunctions() const;
 

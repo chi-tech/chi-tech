@@ -1,9 +1,22 @@
-#include "td_src_context.h"
+#include "transient_source_function.h"
 
-double lbs::TransientSourceContext::
-  AddDelayedFission(const PrecursorList &precursors,
-                    const std::vector<double> &nu_delayed_sigma_f,
-                    const double *phi) const
+//###################################################################
+/**Constructor for the transient source function. The only difference
+ * as compared to a steady source function is the treatment of delayed fission.*/
+lbs::TransientSourceFunction::
+TransientSourceFunction(const LBSSolver& lbs_solver,
+                        double &ref_dt, chi_math::SteppingMethod &method) :
+  SourceFunction(lbs_solver),
+  dt_(ref_dt),
+  method_(method)
+{}
+
+//###################################################################
+/**Customized delayed fission source..*/
+double lbs::TransientSourceFunction::
+AddDelayedFission(const PrecursorList &precursors,
+                  const std::vector<double> &nu_delayed_sigma_f,
+                  const double *phi) const
 {
   const auto& BackwardEuler = chi_math::SteppingMethod::BACKWARD_EULER;
   const auto& CrankNicolson = chi_math::SteppingMethod::CRANK_NICHOLSON;

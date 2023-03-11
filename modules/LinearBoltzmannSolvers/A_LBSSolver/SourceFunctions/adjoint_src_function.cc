@@ -5,16 +5,19 @@
 namespace lbs
 {
 
+//###################################################################
+/**Constructor for an adjoint source function.*/
 AdjointSourceFunction::
-  AdjointSourceFunction(const LBSSolver &lbs_solver,
-                        std::shared_ptr<SourceContext> &context) :
-  SourceFunction(lbs_solver, context)
+  AdjointSourceFunction(const LBSSolver &lbs_solver) :
+  SourceFunction(lbs_solver)
 {}
 
+//###################################################################
+/**Adds Quantities of Interest to the nodal sources.*/
 void AdjointSourceFunction::
   AddVolumetricQOISources(LBSGroupset& groupset,
                           std::vector<double>& destination_q,
-                          const std::vector<double>& phi,
+                          const std::vector<double>&,
                           SourceFlags source_flags)
 {
   const std::string fname = "AdjointSourceFunction::AddVolumetricQOISources";
@@ -31,7 +34,6 @@ void AdjointSourceFunction::
   const auto& cell_transport_views = adjoint_solver.GetCellTransportViews();
   const auto& grid = adjoint_solver.Grid();
   const auto num_groups = adjoint_solver.NumGroups();
-
 
   const bool apply_fixed_src       = (source_flags & APPLY_FIXED_SOURCES);
 

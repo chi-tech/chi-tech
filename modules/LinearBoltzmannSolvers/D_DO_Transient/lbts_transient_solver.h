@@ -64,10 +64,6 @@ public:
 
   //Iterative operations
   std::shared_ptr<SweepChunk> SetTransientSweepChunk(LBSGroupset& groupset);
-  void SetTransientSource(LBSGroupset& groupset,
-                          std::vector<double>&  destination_q,
-                          const std::vector<double>& phi,
-                          SourceFlags source_flags);
 
   double ComputeBeta();
   void   PostStepCallBackFunction() const;
