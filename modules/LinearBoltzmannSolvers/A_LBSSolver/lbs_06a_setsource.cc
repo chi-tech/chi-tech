@@ -57,10 +57,8 @@ void lbs::LBSSolver::
     const auto& precursors = xs.Precursors();
     const auto& nu_delayed_sigma_f = xs.NuDelayedSigmaF();
 
-    //==================== Obtain src
-    double* src = default_zero_src.data();
-    if (P0_src and apply_fixed_src)
-      src = P0_src->source_value_g_.data();
+    //==================== Declare src
+    const double* src;
 
     //======================================== Loop over nodes
     const int num_nodes = transport_view.NumNodes();
@@ -73,16 +71,21 @@ void lbs::LBSSolver::
 
         size_t uk_map = transport_view.MapDOF(i, m, 0); //unknown map
 
+        if (P0_src and ell == 0)
+          src = P0_src->source_value_g_.data();
+        else
+          src = default_zero_src.data();
+
+        if (options_.use_src_moments)
+          src = &ext_src_moments_local_[uk_map];
+
         //============================= Loop over groupset groups
         for (size_t g = gs_i; g <= gs_f; ++g)
         {
           double rhs = 0.0;
 
           //============================== Apply fixed sources
-          if (not options_.use_src_moments) //using regular material src
-            rhs += (apply_fixed_src and ell == 0)? src[g] : 0.0;
-          else if (apply_fixed_src)  //using ext_src_moments
-            rhs += ext_src_moments_local_[uk_map + g];
+          if (apply_fixed_src) rhs += src[g];
 
           //============================== Apply scattering sources
           const bool moment_avail = ell < S.size();
