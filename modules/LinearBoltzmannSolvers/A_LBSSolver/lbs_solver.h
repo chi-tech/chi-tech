@@ -98,13 +98,19 @@ public:
   LBSSolver (const LBSSolver&) = delete;
   LBSSolver& operator= (const LBSSolver&) = delete;
 
+  size_t GetSourceEventTag() const;
+
   double LastRestartWrite() const;
   double& LastRestartWrite();
 
   lbs::Options& Options();
+  const lbs::Options& Options() const;
 
   size_t NumMoments() const;
   size_t NumGroups() const;
+  size_t NumPrecursors() const;
+
+  size_t GetMaxPrecursorsPerMaterial() const;
 
   void AddGroup(int id);
   const std::vector<LBSGroup>& Groups() const;
@@ -113,11 +119,18 @@ public:
   std::vector<LBSGroupset>& Groupsets();
   const std::vector<LBSGroupset>& Groupsets() const;
 
-  const chi_math::SpatialDiscretization& SpatialDiscretization() const;
-
   void AddPointSource(PointSource psrc);
   void ClearPointSources();
   const std::vector<PointSource>& PointSources() const;
+
+  const std::map<int, XSPtr>& GetMatID2XSMap() const;
+  const std::map<int, IsotropicSrcPtr>& GetMatID2IsoSrcMap() const;
+
+  const chi_math::SpatialDiscretization& SpatialDiscretization() const;
+  const chi_mesh::MeshContinuum& Grid() const;
+
+  const std::vector<lbs::CellLBSView>&
+  GetCellTransportViews() const;
 
   std::map<uint64_t, BoundaryPreference>& BoundaryPreferences();
 
@@ -127,9 +140,14 @@ public:
   size_t GlobalNodeCount() const;
 
   std::vector<double>& QMomentsLocal();
+  const std::vector<double>& QMomentsLocal() const;
   std::vector<double>& ExtSrcMomentsLocal();
+  const std::vector<double>& ExtSrcMomentsLocal() const;
   std::vector<double>& PhiOldLocal();
+  const std::vector<double>& PhiOldLocal() const;
   std::vector<double>& PhiNewLocal();
+  const std::vector<double>& PhiNewLocal() const;
+
 
   //01
   void Initialize() override;

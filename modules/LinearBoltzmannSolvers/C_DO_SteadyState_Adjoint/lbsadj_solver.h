@@ -35,6 +35,7 @@ public:
                         lbs::SourceFlags source_flags);
 
   double ComputeInnerProduct();
+  const std::vector<RespFuncAndSubs>& GetResponseFunctions() const;
 
   void Initialize() override;
   void Execute() override;
