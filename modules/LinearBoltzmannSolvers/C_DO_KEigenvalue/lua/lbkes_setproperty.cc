@@ -80,6 +80,18 @@ int chiLBKESSetProperty(lua_State *L)
         << "LinearBoltzmann::KEigenvalueSolver: "
         << "tolerance set to " << buff << ".";
   }
+  else if (property == "K_EIGEN_METHOD")
+  {
+    LuaCheckNilValue(fname, L, 3);
+    LuaCheckStringValue(fname, L, 3);
+    const std::string method = lua_tostring(L, 3);
+
+    solver.k_eigen_method_ = method;
+
+    chi::log.Log()
+      << "LinearBoltzmann::KEigenvalueSolver: "
+      << "k_eigen_method set to " << method << ".";
+  }
   else
   {
     chi::log.LogAllError() << fname << ": Invalid property index.";

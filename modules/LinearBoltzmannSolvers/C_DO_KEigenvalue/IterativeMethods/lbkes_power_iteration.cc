@@ -39,10 +39,14 @@ void DiscOrdKEigenvalueSolver::PowerIteration()
 
     q_moments_local_.assign(q_moments_local_.size(), 0.0);
     for (auto& groupset : groupsets_)
+    {
       active_set_source_function_(groupset, q_moments_local_,
                                   PhiOldLocal(),
                                   APPLY_AGS_FISSION_SOURCES |
                                   APPLY_WGS_FISSION_SOURCES);
+      groupset.angle_agg_.ZeroIncomingDelayedPsi();
+    }
+
 
     primary_ags_solver_->Setup();
     primary_ags_solver_->Solve();

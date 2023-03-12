@@ -20,6 +20,7 @@ public:
   /**Iterative parameters.*/
   size_t max_iterations_ = 1000;
   double tolerance_ = 1.0e-8;
+  std::string k_eigen_method_ = "power";
 
 public:
   DiscOrdKEigenvalueSolver (const DiscOrdKEigenvalueSolver&) = delete;
@@ -27,6 +28,9 @@ public:
 
   explicit DiscOrdKEigenvalueSolver(const std::string& in_text_name) :
     lbs::DiscOrdSteadyStateSolver(in_text_name) {}
+
+  double GetKeff() const {return k_eff_;}
+  void SetKeff(double k_eff) {k_eff_ = k_eff;}
 
 protected:
   void InitializeWGSSolvers() override;
@@ -36,6 +40,7 @@ public:
 
   // IterativeMethods
   void PowerIteration();
+  int NonLinearKEigen();
 
 
 };

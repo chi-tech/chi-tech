@@ -2,7 +2,7 @@
 #define CHITECH_AGS_LINEAR_SOLVER_H
 
 #include "ChiMath/LinearSolver/linear_solver.h"
-#include "A_LBSSolver/Tools/ags_context.h"
+#include "ags_context.h"
 
 namespace lbs
 {

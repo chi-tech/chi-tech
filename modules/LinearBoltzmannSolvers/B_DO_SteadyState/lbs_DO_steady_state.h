@@ -62,7 +62,7 @@ protected:
   //03f
   void ResetSweepOrderings(LBSGroupset& groupset);
 
-protected:
+public:
   virtual std::shared_ptr<SweepChunk> SetSweepChunk(LBSGroupset& groupset);
 
 protected:
@@ -78,6 +78,14 @@ public:
   void GSScopedCopyPrimarySTLvectors(LBSGroupset& groupset,
                                      PhiSTLOption from_which_phi,
                                      PhiSTLOption to_which_phi) override;
+
+  void SetMultiGSPETScVecFromPrimarySTLvector(std::vector<int>& gs_ids,
+                                              Vec x,
+                                              PhiSTLOption which_phi) override;
+
+  void SetPrimarySTLvectorFromMultiGSPETScVecFrom(std::vector<int>& gs_ids,
+                                                  Vec x_src,
+                                                  PhiSTLOption which_phi) override;
 
 public:
   //compute_balance

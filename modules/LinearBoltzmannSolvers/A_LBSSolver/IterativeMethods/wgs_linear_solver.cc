@@ -1,6 +1,6 @@
 #include "wgs_linear_solver.h"
 
-#include "A_LBSSolver/Tools/wgs_convergence_test.h"
+#include "wgs_convergence_test.h"
 #include "A_LBSSolver/lbs_solver.h"
 
 #include "ChiMath/PETScUtils/petsc_utils.h"

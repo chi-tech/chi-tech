@@ -55,12 +55,14 @@ public:
   void InitializeReflectingBCs();
 
   std::pair<size_t,size_t> GetNumDelayedAngularDOFs();
-  void AppendNewDelayedAngularDOFsToArray(int& index, double* x_ref);
-  void AppendOldDelayedAngularDOFsToArray(int& index, double* x_ref);
-  void SetOldDelayedAngularDOFsFromArray(int& index, const double* x_ref);
-  void SetNewDelayedAngularDOFsFromArray(int& index, const double* x_ref);
-  std::vector<double> GetDelayedAngularDOFsAsSTLVector();
-  void SetDelayedAngularDOFsFromSTLVector(const std::vector<double>& stl_vector);
+  void AppendNewDelayedAngularDOFsToArray(int64_t& index, double* x_ref);
+  void AppendOldDelayedAngularDOFsToArray(int64_t& index, double* x_ref);
+  void SetOldDelayedAngularDOFsFromArray(int64_t& index, const double* x_ref);
+  void SetNewDelayedAngularDOFsFromArray(int64_t& index, const double* x_ref);
+  std::vector<double> GetNewDelayedAngularDOFsAsSTLVector();
+  void SetNewDelayedAngularDOFsFromSTLVector(const std::vector<double>& stl_vector);
+  std::vector<double> GetOldDelayedAngularDOFsAsSTLVector();
+  void SetOldDelayedAngularDOFsFromSTLVector(const std::vector<double>& stl_vector);
   void SetDelayedPsiOld2New();
   void SetDelayedPsiNew2Old();
 };

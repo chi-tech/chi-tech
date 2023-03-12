@@ -74,7 +74,7 @@ public:
     return tolerance_options_;
   }
 
-  std::shared_ptr<LinearSolverContext<MatType,VecType>> GetContext()
+  std::shared_ptr<LinearSolverContext<MatType,VecType>>& GetContext()
   {
     return context_ptr_;
   }

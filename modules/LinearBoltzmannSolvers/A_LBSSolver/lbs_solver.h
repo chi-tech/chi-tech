@@ -148,6 +148,21 @@ public:
   std::vector<double>& PhiNewLocal();
   const std::vector<double>& PhiNewLocal() const;
 
+  SetSourceFunction GetActiveSetSourceFunction() const
+  {
+    return active_set_source_function_;
+  }
+
+  AGSLinSolverPtr GetPrimaryAGSSolver()
+  {
+    return primary_ags_solver_;
+  }
+
+  std::vector<LinSolvePtr>& GetWGSSolvers()
+  {
+    return wgs_solvers_;
+  }
+
   //01
   void Initialize() override;
 protected:
@@ -226,9 +241,8 @@ public:
   void UpdateFieldFunctions();
 
   //06b
-protected:
-  double ComputeFissionProduction(const std::vector<double>& phi);
 public:
+  double ComputeFissionProduction(const std::vector<double>& phi);
   double ComputeFissionRate(const std::vector<double>& phi);
 
   //06c
@@ -261,7 +275,13 @@ public:
     int last_group_id, Vec x_src,
     std::vector<double>& y);
 
+  virtual void SetMultiGSPETScVecFromPrimarySTLvector(std::vector<int>& gs_ids,
+                                                      Vec x,
+                                                      PhiSTLOption which_phi);
 
+  virtual void SetPrimarySTLvectorFromMultiGSPETScVecFrom(std::vector<int>& gs_ids,
+                                                      Vec x_src,
+                                                      PhiSTLOption which_phi);
 };
 
 

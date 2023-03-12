@@ -1,7 +1,7 @@
 #ifndef CHITECH_SWEEP_WGS_CONTEXT_H
 #define CHITECH_SWEEP_WGS_CONTEXT_H
 
-#include "A_LBSSolver/Tools/wgs_context.h"
+#include "A_LBSSolver/IterativeMethods/wgs_context.h"
 
 #include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
