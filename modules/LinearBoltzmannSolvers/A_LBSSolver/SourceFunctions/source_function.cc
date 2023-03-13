@@ -111,15 +111,40 @@ void SourceFunction::operator()(LBSGroupset &groupset,
           if (apply_fixed_src_) rhs += this->AddSourceMoments();
 
           //============================== Apply scattering sources
-          if (ell < S.size()) rhs += this->AddScattering(S[ell].Row(g),
-                                                         &phi[uk_map]);
+          if (ell < S.size())
+          {
+            const auto& S_g = S[ell].Row(g);
+            //==================== Add Across GroupSet Scattering (AGS)
+            if (apply_ags_scatter_src_)
+              for (const auto& [_, gp, sigma_sm] : S_g)
+                if (gp < gs_i_ or gp > gs_f_)
+                  rhs += sigma_sm * phi[gp];
+
+            //==================== Add Within GroupSet Scattering (WGS)
+            if (apply_wgs_scatter_src_)
+              for (const auto& [_, gp, sigma_sm] : S_g)
+                if (gp >= gs_i_ and gp <= gs_f_)
+                {
+                  if (suppress_wg_scatter_src_ and g_ == gp) continue;
+                  rhs += sigma_sm * phi[gp];
+                }
+          }
 
           //============================== Apply fission sources
           const bool fission_avail = ell == 0 and xs.IsFissionable();
 
           if (fission_avail)
           {
-            rhs += this->AddPromptFission(F[g], &phi[uk_map]);
+            const auto& F_g = F[g];
+            if (apply_ags_fission_src_)
+              for (size_t gp = first_grp_; gp <= last_grp_; ++gp)
+                if (gp < gs_i_ or gp > gs_f_)
+                  rhs += F_g[gp] * phi[gp];
+
+            if (apply_wgs_fission_src_)
+              for (size_t gp = gs_i_; gp <= gs_f_; ++gp)
+                rhs += F_g[gp] * phi[gp];
+
             if (lbs_solver_.Options().use_precursors)
               rhs += this->AddDelayedFission(
                 precursors, nu_delayed_sigma_f, &phi[uk_map]);
@@ -143,51 +168,6 @@ double SourceFunction::AddSourceMoments() const
   return fixed_src_moments_[g_];
 }
 
-//###################################################################
-/**Adds scattering sources.*/
-double SourceFunction::
-AddScattering(const chi_math::SparseMatrix::
-                    ConstRowIteratorContext& S_g,
-              const double* phi) const
-{
-  double value = 0.0;
-  //==================== Add Across GroupSet Scattering (AGS)
-  if (apply_ags_scatter_src_)
-    for (const auto& [_, gp, sigma_sm] : S_g)
-      if (gp < gs_i_ or gp > gs_f_)
-        value += sigma_sm * phi[gp];
-
-  //==================== Add Within GroupSet Scattering (WGS)
-  if (apply_wgs_scatter_src_)
-    for (const auto& [_, gp, sigma_sm] : S_g)
-      if (gp >= gs_i_ and gp <= gs_f_)
-      {
-        if (suppress_wg_scatter_src_ and g_ == gp) continue;
-        value += sigma_sm * phi[gp];
-      }
-
-  return value;
-}
-
-//###################################################################
-/**Adds prompt fission sources.*/
-double SourceFunction::
-AddPromptFission(const std::vector<double>& F_g,
-                 const double* phi) const
-{
-  double value = 0.0;
-  //==================== Add Across GroupSet Fission (AGS)
-  if (apply_ags_fission_src_)
-    for (size_t gp = first_grp_; gp <= last_grp_; ++gp)
-      if (gp < gs_i_ or gp > gs_f_)
-        value += F_g[gp] * phi[gp];
-
-  if (apply_wgs_fission_src_)
-    for (size_t gp = gs_i_; gp <= gs_f_; ++gp)
-      value += F_g[gp] * phi[gp];
-
-  return value;
-}
 
 //###################################################################
 /**Adds delayed particle precursor sources.*/
