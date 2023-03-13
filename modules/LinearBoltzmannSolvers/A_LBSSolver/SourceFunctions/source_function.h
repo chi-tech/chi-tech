@@ -51,7 +51,8 @@ public:
 
   virtual double AddSourceMoments() const;
   virtual
-  double AddScattering(const chi_math::SparseMatrix& S,
+  double AddScattering(const chi_math::SparseMatrix::
+                             ConstRowIteratorContext& S_g,
                        const double* phi) const;
 
   virtual
