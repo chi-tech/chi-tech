@@ -111,7 +111,8 @@ void SourceFunction::operator()(LBSGroupset &groupset,
           if (apply_fixed_src_) rhs += this->AddSourceMoments();
 
           //============================== Apply scattering sources
-          if (ell < S.size()) rhs += this->AddScattering(S[ell], &phi[uk_map]);
+          if (ell < S.size()) rhs += this->AddScattering(S[ell].Row(g),
+                                                         &phi[uk_map]);
 
           //============================== Apply fission sources
           const bool fission_avail = ell == 0 and xs.IsFissionable();
@@ -145,19 +146,20 @@ double SourceFunction::AddSourceMoments() const
 //###################################################################
 /**Adds scattering sources.*/
 double SourceFunction::
-AddScattering(const chi_math::SparseMatrix& S,
+AddScattering(const chi_math::SparseMatrix::
+                    ConstRowIteratorContext& S_g,
               const double* phi) const
 {
   double value = 0.0;
   //==================== Add Across GroupSet Scattering (AGS)
   if (apply_ags_scatter_src_)
-    for (const auto& [_, gp, sigma_sm] : S.Row(g_))
+    for (const auto& [_, gp, sigma_sm] : S_g)
       if (gp < gs_i_ or gp > gs_f_)
         value += sigma_sm * phi[gp];
 
   //==================== Add Within GroupSet Scattering (WGS)
   if (apply_wgs_scatter_src_)
-    for (const auto& [_, gp, sigma_sm] : S.Row(g_))
+    for (const auto& [_, gp, sigma_sm] : S_g)
       if (gp >= gs_i_ and gp <= gs_f_)
       {
         if (suppress_wg_scatter_src_ and g_ == gp) continue;
