@@ -1,6 +1,5 @@
--- 1D 1G KEigenvalue::Solver test with Vacuum BC.
--- SDM: PWLD
--- Test: Final k-eigenvalue: 0.999541
+-- 2D 2G KEigenvalue::Solver test using NonLinearK
+-- Test: Final k-eigenvalue: 0.5969127
 num_procs = 4
 
 -- NOTE: For command line inputs, specify as:

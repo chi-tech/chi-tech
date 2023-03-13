@@ -18,7 +18,7 @@ public:
   double k_eff_ = 1.0;
 
   /**Iterative parameters.*/
-  size_t max_iterations_ = 1000;
+  int max_iterations_ = 1000;
   double tolerance_ = 1.0e-8;
   std::string k_eigen_method_ = "power";
 

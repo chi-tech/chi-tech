@@ -21,7 +21,7 @@ void DiscOrdKEigenvalueSolver::PowerIteration()
       << "\n********** Solving k-eigenvalue problem with "
       << "the Power Method.\n";
 
-  phi_old_local_.assign(phi_old_local_.size(), 1.0);
+  SetPhiVectorScalarValues(phi_old_local_, 1.0);
 
   double F_prev = 1.0;
   k_eff_ = 1.0;

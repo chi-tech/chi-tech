@@ -1,7 +1,9 @@
 #include "../lbkes_k_eigenvalue_solver.h"
 
 #include "A_LBSSolver/IterativeMethods/ags_linear_solver.h"
-#include "LinearBoltzmannSolvers/A_LBSSolver/IterativeMethods/wgs_context.h"
+#include "A_LBSSolver/IterativeMethods/wgs_context.h"
+
+#include "../Tools/snes_monitor.h"
 
 #include "ChiMath/PETScUtils/petsc_utils.h"
 
@@ -60,7 +62,7 @@ int lbs::DiscOrdKEigenvalueSolver::NonLinearKEigen()
   SNESCreate(PETSC_COMM_WORLD, &snes);
   SNESSetType(snes, SNESNEWTONLS);
   SNESSetApplicationContext(snes, &(*primary_ags_solver_->GetContext()));
-  SNESSetFromOptions(snes);
+//  SNESSetFromOptions(snes);
 
   SNESSetTolerances(snes,
                     tolerance_,                        //absolute tolerance
@@ -70,6 +72,8 @@ int lbs::DiscOrdKEigenvalueSolver::NonLinearKEigen()
                     -1);                               //max r-evals
 
   SNESSetMaxLinearSolveFailures(snes, 1000);
+
+  SNESMonitorSet(snes, &lbs::KEigenSNESMonitor, nullptr, nullptr);
 
   //============================================= Set the residual function
   SNESSetFunction(snes, r, FormFunction, nullptr);
@@ -88,17 +92,24 @@ int lbs::DiscOrdKEigenvalueSolver::NonLinearKEigen()
   SNESGetKSP(snes, &ksp);
   KSPSetType(ksp, KSPGMRES);
 
+  auto& first_groupset = groupsets_.front();
   KSPSetTolerances(ksp,
-                   1.0e-50,                 //relative tol
-                   tolerance_,  //absolute tol
-                   1.0e6,                   //divergence tol
-//                   static_cast<int>(max_iterations_));     //max iterations
-                   50);
+                   1.0e-50,                            //relative tol
+                   first_groupset.residual_tolerance_, //absolute tol
+                   1.0e6,                              //divergence tol
+                   first_groupset.max_iterations_);    //max iters
+
+  KSPGMRESSetRestart(ksp, first_groupset.gmres_restart_intvl_);
+
+  KSPSetOptionsPrefix(ksp, ("    " + TextName() + "_NonLinearK_Inner").c_str());
+  if (options_.verbose_inner_iterations)
+    KSPMonitorSet(ksp, &chi_math::PETScUtils::GeneralKSPMonitor, nullptr, nullptr);
+
   KSPGetPC(ksp, &pc);
   PCSetType(pc, PCNONE);
 
   //============================================= Compute initial guess
-  phi_old_local_.assign(num_local_phi_dofs, 1.0);
+  SetPhiVectorScalarValues(phi_old_local_, 1.0);
 
   DiscOrdSteadyStateSolver::SetMultiGSPETScVecFromPrimarySTLvector(
     groupset_ids, phi, PhiSTLOption::PHI_OLD);
@@ -153,6 +164,7 @@ PetscErrorCode FormFunction(SNES snes, Vec phi, Vec r, void*)
 
   const double k_eff = lbs_solver.ComputeFissionProduction(phi_old_local);
   chi_math::Scale(q_moments_local, 1.0/k_eff);
+  lbs_solver.SetKeff(k_eff);
 
   //============================================= Now add MS phi
   for (auto& groupset : lbs_solver.Groupsets())

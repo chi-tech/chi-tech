@@ -2,6 +2,35 @@
 #include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
 //###################################################################
+/**Sets a value to the zeroth (scalar) moment of the vector.*/
+void lbs::LBSSolver::SetPhiVectorScalarValues(std::vector<double> &phi_vector,
+                                              double value)
+{
+  const size_t first_grp = groups_.front().id_;
+  const size_t final_grp = groups_.back().id_;
+
+  const auto& sdm = *discretization_;
+
+  typedef const int64_t cint64_t;
+  for (const auto& cell : grid_ptr_->local_cells)
+  {
+    const auto& cell_mapping = sdm.GetCellMapping(cell);
+    const size_t num_nodes = cell_mapping.NumNodes();
+
+    for (size_t i=0; i<num_nodes; ++i)
+    {
+      cint64_t dof_map = sdm.MapDOFLocal(cell, i, flux_moments_uk_man_,
+                                         /*m*/0, /*g*/0);
+
+      double* phi = &phi_vector[dof_map];
+
+      for (size_t g=first_grp; g<=final_grp; ++g)
+        phi[g] = value;
+    }//for node i
+  }//for cell
+}
+
+//###################################################################
 /**Assembles a vector for a given groupset from a source vector.*/
 void lbs::LBSSolver::
 SetGSPETScVecFromPrimarySTLvector(LBSGroupset& groupset, Vec x,

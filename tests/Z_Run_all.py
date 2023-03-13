@@ -189,7 +189,7 @@ def parse_output(out, search_strings_vals_tols):
         word_number = search[2]
         if word_number >= len(words):
             test_passed = False
-            print("\nTest failed Comparison work not found:\nLine:" +
+            print("\nTest failed Comparison word not found:\nLine:" +
                   line + "\n" +
                   "Test:", search)
             break
@@ -629,7 +629,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                     k-Eigenvalue Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 41
+# Tests 41 - 43
 
 run_test(
     file_name="Transport_Keigen/KEigenvalueTransport1D_1G",
@@ -638,10 +638,26 @@ run_test(
     search_strings_vals_tols=[
         ["[0]          Final k-eigenvalue    :", 0.99954, 1.0e-5]])
 
+run_test(
+    file_name="Transport_Keigen/KEigenvalueTransport2D_1a_QBlock",
+    comment="2D 2G KEigenvalue::Solver test using Power Iteration",
+    num_procs=4,
+    search_strings_vals_tols=[
+        ["StrCompare", "Iteration    21", 9, "CONVERGED"],
+        ["NumCompare", "Final k-eigenvalue", 3, "float", 0.5969127, 1.0e-7] ])
+
+run_test(
+    file_name="Transport_Keigen/KEigenvalueTransport2D_1b_QBlock",
+    comment="2D 2G KEigenvalue::Solver test using NonLinearK",
+    num_procs=4,
+    search_strings_vals_tols=[
+        ["NumCompare", "Iteration     3", 5, "float", 0.5969127, 1.0e-7],
+        ["NumCompare", "Final k-eigenvalue", 3, "float", 0.5969127, 1.0e-7] ])
+
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #         Steady-State Cylindrical Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 42 - 43
+# Tests 44 - 45
 
 run_test(
     file_name="Transport_Steady_Cyl/Transport2DCyl_1Monoenergetic",
@@ -659,7 +675,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #             Steady-State Adjoint Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 44 - 52
+# Tests 46 - 54
 
 run_test(
     file_name="Transport_Adjoint/Adjoint2D_1a_forward",

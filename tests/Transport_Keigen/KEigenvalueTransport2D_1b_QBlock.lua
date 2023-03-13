@@ -1,5 +1,8 @@
-dofile("tests/BigTests/QBlock/mesh.lua")
-dofile("tests/BigTests/QBlock/materials.lua") --num_groups assigned here
+-- 2D 2G KEigenvalue::Solver test using NonLinearK
+-- Test: Final k-eigenvalue: 0.5969127
+
+dofile("tests/Transport_Keigen/QBlock_mesh.lua")
+dofile("tests/Transport_Keigen/QBlock_materials.lua") --num_groups assigned here
 
 --############################################### Setup Physics
 phys1 = chiLBKESCreateSolver()
@@ -24,8 +27,8 @@ chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
 --chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_RICHARDSON_CYCLES)
 chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-8)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,100)
-chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
+chiLBSGroupsetSetMaxIterations(phys1,cur_gs,50)
+chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,10)
 --chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-8,false)
 --chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-8,false)
 
@@ -37,8 +40,9 @@ chiLBSSetProperty(phys1,BOUNDARY_CONDITION,YMIN,LBSBoundaryTypes.REFLECTING);
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 chiLBSSetProperty(phys1,SCATTERING_ORDER,2)
 
-chiLBKESSetProperty(phys1, "MAX_ITERATIONS", 50)
+chiLBKESSetProperty(phys1, "MAX_ITERATIONS", 100)
 chiLBKESSetProperty(phys1, "TOLERANCE", 1.0e-10)
+chiLBKESSetProperty(phys1, "K_EIGEN_METHOD", "nonlinear")
 
 chiLBSSetProperty(phys1, USE_PRECURSORS, false)
 
@@ -51,6 +55,6 @@ chiSolverExecute(phys1)
 
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 
-chiExportMultiFieldFunctionToVTK(fflist,"tests/BigTests/QBlock/solutions/Flux")
+--chiExportMultiFieldFunctionToVTK(fflist,"tests/BigTests/QBlock/solutions/Flux")
 
 -- Reference value k_eff = 0.5969127

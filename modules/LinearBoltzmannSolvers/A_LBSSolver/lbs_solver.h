@@ -251,6 +251,8 @@ protected:
 
   //07 Vector assembly
 public:
+  virtual void SetPhiVectorScalarValues(std::vector<double>& phi_vector,
+                                        double value);
   virtual void SetGSPETScVecFromPrimarySTLvector(LBSGroupset& groupset, Vec x,
                                                  PhiSTLOption which_phi);
 
