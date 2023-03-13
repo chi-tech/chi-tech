@@ -50,14 +50,6 @@ public:
                           SourceFlags source_flags);
 
   virtual double AddSourceMoments() const;
-  virtual
-  double AddScattering(const chi_math::SparseMatrix::
-                             ConstRowIteratorContext& S_g,
-                       const double* phi) const;
-
-  virtual
-  double AddPromptFission(const std::vector<double>& F_g,
-                          const double* phi) const;
 
   typedef std::vector<chi_physics::MultiGroupXS::Precursor> PrecursorList;
   virtual
