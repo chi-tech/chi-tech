@@ -2,7 +2,8 @@
 
 #include "A_LBSSolver/IterativeMethods/ags_linear_solver.h"
 #include "IterativeOperations/sweep_wgs_context.h"
-#include "LinearBoltzmannSolvers/A_LBSSolver/IterativeMethods/wgs_linear_solver.h"
+#include "A_LBSSolver/IterativeMethods/wgs_linear_solver.h"
+#include "A_LBSSolver/SourceFunctions/source_function.h"
 
 #include "ChiMPI/chi_mpi.h"
 #include "chi_log.h"
@@ -15,10 +16,12 @@ void lbs::DiscOrdSteadyStateSolver::Initialize()
 {
   LBSSolver::Initialize();
 
+  auto src_function = std::make_shared<SourceFunction>(*this);
+
   // Initialize source func
   using namespace std::placeholders;
   active_set_source_function_ =
-    std::bind(&LBSSolver::SetSource, this, _1, _2, _3, _4);
+    std::bind(&SourceFunction::operator(), src_function, _1, _2, _3, _4);
 
   //================================================== Initialize groupsets for
   //                                                   sweeping

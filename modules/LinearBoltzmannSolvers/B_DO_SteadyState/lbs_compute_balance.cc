@@ -1,7 +1,5 @@
 #include "lbs_DO_steady_state.h"
 
-//#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
-
 #include "chi_runtime.h"
 #include "chi_log.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
@@ -33,10 +31,10 @@ void lbs::DiscOrdSteadyStateSolver::ComputeBalance()
   for (auto& groupset : groupsets_)
   {
     q_moments_local_.assign(q_moments_local_.size(), 0.0);
-    SetSource(groupset, q_moments_local_,
-              PhiOldLocal(),
-              APPLY_FIXED_SOURCES | APPLY_AGS_FISSION_SOURCES |
-              APPLY_WGS_FISSION_SOURCES);
+    active_set_source_function_(groupset, q_moments_local_,
+                                PhiOldLocal(),
+                                APPLY_FIXED_SOURCES | APPLY_AGS_FISSION_SOURCES |
+                                APPLY_WGS_FISSION_SOURCES);
     LBSSolver::GSScopedCopyPrimarySTLvectors(groupset,q_moments_local_,mat_src);
   }
 
