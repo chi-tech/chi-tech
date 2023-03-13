@@ -1,5 +1,7 @@
 #include "lbts_transient_solver.h"
 
+#include "A_LBSSolver/SourceFunctions/transient_source_function.h"
+
 #include "chi_runtime.h"
 #include "chi_log.h"
 
@@ -36,7 +38,10 @@ void lbs::DiscOrdTransientSolver::Initialize()
   }
 
   //================================================== Initialize source func
+  auto src_function =
+    std::make_shared<TransientSourceFunction>(*this, this->dt_, this->method);
+
   using namespace std::placeholders;
   active_set_source_function_ =
-    std::bind(&DiscOrdTransientSolver::SetTransientSource, this, _1, _2, _3, _4);
+    std::bind(&SourceFunction::operator(), src_function, _1, _2, _3, _4);
 }

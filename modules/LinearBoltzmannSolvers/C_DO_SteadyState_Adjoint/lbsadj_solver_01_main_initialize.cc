@@ -2,6 +2,7 @@
 
 #include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 #include "ChiPhysics/PhysicsMaterial/MultiGroupXS/adjoint_mgxs.h"
+#include "A_LBSSolver/SourceFunctions/adjoint_src_function.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -60,8 +61,9 @@ void lbs::DiscOrdSteadyStateAdjointSolver::Initialize()
   }
 
   //================================================== Initialize source func
+  auto src_function = std::make_shared<AdjointSourceFunction>(*this);
+
   using namespace std::placeholders;
   active_set_source_function_ =
-    std::bind(&DiscOrdSteadyStateAdjointSolver::SetAdjointSource, this, _1, _2, _3, _4);
-
+    std::bind(&SourceFunction::operator(), src_function, _1, _2, _3, _4);
 }

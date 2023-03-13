@@ -6,6 +6,7 @@
 #include "ChiPhysics/PhysicsMaterial/material_property_isotropic_mg_src.h"
 
 #include <functional>
+#include <map>
 
 namespace lbs
 {
