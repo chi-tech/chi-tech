@@ -4,6 +4,25 @@
 
 namespace chi_math
 {
+
+template<>
+LinearSolver<Mat, Vec, KSP>::~LinearSolver()
+{
+  VecDestroy(&x_);
+  VecDestroy(&b_);
+  KSPDestroy(&solver_);
+}
+
+template<>
+void LinearSolver<Mat, Vec, KSP>::ReApplyToleranceOptions()
+{
+  KSPSetTolerances(solver_,
+                  tolerance_options_.residual_relative,
+                  tolerance_options_.residual_absolute,
+                  tolerance_options_.residual_divergence,
+                  tolerance_options_.maximum_iterations);
+}
+
 template<>
 void LinearSolver<Mat, Vec, KSP>::PreSetupCallback()
 {}
@@ -88,8 +107,8 @@ template<>
 void LinearSolver<Mat, Vec, KSP>::Solve()
 {
   this->PreSolveCallback();
-  this->SetRHS();
   this->SetInitialGuess();
+  this->SetRHS();
 
   KSPSolve(solver_, b_, x_);
   this->PostSolveCallback();

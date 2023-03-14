@@ -56,6 +56,7 @@ namespace chi_math
   //02 Vector operations
   void   PrintVector(const VecDbl& x);
   void   Scale(VecDbl& x, const double& val);
+  void   Set(VecDbl& x, const double& val);
   VecDbl VecMul(const VecDbl& x, const double& val);
   double Vec1Norm(const VecDbl& x);
   double Vec2Norm(const VecDbl& x);
@@ -68,6 +69,7 @@ namespace chi_math
   //03 Matrix operations
   void   PrintMatrix(const MatDbl& A);
   void   Scale(MatDbl& A, const double& val);
+  void   Set(MatDbl& A, const double& val);
   MatDbl Transpose(const MatDbl& A);
   void   SwapRow(size_t r1, size_t r2, MatDbl& A);
   void   SwapColumn(size_t c1, size_t c2, MatDbl& A);

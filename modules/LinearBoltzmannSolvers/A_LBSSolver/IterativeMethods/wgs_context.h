@@ -27,23 +27,20 @@ struct WGSContext : public chi_math::LinearSolverContext<MatType, VecType>
   LBSSolver& lbs_solver_;
   LBSGroupset& groupset_;
   const SetSourceFunction& set_source_function_;
-  const int lhs_src_scope_;
-  const int rhs_src_scope_;
-  const bool with_delayed_psi_ = false;
+  int lhs_src_scope_;
+  int rhs_src_scope_;
   bool log_info_ = true;
 
   WGSContext(LBSSolver& lbs_solver,
              LBSGroupset& groupset,
              const SetSourceFunction& set_source_function,
              int lhs_scope, int rhs_scope,
-             bool with_delayed_psi,
              bool log_info) :
             lbs_solver_(lbs_solver),
             groupset_(groupset),
             set_source_function_(set_source_function),
             lhs_src_scope_(lhs_scope),
             rhs_src_scope_(rhs_scope),
-            with_delayed_psi_(with_delayed_psi),
             log_info_(log_info)
   {
     this->residual_scale_type =

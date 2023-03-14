@@ -30,9 +30,9 @@ chiLBSGroupsetSetAngleAggregationType(phys1, cur_gs, LBSGroupset.ANGLE_AGG_SINGL
 chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-8)
 chiLBSGroupsetSetMaxIterations(phys1,cur_gs,50)
-chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
---chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-2,false)
---chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false)
+chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,30)
+--chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-8,false)
+--chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-8,false)
 
 
 --############################################### Set boundary conditions
@@ -44,11 +44,11 @@ chiLBSSetProperty(phys1,SCATTERING_ORDER,0)
 
 chiLBKESSetProperty(phys1, "MAX_ITERATIONS", 50)
 chiLBKESSetProperty(phys1, "TOLERANCE", 1.0e-8)
-chiLBKESSetProperty(phys1, "K_EIGEN_METHOD", "power")
+chiLBKESSetProperty(phys1, "K_EIGEN_METHOD", "nonlinear")
 
 chiLBSSetProperty(phys1, USE_PRECURSORS, false)
 
-chiLBSSetProperty(phys1, VERBOSE_INNER_ITERATIONS, false)
+chiLBSSetProperty(phys1, VERBOSE_INNER_ITERATIONS, true)
 chiLBSSetProperty(phys1, VERBOSE_OUTER_ITERATIONS, true)
 
 -- chiLBSSetProperty(phys1, SWEEP_EAGER_LIMIT, 1e9)
@@ -59,4 +59,4 @@ chiSolverExecute(phys1)
 
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 
-chiExportMultiFieldFunctionToVTK(fflist,"solutions/ZPhi48","Phi")
+chiExportMultiFieldFunctionToVTK(fflist,"solutions/ZPhi")

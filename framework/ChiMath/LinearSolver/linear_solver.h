@@ -69,10 +69,13 @@ public:
     context_ptr_(context_ptr)
     {}
 
+  virtual ~LinearSolver();
+
   ToleranceOptions& ToleranceOptions()
   {
     return tolerance_options_;
   }
+  void ReApplyToleranceOptions();
 
   std::shared_ptr<LinearSolverContext<MatType,VecType>>& GetContext()
   {
@@ -95,8 +98,8 @@ public:
 
 protected:
   virtual void PreSolveCallback();
-  virtual void SetRHS() = 0;
   virtual void SetInitialGuess() = 0;
+  virtual void SetRHS() = 0;
   virtual void PostSolveCallback();
 public:
   virtual void Solve();

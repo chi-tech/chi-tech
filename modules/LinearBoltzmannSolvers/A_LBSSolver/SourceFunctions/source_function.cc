@@ -20,7 +20,7 @@ SourceFunction::SourceFunction(const LBSSolver &lbs_solver) :
  *
  * \param groupset The groupset the under consideration.
  * \param destination_q A vector to contribute the source to.
- * \param phi The primary STL vector to operate off.
+ * \param phi_local The primary STL vector to operate off.
  * \param source_flags Flags for adding specific terms into the
  *        destination vector. Available flags are for applying
  *        the material source, across/within-group scattering,

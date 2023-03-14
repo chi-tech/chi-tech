@@ -38,7 +38,7 @@ void lbs::acceleration::DiffusionMIPSolver::Solve(std::vector<double>& solution)
     KSPSetConvergenceTest(ksp_, &RelativeResidualConvergenceTest,
                           nullptr, nullptr);
 
-    KSPMonitorSet(ksp_, &GeneralKSPMonitor, nullptr, nullptr);
+    KSPMonitorSet(ksp_, &KSPMonitorRelativeToRHS, nullptr, nullptr);
 
     double rhs_norm;
     VecNorm(rhs_, NORM_2, &rhs_norm);
@@ -103,7 +103,7 @@ void lbs::acceleration::DiffusionMIPSolver::Solve(Vec petsc_solution)
     KSPSetConvergenceTest(ksp_, &RelativeResidualConvergenceTest,
                           nullptr, nullptr);
 
-    KSPMonitorSet(ksp_, &GeneralKSPMonitor, nullptr, nullptr);
+    KSPMonitorSet(ksp_, &KSPMonitorRelativeToRHS, nullptr, nullptr);
 
     double rhs_norm;
     VecNorm(rhs_, NORM_2, &rhs_norm);

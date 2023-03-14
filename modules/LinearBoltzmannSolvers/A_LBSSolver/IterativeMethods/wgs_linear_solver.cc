@@ -101,6 +101,30 @@ void WGSLinearSolver<Mat, Vec, KSP>::PreSolveCallback()
   gs_context_ptr->PreSolveCallback();
 }
 
+/**Sets the initial guess for a gs solver. If the initial guess's norm
+ * is large enough the initial guess will be used, otherwise it is assumed
+ * zero.*/
+template<> void WGSLinearSolver<Mat, Vec, KSP>::SetInitialGuess()
+{
+  auto gs_context_ptr = GetGSContextPtr(context_ptr_);
+
+  auto& groupset   = gs_context_ptr->groupset_;
+  auto& lbs_solver = gs_context_ptr->lbs_solver_;
+
+  lbs_solver.
+  SetGSPETScVecFromPrimarySTLvector(groupset, x_, PhiSTLOption::PHI_OLD);
+
+  double init_guess_norm = 0.0;
+  VecNorm(x_,NORM_2,&init_guess_norm);
+
+  if (init_guess_norm > 1.0e-10)
+  {
+    KSPSetInitialGuessNonzero(solver_, PETSC_TRUE);
+    if (gs_context_ptr->log_info_)
+      chi::log.Log() << "Using phi_old as initial guess.";
+  }
+}
+
 template<>
 void WGSLinearSolver<Mat, Vec, KSP>::SetRHS()
 {
@@ -139,30 +163,6 @@ void WGSLinearSolver<Mat, Vec, KSP>::SetRHS()
   PCApply(pc, b_, temp_vec);
   VecNorm(temp_vec, NORM_2, &context_ptr_->rhs_preconditioned_norm);
   VecDestroy(&temp_vec);
-}
-
-/**Sets the initial guess for a gs solver. If the initial guess's norm
- * is large enough the initial guess will be used, otherwise it is assumed
- * zero.*/
-template<> void WGSLinearSolver<Mat, Vec, KSP>::SetInitialGuess()
-{
-  auto gs_context_ptr = GetGSContextPtr(context_ptr_);
-
-  auto& groupset   = gs_context_ptr->groupset_;
-  auto& lbs_solver = gs_context_ptr->lbs_solver_;
-
-  lbs_solver.
-  SetGSPETScVecFromPrimarySTLvector(groupset, x_, PhiSTLOption::PHI_OLD);
-
-  double init_guess_norm = 0.0;
-  VecNorm(x_,NORM_2,&init_guess_norm);
-
-  if (init_guess_norm > 1.0e-10)
-  {
-    KSPSetInitialGuessNonzero(solver_, PETSC_TRUE);
-    if (gs_context_ptr->log_info_)
-      chi::log.Log() << "Using phi_old as initial guess.";
-  }
 }
 
 /**For this callback we simply restore the q_moments_local vector.*/

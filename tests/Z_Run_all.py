@@ -643,7 +643,7 @@ run_test(
     comment="2D 2G KEigenvalue::Solver test using Power Iteration",
     num_procs=4,
     search_strings_vals_tols=[
-        ["StrCompare", "Iteration    21", 9, "CONVERGED"],
+        ["StrCompare", "Iteration    26", 9, "CONVERGED"],
         ["NumCompare", "Final k-eigenvalue", 3, "float", 0.5969127, 1.0e-7] ])
 
 run_test(

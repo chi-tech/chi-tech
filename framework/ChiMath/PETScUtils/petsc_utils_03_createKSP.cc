@@ -26,7 +26,7 @@ KSPSetTolerances(setup.ksp,1.e-50,
                  in_maximum_iterations);
 KSPSetInitialGuessNonzero(setup.ksp,PETSC_TRUE);
 
-KSPMonitorSet(setup.ksp,&GeneralKSPMonitor,NULL,NULL);
+KSPMonitorSet(setup.ksp,&KSPMonitorRelativeToRHS,NULL,NULL);
 KSPSetConvergenceTest(setup.ksp,&RelativeResidualConvergenceTest,NULL,NULL);
 
 return setup;
@@ -60,7 +60,7 @@ chi_math::PETScUtils::CreateCommonKrylovSolverSetup(
                         nullptr, nullptr);
   KSPSetFromOptions(setup.ksp);
 
-  KSPMonitorSet(setup.ksp,&chi_math::PETScUtils::GeneralKSPMonitor,
+  KSPMonitorSet(setup.ksp, &chi_math::PETScUtils::KSPMonitorRelativeToRHS,
                 nullptr, nullptr);
 
   return setup;
@@ -106,8 +106,9 @@ chi_math::PETScUtils::RelativeResidualConvergenceTest(
 }
 
 //###################################################################
-/**General monitor.*/
-PetscErrorCode chi_math::PETScUtils::GeneralKSPMonitor(
+/**General monitor that print the residual norm relative to the
+ * right-hand side norm.*/
+PetscErrorCode chi_math::PETScUtils::KSPMonitorRelativeToRHS(
   KSP ksp, PetscInt n, PetscReal rnorm, void*)
 {
   Vec Rhs;
@@ -135,6 +136,37 @@ PetscErrorCode chi_math::PETScUtils::GeneralKSPMonitor(
     << std::setw(4) << n
     << " - Residual "
     << std::scientific << std::setprecision(7) << rnorm / rhs_norm
+    << std::endl;
+
+  chi::log.Log() << buff.str();
+
+  return 0;
+}
+
+//###################################################################
+/**General monitor that print the residual norm relative to the
+ * right-hand side norm.*/
+PetscErrorCode chi_math::PETScUtils::KSPMonitorStraight(
+  KSP ksp, PetscInt n, PetscReal rnorm, void*)
+{
+  //Get solver name
+  const char* ksp_name;
+  KSPGetOptionsPrefix(ksp,&ksp_name);
+
+  //Default to this if ksp_name is NULL
+  const char NONAME_SOLVER[] = "NoName-Solver\0";
+
+  if (ksp_name == nullptr)
+    ksp_name = NONAME_SOLVER;
+
+  //Print message
+  std::stringstream buff;
+  buff
+    << ksp_name
+    << " iteration "
+    << std::setw(4) << n
+    << " - Residual "
+    << std::scientific << std::setprecision(7) << rnorm
     << std::endl;
 
   chi::log.Log() << buff.str();

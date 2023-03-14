@@ -27,6 +27,7 @@ resources/Dependencies/glew-2.1.0/
 *.lot
 *.synctex.gz
 *.toc
+*.pdf
 
 # All vtk mesh files
 /*.vtu

@@ -18,6 +18,14 @@ void chi_math::Scale(VecDbl &x, const double &val)
     xi *= val;
 }
 
+//#########################################################  Scale
+/** Sets a constant value to a vector.*/
+void chi_math::Set(VecDbl &x, const double &val)
+{
+  for (double& xi : x)
+    xi = val;
+}
+
 //######################################################### Dot Product
 /** Computes the dot product of two vectors.
  *

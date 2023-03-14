@@ -98,6 +98,8 @@ public:
   LBSSolver (const LBSSolver&) = delete;
   LBSSolver& operator= (const LBSSolver&) = delete;
 
+  virtual ~LBSSolver() = default;
+
   size_t GetSourceEventTag() const;
 
   double LastRestartWrite() const;
@@ -162,6 +164,8 @@ public:
   {
     return wgs_solvers_;
   }
+
+  virtual std::pair<size_t, size_t> GetNumPhiIterativeUnknowns();
 
   //01
   void Initialize() override;
