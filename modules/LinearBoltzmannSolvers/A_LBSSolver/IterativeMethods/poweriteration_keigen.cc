@@ -18,9 +18,6 @@ void PowerIterationKEigen(LBSSolver& lbs_solver,
                           double& k_eff)
 {
   const std::string fname = "lbs::PowerIterationKEigen";
-  chi::log.Log()
-    << "\n********** Solving k-eigenvalue problem with "
-    << "the Power Iteration method.\n";
 
   for (auto& wgs_solver : lbs_solver.GetWGSSolvers())
   {
@@ -32,7 +29,7 @@ void PowerIterationKEigen(LBSSolver& lbs_solver,
 
     wgs_context->lhs_src_scope_ = APPLY_WGS_SCATTER_SOURCES;
     wgs_context->rhs_src_scope_ = APPLY_AGS_SCATTER_SOURCES |
-                                  APPLY_FIXED_SOURCES;
+      APPLY_FIXED_SOURCES;
   }
 
   auto& q_moments_local = lbs_solver.QMomentsLocal();
@@ -57,14 +54,15 @@ void PowerIterationKEigen(LBSSolver& lbs_solver,
   {
     chi_math::Set(q_moments_local, 0.0);
     for (auto& groupset : groupsets)
-    {
-      active_set_source_function(groupset, q_moments_local,
-                                 phi_old_local,
+      active_set_source_function(groupset,
+                                 q_moments_local,//output
+                                 phi_old_local,//input
                                  APPLY_AGS_FISSION_SOURCES |
                                  APPLY_WGS_FISSION_SOURCES);
-    }
+
     chi_math::Scale(q_moments_local, 1.0/k_eff);
 
+    //============================ This solves the inners for transport
     primary_ags_solver->Setup();
     primary_ags_solver->Solve();
 

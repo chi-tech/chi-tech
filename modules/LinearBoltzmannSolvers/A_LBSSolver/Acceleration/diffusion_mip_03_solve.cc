@@ -20,7 +20,7 @@ void lbs::acceleration::DiffusionMIPSolver::Solve(std::vector<double>& solution)
   VecSet(x,0.0);
   KSPSetInitialGuessNonzero(ksp_, PETSC_FALSE);
 
-  KSPSetTolerances(ksp_, 1.e-50,
+  KSPSetTolerances(ksp_, options.residual_tolerance,
                    options.residual_tolerance, 1.0e50,
                    options.max_iters);
 

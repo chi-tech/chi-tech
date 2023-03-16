@@ -137,6 +137,7 @@
 \newcommand{\bpsi}{\boldsymbol{\psi}}
 \newcommand{\br}{\mathbf{r}}
 \newcommand{\bR}{\mathbf{R}}
+\newcommand{\half}{\frac{1}{2}}
 %
 % Vector forms
 %
@@ -150,6 +151,7 @@
 \newcommand{\bdiv}{\boldsymbol{\nabla} \boldsymbol{\cdot}}
 \newcommand{\bgrad}{\bnabla}
 \newcommand{\mat}[1]{\bar{\bar{#1}}}
+
 
 % Background pic
 % Use	\AddToShipoutPicture*{\BackgroundPic} for only current page
@@ -257,7 +259,7 @@ Work is work for some, but for some it is play.
 \section{Power Iteration (Richardson Iteration)}
 We start with our discretized transport formulation
 \beqn 
-(L - MSD)\bpsi = \frac{1}{k} FD\bpsi
+(L - MSD)\bpsi = \frac{1}{k} MFD\bpsi
 \eeqn 
 where
 \beqn 
@@ -266,28 +268,30 @@ k = ||FD\bpsi ||_2.
 
 At initialization we assume some shape to the angular flux, e.g. $\psi^k=1$ for $k=1$. Thereafter we have
 \beqn 
-(L - MSD)\bpsi^{k+1} = \frac{1}{k} FD\bpsi^{k}
+(L - MSD)\bpsi^{k+1} = \frac{1}{k} MFD\bpsi^{k}
 \eeqn 
 where the right-handside is known, therefore, we solve this equation with our standard steady state tools, i.e. Richardson iteration or GMRes. The term $ \frac{1}{k} FD\bpsi^{k}$ is treated as a moment-based source.
 
-\subsection{Richardson iteration (Source Iteration)}
+\subsection{Inner convergence schemes}
+
+\subsubsection{Richardson iteration (Source Iteration)}
 For richardson iteration we have
 \beqn 
-L\bpsi^{k+1,\ell+1} &= MSD\bpsi^{k+1,\ell} +  \frac{1}{k} FD\bpsi^{k} \\
+L\bpsi^{k+1,\ell+1} &= MSD\bpsi^{k+1,\ell} +  \frac{1}{k^k} MFD\bpsi^{k} \\
 \therefore
-\bpsi^{k+1,\ell+1} &= \Linv (MSD\bpsi^{k+1,\ell} +  \frac{1}{k} FD\bpsi^{k}),
+\bpsi^{k+1,\ell+1} &= \Linv (MSD\bpsi^{k+1,\ell} +  \frac{1}{k^k} MFD\bpsi^{k}),
 \eeqn 
 where $\bpsi^{k+1,0} = \bpsi^k$.
 
 
 For a flux-moments based scheme this would be
 \beqn 
-L\bpsi^{k+1,\ell+1} &= MS\bphi^{k+1,\ell} +  \frac{1}{k} F\bphi^{k} \\
+L\bpsi^{k+1,\ell+1} &= MS\bphi^{k+1,\ell} +  \frac{1}{k^k} MF\bphi^{k} \\
 \therefore 
-\bphi^{k+1,\ell+1} &= D\Linv (MS\bphi^{k+1,\ell} +  \frac{1}{k} F\bphi^{k})
+\bphi^{k+1,\ell+1} &= D\Linv (MS\bphi^{k+1,\ell} +  \frac{1}{k^k} MF\bphi^{k})
 \eeqn 
 
-\subsection{Krylov subspace scheme}
+\subsubsection{Krylov subspace scheme}
 For a Krylov subspace scheme we have
 \beqn 
 A \bpsi^{k+1} &= b \\
@@ -295,7 +299,7 @@ A \bpsi^{k+1} &= b \\
 where
 \beqn
 A & = (L-MSD) \\
-\mathbf{b} &= \frac{1}{k} FD\bpsi^{k}
+\mathbf{b} &= \frac{1}{k^k} MFD\bpsi^{k}
 \eeqn 
 
 
@@ -306,7 +310,50 @@ A \bphi^{k+1} = b
 where 
 \beqn 
 A &= (I-D\Linv MS) \\
-\mathbf{b} &= D\Linv (\frac{1}{k} F\bphi^{k})
+\mathbf{b} &= D\Linv (\frac{1}{k^k} MF\bphi^{k})
+\eeqn 
+which can be solved by a matrix-free Krylov subspace solver e.g. GMRes or BiCGStab.
+
+\subsection{Acceleration schemes}
+
+\subsection{Synthetic acceleration}
+Suppose we have an unconverged inner result, with a residual $\mathbf{R}$,
+\beqn 
+L \bpsi^{\ell+\half} - MS\bphi^{\ell+\half} = \frac{1}{k^\ell} MF\bphi^\ell - \mathbf{R}^{\ell+\half}
+\eeqn 
+But we seek
+\beqn 
+L \bpsi - MS\bphi = \frac{1}{k} MF\bphi
+\eeqn 
+therefore we subtract these equations
+\beqn 
+L(\bpsi-\bpsi^{\ell+\half}) -MS(\bphi - \bphi^{\ell+\half})= \frac{1}{k} MF\bphi - \frac{1}{k^\ell} MF\bphi^\ell + \mathbf{R}^{\ell + \half}
+\eeqn
+and define $\delta \bpsi = \bpsi - \bpsi^{\ell+\half}$ and $\delta \bphi = \bphi - \bphi^{\ell+\half}$, the latter from which we rearrange to get $\bphi = \delta \bphi + \bphi^{\ell+\half}$, allowing us to write 
+\beqn 
+L\delta \bpsi - MS\delta \bphi = \frac{1}{k}MF(\delta \bphi + \bphi^{\ell+\half})  - \frac{1}{k^\ell} MF\bphi^\ell + \mathbf{R}^{\ell + \half}
+\eeqn 
+which takes the form of a k-eigenvalue problem with a source. The diffusion approximation can be applied to this, resulting in
+\beqn 
+\mathcal{D} \delta \bphi - S_D \delta \bphi = \frac{1}{k}F(\delta \bphi + \bphi^{\ell+\half}) - \frac{1}{k^\ell} F\bphi^\ell
+\eeqn 
+
+\subsection{Synthetic acceleration based on flux moments}
+Define the residual
+\beqn 
+D\Linv\mathbf{r}^{\ell+\half} = D\Linv \biggr(\frac{1}{k^\ell} MF \bphi^\ell + MS\bphi^{\ell+\half} \biggr) - \phi^{\ell+\half}
+\eeqn 
+but we want
+\beqn 
+0 = D\Linv \biggr(\frac{1}{k} MF \bphi + MS\bphi\biggr) - \phi
+\eeqn 
+so again we subtract and add our definitions
+\beqn 
+\delta \phi= D\Linv \biggr( MS \delta \bphi + \frac{1}{k} MF(\delta \bphi + \bphi^{\ell+\half} + ) - \frac{1}{k^\ell} MF \bphi^\ell \mathbf{r}^{\ell+\half} \biggr)
+\eeqn 
+working it back
+\beqn 
+L\delta \psi = MS \delta \bphi + \frac{1}{k} MF(\delta \bphi + \bphi^{\ell+\half}) - \frac{1}{k^\ell} MF \bphi^\ell + \mathbf{r}^{\ell+\half}
 \eeqn 
 
 \newpage

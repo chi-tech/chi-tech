@@ -1,27 +1,26 @@
-#include "A_LBSSolver/lbs_solver.h"
-#include "A_LBSSolver/IterativeMethods/ags_context.h"
-#include "A_LBSSolver/IterativeMethods/wgs_context.h"
+#include "nl_keigen_ags_context.h"
+#include "wgs_context.h"
 #include "A_LBSSolver/Preconditioning/lbs_shell_operations.h"
-
-#include "snes_k_residual_func_context.h"
 
 #include <petscsnes.h>
 
 namespace lbs
 {
 
+//###################################################################
 /**This function evaluates the flux moments based k-eigenvalue transport
  * residual of the form
 \f$ r(\phi) = DL^{-1} (\frac{1}{k} F\phi + MS \phi) - \phi \f$.*/
-PetscErrorCode SNESKResidualFunction(SNES snes, Vec phi, Vec r, void* ctx)
+PetscErrorCode
+  NLKEigenResidualFunction(SNES snes, Vec phi, Vec r, void* ctx)
 {
   const std::string fname  = "lbs::SNESKResidualFunction";
   auto& function_context = *((KResidualFunctionContext*)ctx);
 
-  lbs::AGSContext<Mat,Vec,KSP>* ags_context;
-  SNESGetApplicationContext(snes, &ags_context);
+  NLKEigenAGSContext<Vec,SNES>* nl_context_ptr;
+  SNESGetApplicationContext(snes, &nl_context_ptr);
 
-  auto& lbs_solver = ags_context->lbs_solver_;
+  auto& lbs_solver = nl_context_ptr->lbs_solver_;
   const auto& phi_old_local = lbs_solver.PhiOldLocal();
   auto& q_moments_local = lbs_solver.QMomentsLocal();
 

@@ -30,7 +30,7 @@ chiLBSGroupsetSetAngleAggregationType(phys1, cur_gs, LBSGroupset.ANGLE_AGG_SINGL
 chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-8)
 chiLBSGroupsetSetMaxIterations(phys1,cur_gs,50)
-chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,30)
+chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,50)
 --chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-8,false)
 --chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-8,false)
 
@@ -48,7 +48,7 @@ chiLBKESSetProperty(phys1, "K_EIGEN_METHOD", "nonlinear")
 
 chiLBSSetProperty(phys1, USE_PRECURSORS, false)
 
-chiLBSSetProperty(phys1, VERBOSE_INNER_ITERATIONS, true)
+chiLBSSetProperty(phys1, VERBOSE_INNER_ITERATIONS, false)
 chiLBSSetProperty(phys1, VERBOSE_OUTER_ITERATIONS, true)
 
 -- chiLBSSetProperty(phys1, SWEEP_EAGER_LIMIT, 1e9)

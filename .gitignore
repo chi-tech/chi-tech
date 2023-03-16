@@ -67,3 +67,4 @@ scratch/
 
 #general data files
 *.data
+tests/BigTests/c5g7/Test1/solutions/

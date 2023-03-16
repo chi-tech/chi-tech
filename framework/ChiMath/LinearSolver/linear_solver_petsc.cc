@@ -14,7 +14,7 @@ LinearSolver<Mat, Vec, KSP>::~LinearSolver()
 }
 
 template<>
-void LinearSolver<Mat, Vec, KSP>::ReApplyToleranceOptions()
+void LinearSolver<Mat, Vec, KSP>::ApplyToleranceOptions()
 {
   KSPSetTolerances(solver_,
                   tolerance_options_.residual_relative,
@@ -64,11 +64,8 @@ void LinearSolver<Mat, Vec, KSP>::Setup()
 
   KSPCreate(PETSC_COMM_WORLD, &solver_);
   KSPSetType(solver_, iterative_method_.c_str());
-  KSPSetTolerances(solver_,
-                   tolerance_options_.residual_relative,
-                   tolerance_options_.residual_absolute,
-                   tolerance_options_.residual_divergence,
-                   tolerance_options_.maximum_iterations);
+
+  this->ApplyToleranceOptions();
 
   if (iterative_method_ == "gmres")
   {

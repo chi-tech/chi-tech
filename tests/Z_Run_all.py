@@ -498,11 +498,11 @@ run_test(
     num_procs=4,
     search_strings_vals_tols=[
         ["StrCompare", "WGS groups [0-62] Iteration    28", 7, "CONVERGED"],
-        ["StrCompare", "WGS groups [63-167] Iteration    55", 7, "CONVERGED"],
+        ["StrCompare", "WGS groups [63-167] Iteration    39", 7, "CONVERGED"],
         ["NumCompare", "WGS groups [0-62] Iteration    28", 6, "float",
-         6.7433e-07, 1.0e-9],
-        ["NumCompare", "WGS groups [63-167] Iteration    55", 6, "float",
-         5.7165e-07, 1.0e-9]])
+         6.74299e-07, 1.0e-9],
+        ["NumCompare", "WGS groups [63-167] Iteration    39", 6, "float",
+         8.73816e-07, 1.0e-9]])
 
 run_test(
     file_name="Transport_Steady/Transport2D_1Poly",
@@ -534,9 +534,9 @@ run_test(
         ["StrCompare", "WGS groups [0-62] Iteration    53", 7, "CONVERGED"],
         ["StrCompare", "WGS groups [63-167] Iteration    59", 7, "CONVERGED"],
         ["NumCompare", "WGS groups [0-62] Iteration    53", 6, "float",
-         6.01304e-07, 1.0e-9],
+         5.96018e-07, 1.0e-9],
         ["NumCompare", "WGS groups [63-167] Iteration    59", 6, "float",
-         6.21411e-07, 1.0e-9]])
+         5.96296e-07, 1.0e-9]])
 
 run_test(
     file_name="Transport_Steady/Transport2D_4b_DSA_ortho",
@@ -545,11 +545,11 @@ run_test(
     num_procs=4,
     search_strings_vals_tols=[
         ["StrCompare", "WGS groups [0-62] Iteration    54", 7, "CONVERGED"],
-        ["StrCompare", "WGS groups [63-167] Iteration    57", 7, "CONVERGED"],
+        ["StrCompare", "WGS groups [63-167] Iteration    56", 7, "CONVERGED"],
         ["NumCompare", "WGS groups [0-62] Iteration    54", 6, "float",
-         4.97136e-07, 1.0e-9],
-        ["NumCompare", "WGS groups [63-167] Iteration    57", 6, "float",
-         6.88134e-07, 1.0e-9]])
+         5.00021e-07, 1.0e-9],
+        ["NumCompare", "WGS groups [63-167] Iteration    56", 6, "float",
+         9.73954e-07, 1.0e-9]])
 
 run_test(
     file_name="Transport_Steady/Transport2D_5PolyA_AniHeteroBndry",
@@ -606,11 +606,11 @@ run_test(
     num_procs=4,
     search_strings_vals_tols=[
         ["StrCompare", "WGS groups [0-62] Iteration    54", 7, "CONVERGED"],
-        ["StrCompare", "WGS groups [63-167] Iteration    66", 7, "CONVERGED"],
+        ["StrCompare", "WGS groups [63-167] Iteration    63", 7, "CONVERGED"],
         ["NumCompare", "WGS groups [0-62] Iteration    54", 6, "float",
-         7.88832e-07, 1.0e-9],
-        ["NumCompare", "WGS groups [63-167] Iteration    66", 6, "float",
-         8.8466e-07, 1.0e-9]])
+         7.92062e-07, 1.0e-9],
+        ["NumCompare", "WGS groups [63-167] Iteration    63", 6, "float",
+         8.1975e-07, 1.0e-9]])
 
 run_test(
     file_name="Transport_Steady/Transport3D_4Cycles1",
@@ -636,14 +636,15 @@ run_test(
     comment="1D KSolver LinearBSolver Test - PWLD",
     num_procs=4,
     search_strings_vals_tols=[
-        ["[0]          Final k-eigenvalue    :", 0.99954, 1.0e-5]])
+        # ["[0]          Final k-eigenvalue    :", 0.99954, 1.0e-5],
+        ["NumCompare", "Final k-eigenvalue", 3, "float", 0.99954, 1.0e-5]])
 
 run_test(
     file_name="Transport_Keigen/KEigenvalueTransport2D_1a_QBlock",
     comment="2D 2G KEigenvalue::Solver test using Power Iteration",
     num_procs=4,
     search_strings_vals_tols=[
-        ["StrCompare", "Iteration    26", 9, "CONVERGED"],
+        ["StrCompare", "Iteration    21", 9, "CONVERGED"],
         ["NumCompare", "Final k-eigenvalue", 3, "float", 0.5969127, 1.0e-7] ])
 
 run_test(

@@ -198,7 +198,14 @@ protected:
   virtual void InitializeWGSSolvers() {};
 
 //03d
+public:
   void InitWGDSA(LBSGroupset& groupset);
+  std::vector<double> WGDSACopyOnlyPhi0(const LBSGroupset& groupset,
+                                        const std::vector<double>& phi_in);
+  void WGDSAProjectBackPhi0(const LBSGroupset& groupset,
+                            const std::vector<double>& input,
+                            std::vector<double>& output);
+//  std::vector<double> WGDSAMake
 public:
   void AssembleWGDSADeltaPhiVector(const LBSGroupset& groupset,
                                    const std::vector<double>& phi_in,
@@ -281,13 +288,15 @@ public:
     int last_group_id, Vec x_src,
     std::vector<double>& y);
 
-  virtual void SetMultiGSPETScVecFromPrimarySTLvector(std::vector<int>& gs_ids,
-                                                      Vec x,
-                                                      PhiSTLOption which_phi);
+  virtual void SetMultiGSPETScVecFromPrimarySTLvector(
+    const std::vector<int>& gs_ids,
+    Vec x,
+    PhiSTLOption which_phi);
 
-  virtual void SetPrimarySTLvectorFromMultiGSPETScVecFrom(std::vector<int>& gs_ids,
-                                                      Vec x_src,
-                                                      PhiSTLOption which_phi);
+  virtual void SetPrimarySTLvectorFromMultiGSPETScVecFrom(
+    const std::vector<int>& gs_ids,
+    Vec x_src,
+    PhiSTLOption which_phi);
 };
 
 

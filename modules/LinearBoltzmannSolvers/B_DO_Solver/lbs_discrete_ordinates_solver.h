@@ -67,13 +67,15 @@ public:
                                      PhiSTLOption from_which_phi,
                                      PhiSTLOption to_which_phi) override;
 
-  void SetMultiGSPETScVecFromPrimarySTLvector(std::vector<int>& gs_ids,
-                                              Vec x,
-                                              PhiSTLOption which_phi) override;
+  void SetMultiGSPETScVecFromPrimarySTLvector(
+    const std::vector<int>& gs_ids,
+    Vec x,
+    PhiSTLOption which_phi) override;
 
-  void SetPrimarySTLvectorFromMultiGSPETScVecFrom(std::vector<int>& gs_ids,
-                                                  Vec x_src,
-                                                  PhiSTLOption which_phi) override;
+  void SetPrimarySTLvectorFromMultiGSPETScVecFrom(
+    const std::vector<int>& gs_ids,
+    Vec x_src,
+    PhiSTLOption which_phi) override;
 
   //compute_balance
 public:

@@ -1,7 +1,4 @@
 #include "snes_k_residual_func_context.h"
-#include "ags_context.h"
-
-#include "A_LBSSolver/lbs_solver.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -13,7 +10,7 @@
 namespace lbs
 {
 
-PetscErrorCode KEigenSNESMonitor(SNES snes, PetscInt iter,
+PetscErrorCode KEigenSNESMonitor(SNES, PetscInt iter,
                                  PetscReal rnorm, void*ctx)
 {
   auto& residual_context = *(KResidualFunctionContext*)ctx;
@@ -32,6 +29,24 @@ PetscErrorCode KEigenSNESMonitor(SNES snes, PetscInt iter,
     << k_eff
     << std::setprecision(2)
     << "  reactivity " << std::setw(10) << reactivity * 1e5;
+
+  chi::log.Log() << iter_info.str();
+
+  return 0;
+}
+
+PetscErrorCode KEigenKSPMonitor(KSP ksp, PetscInt iter, PetscReal rnorm,
+                                void*ctx)
+{
+  auto& residual_context = *(KResidualFunctionContext*)ctx;
+
+  std::stringstream iter_info;
+  iter_info
+    << "      " << chi::program_timer.GetTimeString() << " "
+    << residual_context.solver_name
+    << "_NonLinearK_Inner"
+    << " Iteration " << std::setw(5) << iter
+    << " Residual " << std::setw(11) << rnorm;
 
   chi::log.Log() << iter_info.str();
 

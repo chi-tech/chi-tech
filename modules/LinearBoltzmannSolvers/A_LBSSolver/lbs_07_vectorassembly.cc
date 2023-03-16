@@ -268,7 +268,7 @@ void lbs::LBSSolver::
 //###################################################################
 /**Assembles a PETSc vector from multiple groupsets.*/
 void lbs::LBSSolver::
-  SetMultiGSPETScVecFromPrimarySTLvector(std::vector<int> &gs_ids,
+  SetMultiGSPETScVecFromPrimarySTLvector(const std::vector<int> &gs_ids,
                                          Vec x, PhiSTLOption which_phi)
 {
   const std::vector<double>* y_ptr;
@@ -317,7 +317,7 @@ void lbs::LBSSolver::
 //###################################################################
 /**Disassembles a multiple Groupset PETSc vector STL vectors.*/
 void lbs::LBSSolver::
-  SetPrimarySTLvectorFromMultiGSPETScVecFrom(std::vector<int> &gs_ids,
+  SetPrimarySTLvectorFromMultiGSPETScVecFrom(const std::vector<int> &gs_ids,
                                              Vec x_src,
                                              PhiSTLOption which_phi)
 {
