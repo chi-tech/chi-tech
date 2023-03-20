@@ -39,8 +39,6 @@ void PowerIterationKEigen(LBSSolver& lbs_solver,
   auto& groupsets = lbs_solver.Groupsets();
   auto active_set_source_function = lbs_solver.GetActiveSetSourceFunction();
 
-  lbs_solver.SetPhiVectorScalarValues(phi_old_local, 1.0);
-
   double F_prev = 1.0;
   k_eff = 1.0;
   double k_eff_prev = 1.0;

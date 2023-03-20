@@ -94,9 +94,9 @@ chiLBSGroupsetSetAngleAggregationType(phys, gs, LBSGroupset.ANGLE_AGG_SINGLE)
 -- Additional parameters
 chiLBSSetProperty(phys, USE_PRECURSORS, use_precursors)
 
-chiLBKESSetProperty(phys, "MAX_ITERATIONS", kes_max_iterations)
-chiLBKESSetProperty(phys, "TOLERANCE", kes_tolerance)
-chiLBKESSetProperty(phys, "K_EIGEN_METHOD", "nonlinear")
+chiSolverSetBasicOption(phys, "K_EIGEN_METHOD", "nonlinear")
+chiSolverSetBasicOption(phys, "NLK_MAX_ITS", kes_max_iterations)
+chiSolverSetBasicOption(phys, "NLK_ABS_TOL", kes_tolerance)
 
 chiLBSSetProperty(phys, VERBOSE_INNER_ITERATIONS, false)
 chiLBSSetProperty(phys, VERBOSE_OUTER_ITERATIONS, true)

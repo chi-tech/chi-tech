@@ -315,46 +315,71 @@ A &= (I-D\Linv MS) \\
 which can be solved by a matrix-free Krylov subspace solver e.g. GMRes or BiCGStab.
 
 \subsection{Acceleration schemes}
-
-\subsection{Synthetic acceleration}
-Suppose we have an unconverged inner result, with a residual $\mathbf{R}$,
+Suppose we have an unconverged inner result, for which
 \beqn 
-L \bpsi^{\ell+\half} - MS\bphi^{\ell+\half} = \frac{1}{k^\ell} MF\bphi^\ell - \mathbf{R}^{\ell+\half}
+\bpsi^{\ell+\half,i+1} = \Linv \biggr(
+MS\bphi^{\ell+\half, i} + \frac{1}{k}F\bphi^\ell
+\biggr)
+\eeqn 
+the residual of the transport equation here is
+\beqn
+\mathbf{R}^{\ell+\half} = MS\bphi^{\ell+\half,i+1} + \frac{1}{k}F\bphi^\ell - L \bpsi^{\ell+\half,i+1}
+\eeqn 
+but if we plug in the expression for $\bpsi^{\ell+\half,i+1}$ we get
+\beqn 
+\mathbf{R}^{\ell+\half} = MS\bphi^{\ell+\half,i+1} - MS\bphi^{\ell+\half,i}
+\eeqn 
+
+
+Now, suppose we have an unconverged inner result, with a residual $\mathbf{R}$,
+\beqn 
+L \bpsi^{\ell+\half,i+1} - MS\bphi^{\ell+\half,i+1} = \frac{1}{k^\ell} MF\bphi^\ell - \mathbf{R}^{\ell+\half}
 \eeqn 
 But we seek
 \beqn 
-L \bpsi - MS\bphi = \frac{1}{k} MF\bphi
+L \bpsi - MS\bphi = \frac{1}{\lambda} MF\bphi
 \eeqn 
 therefore we subtract these equations
 \beqn 
-L(\bpsi-\bpsi^{\ell+\half}) -MS(\bphi - \bphi^{\ell+\half})= \frac{1}{k} MF\bphi - \frac{1}{k^\ell} MF\bphi^\ell + \mathbf{R}^{\ell + \half}
+L(\bpsi-\bpsi^{\ell+\half,i+1}) -MS(\bphi - \bphi^{\ell+\half,i+1})= \frac{1}{\lambda} MF\bphi - \frac{1}{k^\ell} MF\bphi^\ell + \mathbf{R}^{\ell + \half}
 \eeqn
-and define $\delta \bpsi = \bpsi - \bpsi^{\ell+\half}$ and $\delta \bphi = \bphi - \bphi^{\ell+\half}$, the latter from which we rearrange to get $\bphi = \delta \bphi + \bphi^{\ell+\half}$, allowing us to write 
+and define $\delta \bpsi = \bpsi - \bpsi^{\ell+\half,i+1}$ and $\delta \bphi = \bphi - \bphi^{\ell+\half,i+1}$, the latter from which we rearrange to get $\bphi = \delta \bphi + \bphi^{\ell+\half,i+1}$, allowing us to write 
 \beqn 
-L\delta \bpsi - MS\delta \bphi = \frac{1}{k}MF(\delta \bphi + \bphi^{\ell+\half})  - \frac{1}{k^\ell} MF\bphi^\ell + \mathbf{R}^{\ell + \half}
+L\delta \bpsi - MS\delta \bphi &= \frac{1}{\lambda}MF(\delta \bphi + \bphi^{\ell+\half,i+1})  - \frac{1}{k^\ell} MF\bphi^\ell + \mathbf{R}^{\ell + \half}.
 \eeqn 
+We can now insert our expression for $\mathbf{R}^{\ell + \half}$ to get
+\beqn 
+L\delta \bpsi - MS\delta \bphi &= \frac{1}{\lambda}MF(\delta \bphi + \bphi^{\ell+\half,i+1})  - \frac{1}{k^\ell} MF\bphi^\ell + MS(\bphi^{\ell+\half,i+1} - \bphi^{\ell+\half,i}),
+\eeqn
 which takes the form of a k-eigenvalue problem with a source. The diffusion approximation can be applied to this, resulting in
 \beqn 
-\mathcal{D} \delta \bphi - S_D \delta \bphi = \frac{1}{k}F(\delta \bphi + \bphi^{\ell+\half}) - \frac{1}{k^\ell} F\bphi^\ell
+\mathcal{D} \delta \bphi - S_{\mathcal{D}} \delta \bphi = \frac{1}{\lambda}F(\delta \bphi + \bphi^{\ell+\half,i+1}) - \frac{1}{k^\ell} F\bphi^\ell + S^*(\bphi^{\ell+\half,i+1} - \bphi^{\ell+\half,i})
+\eeqn 
+where $S^*$ is essentially the same as $S$ except that only the zeroth-moment is non-zero, $S_{\mathcal{D}}$ is the same as $S^*$ except for the suppression of within-group scattering.
+
+
+We can solve the above equation using power iteration if we define it as
+\beqn 
+\mathcal{D} \delta \bphi^{k+1} = S_{\mathcal{D}} \delta \bphi^k + \frac{1}{\lambda^k}F(\delta \bphi^k + \bphi^{\ell+\half,i+1}) - \frac{1}{k^\ell} F\bphi^\ell + S^*(\bphi^{\ell+\half,i+1} - \bphi^{\ell+\half,i})
+\eeqn 
+where $\delta \bphi^0 = 0$ and $\lambda^0 = k^\ell$.
+
+
+We can also define a non-linear solver with
+\beqn 
+\mathcal{D}^{-1} \mathbf{r}(\delta \bphi) = \mathcal{D}^{-1}
+\biggr(
+S_{\mathcal{D}} \delta \bphi
++ \frac{1}{\lambda}F(\delta \bphi + \bphi^{\ell+\half,i+1}) 
+- \frac{1}{k^\ell} F\bphi^\ell 
++ S^*(\bphi^{\ell+\half,i+1} - \bphi^{\ell+\half,i})
+\biggr) - \delta \bphi
 \eeqn 
 
-\subsection{Synthetic acceleration based on flux moments}
-Define the residual
-\beqn 
-D\Linv\mathbf{r}^{\ell+\half} = D\Linv \biggr(\frac{1}{k^\ell} MF \bphi^\ell + MS\bphi^{\ell+\half} \biggr) - \phi^{\ell+\half}
-\eeqn 
-but we want
-\beqn 
-0 = D\Linv \biggr(\frac{1}{k} MF \bphi + MS\bphi\biggr) - \phi
-\eeqn 
-so again we subtract and add our definitions
-\beqn 
-\delta \phi= D\Linv \biggr( MS \delta \bphi + \frac{1}{k} MF(\delta \bphi + \bphi^{\ell+\half} + ) - \frac{1}{k^\ell} MF \bphi^\ell \mathbf{r}^{\ell+\half} \biggr)
-\eeqn 
-working it back
-\beqn 
-L\delta \psi = MS \delta \bphi + \frac{1}{k} MF(\delta \bphi + \bphi^{\ell+\half}) - \frac{1}{k^\ell} MF \bphi^\ell + \mathbf{r}^{\ell+\half}
-\eeqn 
+
+
+
+
 
 \newpage
 \chead{Angular flux based non-linear eigenvalue formulation}

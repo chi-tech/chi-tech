@@ -40,9 +40,9 @@ chiLBSSetProperty(phys1,BOUNDARY_CONDITION,YMIN,LBSBoundaryTypes.REFLECTING);
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 chiLBSSetProperty(phys1,SCATTERING_ORDER,2)
 
-chiLBKESSetProperty(phys1, "MAX_ITERATIONS", 1000)
-chiLBKESSetProperty(phys1, "TOLERANCE", 1.0e-10)
-chiLBKESSetProperty(phys1, "K_EIGEN_METHOD", "power")
+chiSolverSetBasicOption(phys1, "K_EIGEN_METHOD", "power")
+chiSolverSetBasicOption(phys1, "PI_MAX_ITS", 1000)
+chiSolverSetBasicOption(phys1, "PI_K_TOL", 1.0e-10)
 
 chiLBSSetProperty(phys1, USE_PRECURSORS, false)
 

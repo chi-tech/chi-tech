@@ -31,6 +31,24 @@ void lbs::LBSSolver::SetPhiVectorScalarValues(std::vector<double> &phi_vector,
 }
 
 //###################################################################
+/**Scales a flux moment vector. For sweep methods the delayed angular
+ * fluxes will also be scaled.*/
+void lbs::LBSSolver::ScalePhiVector(PhiSTLOption which_phi,
+                                    double value)
+{
+  std::vector<double>* y_ptr;
+  switch (which_phi)
+  {
+    case PhiSTLOption::PHI_NEW: y_ptr = &phi_new_local_; break;
+    case PhiSTLOption::PHI_OLD: y_ptr = &phi_old_local_; break;
+    default:
+      throw std::logic_error("SetGSPETScVecFromPrimarySTLvector");
+  }
+
+  chi_math::Scale(*y_ptr, value);
+}
+
+//###################################################################
 /**Assembles a vector for a given groupset from a source vector.*/
 void lbs::LBSSolver::
 SetGSPETScVecFromPrimarySTLvector(LBSGroupset& groupset, Vec x,

@@ -199,7 +199,7 @@ protected:
 
 //03d
 public:
-  void InitWGDSA(LBSGroupset& groupset);
+  void InitWGDSA(LBSGroupset& groupset, bool vaccum_bcs_are_dirichlet=true);
   std::vector<double> WGDSACopyOnlyPhi0(const LBSGroupset& groupset,
                                         const std::vector<double>& phi_in);
   void WGDSAProjectBackPhi0(const LBSGroupset& groupset,
@@ -264,6 +264,7 @@ protected:
 public:
   virtual void SetPhiVectorScalarValues(std::vector<double>& phi_vector,
                                         double value);
+  virtual void ScalePhiVector(PhiSTLOption which_phi, double value);
   virtual void SetGSPETScVecFromPrimarySTLvector(LBSGroupset& groupset, Vec x,
                                                  PhiSTLOption which_phi);
 

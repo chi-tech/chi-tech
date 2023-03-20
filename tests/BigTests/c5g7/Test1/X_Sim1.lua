@@ -1,3 +1,4 @@
+-- Final k-eigenvalue    :         1.1925596 (265)
 dofile("mesh/gmesh_coarse.lua")
 
 --chiMeshHandlerExportMeshToVTK("ZMesh")
@@ -29,7 +30,7 @@ chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
 chiLBSGroupsetSetAngleAggregationType(phys1, cur_gs, LBSGroupset.ANGLE_AGG_SINGLE)
 chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-8)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,50)
+chiLBSGroupsetSetMaxIterations(phys1,cur_gs,10)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,50)
 --chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-8,false)
 --chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-8,false)
@@ -42,13 +43,15 @@ chiLBSSetProperty(phys1,BOUNDARY_CONDITION,YMIN,LBSBoundaryTypes.REFLECTING);
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 chiLBSSetProperty(phys1,SCATTERING_ORDER,0)
 
-chiLBKESSetProperty(phys1, "MAX_ITERATIONS", 50)
-chiLBKESSetProperty(phys1, "TOLERANCE", 1.0e-8)
-chiLBKESSetProperty(phys1, "K_EIGEN_METHOD", "nonlinear")
+chiSolverSetBasicOption(phys1, "K_EIGEN_METHOD", "power1")
+chiSolverSetBasicOption(phys1, "PI_MAX_ITS", 1000)
+chiSolverSetBasicOption(phys1, "PI_K_TOL", 1.0e-10)
+chiSolverSetBasicOption(phys1, "PISA_PI_MAX_ITS", 30)
+chiSolverSetBasicOption(phys1, "PISA_VERBOSE_LEVEL", 2)
 
 chiLBSSetProperty(phys1, USE_PRECURSORS, false)
 
-chiLBSSetProperty(phys1, VERBOSE_INNER_ITERATIONS, false)
+chiLBSSetProperty(phys1, VERBOSE_INNER_ITERATIONS, true)
 chiLBSSetProperty(phys1, VERBOSE_OUTER_ITERATIONS, true)
 
 -- chiLBSSetProperty(phys1, SWEEP_EAGER_LIMIT, 1e9)

@@ -1,5 +1,7 @@
 /** \defgroup LuaLBS Linear Boltzmann Solver
 
+@ref LBSDOKeigen
+
 # The Linear Boltzmann Solver
 This is the documentation for the Linear Boltzmann Solver (LBS).
 

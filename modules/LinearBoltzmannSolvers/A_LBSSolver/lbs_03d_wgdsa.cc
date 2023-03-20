@@ -6,7 +6,8 @@
 
 //###################################################################
 /**Initializes the Within-Group DSA solver. */
-void lbs::LBSSolver::InitWGDSA(LBSGroupset& groupset)
+void lbs::LBSSolver::InitWGDSA(LBSGroupset& groupset,
+                               bool vaccum_bcs_are_dirichlet/*=true*/)
 {
   if (groupset.apply_wgdsa_)
   {
@@ -25,6 +26,11 @@ void lbs::LBSSolver::InitWGDSA(LBSGroupset& groupset)
     {
       if (lbs_bndry->Type() == SwpBndryType::REFLECTING)
         bcs[bid] = {BCType::ROBIN,{0.0,1.0,0.0}};
+      else if (lbs_bndry->Type() == SwpBndryType::INCIDENT_VACCUUM)
+        if (vaccum_bcs_are_dirichlet)
+          bcs[bid] = {BCType::DIRICHLET,{0.0,0.0,0.0}};
+        else
+          bcs[bid] = {BCType::ROBIN,{0.25,0.5}};
       else//dirichlet
         bcs[bid] = {BCType::DIRICHLET,{0.0,0.0,0.0}};
     }

@@ -2,6 +2,44 @@
 #include "A_LBSSolver/Groupset/lbs_groupset.h"
 
 //###################################################################
+/**Scales a flux moment vector. For sweep methods the delayed angular
+ * fluxes will also be scaled.*/
+void lbs::LBSDiscreteOrdinatesSolver::
+  ScalePhiVector(PhiSTLOption which_phi, double value)
+{
+  std::vector<double>* y_ptr;
+  switch (which_phi)
+  {
+    case PhiSTLOption::PHI_NEW: y_ptr = &phi_new_local_; break;
+    case PhiSTLOption::PHI_OLD: y_ptr = &phi_old_local_; break;
+    default:
+      throw std::logic_error("SetGSPETScVecFromPrimarySTLvector");
+  }
+
+  chi_math::Scale(*y_ptr, value);
+
+  for (auto& groupset : groupsets_)
+  {
+    switch (which_phi)
+    {
+      case PhiSTLOption::PHI_NEW:
+      {
+        auto psi = groupset.angle_agg_.GetNewDelayedAngularDOFsAsSTLVector();
+        chi_math::Scale(psi, value);
+        groupset.angle_agg_.SetNewDelayedAngularDOFsFromSTLVector(psi);
+        break;
+      }
+      case PhiSTLOption::PHI_OLD:
+      {
+        auto psi = groupset.angle_agg_.GetOldDelayedAngularDOFsAsSTLVector();
+        chi_math::Scale(psi, value);
+        groupset.angle_agg_.SetOldDelayedAngularDOFsFromSTLVector(psi);
+        break;
+      }
+    }
+  }
+}
+//###################################################################
 /**Assembles a vector for a given groupset from a source vector.*/
 void lbs::LBSDiscreteOrdinatesSolver::
   SetGSPETScVecFromPrimarySTLvector(LBSGroupset& groupset, Vec x,
