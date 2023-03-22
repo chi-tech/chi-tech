@@ -42,18 +42,26 @@ public:
       iterator operator++()
       {
         iterator i = *this;
-        ++ref_element;
-        while (not ref_block.vertex_valid_flags_[ref_element] and
-               ref_element<ref_block.vertices_.size())
+        bool stop = false;
+        do
+        {
           ++ref_element;
+          if (ref_element>=ref_block.vertices_.size()) stop = true;
+          if (not stop)
+            if (ref_block.vertex_valid_flags_[ref_element]) stop = true;
+        } while (not stop);
         return i;
       }
       iterator operator++(int junk)
       {
-        ++ref_element;
-        while (not ref_block.vertex_valid_flags_[ref_element] and
-               ref_element<ref_block.vertices_.size())
+        bool stop = false;
+        do
+        {
           ++ref_element;
+          if (ref_element>=ref_block.vertices_.size()) stop = true;
+          if (not stop)
+            if (ref_block.vertex_valid_flags_[ref_element]) stop = true;
+        } while (not stop);
         return *this;
       }
       GraphVertex& operator*()
@@ -70,10 +78,16 @@ public:
     iterator begin()
     {
       size_t count=0;
-      while (not vertex_valid_flags_[count] and
-             count < vertices_.size())
+      if (vertex_valid_flags_.empty()) return {*this, count};
+      if (vertex_valid_flags_[count]) return {*this, count};
+
+      //Get next valid or end
+      while (true)
+      {
+        if (count >= vertices_.size()) return {*this, count};
+        if (vertex_valid_flags_[count]) return {*this, count};
         ++count;
-      return {*this,count};
+      }
     }
 
     iterator end(){return {*this, vertices_.size()};}
