@@ -72,7 +72,7 @@ std::pair<int64_t, int64_t> SweepWGSContext<Mat, Vec, KSP>::SystemSize()
   const size_t num_moments      = lbs_solver_.NumMoments();
 
   const size_t groupset_numgrps = groupset_.groups_.size();
-  const auto num_delayed_psi_info = groupset_.angle_agg_.GetNumDelayedAngularDOFs();
+  const auto num_delayed_psi_info = groupset_.angle_agg_->GetNumDelayedAngularDOFs();
   const size_t local_size = local_node_count * num_moments * groupset_numgrps +
                             num_delayed_psi_info.first;
   const size_t globl_size = globl_node_count * num_moments * groupset_numgrps +

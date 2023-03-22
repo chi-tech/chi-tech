@@ -63,7 +63,7 @@ protected:
 public:
   /*virtual void Solve();*/
 
-  virtual ~WGSLinearSolver() = default;
+  virtual ~WGSLinearSolver() override;
 };
 
 }//namespace lbs

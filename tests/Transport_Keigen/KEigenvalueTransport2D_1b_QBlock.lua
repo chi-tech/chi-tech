@@ -40,7 +40,7 @@ chiLBSSetProperty(phys1,BOUNDARY_CONDITION,YMIN,LBSBoundaryTypes.REFLECTING);
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 chiLBSSetProperty(phys1,SCATTERING_ORDER,2)
 
-chiSolverSetBasicOption(phys1, "K_EIGEN_METHOD", "power2")
+chiSolverSetBasicOption(phys1, "K_EIGEN_METHOD", "nonlinear")
 chiSolverSetBasicOption(phys1, "NLK_ABS_TOL", 1.0e-8)
 
 chiLBSSetProperty(phys1, USE_PRECURSORS, false)

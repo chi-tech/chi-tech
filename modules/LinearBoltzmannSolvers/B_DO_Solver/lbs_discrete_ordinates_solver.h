@@ -57,7 +57,7 @@ protected:
 
   //Vector assembly
 public:
-  void ScalePhiVector(PhiSTLOption which_phi, double value);
+  void ScalePhiVector(PhiSTLOption which_phi, double value) override;
   void SetGSPETScVecFromPrimarySTLvector(LBSGroupset& groupset, Vec x,
                                          PhiSTLOption which_phi) override;
 

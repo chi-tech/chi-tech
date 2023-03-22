@@ -32,7 +32,7 @@ GetNumPhiIterativeUnknowns()
   for (auto& groupset : groupsets_)
   {
     const auto num_delayed_psi_info =
-      groupset.angle_agg_.GetNumDelayedAngularDOFs();
+      groupset.angle_agg_->GetNumDelayedAngularDOFs();
     num_local_psi_dofs += num_delayed_psi_info.first;
     num_globl_psi_dofs += num_delayed_psi_info.second;
   }

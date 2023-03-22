@@ -13,14 +13,15 @@ typedef std::vector<std::pair<int,short>> LockBox;
 //###################################################################
 /**Populates a flux data structure.*/
 void chi_mesh::sweep_management::PRIMARY_FLUDS::
-InitializeAlphaElements(const SPDS& spds)
+InitializeAlphaElements(const SPDS& spds,
+                        const GridFaceHistogram& grid_face_histogram)
 {
   chi_mesh::MeshContinuum& grid = *spds.grid;
   const chi_mesh::sweep_management::SPLS& spls = spds.spls;
 
   //================================================== Initialize face
   //                                                   categorization
-  num_face_categories = grid_face_histogram_.NumberOfFaceHistogramBins();
+  num_face_categories = grid_face_histogram.NumberOfFaceHistogramBins();
   local_psi_stride.resize(num_face_categories,0);
   local_psi_max_elements.resize(num_face_categories,0);
   local_psi_n_block_stride.resize(num_face_categories, 0);
@@ -59,6 +60,7 @@ InitializeAlphaElements(const SPDS& spds)
 
     SlotDynamics(cell,
                  spds,
+                 grid_face_histogram,
                  lock_boxes,
                  delayed_lock_box,
                  location_boundary_dependency_set);
@@ -91,7 +93,7 @@ InitializeAlphaElements(const SPDS& spds)
 
   for (size_t fc=0; fc<num_face_categories; ++fc)
   {
-    local_psi_stride[fc] = grid_face_histogram_.GetFaceHistogramBinDOFSize(fc);
+    local_psi_stride[fc] = grid_face_histogram.GetFaceHistogramBinDOFSize(fc);
     local_psi_max_elements[fc]     = lock_boxes[fc].size();
     local_psi_n_block_stride[fc]  = local_psi_stride[fc] * lock_boxes[fc].size();
     local_psi_Gn_block_strideG[fc] = local_psi_n_block_stride[fc] * G;

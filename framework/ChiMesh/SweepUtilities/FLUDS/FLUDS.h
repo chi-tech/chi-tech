@@ -135,9 +135,6 @@ class chi_mesh::sweep_management::PRIMARY_FLUDS :
 //  std::vector<int>    prelocI_face_dof_count;
 //
 //  std::vector<int>    delayed_prelocI_face_dof_count;
-protected:
-  const SPDS& spds_;
-  const GridFaceHistogram& grid_face_histogram_;
 
 private:
   int largest_face=0;
@@ -276,7 +273,8 @@ public:
 public:
   typedef std::shared_ptr<chi_mesh::sweep_management::SPDS> SPDS_ptr;
   //alphapass.cc
-  void InitializeAlphaElements(const SPDS& spds);
+  void InitializeAlphaElements(const SPDS& spds,
+                               const GridFaceHistogram& grid_face_histogram);
 
   void AddFaceViewToDepLocI(int deplocI, int cell_g_index,
                             int face_slot, const chi_mesh::CellFace& face);
@@ -284,6 +282,7 @@ public:
   //alphapass_slotdynamics.cc
   void SlotDynamics(const chi_mesh::Cell& cell,
                     const SPDS& spds,
+                    const GridFaceHistogram& grid_face_histogram,
                     std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
                     std::vector<std::pair<int,short>>& delayed_lock_box,
                     std::set<int>& location_boundary_dependency_set);

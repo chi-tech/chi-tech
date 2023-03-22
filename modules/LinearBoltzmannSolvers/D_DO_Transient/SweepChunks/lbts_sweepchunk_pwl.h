@@ -65,7 +65,7 @@ public:
 
   struct Upwinder
   {
-    chi_mesh::sweep_management::FLUDS* fluds;
+    chi_mesh::sweep_management::FLUDS& fluds;
     chi_mesh::sweep_management::AngleSet* angle_set;
     size_t spls_index;
     size_t angle_set_index;

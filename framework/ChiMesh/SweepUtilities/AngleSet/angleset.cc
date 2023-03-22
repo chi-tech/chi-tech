@@ -1,5 +1,7 @@
 #include "ChiMesh/SweepUtilities/sweep_namespace.h"
 #include "angleset.h"
+
+#include <utility>
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 #include "ChiMesh/SweepUtilities/sweepchunk_base.h"
 
@@ -13,7 +15,7 @@ chi_mesh::sweep_management::AngleSet::
 AngleSet(size_t in_numgrps,
          size_t in_ref_subset,
          const SPDS& in_spds,
-         FLUDS* in_fluds,
+         std::shared_ptr<FLUDS> in_fluds,
          std::vector<size_t>& angle_indices,
          std::map<uint64_t, std::shared_ptr<SweepBndry>>& sim_boundaries,
          int sweep_eager_limit,
@@ -21,7 +23,7 @@ AngleSet(size_t in_numgrps,
   num_grps(in_numgrps),
   spds(in_spds),
   sweep_buffer(this,sweep_eager_limit,in_comm_set),
-  fluds(in_fluds),
+  fluds(std::move(in_fluds)),
   angles(angle_indices),
   ref_boundaries(sim_boundaries),
   ref_subset(in_ref_subset)

@@ -39,7 +39,9 @@ void lbs::LBSDiscreteOrdinatesSolver::
 
   //=========================================== Passing the sweep boundaries
   //                                            to the angle aggregation
-  groupset.angle_agg_.Setup(sweep_boundaries_,
+  groupset.angle_agg_ =
+    std::make_shared<chi_mesh::sweep_management::AngleAggregation>();
+  groupset.angle_agg_->Setup(sweep_boundaries_,
                             gs_num_grps,
                             gs_num_ss,
                             groupset.quadrature_,
@@ -76,10 +78,14 @@ void lbs::LBSDiscreteOrdinatesSolver::
             angle_indices[k++] = so_grouping[n];
         }
 
-        chi_mesh::sweep_management::FLUDS* fluds =
-          new chi_mesh::sweep_management::AUX_FLUDS(
-            fluds_template,
-            gs_ss_size);
+        using namespace chi_mesh::sweep_management;
+        auto aux_fluds = std::make_shared<AUX_FLUDS>(fluds_template,gs_ss_size);
+
+        auto fluds = std::dynamic_pointer_cast<FLUDS>(aux_fluds);
+
+        if (not fluds)
+          throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +
+          ": Casting failure.");
 
         auto angleSet = std::make_shared<TAngleSet>(
           gs_ss_size,
@@ -96,7 +102,7 @@ void lbs::LBSDiscreteOrdinatesSolver::
     }//for gs_ss
   }//for so_grouping
 
-  groupset.angle_agg_.angle_set_groups.push_back(std::move(angle_set_group));
+  groupset.angle_agg_->angle_set_groups.push_back(std::move(angle_set_group));
 
   if (options_.verbose_inner_iterations)
     chi::log.Log()
