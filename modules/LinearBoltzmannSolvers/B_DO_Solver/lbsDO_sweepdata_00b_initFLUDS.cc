@@ -39,13 +39,12 @@ void lbs::LBSDiscreteOrdinatesSolver::
 
   //=========================================== Passing the sweep boundaries
   //                                            to the angle aggregation
-  groupset.angle_agg_ =
-    std::make_shared<chi_mesh::sweep_management::AngleAggregation>();
-  groupset.angle_agg_->Setup(sweep_boundaries_,
-                            gs_num_grps,
-                            gs_num_ss,
-                            groupset.quadrature_,
-                            grid_ptr_);
+  typedef chi_mesh::sweep_management::AngleAggregation AngleAgg;
+  groupset.angle_agg_ = std::make_shared<AngleAgg>(sweep_boundaries_,
+                                                   gs_num_grps,
+                                                   gs_num_ss,
+                                                   groupset.quadrature_,
+                                                   grid_ptr_);
 
   TAngleSetGroup angle_set_group;
   for (const auto& so_grouping : unique_so_groupings)

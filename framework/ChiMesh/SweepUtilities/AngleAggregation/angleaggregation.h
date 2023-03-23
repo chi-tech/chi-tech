@@ -28,8 +28,10 @@
 class chi_mesh::sweep_management::AngleAggregation
 {
 public:
+  typedef std::shared_ptr<SweepBndry> SweepBndryPtr;
+public:
   std::vector<AngleSetGroup>                   angle_set_groups;
-  std::map<uint64_t, std::shared_ptr<SweepBndry>>     sim_boundaries;
+  std::map<uint64_t, SweepBndryPtr>            sim_boundaries;
   size_t                                       number_of_groups=0;
   size_t                                       number_of_group_subsets=0;
   std::shared_ptr<chi_math::AngularQuadrature> quadrature=nullptr;
@@ -42,11 +44,13 @@ private:
 public:
   chi_mesh::MeshContinuumPtr grid = nullptr;
 
-  void Setup(const std::map<uint64_t, std::shared_ptr<SweepBndry>>& in_sim_boundaries,
-             size_t in_number_of_groups,
-             size_t in_number_of_group_subsets,
-             std::shared_ptr<chi_math::AngularQuadrature>& in_quadrature,
-             chi_mesh::MeshContinuumPtr& in_grid);
+  AngleAggregation(const std::map<uint64_t, SweepBndryPtr>& in_sim_boundaries,
+                   size_t in_number_of_groups,
+                   size_t in_number_of_group_subsets,
+                   std::shared_ptr<chi_math::AngularQuadrature>& in_quadrature,
+                   chi_mesh::MeshContinuumPtr& in_grid);
+
+  bool IsSetup() const {return is_setup;}
 
 public:
   void   ZeroOutgoingDelayedPsi();
@@ -55,14 +59,19 @@ public:
   void InitializeReflectingBCs();
 
   std::pair<size_t,size_t> GetNumDelayedAngularDOFs();
+
   void AppendNewDelayedAngularDOFsToArray(int64_t& index, double* x_ref);
   void AppendOldDelayedAngularDOFsToArray(int64_t& index, double* x_ref);
+
   void SetOldDelayedAngularDOFsFromArray(int64_t& index, const double* x_ref);
   void SetNewDelayedAngularDOFsFromArray(int64_t& index, const double* x_ref);
+
   std::vector<double> GetNewDelayedAngularDOFsAsSTLVector();
   void SetNewDelayedAngularDOFsFromSTLVector(const std::vector<double>& stl_vector);
+
   std::vector<double> GetOldDelayedAngularDOFsAsSTLVector();
   void SetOldDelayedAngularDOFsFromSTLVector(const std::vector<double>& stl_vector);
+
   void SetDelayedPsiOld2New();
   void SetDelayedPsiNew2Old();
 };

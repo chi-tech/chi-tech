@@ -14,23 +14,21 @@ void lbs::LBSSolver::InitializeSolverSchemes()
 
   /*This default behavior covers the situation when no Across-GroupSet (AGS)
    * solvers have been created for this solver.*/
-  if (ags_solvers_.empty())
+  ags_solvers_.clear();
+  //=========================================== Default AGS scheme
+  if (options_.ags_scheme.empty())
   {
-    //=========================================== Default AGS scheme
-    if (options_.ags_scheme.empty())
-    {
-      auto ags_context = std::make_shared<AGSContext<Mat,Vec,KSP>>(
-        *this, wgs_solvers_);
+    auto ags_context = std::make_shared<AGSContext<Mat,Vec,KSP>>(
+      *this, wgs_solvers_);
 
-      auto ags_solver = std::make_shared<AGSLinearSolver<Mat,Vec,KSP>>(
-        "richardson", ags_context,
-        groupsets_.front().id_, groupsets_.back().id_);
-      ags_solver->ToleranceOptions().maximum_iterations = 1;
-      ags_solver->SetVerbosity(options_.verbose_ags_iterations);
+    auto ags_solver = std::make_shared<AGSLinearSolver<Mat,Vec,KSP>>(
+      "richardson", ags_context,
+      groupsets_.front().id_, groupsets_.back().id_);
+    ags_solver->ToleranceOptions().maximum_iterations = 1;
+    ags_solver->SetVerbosity(options_.verbose_ags_iterations);
 
-      ags_solvers_.push_back(ags_solver);
+    ags_solvers_.push_back(ags_solver);
 
-      primary_ags_solver_ = ags_solvers_.front();
-    }
-  }//if ags_solvers.empty()
+    primary_ags_solver_ = ags_solvers_.front();
+  }
 }

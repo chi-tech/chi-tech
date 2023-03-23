@@ -23,8 +23,7 @@ SweepChunkPWLTransientTheta(
   const std::map<int, XSPtr>& xs,
   const int num_moments,
   const int max_num_cell_dofs)
-                    : SweepChunk(destination_phi, destination_psi,
-                                 *groupset.angle_agg_, false),
+                    : SweepChunk(destination_phi, destination_psi),
                       grid_view_(std::move(grid_ptr)),
                       grid_fe_view_(discretization),
                       unit_cell_matrices_(unit_cell_matrices),

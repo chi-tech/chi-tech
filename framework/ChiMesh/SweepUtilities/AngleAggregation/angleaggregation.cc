@@ -14,8 +14,9 @@ std::logic_error(fname + \
 
 //###################################################################
 /** Sets up the angle-aggregation object. */
-void chi_mesh::sweep_management::AngleAggregation::
-  Setup(const std::map<uint64_t, std::shared_ptr<SweepBndry>>& in_sim_boundaries,
+chi_mesh::sweep_management::AngleAggregation::
+  AngleAggregation(
+    const std::map<uint64_t, SweepBndryPtr>& in_sim_boundaries,
         size_t in_number_of_groups,
         size_t in_number_of_group_subsets,
         std::shared_ptr<chi_math::AngularQuadrature> &in_quadrature,
