@@ -1,7 +1,7 @@
 -- 2D LinearBSolver Same as 4a but with reflective BCs. DSA and TG
 -- SDM: PWLD
--- Test: WGS groups [0-62] Iteration    54 Residual 4.97136e-07 CONVERGED
--- and   WGS groups [63-167] Iteration    57 Residual 6.88134e-07 CONVERGED
+-- Test: WGS groups [0-62] Iteration    54 Residual 5.00021e-07 CONVERGED
+-- and   WGS groups [63-167] Iteration    56 Residual 9.73954e-07 CONVERGED
 num_procs = 4
 
 

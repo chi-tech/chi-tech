@@ -98,6 +98,8 @@ public:
   LBSSolver (const LBSSolver&) = delete;
   LBSSolver& operator= (const LBSSolver&) = delete;
 
+  virtual ~LBSSolver() = default;
+
   size_t GetSourceEventTag() const;
 
   double LastRestartWrite() const;
@@ -148,6 +150,23 @@ public:
   std::vector<double>& PhiNewLocal();
   const std::vector<double>& PhiNewLocal() const;
 
+  SetSourceFunction GetActiveSetSourceFunction() const
+  {
+    return active_set_source_function_;
+  }
+
+  AGSLinSolverPtr GetPrimaryAGSSolver()
+  {
+    return primary_ags_solver_;
+  }
+
+  std::vector<LinSolvePtr>& GetWGSSolvers()
+  {
+    return wgs_solvers_;
+  }
+
+  virtual std::pair<size_t, size_t> GetNumPhiIterativeUnknowns();
+
   //01
   void Initialize() override;
 protected:
@@ -179,7 +198,14 @@ protected:
   virtual void InitializeWGSSolvers() {};
 
 //03d
-  void InitWGDSA(LBSGroupset& groupset);
+public:
+  void InitWGDSA(LBSGroupset& groupset, bool vaccum_bcs_are_dirichlet=true);
+  std::vector<double> WGDSACopyOnlyPhi0(const LBSGroupset& groupset,
+                                        const std::vector<double>& phi_in);
+  void WGDSAProjectBackPhi0(const LBSGroupset& groupset,
+                            const std::vector<double>& input,
+                            std::vector<double>& output);
+//  std::vector<double> WGDSAMake
 public:
   void AssembleWGDSADeltaPhiVector(const LBSGroupset& groupset,
                                    const std::vector<double>& phi_in,
@@ -226,9 +252,8 @@ public:
   void UpdateFieldFunctions();
 
   //06b
-protected:
-  double ComputeFissionProduction(const std::vector<double>& phi);
 public:
+  double ComputeFissionProduction(const std::vector<double>& phi);
   double ComputeFissionRate(const std::vector<double>& phi);
 
   //06c
@@ -237,6 +262,9 @@ protected:
 
   //07 Vector assembly
 public:
+  virtual void SetPhiVectorScalarValues(std::vector<double>& phi_vector,
+                                        double value);
+  virtual void ScalePhiVector(PhiSTLOption which_phi, double value);
   virtual void SetGSPETScVecFromPrimarySTLvector(LBSGroupset& groupset, Vec x,
                                                  PhiSTLOption which_phi);
 
@@ -261,7 +289,15 @@ public:
     int last_group_id, Vec x_src,
     std::vector<double>& y);
 
+  virtual void SetMultiGSPETScVecFromPrimarySTLvector(
+    const std::vector<int>& gs_ids,
+    Vec x,
+    PhiSTLOption which_phi);
 
+  virtual void SetPrimarySTLvectorFromMultiGSPETScVecFrom(
+    const std::vector<int>& gs_ids,
+    Vec x_src,
+    PhiSTLOption which_phi);
 };
 
 

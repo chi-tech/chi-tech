@@ -6,7 +6,8 @@
 
 //###################################################################
 /**Initializes the Within-Group DSA solver. */
-void lbs::LBSSolver::InitWGDSA(LBSGroupset& groupset)
+void lbs::LBSSolver::InitWGDSA(LBSGroupset& groupset,
+                               bool vaccum_bcs_are_dirichlet/*=true*/)
 {
   if (groupset.apply_wgdsa_)
   {
@@ -25,6 +26,11 @@ void lbs::LBSSolver::InitWGDSA(LBSGroupset& groupset)
     {
       if (lbs_bndry->Type() == SwpBndryType::REFLECTING)
         bcs[bid] = {BCType::ROBIN,{0.0,1.0,0.0}};
+      else if (lbs_bndry->Type() == SwpBndryType::INCIDENT_VACCUUM)
+        if (vaccum_bcs_are_dirichlet)
+          bcs[bid] = {BCType::DIRICHLET,{0.0,0.0,0.0}};
+        else
+          bcs[bid] = {BCType::ROBIN,{0.25,0.5}};
       else//dirichlet
         bcs[bid] = {BCType::DIRICHLET,{0.0,0.0,0.0}};
     }
@@ -88,6 +94,78 @@ void lbs::LBSSolver::InitWGDSA(LBSGroupset& groupset)
 void lbs::LBSSolver::CleanUpWGDSA(LBSGroupset& groupset)
 {
   if (groupset.apply_wgdsa_) groupset.wgdsa_solver_ = nullptr;
+}
+
+//###################################################################
+/**Creates a vector from a lbs primary stl vector where only the
+ * scalar moments are mapped to the DOFs needed by WGDSA.*/
+std::vector<double> lbs::LBSSolver::
+  WGDSACopyOnlyPhi0(const LBSGroupset &groupset,
+                    const std::vector<double> &phi_in)
+{
+  const auto& sdm = *discretization_;
+  const auto& dphi_uk_man = groupset.wgdsa_solver_->UnknownStructure();
+  const auto& phi_uk_man  = flux_moments_uk_man_;
+
+  const int    gsi = groupset.groups_.front().id_;
+  const size_t gss = groupset.groups_.size();
+
+  std::vector<double> output_phi_local(sdm.GetNumLocalDOFs(dphi_uk_man), 0.0);
+
+  for (const auto& cell : grid_ptr_->local_cells)
+  {
+    const auto& cell_mapping = sdm.GetCellMapping(cell);
+    const size_t num_nodes = cell_mapping.NumNodes();
+
+    for (size_t i=0; i < num_nodes; i++)
+    {
+      const int64_t dphi_map = sdm.MapDOFLocal(cell, i, dphi_uk_man, 0, 0);
+      const int64_t  phi_map = sdm.MapDOFLocal(cell, i,  phi_uk_man, 0, gsi);
+
+      double* output_mapped       = &output_phi_local[dphi_map];
+      const double* phi_in_mapped = &phi_in[phi_map];
+
+      for (size_t g=0; g<gss; g++)
+      {
+        output_mapped[g] = phi_in_mapped[g];
+      }//for g
+    }//for node
+  }//for cell
+
+  return output_phi_local;
+}
+
+//###################################################################
+/**From the WGDSA DOFs, projects the scalar moments back into a
+ * primary STL vector.*/
+void lbs::LBSSolver::WGDSAProjectBackPhi0(const LBSGroupset &groupset,
+                                          const std::vector<double>& input,
+                                          std::vector<double> &output)
+{
+  const auto& sdm = *discretization_;
+  const auto& dphi_uk_man = groupset.wgdsa_solver_->UnknownStructure();
+  const auto& phi_uk_man  = flux_moments_uk_man_;
+
+  const int    gsi = groupset.groups_.front().id_;
+  const size_t gss = groupset.groups_.size();
+
+  for (const auto& cell : grid_ptr_->local_cells)
+  {
+    const auto& cell_mapping = sdm.GetCellMapping(cell);
+    const size_t num_nodes = cell_mapping.NumNodes();
+
+    for (size_t i=0; i < num_nodes; i++)
+    {
+      const int64_t dphi_map = sdm.MapDOFLocal(cell, i, dphi_uk_man, 0, 0);
+      const int64_t  phi_map = sdm.MapDOFLocal(cell, i,  phi_uk_man, 0, gsi);
+
+      const double* input_mapped = &input[dphi_map];
+      double* output_mapped      = &output[phi_map];
+
+      for (int g=0; g<gss; g++)
+        output_mapped[g] = input_mapped[g];
+    }//for dof
+  }//for cell
 }
 
 

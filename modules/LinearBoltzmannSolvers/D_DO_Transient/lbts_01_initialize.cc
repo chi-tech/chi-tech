@@ -33,7 +33,7 @@ void lbs::DiscOrdTransientSolver::Initialize()
     const double beta = ComputeBeta();
     char buff[200];
     snprintf(buff,200, " Beta=%.2f [pcm] reactivity=%.3f [$]",
-            beta*1e5, (1.0- 1.0 / k_eff_) / beta);
+            beta*1e5, (1.0- 1.0 / GetKeff()) / beta);
     chi::log.Log() << TextName() << buff;
   }
 

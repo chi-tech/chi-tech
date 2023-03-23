@@ -1,6 +1,5 @@
--- 1D 1G KEigenvalue::Solver test with Vacuum BC.
--- SDM: PWLD
--- Test: Final k-eigenvalue: 0.999541
+-- 1D 1G KEigenvalue::Solver test using power iteration
+-- Test: Final k-eigenvalue: 0.9995433
 num_procs = 4
 
 -- NOTE: For command line inputs, specify as:
@@ -34,7 +33,7 @@ if (kes_tolerance == nil) then kes_tolerance = 1e-8 end
 
 -- Source iteration parameters
 if (si_max_iterations == nil) then si_max_iterations = 500 end
-if (si_tolerance == nil) then si_tolerance = 1e-4 end
+if (si_tolerance == nil) then si_tolerance = 1e-8 end
 
 -- Delayed neutrons
 if (use_precursors == nil) then use_precursors = true end
@@ -95,11 +94,12 @@ chiLBSGroupsetSetAngleAggregationType(phys, gs, LBSGroupset.ANGLE_AGG_SINGLE)
 -- Additional parameters
 chiLBSSetProperty(phys, USE_PRECURSORS, use_precursors)
 
-chiLBKESSetProperty(phys, "MAX_ITERATIONS", kes_max_iterations)
-chiLBKESSetProperty(phys, "TOLERANCE", kes_tolerance)
+chiSolverSetBasicOption(phys, "K_EIGEN_METHOD", "nonlinear")
+chiSolverSetBasicOption(phys, "NLK_MAX_ITS", kes_max_iterations)
+chiSolverSetBasicOption(phys, "NLK_ABS_TOL", kes_tolerance)
 
 chiLBSSetProperty(phys, VERBOSE_INNER_ITERATIONS, false)
-chiLBSSetProperty(phys, VERBOSE_OUTER_ITERATIONS, false)
+chiLBSSetProperty(phys, VERBOSE_OUTER_ITERATIONS, true)
 
 --############################################### Initialize and Execute Solver
 chiSolverInitialize(phys)

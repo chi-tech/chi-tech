@@ -1,5 +1,5 @@
-#ifndef CHITECH_LINEAR_SOLVER_H
-#define CHITECH_LINEAR_SOLVER_H
+#ifndef CHITECH_CHI_MATH_LINEAR_SOLVER_H
+#define CHITECH_CHI_MATH_LINEAR_SOLVER_H
 
 #include "linear_solver_context.h"
 
@@ -17,11 +17,15 @@ struct LinearSolverContext;
 template<class MatType, class VecType, class SolverType>
 class LinearSolver
 {
+public:
+  typedef LinearSolverContext<MatType,VecType> LinSolveContext;
+  typedef std::shared_ptr<LinSolveContext> LinSolveContextPtr;
+
 protected:
   const std::string solver_name_;
   const std::string iterative_method_;
 
-  std::shared_ptr<LinearSolverContext<MatType,VecType>> context_ptr_ = nullptr;
+  LinSolveContextPtr context_ptr_ = nullptr;
 
   MatType A_;
   VecType b_;
@@ -48,10 +52,8 @@ protected:
 protected:
   bool IsSystemSet() const {return system_set_;}
 
-public:
-  typedef LinearSolverContext<MatType,VecType> LinSolveContext;
-  typedef std::shared_ptr<LinSolveContext> LinSolveContextPtr;
 
+public:
   explicit
   LinearSolver(const std::string& iterative_method,
                LinSolveContextPtr context_ptr) :
@@ -69,15 +71,14 @@ public:
     context_ptr_(context_ptr)
     {}
 
-  ToleranceOptions& ToleranceOptions()
-  {
-    return tolerance_options_;
-  }
+  virtual ~LinearSolver();
 
-  std::shared_ptr<LinearSolverContext<MatType,VecType>> GetContext()
-  {
-    return context_ptr_;
-  }
+  ToleranceOptions& ToleranceOptions()
+  { return tolerance_options_; }
+  void ApplyToleranceOptions();
+
+  LinSolveContextPtr& GetContext()
+  { return context_ptr_; }
 
 protected:
   virtual void PreSetupCallback();
@@ -95,8 +96,8 @@ public:
 
 protected:
   virtual void PreSolveCallback();
-  virtual void SetRHS() = 0;
   virtual void SetInitialGuess() = 0;
+  virtual void SetRHS() = 0;
   virtual void PostSolveCallback();
 public:
   virtual void Solve();
@@ -104,4 +105,4 @@ public:
 
 }//namespace chi_math
 
-#endif //CHITECH_LINEAR_SOLVER_H
+#endif //CHITECH_CHI_MATH_LINEAR_SOLVER_H

@@ -2,7 +2,7 @@
 
 #include "A_LBSSolver/lbs_solver.h"
 #include "A_LBSSolver/Acceleration/diffusion_mip.h"
-#include "A_LBSSolver/Tools/wgs_context.h"
+#include "LinearBoltzmannSolvers/A_LBSSolver/IterativeMethods/wgs_context.h"
 
 //###################################################################
 /**Applies TGDSA to the given input vector.*/

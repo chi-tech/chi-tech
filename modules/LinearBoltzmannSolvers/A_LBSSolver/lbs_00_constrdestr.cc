@@ -204,3 +204,15 @@ BoundaryPreferences()
 {
   return boundary_preferences_;
 }
+
+/**Gets the local and global number of iterative unknowns. This normally is
+ * only the flux moments, however, the sweep based solvers might include
+ * delayed angular fluxes in this number.*/
+std::pair<size_t, size_t> lbs::LBSSolver::GetNumPhiIterativeUnknowns()
+{
+  const auto& sdm = *discretization_;
+  const size_t num_local_phi_dofs = sdm.GetNumLocalDOFs(flux_moments_uk_man_);
+  const size_t num_globl_phi_dofs = sdm.GetNumGlobalDOFs(flux_moments_uk_man_);
+
+  return {num_local_phi_dofs, num_globl_phi_dofs};
+}

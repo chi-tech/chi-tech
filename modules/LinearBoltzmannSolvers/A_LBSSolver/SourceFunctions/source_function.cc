@@ -20,7 +20,7 @@ SourceFunction::SourceFunction(const LBSSolver &lbs_solver) :
  *
  * \param groupset The groupset the under consideration.
  * \param destination_q A vector to contribute the source to.
- * \param phi The primary STL vector to operate off.
+ * \param phi_local The primary STL vector to operate off.
  * \param source_flags Flags for adding specific terms into the
  *        destination vector. Available flags are for applying
  *        the material source, across/within-group scattering,
@@ -32,6 +32,8 @@ void SourceFunction::operator()(LBSGroupset &groupset,
                                 const std::vector<double> &phi_local,
                                 SourceFlags source_flags)
 {
+  if (source_flags & NO_FLAGS_SET) return;
+
   const size_t source_event_tag = lbs_solver_.GetSourceEventTag();
   chi::log.LogEvent(source_event_tag, chi_objects::ChiLog::EventType::EVENT_BEGIN);
 

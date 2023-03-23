@@ -1,6 +1,6 @@
 #include "lbts_transient_solver.h"
 
-#include "B_DO_SteadyState/IterativeOperations/sweep_wgs_context.h"
+#include "LinearBoltzmannSolvers/B_DO_Solver/IterativeMethods/sweep_wgs_context.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/IterativeMethods/wgs_linear_solver.h"
 
 #include "chi_runtime.h"
@@ -30,7 +30,6 @@ void lbs::DiscOrdTransientSolver::Step()
         APPLY_WGS_SCATTER_SOURCES | APPLY_WGS_FISSION_SOURCES,  //lhs_scope
         APPLY_FIXED_SOURCES | APPLY_AGS_SCATTER_SOURCES |
         APPLY_AGS_FISSION_SOURCES,                              //rhs_scope
-        true/*with_delayed_psi*/,
         options_.verbose_inner_iterations,
         sweep_chunk);
 

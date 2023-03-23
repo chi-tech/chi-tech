@@ -1,7 +1,7 @@
 -- 3D LinearBSolver test of a block of graphite with an air cavity. DSA and TG
 -- SDM: PWLD
--- Test: WGS groups [0-62] Iteration    54 Residual 7.88832e-07 CONVERGED
--- and   WGS groups [63-167] Iteration    66 Residual 8.8466e-07 CONVERGED
+-- Test: WGS groups [0-62] Iteration    54 Residual 7.92062e-07 CONVERGED
+-- and   WGS groups [63-167] Iteration    63 Residual 8.1975e-07 CONVERGED
 num_procs = 4
 
 

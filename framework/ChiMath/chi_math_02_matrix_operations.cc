@@ -31,6 +31,15 @@ void chi_math::Scale(MatDbl &A, const double &val)
       Aij *= val;
 }
 
+//######################################################### Scale
+/** Sets all the entries of the matrix to a constant value.*/
+void chi_math::Set(MatDbl &A, const double &val)
+{
+  for (std::vector<double>& Ai : A)
+    for (double& Aij : Ai)
+      Aij = val;
+}
+
 //######################################################### Transpose
 /** Returns the transpose of a matrix.*/
 MatDbl chi_math::Transpose(const MatDbl &A)

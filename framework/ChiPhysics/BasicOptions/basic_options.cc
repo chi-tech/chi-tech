@@ -42,8 +42,8 @@ chi_physics::BasicOption& chi_physics::BasicOptions::
       return option;
   }
 
-    throw std::out_of_range("Basic option " + option_name +
-                            " does not appear to exist.");
+    throw std::out_of_range("Basic option \"" + option_name +
+                            "\" does not appear to exist.");
 }
 
 /**Returns a non-constant reference to an option at the given
