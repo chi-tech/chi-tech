@@ -1,4 +1,0 @@
-module: LinearBoltzmann - KEigenvalueSolver
-function: chiLBKESCreateSolver
-function: chiLBKESSetProperty
-module_end

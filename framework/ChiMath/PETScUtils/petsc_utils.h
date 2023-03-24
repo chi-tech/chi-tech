@@ -55,8 +55,11 @@ namespace chi_math::PETScUtils
     void *monitordestroy);
 
   PetscErrorCode
-  GeneralKSPMonitor(KSP ksp, PetscInt n,
-                    PetscReal rnorm, void *monitordestroy);
+  KSPMonitorRelativeToRHS(KSP ksp, PetscInt n,
+                          PetscReal rnorm, void *);
+  PetscErrorCode
+  KSPMonitorStraight(KSP ksp, PetscInt n,
+                     PetscReal rnorm, void *);
 
   //04
   void CopyVecToSTLvector(Vec x, std::vector<double>& data, size_t N);

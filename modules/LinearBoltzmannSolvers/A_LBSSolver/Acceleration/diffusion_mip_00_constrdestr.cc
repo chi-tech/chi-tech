@@ -52,3 +52,10 @@ const Vec& lbs::acceleration::DiffusionMIPSolver::RHS() const
 {
   return rhs_;
 }
+
+std::pair<size_t, size_t> lbs::acceleration::DiffusionMIPSolver::
+  GetNumPhiIterativeUnknowns()
+{
+  return {sdm_.GetNumLocalDOFs(uk_man_),
+          sdm_.GetNumGlobalDOFs(uk_man_)};
+}

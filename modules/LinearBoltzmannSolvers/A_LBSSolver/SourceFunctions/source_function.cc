@@ -20,7 +20,7 @@ SourceFunction::SourceFunction(const LBSSolver &lbs_solver) :
  *
  * \param groupset The groupset the under consideration.
  * \param destination_q A vector to contribute the source to.
- * \param phi The primary STL vector to operate off.
+ * \param phi_local The primary STL vector to operate off.
  * \param source_flags Flags for adding specific terms into the
  *        destination vector. Available flags are for applying
  *        the material source, across/within-group scattering,
@@ -29,9 +29,11 @@ SourceFunction::SourceFunction(const LBSSolver &lbs_solver) :
  * */
 void SourceFunction::operator()(LBSGroupset &groupset,
                                 std::vector<double> &destination_q,
-                                const std::vector<double> &phi,
+                                const std::vector<double> &phi_local,
                                 SourceFlags source_flags)
 {
+  if (source_flags & NO_FLAGS_SET) return;
+
   const size_t source_event_tag = lbs_solver_.GetSourceEventTag();
   chi::log.LogEvent(source_event_tag, chi_objects::ChiLog::EventType::EVENT_BEGIN);
 
@@ -91,6 +93,8 @@ void SourceFunction::operator()(LBSGroupset &groupset,
 
         size_t uk_map = transport_view.MapDOF(i, m, 0); //unknown map
 
+        const double* phi = &phi_local[uk_map];
+
         //==================== Declare moment src
         if (P0_src and ell == 0)
           fixed_src_moments_ = P0_src->source_value_g_.data();
@@ -113,16 +117,16 @@ void SourceFunction::operator()(LBSGroupset &groupset,
           //============================== Apply scattering sources
           if (ell < S.size())
           {
-            const auto& S_g = S[ell].Row(g);
+            const auto& S_ell = S[ell];
             //==================== Add Across GroupSet Scattering (AGS)
             if (apply_ags_scatter_src_)
-              for (const auto& [_, gp, sigma_sm] : S_g)
+              for (const auto& [_, gp, sigma_sm] : S_ell.Row(g))
                 if (gp < gs_i_ or gp > gs_f_)
                   rhs += sigma_sm * phi[gp];
 
             //==================== Add Within GroupSet Scattering (WGS)
             if (apply_wgs_scatter_src_)
-              for (const auto& [_, gp, sigma_sm] : S_g)
+              for (const auto& [_, gp, sigma_sm] : S_ell.Row(g))
                 if (gp >= gs_i_ and gp <= gs_f_)
                 {
                   if (suppress_wg_scatter_src_ and g_ == gp) continue;
@@ -147,7 +151,7 @@ void SourceFunction::operator()(LBSGroupset &groupset,
 
             if (lbs_solver_.Options().use_precursors)
               rhs += this->AddDelayedFission(
-                precursors, nu_delayed_sigma_f, &phi[uk_map]);
+                precursors, nu_delayed_sigma_f, &phi_local[uk_map]);
           }
 
           //============================== Add to destination vector
@@ -158,7 +162,7 @@ void SourceFunction::operator()(LBSGroupset &groupset,
     }//for dof i
   }//for cell
 
-  AddAdditionalSources(groupset, destination_q, phi, source_flags);
+  AddAdditionalSources(groupset, destination_q, phi_local, source_flags);
 
   chi::log.LogEvent(source_event_tag, chi_objects::ChiLog::EventType::EVENT_END);
 }

@@ -3,8 +3,8 @@
 
 #include "ChiMath/LinearSolver/linear_solver.h"
 
-#include "A_LBSSolver/Tools/wgs_context.h"
-#include "A_LBSSolver/Tools/wgs_context.h"
+#include "wgs_context.h"
+#include "wgs_context.h"
 
 #include <memory>
 #include <vector>

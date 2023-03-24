@@ -109,6 +109,7 @@ public:
                      MatID2XSMap map_mat_id_2_xs,
                      const std::vector<UnitCellMatrices>& unit_cell_matrices,
                      bool verbose=false);
+  std::string TextName() const {return text_name_;}
   const Vec& RHS() const;
   //00a
   void Initialize();
@@ -140,6 +141,8 @@ public:
   static
   double CallLuaXYZFunction(lua_State* L, const std::string& lua_func_name,
                             const chi_mesh::Vector3& xyz);
+
+  std::pair<size_t, size_t> GetNumPhiIterativeUnknowns();
 
   virtual ~DiffusionMIPSolver();
 };

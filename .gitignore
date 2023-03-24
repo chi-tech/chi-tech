@@ -27,6 +27,7 @@ resources/Dependencies/glew-2.1.0/
 *.lot
 *.synctex.gz
 *.toc
+*.pdf
 
 # All vtk mesh files
 /*.vtu
@@ -66,3 +67,4 @@ scratch/
 
 #general data files
 *.data
+tests/BigTests/c5g7/Test1/solutions/

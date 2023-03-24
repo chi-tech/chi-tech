@@ -169,6 +169,7 @@ int chiSolverSetBasicOption(lua_State* L)
   catch (const std::out_of_range& oor)
   {
     chi::log.Log0Error() << fname << ": " << oor.what();
+    throw oor;
   }
 
   return 0;

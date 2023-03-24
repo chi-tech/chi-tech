@@ -299,7 +299,7 @@ std::pair<size_t,size_t> chi_mesh::sweep_management::AngleAggregation::
 //###################################################################
 /** Assembles angular unknowns into the reference vector. */
 void chi_mesh::sweep_management::AngleAggregation::
-  AppendNewDelayedAngularDOFsToArray(int &index, double* x_ref)
+  AppendNewDelayedAngularDOFsToArray(int64_t& index, double* x_ref)
 {
   //======================================== Opposing reflecting bndries
   for (auto& [bid, bndry] : sim_boundaries)
@@ -336,7 +336,7 @@ void chi_mesh::sweep_management::AngleAggregation::
 //###################################################################
 /** Assembles angular unknowns into the reference vector. */
 void chi_mesh::sweep_management::AngleAggregation::
-AppendOldDelayedAngularDOFsToArray(int &index, double* x_ref)
+AppendOldDelayedAngularDOFsToArray(int64_t& index, double* x_ref)
 {
   //======================================== Opposing reflecting bndries
   for (auto& [bid, bndry] : sim_boundaries)
@@ -373,7 +373,7 @@ AppendOldDelayedAngularDOFsToArray(int &index, double* x_ref)
 //###################################################################
 /** Assembles angular unknowns into the reference vector. */
 void chi_mesh::sweep_management::AngleAggregation::
-  SetOldDelayedAngularDOFsFromArray(int &index, const double* x_ref)
+  SetOldDelayedAngularDOFsFromArray(int64_t& index, const double* x_ref)
 {
   //======================================== Opposing reflecting bndries
   for (auto& [bid, bndry] : sim_boundaries)
@@ -410,7 +410,7 @@ void chi_mesh::sweep_management::AngleAggregation::
 //###################################################################
 /** Assembles angular unknowns into the reference vector. */
 void chi_mesh::sweep_management::AngleAggregation::
-  SetNewDelayedAngularDOFsFromArray(int &index, const double* x_ref)
+  SetNewDelayedAngularDOFsFromArray(int64_t& index, const double* x_ref)
 {
   //======================================== Opposing reflecting bndries
   for (auto& [bid, bndry] : sim_boundaries)
@@ -447,7 +447,7 @@ void chi_mesh::sweep_management::AngleAggregation::
 //###################################################################
 /**Gets the current values of the angular unknowns as an STL vector.*/
 std::vector<double> chi_mesh::sweep_management::AngleAggregation::
-  GetDelayedAngularDOFsAsSTLVector()
+  GetNewDelayedAngularDOFsAsSTLVector()
 {
   std::vector<double> psi_vector;
 
@@ -491,7 +491,7 @@ std::vector<double> chi_mesh::sweep_management::AngleAggregation::
 //###################################################################
 /**Gets the current values of the angular unknowns as an STL vector.*/
 void chi_mesh::sweep_management::AngleAggregation::
-  SetDelayedAngularDOFsFromSTLVector(const std::vector<double>& stl_vector)
+  SetNewDelayedAngularDOFsFromSTLVector(const std::vector<double>& stl_vector)
 {
   auto psi_size = GetNumDelayedAngularDOFs();
   size_t stl_size = stl_vector.size();
@@ -499,6 +499,95 @@ void chi_mesh::sweep_management::AngleAggregation::
     throw std::logic_error(std::string(__FUNCTION__) + ": STL-vector size "
                            "is incompatible with number angular unknowns stored "
                            "in the angle-aggregation object.");
+
+  size_t index = 0;
+  //======================================== Opposing reflecting bndries
+  for (auto& [bid, bndry] : sim_boundaries)
+  {
+    if (bndry->IsReflecting())
+    {
+      auto& rbndry = (BoundaryReflecting&)(*bndry);
+
+      if (rbndry.IsOpposingReflected())
+        for (auto& angle : rbndry.GetHeteroBoundaryFluxNew())
+          for (auto& cellvec : angle)
+            for (auto& facevec : cellvec)
+              for (auto& dofvec : facevec)
+                for (auto& val : dofvec)
+                  val = stl_vector[index++];
+
+    }//if reflecting
+  }//for bndry
+
+  //======================================== Intra-cell cycles
+  for (auto& as_group : angle_set_groups)
+    for (auto& angle_set : as_group.angle_sets)
+      for (auto& val : angle_set->delayed_local_psi)
+        val = stl_vector[index++];
+
+  //======================================== Inter location cycles
+  for (auto& as_group : angle_set_groups)
+    for (auto& angle_set : as_group.angle_sets)
+      for (auto& loc_vector : angle_set->delayed_prelocI_outgoing_psi)
+        for (auto& val : loc_vector)
+          val = stl_vector[index++];
+}
+
+//###################################################################
+/**Gets the current values of the angular unknowns as an STL vector.*/
+std::vector<double> chi_mesh::sweep_management::AngleAggregation::
+GetOldDelayedAngularDOFsAsSTLVector()
+{
+  std::vector<double> psi_vector;
+
+  auto psi_size = GetNumDelayedAngularDOFs();
+  psi_vector.reserve(psi_size.first);
+
+  //======================================== Opposing reflecting bndries
+  for (auto& [bid, bndry] : sim_boundaries)
+  {
+    if (bndry->IsReflecting())
+    {
+      auto& rbndry = (BoundaryReflecting&)(*bndry);
+
+      if (rbndry.IsOpposingReflected())
+        for (auto& angle : rbndry.GetHeteroBoundaryFluxOld())
+          for (auto& cellvec : angle)
+            for (auto& facevec : cellvec)
+              for (auto& dofvec : facevec)
+                for (auto val : dofvec)
+                  psi_vector.push_back(val);
+
+    }//if reflecting
+  }//for bndry
+
+  //======================================== Intra-cell cycles
+  for (auto& as_group : angle_set_groups)
+    for (auto& angle_set : as_group.angle_sets)
+      for (auto val : angle_set->delayed_local_psi_old)
+        psi_vector.push_back(val);
+
+  //======================================== Inter location cycles
+  for (auto& as_group : angle_set_groups)
+    for (auto& angle_set : as_group.angle_sets)
+      for (auto& loc_vector : angle_set->delayed_prelocI_outgoing_psi_old)
+        for (auto val : loc_vector)
+          psi_vector.push_back(val);
+
+  return psi_vector;
+}
+
+//###################################################################
+/**Gets the current values of the angular unknowns as an STL vector.*/
+void chi_mesh::sweep_management::AngleAggregation::
+SetOldDelayedAngularDOFsFromSTLVector(const std::vector<double>& stl_vector)
+{
+  auto psi_size = GetNumDelayedAngularDOFs();
+  size_t stl_size = stl_vector.size();
+  if (stl_size != psi_size.first)
+    throw std::logic_error(std::string(__FUNCTION__) + ": STL-vector size "
+                                                       "is incompatible with number angular unknowns stored "
+                                                       "in the angle-aggregation object.");
 
   size_t index = 0;
   //======================================== Opposing reflecting bndries
