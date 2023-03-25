@@ -25,7 +25,7 @@ namespace lbs
  * all the angles in a particular angleset share the same sweep ordering.
  * ii) is a mapping, per quadrature, to a collection of SPDSs where each
  * SPDS mirrors an angle-index-set in i)
- * ii) is again a mapping, per quadrature, to a collection of Template FLUDS
+ * iii) is again a mapping, per quadrature, to a collection of Template FLUDS
  * where each FLUDS mirrors a SPDS in ii).
  *
  * The Template FLUDS can be scaled with number of angles and groups which
