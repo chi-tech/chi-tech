@@ -38,8 +38,6 @@ public:
     verbose_(verbose)
   {}
 
-  virtual ~AGSLinearSolver() = default;
-
   int GroupSpanFirstID() const {return groupspan_first_id_;}
   int GroupSpanLastID() const {return groupspan_last_id_;}
   bool IsVerbose() const {return verbose_;}
@@ -70,7 +68,7 @@ public:
   void Solve() override;
 
 public:
-
+  virtual ~AGSLinearSolver() override;
 };
 
 }//namespace lbs

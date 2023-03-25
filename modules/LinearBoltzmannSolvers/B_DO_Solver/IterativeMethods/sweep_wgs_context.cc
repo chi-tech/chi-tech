@@ -72,7 +72,7 @@ std::pair<int64_t, int64_t> SweepWGSContext<Mat, Vec, KSP>::SystemSize()
   const size_t num_moments      = lbs_solver_.NumMoments();
 
   const size_t groupset_numgrps = groupset_.groups_.size();
-  const auto num_delayed_psi_info = groupset_.angle_agg_.GetNumDelayedAngularDOFs();
+  const auto num_delayed_psi_info = groupset_.angle_agg_->GetNumDelayedAngularDOFs();
   const size_t local_size = local_node_count * num_moments * groupset_numgrps +
                             num_delayed_psi_info.first;
   const size_t globl_size = globl_node_count * num_moments * groupset_numgrps +
@@ -105,19 +105,17 @@ std::pair<int64_t, int64_t> SweepWGSContext<Mat, Vec, KSP>::SystemSize()
 template<>
 void SweepWGSContext<Mat, Vec, KSP>::ApplyInverseTransportOperator(int scope)
 {
-  const bool use_surface_source_flag =
+  const bool use_bndry_source_flag =
     (scope & APPLY_FIXED_SOURCES) and
     (not lbs_solver_.Options().use_src_moments);
 
-  auto& sweep_chunk = sweep_scheduler_.GetSweepChunk();
-
-  sweep_chunk.SetSurfaceSourceActiveFlag(use_surface_source_flag);
+  sweep_scheduler_.SetBoundarySourceActiveFlag(use_bndry_source_flag);
 
   if (scope & APPLY_FIXED_SOURCES)
-    sweep_chunk.ZeroIncomingDelayedPsi();
+    sweep_scheduler_.ZeroIncomingDelayedPsi();
 
   //Sweep
-  sweep_chunk.ZeroFluxDataStructures();
+  sweep_scheduler_.ZeroOutputFluxDataStructures();
   sweep_scheduler_.Sweep();
 }
 
@@ -129,21 +127,19 @@ void SweepWGSContext<Mat, Vec, KSP>::ApplyInverseTransportOperator(int scope)
 template<>
 void SweepWGSContext<Mat, Vec, KSP>::PostSolveCallback()
 {
-  auto& sweep_chunk = sweep_scheduler_.GetSweepChunk();
-
   //================================================== Perform final sweep
   //                                                   with converged phi and
   //                                                   delayed psi dofs
   lbs_ss_solver_.ZeroOutflowBalanceVars(groupset_);
 
-  sweep_chunk.SetDestinationPhi(lbs_solver_.PhiNewLocal());
-  sweep_chunk.SetSurfaceSourceActiveFlag(rhs_src_scope_ & APPLY_FIXED_SOURCES);
+  sweep_scheduler_.SetDestinationPhi(lbs_solver_.PhiNewLocal());
+  sweep_scheduler_.SetBoundarySourceActiveFlag(rhs_src_scope_ & APPLY_FIXED_SOURCES);
 
   set_source_function_(groupset_, lbs_solver_.QMomentsLocal(),
                        lbs_solver_.PhiOldLocal(),
                        lhs_src_scope_ | rhs_src_scope_);
 
-  sweep_chunk.ZeroDestinationPhi();
+  sweep_scheduler_.ZeroDestinationPhi();
   sweep_scheduler_.Sweep();
 
   lbs_solver_.GSScopedCopyPrimarySTLvectors(groupset_,

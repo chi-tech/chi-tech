@@ -31,12 +31,12 @@ class LBSGroupset
 {
 protected:
   typedef std::shared_ptr<chi_mesh::sweep_management::SPDS> SPDS_ptr;
+  typedef std::shared_ptr<chi_mesh::sweep_management::AngleAggregation> AngleAggPtr;
 public:
   int                                          id_;
   std::vector<LBSGroup>                        groups_;
   std::shared_ptr<chi_math::AngularQuadrature> quadrature_ = nullptr;
-  chi_mesh::sweep_management::AngleAggregation angle_agg_;
-  std::vector<SPDS_ptr>                        sweep_orderings_;
+  AngleAggPtr                                  angle_agg_;
   UniqueSOGroupings                            unique_so_groupings_;
   DirIDToSOMap                                 dir_id_to_so_map_;
 

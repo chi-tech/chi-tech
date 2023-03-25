@@ -13,6 +13,7 @@ typedef std::vector<std::pair<int,short>> LockBox;
 void chi_mesh::sweep_management::PRIMARY_FLUDS::
   SlotDynamics(const chi_mesh::Cell& cell,
                const SPDS& spds,
+               const GridFaceHistogram& grid_face_histogram,
                std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
                std::vector<std::pair<int,short>>& delayed_lock_box,
                std::set<int>& location_boundary_dependency_set)
@@ -42,7 +43,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
       if (face.IsNeighborLocal(*grid))
       {
         size_t num_face_dofs = face.vertex_ids_.size();
-        size_t face_categ = grid_face_histogram_.MapFaceHistogramBins(num_face_dofs);
+        size_t face_categ = grid_face_histogram.MapFaceHistogramBins(num_face_dofs);
 
         inco_face_face_category.push_back(face_categ);
 
@@ -155,7 +156,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
     if (mu>=(0.0+1.0e-16))
     {
       size_t num_face_dofs = face.vertex_ids_.size();
-      size_t face_categ = grid_face_histogram_.MapFaceHistogramBins(num_face_dofs);
+      size_t face_categ = grid_face_histogram.MapFaceHistogramBins(num_face_dofs);
 
       outb_face_face_category.push_back(face_categ);
 

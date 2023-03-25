@@ -15,7 +15,7 @@
 
 //###################################################################
 /**Develops a sweep ordering for a given angle for locally owned
- * cells.*/
+ * cells as well as the global partitioning.*/
 std::shared_ptr<chi_mesh::sweep_management::SPDS>
 chi_mesh::sweep_management::
   CreateSweepOrder(const chi_mesh::Vector3& omega,

@@ -191,5 +191,10 @@ template<> void WGSLinearSolver<Mat, Vec, KSP>::PostSolveCallback()
   //============================================= Context specific callback
   gs_context_ptr->PostSolveCallback();
 }
+
+template<> WGSLinearSolver<Mat, Vec, KSP>::~WGSLinearSolver()
+{
+  MatDestroy(&A_);
+}
 }//namespace lbs
 

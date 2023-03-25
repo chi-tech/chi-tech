@@ -24,16 +24,16 @@ void lbs::LBSDiscreteOrdinatesSolver::
     {
       case PhiSTLOption::PHI_NEW:
       {
-        auto psi = groupset.angle_agg_.GetNewDelayedAngularDOFsAsSTLVector();
+        auto psi = groupset.angle_agg_->GetNewDelayedAngularDOFsAsSTLVector();
         chi_math::Scale(psi, value);
-        groupset.angle_agg_.SetNewDelayedAngularDOFsFromSTLVector(psi);
+        groupset.angle_agg_->SetNewDelayedAngularDOFsFromSTLVector(psi);
         break;
       }
       case PhiSTLOption::PHI_OLD:
       {
-        auto psi = groupset.angle_agg_.GetOldDelayedAngularDOFsAsSTLVector();
+        auto psi = groupset.angle_agg_->GetOldDelayedAngularDOFsAsSTLVector();
         chi_math::Scale(psi, value);
-        groupset.angle_agg_.SetOldDelayedAngularDOFsFromSTLVector(psi);
+        groupset.angle_agg_->SetOldDelayedAngularDOFsFromSTLVector(psi);
         break;
       }
     }
@@ -83,10 +83,10 @@ void lbs::LBSDiscreteOrdinatesSolver::
   switch (which_phi)
   {
     case PhiSTLOption::PHI_NEW:
-      groupset.angle_agg_.AppendNewDelayedAngularDOFsToArray(index, x_ref);
+      groupset.angle_agg_->AppendNewDelayedAngularDOFsToArray(index, x_ref);
       break;
     case PhiSTLOption::PHI_OLD:
-      groupset.angle_agg_.AppendOldDelayedAngularDOFsToArray(index, x_ref);
+      groupset.angle_agg_->AppendOldDelayedAngularDOFsToArray(index, x_ref);
       break;
   }
 
@@ -137,10 +137,10 @@ void lbs::LBSDiscreteOrdinatesSolver::
   switch (which_phi)
   {
     case PhiSTLOption::PHI_NEW:
-      groupset.angle_agg_.SetNewDelayedAngularDOFsFromArray(index, x_ref);
+      groupset.angle_agg_->SetNewDelayedAngularDOFsFromArray(index, x_ref);
       break;
     case PhiSTLOption::PHI_OLD:
-      groupset.angle_agg_.SetOldDelayedAngularDOFsFromArray(index, x_ref);
+      groupset.angle_agg_->SetOldDelayedAngularDOFsFromArray(index, x_ref);
   }
 
   VecRestoreArrayRead(x_src,&x_ref);
@@ -193,10 +193,10 @@ void lbs::LBSDiscreteOrdinatesSolver::
 
   if (from_which_phi == PhiSTLOption::PHI_NEW and
       to_which_phi == PhiSTLOption::PHI_OLD)
-    groupset.angle_agg_.SetDelayedPsiOld2New();
+    groupset.angle_agg_->SetDelayedPsiOld2New();
   if (from_which_phi == PhiSTLOption::PHI_OLD and
       to_which_phi == PhiSTLOption::PHI_NEW)
-    groupset.angle_agg_.SetDelayedPsiNew2Old();
+    groupset.angle_agg_->SetDelayedPsiNew2Old();
 }
 
 //###################################################################
@@ -247,10 +247,10 @@ SetMultiGSPETScVecFromPrimarySTLvector(const std::vector<int> &gs_ids,
     switch (which_phi)
     {
       case PhiSTLOption::PHI_NEW:
-        groupset.angle_agg_.AppendNewDelayedAngularDOFsToArray(index, x_ref);
+        groupset.angle_agg_->AppendNewDelayedAngularDOFsToArray(index, x_ref);
         break;
       case PhiSTLOption::PHI_OLD:
-        groupset.angle_agg_.AppendOldDelayedAngularDOFsToArray(index, x_ref);
+        groupset.angle_agg_->AppendOldDelayedAngularDOFsToArray(index, x_ref);
         break;
     }
   }//for groupset id
@@ -307,10 +307,10 @@ SetPrimarySTLvectorFromMultiGSPETScVecFrom(const std::vector<int> &gs_ids,
     switch (which_phi)
     {
       case PhiSTLOption::PHI_NEW:
-        groupset.angle_agg_.SetNewDelayedAngularDOFsFromArray(index, x_ref);
+        groupset.angle_agg_->SetNewDelayedAngularDOFsFromArray(index, x_ref);
         break;
       case PhiSTLOption::PHI_OLD:
-        groupset.angle_agg_.SetOldDelayedAngularDOFsFromArray(index, x_ref);
+        groupset.angle_agg_->SetOldDelayedAngularDOFsFromArray(index, x_ref);
     }
   }//for groupset id
 

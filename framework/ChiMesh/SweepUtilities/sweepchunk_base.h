@@ -12,8 +12,7 @@ class chi_mesh::sweep_management::SweepChunk
 private:
   std::vector<double>* destination_phi;
   std::vector<double>* destination_psi;
-  AngleAggregation& angle_agg;
-  bool surface_source_active;
+  bool surface_source_active = false;
 
 public:
   /**
@@ -35,15 +34,13 @@ public:
   std::vector<MomentCallbackF> moment_callbacks;
 
   SweepChunk(std::vector<double>& in_destination_phi,
-             std::vector<double>& in_destination_psi,
-             AngleAggregation& in_angle_agg,
-             bool suppress_src)
+             std::vector<double>& in_destination_psi)
     : destination_phi(&in_destination_phi),
-      destination_psi(&in_destination_psi),
-      angle_agg(in_angle_agg),
-      surface_source_active(suppress_src)
+      destination_psi(&in_destination_psi)
   {}
 
+protected:
+  friend class SweepScheduler;
   /**Sets the location where flux moments are to be written.*/
   void SetDestinationPhi(std::vector<double>& in_destination_phi)
   {
@@ -80,45 +77,24 @@ public:
     return *destination_psi;
   }
 
-  /** Resets all the incoming intra-location and inter-location
-   * cyclic interfaces.*/
-  void ZeroIncomingDelayedPsi()
-  {
-   angle_agg.ZeroIncomingDelayedPsi();
-  }
-
-  /** Resets all the outgoing intra-location and inter-location
-   * cyclic interfaces.*/
-  void ZeroOutgoingDelayedPsi()
-  {
-    angle_agg.ZeroOutgoingDelayedPsi();
-  }
-
-  /** Clear the output angular flux vector, the flux moments
-   * vector, and the outgoing delayed psi.
-   */
-  void ZeroFluxDataStructures()
-  {
-    ZeroDestinationPsi();
-    ZeroDestinationPhi();
-    ZeroOutgoingDelayedPsi();
-  }
-
   /**Activates or deactives the surface src flag.*/
-  void SetSurfaceSourceActiveFlag(bool flag_value)
+  void SetBoundarySourceActiveFlag(bool flag_value) //Done
   {
     surface_source_active = flag_value;
   }
 
-  /**Returns the surface src-active flag.*/
-  bool IsSurfaceSourceActive() const
-  {return surface_source_active;}
-
-  virtual ~SweepChunk() = default;
-
+public:
   /**Sweep chunks should override this.*/
   virtual void Sweep(AngleSet* angle_set)
   {}
+
+protected:
+  /**Returns the surface src-active flag.*/
+  bool IsSurfaceSourceActive() const
+  {return surface_source_active;}
+public:
+  virtual ~SweepChunk() = default;
+
 };
 
 #endif //CHI_SWEEPCHUNK_BASE_H

@@ -18,19 +18,7 @@ void lbs::LBSDiscreteOrdinatesSolver::ResetSweepOrderings(LBSGroupset& groupset)
   chi::log.Log0Verbose1()
     << "Resetting SPDS and FLUDS";
 
-  groupset.sweep_orderings_.clear();
-
-  auto& angle_agg = groupset.angle_agg_;
-
-  for (auto& angset_grp : angle_agg.angle_set_groups)
-  {
-    for (auto& angset : angset_grp.angle_sets)
-    {
-      delete angset->fluds;
-    }
-    angset_grp.angle_sets.clear();
-  }
-  angle_agg.angle_set_groups.clear();
+  groupset.angle_agg_->angle_set_groups.clear();
 
   MPI_Barrier(MPI_COMM_WORLD);
 

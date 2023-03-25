@@ -74,7 +74,7 @@ void SourceFunction::operator()(LBSGroupset &groupset,
     const auto& xs = transport_view.XS();
 
       std::shared_ptr<chi_physics::IsotropicMultiGrpSource> P0_src = nullptr;
-    if (matid_to_src_map.count(cell.material_id_ > 0))
+    if (matid_to_src_map.count(cell.material_id_) > 0)
       P0_src = matid_to_src_map.at(cell.material_id_);
 
     const auto& S = xs.TransferMatrices();
