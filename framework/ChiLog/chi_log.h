@@ -1,5 +1,5 @@
-#ifndef _chi_log_h
-#define _chi_log_h
+#ifndef CHI_LOG_H
+#define CHI_LOG_H
 
 #include "chi_logstream.h"
 #include "chi_log_exceptions.h"
@@ -325,4 +325,4 @@ public:
   {  }
 };
 
-#endif
+#endif//CHI_LOG_H

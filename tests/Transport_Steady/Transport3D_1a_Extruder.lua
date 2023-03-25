@@ -115,6 +115,7 @@ chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 
 --############################################### Initialize and Execute Solver
 chiSolverInitialize(phys1)
+chiSolverInitialize(phys1)
 chiSolverExecute(phys1)
 
 --############################################### Get field functions

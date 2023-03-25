@@ -58,6 +58,8 @@ public:
                  AngleAggregation& in_angle_agg,
                  SweepChunk& in_sweep_chunk);
 
+  AngleAggregation& AngleAgg() {return angle_agg;}
+
   void Sweep();
   double GetAverageSweepTime() const;
   std::vector<double> GetAngleSetTimings();
@@ -69,6 +71,26 @@ private:
   //02
   void InitializeAlgoDOG();
   void ScheduleAlgoDOG(SweepChunk& sweep_chunk);
+
+  //03 utils
+public:
+  //phi
+  void SetDestinationPhi(std::vector<double>& in_destination_phi);
+  void ZeroDestinationPhi();
+  std::vector<double>& GetDestinationPhi();
+
+  //psi
+  void SetDestinationPsi(std::vector<double>& in_destination_psi);
+  void ZeroDestinationPsi();
+  std::vector<double>& GetDestinationPsi();
+
+  void ZeroIncomingDelayedPsi();
+  void ZeroOutgoingDelayedPsi();
+
+  void ZeroOutputFluxDataStructures();
+
+  void SetBoundarySourceActiveFlag(bool flag_value);
+
 };
 
 #endif //CHI_SWEEPSCHEDULER_H

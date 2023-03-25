@@ -17,12 +17,23 @@ mesher.options.partition_type == chi_mesh::VolumeMesher::PartitionType::PARMETIS
 
 namespace lbs
 {
-
+/**This routine initializes basic sweep datastructures that are agnostic of
+ * the number of groups and essentially the groupsets. The routine rebuilds
+ * the data structures i) `quadrature_unq_so_grouping_map_`,
+ * ii) `quadrature_spds_map_` and iii) `quadrature_fluds_templates_map_`.
+ * i) is a mapping, per quadrature, to a collection of angle-index-sets where
+ * all the angles in a particular angleset share the same sweep ordering.
+ * ii) is a mapping, per quadrature, to a collection of SPDSs where each
+ * SPDS mirrors an angle-index-set in i)
+ * iii) is again a mapping, per quadrature, to a collection of Template FLUDS
+ * where each FLUDS mirrors a SPDS in ii).
+ *
+ * The Template FLUDS can be scaled with number of angles and groups which
+ * provides us with the angle-set-subset- and groupset-subset capability.*/
 void LBSDiscreteOrdinatesSolver::InitializeSweepDataStructures()
 {
-  if (options_.verbose_inner_iterations)
-    chi::log.Log() << chi::program_timer.GetTimeString()
-                   << " Initializing sweep datastructures.\n";
+  chi::log.Log() << chi::program_timer.GetTimeString()
+                 << " Initializing sweep datastructures.\n";
 
   //=================================== Perform checks
   {
@@ -88,6 +99,9 @@ void LBSDiscreteOrdinatesSolver::InitializeSweepDataStructures()
                                         *grid_face_histogram_)
       );
   }//for quadrature spds-list pair
+
+  chi::log.Log() << chi::program_timer.GetTimeString()
+                 << " Done initializing sweep datastructures.\n";
 }
 
 }//namespace lbs

@@ -17,6 +17,7 @@ void lbs::LBSSolver::InitializeParrays()
                  << " M=" << num_moments_ << std::endl;
 
   //================================================== Initialize unknown structure
+  flux_moments_uk_man_.unknowns_.clear();
   for (size_t m=0; m < num_moments_; m++)
   {
     flux_moments_uk_man_.AddUnknown(chi_math::UnknownType::VECTOR_N, groups_.size());
@@ -41,6 +42,7 @@ void lbs::LBSSolver::InitializeParrays()
   phi_new_local_.assign(local_unknown_count, 0.0);
 
   //============================================= Setup groupset psi vectors
+  psi_new_local_.clear();
   for (auto& groupset : groupsets_)
   {
     psi_new_local_.emplace_back();
@@ -83,6 +85,7 @@ void lbs::LBSSolver::InitializeParrays()
   const chi_mesh::Vector3 jhat(0.0, 1.0, 0.0);
   const chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
 
+  max_cell_dof_count_ = 0;
   cell_transport_views_.clear();
   cell_transport_views_.reserve(grid_ptr_->local_cells.size());
   for (auto& cell : grid_ptr_->local_cells)

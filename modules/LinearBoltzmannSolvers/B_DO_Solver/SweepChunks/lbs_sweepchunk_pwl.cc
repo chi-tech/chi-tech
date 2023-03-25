@@ -19,8 +19,7 @@ lbs::SweepChunkPWL::
                 const std::map<int, XSPtr>& xs,
                 const int num_moments,
                 const int max_num_cell_dofs)
-                    : SweepChunk(destination_phi, destination_psi,
-                                 groupset.angle_agg_, false),
+                    : SweepChunk(destination_phi, destination_psi),
                       grid_view_(std::move(grid_ptr)),
                       grid_fe_view_(discretization),
                       unit_cell_matrices_(unit_cell_matrices),
@@ -39,10 +38,10 @@ const double* lbs::SweepChunkPWL::Upwinder::
 GetUpwindPsi(int fj, bool local, bool boundary) const
 {
   const double* psi;
-  if (local)             psi = fluds->UpwindPsi(spls_index,
+  if (local)             psi = fluds.UpwindPsi(spls_index,
                                                 in_face_counter,
                                                 fj,0,angle_set_index);
-  else if (not boundary) psi = fluds->NLUpwindPsi(preloc_face_counter,
+  else if (not boundary) psi = fluds.NLUpwindPsi(preloc_face_counter,
                                                   fj,0,angle_set_index);
   else                   psi = angle_set->PsiBndry(bndry_id,
                                                    angle_num,
@@ -56,11 +55,11 @@ double* lbs::SweepChunkPWL::Upwinder::
 GetDownwindPsi(int fi, bool local, bool boundary, bool reflecting_bndry) const
 {
   double* psi;
-  if (local)                 psi = fluds->
+  if (local)                 psi = fluds.
       OutgoingPsi(spls_index,
                   out_face_counter,
                   fi, angle_set_index);
-  else if (not boundary)     psi = fluds->
+  else if (not boundary)     psi = fluds.
       NLOutgoingPsi(deploc_face_counter,
                     fi, angle_set_index);
   else if (reflecting_bndry) psi = angle_set->
@@ -153,7 +152,7 @@ Sweep(chi_mesh::sweep_management::AngleSet *angle_set)
         b_[gsg].assign(num_nodes, 0.0);
 
       // ============================================ Upwinding structure
-      Upwinder upwind{fluds, angle_set, spls_index, angle_set_index,
+      Upwinder upwind{*fluds, angle_set, spls_index, angle_set_index,
         /*in_face_counter*/0,
         /*preloc_face_counter*/0,
         /*out_face_counter*/0,

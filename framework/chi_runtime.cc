@@ -220,7 +220,7 @@ int chi::RunInteractive(int argc, char** argv)
     try{chi::console.ExecuteFile(input_fname,argc, argv);}
     catch (const std::exception& excp)
     {
-      chi::log.LogAllError() << "\n" << excp.what();
+      chi::log.LogAllError() << excp.what();
       //No quitting if file execution fails
     }
   }
@@ -268,7 +268,7 @@ int chi::RunBatch(int argc, char** argv)
 #ifndef NDEBUG
   chi::log.Log() << "Waiting...";
   if (chi::mpi.location_id == 0)
-    for (int k=0; k<30; ++k)
+    for (int k=0; k<2; ++k)
     {
       usleep(1000000);
       chi::log.Log() << k;
@@ -285,7 +285,7 @@ int chi::RunBatch(int argc, char** argv)
     try{error_code = chi::console.ExecuteFile(input_fname,argc, argv);}
     catch (const std::exception& excp)
     {
-      chi::log.LogAllError() << "\n" << excp.what();
+      chi::log.LogAllError() << excp.what();
       chi::Exit(EXIT_FAILURE);
     }
   }

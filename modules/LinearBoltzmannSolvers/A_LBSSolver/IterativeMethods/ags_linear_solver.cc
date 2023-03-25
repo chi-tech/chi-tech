@@ -125,4 +125,10 @@ void AGSLinearSolver<Mat,Vec,KSP>::Solve()
   VecDestroy(&x_old);
 }
 
+template<>
+AGSLinearSolver<Mat,Vec,KSP>::~AGSLinearSolver()
+{
+  MatDestroy(&A_);
+}
+
 }//namespace lbs

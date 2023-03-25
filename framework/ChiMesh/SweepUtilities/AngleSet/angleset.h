@@ -16,6 +16,8 @@ typedef chi_mesh::sweep_management::SweepBoundary SweepBndry;
 /**Manages the workstages of a single angle set.*/
 class chi_mesh::sweep_management::AngleSet
 {
+public:
+  typedef std::shared_ptr<SweepBndry> SweepBndryPtr;
 private:
   size_t                            num_grps;
   const SPDS&                       spds;
@@ -24,10 +26,10 @@ private:
   chi_mesh::sweep_management::SweepBuffer sweep_buffer;
 
 public:
-  FLUDS*                            fluds;
-  std::vector<size_t>               angles;
-  std::map<uint64_t, std::shared_ptr<SweepBndry>>&         ref_boundaries;
-  size_t                            ref_subset;
+  std::shared_ptr<FLUDS>             fluds;
+  std::vector<size_t>                angles;
+  std::map<uint64_t, SweepBndryPtr>& ref_boundaries;
+  size_t                             ref_subset;
 
   //FLUDS
   std::vector<std::vector<double>>  local_psi;
@@ -43,7 +45,7 @@ public:
   AngleSet(size_t in_numgrps,
            size_t in_ref_subset,
            const SPDS& in_spds,
-           FLUDS* in_fluds,
+           std::shared_ptr<FLUDS> in_fluds,
            std::vector<size_t>& angle_indices,
            std::map<uint64_t, std::shared_ptr<SweepBndry>>& sim_boundaries,
            int sweep_eager_limit,

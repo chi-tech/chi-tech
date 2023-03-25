@@ -35,6 +35,8 @@ namespace lbs
 {
 
 //###################################################################
+/**This routine groups angle-indices to groups sharing the same sweep
+ * ordering. It also takes geometry into account.*/
 std::pair<UniqueSOGroupings, DirIDToSOMap> LBSDiscreteOrdinatesSolver::
   AssociateSOsAndDirections(const chi_mesh::MeshContinuum &grid,
                             const chi_math::AngularQuadrature& quadrature,
