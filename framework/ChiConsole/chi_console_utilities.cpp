@@ -27,7 +27,8 @@ int chi_objects::ChiConsole::
 
 		if (error > 0)
 		{
-			chi::log.LogAll() << lua_tostring(this->consoleState, -1);
+			chi::log.LogAllError() << "LuaError: "
+                             << lua_tostring(this->consoleState, -1);
 			return EXIT_FAILURE;
 		}
 	}
