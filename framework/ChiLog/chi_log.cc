@@ -2,13 +2,15 @@
 #include "chi_mpi.h"
 #include "ChiTimer/chi_timer.h"
 
+#include "stringstream_color.h"
+
 #include <sstream>
 
 //###################################################################
 /** Default constructor*/
 chi_objects::ChiLog::ChiLog() noexcept
 {
-  verbosity_ = LOG_0VERBOSE_0;
+  verbosity_ = 0;
   std::string memory_usage_event("Maximum Memory Usage");
   repeating_events.emplace_back(memory_usage_event);
 
@@ -26,6 +28,7 @@ chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
 {
   switch (level)
   {
+    case LOG_0VERBOSE_0:
     case LOG_0:
     {
       if (chi::mpi.location_id == 0)
@@ -44,7 +47,7 @@ chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
       if (chi::mpi.location_id == 0)
       {
         std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
-        header += "**WARNING** ";
+        header += StringStreamColor(FG_YELLOW) + "**WARNING** ";
         return {&std::cout, header};
       }
       else
@@ -58,7 +61,7 @@ chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
       if (chi::mpi.location_id == 0)
       {
         std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
-        header += "**!**ERROR**!** ";
+        header += StringStreamColor(FG_RED) + "**!**ERROR**!** ";
         return {&std::cerr, header};
       }
       else
@@ -67,13 +70,13 @@ chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
         return {&dummy_stream_, header, true};
       }
     }
-    case LOG_0VERBOSE_0:
+
     case LOG_0VERBOSE_1:
-    case ChiLog::LOG_LVL::LOG_0VERBOSE_2:
     {
-      if ((chi::mpi.location_id == 0) && (verbosity_ >= level))
+      if ((chi::mpi.location_id == 0) && (verbosity_ >= 1))
       {
         std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
+        header += StringStreamColor(FG_CYAN);
         return {&std::cout, header};
       }
       else
@@ -82,6 +85,21 @@ chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
         return {&dummy_stream_, header, true};
       }
     }
+    case ChiLog::LOG_LVL::LOG_0VERBOSE_2:
+    {
+      if ((chi::mpi.location_id == 0) && (verbosity_ >= 2))
+      {
+        std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
+        header += StringStreamColor(FG_MAGENTA);
+        return {&std::cout, header};
+      }
+      else
+      {
+        std::string header = " ";
+        return {&dummy_stream_, header, true};
+      }
+    }
+    case LOG_ALLVERBOSE_0:
     case LOG_ALL:
     {
       std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
@@ -90,23 +108,36 @@ chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
     case LOG_ALLWARNING:
     {
       std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
-      header += "**WARNING** ";
+      header += StringStreamColor(FG_YELLOW) + "**WARNING** ";
       return {&std::cout, header};
     }
     case LOG_ALLERROR:
     {
       std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
-      header += "**!**ERROR**!** ";
+      header += StringStreamColor(FG_RED) + "**!**ERROR**!** ";
       return {&std::cerr, header};
     }
 
-    case LOG_ALLVERBOSE_0:
     case LOG_ALLVERBOSE_1:
-    case LOG_ALLVERBOSE_2:
     {
-      if (verbosity_ >= (level - 6))
+      if (verbosity_ >= 1)
       {
         std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
+        header += StringStreamColor(FG_CYAN);
+        return {&std::cout, header};
+      }
+      else
+      {
+        std::string header = " ";
+        return {&dummy_stream_, header, true};
+      }
+    }
+    case LOG_ALLVERBOSE_2:
+    {
+      if (verbosity_ >= 2)
+      {
+        std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
+        header += StringStreamColor(FG_MAGENTA);
         return {&std::cout, header};
       }
       else
@@ -126,18 +157,7 @@ chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
 /** Sets the verbosity level.*/
 void chi_objects::ChiLog::SetVerbosity(int int_level)
 {
-  if (int_level == 0)
-  {
-    verbosity_ = LOG_0VERBOSE_0;
-  }
-  else if (int_level == 1)
-  {
-    verbosity_ = LOG_0VERBOSE_1;
-  }
-  else if (int_level == 2)
-  {
-    verbosity_ = ChiLog::LOG_LVL::LOG_0VERBOSE_2;
-  }
+  verbosity_ = std::min(int_level, 2);
 }
 
 //###################################################################
