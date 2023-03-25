@@ -113,7 +113,7 @@ def format3(number):
 
 
 def format_filename(filename):
-    return f"{filename[:38]:38s}"
+    return f"{filename[:50]:50s}"
 
 
 # Numerical comparison:
@@ -234,9 +234,9 @@ def parse_output(out, search_strings_vals_tols):
                 break
 
     if test_passed:
-        print(" - Passed")
+        print(" - \033[32mPassed\033[39m")
     else:
-        print(" - FAILED!")
+        print(" - \033[31mFAILED!\033[39m")
         num_failed += 1
         # print(out)
 
@@ -755,10 +755,10 @@ print()
 if num_failed == 0:
     print("All regression tests passed!")
 else:
-    print("ERROR: Not all regression tests passed!")
+    print("\033[31mERROR: Not all regression tests passed!\033[39m")
     print("Number of Tests failed = " + str(num_failed))
 print("")
-print("************* End of Regression Test *************")
+print("************* End of Regression Test Suite *************")
 print("")
 if num_failed == 0:
     sys.exit(0)
