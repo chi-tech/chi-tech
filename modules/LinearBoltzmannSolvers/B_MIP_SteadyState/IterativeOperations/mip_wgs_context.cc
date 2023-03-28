@@ -77,7 +77,7 @@ std::pair<int64_t, int64_t> MIPWGSContext<Mat, Vec, KSP>::SystemSize()
 template<>
 void MIPWGSContext<Mat, Vec, KSP>::ApplyInverseTransportOperator(int scope)
 {
-
+  ++counter_applications_of_inv_op_;
   auto& mip_solver = *lbs_mip_ss_solver_.gs_mip_solvers_[groupset_.id_];
 
   lbs_solver_.PhiNewLocal() = lbs_solver_.QMomentsLocal();

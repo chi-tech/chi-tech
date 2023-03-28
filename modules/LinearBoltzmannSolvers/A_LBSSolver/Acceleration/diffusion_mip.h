@@ -126,8 +126,8 @@ public:
   void Assemble_b(Vec petsc_q_vector);
 
   //02
-  void Solve(std::vector<double>& solution);
-  void Solve(Vec petsc_solution);
+  void Solve(std::vector<double>& solution, bool use_initial_guess=false);
+  void Solve(Vec petsc_solution, bool use_initial_guess=false);
   //05
   double HPerpendicular(const chi_mesh::Cell& cell, unsigned int f);
 

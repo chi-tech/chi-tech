@@ -223,7 +223,9 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
 
   if (num_cell_blocks != 1)
     throw std::logic_error(fname + ": More than one cell-block has been read "
-          "from the file. Only a single face-containing object is supported.");
+          "from the file. Only a single face-containing object is supported. "
+          "If you exported this mesh from blender, be sure to export "
+          "\"selection only\"");
 
   //======================================================= Process blocks
   std::vector<chi_mesh::Vertex> cell_vertices;

@@ -6,9 +6,6 @@
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-;
-
-
 //###################################################################
 /**Provides the text name associated with a cell type.*/
 std::string chi_mesh::CellTypeName(const CellType type)
@@ -21,12 +18,18 @@ std::string chi_mesh::CellTypeName(const CellType type)
 //    case CellType::CYLINDRICAL_ANNULUS: return "CYLINDRICAL_ANNULUS";
     case CellType::TRIANGLE:            return "TRIANGLE";
     case CellType::QUADRILATERAL:       return "QUADRILATERAL";
+
     case CellType::POLYGON:             return "POLYGON";
     case CellType::TETRAHEDRON:         return "TETRAHEDRON";
     case CellType::HEXAHEDRON:          return "HEXAHEDRON";
+    case CellType::WEDGE:               return "WEDGE";
+    case CellType::PYRAMID:             return "PYRAMID";
     case CellType::POLYHEDRON:          return "POLYHEDRON";
-    default: return "NONE";
+
+    case CellType::POINT:               return "POINT";
   }
+
+  return "NONE";
 }
 
 //###################################################################

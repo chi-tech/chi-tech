@@ -100,8 +100,8 @@ void lbs::LBSSolver::CleanUpWGDSA(LBSGroupset& groupset)
 /**Creates a vector from a lbs primary stl vector where only the
  * scalar moments are mapped to the DOFs needed by WGDSA.*/
 std::vector<double> lbs::LBSSolver::
-  WGDSACopyOnlyPhi0(const LBSGroupset &groupset,
-                    const std::vector<double> &phi_in)
+  WGSCopyOnlyPhi0(const LBSGroupset &groupset,
+                  const std::vector<double> &phi_in)
 {
   const auto& sdm = *discretization_;
   const auto& dphi_uk_man = groupset.wgdsa_solver_->UnknownStructure();
@@ -138,9 +138,9 @@ std::vector<double> lbs::LBSSolver::
 //###################################################################
 /**From the WGDSA DOFs, projects the scalar moments back into a
  * primary STL vector.*/
-void lbs::LBSSolver::WGDSAProjectBackPhi0(const LBSGroupset &groupset,
-                                          const std::vector<double>& input,
-                                          std::vector<double> &output)
+void lbs::LBSSolver::GSProjectBackPhi0(const LBSGroupset &groupset,
+                                       const std::vector<double>& input,
+                                       std::vector<double> &output)
 {
   const auto& sdm = *discretization_;
   const auto& dphi_uk_man = groupset.wgdsa_solver_->UnknownStructure();

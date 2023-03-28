@@ -105,6 +105,7 @@ std::pair<int64_t, int64_t> SweepWGSContext<Mat, Vec, KSP>::SystemSize()
 template<>
 void SweepWGSContext<Mat, Vec, KSP>::ApplyInverseTransportOperator(int scope)
 {
+  ++counter_applications_of_inv_op_;
   const bool use_bndry_source_flag =
     (scope & APPLY_FIXED_SOURCES) and
     (not lbs_solver_.Options().use_src_moments);
