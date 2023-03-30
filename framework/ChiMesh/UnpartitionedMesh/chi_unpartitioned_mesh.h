@@ -131,19 +131,16 @@ public:
                      int cell_material_id,
                      const std::vector<std::vector<uint64_t>>& proxy_faces);
 
-  ~UnpartitionedMesh()
-  {
-    for (auto& cell : raw_cells_)          delete cell;
-    for (auto& cell : raw_boundary_cells_) delete cell;
-  }
+  ~UnpartitionedMesh();
+
   void CleanUp()
   {
     for (auto& cell : raw_cells_)          delete cell;
     for (auto& cell : raw_boundary_cells_) delete cell;
-    vertices_.clear();
-    raw_cells_.clear();
-    raw_boundary_cells_.clear();
-    vertex_cell_subscriptions_.clear();
+    vertices_.clear(); vertices_.shrink_to_fit();
+    raw_cells_.clear(); raw_cells_.shrink_to_fit();
+    raw_boundary_cells_.clear(); raw_boundary_cells_.shrink_to_fit();
+    vertex_cell_subscriptions_.clear(); vertex_cell_subscriptions_.shrink_to_fit();
   }
 };
 

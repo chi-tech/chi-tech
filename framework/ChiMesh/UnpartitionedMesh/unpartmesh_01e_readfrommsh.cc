@@ -344,6 +344,8 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
 
       for (auto& lw_face : lw_faces) cell.faces.push_back(lw_face);
     }
+    else
+      throw std::runtime_error(fname + ": Unsupported cell type");
 
   }//for elements
 

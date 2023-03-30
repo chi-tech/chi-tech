@@ -3,7 +3,7 @@ dofile("mesh/gmesh_coarse.lua")
 
 --chiMeshHandlerExportMeshToVTK("ZMesh")
 --os.exit()
-
+chiDestroyUnpartitionedMesh(umesh)
 dofile("materials/materials.lua")
 
 --############################################### Setup Physics

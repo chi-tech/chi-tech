@@ -92,6 +92,7 @@ public:
     ghost_cells_.clear();
     global_cell_id_to_local_id_map_.clear();
     global_cell_id_to_nonlocal_id_map_.clear();
+    vertices.Clear();
   }
 
   void ExportCellsToObj(const char* fileName,
@@ -105,7 +106,6 @@ public:
                         double slave_tolerance=1.1) const;
 
   bool IsCellLocal(uint64_t cell_global_index) const;
-  bool IsCellBndry(uint64_t cell_global_index) const;
   static int GetCellDimension(const chi_mesh::Cell& cell);
 
   void FindAssociatedVertices(const chi_mesh::CellFace& cur_face,
