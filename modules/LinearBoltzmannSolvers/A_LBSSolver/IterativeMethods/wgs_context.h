@@ -30,6 +30,7 @@ struct WGSContext : public chi_math::LinearSolverContext<MatType, VecType>
   int lhs_src_scope_;
   int rhs_src_scope_;
   bool log_info_ = true;
+  size_t counter_applications_of_inv_op_ = 0;
 
   WGSContext(LBSSolver& lbs_solver,
              LBSGroupset& groupset,

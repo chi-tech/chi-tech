@@ -39,6 +39,11 @@ void PowerIterationKEigen(LBSSolver& lbs_solver,
   auto& groupsets = lbs_solver.Groupsets();
   auto active_set_source_function = lbs_solver.GetActiveSetSourceFunction();
 
+  auto& front_gs = groupsets.front();
+  auto& front_wgs_solver = lbs_solver.GetWGSSolvers()[front_gs.id_];
+  auto frons_wgs_context = std::dynamic_pointer_cast<lbs::WGSContext<Mat,Vec,KSP>>(
+    front_wgs_solver->GetContext());
+
   double F_prev = 1.0;
   k_eff = 1.0;
   double k_eff_prev = 1.0;
@@ -103,7 +108,9 @@ void PowerIterationKEigen(LBSSolver& lbs_solver,
     << std::setprecision(7) << k_eff;
   chi::log.Log()
     << "        Final change          :        "
-    << std::setprecision(6) << k_eff_change;
+    << std::setprecision(6) << k_eff_change
+    << " (num_TrOps:" << frons_wgs_context->counter_applications_of_inv_op_ << ")"
+    << "\n";
   chi::log.Log() << "\n";
 }
 

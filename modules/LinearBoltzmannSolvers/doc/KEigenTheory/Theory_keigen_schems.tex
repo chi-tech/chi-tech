@@ -138,6 +138,7 @@
 \newcommand{\br}{\mathbf{r}}
 \newcommand{\bR}{\mathbf{R}}
 \newcommand{\half}{\frac{1}{2}}
+\newcommand{\bepsilon}{\boldsymbol{\epsilon}}
 %
 % Vector forms
 %
@@ -253,10 +254,10 @@ Work is work for some, but for some it is play.
 \setlength{\headheight}{13.59999pt}
 
 \pagenumbering{arabic}
-%\setcounter{secnumdepth}{1}
+%\setcounter{secnumdepth}{3}
 
 \chead{Power Iteration (Richardson Iteration)}
-\section{Power Iteration (Richardson Iteration)}
+\section{Power Iteration (Richardson Iteration)}\BackToTOC
 We start with our discretized transport formulation
 \beqn 
 (L - MSD)\bpsi = \frac{1}{k} MFD\bpsi
@@ -266,74 +267,82 @@ where
 k = ||FD\bpsi ||_2.
 \eeqn 
 
-At initialization we assume some shape to the angular flux, e.g. $\psi^k=1$ for $k=1$. Thereafter we have
+At initialization we assume some shape to the angular flux, e.g. $\psi^\ell=1$ for $\ell=1$. Thereafter we have
 \beqn 
-(L - MSD)\bpsi^{k+1} = \frac{1}{k} MFD\bpsi^{k}
+(L - MSD)\bpsi^{\ell+1} = \frac{1}{k} MFD\bpsi^{\ell}
 \eeqn 
-where the right-handside is known, therefore, we solve this equation with our standard steady state tools, i.e. Richardson iteration or GMRes. The term $ \frac{1}{k} FD\bpsi^{k}$ is treated as a moment-based source.
+where the right-handside is known, therefore, we solve this equation with our standard steady state tools, i.e. Richardson iteration or GMRes. The term $ \frac{1}{k} FD\bpsi^{\ell}$ is treated as a moment-based source.
 
-\subsection{Inner convergence schemes}
+\subsection{Inner convergence schemes}\BackToTOC
 
 \subsubsection{Richardson iteration (Source Iteration)}
 For richardson iteration we have
 \beqn 
-L\bpsi^{k+1,\ell+1} &= MSD\bpsi^{k+1,\ell} +  \frac{1}{k^k} MFD\bpsi^{k} \\
+L\bpsi^{\ell+1,i+1} &= MSD\bpsi^{\ell+1,i} +  \frac{1}{k^\ell} MFD\bpsi^{\ell} \\
 \therefore
-\bpsi^{k+1,\ell+1} &= \Linv (MSD\bpsi^{k+1,\ell} +  \frac{1}{k^k} MFD\bpsi^{k}),
+\bpsi^{\ell+1,i+1} &= \Linv (MSD\bpsi^{\ell+1,i} +  \frac{1}{k^\ell} MFD\bpsi^{\ell}),
 \eeqn 
-where $\bpsi^{k+1,0} = \bpsi^k$.
+where $\bpsi^{\ell+1,0} = \bpsi^\ell$.
 
 
 For a flux-moments based scheme this would be
 \beqn 
-L\bpsi^{k+1,\ell+1} &= MS\bphi^{k+1,\ell} +  \frac{1}{k^k} MF\bphi^{k} \\
+L\bpsi^{\ell+1,i+1} &= MS\bphi^{\ell+1,i} +  \frac{1}{k^\ell} MF\bphi^{\ell} \\
 \therefore 
-\bphi^{k+1,\ell+1} &= D\Linv (MS\bphi^{k+1,\ell} +  \frac{1}{k^k} MF\bphi^{k})
+\bphi^{\ell+1,i+1} &= D\Linv (MS\bphi^{\ell+1,i} +  \frac{1}{k^\ell} MF\bphi^{\ell})
 \eeqn 
 
 \subsubsection{Krylov subspace scheme}
 For a Krylov subspace scheme we have
 \beqn 
-A \bpsi^{k+1} &= b \\
+L\bpsi^{\ell+1} - MSD\bpsi^{\ell+1} &=  \frac{1}{k^\ell} MFD\bpsi^{\ell}
+\eeqn 
+which we modify by applying the inverse of the transport operator, $\Linv$, to get
+\beqn 
+(\Linv \to) \quad \quad 
+\bpsi^{\ell+1} - \Linv MSD\bpsi^{\ell+1} &=  \Linv \frac{1}{k^\ell} MFD\bpsi^{\ell} \\
+(D \to) \quad \quad 
+D\bpsi^{\ell+1} - D\Linv MSD\bpsi^{\ell+1} &=  D\Linv \frac{1}{k^\ell} MFD\bpsi^{\ell}\\
+\therefore
+\bphi^{\ell+1} - D\Linv MS\bphi^{\ell+1} &=  D\Linv \frac{1}{k^\ell} MF\bphi^{\ell}\\
+(I - D\Linv MS) \bphi^{\ell+1} &= D\Linv \frac{1}{k^\ell} MF\bphi^{\ell}
+\eeqn 
+which can be written in the form
+\beqn 
+A \bphi^{\ell+1} &= b \\
 \eeqn 
 where
 \beqn
-A & = (L-MSD) \\
-\mathbf{b} &= \frac{1}{k^k} MFD\bpsi^{k}
+A & = (I - D\Linv MS) \\
+\mathbf{b} &= D\Linv \frac{1}{k^\ell} MF\bphi^{\ell}
 \eeqn 
+and can be solved by a matrix-free Krylov subspace solver e.g. GMRes or BiCGStab.
 
-
-For a flux-moments based scheme this would be
-\beqn 
-A \bphi^{k+1} = b
-\eeqn 
-where 
-\beqn 
-A &= (I-D\Linv MS) \\
-\mathbf{b} &= D\Linv (\frac{1}{k^k} MF\bphi^{k})
-\eeqn 
-which can be solved by a matrix-free Krylov subspace solver e.g. GMRes or BiCGStab.
-
-\subsection{Acceleration schemes}
+\subsection{k-eigenvalue Diffusion Synthetic Acceleration (kDSA) scheme}
+\BackToTOC
 Suppose we have an unconverged inner result, for which
 \beqn 
+L\bpsi^{\ell+\half,i} \ne
+MS\bphi^{\ell+\half, i} + \frac{1}{k^\ell}MF\bphi^\ell.
+\eeqn 
+By performing an additional sweep we can get a single update, $\bphi^{\ell+\half,i+1}$, from
+\beqn 
 \bpsi^{\ell+\half,i+1} = \Linv \biggr(
-MS\bphi^{\ell+\half, i} + \frac{1}{k}F\bphi^\ell
+MS\bphi^{\ell+\half, i} + \frac{1}{k^\ell}MF\bphi^\ell
 \biggr)
 \eeqn 
-the residual of the transport equation here is
+allowing us to define the residual of the transport equation, for the update, as 
 \beqn
-\mathbf{R}^{\ell+\half} = MS\bphi^{\ell+\half,i+1} + \frac{1}{k}F\bphi^\ell - L \bpsi^{\ell+\half,i+1}
+\mathbf{R}^{\ell+\half} = MS\bphi^{\ell+\half,i+1} + \frac{1}{k^\ell}MF\bphi^\ell - L \bpsi^{\ell+\half,i+1}
 \eeqn 
 but if we plug in the expression for $\bpsi^{\ell+\half,i+1}$ we get
 \beqn 
 \mathbf{R}^{\ell+\half} = MS\bphi^{\ell+\half,i+1} - MS\bphi^{\ell+\half,i}
 \eeqn 
-
-
-Now, suppose we have an unconverged inner result, with a residual $\mathbf{R}$,
+\newline 
+Now, the following holds
 \beqn 
-L \bpsi^{\ell+\half,i+1} - MS\bphi^{\ell+\half,i+1} = \frac{1}{k^\ell} MF\bphi^\ell - \mathbf{R}^{\ell+\half}
+L \bpsi^{\ell+\half,i+1} - MS\bphi^{\ell+\half,i+1} = \frac{1}{k^\ell} MF\bphi^\ell - \mathbf{R}^{\ell+\half}.
 \eeqn 
 But we seek
 \beqn 
@@ -353,29 +362,145 @@ L\delta \bpsi - MS\delta \bphi &= \frac{1}{\lambda}MF(\delta \bphi + \bphi^{\ell
 \eeqn
 which takes the form of a k-eigenvalue problem with a source. The diffusion approximation can be applied to this, resulting in
 \beqn 
-\mathcal{D} \delta \bphi - S_{\mathcal{D}} \delta \bphi = \frac{1}{\lambda}F(\delta \bphi + \bphi^{\ell+\half,i+1}) - \frac{1}{k^\ell} F\bphi^\ell + S^*(\bphi^{\ell+\half,i+1} - \bphi^{\ell+\half,i})
+\mathcal{D} \bepsilon - S_{0\mathcal{D}} \bepsilon = \frac{1}{\lambda}F(\bepsilon + \bphi_0^{\ell+\half,i+1}) - \frac{1}{k^\ell} F\bphi_0^\ell + S_0(\bphi_0^{\ell+\half,i+1} - \bphi_0^{\ell+\half,i})
 \eeqn 
-where $S^*$ is essentially the same as $S$ except that only the zeroth-moment is non-zero, $S_{\mathcal{D}}$ is the same as $S^*$ except for the suppression of within-group scattering.
+where $\bepsilon$ are the scalar moments of $\delta \bphi$, $\bphi$ are the scalar moments of $\bphi$, $S_0$ is essentially the same as $S$ except that only the zeroth-moment is non-zero, $S_{0\mathcal{D}}$ is the same as $S_0$ except for the suppression of within-group scattering.
 
 
 We can solve the above equation using power iteration if we define it as
 \beqn 
-\mathcal{D} \delta \bphi^{k+1} = S_{\mathcal{D}} \delta \bphi^k + \frac{1}{\lambda^k}F(\delta \bphi^k + \bphi^{\ell+\half,i+1}) - \frac{1}{k^\ell} F\bphi^\ell + S^*(\bphi^{\ell+\half,i+1} - \bphi^{\ell+\half,i})
+\mathcal{D} \bepsilon^{k+1} &= S_{0\mathcal{D}} \bepsilon^k + \frac{1}{\lambda^k}F(\bepsilon^k + \bphi_0^{\ell+\half,i+1}) - \frac{1}{k^\ell} F\bphi_0^\ell + S_0(\bphi_0^{\ell+\half,i+1} - \bphi_0^{\ell+\half,i}) \\
+&= S_s + S_{f,aux} - S_f + S_{s,\mathbf{R}}
 \eeqn 
-where $\delta \bphi^0 = 0$ and $\lambda^0 = k^\ell$.
+where $\bepsilon^0 = 0$ and $\lambda^0 = k^\ell$.
 
+\newpage
+\subsection{Implementation}
+\subsubsection{Getting $\bphi_0^\ell, \bphi_0^{\ell+\half,i}, \bphi_0^{\ell+\half,i+1}$}
+For each $\ell$ of the Power Iteration loop:
+$$
+\bphi_0^\ell \leftarrow \bphi^\ell
+$$
+$$
+\mathbf{q} = \text{Compute }\frac{1}{k^\ell} F\bphi^\ell
+$$
+$$
+S_f \leftarrow \mathbf{q_0}
+$$
+Solve a few iterations
+\beq 
+\text{GMRES}: \quad \quad 
+&(I - D\Linv MS) \bphi^{\ell+1} = D\Linv \frac{1}{k^\ell} MF\bphi^{\ell}  \\
+\text{or SI}:\quad \quad  &\bphi^{\ell+1,i+1} = D\Linv (MS\bphi^{\ell+1,i} +  \frac{1}{k^\ell} MF\bphi^{\ell})
+\eeq
+Up to here was actually standard Power Iteration except for the saving of $\bphi_0^\ell$ and $S_f$. Afterwards we have $\bphi^{latest}$,
+$$
+\bphi_0^{\ell+\half,i} \leftarrow \bphi^{\ell+\half,i} \leftarrow \bphi^{latest}
+$$
+Now we compute a single update
+$$
+\mathbf{q} = \text{Compute }S\phi^{\ell+\half,i} + \frac{1}{k^\ell} F\bphi^\ell
+$$
+$$
+\bphi^{\ell+\half,i+1} = D\Linv M\mathbf{q}
+$$
+$$
+\bphi_0^{\ell+\half,i+1} \leftarrow \bphi^{\ell+\half,i+1}
+$$
+Now we are ready for the acceleration step.
 
-We can also define a non-linear solver with
-\beqn 
-\mathcal{D}^{-1} \mathbf{r}(\delta \bphi) = \mathcal{D}^{-1}
-\biggr(
-S_{\mathcal{D}} \delta \bphi
-+ \frac{1}{\lambda}F(\delta \bphi + \bphi^{\ell+\half,i+1}) 
-- \frac{1}{k^\ell} F\bphi^\ell 
-+ S^*(\bphi^{\ell+\half,i+1} - \bphi^{\ell+\half,i})
-\biggr) - \delta \bphi
-\eeqn 
+\subsubsection{Acceleration step}
+Before the loop
+$$
+\bepsilon^k = \bepsilon^{k+1} = \mathbf{0}
+$$
+$$
+\lambda^k = \lambda^{k+1} = k^\ell
+$$
+Now begin the loop over $k$
+$$
+P^k = || F(\bepsilon^k + \bphi_0^{\ell+\half,i+1}) ||
+$$
+$$
+S_{f,aux} = \frac{1}{\lambda^k} F(\bepsilon^k + \bphi_0^{\ell+\half,i+1})
+$$
+$$
+S_{s,\mathbf{R}} = S_0(\bphi_0^{\ell+\half,i+1} - \bphi_0^{\ell+\half,i})
+$$
+$$
+S_s = S_{0\mathcal{D}}(\bepsilon^k)
+$$
+$$
+\text{Solve } \mathcal{D}\bepsilon^{k+1} = S_s + S_{f,aux} - S_f + S_{s,\mathbf{R}}
+$$
+$$
+P^{k+1} = || F(\bepsilon^{k+1} + \bphi_0^{\ell+\half,i+1}) ||
+$$
+$$
+\frac{P^{k+1}}{\lambda^{k+1}} = \frac{P^{k}}{\lambda^k} \quad \quad \to \quad \quad  \lambda^{k+1} = P^{k+1}/\frac{P^{k}}{\lambda^k}
+$$
+$$
+\epsilon^k = \epsilon^{k+1}
+\lambda^k = \lambda^{k+1}
+$$
+Repeat for the next $k$
 
+\subsection{Update}
+$$
+\bphi^{\ell+1,*} = \epsilon^{k+1} \to \text{add} \bphi^{\ell+\half, i+1}
+$$
+$$
+P = || F(\bphi^{\ell+1,*}) ||
+$$
+$$
+\bphi^{\ell+1} = \frac{\lambda^{k+1}}{P} \bphi^{\ell+1,*}
+$$
+$$
+k^{\ell+1} = \lambda^{k+1}
+$$
+Repeat regular power iteration.
+
+\subsubsection{QBlock Performance}
+
+\subsubsection{C5G7 Performance}
+\begin{itemize}
+\item \textbf{Power Iteration, Num-inners = 5}
+\begin{itemize}
+	\item Time=8m26s. Num-sweeps=1215
+\end{itemize}
+\item \textbf{Power Iteration, Num-inners = 5, with kDSA-PI(100)$\epsilon_{MIP}=1.0e-10$}
+\begin{itemize}
+	\item Time=41m42s. Num-sweeps=152
+\end{itemize}
+\item \textbf{Power Iteration, Num-inners = 5, with kDSA-PI(100)$\epsilon_{MIP}=1.0e-6$ MIP using initial guess}
+\begin{itemize}
+	\item Time=11m22s. Num-sweeps=120
+\end{itemize}
+\item \textbf{Power Iteration, Num-inners = 5, with kDSA-PI(50)$\epsilon_{MIP}=1.0e-6$ MIP using initial guess}
+\begin{itemize}
+	\item Time=06m28s. Num-sweeps=112. Wrong answer.
+\end{itemize}
+\item \textbf{Power Iteration, Num-inners = 5, with kDSA-PI(50)$\epsilon_{MIP}=1.0e-10$}
+\begin{itemize}
+	\item Time=19m29s. Num-sweeps=160
+\end{itemize}
+\item \textbf{Power Iteration, Num-inners = 5, with kDSA-PI(50)$\epsilon_{MIP}=1.0e-6$}
+\begin{itemize}
+	\item Time=8m31s. Num-sweeps=128. Might have false convergence.
+\end{itemize}
+\item \textbf{Power Iteration, Num-inners = 5, with kDSA-PI(50)$\epsilon_{MIP}=1.0e-6$, MIP no rel conver}
+\begin{itemize}
+	\item Time=8m58s. Num-sweeps=128. Might have false convergence.
+\end{itemize}
+\item \textbf{Power Iteration, Num-inners = 5, with kDSA-PI(20)$\epsilon_{MIP}=1.0e-10$}
+\begin{itemize}
+	\item Time=18m58s. Num-sweeps=361
+\end{itemize}
+\item \textbf{Power Iteration, Num-inners = 5, with kDSA-NL($5_{L}\times 10_{NL}$)}
+\begin{itemize}
+	\item Time=XXmXXs. Num-sweeps=XXX. Took > 60min
+\end{itemize}
+\end{itemize}
 
 
 
@@ -384,6 +509,7 @@ S_{\mathcal{D}} \delta \bphi
 \newpage
 \chead{Angular flux based non-linear eigenvalue formulation}
 \section{Angular flux based non-linear eigenvalue formulation}
+\BackToTOC
 We start with our discretized transport formulation
 \beqn 
 (L - MSD)\bpsi = \frac{1}{k} FD\bpsi
@@ -436,6 +562,7 @@ L\Delta \bpsi = \frac{1}{k} FD\bpsi + MSD\bpsi.
 \newpage
 \chead{Flux-moments based non-linear eigenvalue formulation}
 \section{Flux-moments based non-linear eigenvalue formulation}
+\BackToTOC
 We start with our flux-moments formulation of the transport system:
 \beqn 
 (I-D\Linv MS) \bphi = \frac{1}{k} D\Linv F\bphi
@@ -484,6 +611,65 @@ and is obtained by solving the system
 L \Delta \bpsi  =  \frac{1}{k} F \bphi + MS \bphi
 \eeqn 
 
+\subsection{Possible k-eigenvalue Diffusion Synthetic
+	Acceleration (kDSA) scheme} \BackToTOC
+For the non-linear k-eigenvalue solver the solution is updated with the following
+\beqn 
+L\bpsi^{\ell} \ne
+MS\bphi^{\ell} + \frac{1}{k^\ell}MF\bphi^\ell.
+\eeqn 
+By performing an additional sweep we can get a single update, $\bphi^{\ell+\half}$, from
+\beqn 
+\bpsi^{\ell+\half} = \Linv \biggr(
+MS\bphi^{\ell} + \frac{1}{k^\ell}MF\bphi^\ell
+\biggr)
+\eeqn 
+allowing us to define the residual of the transport equation, for this update, as 
+\beqn
+\mathbf{R}^{\ell+\half} = MS\bphi^{\ell+\half} + \frac{1}{k^{\ell+\half}}MF\bphi^{\ell+\half} - L \bpsi^{\ell+\half}
+\eeqn 
+but if we plug in the expression for $\bpsi^{\ell+\half}$ we get
+\beqn 
+\mathbf{R}^{\ell+\half} &= MS\bphi^{\ell+\half} + \frac{1}{k^{\ell+\half}}MF\bphi^{\ell+\half} - MS\bphi^{\ell} - \frac{1}{k^\ell}F\bphi^\ell \\
+&= MS(\bphi^{\ell+\half} - \bphi^{\ell}) 
++ MF\biggr(\frac{1}{k^{\ell+\half}}\bphi^{\ell+\half} - \frac{1}{k^{\ell}}\bphi^{\ell}\biggr)
+\eeqn 
+\newline
+Now, the following holds
+\beqn 
+L \bpsi^{\ell+\half} - MS\bphi^{\ell+\half} = \frac{1}{k^{\ell+\half}} MF\bphi^{\ell+\half} - \mathbf{R}^{\ell+\half}.
+\eeqn 
+But we seek
+\beqn 
+L \bpsi - MS\bphi = \frac{1}{\lambda} MF\bphi
+\eeqn 
+therefore we subtract these equations
+\beqn 
+L(\bpsi-\bpsi^{\ell+\half}) -MS(\bphi - \bphi^{\ell+\half})= \frac{1}{\lambda} MF\bphi - \frac{1}{k^{\ell+\half}} MF\bphi^{\ell+\half} + \mathbf{R}^{\ell + \half}
+\eeqn
+and define $\delta \bpsi = \bpsi - \bpsi^{\ell+\half}$ and $\delta \bphi = \bphi - \bphi^{\ell+\half}$, the latter from which we rearrange to get $\bphi = \delta \bphi + \bphi^{\ell+\half}$, allowing us to write 
+\beqn 
+L\delta \bpsi - MS\delta \bphi &= \frac{1}{\lambda}MF(\delta \bphi + \bphi^{\ell+\half})  - \frac{1}{k^{\ell+\half}} MF\bphi^{\ell+\half} + \mathbf{R}^{\ell + \half}.
+\eeqn 
+We can now insert our expression for $\mathbf{R}^{\ell + \half}$ to get
+\beqn 
+L\delta \bpsi - MS\delta \bphi &= \frac{1}{\lambda}MF(\delta \bphi + \bphi^{\ell+\half})  - \frac{1}{k^{\ell+\half}} MF\bphi^{\ell+\half} + MS(\bphi^{\ell+\half} - \bphi^{\ell}) 
++ MF\biggr(\frac{1}{k^{\ell+\half}}\bphi^{\ell+\half} - \frac{1}{k^{\ell}}F\bphi^{\ell}\biggr) \\
+&= \frac{1}{\lambda}MF(\delta \bphi + \bphi^{\ell+\half})  - \frac{1}{k^{\ell}} MF\bphi^{\ell} + MS(\bphi^{\ell+\half} - \bphi^{\ell}).
+\eeqn 
+which takes the form of a k-eigenvalue problem with a source. The diffusion approximation can be applied to this, resulting in
+\beqn 
+\mathcal{D} \bepsilon - S_{\mathcal{D}} \bepsilon = \frac{1}{\lambda}F(\bepsilon + \bphi^{\ell+\half}) - \frac{1}{k^{\ell}} F\bphi^{\ell} + S^*(\bphi^{\ell+\half} - \bphi^{\ell}) 
+\eeqn 
+where $\bepsilon$ is the scalar moments of $\bphi$, $S^*$ is essentially the same as $S$ except that only the zeroth-moment is non-zero, $S_{\mathcal{D}}$ is the same as $S^*$ except for the suppression of within-group scattering.
+
+
+We can solve the above equation using power iteration if we define it as
+\beqn 
+\mathcal{D} \bepsilon^{k+1} &= S_{\mathcal{D}} \bepsilon^k +  \frac{1}{\lambda}F(\bepsilon^k + \bphi^{\ell+\half}) - \frac{1}{k^{\ell}} F\bphi^{\ell} + S^*(\bphi^{\ell+\half} - \bphi^{\ell}) \\
+&= S_s + S_{f,aux} - S_f + S_{s,\mathbf{R}}
+\eeqn
+where $\bepsilon^0 = 0$ and $\lambda^0 = k^\ell$.
 
 
 \newpage

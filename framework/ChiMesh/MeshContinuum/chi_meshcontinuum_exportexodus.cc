@@ -68,6 +68,11 @@ void chi_mesh::MeshContinuum::
     //============================ Load cells
     for (const auto& cell : grid.local_cells)
     {
+      if (cell.SubType() == CellType::POLYGON or
+          cell.SubType() == CellType::POLYHEDRON)
+        throw std::logic_error(fname + ": Cell-subtype \"" +
+          chi_mesh::CellTypeName(cell.SubType()) + "\" encountered that is not"
+          "supported by exodus.");
       chi_mesh::UploadCellGeometryContinuous(cell, vertex_map, ugrid);
       block_id_list->InsertNextValue(cell.material_id_);
       max_dimension =

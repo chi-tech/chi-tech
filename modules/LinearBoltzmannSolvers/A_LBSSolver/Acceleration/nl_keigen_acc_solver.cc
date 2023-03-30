@@ -95,7 +95,7 @@ void NLKEigenDiffSolver::PostSolveCallback()
 
   using namespace chi_math;
   auto phi_lp1_temp = phi_lph_ip1 + delta_phi;
-  lbs_solver.WGDSAProjectBackPhi0(front_gs, phi_lp1_temp, phi_new_local);
+  lbs_solver.GSProjectBackPhi0(front_gs, phi_lp1_temp, phi_new_local);
   lbs_solver.GSScopedCopyPrimarySTLvectors(front_gs, phi_new_local, phi_old_local);
 
   //============================================= Compute final k_eff
@@ -109,11 +109,12 @@ void NLKEigenDiffSolver::PostSolveCallback()
   SNESGetNumberFunctionEvals(nl_solver_, &number_of_func_evals);
 
   //================================================== Print summary
+  if (nl_context_ptr->verbosity_level_ >= 1)
   chi::log.Log()
                  << "        Final lambda-eigenvalue    :        "
                  << std::fixed << std::setw(10) << std::setprecision(7)
                  << k_eff
-                 << " (" << number_of_func_evals << ")"
+                 << " (num_DOps:" << number_of_func_evals << ")"
                  << "\n";
 }
 

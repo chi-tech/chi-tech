@@ -59,12 +59,12 @@ PetscErrorCode
     (const VecDbl& input)
   {
     chi_math::Set(phi_temp, 0.0);
-    lbs_solver.WGDSAProjectBackPhi0(front_gs, /*in*/input,
+    lbs_solver.GSProjectBackPhi0(front_gs, /*in*/input,
       /*out*/phi_temp);
 
     SetLBSFissionSource(/*input*/phi_temp, /*output*/q_moments_local);
 
-    auto output = lbs_solver.WGDSACopyOnlyPhi0(front_gs, q_moments_local);
+    auto output = lbs_solver.WGSCopyOnlyPhi0(front_gs, q_moments_local);
     return output;
   };
 
@@ -73,13 +73,13 @@ PetscErrorCode
     (const VecDbl& input, bool suppress_wgs)
   {
     chi_math::Set(phi_temp, 0.0);
-    lbs_solver.WGDSAProjectBackPhi0(front_gs, /*in*/input,
+    lbs_solver.GSProjectBackPhi0(front_gs, /*in*/input,
       /*out*/phi_temp);
 
     SetLBSScatterSource(/*input*/phi_temp, /*output*/q_moments_local,
                         suppress_wgs);
 
-    auto output = lbs_solver.WGDSACopyOnlyPhi0(front_gs, q_moments_local);
+    auto output = lbs_solver.WGSCopyOnlyPhi0(front_gs, q_moments_local);
     return output;
   };
 
@@ -87,9 +87,9 @@ PetscErrorCode
     (const VecDbl& input)
   {
     chi_math::Set(phi_temp, 0.0);
-    lbs_solver.WGDSAProjectBackPhi0(front_gs,
-                                    /*in*/input,
-                                    /*out*/phi_temp);
+    lbs_solver.GSProjectBackPhi0(front_gs,
+      /*in*/input,
+      /*out*/phi_temp);
 
     return lbs_solver.ComputeFissionProduction(phi_temp);
   };
@@ -108,7 +108,7 @@ PetscErrorCode
   Scale(Sfaux, 1.0 / lambda);
 
   diff_solver.Assemble_b(Sscat + Sfaux + Ss_res - Sf);
-  diff_solver.Solve(epsilon);
+  diff_solver.Solve(epsilon, /*use_initial_guess=*/true);
 
   nl_context_ptr->STLVecToPhiVec(epsilon - delta_phi, r);
 
