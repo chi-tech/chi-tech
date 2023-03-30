@@ -57,7 +57,7 @@ void PowerIterationKEigen1(LBSSolver& lbs_solver,
   front_gs.wgdsa_tol_ = basic_options("PISA_MIP_L_ABS_TOL").FloatValue();
   front_gs.wgdsa_max_iters_ =
     static_cast<int>(basic_options("PISA_MIP_L_MAX_ITS").IntegerValue());
-  lbs_solver.InitWGDSA(front_gs, true);
+  lbs_solver.InitWGDSA(front_gs, /*vaccum_bcs_are_dirichlet=*/false);
   front_gs.apply_wgdsa_ = false;
 
   bool pisa_verbose_level =
@@ -74,15 +74,41 @@ void PowerIterationKEigen1(LBSSolver& lbs_solver,
   double k_eff_change = 1.0;
 
   /**Lambda for the creation of fission sources.*/
-  auto SetLBSFissionSource = [&active_set_source_function,&front_gs]
-    (const VecDbl& input, VecDbl& output)
+  auto SetLBSFissionSource = [&active_set_source_function,&front_gs,
+                              &q_moments_local]
+    (const VecDbl& input, const bool additive)
   {
-    chi_math::Set(output, 0.0);
-    active_set_source_function(front_gs, output,
+    if (not additive) chi_math::Set(q_moments_local, 0.0);
+    active_set_source_function(front_gs, q_moments_local,
                                input,
                                APPLY_AGS_FISSION_SOURCES |
                                APPLY_WGS_FISSION_SOURCES);
   };
+
+  /**Lambda for the creation of scattering sources*/
+  auto SetLBSScatterSource = [&active_set_source_function,&front_gs,
+                              &q_moments_local]
+    (const VecDbl& input, const bool additive,const bool suppress_wgs=false)
+  {
+    if (not additive) chi_math::Set(q_moments_local, 0.0);
+    active_set_source_function(front_gs, q_moments_local, input,
+      APPLY_AGS_SCATTER_SOURCES | APPLY_WGS_SCATTER_SOURCES |
+      (suppress_wgs ? SUPPRESS_WG_SCATTER : NO_FLAGS_SET));
+  };
+
+  auto phi_temp = phi_old_local;
+
+  /**Lambda for the creation of scattering sources but the
+   * input vector is only the zeroth moment*/
+  auto SetLBSScatterSourcePhi0 = [&lbs_solver,&front_gs,
+                                  &phi_temp, &SetLBSScatterSource]
+    (const VecDbl& input, const bool additive,const bool suppress_wgs=false)
+  {
+    lbs_solver.GSProjectBackPhi0(front_gs, input, phi_temp);
+    SetLBSScatterSource(/*in*/phi_temp, additive, suppress_wgs);
+  };
+
+  using namespace chi_math;
 
   //================================================== Start power iterations
   primary_ags_solver->SetVerbosity(lbs_solver.Options().verbose_ags_iterations);
@@ -90,106 +116,101 @@ void PowerIterationKEigen1(LBSSolver& lbs_solver,
   bool converged = false;
   while (nit < max_iterations)
   {
-    auto phi_l = lbs_solver.WGDSACopyOnlyPhi0(front_gs, phi_old_local);
+    auto phi0_l = lbs_solver.WGSCopyOnlyPhi0(front_gs, phi_old_local);
 
-    SetLBSFissionSource(/*input*/phi_old_local, /*output*/q_moments_local);
-    chi_math::Scale(q_moments_local, 1.0/k_eff);
+    SetLBSFissionSource(phi_old_local, /*additive=*/false);
+    Scale(q_moments_local, 1.0/k_eff);
 
-    auto Sffull = q_moments_local;
-    auto Sf = lbs_solver.WGDSACopyOnlyPhi0(front_gs, q_moments_local);
+    auto Sf_all_moments = q_moments_local;
+    auto Sf = lbs_solver.WGSCopyOnlyPhi0(front_gs, q_moments_local);
 
     //====================================== This solves the inners for transport
     // produces phi at l+1/2
-    primary_ags_solver->Setup();
-    primary_ags_solver->Solve();
+    for (auto& wgs_solver : lbs_solver.GetWGSSolvers())
+    {
+      wgs_solver->Setup();
+      wgs_solver->Solve();
+    }
 
     //lph_i = l + 1/2,i
-    auto phi_lph_i = lbs_solver.WGDSACopyOnlyPhi0(front_gs, phi_new_local);
+    auto phi0_lph_i = lbs_solver.WGSCopyOnlyPhi0(front_gs, phi_new_local);
 
-    //lph_ip1 = l + 1/2, i+1
-    q_moments_local = Sffull;
-    active_set_source_function(front_gs, q_moments_local,
-                               phi_new_local,
-                               APPLY_AGS_SCATTER_SOURCES |
-                               APPLY_WGS_SCATTER_SOURCES);
+    // Now we produce lph_ip1 = l + 1/2, i+1
+    q_moments_local = Sf_all_moments; //Restore 1/k F phi_l
+    SetLBSScatterSource(phi_new_local, /*additive=*/true);
 
-    frons_wgs_context->ApplyInverseTransportOperator(NO_FLAGS_SET);
-    lbs_solver.GSScopedCopyPrimarySTLvectors(front_gs, phi_new_local, phi_old_local);
+    frons_wgs_context->ApplyInverseTransportOperator(NO_FLAGS_SET); //Sweep
 
-    auto phi_lph_ip1 = lbs_solver.WGDSACopyOnlyPhi0(front_gs, phi_new_local);
+    auto phi0_lph_ip1 = lbs_solver.WGSCopyOnlyPhi0(front_gs, phi_new_local);
 
     //====================================== Power Iteration Acceleration solve
-    auto epsilon_k = phi_l;
-    chi_math::Set(epsilon_k, 0.0);
+    VecDbl epsilon_k(phi0_l.size(), 0.0);
     auto epsilon_kp1 = epsilon_k;
 
-    double mu_k = k_eff;
-    double mu_kp1 = mu_k;
+    double lambda_k = k_eff;
+    double lambda_kp1 = lambda_k;
 
     for (size_t k=0; k<pisa_pi_max_its; ++k)
     {
-      using namespace chi_math;
+      lbs_solver.GSProjectBackPhi0(front_gs, /*in*/epsilon_k + phi0_lph_ip1,
+                                             /*out*/phi_temp);
 
-      auto eps_k_plus_phi_lph_ip1 = epsilon_k + phi_lph_ip1;
-      lbs_solver.WGDSAProjectBackPhi0(front_gs, eps_k_plus_phi_lph_ip1, phi_old_local);
+      double production_k = lbs_solver.ComputeFissionProduction(phi_temp);
 
-      SetLBSFissionSource(/*input*/phi_old_local, /*output*/q_moments_local);
-      chi_math::Scale(q_moments_local, 1.0/mu_k);
+      SetLBSFissionSource(phi_temp, /*additive=*/false);
+      Scale(q_moments_local, 1.0 / lambda_k);
 
-      auto Sfaux = lbs_solver.WGDSACopyOnlyPhi0(front_gs, q_moments_local);
+      auto Sfaux = lbs_solver.WGSCopyOnlyPhi0(front_gs, q_moments_local);
 
-      Set(q_moments_local, 0.0);
-      lbs_solver.WGDSAProjectBackPhi0(front_gs, phi_lph_ip1-phi_lph_i, phi_old_local);
-      active_set_source_function(front_gs, q_moments_local,
-                                 phi_old_local,
-                                 APPLY_AGS_SCATTER_SOURCES |
-                                 APPLY_WGS_SCATTER_SOURCES);
 
-      auto Ss_res = lbs_solver.WGDSACopyOnlyPhi0(front_gs, q_moments_local);
+      SetLBSScatterSourcePhi0(phi0_lph_ip1 - phi0_lph_i, /*additive=*/false);
 
+      auto Ss_res = lbs_solver.WGSCopyOnlyPhi0(front_gs, q_moments_local);
+
+      // Inner iterations seems extremely wasteful therefore I
+      // am leaving this at 1 iteration here for further investigation.
+      for (int i=0; i<1; ++i)
       {
-        Set(q_moments_local, 0.0);
-        lbs_solver.WGDSAProjectBackPhi0(front_gs, epsilon_k, phi_old_local);
-        active_set_source_function(front_gs, q_moments_local,
-                                   phi_old_local,
-                                   APPLY_AGS_SCATTER_SOURCES |
-                                   APPLY_WGS_SCATTER_SOURCES |
-                                   SUPPRESS_WG_SCATTER);
+        SetLBSScatterSourcePhi0(epsilon_k, /*additive=*/false,
+                                           /*suppress_wgs=*/true);
 
-        auto Ss = lbs_solver.WGDSACopyOnlyPhi0(front_gs, q_moments_local);
+        auto Ss = lbs_solver.WGSCopyOnlyPhi0(front_gs, q_moments_local);
 
+        //Solve the diffusion system
         diff_solver.Assemble_b(Ss + Sfaux + Ss_res - Sf);
-        diff_solver.Solve(epsilon_kp1);
+        diff_solver.Solve(epsilon_kp1, /*use_initial_guess=*/true);
+
+        epsilon_k = epsilon_kp1;
       }
 
-      lbs_solver.WGDSAProjectBackPhi0(front_gs, epsilon_k + phi_lph_ip1, phi_old_local);
-      double pk = lbs_solver.ComputeFissionProduction(phi_old_local);
+      lbs_solver.GSProjectBackPhi0(front_gs, /*in*/epsilon_kp1 + phi0_lph_ip1,
+                                             /*out*/phi_old_local);
+      double production_kp1 = lbs_solver.ComputeFissionProduction(phi_old_local);
 
-      lbs_solver.WGDSAProjectBackPhi0(front_gs, epsilon_kp1 + phi_lph_ip1, phi_old_local);
-      double pkp1 = lbs_solver.ComputeFissionProduction(phi_old_local);
+      lambda_kp1 = production_kp1 / (production_k / lambda_k);
 
-      mu_kp1 = pkp1/pk*mu_k;
-
-      const double mu_change = std::fabs(1.0-mu_kp1/mu_k);
+      const double lambda_change = std::fabs(1.0 - lambda_kp1 / lambda_k);
       if (pisa_verbose_level >= 1)
         chi::log.Log()
           << "PISA iteration " << k
-          << " mu " << mu_kp1 << " mu change " << mu_change;
+          << " lambda " << lambda_kp1 << " lambda change " << lambda_change;
 
-      if (mu_change < pisa_pi_k_tol) break;
+      if (lambda_change < pisa_pi_k_tol) break;
 
-      mu_k = mu_kp1;
+      lambda_k = lambda_kp1;
       epsilon_k = epsilon_kp1;
     }//acceleration
-    auto phi_lp1_temp = chi_math::operator+(epsilon_kp1, phi_lph_ip1);
-    lbs_solver.WGDSAProjectBackPhi0(front_gs, phi_lp1_temp, phi_new_local);
-    lbs_solver.GSScopedCopyPrimarySTLvectors(front_gs, phi_new_local, phi_old_local);
+
+    lbs_solver.GSProjectBackPhi0(front_gs, /*in*/epsilon_kp1 + phi0_lph_ip1,
+                                           /*out*/phi_new_local);
+    lbs_solver.GSScopedCopyPrimarySTLvectors(front_gs, /*in*/phi_new_local,
+                                                       /*out*/phi_old_local);
 
     const double production = lbs_solver.ComputeFissionProduction(phi_old_local);
-    lbs_solver.ScalePhiVector(PhiSTLOption::PHI_OLD, mu_kp1/production);
+    lbs_solver.ScalePhiVector(PhiSTLOption::PHI_OLD, lambda_kp1 / production);
 
     //======================================== Recompute k-eigenvalue
-    k_eff = mu_kp1;
+    k_eff = lambda_kp1;
     double reactivity = (k_eff - 1.0) / k_eff;
 
     //======================================== Check convergence, bookkeeping
@@ -225,7 +246,9 @@ void PowerIterationKEigen1(LBSSolver& lbs_solver,
     << std::setprecision(7) << k_eff;
   chi::log.Log()
     << "        Final change          :        "
-    << std::setprecision(6) << k_eff_change;
+    << std::setprecision(6) << k_eff_change
+    << " (num_TrOps:" << frons_wgs_context->counter_applications_of_inv_op_ << ")"
+    << "\n";
   chi::log.Log() << "\n";
 }
 

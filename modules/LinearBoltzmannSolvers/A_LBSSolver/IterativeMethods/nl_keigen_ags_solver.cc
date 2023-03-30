@@ -125,7 +125,7 @@ void NLKEigenvalueAGSSolver<SNESTypes>::PostSolveCallback()
                  << "        Final k-eigenvalue    :        "
                  << std::fixed << std::setw(10) << std::setprecision(7)
                  << k_eff
-                 << " (" << number_of_func_evals << ")"
+                 << " (num_TrOps:" << number_of_func_evals << ")"
                  << "\n";
 }
 

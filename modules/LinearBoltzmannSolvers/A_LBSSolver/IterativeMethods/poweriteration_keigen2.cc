@@ -57,7 +57,7 @@ void PowerIterationKEigen2(LBSSolver& lbs_solver,
   front_gs.wgdsa_tol_ = basic_options("PISA_MIP_L_ABS_TOL").FloatValue();
   front_gs.wgdsa_max_iters_ =
     static_cast<int>(basic_options("PISA_MIP_L_MAX_ITS").IntegerValue());
-  lbs_solver.InitWGDSA(front_gs, true);
+  lbs_solver.InitWGDSA(front_gs, /*vaccum_bcs_are_dirichlet=*/false);
   front_gs.apply_wgdsa_ = false;
 
   int pisa_verbose_level =
@@ -85,7 +85,7 @@ void PowerIterationKEigen2(LBSSolver& lbs_solver,
   tolerances.l_gmres_restart_interval =
     static_cast<int>(basic_options("PISA_L_MAX_ITS").IntegerValue());
 
-
+  double F_prev = 1.0;
   k_eff = 1.0;
   double k_eff_prev = 1.0;
   double k_eff_change = 1.0;
@@ -107,13 +107,13 @@ void PowerIterationKEigen2(LBSSolver& lbs_solver,
   bool converged = false;
   while (nit < max_iterations)
   {
-    nl_diff_context->phi_l_ = lbs_solver.WGDSACopyOnlyPhi0(front_gs, phi_old_local);
+    nl_diff_context->phi_l_ = lbs_solver.WGSCopyOnlyPhi0(front_gs, phi_old_local);
 
     SetLBSFissionSource(/*input*/phi_old_local, /*output*/q_moments_local);
     chi_math::Scale(q_moments_local, 1.0/k_eff);
 
     auto Sffull = q_moments_local;
-    nl_diff_context->Sf_ = lbs_solver.WGDSACopyOnlyPhi0(front_gs, q_moments_local);
+    nl_diff_context->Sf_ = lbs_solver.WGSCopyOnlyPhi0(front_gs, q_moments_local);
 
     //====================================== This solves the inners for transport
     // produces phi at l+1/2
@@ -121,7 +121,7 @@ void PowerIterationKEigen2(LBSSolver& lbs_solver,
     primary_ags_solver->Solve();
 
     //lph_i = l + 1/2, i
-    nl_diff_context->phi_lph_i_ = lbs_solver.WGDSACopyOnlyPhi0(front_gs, phi_new_local);
+    nl_diff_context->phi_lph_i_ = lbs_solver.WGSCopyOnlyPhi0(front_gs, phi_new_local);
 
     //lph_ip1 = l + 1/2, i+1
     q_moments_local = Sffull;
@@ -134,16 +134,24 @@ void PowerIterationKEigen2(LBSSolver& lbs_solver,
     lbs_solver.GSScopedCopyPrimarySTLvectors(front_gs, phi_new_local, phi_old_local);
 
     //====================================== Non-Linear Acceleration solve
-    nl_diff_context->phi_lph_ip1_ = lbs_solver.WGDSACopyOnlyPhi0(front_gs, phi_new_local);
+    nl_diff_context->phi_lph_ip1_ = lbs_solver.WGSCopyOnlyPhi0(front_gs, phi_new_local);
 
     nl_diff_context->kresid_func_context_.k_eff = k_eff; //sets mu_k
     nl_diff_context->k_l = k_eff;
 
-    nl_keigen_diff_solver.Setup();
-    nl_keigen_diff_solver.Solve();
+    if (nit > 4)
+    {
+      nl_keigen_diff_solver.Setup();
+      nl_keigen_diff_solver.Solve();
+      k_eff = nl_diff_context->kresid_func_context_.k_eff;
+    }
+    else
+    {
+      double F_new = lbs_solver.ComputeFissionProduction(phi_new_local);
+      k_eff = F_new / F_prev * k_eff;
+    }
 
-    //======================================== Recompute k-eigenvalue
-    k_eff = nl_diff_context->kresid_func_context_.k_eff;
+    //======================================== Compute reactivity
     double reactivity = (k_eff - 1.0) / k_eff;
 
     //======================================== Check convergence, bookkeeping
@@ -179,7 +187,9 @@ void PowerIterationKEigen2(LBSSolver& lbs_solver,
     << std::setprecision(7) << k_eff;
   chi::log.Log()
     << "        Final change          :        "
-    << std::setprecision(6) << k_eff_change;
+    << std::setprecision(6) << k_eff_change
+    << " (num_TrOps:" << frons_wgs_context->counter_applications_of_inv_op_ << ")"
+    << "\n";
   chi::log.Log() << "\n";
 }
 

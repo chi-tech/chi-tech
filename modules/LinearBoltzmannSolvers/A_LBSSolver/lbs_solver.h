@@ -200,11 +200,11 @@ protected:
 //03d
 public:
   void InitWGDSA(LBSGroupset& groupset, bool vaccum_bcs_are_dirichlet=true);
-  std::vector<double> WGDSACopyOnlyPhi0(const LBSGroupset& groupset,
-                                        const std::vector<double>& phi_in);
-  void WGDSAProjectBackPhi0(const LBSGroupset& groupset,
-                            const std::vector<double>& input,
-                            std::vector<double>& output);
+  std::vector<double> WGSCopyOnlyPhi0(const LBSGroupset& groupset,
+                                      const std::vector<double>& phi_in);
+  void GSProjectBackPhi0(const LBSGroupset& groupset,
+                         const std::vector<double>& input,
+                         std::vector<double>& output);
 //  std::vector<double> WGDSAMake
 public:
   void AssembleWGDSADeltaPhiVector(const LBSGroupset& groupset,

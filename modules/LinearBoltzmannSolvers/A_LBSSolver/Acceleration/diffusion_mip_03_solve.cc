@@ -11,14 +11,21 @@
 //###################################################################
 /**Solves the system and stores the local solution in the vector provide.
  *
- * \param solution Vector in to which the solution will be parsed.*/
-void lbs::acceleration::DiffusionMIPSolver::Solve(std::vector<double>& solution)
+ * \param solution Vector in to which the solution will be parsed.
+ * \param use_initial_guess bool [Default:False] Flag, when set, will
+ *                 use the values of the output solution as initial guess.*/
+void lbs::acceleration::DiffusionMIPSolver::
+  Solve(std::vector<double>& solution, bool use_initial_guess/*=false*/)
 {
   const std::string fname = "lbs::acceleration::DiffusionMIPSolver::Solve";
   Vec x;
   VecDuplicate(rhs_, &x);
   VecSet(x,0.0);
-  KSPSetInitialGuessNonzero(ksp_, PETSC_FALSE);
+
+  if (not use_initial_guess)
+    KSPSetInitialGuessNonzero(ksp_, PETSC_FALSE);
+  else
+    KSPSetInitialGuessNonzero(ksp_, PETSC_TRUE);
 
   KSPSetTolerances(ksp_, options.residual_tolerance,
                    options.residual_tolerance, 1.0e50,
@@ -45,6 +52,15 @@ void lbs::acceleration::DiffusionMIPSolver::Solve(std::vector<double>& solution)
     chi::log.Log() << "RHS-norm " << rhs_norm;
   }
 
+  if (use_initial_guess)
+  {
+    double *x_raw;
+    VecGetArray(x, &x_raw);
+    size_t k = 0;
+    for (const auto &value: solution)
+      x_raw[k++] = value;
+    VecRestoreArray(x, &x_raw);
+  }
 
   //============================================= Solve
   KSPSolve(ksp_, rhs_, x);
@@ -76,16 +92,23 @@ void lbs::acceleration::DiffusionMIPSolver::Solve(std::vector<double>& solution)
 //###################################################################
 /**Solves the system and stores the local solution in the vector provide.
  *
- * \param petsc_solution Vector in to which the solution will be parsed.*/
-void lbs::acceleration::DiffusionMIPSolver::Solve(Vec petsc_solution)
+ * \param petsc_solution Vector in to which the solution will be parsed.
+ * \param use_initial_guess bool [Default:False] Flag, when set, will
+ *                 use the values of the output solution as initial guess.*/
+void lbs::acceleration::DiffusionMIPSolver::
+  Solve(Vec petsc_solution, bool use_initial_guess/*=false*/)
 {
   const std::string fname = "lbs::acceleration::DiffusionMIPSolver::Solve";
   Vec x;
   VecDuplicate(rhs_, &x);
   VecSet(x,0.0);
-  KSPSetInitialGuessNonzero(ksp_, PETSC_FALSE);
 
-  KSPSetTolerances(ksp_, 1.e-50,
+  if (not use_initial_guess)
+    KSPSetInitialGuessNonzero(ksp_, PETSC_FALSE);
+  else
+    KSPSetInitialGuessNonzero(ksp_, PETSC_TRUE);
+
+  KSPSetTolerances(ksp_, options.residual_tolerance,
                    options.residual_tolerance, 1.0e50,
                    options.max_iters);
 
@@ -110,6 +133,10 @@ void lbs::acceleration::DiffusionMIPSolver::Solve(Vec petsc_solution)
     chi::log.Log() << "RHS-norm " << rhs_norm;
   }
 
+  if (use_initial_guess)
+  {
+    VecCopy(petsc_solution, x);
+  }
 
   //============================================= Solve
   KSPSolve(ksp_, rhs_, x);
