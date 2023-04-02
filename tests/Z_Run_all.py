@@ -11,26 +11,32 @@ class CustomFormatter(argparse.RawTextHelpFormatter,
                       argparse.ArgumentDefaultsHelpFormatter):
     pass
 
+arguments_help = textwrap.dedent('''\
+Run the regression suite, or optionally, a series of individual
+tests or a range of tests. 
+
+To run all tests, use
+python test/Z_Run_all.py
+
+To run a list of individual tests, use 
+python test/Z_Run_all.py --test-list test1 test2 ... testN
+
+To run a range of tests, use
+python test/Z_Run_all.py --test-range test_start test_end
+
+For verbose fail messages, use
+python test/Z_Run_all.py --verbose_fail
+
+In each of the above examples, all arguments are separated by spaces 
+and each of the arguments are integers.
+''')
+
+print(arguments_help)
 
 parser = argparse.ArgumentParser(
     description="A script to run the regression test suite.",
     formatter_class=CustomFormatter,
-    epilog=textwrap.dedent('''\
-    Run the regression suite, or optionally, a series of individual
-    tests or a range of tests. 
-    
-    To run all tests, use
-    python test/Z_Run_all.py
-    
-    To run a list of individual tests, use 
-    python test/Z_Run_all.py --test-list test1 test2 ... testN
-    
-    To run a range of tests, use
-    python test/Z_Run_all.py --test-range test_start test_end
-    
-    In each of the above examples, all arguments are separated by spaces 
-    and each of the arguments are integers.
-    ''')
+    epilog=arguments_help
 )
 
 parser.add_argument(
@@ -48,6 +54,12 @@ parser.add_argument(
     type=int,
     required=False,
     help="The first and last test ID of a range of tests to run."
+)
+
+parser.add_argument(
+    '--verbose_fail',
+    action="store_true",
+    help="If set, prints the error stream if tests failed."
 )
 
 argv = parser.parse_args()
@@ -130,7 +142,7 @@ def format_filename(filename):
 # search[2] = Which word
 # search[3] = value it should be
 
-def parse_output(out, search_strings_vals_tols):
+def parse_output(out, err, search_strings_vals_tols):
     global num_failed
     test_passed = True
     for search in search_strings_vals_tols:
@@ -154,14 +166,16 @@ def parse_output(out, search_strings_vals_tols):
                 test_val = float(out[test_str_end:test_str_line_end])
                 if not abs(test_val - true_val) < tolerance:
                     test_passed = False
-                    print("\nTest failed:\nLine:" +
-                          out[test_str_start:test_str_line_end] + "\n" +
-                          "Test:", search)
+                    if argv.verbose_fail:
+                        print("\nTest failed:\nLine:" +
+                              out[test_str_start:test_str_line_end] + "\n" +
+                              "Test:", search)
                     break
         else:
             test_passed = False
-            print("\nTest failed: identifying string not found",
-                  search[0])
+            if argv.verbose_fail:
+                print("\nTest failed: identifying string not found",
+                      search[0])
             break
 
     for search in search_strings_vals_tols:
@@ -176,8 +190,9 @@ def parse_output(out, search_strings_vals_tols):
         # If we didnt find this string we should quit
         if id_str_start < 0:
             test_passed = False
-            print("\nTest failed: identifying string not found\n",
-                  identifying_string)
+            if argv.verbose_fail:
+                print("\nTest failed: identifying string not found\n",
+                      identifying_string)
             break
 
         line = out[id_str_start:id_str_line_end]
@@ -189,9 +204,10 @@ def parse_output(out, search_strings_vals_tols):
         word_number = search[2]
         if word_number >= len(words):
             test_passed = False
-            print("\nTest failed Comparison word not found:\nLine:" +
-                  line + "\n" +
-                  "Test:", search)
+            if argv.verbose_fail:
+                print("\nTest failed Comparison word not found:\nLine:" +
+                      line + "\n" +
+                      "Test:", search)
             break
 
         if search[0] == "NumCompare":
@@ -206,9 +222,10 @@ def parse_output(out, search_strings_vals_tols):
 
                 if abs(trial_value - value_it_should_be) > tolerance:
                     test_passed = False
-                    print("\nTest failed:\nLine:" +
-                          line + "\n" +
-                          "Test:", search)
+                    if argv.verbose_fail:
+                        print("\nTest failed:\nLine:" +
+                              line + "\n" +
+                              "Test:", search)
                     break
 
             if numerical_format == "int":
@@ -216,9 +233,10 @@ def parse_output(out, search_strings_vals_tols):
 
                 if trial_value != value_it_should_be:
                     test_passed = False
-                    print("\nTest failed:\nLine:" +
-                          line + "\n" +
-                          "Test:", search)
+                    if argv.verbose_fail:
+                        print("\nTest failed:\nLine:" +
+                              line + "\n" +
+                              "Test:", search)
                     break
 
         if search[0] == "StrCompare":
@@ -228,9 +246,10 @@ def parse_output(out, search_strings_vals_tols):
 
             if trial_word != value_it_should_be:
                 test_passed = False
-                print("\nTest failed:\nLine:" +
-                      line + "\n" +
-                      "Test:", search)
+                if argv.verbose_fail:
+                    print("\nTest failed:\nLine:" +
+                          line + "\n" +
+                          "Test:", search)
                 break
 
     if test_passed:
@@ -238,7 +257,8 @@ def parse_output(out, search_strings_vals_tols):
     else:
         print(" - \033[31mFAILED!\033[39m")
         num_failed += 1
-        # print(out)
+        if argv.verbose_fail:
+            print(err)
 
     return test_passed
 
@@ -301,11 +321,13 @@ def run_test_local(file_name, comment, num_procs, search_strings_vals_tols):
     process = subprocess.Popen(cmd.split(),
                                cwd=kchi_src_pth,
                                stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE,
                                universal_newlines=True)
     process.wait()
     out, err = process.communicate()
 
-    parse_output(out, search_strings_vals_tols)
+    parse_output(out, err, search_strings_vals_tols)
+
 
 
 def run_test(file_name, comment, num_procs, search_strings_vals_tols):
@@ -320,10 +342,116 @@ def run_test(file_name, comment, num_procs, search_strings_vals_tols):
             run_test_local(file_name, comment, num_procs,
                            search_strings_vals_tols)
 
+
+def run_unit_test(file_name, comment, num_procs):
+    global num_failed
+    test_name = f"{format_filename(file_name)} - {comment} - " \
+                f"{num_procs} MPI Processes"
+
+    msg = f"Running Test {format3(test_number)} {test_name}"
+    print(msg, end='', flush=True)
+    if print_only:
+        print()
+        return
+
+    cmd = f"./tests/unit_test_inputs/ZUnitTestRunner.sh {mpiexec} " \
+          f"{num_procs} {kpath_to_exe} tests/{file_name}"
+    process = subprocess.Popen(cmd.split(),
+                               cwd=kchi_src_pth,
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE,
+                               universal_newlines=True)
+    process.wait()
+    out, err = process.communicate()
+
+    if process.returncode == 0:
+        print(" - \033[32mPassed\033[39m")
+    else:
+        print(" - \033[31mFAILED!\033[39m")
+        num_failed += 1
+        if argv.verbose_fail:
+            print(err)
+
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#                             Unit Tests
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+run_unit_test(file_name="unit_test_inputs/test_00_chi_math.lua",
+              comment="Testing objects in chi_math",
+              num_procs=1)
+run_unit_test(file_name="unit_test_inputs/test_01_chi_misc_utils.lua",
+              comment="Testing objects in chi_misc_utils",
+              num_procs=1)
+run_unit_test(file_name="unit_test_inputs/test_02_chi_data_types.lua",
+              comment="Testing chi_data_types",
+              num_procs=2)
+run_unit_test(file_name="unit_test_inputs/test_02a_wdd_ijk_sweep.lua",
+              comment="Testing utilities for orthogonal meshes",
+              num_procs=1)
+run_unit_test(file_name="unit_test_inputs/test_02b_paramblock.lua",
+              comment="Testing parameter blocks",
+              num_procs=1)
+
+# SimTests
+run_test(
+    file_name="unit_test_inputs/SimTest01_FV",
+    comment="Finite Volume developer's example",
+    num_procs=1,
+    search_strings_vals_tols=[
+        ["NumCompare", "iteration   10", 4, "float", 2.2349712e-07, 1.0e-10]])
+
+run_test(
+    file_name="unit_test_inputs/SimTest02_FV",
+    comment="Finite Volume gradient developer's example",
+    num_procs=1,
+    search_strings_vals_tols=[
+        ["NumCompare", "iteration   10", 4, "float", 2.2349712e-07, 1.0e-10]])
+
+run_test(
+    file_name="unit_test_inputs/SimTest03_PWLC",
+    comment="CFEM PWLC developer's example",
+    num_procs=4,
+    search_strings_vals_tols=[
+        ["NumCompare", "iteration   10", 4, "float", 1.3725535e-07, 1.0e-11]])
+
+run_test(
+    file_name="unit_test_inputs/SimTest04_PWLC",
+    comment="CFEM PWLC with MMS developer's example",
+    num_procs=4,
+    search_strings_vals_tols=[
+        ["NumCompare", "iteration    6", 4, "float", 1.1613008e-07, 1.0e-10],
+        ["NumCompare", "Error:"        , 1, "float", 7.032369e-02, 1.0e-7]])
+
+run_test(
+    file_name="unit_test_inputs/SimTest06_WDD",
+    comment="FV Transport WDD developer's example",
+    num_procs=1,
+    search_strings_vals_tols=[
+        ["NumCompare", "Iteration     8", 2, "float", 5.483e-07, 1.0e-10]])
+
+run_test(
+    file_name="unit_test_inputs/SimTest91_PWLD",
+    comment="DFEM Transport PWLD developer's example",
+    num_procs=1,
+    search_strings_vals_tols=[
+        ["NumCompare", "Iteration     8", 2, "float", 5.872e-07, 1.0e-10]])
+
+run_test(
+    file_name="unit_test_inputs/SimTest92_DSA",
+    comment="MIP Diffusion solver tests",
+    num_procs=1,
+    search_strings_vals_tols=[
+        ["NumCompare", "SimTest92_DSA iteration    8", 5, "float", 1.9731053e-11, 1.0e-14]])
+
+run_test(
+    file_name="unit_test_inputs/SimTest93_RayTracing",
+    comment="Raytracing Transport developer's example",
+    num_procs=1,
+    search_strings_vals_tols=[])
+
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                             Mesh IO tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 1 - 1
+# Tests 14 - 14
 run_test(
     file_name="MeshIO/ReadWavefrontObj1",
     comment="Mesh reading 2D Wavefront.obj",
@@ -334,7 +462,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                             CFEM Diffusion Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 2 - 6
+# Tests 15 - 19
 
 run_test(
     file_name="CFEM_Diffusion/cDiffusion_2D_1a_linear",
@@ -369,7 +497,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                             CFEM Diffusion Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 7 - 11
+# Tests 20 - 24
 
 run_test(
     file_name="DFEM_Diffusion/dDiffusion_2D_1a_linear",
@@ -404,7 +532,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                                  Diffusion Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 12 - 23
+# Tests 25 - 36
 
 
 run_test(
@@ -482,7 +610,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                     Steady State Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 24 - 40
+# Tests 37 - 53
 
 run_test(
     file_name="Transport_Steady/Transport1D_1",
@@ -629,7 +757,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                     k-Eigenvalue Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 41 - 43
+# Tests 54 - 56
 
 run_test(
     file_name="Transport_Keigen/KEigenvalueTransport1D_1G",
@@ -658,7 +786,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #         Steady-State Cylindrical Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 44 - 45
+# Tests 57 - 58
 
 run_test(
     file_name="Transport_Steady_Cyl/Transport2DCyl_1Monoenergetic",
@@ -676,7 +804,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #             Steady-State Adjoint Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 46 - 54
+# Tests 59 - 67
 
 run_test(
     file_name="Transport_Adjoint/Adjoint2D_1a_forward",
@@ -750,6 +878,7 @@ run_test(
 
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ END OF TESTS
+os.system("rm *.pvtu *.vtu *.e *.data")
 
 print()
 if num_failed == 0:

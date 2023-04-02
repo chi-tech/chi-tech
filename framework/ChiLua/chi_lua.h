@@ -32,6 +32,7 @@ namespace chi_data_types
 }
 namespace chi_lua
 {
+  /**This static object is used to parse lua tables into parameter blocks.*/
   class TableParserAsParameterBlock
   {
   private:

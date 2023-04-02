@@ -27,7 +27,11 @@ typedef chi_data_types::ParameterBlock ParamBlock;
 
 
 //###################################################################
-/***/
+/**This function recursively processes table values. If the value is
+ * a primitive type the recursion stops and the parameter block, which is
+ * currently active, will be extended with a parameter of this primitive
+ * type. If the value is another table, a new `Block`-type will be instantiated
+ * and the table recursion will then operate on this new block.*/
 void TableParserAsParameterBlock::
   RecursivelyParseTableValues(
     lua_State* L, ParamBlock &block, const std::string& key_str_name)
@@ -78,6 +82,8 @@ void TableParserAsParameterBlock::
 
 
 //###################################################################
+/**This function operates on table keys recursively. It has a specific
+ * behavior if it detects an array.*/
 void TableParserAsParameterBlock::
   RecursivelyParseTableKeys(
     lua_State* L, int t, chi_data_types::ParameterBlock& block)
@@ -120,6 +126,31 @@ void TableParserAsParameterBlock::
 }
 
 //###################################################################
+/**This is the root command for parsing a table as a parameter block.
+ * Example table:
+\code
+block =
+{
+  enabled = true,
+  it_method = "gmres",
+  nl_abs_tol = 1.0e-12,
+  nl_max_its = 33,
+  sub1 =
+  {
+    ax_method = 2,
+    l_abs_tol = 1.0e-2
+  },
+  sub2 =
+  {
+    ax_method = 3,
+    l_abs_tol = 1.0e-3,
+    blocks = {99, 98, 97},
+    cblocks = {{1,2,3},{4,5,6},{7,8,9}}
+  }
+}
+
+chiUnitTests_Test_paramblock(--[[verbose=]]true, block)
+\endcode*/
 std::shared_ptr<chi_data_types::ParameterBlock> TableParserAsParameterBlock::
   ParseTable(lua_State* L, int table_stack_index)
 {

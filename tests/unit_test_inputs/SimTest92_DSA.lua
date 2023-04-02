@@ -43,6 +43,10 @@ function MMS_q(x,y,z)
 end
 
 chiSimTest92_DSA();
+chiMPIBarrier()
+if (chi_location_id == 0) then
+    os.execute("rm SimTest_92*")
+end
 
 --[0]  Iteration     0   1.000e+00
 --[0]  Iteration     1   2.016e+02

@@ -20,3 +20,7 @@ chiVolumeMesherExecute();
 chiVolumeMesherSetMatIDToAll(0)
 
 chiSimTest02_FV();
+chiMPIBarrier()
+if (chi_location_id == 0) then
+    os.execute("rm CodeTut2_FV*")
+end

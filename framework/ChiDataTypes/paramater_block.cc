@@ -1,6 +1,7 @@
 #include "parameter_block.h"
 
 #include <cmath>
+#include <algorithm>
 
 namespace chi_data_types
 {
@@ -81,6 +82,23 @@ void ParameterBlock::AddParameter(ParameterBlockPtr block)
       ": Attempting to add duplicate parameter " + param->Name() + " to "
       "block " + this->Name());
   parameters_.push_back(std::move(block));
+
+  SortParameters();
+}
+
+//#################################################################
+void ParameterBlock::SortParameters()
+{
+  struct AlphabeticFunctor
+  {
+    bool operator()(const ParameterBlockPtr& paramA,
+                    const ParameterBlockPtr& paramB)
+    {
+      return paramA->Name() < paramB->Name();
+    }
+  };
+
+  std::sort(parameters_.begin(), parameters_.end(), AlphabeticFunctor());
 }
 
 //#################################################################

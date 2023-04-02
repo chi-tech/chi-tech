@@ -89,6 +89,8 @@ public:
   //utilities
 protected:
   void AddParameter(ParameterBlockPtr block);
+private:
+  void SortParameters();
 public:
   bool Has(const std::string& param_name) const;
 
