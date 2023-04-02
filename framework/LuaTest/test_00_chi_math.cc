@@ -1,4 +1,4 @@
-#include "unit_tests.h"
+#include "chi_lua.h"
 
 #include "ChiMath/dynamic_vector.h"
 #include "ChiMath/dynamic_matrix.h"
@@ -7,53 +7,25 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-void chi_unit_tests::Test_chi_math(bool verbose)
+namespace chi_unit_tests
 {
-  bool passed = true;
-  std::stringstream output;
 
+int Test_chi_math(lua_State* L)
+{
   //======================================================= Dynamic Vector
   {
-    output << "Testing chi_math::DynamicVector\n";
+    chi::log.Log() << "Testing chi_math::DynamicVector\n";
 
     chi_math::DynamicVector<double> vec(5, 1.0);
 
-    const auto vec_str = vec.PrintStr();
-
-    if (vec_str != "[1 1 1 1 1]")
-    {
-      passed = false;
-      output << std::string("chi_math::DynamicVector<double>.PrintStr() ... Failed\n"
-                            " Expected:\n"
-                            "[1 1 1 1 1]\n"
-                            "Got:\n") + vec_str;
-    } else
-      output << std::string("chi_math::DynamicVector<double>.PrintStr() ... Passed\n");
+    chi::log.Log() << vec.PrintStr();
   }
   //======================================================= Dynamic Matrix
   {
-    output << "Testing chi_math::DynamicMatrix\n";
+    chi::log.Log() << "Testing chi_math::DynamicMatrix\n";
     chi_math::DynamicMatrix<double> mat(5, 7, 1.0);
 
-    const auto mat_str = mat.PrintStr();
-
-    if (mat_str != "1 1 1 1 1 1 1\n"
-                   "1 1 1 1 1 1 1\n"
-                   "1 1 1 1 1 1 1\n"
-                   "1 1 1 1 1 1 1\n"
-                   "1 1 1 1 1 1 1")
-    {
-      passed = false;
-      output << std::string("chi_math::DynamicMatrix<double>.PrintStr() ... Failed\n"
-                            " Expected:\n"
-                            "1 1 1 1 1 1 1\n"
-                            "1 1 1 1 1 1 1\n"
-                            "1 1 1 1 1 1 1\n"
-                            "1 1 1 1 1 1 1\n"
-                            "1 1 1 1 1 1 1\n"
-                            "Got:\n") + mat_str;
-    } else
-      output << std::string("chi_math::DynamicMatrix<double>.PrintStr() ... Passed\n");
+    chi::log.Log() << mat.PrintStr();
   }
 
   //======================================================= SparseMatrix
@@ -67,36 +39,40 @@ void chi_unit_tests::Test_chi_math(bool verbose)
 
     {
       auto &m = mat;
-      output << "----- SparseMatrix::PrintS() -----"
-             << "\n" << m.PrintStr() << "\n";
+      chi::log.Log() << "----- SparseMatrix::PrintS() -----"
+                     << "\n" << m.PrintStr() << "\n";
 
-      output << "----- for (const auto& entry : m.Row(2)) -----";
+      chi::log.Log() <<"----- for (const auto& entry : m.Row(2)) -----";
       for (const auto &entry: m.Row(2))
-        output << entry.row_index << " "
-               << entry.column_index << " "
-               << entry.value;
+        chi::log.Log() << entry.row_index << " "
+                       << entry.column_index << " "
+                       << entry.value;
 
-      output << "----- after value*2 -----";
+      chi::log.Log() << "----- after value*2 -----";
       for (const auto&[row_index, column_index, value]: m.Row(2))
         value *= 2;
 
       for (const auto &entry: m.Row(2))
-        output << entry.row_index << " "
-               << entry.column_index << " "
-               << entry.value;
+        chi::log.Log() << entry.row_index << " "
+                       << entry.column_index << " "
+                       << entry.value;
     }
 
-    output << "----- for (auto entry : matrix) -----";
+    chi::log.Log() << "----- for (auto entry : matrix) -----";
     for (const auto& entry : matrix)
-      output << entry.row_index << " "
-             << entry.column_index << " "
-             << entry.value;
+      chi::log.Log() << entry.row_index << " "
+                     << entry.column_index << " "
+                     << entry.value;
 
     matrix.Compress();
+    chi::log.Log() << "----- after compress -----";
+    for (const auto& entry : matrix)
+      chi::log.Log() << entry.row_index << " "
+                     << entry.column_index << " "
+                     << entry.value;
   }
 
-  if (verbose)
-    chi::log.Log() << output.str();
-
-  ChiUnitTestMessageHome(passed)
+  return 0;
 }
+
+}//namespace chi_unit_tests

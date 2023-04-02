@@ -47,6 +47,7 @@ bool        chi::run_time::termination_posted_ = false;
 std::string chi::run_time::input_file_name_;
 bool        chi::run_time::sim_option_interactive_ = true;
 bool        chi::run_time::allow_petsc_error_handler_ = false;
+bool        chi::run_time::supress_beg_end_timelog_ = false;
 
 //================================ mpi
 chi_objects::MPI_Info chi_objects::MPI_Info::instance;
@@ -73,14 +74,23 @@ void chi::run_time::ParseArguments(int argc, char** argv)
       chi::log.Log()
         << "\nUsage: exe inputfile [options values]\n"
         << "\n"
-        << "     -v                         Level of verbosity. Default 0. Can be either 0, 1 or 2.\n"
-        << "     a=b                        Executes argument as a lua string. i.e. x=2 or y=[[\"string\"]]\n"
-        << "     -allow_petsc_error_handler Allow petsc error handler.\n\n\n";
+        << "     -v                         Level of verbosity. Default 0. "
+           "Can be either 0, 1 or 2.\n"
+        << "     a=b                        Executes argument as a lua string. "
+           "i.e. x=2 or y=[[\"string\"]]\n"
+        << "     --allow_petsc_error_handler Allow petsc error handler.\n"
+           "     --supress_beg_end_timelog   Suppress time logs at the \n"
+           "                                 beginning and end of execution."
+           "\n\n\n";
 
       chi::log.Log() << "PETSc options:";
       chi::run_time::termination_posted_ = true;
     }
-    else if (argument.find("-allow_petsc_error_handler")!=std::string::npos)
+    else if (argument.find("--supress_beg_end_timelog")!=std::string::npos)
+    {
+      chi::run_time::supress_beg_end_timelog_ = true;
+    }
+    else if (argument.find("--allow_petsc_error_handler")!=std::string::npos)
     {
       chi::run_time::allow_petsc_error_handler_ = true;
     }
@@ -197,13 +207,16 @@ void chi::Finalize()
 /**Runs the interactive chitech engine*/
 int chi::RunInteractive(int argc, char** argv)
 {
-  chi::log.Log()
-    << chi_objects::ChiTimer::GetLocalDateTimeString()
-    << " Running ChiTech in interactive-mode with "
-    << chi::mpi.process_count << " processes.";
+  if (not chi::run_time::supress_beg_end_timelog_)
+  {
+    chi::log.Log()
+      << chi_objects::ChiTimer::GetLocalDateTimeString()
+      << " Running ChiTech in interactive-mode with "
+      << chi::mpi.process_count << " processes.";
 
-  chi::log.Log()
-    << "ChiTech version " << GetVersionStr();
+    chi::log.Log()
+      << "ChiTech version " << GetVersionStr();
+  }
 
   chi::log.Log()
     << "ChiTech number of arguments supplied: "
@@ -227,12 +240,14 @@ int chi::RunInteractive(int argc, char** argv)
 
   chi::console.RunConsoleLoop();
 
-  chi::log.Log()
-    << "Final program time " << program_timer.GetTimeString();
-
-  chi::log.Log()
-    << chi_objects::ChiTimer::GetLocalDateTimeString()
-    << " ChiTech finished execution.";
+  if (not chi::run_time::supress_beg_end_timelog_)
+  {
+    chi::log.Log()
+      << "Final program time " << program_timer.GetTimeString();
+    chi::log.Log()
+      << chi_objects::ChiTimer::GetLocalDateTimeString()
+      << " ChiTech finished execution.";
+  }
 
   return 0;
 }
@@ -243,13 +258,16 @@ int chi::RunInteractive(int argc, char** argv)
 /**Runs ChiTech in pure batch mode. Start then finish.*/
 int chi::RunBatch(int argc, char** argv)
 {
-  chi::log.Log()
-    << chi_objects::ChiTimer::GetLocalDateTimeString()
-    << " Running ChiTech in batch-mode with "
-    << chi::mpi.process_count << " processes.";
+  if (not chi::run_time::supress_beg_end_timelog_)
+  {
+    chi::log.Log()
+      << chi_objects::ChiTimer::GetLocalDateTimeString()
+      << " Running ChiTech in batch-mode with "
+      << chi::mpi.process_count << " processes.";
 
-  chi::log.Log()
-    << "ChiTech version " << GetVersionStr();
+    chi::log.Log()
+      << "ChiTech version " << GetVersionStr();
+  }
 
   chi::log.Log()
     << "ChiTech number of arguments supplied: "
@@ -290,12 +308,14 @@ int chi::RunBatch(int argc, char** argv)
     }
   }
 
-  chi::log.Log()
-    << "\nFinal program time " << program_timer.GetTimeString();
-
-  chi::log.Log()
-    << chi_objects::ChiTimer::GetLocalDateTimeString()
-    << " ChiTech finished execution of " << chi::run_time::input_file_name_;
+  if (not chi::run_time::supress_beg_end_timelog_)
+  {
+    chi::log.Log()
+      << "\nFinal program time " << program_timer.GetTimeString();
+    chi::log.Log()
+      << chi_objects::ChiTimer::GetLocalDateTimeString()
+      << " ChiTech finished execution of " << chi::run_time::input_file_name_;
+  }
 
   return error_code;
 }

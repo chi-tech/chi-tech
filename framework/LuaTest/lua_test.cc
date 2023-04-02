@@ -6,6 +6,7 @@
 #define LUA_FMACRO1(x) lua_register(L, #x, x)
 
 #include "unit_tests.h"
+#include "chi_log.h"
 
 #include <stdexcept>
 
@@ -17,19 +18,13 @@
 int chiLuaTest(lua_State* L)
 {
   const int num_args = lua_gettop(L);
-  bool verbose = false;
-  if (num_args >= 1)
-    verbose = lua_toboolean(L,1);
-
-  chi_unit_tests::Test_chi_math(verbose);
-  chi_unit_tests::Test_chi_misc_utils(verbose);
-  chi_unit_tests::Test_chi_data_types(verbose);
-  chi_unit_tests::Test_WDD_IJK_Sweep(verbose);
-
+  chi::log.Log() << "Hello from chiLuaTest()";
+  chi::log.Log() << "num_args = " << num_args;
   return 0;
 }
 
-
+/**Throws an exception that will cause ChiTech to stop
+ * execution.*/
 int chiThrowException(lua_State* L)
 {
   const std::string fname = __FUNCTION__;
@@ -44,6 +39,8 @@ int chiThrowException(lua_State* L)
 
   throw std::logic_error(message);
 }
+
+/**Throws an exception that will not cause ChiTech to stop execution.*/
 int chiThrowRecoverableException(lua_State* L)
 {
   const std::string fname = __FUNCTION__;
@@ -59,11 +56,22 @@ int chiThrowRecoverableException(lua_State* L)
   throw chi::RecoverableException(message);
 }
 
+/**Registers the lua function calls for unit tests.*/
 void chi_lua_test::lua_utils::RegisterLuaEntities(lua_State *L)
 {
   LUA_FMACRO1(chiLuaTest);
   LUA_FMACRO1(chiThrowException);
   LUA_FMACRO1(chiThrowRecoverableException);
+
+  lua_register(L, "chiUnitTests_Test_chi_math", chi_unit_tests::Test_chi_math);
+  lua_register(L, "chiUnitTests_Test_chi_misc_utils",
+               chi_unit_tests::Test_chi_misc_utils);
+  lua_register(L, "chiUnitTests_Test_chi_data_types",
+               chi_unit_tests::Test_chi_data_types);
+  lua_register(L, "chiUnitTests_Test_WDD_IJK_Sweep",
+               chi_unit_tests::Test_WDD_IJK_Sweep);
+  lua_register(L, "chiUnitTests_Test_paramblock",
+               chi_unit_tests::Test_paramblock);
 
   lua_register(L, "chiSimTest01_FV"  , chi_unit_sim_tests::chiSimTest01_FV);
   lua_register(L, "chiSimTest02_FV"  , chi_unit_sim_tests::chiSimTest02_FV);
@@ -74,8 +82,10 @@ void chi_lua_test::lua_utils::RegisterLuaEntities(lua_State *L)
 
   lua_register(L, "chiSimTest91_PWLD", chi_unit_sim_tests::chiSimTest91_PWLD);
   lua_register(L, "chiSimTest92_DSA", chi_unit_sim_tests::chiSimTest92_DSA);
-  lua_register(L, "chiSimTest93_RayTracing", chi_unit_sim_tests::chiSimTest93_RayTracing);
+  lua_register(L, "chiSimTest93_RayTracing",
+               chi_unit_sim_tests::chiSimTest93_RayTracing);
 
-  lua_register(L, "chiSimTest_IP_MMS_L2error", chi_unit_sim_tests::chiSimTest_IP_MMS_L2error);
+  lua_register(L, "chiSimTest_IP_MMS_L2error",
+               chi_unit_sim_tests::chiSimTest_IP_MMS_L2error);
 }
 

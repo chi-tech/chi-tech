@@ -94,6 +94,7 @@ public:
     static std::string input_file_name_;
     static bool        sim_option_interactive_;
     static bool        allow_petsc_error_handler_;
+    static bool        supress_beg_end_timelog_;
 
   private:
     friend class chi;

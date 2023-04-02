@@ -11,6 +11,7 @@ extern "C"
 #include <typeinfo>
 #include <string>
 #include <vector>
+#include <memory>
 
 void LuaPostArgAmountError(const std::string& func_name,int expected, int given);
 void LuaCheckNilValue(const std::string& func_name, lua_State* L, int arg);
@@ -24,5 +25,29 @@ void LuaPopulateVectorFrom1DArray(const std::string& func_name,
                                   lua_State* L,
                                   int table_arg_index,
                                   std::vector<double>& vec);
+
+namespace chi_data_types
+{
+  class ParameterBlock;
+}
+namespace chi_lua
+{
+  class TableParserAsParameterBlock
+  {
+  private:
+    static
+    void RecursivelyParseTableValues(
+      lua_State* L, chi_data_types::ParameterBlock& block,
+      const std::string& key_str_name);
+
+    static
+    void RecursivelyParseTableKeys(
+      lua_State* L, int t, chi_data_types::ParameterBlock& block);
+  public:
+    static
+    std::shared_ptr<chi_data_types::ParameterBlock>
+      ParseTable(lua_State* L, int table_stack_index);
+  };
+}//namespace chi_lua
 
 #endif
