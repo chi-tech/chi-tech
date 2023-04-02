@@ -112,7 +112,7 @@ void TableParserAsParameterBlock::
     {
       if (string_key_encountered) ExceptionMixStringNumberKeys;
 
-      if (block.Type() != chi_data_types::ParameterBlockType::Array)
+      if (block.Type() != chi_data_types::ParameterBlockType::ARRAY)
         block.ChangeToArray();
 
       number_key_encountered = true;

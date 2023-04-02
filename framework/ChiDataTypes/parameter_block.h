@@ -18,13 +18,13 @@ namespace chi_data_types
 enum class ParameterBlockType
 {
   NONE    = -1    /*LUA_TNONE   */,
-  Nil     = 0     /*LUA_TNIL    */,
-  Boolean = 1     /*LUA_TBOOLEAN*/,
-  Number  = 3     /*LUA_TNUMBER */,
-  String  = 4     /*LUA_TSTRING */,
-  Integer = 5,
-  Array   = 98,
-  Block  = 99
+  NIL     = 0     /*LUA_TNIL    */,
+  BOOLEAN = 1     /*LUA_TBOOLEAN*/,
+  NUMBER  = 3     /*LUA_TNUMBER */,
+  STRING  = 4     /*LUA_TSTRING */,
+  INTEGER = 5,
+  ARRAY   = 98,
+  BLOCK   = 99
 };
 
 std::string ParameterBlockTypeName(ParameterBlockType type);
@@ -68,10 +68,10 @@ public:
 
     static_assert(is_supported, "Value type not supported for parameter block");
 
-    if (IsBool<T>::value) type_ = ParameterBlockType::Boolean;
-    if (IsFloat<T>::value) type_ = ParameterBlockType::Number;
-    if (IsString<T>::value) type_ = ParameterBlockType::String;
-    if (IsInteger<T>::value) type_ = ParameterBlockType::Integer;
+    if (IsBool<T>::value) type_ = ParameterBlockType::BOOLEAN;
+    if (IsFloat<T>::value) type_ = ParameterBlockType::NUMBER;
+    if (IsString<T>::value) type_ = ParameterBlockType::STRING;
+    if (IsInteger<T>::value) type_ = ParameterBlockType::INTEGER;
 
     value_ptr_ = std::make_unique<Varying>(value);
   }
@@ -122,7 +122,7 @@ public:
   template<typename T>
   std::vector<T> GetVectorValue() const
   {
-    if (Type() != ParameterBlockType::Array)
+    if (Type() != ParameterBlockType::ARRAY)
       throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
                              ": Invalid type requested for parameter of type " +
                              ParameterBlockTypeName(Type()));

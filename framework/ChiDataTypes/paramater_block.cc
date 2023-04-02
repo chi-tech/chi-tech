@@ -11,13 +11,13 @@ std::string ParameterBlockTypeName(ParameterBlockType type)
   switch (type)
   {
     case ParameterBlockType::NONE:    return "NONE";
-    case ParameterBlockType::Nil:     return "NIL";
-    case ParameterBlockType::Boolean: return "BOOLEAN";
-    case ParameterBlockType::Number:  return "NUMBER";
-    case ParameterBlockType::String:  return "STRING";
-    case ParameterBlockType::Integer: return "INTEGER";
-    case ParameterBlockType::Array:   return "ARRAY";
-    case ParameterBlockType::Block:   return "BLOCK";
+    case ParameterBlockType::NIL:     return "NIL";
+    case ParameterBlockType::BOOLEAN: return "BOOLEAN";
+    case ParameterBlockType::NUMBER:  return "NUMBER";
+    case ParameterBlockType::STRING:  return "STRING";
+    case ParameterBlockType::INTEGER: return "INTEGER";
+    case ParameterBlockType::ARRAY:   return "ARRAY";
+    case ParameterBlockType::BLOCK:   return "BLOCK";
     default:
       throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
       ": No name associated with type");
@@ -26,7 +26,7 @@ std::string ParameterBlockTypeName(ParameterBlockType type)
 
 //#################################################################
 ParameterBlock::ParameterBlock(const std::string& key_str_name) :
-  type_(ParameterBlockType::Block),
+  type_(ParameterBlockType::BLOCK),
   keyword_(key_str_name)
 {}
 
@@ -39,10 +39,10 @@ const Varying& ParameterBlock::Value() const
 {
   switch (this->Type())
   {
-    case ParameterBlockType::Boolean:
-    case ParameterBlockType::Number:
-    case ParameterBlockType::String:
-    case ParameterBlockType::Integer:
+    case ParameterBlockType::BOOLEAN:
+    case ParameterBlockType::NUMBER:
+    case ParameterBlockType::STRING:
+    case ParameterBlockType::INTEGER:
     {
       if (value_ptr_ == nullptr)
         throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +
@@ -70,7 +70,7 @@ size_t ParameterBlock::NumParameters() const
  * keys.*/
 void ParameterBlock::ChangeToArray()
 {
-  type_ = ParameterBlockType::Array;
+  type_ = ParameterBlockType::ARRAY;
 }
 
 //#################################################################
@@ -154,36 +154,36 @@ void ParameterBlock::RecursiveDumpToString(std::string& outstr,
 
     switch (param->Type())
     {
-      case ParameterBlockType::Boolean:
+      case ParameterBlockType::BOOLEAN:
       {
         outstr += offset + "  " + param->Name() + " = ";
         const bool value = param->Value().BoolValue();
         outstr += std::string( value ? "true" : "false") + ",\n";
         break;
       }
-      case ParameterBlockType::Number:
+      case ParameterBlockType::NUMBER:
       {
         outstr += offset + "  " + param->Name() + " = ";
         const double value = param->Value().FloatValue();
         outstr += std::to_string(value) + ",\n";
         break;
       }
-      case ParameterBlockType::String:
+      case ParameterBlockType::STRING:
       {
         outstr += offset + "  " + param->Name() + " = ";
         const auto& value = param->Value().StringValue();
         outstr += "\"" + value + "\",\n";
         break;
       }
-      case ParameterBlockType::Integer:
+      case ParameterBlockType::INTEGER:
       {
         outstr += offset + "  " + param->Name() + " = ";
         const int64_t value = param->Value().IntegerValue();
         outstr += std::to_string(value) + ",\n";
         break;
       }
-      case ParameterBlockType::Array:
-      case ParameterBlockType::Block:
+      case ParameterBlockType::ARRAY:
+      case ParameterBlockType::BLOCK:
       {
         param->RecursiveDumpToString(outstr, offset + "  ");
         break;
