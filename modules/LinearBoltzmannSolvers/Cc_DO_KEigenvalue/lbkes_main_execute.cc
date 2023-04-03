@@ -2,6 +2,7 @@
 #include "A_LBSSolver/IterativeMethods/poweriteration_keigen.h"
 #include "A_LBSSolver/IterativeMethods/nl_keigen_ags_solver.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 
 #include <petscsnes.h>

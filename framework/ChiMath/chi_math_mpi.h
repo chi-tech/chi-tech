@@ -2,6 +2,7 @@
 #define CHITECH_CHI_MATH_MPI_H
 
 #include "chi_mpi.h"
+#include <vector>
 typedef std::vector<double> VecDbl;
 
 namespace chi_math

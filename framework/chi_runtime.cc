@@ -19,11 +19,10 @@
 #endif
 
 //=============================================== Global variables
-chi_objects::ChiConsole  chi_objects::ChiConsole::instance_;
-chi_objects::ChiConsole& chi::console = chi_objects::ChiConsole::GetInstance();
-
-chi_objects::ChiLog      chi_objects::ChiLog::instance_;
+chi_objects::ChiConsole&  chi::console = chi_objects::ChiConsole::GetInstance();
 chi_objects::ChiLog&      chi::log = chi_objects::ChiLog::GetInstance();
+chi_objects::MPI_Info&    chi::mpi = chi_objects::MPI_Info::GetInstance();
+chi_objects::ChiTimer     chi::program_timer;
 
 /** Global stack of handlers */
 std::vector<chi_mesh::MeshHandlerPtr>   chi::meshhandler_stack;
@@ -48,12 +47,6 @@ std::string chi::run_time::input_file_name_;
 bool        chi::run_time::sim_option_interactive_ = true;
 bool        chi::run_time::allow_petsc_error_handler_ = false;
 bool        chi::run_time::supress_beg_end_timelog_ = false;
-
-//================================ mpi
-chi_objects::MPI_Info chi_objects::MPI_Info::instance;
-chi_objects::MPI_Info& chi::mpi = chi_objects::MPI_Info::GetInstance();
-
-chi_objects::ChiTimer chi::program_timer;
 
 //############################################### Argument parser
 /**Parses input arguments.
@@ -154,6 +147,7 @@ int chi::Initialize(int argc, char** argv)
   mpi.SetLocationID(location_id);
   mpi.SetProcessCount(number_processes);
 
+  chi::console.LoadRegisteredLuaItems();
   chi::console.PostMPIInfo(location_id, number_processes);
 
   run_time::ParseArguments(argc, argv);

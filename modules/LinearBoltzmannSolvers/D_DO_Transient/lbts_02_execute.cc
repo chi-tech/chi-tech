@@ -1,5 +1,6 @@
 #include "lbts_transient_solver.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 
 //###################################################################

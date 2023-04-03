@@ -1,11 +1,10 @@
 #include "lbs_discrete_ordinates_solver.h"
 
-#include "A_LBSSolver/IterativeMethods/ags_linear_solver.h"
 #include "LinearBoltzmannSolvers/B_DO_Solver/IterativeMethods/sweep_wgs_context.h"
 #include "A_LBSSolver/IterativeMethods/wgs_linear_solver.h"
 #include "A_LBSSolver/SourceFunctions/source_function.h"
 
-#include "ChiMPI/chi_mpi.h"
+#include "chi_runtime.h"
 #include "chi_log.h"
 
 typedef chi_mesh::sweep_management::SweepChunk SweepChunk;

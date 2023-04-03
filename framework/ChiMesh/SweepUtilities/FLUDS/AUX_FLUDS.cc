@@ -1,5 +1,6 @@
 #include "AUX_FLUDS.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 
 //######################################################### Constr

@@ -4,8 +4,9 @@
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 #include "ChiMesh/SweepUtilities/FLUDS/FLUDS.h"
 
-#include <ChiConsole/chi_console.h>
-#include <chi_log.h>
+#include "chi_runtime.h"
+#include "ChiConsole/chi_console.h"
+#include "chi_log.h"
 
 //###################################################################
 /** This is the final level of initialization before a sweep-chunk executes.

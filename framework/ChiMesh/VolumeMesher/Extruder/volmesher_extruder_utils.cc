@@ -3,6 +3,7 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 #include "ChiMesh/UnpartitionedMesh/chi_unpartitioned_mesh.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 
 

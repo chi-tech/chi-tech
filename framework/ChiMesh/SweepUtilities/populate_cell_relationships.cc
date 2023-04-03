@@ -2,14 +2,6 @@
 
 #include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
 
-#include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
-
-#include <chi_mpi.h>
-#include <chi_log.h>
-
-
-;
-
 //###################################################################
 /**Populates the local sub-grid connection information for sweep orderings.*/
 void chi_mesh::sweep_management::PopulateCellRelationships(

@@ -204,11 +204,8 @@ namespace chi_objects
     DummyStream dummy_stream_;
     int verbosity_;
 
-    static ChiLog instance_;
-
   public:
-    static ChiLog& GetInstance() noexcept
-    { return instance_;}
+    static ChiLog& GetInstance() noexcept;
   private:
     //00
                     ChiLog() noexcept;

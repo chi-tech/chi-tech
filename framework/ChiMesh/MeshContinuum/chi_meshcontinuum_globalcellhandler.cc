@@ -1,5 +1,6 @@
 #include "chi_meshcontinuum.h"
 
+#include "chi_runtime.h"
 #include "chi_mpi.h"
 #include "chi_log.h"
 

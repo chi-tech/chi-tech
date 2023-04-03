@@ -1,11 +1,21 @@
 #include "ChiLua/chi_lua.h"
-#include "physics_lua_utils.h"
+#include "ChiPhysics/lua/physics_lua_utils.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
+#include "ChiConsole/chi_console.h"
 
 /** \defgroup LuaSolver Solvers
  * \ingroup LuaPhysics*/
+
+namespace chi_physics::lua_utils
+{
+  ChiConsoleRegisterLuaFunction(chiSolverInitialize);
+  ChiConsoleRegisterLuaFunction(chiSolverExecute);
+  ChiConsoleRegisterLuaFunction(chiSolverStep);
+  ChiConsoleRegisterLuaFunction(chiSolverSetBasicOption);
+  ChiConsoleRegisterLuaFunction(chiSolverGetName);
+  ChiConsoleRegisterLuaFunction(chiSolverGetFieldFunctionList);
 
 //#############################################################################
 /** Initializes the solver at the given handle.
@@ -252,3 +262,5 @@ int chiSolverGetFieldFunctionList(lua_State* L)
 
   return 2;
 }
+//}//namespace temp
+}//namespace chi_physics::lua_utils

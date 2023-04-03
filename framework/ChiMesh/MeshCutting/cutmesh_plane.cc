@@ -3,8 +3,8 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 #include "ChiMesh/Raytrace/raytracing.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-;
 
 #include <algorithm>
 

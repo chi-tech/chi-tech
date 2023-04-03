@@ -4,8 +4,8 @@
 #include "ChiMesh/SurfaceMesher/surfacemesher.h"
 #include "ChiMesh/UnpartitionedMesh/chi_unpartitioned_mesh.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-
 #include "chi_mpi.h"
 
 

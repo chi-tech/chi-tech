@@ -4,6 +4,8 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
+#include "chi_runtime.h"
+
 namespace lbs::adjoint_lua_utils
 {
 

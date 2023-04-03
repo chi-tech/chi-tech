@@ -10,6 +10,8 @@
 #include <vtkXMLUnstructuredGridWriter.h>
 #include <vtkXMLPUnstructuredGridWriter.h>
 
+#include "chi_runtime.h"
+
 //###################################################################
 /**Uploads vertices and cells to an unstructured grid. This routine
  * also uploads cell material ids (sub-domain ids) and partition ids.*/
