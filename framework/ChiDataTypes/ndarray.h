@@ -74,6 +74,8 @@ public:
     }
 
     base_ = new T[size_];
+    for (size_t i=0; i < size_; ++i)
+      base_[i] = 0.0;
   }
 
   /** Creates an array with the specified number of elements in each dimension,
@@ -114,6 +116,8 @@ public:
     }
 
     base_ = new T[size_];
+    for (size_t i=0; i < size_; ++i)
+      base_[i] = 0.0;
   }
 
   /** Creates an array with the specified number of elements in each dimension,
@@ -161,6 +165,8 @@ public:
     }
 
     base_ = new T[size_];
+    for (size_t i=0; i < size_; ++i)
+      base_[i] = 0.0;
   }
 
   /** Creates an array with the specified number of elements in each dimension,
