@@ -5,6 +5,7 @@
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 #include "ChiMesh/SweepUtilities/sweepchunk_base.h"
 
+#include "chi_runtime.h"
 #include "chi_mpi.h"
 #include "chi_log.h"
 

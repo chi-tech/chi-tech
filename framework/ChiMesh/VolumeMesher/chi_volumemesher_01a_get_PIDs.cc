@@ -4,9 +4,8 @@
 #include "ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h"
 #include "ChiMesh/VolumeMesher/PredefinedUnpartitioned/volmesher_predefunpart.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-;
-
 #include "chi_mpi.h"
 
 

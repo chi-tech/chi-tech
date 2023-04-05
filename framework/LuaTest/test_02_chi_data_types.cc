@@ -236,7 +236,7 @@ int Test_chi_data_types(lua_State* L)
     dummy << "Should be printing rank and 2x2x2=8 zeros\n";
     dummy << nd_array1.rank() << "\n";
     for (auto val : nd_array1) {dummy << val << " ";}
-    dummy << "Done\n";
+    dummy << "Done1\n";
   }
 
   //Constructor array
@@ -244,7 +244,7 @@ int Test_chi_data_types(lua_State* L)
     chi_data_types::NDArray<double> nd_array1(std::array<size_t,3>{2, 2, 2});
     dummy << "Should be 2x2x2=8 zeros\n";
     for (auto val : nd_array1) {dummy << val << " ";}
-    dummy << "Done\n";
+    dummy << "Done2\n";
   }
 
   //Constructor initializer_list
@@ -252,7 +252,7 @@ int Test_chi_data_types(lua_State* L)
     dummy << "Should be 2x2x2=8 zeros\n";
     chi_data_types::NDArray<double> nd_array1({2, 2, 2});
     for (auto val : nd_array1) {dummy << val << " ";}
-    dummy << "Done\n";
+    dummy << "Done3\n";
   }
 
   //Constructor vector value
@@ -261,7 +261,7 @@ int Test_chi_data_types(lua_State* L)
     chi_data_types::NDArray<double>
       nd_array1(std::vector<size_t>{2, 2, 2}, 0.0);
     for (auto val : nd_array1) {dummy << val << " ";}
-    dummy << "Done\n";
+    dummy << "Done4\n";
   }
 
   //Constructor array value
@@ -270,7 +270,7 @@ int Test_chi_data_types(lua_State* L)
     chi_data_types::NDArray<double>
       nd_array1(std::array<size_t, 3>{2, 2, 2}, 0.0);
     for (auto val : nd_array1) {dummy << val << " ";}
-    dummy << "Done\n";
+    dummy << "Done5\n";
   }
 
   //Constructor initializer_list value
@@ -278,7 +278,7 @@ int Test_chi_data_types(lua_State* L)
     dummy << "Should be 2x2x2=8 zeros\n";
     chi_data_types::NDArray<double> nd_array1({2, 2, 2}, 0.0);
     for (auto val : nd_array1) {dummy << val << " ";}
-    dummy << "Done\n";
+    dummy << "Done6\n";
   }
 
   //Constructor none
@@ -286,7 +286,7 @@ int Test_chi_data_types(lua_State* L)
     dummy << "Should not print anything\n";
     chi_data_types::NDArray<double> nd_array1;
     for (auto val : nd_array1) {dummy << val << " ";}
-    dummy << "Done\n";
+    dummy << "Done7\n";
   }
 
   //method set
@@ -299,14 +299,14 @@ int Test_chi_data_types(lua_State* L)
     dummy << "Should be 2x2x2=8 ones\n";
     for (auto val: nd_array2) dummy << val << " ";
     dummy << "\n";
-    dummy << "Done\n";
+    dummy << "Done8\n";
 
     dummy << "Should be 2x2x2=8 ones\n";
     const auto& nd_array3 = nd_array2;
     for (auto i=nd_array3.cbegin(); i != nd_array3.cend(); ++i)
       dummy << *i << " ";
     dummy << "\n";
-    dummy << "Done\n";
+    dummy << "Done9\n";
   }
 
   //size and empty
@@ -320,7 +320,7 @@ int Test_chi_data_types(lua_State* L)
     dummy << "Should be 2x2x2=8 ones\n";
     for (auto val: nd_array4) dummy << val << " ";
     dummy << "\n";
-    dummy << "Done\n";
+    dummy << "Done10\n";
   }
 
   chi::log.Log() << dummy.str();

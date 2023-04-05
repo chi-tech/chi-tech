@@ -1,5 +1,6 @@
 #include "Ca_DO_SteadyState/lbs_DO_steady_state.h"
 
+#include "chi_runtime.h"
 namespace lbs::disc_ord_steady_state_lua_utils
 {
 

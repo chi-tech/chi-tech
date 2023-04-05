@@ -2,6 +2,7 @@
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 
+#include "chi_runtime.h"
 #include "ChiLog/chi_log.h"
 
 //###################################################################

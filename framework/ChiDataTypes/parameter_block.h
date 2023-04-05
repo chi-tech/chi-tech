@@ -87,8 +87,15 @@ protected:
   void ChangeToArray();
 public:
   //utilities
-protected:
+public:
   void AddParameter(ParameterBlockPtr block);
+  /**Makes a parameter block and adds it to the parameters.*/
+  template<typename T>
+  void MakeAddParameter(const std::string& key_str_name, T value)
+  {
+    AddParameter(std::make_unique<ParameterBlock>(
+      key_str_name, value));
+  }
 private:
   void SortParameters();
 public:

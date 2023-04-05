@@ -4,6 +4,7 @@
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/finite_element.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 
 std::vector<chi_mesh::Vector3> chi_math::CellMappingFE_PWL::GetNodeLocations() const

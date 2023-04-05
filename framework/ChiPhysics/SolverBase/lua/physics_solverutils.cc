@@ -1,11 +1,69 @@
 #include "ChiLua/chi_lua.h"
-#include "physics_lua_utils.h"
+#include "ChiPhysics/lua/physics_lua_utils.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
+#include "ChiConsole/chi_console.h"
 
 /** \defgroup LuaSolver Solvers
  * \ingroup LuaPhysics*/
+
+namespace chi_physics::lua_utils
+{
+  int chiSolverCreate(lua_State* L);
+
+  ChiConsoleRegisterLuaFunction(chiSolverCreate);
+
+  ChiConsoleRegisterLuaFunction(chiSolverInitialize);
+  ChiConsoleRegisterLuaFunction(chiSolverExecute);
+  ChiConsoleRegisterLuaFunction(chiSolverStep);
+  ChiConsoleRegisterLuaFunction(chiSolverSetBasicOption);
+  ChiConsoleRegisterLuaFunction(chiSolverGetName);
+  ChiConsoleRegisterLuaFunction(chiSolverGetFieldFunctionList);
+
+//#############################################################################
+/**Generic lua routine for the creation of solvers.
+ * \param params ParameterBlock. A single block with at least one field
+ *                   \"type\", which contains a registered solver type.
+ * ## _
+ *
+ * Example:
+\code
+chiSolverCreate({type=cfem_diffusion.Solver})
+\endcode*/
+int chiSolverCreate(lua_State* L)
+{
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
+  if (num_args != 1)
+    LuaPostArgAmountError(fname, 1, num_args);
+
+  LuaCheckTableValue(fname, L, 1);
+
+  const auto params = chi_lua::TableParserAsParameterBlock::ParseTable(L, 1);
+
+  if (not params->Has("type"))
+    throw std::invalid_argument(fname + ": Requires a parameter block with "
+      "a field called \"type\".");
+
+  const std::string type = params->GetParamValue<std::string>("type");
+
+  const auto& solver_register = chi::console.GetSolverRegistry();
+
+  if (solver_register.count(type) == 0)
+    throw std::logic_error(fname + ": No registered type \"" + type +
+                           "\" found.");
+
+  auto construction_function = solver_register.at(type);
+
+  auto new_solver = construction_function(*params);
+
+  chi::solver_stack.push_back(new_solver);
+
+  lua_pushinteger(L,
+    static_cast<lua_Integer>(chi::solver_stack.size()-1));
+  return 1;
+}
 
 //#############################################################################
 /** Initializes the solver at the given handle.
@@ -252,3 +310,5 @@ int chiSolverGetFieldFunctionList(lua_State* L)
 
   return 2;
 }
+//}//namespace temp
+}//namespace chi_physics::lua_utils

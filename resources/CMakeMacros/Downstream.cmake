@@ -114,7 +114,7 @@ else ()
 endif()
 
 set(CHI_LIBS stdc++ lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES})
-set(CHI_LIBS ${CHI_LIBS} ChiLib ThirdParty)
+set(CHI_LIBS ${CHI_LIBS} external)
 
 #================================================ Compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MPI_CXX_COMPILE_FLAGS}")

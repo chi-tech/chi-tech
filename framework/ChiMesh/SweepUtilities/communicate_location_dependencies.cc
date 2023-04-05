@@ -1,9 +1,8 @@
 #include "sweep_namespace.h"
 
-#include <chi_log.h>
-#include <chi_mpi.h>
-
-;
+#include "chi_runtime.h"
+#include "chi_log.h"
+#include "chi_mpi.h"
 
 //###################################################################
 /**Communicates location by location dependencies.*/

@@ -3,9 +3,10 @@
 
 #include <ChiMesh/Cell/cell.h>
 
-typedef std::vector<std::pair<int,short>> LockBox;
-
+#include "chi_runtime.h"
 #include "chi_log.h"
+
+typedef std::vector<std::pair<int,short>> LockBox;
 
 //###################################################################
 /**Performs Incident mapping for Polyhedron cell.*/

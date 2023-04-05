@@ -3,7 +3,6 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
-#include <sstream>
 
 //###################################################################
 /**Print the percentage completed based on the given interval.

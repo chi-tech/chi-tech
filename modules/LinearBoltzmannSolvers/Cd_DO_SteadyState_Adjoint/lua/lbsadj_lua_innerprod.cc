@@ -1,6 +1,8 @@
 #include "Cd_DO_SteadyState_Adjoint/lbsadj_solver.h"
 #include "lbsadj_lua_utils.h"
 
+#include "chi_runtime.h"
+
 namespace lbs::adjoint_lua_utils
 {
 

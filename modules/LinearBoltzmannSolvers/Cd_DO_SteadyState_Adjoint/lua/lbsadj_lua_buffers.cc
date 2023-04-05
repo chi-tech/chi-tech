@@ -2,6 +2,8 @@
 
 #include "lbsadj_lua_utils.h"
 
+#include "chi_runtime.h"
+
 namespace lbs::adjoint_lua_utils
 {
 

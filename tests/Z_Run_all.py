@@ -344,6 +344,9 @@ def run_test(file_name, comment, num_procs, search_strings_vals_tols):
 
 
 def run_unit_test(file_name, comment, num_procs):
+    global test_number
+    test_number += 1
+
     global num_failed
     test_name = f"{format_filename(file_name)} - {comment} - " \
                 f"{num_procs} MPI Processes"

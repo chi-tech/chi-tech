@@ -1,5 +1,6 @@
 #include "A_LBSSolver/lbs_solver.h"
 
+#include "chi_runtime.h"
 using namespace lbs;
 
 //###################################################################

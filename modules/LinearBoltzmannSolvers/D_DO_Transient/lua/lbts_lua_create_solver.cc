@@ -1,5 +1,7 @@
 #include "D_DO_Transient/lbts_transient_solver.h"
 
+#include "chi_runtime.h"
+
 namespace lbs::lbts_lua_utils
 {
 

@@ -12,27 +12,27 @@
 [0m[0]  Testing chi_data_types::NDArray
 [0m[0]  Should be printing rank and 2x2x2=8 zeros
 [0m[0]  3
-[0m[0]  0 0 0 0 0 0 0 0 Done
+[0m[0]  0 0 0 0 0 0 0 0 Done1
 [0m[0]  Should be 2x2x2=8 zeros
-[0m[0]  0 0 0 0 0 0 0 0 Done
+[0m[0]  0 0 0 0 0 0 0 0 Done2
 [0m[0]  Should be 2x2x2=8 zeros
-[0m[0]  0 0 0 0 0 0 0 0 Done
+[0m[0]  0 0 0 0 0 0 0 0 Done3
 [0m[0]  Should be 2x2x2=8 zeros
-[0m[0]  0 0 0 0 0 0 0 0 Done
+[0m[0]  0 0 0 0 0 0 0 0 Done4
 [0m[0]  Should be 2x2x2=8 zeros
-[0m[0]  0 0 0 0 0 0 0 0 Done
+[0m[0]  0 0 0 0 0 0 0 0 Done5
 [0m[0]  Should be 2x2x2=8 zeros
-[0m[0]  0 0 0 0 0 0 0 0 Done
+[0m[0]  0 0 0 0 0 0 0 0 Done6
 [0m[0]  Should not print anything
-[0m[0]  Done
+[0m[0]  Done7
 [0m[0]  Should be 2x2x2=8 ones
 [0m[0]  1 1 1 1 1 1 1 1 
-[0m[0]  Done
+[0m[0]  Done8
 [0m[0]  Should be 2x2x2=8 ones
 [0m[0]  1 1 1 1 1 1 1 1 
-[0m[0]  Done
+[0m[0]  Done9
 [0m[0]  size 8
 [0m[0]  empty() 0Should be 2x2x2=8 ones
 [0m[0]  1 1 1 1 1 1 1 1 
-[0m[0]  Done
+[0m[0]  Done10
 [0m

@@ -12,23 +12,38 @@
 
 #include "chi_configuration.h"
 
-//############################################################################# Default constructor
+//###################################################################
+/**Access to the singleton*/
+chi_objects::ChiConsole& chi_objects::ChiConsole::GetInstance() noexcept
+{
+  static ChiConsole singleton;
+  return singleton;
+}
+
+//###################################################################
 /** Default constructor for the console*/
 chi_objects::ChiConsole::ChiConsole() noexcept :
-  consoleState(luaL_newstate())
+  console_state_(luaL_newstate())
 {
-	//========================================== Initializing console
-  auto& L = this->consoleState;
 
-	luaL_openlibs(L);
+}
 
-  //========================================== Register version
-  lua_pushstring(L,  PROJECT_VERSION);       lua_setglobal(L,"chi_version");
-  lua_pushinteger(L, PROJECT_MAJOR_VERSION); lua_setglobal(L, "chi_major_version");
-  lua_pushinteger(L, PROJECT_MINOR_VERSION); lua_setglobal(L, "chi_minor_version");
-  lua_pushinteger(L, PROJECT_PATCH_VERSION); lua_setglobal(L, "chi_patch_version");
+//###################################################################
+/**Registers all lua items so that they are available in the console.*/
+void chi_objects::ChiConsole::LoadRegisteredLuaItems()
+{
+  //=================================== Initializing console
+  auto& L = GetConsoleState();
 
-	//========================================== Registering functions
+  luaL_openlibs(L);
+
+  //=================================== Register version
+  lua_pushstring(L, PROJECT_VERSION);      lua_setglobal(L,"chi_version");
+  lua_pushinteger(L,PROJECT_MAJOR_VERSION);lua_setglobal(L,"chi_major_version");
+  lua_pushinteger(L,PROJECT_MINOR_VERSION);lua_setglobal(L,"chi_minor_version");
+  lua_pushinteger(L,PROJECT_PATCH_VERSION);lua_setglobal(L,"chi_patch_version");
+
+  //=================================== Registering functions
   chi_math::lua_utils::RegisterLuaEntities(L);
   chi_mesh::lua_utils::RegisterLuaEntities(L);
   chi_mpi_utils::lua_utils::RegisterLuaEntities(L);
@@ -37,6 +52,17 @@ chi_objects::ChiConsole::ChiConsole() noexcept :
   chi_lua_test::lua_utils::RegisterLuaEntities(L);
 
   chi_modules::lua_utils::RegisterLuaEntities(L);
+
+  //=================================== Registering static-registration
+  //                                    functions
+  for (const auto& [key, entry] : lua_function_registry_)
+    lua_register(L, key.c_str(), entry.function_ptr);
+
+  //=================================== Registering solver-function
+  //                                    scope resolution tables
+  for (const auto& entry : solver_registry_)
+    SetNamespaceTableStructure(entry.first);
+
 }
 
 
