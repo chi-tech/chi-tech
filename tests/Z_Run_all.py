@@ -347,33 +347,34 @@ def run_unit_test(file_name, comment, num_procs):
     global test_number
     test_number += 1
 
-    global num_failed
-    test_name = f"{format_filename(file_name)} - {comment} - " \
-                f"{num_procs} MPI Processes"
+    if (tests_to_run and test_number in tests_to_run) or (not tests_to_run):
+        global num_failed
+        test_name = f"{format_filename(file_name)} - {comment} - " \
+                    f"{num_procs} MPI Processes"
 
-    msg = f"Running Test {format3(test_number)} {test_name}"
-    print(msg, end='', flush=True)
-    if print_only:
-        print()
-        return
+        msg = f"Running Test {format3(test_number)} {test_name}"
+        print(msg, end='', flush=True)
+        if print_only:
+            print()
+            return
 
-    cmd = f"./tests/unit_test_inputs/ZUnitTestRunner.sh {mpiexec} " \
-          f"{num_procs} {kpath_to_exe} tests/{file_name}"
-    process = subprocess.Popen(cmd.split(),
-                               cwd=kchi_src_pth,
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE,
-                               universal_newlines=True)
-    process.wait()
-    out, err = process.communicate()
+        cmd = f"./tests/unit_test_inputs/ZUnitTestRunner.sh {mpiexec} " \
+              f"{num_procs} {kpath_to_exe} tests/{file_name}"
+        process = subprocess.Popen(cmd.split(),
+                                   cwd=kchi_src_pth,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE,
+                                   universal_newlines=True)
+        process.wait()
+        out, err = process.communicate()
 
-    if process.returncode == 0:
-        print(" - \033[32mPassed\033[39m")
-    else:
-        print(" - \033[31mFAILED!\033[39m")
-        num_failed += 1
-        if argv.verbose_fail:
-            print(err)
+        if process.returncode == 0:
+            print(" - \033[32mPassed\033[39m")
+        else:
+            print(" - \033[31mFAILED!\033[39m")
+            num_failed += 1
+            if argv.verbose_fail:
+                print(err)
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                             Unit Tests
