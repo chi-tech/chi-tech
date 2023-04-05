@@ -32,18 +32,18 @@ chi_objects::ChiConsole::ChiConsole() noexcept :
 /**Registers all lua items so that they are available in the console.*/
 void chi_objects::ChiConsole::LoadRegisteredLuaItems()
 {
-  //============================================= Initializing console
+  //=================================== Initializing console
   auto& L = GetConsoleState();
 
   luaL_openlibs(L);
 
-  //============================================= Register version
-  lua_pushstring(L,  PROJECT_VERSION);       lua_setglobal(L,"chi_version");
-  lua_pushinteger(L, PROJECT_MAJOR_VERSION); lua_setglobal(L, "chi_major_version");
-  lua_pushinteger(L, PROJECT_MINOR_VERSION); lua_setglobal(L, "chi_minor_version");
-  lua_pushinteger(L, PROJECT_PATCH_VERSION); lua_setglobal(L, "chi_patch_version");
+  //=================================== Register version
+  lua_pushstring(L, PROJECT_VERSION);      lua_setglobal(L,"chi_version");
+  lua_pushinteger(L,PROJECT_MAJOR_VERSION);lua_setglobal(L,"chi_major_version");
+  lua_pushinteger(L,PROJECT_MINOR_VERSION);lua_setglobal(L,"chi_minor_version");
+  lua_pushinteger(L,PROJECT_PATCH_VERSION);lua_setglobal(L,"chi_patch_version");
 
-  //============================================= Registering functions
+  //=================================== Registering functions
   chi_math::lua_utils::RegisterLuaEntities(L);
   chi_mesh::lua_utils::RegisterLuaEntities(L);
   chi_mpi_utils::lua_utils::RegisterLuaEntities(L);
@@ -53,8 +53,15 @@ void chi_objects::ChiConsole::LoadRegisteredLuaItems()
 
   chi_modules::lua_utils::RegisterLuaEntities(L);
 
+  //=================================== Registering static-registration
+  //                                    functions
   for (const auto& [key, entry] : lua_function_registry_)
     lua_register(L, key.c_str(), entry.function_ptr);
+
+  //=================================== Registering solver-function
+  //                                    scope resolution tables
+  for (const auto& entry : solver_registry_)
+    SetNamespaceTableStructure(entry.first);
 
 }
 

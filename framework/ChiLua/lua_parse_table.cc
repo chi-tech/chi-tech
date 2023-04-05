@@ -1,7 +1,7 @@
 #include "chi_lua.h"
 
 #include "chi_runtime.h"
-#include "chi_log.h"
+
 #include "ChiDataTypes/chi_data_types.h"
 #include "ChiDataTypes/parameter_block.h"
 
@@ -63,9 +63,7 @@ void TableParserAsParameterBlock::
     case LUA_TSTRING:
     {
       const std::string string_value = lua_tostring(L, -1);
-      chi::log.Log() << key_str_name + " -- " + string_value;
       block.AddParameter(MakeParamBlock(key_str_name, string_value));
-      chi::log.Log() << block.GetParamValue<std::string>(key_str_name);
       break;
     }
     case LUA_TTABLE:

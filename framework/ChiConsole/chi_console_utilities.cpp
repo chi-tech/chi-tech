@@ -3,6 +3,8 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
+#include "chi_misc_utils.h"
+
 #define MakeLuaFunctionRegistryEntry(x,y) \
   std::make_pair(x,LuaFunctionRegistryEntry{y,#y})
 
@@ -60,10 +62,8 @@ char chi_objects::ChiConsole::
                         lua_CFunction function_ptr)
 {
   //Filter out namespace from the raw name
-  std::string name_in_lua = raw_name_in_lua;
-  const size_t last_scope = raw_name_in_lua.find_last_of(':');
-  if (last_scope != std::string::npos)
-    name_in_lua = raw_name_in_lua.substr(last_scope+1, std::string::npos);
+  const std::string name_in_lua =
+    chi_misc_utils::StringUpToFirstReverse(raw_name_in_lua, "::");
 
   auto& console = GetInstance();
 
@@ -81,5 +81,63 @@ char chi_objects::ChiConsole::
     MakeLuaFunctionRegistryEntry(name_in_lua, function_ptr));
 
   return 0;
+}
+
+//###################################################################
+/**Sets/Forms a table structure that mimics the namespace structure of
+ * a string. For example the string "sing::sob::nook::Tigger" will be
+ * assigned a table structure
+ * `sing.sob.nook.Tigger = "sing::sob::nook::Tigger"`.*/
+void chi_objects::ChiConsole::SetNamespaceTableStructure(const std::string &key)
+{
+  auto L = GetInstance().console_state_;
+  const auto key_split = chi_misc_utils::StringSplit(key, "::");
+
+  if (key_split.size() == 1)
+  {
+    lua_pushstring(L, key.c_str());
+    lua_setglobal(L, key.c_str());
+    return;
+  }
+
+  const std::vector<std::string> table_names(key_split.begin(),
+                                             key_split.end()-1);
+
+  for (const auto& table_key : table_names)
+  {
+    // The first entry needs to be in lua's global scope
+    // so it looks a little different
+    if (table_key == table_names.front())
+    {
+      lua_getglobal(L, table_names.front().c_str());
+      if (not lua_istable(L,-1))
+      {
+        lua_pop(L,1);
+        lua_newtable(L);
+        lua_setglobal(L, table_names.front().c_str());
+        lua_getglobal(L, table_names.front().c_str());
+      }
+    }
+    else
+    {
+      lua_getfield(L, -1, table_key.c_str());
+      if (not lua_istable(L,-1))
+      {
+        lua_pop(L,1);
+        lua_pushstring(L, table_key.c_str());
+        lua_newtable(L);
+        lua_settable(L, -3);
+        lua_getfield(L, -1, table_key.c_str());
+      }
+    }
+
+    if (table_key == table_names.back())
+    {
+      lua_pushstring(L, key_split.back().c_str());
+      lua_pushstring(L, key.c_str());
+      lua_settable(L,-3);
+    }
+  }//for table_key in table_keys
+  lua_pop(L, lua_gettop(L));
 }
 

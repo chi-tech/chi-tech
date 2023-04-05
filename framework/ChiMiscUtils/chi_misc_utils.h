@@ -3,7 +3,8 @@
 
 #include <cstddef>
 #include <string>
-#include <algorithm>
+#include <vector>
+
 
 /**Miscellaneous utilities. These utilities should have no dependencies.*/
 namespace chi_misc_utils
@@ -15,23 +16,26 @@ namespace chi_misc_utils
 //#include <iostream>
 //#include <string>
 
-const std::string WHITESPACE = " \n\r\t\f\v";
+  const std::string WHITESPACE = " \n\r\t\f\v";
 
-inline std::string ltrim(const std::string &s)
-{
-  size_t start = s.find_first_not_of(WHITESPACE);
-  return (start == std::string::npos) ? "" : s.substr(start);
-}
+  /**Trims whitespace from the front of a string.*/
+  std::string StringLTrim(const std::string &s);
 
-inline std::string rtrim(const std::string &s)
-{
-  size_t end = s.find_last_not_of(WHITESPACE);
-  return (end == std::string::npos) ? "" : s.substr(0, end + 1);
-}
+  /**Trims whitespace from the back of a string.*/
+  std::string StringRTrim(const std::string &s);
 
-inline std::string trim(const std::string &s) {
-  return rtrim(ltrim(s));
-}
+  /**Trims whitespace from the front and back of a string.*/
+  std::string StringTrim(const std::string &s);
+
+  /**Splits a string using the given delimiter. Consecutive delimiters
+   * are treated as one.*/
+  std::vector<std::string> StringSplit(const std::string& input,
+                                       const std::string& delim=" ");
+
+  /**The string portion, from the rear of the input string, up to
+   * encountering the search_string.*/
+  std::string StringUpToFirstReverse(const std::string& input,
+                                     const std::string& search_string);
 }//namespace chi_misc_utils
 
 #endif //CHITECH_CHI_MISC_UTILS_H
