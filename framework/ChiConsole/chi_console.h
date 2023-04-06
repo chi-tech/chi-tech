@@ -74,7 +74,6 @@ private:
   static ChiConsole       instance_;
 
   std::map<std::string, LuaFunctionRegistryEntry> lua_function_registry_;
-  // chiDoShit -> pkinetics::lua_utils::chiDoShit
   std::map<std::string, SolverConstructionPtr>    solver_registry_;
 
   //00

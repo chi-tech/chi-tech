@@ -1,5 +1,6 @@
 #include "ChiLua/chi_lua.h"
-#include "ChiPhysics/lua/physics_lua_utils.h"
+
+#include "ChiPhysics/SolverBase/chi_solver.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -11,6 +12,12 @@
 namespace chi_physics::lua_utils
 {
   int chiSolverCreate(lua_State* L);
+  int chiSolverInitialize(lua_State* L);
+  int chiSolverExecute(lua_State* L);
+  int chiSolverStep(lua_State* L);
+  int chiSolverSetBasicOption(lua_State* L);
+  int chiSolverGetName(lua_State* L);
+  int chiSolverGetFieldFunctionList(lua_State* L);
 
   ChiConsoleRegisterLuaFunction(chiSolverCreate);
 

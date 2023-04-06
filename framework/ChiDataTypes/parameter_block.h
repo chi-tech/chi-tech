@@ -7,20 +7,13 @@
 #include <vector>
 #include <string>
 
-namespace chi_lua
-{
-  class TableParserAsParameterBlock;
-}
-
 namespace chi_data_types
 {
 
 enum class ParameterBlockType
 {
-  NONE    = -1    /*LUA_TNONE   */,
-  NIL     = 0     /*LUA_TNIL    */,
   BOOLEAN = 1     /*LUA_TBOOLEAN*/,
-  NUMBER  = 3     /*LUA_TNUMBER */,
+  FLOAT  = 3     /*LUA_TNUMBER */,
   STRING  = 4     /*LUA_TSTRING */,
   INTEGER = 5,
   ARRAY   = 98,
@@ -32,12 +25,22 @@ std::string ParameterBlockTypeName(ParameterBlockType type);
 class ParameterBlock;
 typedef std::unique_ptr<ParameterBlock> ParameterBlockPtr;
 
+/**A ParameterBlock is a conceptually simple data structure that supports
+ * a hierarchy of primitive parameters. There really are just 4 member variables
+ * on a ParameterBlock object, they are 1) the type (as an enum), 2) the
+ * name of the block, 3) a pointer to a value (which can only be a primitive
+ * type), and 4) a vector of child parameters.
+ *
+ * If a ParameterBlock has a primitive type, i.e., BOOLEAN, FLOAT, STRING, or
+ * INTEGER, then the value_ptr will contain a pointer to the value of a
+ * primitive type. Otherwise, for types ARRAY and BLOCK, the ParameterBlock
+ * will not have a value_ptr and instead the vector member will contain
+ * sub-parameters.*/
 class ParameterBlock
 {
-  friend class chi_lua::TableParserAsParameterBlock;
 private:
-  ParameterBlockType type_ = ParameterBlockType::NONE;
-  std::string keyword_;
+  ParameterBlockType type_ = ParameterBlockType::BLOCK;
+  std::string name_;
   std::unique_ptr<Varying> value_ptr_ = nullptr;
   std::vector<ParameterBlockPtr> parameters_;
 
@@ -55,12 +58,12 @@ public:
 
   //Constructors
   /**Constructs an empty parameter block.*/
-  explicit ParameterBlock(const std::string& key_str_name = "");
+  explicit ParameterBlock(const std::string& name = "");
 
   /**Constructs one of the fundamental types.*/
   template<typename T>
-  explicit ParameterBlock(const std::string& key_str_name, T value) :
-    keyword_(key_str_name)
+  explicit ParameterBlock(const std::string& name, T value) :
+    name_(name)
   {
     constexpr bool is_supported =
       IsBool<T>::value or IsFloat<T>::value or IsString<T>::value or
@@ -69,7 +72,7 @@ public:
     static_assert(is_supported, "Value type not supported for parameter block");
 
     if (IsBool<T>::value) type_ = ParameterBlockType::BOOLEAN;
-    if (IsFloat<T>::value) type_ = ParameterBlockType::NUMBER;
+    if (IsFloat<T>::value) type_ = ParameterBlockType::FLOAT;
     if (IsString<T>::value) type_ = ParameterBlockType::STRING;
     if (IsInteger<T>::value) type_ = ParameterBlockType::INTEGER;
 
@@ -83,13 +86,13 @@ public:
   size_t NumParameters() const;
 
   //Mutators
-protected:
   void ChangeToArray();
 public:
   //utilities
 public:
+  /**Adds a parameter to the sub-parameter list.*/
   void AddParameter(ParameterBlockPtr block);
-  /**Makes a parameter block and adds it to the parameters.*/
+  /**Makes a ParameterBlock and adds it to the sub-parameters list.*/
   template<typename T>
   void MakeAddParameter(const std::string& key_str_name, T value)
   {
@@ -97,11 +100,17 @@ public:
       key_str_name, value));
   }
 private:
+  /**Sorts the sub-parameter list according to name. This is useful
+   * for regression testing.*/
   void SortParameters();
 public:
+  /**Returns true if a parameter with the specified name is in the
+   * list of sub-parameters. Otherwise, false.*/
   bool Has(const std::string& param_name) const;
 
+  /**Gets a parameter by name.*/
   const ParameterBlock& GetParam(const std::string& param_name) const;
+  /**Gets a parameter by index.*/
   const ParameterBlock& GetParam(size_t index) const;
 
 public:

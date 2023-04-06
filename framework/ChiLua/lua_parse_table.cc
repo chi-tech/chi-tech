@@ -27,6 +27,7 @@ typedef chi_data_types::ParameterBlock ParamBlock;
 
 
 //###################################################################
+// NOLINTBEGIN(misc-no-recursion)
 /**This function recursively processes table values. If the value is
  * a primitive type the recursion stops and the parameter block, which is
  * currently active, will be extended with a parameter of this primitive
@@ -42,7 +43,7 @@ void TableParserAsParameterBlock::
     case LUA_TBOOLEAN:
     {
       const bool bool_value = lua_toboolean(L, -1);
-      block.AddParameter(MakeParamBlock(key_str_name, bool_value));
+      block.MakeAddParameter(key_str_name, bool_value);
       break;
     }
     case LUA_TNUMBER:
@@ -50,12 +51,12 @@ void TableParserAsParameterBlock::
       if (lua_isinteger(L, -1))
       {
         const int64_t number_value = lua_tointeger(L, -1);
-        block.AddParameter(MakeParamBlock(key_str_name, number_value));
+        block.MakeAddParameter(key_str_name, number_value);
       }
       else
       {
         const double number_value = lua_tonumber(L, -1);
-        block.AddParameter(MakeParamBlock(key_str_name, number_value));
+        block.MakeAddParameter(key_str_name, number_value);
       }
 
       break;
@@ -63,7 +64,7 @@ void TableParserAsParameterBlock::
     case LUA_TSTRING:
     {
       const std::string string_value = lua_tostring(L, -1);
-      block.AddParameter(MakeParamBlock(key_str_name, string_value));
+      block.MakeAddParameter(key_str_name, string_value);
       break;
     }
     case LUA_TTABLE:
@@ -76,10 +77,11 @@ void TableParserAsParameterBlock::
     default:           ExceptionLuaUnsupportedValue;
   }//switch on value types
 }
-
+// NOLINTEND(misc-no-recursion)
 
 
 //###################################################################
+// NOLINTBEGIN(misc-no-recursion)
 /**This function operates on table keys recursively. It has a specific
  * behavior if it detects an array.*/
 void TableParserAsParameterBlock::
@@ -122,6 +124,7 @@ void TableParserAsParameterBlock::
     lua_pop(L, 1);
   }
 }
+// NOLINTEND(misc-no-recursion)
 
 //###################################################################
 /**This is the root command for parsing a table as a parameter block.

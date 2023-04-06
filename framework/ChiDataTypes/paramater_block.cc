@@ -1,6 +1,5 @@
 #include "parameter_block.h"
 
-#include <cmath>
 #include <algorithm>
 
 namespace chi_data_types
@@ -10,10 +9,8 @@ std::string ParameterBlockTypeName(ParameterBlockType type)
 {
   switch (type)
   {
-    case ParameterBlockType::NONE:    return "NONE";
-    case ParameterBlockType::NIL:     return "NIL";
     case ParameterBlockType::BOOLEAN: return "BOOLEAN";
-    case ParameterBlockType::NUMBER:  return "NUMBER";
+    case ParameterBlockType::FLOAT:   return "FLOAT";
     case ParameterBlockType::STRING:  return "STRING";
     case ParameterBlockType::INTEGER: return "INTEGER";
     case ParameterBlockType::ARRAY:   return "ARRAY";
@@ -25,14 +22,14 @@ std::string ParameterBlockTypeName(ParameterBlockType type)
 }
 
 //#################################################################
-ParameterBlock::ParameterBlock(const std::string& key_str_name) :
+ParameterBlock::ParameterBlock(const std::string& name) :
   type_(ParameterBlockType::BLOCK),
-  keyword_(key_str_name)
+  name_(name)
 {}
 
 //Accessors
 ParameterBlockType ParameterBlock::Type() const {return type_;}
-std::string ParameterBlock::Name() const {return keyword_;}
+std::string ParameterBlock::Name() const {return name_;}
 
 //#################################################################
 const Varying& ParameterBlock::Value() const
@@ -40,7 +37,7 @@ const Varying& ParameterBlock::Value() const
   switch (this->Type())
   {
     case ParameterBlockType::BOOLEAN:
-    case ParameterBlockType::NUMBER:
+    case ParameterBlockType::FLOAT:
     case ParameterBlockType::STRING:
     case ParameterBlockType::INTEGER:
     {
@@ -70,10 +67,23 @@ size_t ParameterBlock::NumParameters() const
  * keys.*/
 void ParameterBlock::ChangeToArray()
 {
-  type_ = ParameterBlockType::ARRAY;
+  const std::string fname = __PRETTY_FUNCTION__;
+  if (parameters_.empty())
+  {
+    type_ = ParameterBlockType::ARRAY;
+    return;
+  }
+
+  const auto& first_param = parameters_.front();
+  for (const auto& param : parameters_)
+    if (param->Type() != first_param->Type())
+      throw std::logic_error(fname + ": Cannot change ParameterBlock to "
+        "array. It has existing parameters and they are not of the same"
+        "type.");
 }
 
 //#################################################################
+/**Adds a parameter to the sub-parameter list.*/
 void ParameterBlock::AddParameter(ParameterBlockPtr block)
 {
   for (const auto& param : parameters_)
@@ -87,6 +97,8 @@ void ParameterBlock::AddParameter(ParameterBlockPtr block)
 }
 
 //#################################################################
+/**Sorts the sub-parameter list according to name. This is useful
+* for regression testing.*/
 void ParameterBlock::SortParameters()
 {
   struct AlphabeticFunctor
@@ -102,6 +114,8 @@ void ParameterBlock::SortParameters()
 }
 
 //#################################################################
+/**Returns true if a parameter with the specified name is in the
+ * list of sub-parameters. Otherwise, false.*/
 bool ParameterBlock::Has(const std::string &param_name) const
 {
   for (const auto& param : parameters_)
@@ -142,6 +156,7 @@ const ParameterBlock& ParameterBlock::GetParam(size_t index) const
 
 
 //#################################################################
+// NOLINTBEGIN(misc-no-recursion)
 /**Print the block tree structure into a designated string.*/
 void ParameterBlock::RecursiveDumpToString(std::string& outstr,
                                            const std::string& offset) const
@@ -161,7 +176,7 @@ void ParameterBlock::RecursiveDumpToString(std::string& outstr,
         outstr += std::string( value ? "true" : "false") + ",\n";
         break;
       }
-      case ParameterBlockType::NUMBER:
+      case ParameterBlockType::FLOAT:
       {
         outstr += offset + "  " + param->Name() + " = ";
         const double value = param->Value().FloatValue();
@@ -194,5 +209,6 @@ void ParameterBlock::RecursiveDumpToString(std::string& outstr,
 
   outstr += offset + "}\n";
 }
+// NOLINTEND(misc-no-recursion)
 
 }//namespace chi_data_types
