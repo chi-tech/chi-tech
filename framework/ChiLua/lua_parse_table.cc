@@ -3,7 +3,7 @@
 #include "chi_runtime.h"
 
 #include "ChiDataTypes/chi_data_types.h"
-#include "ChiDataTypes/parameter_block.h"
+#include "ChiParameters/parameter_block.h"
 
 #define MakeParamBlock std::make_unique<ParamBlock>
 
@@ -23,7 +23,7 @@ throw std::logic_error(std::string(__PRETTY_FUNCTION__) + \
 namespace chi_lua
 {
 
-typedef chi_data_types::ParameterBlock ParamBlock;
+typedef chi_objects::ParameterBlock ParamBlock;
 
 
 //###################################################################
@@ -43,7 +43,7 @@ void TableParserAsParameterBlock::
     case LUA_TBOOLEAN:
     {
       const bool bool_value = lua_toboolean(L, -1);
-      block.MakeAddParameter(key_str_name, bool_value);
+      block.AddParameter(key_str_name, bool_value);
       break;
     }
     case LUA_TNUMBER:
@@ -51,12 +51,12 @@ void TableParserAsParameterBlock::
       if (lua_isinteger(L, -1))
       {
         const int64_t number_value = lua_tointeger(L, -1);
-        block.MakeAddParameter(key_str_name, number_value);
+        block.AddParameter(key_str_name, number_value);
       }
       else
       {
         const double number_value = lua_tonumber(L, -1);
-        block.MakeAddParameter(key_str_name, number_value);
+        block.AddParameter(key_str_name, number_value);
       }
 
       break;
@@ -64,7 +64,7 @@ void TableParserAsParameterBlock::
     case LUA_TSTRING:
     {
       const std::string string_value = lua_tostring(L, -1);
-      block.MakeAddParameter(key_str_name, string_value);
+      block.AddParameter(key_str_name, string_value);
       break;
     }
     case LUA_TTABLE:
@@ -86,7 +86,7 @@ void TableParserAsParameterBlock::
  * behavior if it detects an array.*/
 void TableParserAsParameterBlock::
   RecursivelyParseTableKeys(
-    lua_State* L, int t, chi_data_types::ParameterBlock& block)
+    lua_State* L, int t, chi_objects::ParameterBlock& block)
 {
   bool number_key_encountered = false;
   bool string_key_encountered = false;
@@ -112,7 +112,7 @@ void TableParserAsParameterBlock::
     {
       if (string_key_encountered) ExceptionMixStringNumberKeys;
 
-      if (block.Type() != chi_data_types::ParameterBlockType::ARRAY)
+      if (block.Type() != chi_objects::ParameterBlockType::ARRAY)
         block.ChangeToArray();
 
       number_key_encountered = true;
@@ -152,7 +152,7 @@ block =
 
 chiUnitTests_Test_paramblock(--[[verbose=]]true, block)
 \endcode*/
-std::shared_ptr<chi_data_types::ParameterBlock> TableParserAsParameterBlock::
+std::shared_ptr<chi_objects::ParameterBlock> TableParserAsParameterBlock::
   ParseTable(lua_State* L, int table_stack_index)
 {
   auto param_block = std::make_shared<ParamBlock>();

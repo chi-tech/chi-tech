@@ -5,7 +5,7 @@
 #include "ChiPhysics/chi_physics_namespace.h"
 
 #include "ChiPhysics/BasicOptions/basic_options.h"
-#include "ChiDataTypes/parameter_block.h"
+#include "ChiParameters/parameter_block.h"
 
 namespace chi_physics
 {

@@ -3,7 +3,7 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-#include "ChiDataTypes/parameter_block.h"
+#include "ChiParameters/parameter_block.h"
 
 namespace chi_unit_tests
 {

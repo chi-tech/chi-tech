@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-namespace chi_data_types
+namespace chi_objects
 {
 //#################################################################
 std::string ParameterBlockTypeName(ParameterBlockType type)
@@ -32,7 +32,7 @@ ParameterBlockType ParameterBlock::Type() const {return type_;}
 std::string ParameterBlock::Name() const {return name_;}
 
 //#################################################################
-const Varying& ParameterBlock::Value() const
+const chi_data_types::Varying& ParameterBlock::Value() const
 {
   switch (this->Type())
   {

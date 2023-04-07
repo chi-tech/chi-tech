@@ -8,7 +8,7 @@ extern "C"
 #include<lauxlib.h>
 }
 #include "chi_console_structs.h"
-#include "ChiDataTypes/parameter_block.h"
+#include "ChiParameters/parameter_block.h"
 
 #include <vector>
 #include <string>
@@ -57,7 +57,7 @@ namespace chi_objects
 class ChiConsole
 {
 public:
-  using ParamBlock = chi_data_types::ParameterBlock;
+  using ParamBlock = chi_objects::ParameterBlock;
   using SolverPtr = std::shared_ptr<chi_physics::Solver>;
   using SolverConstructionPtr = SolverPtr(*)(const ParamBlock& params) ;
 

@@ -1,13 +1,13 @@
 #ifndef CHITECH_PARAMETER_BLOCK_H
 #define CHITECH_PARAMETER_BLOCK_H
 
-#include "varying.h"
+#include "ChiDataTypes/varying.h"
 
 #include <memory>
 #include <vector>
 #include <string>
 
-namespace chi_data_types
+namespace chi_objects
 {
 
 enum class ParameterBlockType
@@ -41,7 +41,7 @@ class ParameterBlock
 private:
   ParameterBlockType type_ = ParameterBlockType::BLOCK;
   std::string name_;
-  std::unique_ptr<Varying> value_ptr_ = nullptr;
+  std::unique_ptr<chi_data_types::Varying> value_ptr_ = nullptr;
   std::vector<ParameterBlockPtr> parameters_;
 
 public:
@@ -76,13 +76,13 @@ public:
     if (IsString<T>::value) type_ = ParameterBlockType::STRING;
     if (IsInteger<T>::value) type_ = ParameterBlockType::INTEGER;
 
-    value_ptr_ = std::make_unique<Varying>(value);
+    value_ptr_ = std::make_unique<chi_data_types::Varying>(value);
   }
 
   //Accessors
   ParameterBlockType Type() const;
   std::string Name() const;
-  const Varying& Value() const;
+  const chi_data_types::Varying& Value() const;
   size_t NumParameters() const;
 
   //Mutators
@@ -94,10 +94,9 @@ public:
   void AddParameter(ParameterBlockPtr block);
   /**Makes a ParameterBlock and adds it to the sub-parameters list.*/
   template<typename T>
-  void MakeAddParameter(const std::string& key_str_name, T value)
+  void AddParameter(const std::string& name, T value)
   {
-    AddParameter(std::make_unique<ParameterBlock>(
-      key_str_name, value));
+    AddParameter(std::make_unique<ParameterBlock>(name, value));
   }
 private:
   /**Sorts the sub-parameter list according to name. This is useful

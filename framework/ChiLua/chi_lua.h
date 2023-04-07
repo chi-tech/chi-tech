@@ -26,7 +26,7 @@ void LuaPopulateVectorFrom1DArray(const std::string& func_name,
                                   int table_arg_index,
                                   std::vector<double>& vec);
 
-namespace chi_data_types
+namespace chi_objects
 {
   class ParameterBlock;
 }
@@ -38,15 +38,15 @@ namespace chi_lua
   private:
     static
     void RecursivelyParseTableValues(
-      lua_State* L, chi_data_types::ParameterBlock& block,
+      lua_State* L, chi_objects::ParameterBlock& block,
       const std::string& key_str_name);
 
     static
     void RecursivelyParseTableKeys(
-      lua_State* L, int t, chi_data_types::ParameterBlock& block);
+      lua_State* L, int t, chi_objects::ParameterBlock& block);
   public:
     static
-    std::shared_ptr<chi_data_types::ParameterBlock>
+    std::shared_ptr<chi_objects::ParameterBlock>
       ParseTable(lua_State* L, int table_stack_index);
   };
 }//namespace chi_lua
