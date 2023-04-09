@@ -22,10 +22,7 @@ enum StringSteamColorCode
   FG_DEFAULT = 39,
 };
 
-inline std::string StringStreamColor(StringSteamColorCode code)
-{
-  return std::string("\033[") + std::to_string(code) + "m";
-}
+std::string StringStreamColor(StringSteamColorCode code);
 
 }//chi_objects
 

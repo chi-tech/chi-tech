@@ -26,9 +26,9 @@ int chiLBSCreateTransientSolver(lua_State* L)
 
   auto new_solver = std::make_shared<lbs::DiscOrdTransientSolver>(solver_name);
 
-  chi::solver_stack.push_back(new_solver);
+  chi::object_stack.push_back(new_solver);
 
-  lua_pushinteger(L, static_cast<lua_Integer>(chi::solver_stack.size()-1));
+  lua_pushinteger(L, static_cast<lua_Integer>(chi::object_stack.size()-1));
   return 1;
 }
 

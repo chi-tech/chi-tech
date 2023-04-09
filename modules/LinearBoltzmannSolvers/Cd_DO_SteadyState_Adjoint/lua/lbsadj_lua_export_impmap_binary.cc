@@ -26,7 +26,7 @@ int chiAdjointSolverExportImportanceMapBinary(lua_State* L)
   const std::string file_name = lua_tostring(L,2);
 
   auto& solver = chi::GetStackItem<lbs::DiscOrdSteadyStateAdjointSolver>(
-    chi::solver_stack, solver_handle, fname);
+    chi::object_stack, solver_handle, fname);
 
   solver.ExportImportanceMap(file_name);
 

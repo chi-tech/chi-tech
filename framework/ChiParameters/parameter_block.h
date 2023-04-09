@@ -12,18 +12,17 @@ namespace chi_objects
 
 enum class ParameterBlockType
 {
-  BOOLEAN = 1     /*LUA_TBOOLEAN*/,
-  FLOAT  = 3     /*LUA_TNUMBER */,
-  STRING  = 4     /*LUA_TSTRING */,
+  BOOLEAN = 1,
+  FLOAT = 3,
+  STRING = 4,
   INTEGER = 5,
-  ARRAY   = 98,
-  BLOCK   = 99
+  ARRAY = 98,
+  BLOCK = 99
 };
 
 std::string ParameterBlockTypeName(ParameterBlockType type);
 
 class ParameterBlock;
-typedef std::unique_ptr<ParameterBlock> ParameterBlockPtr;
 
 /**A ParameterBlock is a conceptually simple data structure that supports
  * a hierarchy of primitive parameters. There really are just 4 member variables
@@ -42,32 +41,43 @@ private:
   ParameterBlockType type_ = ParameterBlockType::BLOCK;
   std::string name_;
   std::unique_ptr<chi_data_types::Varying> value_ptr_ = nullptr;
-  std::vector<ParameterBlockPtr> parameters_;
+  std::vector<ParameterBlock> parameters_;
 
 public:
-  //Helpers
-  template<typename T> struct IsBool
-  {static constexpr bool value = std::is_same_v<T,bool>;};
-  template<typename T> struct IsFloat
-  {static constexpr bool value = std::is_floating_point_v<T>;};
-  template<typename T> struct IsString
-  {static constexpr bool value = std::is_same_v<T,std::string>;};
-  template<typename T> struct IsInteger
-  {static constexpr bool value = std::is_integral_v<T> and
-                                 not std::is_same_v<T,bool>;};
+  // Helpers
+  template <typename T>
+  struct IsBool
+  {
+    static constexpr bool value = std::is_same_v<T, bool>;
+  };
+  template <typename T>
+  struct IsFloat
+  {
+    static constexpr bool value = std::is_floating_point_v<T>;
+  };
+  template <typename T>
+  struct IsString
+  {
+    static constexpr bool value = std::is_same_v<T, std::string> or
+                                  std::is_same_v<T, const char*>;
+  };
+  template <typename T>
+  struct IsInteger
+  {
+    static constexpr bool value =
+      std::is_integral_v<T> and not std::is_same_v<T, bool>;
+  };
 
-  //Constructors
+  // Constructors
   /**Constructs an empty parameter block.*/
   explicit ParameterBlock(const std::string& name = "");
 
   /**Constructs one of the fundamental types.*/
-  template<typename T>
-  explicit ParameterBlock(const std::string& name, T value) :
-    name_(name)
+  template <typename T>
+  explicit ParameterBlock(const std::string& name, T value) : name_(name)
   {
-    constexpr bool is_supported =
-      IsBool<T>::value or IsFloat<T>::value or IsString<T>::value or
-      IsInteger<T>::value;
+    constexpr bool is_supported = IsBool<T>::value or IsFloat<T>::value or
+                                  IsString<T>::value or IsInteger<T>::value;
 
     static_assert(is_supported, "Value type not supported for parameter block");
 
@@ -79,33 +89,50 @@ public:
     value_ptr_ = std::make_unique<chi_data_types::Varying>(value);
   }
 
-  //Accessors
+  /**Copy constructor*/
+  ParameterBlock(const ParameterBlock& other);
+
+  /**Copy assignment operator*/
+  ParameterBlock& operator=(const ParameterBlock& other);
+
+  /**Move constructor*/
+  ParameterBlock(ParameterBlock&& other) noexcept;
+
+  // Accessors
   ParameterBlockType Type() const;
   std::string Name() const;
   const chi_data_types::Varying& Value() const;
   size_t NumParameters() const;
+  const std::vector<ParameterBlock>& Parameters() const;
 
-  //Mutators
+  // Mutators
   void ChangeToArray();
+
 public:
-  //utilities
+  // utilities
 public:
   /**Adds a parameter to the sub-parameter list.*/
-  void AddParameter(ParameterBlockPtr block);
+  void AddParameter(ParameterBlock block);
   /**Makes a ParameterBlock and adds it to the sub-parameters list.*/
-  template<typename T>
+  template <typename T>
   void AddParameter(const std::string& name, T value)
   {
-    AddParameter(std::make_unique<ParameterBlock>(name, value));
+    AddParameter(ParameterBlock(name, value));
   }
-private:
+
+public:
   /**Sorts the sub-parameter list according to name. This is useful
    * for regression testing.*/
   void SortParameters();
-public:
+
   /**Returns true if a parameter with the specified name is in the
    * list of sub-parameters. Otherwise, false.*/
   bool Has(const std::string& param_name) const;
+
+  /**Gets a parameter by name.*/
+  ParameterBlock& GetParam(const std::string& param_name);
+  /**Gets a parameter by index.*/
+  ParameterBlock& GetParam(size_t index);
 
   /**Gets a parameter by name.*/
   const ParameterBlock& GetParam(const std::string& param_name) const;
@@ -114,7 +141,7 @@ public:
 
 public:
   /**Returns the value of the parameter.*/
-  template<typename T>
+  template <typename T>
   T GetValue() const
   {
     if (value_ptr_ == nullptr)
@@ -125,16 +152,25 @@ public:
   }
 
   /**Fetches the parameter with the given name and returns it value.*/
-  template<typename T>
+  template <typename T>
   T GetParamValue(const std::string& param_name) const
   {
-    const auto& param = GetParam(param_name);
-    return param.GetValue<T>();
+    try
+    {
+      const auto& param = GetParam(param_name);
+      return param.GetValue<T>();
+    }
+    catch (const std::out_of_range& oor)
+    {
+      throw std::out_of_range(std::string(__PRETTY_FUNCTION__) +
+                              ": Parameter \"" + param_name +
+                              "\" not present in block");
+    }
   }
 
   /**Converts the parameters of an array-type parameter block to a vector of
    * primitive types and returns it.*/
-  template<typename T>
+  template <typename T>
   std::vector<T> GetVectorValue() const
   {
     if (Type() != ParameterBlockType::ARRAY)
@@ -145,18 +181,19 @@ public:
     std::vector<T> vec;
     if (parameters_.empty()) return vec;
 
-    //Check the first sub-param is of the right type
+    // Check the first sub-param is of the right type
     const auto& front_param = parameters_.front();
 
-    //Check that all other parameters are of the required type
+    // Check that all other parameters are of the required type
     for (const auto& param : parameters_)
-      if (param->Type() != front_param->Type())
-        throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
+      if (param.Type() != front_param.Type())
+        throw std::logic_error(
+          std::string(__PRETTY_FUNCTION__) +
           ": Cannot construct vector from block because "
           "the sub_parameters do not all have the correct type.");
 
     const size_t num_params = parameters_.size();
-    for (size_t k=0; k<num_params; ++k)
+    for (size_t k = 0; k < num_params; ++k)
     {
       const auto& param = GetParam(k);
       vec.push_back(param.GetValue<T>());
@@ -167,7 +204,7 @@ public:
 
   /**Gets a vector of primitive types from an array-type parameter block
    * specified as a parameter of the current block.*/
-  template<typename T>
+  template <typename T>
   std::vector<T> GetParamVectorValue(const std::string& param_name) const
   {
     const auto& param = GetParam(param_name);
@@ -177,9 +214,9 @@ public:
   /**Given a reference to a string, recursively travels the parameter
    * tree and print values into the reference string.*/
   void RecursiveDumpToString(std::string& outstr,
-                             const std::string& offset="") const;
+                             const std::string& offset = "") const;
 };
 
-}//namespace chi_lua
+} // namespace chi_objects
 
-#endif //CHITECH_PARAMETER_BLOCK_H
+#endif // CHITECH_PARAMETER_BLOCK_H

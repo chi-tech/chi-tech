@@ -33,7 +33,7 @@ std::vector<chi_mesh::LogicalVolumePtr> chi::logicvolume_stack;
 std::vector<chi_mesh::FFInterpPtr>      chi::field_func_interpolation_stack;
 std::vector<chi_mesh::UnpartMeshPtr>    chi::unpartitionedmesh_stack;
 
-std::vector<chi_physics::SolverPtr>                 chi::solver_stack;
+//std::vector<chi_physics::SolverPtr>                 chi::object_stack;
 std::vector<chi_physics::MaterialPtr>               chi::material_stack;
 std::vector<chi_physics::MultiGroupXSPtr> chi::multigroup_xs_stack;
 std::vector<chi_physics::FieldFunctionPtr>         chi::field_function_stack;
@@ -41,12 +41,15 @@ std::vector<chi_physics::FieldFunctionPtr>         chi::field_function_stack;
 std::vector<chi_math::QuadraturePtr>        chi::quadrature_stack;
 std::vector<chi_math::AngularQuadraturePtr> chi::angular_quadrature_stack;
 
+std::vector<chi_objects::ChiObjectPtr>      chi::object_stack;
+
 //================================ run_time quantities
 bool        chi::run_time::termination_posted_ = false;
 std::string chi::run_time::input_file_name_;
 bool        chi::run_time::sim_option_interactive_ = true;
 bool        chi::run_time::allow_petsc_error_handler_ = false;
 bool        chi::run_time::supress_beg_end_timelog_ = false;
+bool        chi::run_time::suppress_color_ = false;
 
 //############################################### Argument parser
 /**Parses input arguments.
@@ -86,6 +89,10 @@ void chi::run_time::ParseArguments(int argc, char** argv)
     else if (argument.find("--allow_petsc_error_handler")!=std::string::npos)
     {
       chi::run_time::allow_petsc_error_handler_ = true;
+    }
+    else if (argument.find("--suppress_color")!=std::string::npos)
+    {
+      chi::run_time::suppress_color_ = true;
     }
     //================================================ No-graphics option
     else if (argument.find("-b")!=std::string::npos)
@@ -189,7 +196,7 @@ void chi::Finalize()
   field_func_interpolation_stack.clear();
   unpartitionedmesh_stack.clear();
 
-  solver_stack.clear();
+  object_stack.clear();
   material_stack.clear();
   multigroup_xs_stack.clear();
 

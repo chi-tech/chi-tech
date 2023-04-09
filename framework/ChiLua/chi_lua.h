@@ -46,8 +46,7 @@ namespace chi_lua
       lua_State* L, int t, chi_objects::ParameterBlock& block);
   public:
     static
-    std::shared_ptr<chi_objects::ParameterBlock>
-      ParseTable(lua_State* L, int table_stack_index);
+    chi_objects::ParameterBlock ParseTable(lua_State* L, int table_stack_index);
   };
 }//namespace chi_lua
 

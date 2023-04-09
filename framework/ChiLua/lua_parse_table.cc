@@ -5,8 +5,6 @@
 #include "ChiDataTypes/chi_data_types.h"
 #include "ChiParameters/parameter_block.h"
 
-#define MakeParamBlock std::make_unique<ParamBlock>
-
 #define ExceptionLuaNilValue \
 throw std::logic_error(std::string(__PRETTY_FUNCTION__) + \
 ": Encountered nil value assigned to key " + key_str_name)
@@ -69,9 +67,9 @@ void TableParserAsParameterBlock::
     }
     case LUA_TTABLE:
     {
-      auto new_block = MakeParamBlock(key_str_name);
-      RecursivelyParseTableKeys(L, lua_gettop(L), *new_block);
-      block.AddParameter(std::move(new_block));
+      chi_objects::ParameterBlock new_block(key_str_name);
+      RecursivelyParseTableKeys(L, lua_gettop(L), new_block);
+      block.AddParameter(new_block);
       break;
     }
     default:           ExceptionLuaUnsupportedValue;
@@ -152,12 +150,12 @@ block =
 
 chiUnitTests_Test_paramblock(--[[verbose=]]true, block)
 \endcode*/
-std::shared_ptr<chi_objects::ParameterBlock> TableParserAsParameterBlock::
+chi_objects::ParameterBlock TableParserAsParameterBlock::
   ParseTable(lua_State* L, int table_stack_index)
 {
-  auto param_block = std::make_shared<ParamBlock>();
+  ParamBlock param_block;
 
-  RecursivelyParseTableKeys(L, table_stack_index, *param_block);
+  RecursivelyParseTableKeys(L, table_stack_index, param_block);
 
   return param_block;
 }

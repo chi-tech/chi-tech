@@ -1,18 +1,19 @@
 [0]  Parsing argument 1 tests/unit_test_inputs/test_02a_wdd_ijk_sweep.lua
 [0m[0]  Parsing argument 2 --supress_beg_end_timelog
-[0m[0]  ChiTech number of arguments supplied: 2
-[0m[0]  Azimuthal angles:
-[0m[0]  0
-[0m[0]  Polar angles:
-[0m[0]  0.955317
-[0m[0]  2.18628
-[0m[0]  Quadrature angle=[0.816497 0 0.57735]
-[0m[0]  Quadrature angle=[0.816497 0 -0.57735]
-[0m[0]  Varphi=0.00 Theta=54.74 Weight=1.000e+00
-[0m[0]  Varphi=0.00 Theta=125.26 Weight=1.000e+00
-[0m[0]  
-[0m[0]  Weight sum=2
-[0mSweep angle 0 [0.816497 0 0.57735]
+[0m[0]  Parsing argument 3 --suppress_color
+[0m[0]  ChiTech number of arguments supplied: 3
+[0]  Azimuthal angles:
+[0]  0
+[0]  Polar angles:
+[0]  0.955317
+[0]  2.18628
+[0]  Quadrature angle=[0.816497 0 0.57735]
+[0]  Quadrature angle=[0.816497 0 -0.57735]
+[0]  Varphi=0.00 Theta=54.74 Weight=1.000e+00
+[0]  Varphi=0.00 Theta=125.26 Weight=1.000e+00
+[0]  
+[0]  Weight sum=2
+Sweep angle 0 [0.816497 0 0.57735]
 Sweep angle 1 [0.816497 0 -0.57735]
 order:
 0.426183

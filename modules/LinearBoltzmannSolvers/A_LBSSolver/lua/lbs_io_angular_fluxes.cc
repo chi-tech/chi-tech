@@ -37,7 +37,7 @@ int chiLBSWriteGroupsetAngularFlux(lua_State *L)
   const std::string file_base  = lua_tostring(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -89,7 +89,7 @@ int chiLBSReadGroupsetAngularFlux(lua_State *L)
   const std::string file_base  = lua_tostring(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 

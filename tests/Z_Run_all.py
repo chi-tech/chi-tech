@@ -110,12 +110,7 @@ print()
 test_number = 0
 num_failed = 0
 
-# Determine if we are on TACC
-# (each test will require a separate job)
 hostname = subprocess.check_output(['hostname']).decode('utf-8')
-tacc = False
-if "tacc.utexas.edu" in hostname:
-    tacc = True
 
 print("Using mpiexec at: ", mpiexec)
 
@@ -258,55 +253,13 @@ def parse_output(out, err, search_strings_vals_tols):
         print(" - \033[31mFAILED!\033[39m")
         num_failed += 1
         if argv.verbose_fail:
-            print(err)
+            print(err, out)
 
     return test_passed
 
 
-def run_test_tacc(file_name, comment, num_procs, search_strings_vals_tols):
-    test_name = f"{format_filename(file_name)} {comment} " \
-                f"{num_procs} MPI Processes"
-
-    msg = f"Running Test {format3(test_number)} {test_name}"
-    print(msg, end='', flush=True)
-
-    if print_only:
-        print()
-        return
-
-    with open(f"tests/{file_name}.job", 'w') as job_file:
-        job_file.write(textwrap.dedent(f"""
-            #!/usr/bin/bash
-            #
-            #SBATCH -J {file_name} # Job name
-            #SBATCH -o tests/{file_name}.o # output file
-            #SBATCH -e tests/{file_name}.e # error file
-            #SBATCH -p skx-normal_ # Queue (partition) name
-            #SBATCH -N {num_procs // 48 + 1} # Total # of nodes
-            #SBATCH -n {num_procs} # Total # of mpi tasks
-            #SBATCH -t 00:05:00 # Runtime (hh:mm:ss)
-            #SBATCH -A Massively-Parallel-R # Allocation name (req'd if you have more than 1)
-
-            export I_MPI_SHM=disable
-
-            ibrun {kpath_to_exe} tests/{file_name}.lua master_export=false
-            """
-                                       ).strip())
-
-    # -W means wait for job to finish
-    os.system(f"sbatch -W tests/{file_name}.job > /dev/null")
-    with open(f"tests/{file_name}.o", 'r') as outfile:
-        out = outfile.read()
-
-    passed = parse_output(out, search_strings_vals_tols)
-
-    # Cleanup
-    if passed:
-        os.system(f"rm tests/{file_name}.job "
-                  f"tests/{file_name}.o tests/{file_name}.e")
-
-
-def run_test_local(file_name, comment, num_procs, search_strings_vals_tols):
+def run_test_local(file_name, comment, num_procs, search_strings_vals_tols,
+                   join_stdout_and_stderr = False):
     test_name = f"{format_filename(file_name)} - {comment} - " \
                 f"{num_procs} MPI Processes"
 
@@ -317,7 +270,7 @@ def run_test_local(file_name, comment, num_procs, search_strings_vals_tols):
         return
 
     cmd = f"{mpiexec} -np {num_procs} {kpath_to_exe} " \
-          f"tests/{file_name}.lua master_export=false"
+          f"tests/{file_name}.lua master_export=false --suppress_color"
     process = subprocess.Popen(cmd.split(),
                                cwd=kchi_src_pth,
                                stdout=subprocess.PIPE,
@@ -326,21 +279,21 @@ def run_test_local(file_name, comment, num_procs, search_strings_vals_tols):
     process.wait()
     out, err = process.communicate()
 
+    if join_stdout_and_stderr:
+        out += err
+
     parse_output(out, err, search_strings_vals_tols)
 
 
 
-def run_test(file_name, comment, num_procs, search_strings_vals_tols):
+def run_test(file_name, comment, num_procs, search_strings_vals_tols,
+             join_stdout_and_stderr=False):
     global test_number
 
     test_number += 1
     if (tests_to_run and test_number in tests_to_run) or (not tests_to_run):
-        if tacc:
-            run_test_tacc(file_name, comment, num_procs,
-                          search_strings_vals_tols)
-        else:
-            run_test_local(file_name, comment, num_procs,
-                           search_strings_vals_tols)
+        run_test_local(file_name, comment, num_procs,
+                       search_strings_vals_tols, join_stdout_and_stderr)
 
 
 def run_unit_test(file_name, comment, num_procs):
@@ -394,6 +347,44 @@ run_unit_test(file_name="unit_test_inputs/test_02a_wdd_ijk_sweep.lua",
 run_unit_test(file_name="unit_test_inputs/test_02b_paramblock.lua",
               comment="Testing parameter blocks",
               num_procs=1)
+
+run_test(
+    file_name="unit_test_inputs/test_03a_inparam_test_objects",
+    comment="Test A for input parameters",
+    num_procs=1,
+    join_stdout_and_stderr=True,
+    search_strings_vals_tols=[
+        ["StrCompare", '**WARNING** Parameter "limiter_type"'],
+        ["StrCompare", '**!**ERROR**!** Parameter "scheme" has been deprecated.']])
+
+run_test(
+    file_name="unit_test_inputs/test_03b_inparam_test_objects",
+    comment="Test B for input parameters",
+    num_procs=1,
+    join_stdout_and_stderr=True,
+    search_strings_vals_tols=[
+        ["StrCompare", 'TestSubObject created num_groups=99'],
+        ["StrCompare", '**!**ERROR**!** Parameter "format" has been deprecated.']])
+
+run_test(
+    file_name="unit_test_inputs/test_03c_inparam_test_objects",
+    comment="Test C for input parameters",
+    num_procs=1,
+    join_stdout_and_stderr=True,
+    search_strings_vals_tols=[
+        ["StrCompare", '**!**ERROR**!** Invalid param "use_my_stuff" supplied. '
+                       'The parameter has been renamed. '
+                       'Renamed to "use_zaks_stuff".']])
+
+run_test(
+    file_name="unit_test_inputs/test_03d_inparam_test_objects",
+    comment="Test D for input parameters",
+    num_procs=1,
+    join_stdout_and_stderr=True,
+    search_strings_vals_tols=[
+        ["StrCompare", '**!**ERROR**!** Invalid param "use_ragusas_stuff" '
+                       'supplied. The parameter has been renamed. Renamed '
+                       'to "use_complicated_stuff".']])
 
 # SimTests
 run_test(
@@ -455,7 +446,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                             Mesh IO tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 14 - 14
+# Tests 18 - 18
 run_test(
     file_name="MeshIO/ReadWavefrontObj1",
     comment="Mesh reading 2D Wavefront.obj",
@@ -466,7 +457,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                             CFEM Diffusion Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 15 - 19
+# Tests 19 - 23
 
 run_test(
     file_name="CFEM_Diffusion/cDiffusion_2D_1a_linear",
@@ -501,7 +492,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                             CFEM Diffusion Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 20 - 24
+# Tests 24 - 28
 
 run_test(
     file_name="DFEM_Diffusion/dDiffusion_2D_1a_linear",
@@ -536,7 +527,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                                  Diffusion Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 25 - 36
+# Tests 29 - 40
 
 
 run_test(
@@ -614,7 +605,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                     Steady State Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 37 - 53
+# Tests 41 - 57
 
 run_test(
     file_name="Transport_Steady/Transport1D_1",
@@ -761,7 +752,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                     k-Eigenvalue Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 54 - 56
+# Tests 58 - 60
 
 run_test(
     file_name="Transport_Keigen/KEigenvalueTransport1D_1G",
@@ -790,7 +781,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #         Steady-State Cylindrical Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 57 - 58
+# Tests 61 - 62
 
 run_test(
     file_name="Transport_Steady_Cyl/Transport2DCyl_1Monoenergetic",
@@ -808,7 +799,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #             Steady-State Adjoint Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 59 - 67
+# Tests 63 - 71
 
 run_test(
     file_name="Transport_Adjoint/Adjoint2D_1a_forward",

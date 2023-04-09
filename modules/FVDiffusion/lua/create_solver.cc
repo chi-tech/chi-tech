@@ -32,10 +32,10 @@ int chiFVDiffusionSolverCreate(lua_State *L)
 
   auto new_solver = std::make_shared<fv_diffusion::Solver>(solver_name);
 
-  chi::solver_stack.push_back(new_solver);
+  chi::object_stack.push_back(new_solver);
 
   lua_pushinteger(L,
-      static_cast<lua_Integer>(chi::solver_stack.size()-1));
+      static_cast<lua_Integer>(chi::object_stack.size()-1));
 
   chi::log.LogAllVerbose1()
     << "\nFVDiffusionSolverCreate: FV Diffusion solver created"

@@ -32,7 +32,7 @@ int chiLBSComputeLeakage(lua_State *L)
   const int solver_handle = lua_tonumber(L, 1);
 
   auto& lbs_solver = chi::GetStackItem<lbs::DiscOrdSteadyStateSolver>(
-    chi::solver_stack, solver_handle, fname);
+    chi::object_stack, solver_handle, fname);
   LuaCheckNilValue(fname, L, 2);
   LuaCheckNilValue(fname, L, 3);
 

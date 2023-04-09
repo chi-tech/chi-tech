@@ -2,6 +2,8 @@
 
 #include "ChiPhysics/SolverBase/chi_solver.h"
 
+#include "ChiObject/object_maker.h"
+
 #include "chi_runtime.h"
 #include "chi_log.h"
 #include "ChiConsole/chi_console.h"
@@ -49,26 +51,10 @@ int chiSolverCreate(lua_State* L)
 
   const auto params = chi_lua::TableParserAsParameterBlock::ParseTable(L, 1);
 
-  if (not params->Has("type"))
-    throw std::invalid_argument(fname + ": Requires a parameter block with "
-      "a field called \"type\".");
+  const auto& object_maker = chi_objects::ObjectMaker::GetInstance();
+  const size_t handle = object_maker.MakeObject(params);
 
-  const std::string type = params->GetParamValue<std::string>("type");
-
-  const auto& solver_register = chi::console.GetSolverRegistry();
-
-  if (solver_register.count(type) == 0)
-    throw std::logic_error(fname + ": No registered type \"" + type +
-                           "\" found.");
-
-  auto construction_function = solver_register.at(type);
-
-  auto new_solver = construction_function(*params);
-
-  chi::solver_stack.push_back(new_solver);
-
-  lua_pushinteger(L,
-    static_cast<lua_Integer>(chi::solver_stack.size()-1));
+  lua_pushinteger(L, static_cast<lua_Integer>(handle));
   return 1;
 }
 
@@ -91,7 +77,7 @@ int chiSolverInitialize(lua_State *L)
 
   const int solver_handle = lua_tonumber(L, 1);
 
-  auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::solver_stack,
+  auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::object_stack,
                                                         solver_handle,
                                                         fname);
 
@@ -119,7 +105,7 @@ int chiSolverExecute(lua_State *L)
 
   const int solver_handle = lua_tonumber(L, 1);
 
-  auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::solver_stack,
+  auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::object_stack,
                                                         solver_handle,
                                                         fname);
 
@@ -147,7 +133,7 @@ int chiSolverStep(lua_State *L)
 
   const int solver_handle = lua_tonumber(L, 1);
 
-  auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::solver_stack,
+  auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::object_stack,
                                                         solver_handle,
                                                         fname);
 
@@ -182,7 +168,7 @@ int chiSolverSetBasicOption(lua_State* L)
   const int         solver_handle = lua_tointeger(L,1);
   const std::string option_name   = lua_tostring(L,2);
 
-  auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::solver_stack,
+  auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::object_stack,
                                                         solver_handle,
                                                         fname);
 
@@ -259,7 +245,7 @@ int chiSolverGetName(lua_State *L)
 
   const int solver_handle = lua_tonumber(L, 1);
 
-  const auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::solver_stack,
+  const auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::object_stack,
                                                               solver_handle,
                                                               fname);
 
@@ -284,7 +270,7 @@ int chiSolverGetFieldFunctionList(lua_State* L)
   //======================================================= Getting solver
   const int solver_handle = lua_tonumber(L,1);
 
-  const auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::solver_stack,
+  const auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::object_stack,
                                                               solver_handle,
                                                               fname);
 

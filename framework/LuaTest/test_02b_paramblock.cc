@@ -19,40 +19,41 @@ int Test_paramblock(lua_State* L)
     chi::log.Log() << "Hello world";
 
   if (num_args == 2)
-    if (lua_istable(L,2))
+  {
+    if (lua_istable(L, 2))
     {
       chi::log.Log() << "It is a block";
-      auto param_block_ptr =
+      const auto param_block =
         chi_lua::TableParserAsParameterBlock::ParseTable(L, 2);
 
       {
         std::string outstr;
-        param_block_ptr->RecursiveDumpToString(outstr);
+        param_block.RecursiveDumpToString(outstr);
 
         chi::log.Log() << outstr;
       }
 
-      chi::log.Log() << param_block_ptr->GetParamValue<std::string>("it_method");
+      chi::log.Log() << param_block.GetParamValue<std::string>("it_method");
 
-      chi::log.Log() << param_block_ptr->
-        GetParam("sub1").
-        GetParamValue<int>("ax_method");
+      chi::log.Log() << param_block.GetParam("sub1").GetParamValue<int>(
+        "ax_method");
 
-      chi::log.Log() << param_block_ptr->GetParamValue<double>("nl_abs_tol");
+      chi::log.Log() << param_block.GetParamValue<double>("nl_abs_tol");
 
-      chi::log.Log() << (param_block_ptr->GetParamValue<bool>("enabled") ?
-                         "true" : "false");
+      chi::log.Log() << (param_block.GetParamValue<bool>("enabled") ? "true"
+                                                                    : "false");
 
-      chi::log.Log() << param_block_ptr->GetParamValue<size_t>("nl_max_its");
+      chi::log.Log() << param_block.GetParamValue<size_t>("nl_max_its");
 
-      chi::log.Log() << "Has \"blocks\"?: " <<
-        param_block_ptr->GetParam("sub2").Has("blocks");
+      chi::log.Log() << "Has \"blocks\"?: "
+                     << param_block.GetParam("sub2").Has("blocks");
 
-      chi::log.Log() << "Num Parameters: " << param_block_ptr->GetParam("sub2").
-                                              GetParam("blocks").NumParameters();
+      chi::log.Log()
+        << "Num Parameters: "
+        << param_block.GetParam("sub2").GetParam("blocks").NumParameters();
 
-      const auto vec = param_block_ptr->GetParam("sub2").
-        GetParamVectorValue<int>("blocks");
+      const auto vec =
+        param_block.GetParam("sub2").GetParamVectorValue<int>("blocks");
 
       {
         std::stringstream outstr;
@@ -60,7 +61,26 @@ int Test_paramblock(lua_State* L)
           outstr << val << " ";
         chi::log.Log() << outstr.str();
       }
-    }
+
+      chi::log.Log() << "Testing copy constructor";
+      const auto& param_block2 = param_block;
+      {
+        std::string outstr;
+        param_block2.RecursiveDumpToString(outstr);
+
+        chi::log.Log() << outstr;
+      }
+
+      chi::log.Log() << "Testing move constructor";
+      const chi_objects::ParameterBlock& param_block3(param_block2);
+      {
+        std::string outstr;
+        param_block3.RecursiveDumpToString(outstr);
+
+        chi::log.Log() << outstr;
+      }
+    }//if table
+  }//if num_args == 2
 
   chi::log.Log() << "Testing varying";
   {

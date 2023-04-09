@@ -32,7 +32,7 @@ int chiLBSWriteFluxMoments(lua_State *L)
   const std::string file_base = lua_tostring(L,2);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -67,7 +67,7 @@ int chiLBSCreateAndWriteSourceMoments(lua_State *L)
   const std::string file_base = lua_tostring(L,2);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -115,7 +115,7 @@ int chiLBSReadFluxMomentsAndMakeSourceMoments(lua_State *L)
   }
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -169,7 +169,7 @@ int chiLBSReadSourceMoments(lua_State *L)
   }
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -216,7 +216,7 @@ int chiLBSReadFluxMoments(lua_State *L)
   }
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 

@@ -53,6 +53,9 @@ namespace chi_math
 
 namespace chi_objects
 {
+  class ChiObject;
+  typedef std::shared_ptr<ChiObject> ChiObjectPtr;
+
   class MPI_Info;
   class ChiTimer;
   class ChiConsole;
@@ -77,13 +80,15 @@ public:
   static std::vector<chi_mesh::FFInterpPtr>      field_func_interpolation_stack;
   static std::vector<chi_mesh::UnpartMeshPtr>    unpartitionedmesh_stack;
 
-  static std::vector<chi_physics::SolverPtr>                solver_stack;
+  //static std::vector<chi_physics::SolverPtr> object_stack;
   static std::vector<chi_physics::MaterialPtr>              material_stack;
   static std::vector<chi_physics::MultiGroupXSPtr>          multigroup_xs_stack;
   static std::vector<chi_physics::FieldFunctionPtr>         field_function_stack;
 
   static std::vector<chi_math::QuadraturePtr>        quadrature_stack;
   static std::vector<chi_math::AngularQuadraturePtr> angular_quadrature_stack;
+
+  static std::vector<chi_objects::ChiObjectPtr>      object_stack;
 
   //#######################################################
   /**Data block for run-time quantities.*/
@@ -95,6 +100,7 @@ public:
     static bool        sim_option_interactive_;
     static bool        allow_petsc_error_handler_;
     static bool        supress_beg_end_timelog_;
+    static bool        suppress_color_;
 
   private:
     friend class chi;
@@ -202,6 +208,8 @@ public:
                               "Calling function: " + calling_function_name);
     }
   }
+
+
 };
 
 #endif

@@ -1,4 +1,3 @@
-
 #include "ChiConsole/chi_console.h"
 
 #include "ChiMath/lua/chi_math_lua.h"
@@ -11,6 +10,8 @@
 #include "lua/chi_modules_lua.h"
 
 #include "chi_configuration.h"
+
+#include "ChiObject/object_maker.h"
 
 //###################################################################
 /**Access to the singleton*/
@@ -60,7 +61,8 @@ void chi_objects::ChiConsole::LoadRegisteredLuaItems()
 
   //=================================== Registering solver-function
   //                                    scope resolution tables
-  for (const auto& entry : solver_registry_)
+  const auto& object_maker = chi_objects::ObjectMaker::GetInstance();
+  for (const auto& entry : object_maker.Registry())
     SetNamespaceTableStructure(entry.first);
 
 }
