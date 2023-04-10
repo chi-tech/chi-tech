@@ -7,7 +7,7 @@ std::shared_ptr<SweepChunk> lbs::DiscOrdTransientSolver::
   SetTransientSweepChunk(LBSGroupset& groupset)
 {
   double theta;
-  if (method == chi_math::SteppingMethod::BACKWARD_EULER)
+  if (method == chi_math::SteppingMethod::IMPLICIT_EULER)
     theta = 1.0;
   else
     theta = 0.5;

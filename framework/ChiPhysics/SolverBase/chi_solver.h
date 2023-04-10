@@ -54,6 +54,7 @@ public:
   virtual void Initialize();
   virtual void Execute();
   virtual void Step();
+  virtual void Advance();
 };
 
 

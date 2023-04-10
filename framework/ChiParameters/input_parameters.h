@@ -2,6 +2,7 @@
 #define CHITECH_INPUT_PARAMETERS_H
 
 #include "parameter_block.h"
+#include "ChiDataTypes/allowable_range.h"
 
 #include <map>
 
@@ -29,6 +30,9 @@ private:
   std::map<std::string, std::string> deprecation_warning_tags_;
   std::map<std::string, std::string> deprecation_error_tags_;
   std::map<std::string, std::string> renamed_error_tags_;
+
+  typedef std::unique_ptr<chi_data_types::AllowableRange> AllowableRangePtr;
+  std::map<std::string, AllowableRangePtr> constraint_tags_;
 
 public:
   InputParameters() = default;
@@ -61,6 +65,16 @@ public:
   void AddOptionalParameterBlock(const std::string& name,
                                  ParameterBlock block,
                                  const std::string& grouping_name = "");
+
+  template <typename T>
+  void AddOptionalParameterBlock(const std::string& name,
+                                 std::vector<T> array,
+                                 const std::string& grouping_name = "")
+  {
+    AddParameter(name, array);
+    parameter_tags_[name] = InputParameterTag::OPTIONAL;
+    parameter_group_names_[name] = grouping_name;
+  }
 
   template <typename T>
   void AddRequiredParameter(const std::string& name,
@@ -98,12 +112,16 @@ public:
 public:
   void AssignParameters(const ParameterBlock& params);
 
-  void MarkParamaterDeprecatedWarning(const std::string& param_name,
-                                      const std::string& deprecation_message="");
-  void MarkParamaterDeprecatedError(const std::string& param_name,
-                                    const std::string& deprecation_message="");
+  void
+  MarkParamaterDeprecatedWarning(const std::string& param_name,
+                                 const std::string& deprecation_message = "");
+  void
+  MarkParamaterDeprecatedError(const std::string& param_name,
+                               const std::string& deprecation_message = "");
   void MarkParamaterRenamed(const std::string& param_name,
                             const std::string& renaming_description);
+  void ConstrainParameterRange(const std::string& param_name,
+                               AllowableRangePtr allowable_range);
 };
 
 } // namespace chi_objects

@@ -17,6 +17,7 @@ namespace chi_physics::lua_utils
   int chiSolverInitialize(lua_State* L);
   int chiSolverExecute(lua_State* L);
   int chiSolverStep(lua_State* L);
+  int chiSolverAdvance(lua_State* L);
   int chiSolverSetBasicOption(lua_State* L);
   int chiSolverGetName(lua_State* L);
   int chiSolverGetFieldFunctionList(lua_State* L);
@@ -26,6 +27,7 @@ namespace chi_physics::lua_utils
   ChiConsoleRegisterLuaFunction(chiSolverInitialize);
   ChiConsoleRegisterLuaFunction(chiSolverExecute);
   ChiConsoleRegisterLuaFunction(chiSolverStep);
+  ChiConsoleRegisterLuaFunction(chiSolverAdvance);
   ChiConsoleRegisterLuaFunction(chiSolverSetBasicOption);
   ChiConsoleRegisterLuaFunction(chiSolverGetName);
   ChiConsoleRegisterLuaFunction(chiSolverGetFieldFunctionList);
@@ -138,6 +140,34 @@ int chiSolverStep(lua_State *L)
                                                         fname);
 
   solver.Step();
+
+  return 0;
+}
+
+//#############################################################################
+/** Advances the time values of the solver at the given handle.
+
+\param solver_handle int Handle to the solver.
+
+\ingroup LuaSolver
+\author Jan*/
+  int chiSolverAdvance(lua_State *L)
+{
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
+
+  if (num_args != 1)
+    LuaPostArgAmountError(fname, 1, num_args);
+  LuaCheckNilValue(fname, L, 1);
+  LuaCheckIntegerValue(fname, L, 1);
+
+  const int solver_handle = lua_tonumber(L, 1);
+
+  auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::object_stack,
+                                                        solver_handle,
+                                                        fname);
+
+  solver.Advance();
 
   return 0;
 }

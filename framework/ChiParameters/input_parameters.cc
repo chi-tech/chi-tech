@@ -74,7 +74,7 @@ void InputParameters::AssignParameters(const ParameterBlock& params)
     if (deprecation_warning_tags_.count(req_param_name) > 0 or
         deprecation_error_tags_.count(req_param_name) > 0 or
         renamed_error_tags_.count(req_param_name) > 0)
-      continue ;
+      continue;
 
     if (not params.Has(req_param.Name()))
       err_stream << "Required param \"" << req_param.Name()
@@ -90,13 +90,12 @@ void InputParameters::AssignParameters(const ParameterBlock& params)
       const auto& param_name = param.Name();
       if (not this->Has(param_name))
         err_stream << "Invalid param \"" << param_name << "\" supplied.\n";
-      else
-        if (renamed_error_tags_.count(param_name) > 0)
-        {
-          err_stream << "Invalid param \"" << param_name << "\" supplied. ";
-          err_stream << "The parameter has been renamed. ";
-          err_stream << renamed_error_tags_.at(param_name);
-        }
+      else if (renamed_error_tags_.count(param_name) > 0)
+      {
+        err_stream << "Invalid param \"" << param_name << "\" supplied. ";
+        err_stream << "The parameter has been renamed. ";
+        err_stream << renamed_error_tags_.at(param_name);
+      }
     }
 
     if (not err_stream.str().empty()) ThrowInputError;
@@ -139,6 +138,7 @@ void InputParameters::AssignParameters(const ParameterBlock& params)
   {
     auto& input_param = GetParam(param.Name());
 
+    // ====================== Check types match
     if (param.Type() != input_param.Type())
     {
       err_stream << "Invalid parameter type \""
@@ -148,8 +148,21 @@ void InputParameters::AssignParameters(const ParameterBlock& params)
                  << ParameterBlockTypeName(input_param.Type()) << "\".\n";
       continue;
     } // if type mismatch
-    else
-      input_param = param;
+
+    // ====================== Check constraint
+    if (constraint_tags_.count(input_param.Name()) != 0)
+    {
+      const auto& constraint = constraint_tags_.at(input_param.Name());
+      if (not constraint->IsAllowable(param.Value()))
+      {
+        err_stream << constraint->OutOfRangeString(input_param.Name(),
+                                                   param.Value());
+        err_stream << "\n";
+      }
+      continue;
+    } // if constraint
+
+    input_param = param;
   } // for input params
 
   if (not err_stream.str().empty()) ThrowInputError;
@@ -185,6 +198,17 @@ void InputParameters::MarkParamaterRenamed(
   const std::string& param_name, const std::string& renaming_description)
 {
   if (Has(param_name)) renamed_error_tags_[param_name] = renaming_description;
+  else
+    ExceptionParamNotPresent(param_name);
+}
+
+// ##################################################################
+/**Creates a range based constraint for a given parameter.*/
+void InputParameters::ConstrainParameterRange(const std::string& param_name,
+                                              AllowableRangePtr allowable_range)
+{
+  if (Has(param_name))
+    constraint_tags_[param_name] = std::move(allowable_range);
   else
     ExceptionParamNotPresent(param_name);
 }

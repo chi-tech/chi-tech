@@ -58,8 +58,8 @@ public:
   template <typename T>
   struct IsString
   {
-    static constexpr bool value = std::is_same_v<T, std::string> or
-                                  std::is_same_v<T, const char*>;
+    static constexpr bool value =
+      std::is_same_v<T, std::string> or std::is_same_v<T, const char*>;
   };
   template <typename T>
   struct IsInteger
@@ -69,8 +69,18 @@ public:
   };
 
   // Constructors
-  /**Constructs an empty parameter block.*/
+  /**Constructs an empty parameter block with the given name and type BLOCK.*/
   explicit ParameterBlock(const std::string& name = "");
+
+  /***/
+  template <typename T>
+  ParameterBlock(const std::string& name, const std::vector<T>& array)
+    : type_(ParameterBlockType::ARRAY), name_(name)
+  {
+    size_t k = 0;
+    for (const T& value : array)
+      AddParameter(std::to_string(k++), value);
+  }
 
   /**Constructs one of the fundamental types.*/
   template <typename T>

@@ -42,8 +42,8 @@ void lbs::DiscOrdTransientSolver::Step()
 
   //======================================== Compute t^{n+1} value
   {
-    const auto& BackwardEuler = chi_math::SteppingMethod::BACKWARD_EULER;
-    const auto& CrankNicolson = chi_math::SteppingMethod::CRANK_NICHOLSON;
+    const auto& BackwardEuler = chi_math::SteppingMethod::IMPLICIT_EULER;
+    const auto& CrankNicolson = chi_math::SteppingMethod::CRANK_NICOLSON;
 
     double theta;
     if      (method == BackwardEuler) theta = 1.0;

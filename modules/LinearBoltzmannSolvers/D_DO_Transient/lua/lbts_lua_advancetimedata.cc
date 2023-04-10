@@ -33,7 +33,7 @@ int chiLBTSAdvanceTimeData(lua_State* L)
                                                                 solver_handle,
                                                                 fname);
 
-  solver.AdvanceTimeValues();
+  solver.Advance();
 
   return 0;
 }

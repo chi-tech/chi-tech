@@ -21,7 +21,7 @@ void lbs::DiscOrdTransientSolver::Execute()
 
     if (not transient_options_.inhibit_advance)
     {
-      AdvanceTimeValues(); //new copied to prev + time+=dt
+      Advance(); //new copied to prev + time+=dt
       ++step_number;
       transient_options_.inhibit_advance = false;
     }

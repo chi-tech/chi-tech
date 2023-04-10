@@ -165,9 +165,9 @@ int chiLBTSSetProperty(lua_State* L)
     const std::string option = lua_tostring(L, 3);
 
     if (option == "BACKWARD_EULER")
-      solver.method = chi_math::SteppingMethod::BACKWARD_EULER;
+      solver.method = chi_math::SteppingMethod::IMPLICIT_EULER;
     else if (option =="CRANK_NICHOLSON")
-      solver.method = chi_math::SteppingMethod::CRANK_NICHOLSON;
+      solver.method = chi_math::SteppingMethod::CRANK_NICOLSON;
     else
       throw std::invalid_argument(fname + ": Only the following timestepping "
             "methods are supported: \"CRANK_NICHOLSON\", \"BACKWARD_EULER\"");

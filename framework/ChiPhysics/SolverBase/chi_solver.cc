@@ -32,3 +32,8 @@ void chi_physics::Solver::Step()
 {
   chi::log.Log() << "\"Step()\" method not defined for " << TextName();
 }
+
+void chi_physics::Solver::Advance()
+{
+  chi::log.Log() << "\"Advance()\" method not defined for " << TextName();
+}

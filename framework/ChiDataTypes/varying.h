@@ -53,8 +53,8 @@ public:
   template <typename T>
   struct IsString
   {
-    static constexpr bool value = std::is_same_v<T, std::string> or
-                                  std::is_same_v<T, char*>;
+    static constexpr bool value =
+      std::is_same_v<T, std::string> or std::is_same_v<T, char*>;
   };
   template <typename T>
   struct IsFloat
@@ -121,8 +121,10 @@ public:
   /**Constructor for a string value.*/
   explicit Varying(const std::string& value);
   /**Constructor for a string literal value.*/
-  explicit Varying(const char*& value) : Varying(std::string(value)) {}
-
+  //explicit Varying(const char*& value) : Varying(std::string(value)) {}
+  explicit Varying(const char* value) : Varying(std::string(value)) {}
+  template <std::size_t N>
+  explicit Varying(const char(&value)[N]) : Varying(static_cast<const char*>(value)) {}
 
   /**Copy constructor.*/
   Varying(const Varying& other);
@@ -149,6 +151,71 @@ public:
     PopulateRaw<bool>(value);
 
     return *this;
+  }
+
+  /**Equality operator*/
+  bool operator==(const Varying& that) const
+  {
+    bool is_same = true;
+
+    if (this->Type() != that.type_) return false;
+    if (this->raw_data_ != that.raw_data_) return false;
+
+    return is_same;
+  }
+
+  /**Inequality operator*/
+  bool operator!=(const Varying& that) const { return not(*this == that); }
+
+  /**Relation operators*/
+  bool operator>(const Varying& that) const
+  {
+    switch (this->Type())
+    {
+      case VaryingDataType::ARBITRARY_BYTES:
+        return raw_data_ > that.raw_data_;
+      case VaryingDataType::STRING:
+        return StringValue() > that.StringValue();
+      case VaryingDataType::BOOL:
+        return BoolValue() > that.BoolValue();
+      case VaryingDataType::INTEGER:
+        return IntegerValue() > that.IntegerValue();
+      case VaryingDataType::FLOAT:
+        return FloatValue() > that.FloatValue();
+      case VaryingDataType::VOID:
+      default:
+        return false;
+    }
+  }
+  /**Relation operators*/
+  bool operator>=(const Varying& that) const
+  {
+    return (*this > that) or (*this == that);
+  }
+  /**Relation operators*/
+  bool operator<(const Varying& that) const
+  {
+    switch (this->Type())
+    {
+      case VaryingDataType::ARBITRARY_BYTES:
+        return raw_data_ < that.raw_data_;
+      case VaryingDataType::STRING:
+        return StringValue() < that.StringValue();
+      case VaryingDataType::BOOL:
+        return BoolValue() < that.BoolValue();
+      case VaryingDataType::INTEGER:
+        return IntegerValue() < that.IntegerValue();
+      case VaryingDataType::FLOAT:
+        return FloatValue() < that.FloatValue();
+      case VaryingDataType::VOID:
+      default:
+        return false;
+    }
+  }
+  /**Relation operators*/
+  bool operator<=(const Varying& that) const
+  {
+    return (*this < that) or (*this == that);
   }
 
   /**Assigns an integer value.*/
@@ -282,10 +349,17 @@ public:
   /**Returns the string type name of the type.*/
   std::string TypeName() const { return VaryingDataTypeStringName(type_); }
 
+  /**Returns a string value for the value.*/
+  std::string PrintStr() const;
+
 public:
   ~Varying() = default;
 }; // class Varying
 
 } // namespace chi_data_types
+
+/**Stream operator*/
+std::ostream& operator<<(std::ostream& outstr,
+                         const chi_data_types::Varying& value);
 
 #endif // CHI_DATA_TYPES_VARYING_H
