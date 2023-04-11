@@ -7,10 +7,10 @@
 
 #include <numeric>
 
-namespace rpk
+namespace prk
 {
 
-RegisterChiObject(rpk, TransientSolver);
+RegisterChiObject(prk, TransientSolver);
 
 /**Sets input parameters.*/
 chi_objects::InputParameters TransientSolver::GetInputParameters()

@@ -6,7 +6,7 @@
 #include "ChiMath/dynamic_matrix.h"
 #include "ChiMath/dynamic_vector.h"
 
-namespace rpk
+namespace prk
 {
 /**General transient solver for point kinetics.*/
 class TransientSolver : public chi_physics::Solver
