@@ -7,7 +7,7 @@
 namespace chi_unit_tests
 {
 
-class TestSubObject : public chi_objects::ChiObject
+class TestSubObject : public ChiObject
 {
 private:
   const size_t num_groups_;
@@ -16,7 +16,7 @@ public:
   explicit TestSubObject(const chi_objects::InputParameters& params);
 };
 
-class TestObject : public chi_objects::ChiObject
+class TestObject : public ChiObject
 {
 private:
   const std::string solver_type_;

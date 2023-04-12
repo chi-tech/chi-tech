@@ -53,14 +53,15 @@ class UnknownManager;
 
 namespace chi_objects
 {
-class ChiObject;
-typedef std::shared_ptr<ChiObject> ChiObjectPtr;
 
 class MPI_Info;
 class ChiTimer;
 class ChiConsole;
 class ChiLog;
 } // namespace chi_objects
+
+class ChiObject;
+typedef std::shared_ptr<ChiObject> ChiObjectPtr;
 
 // ###################################################################
 /**General utilities in ChiTech*/
@@ -88,7 +89,7 @@ public:
   static std::vector<chi_math::QuadraturePtr> quadrature_stack;
   static std::vector<chi_math::AngularQuadraturePtr> angular_quadrature_stack;
 
-  static std::vector<chi_objects::ChiObjectPtr> object_stack;
+  static std::vector<ChiObjectPtr> object_stack;
 
   // #######################################################
   /**Data block for run-time quantities.*/

@@ -61,7 +61,7 @@ void chi_objects::ChiConsole::LoadRegisteredLuaItems()
 
   //=================================== Registering solver-function
   //                                    scope resolution tables
-  const auto& object_maker = chi_objects::ObjectMaker::GetInstance();
+  const auto& object_maker = ChiObjectMaker::GetInstance();
   for (const auto& entry : object_maker.Registry())
     SetNamespaceTableStructure(entry.first);
 

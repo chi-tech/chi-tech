@@ -3,21 +3,18 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-namespace chi_objects
-{
-
 // ###################################################################
 /**Access to the singleton*/
-ObjectMaker& ObjectMaker::GetInstance() noexcept
+ChiObjectMaker& ChiObjectMaker::GetInstance() noexcept
 {
-  static ObjectMaker singleton;
+  static ChiObjectMaker singleton;
   return singleton;
 }
 
 // ###################################################################
 /**Returns a constant reference to the object registry.*/
-const std::map<std::string, ObjectMaker::ObjectRegistryEntry>&
-ObjectMaker::Registry() const
+const std::map<std::string, ChiObjectMaker::ObjectRegistryEntry>&
+ChiObjectMaker::Registry() const
 {
   return object_registry_;
 }
@@ -25,7 +22,8 @@ ObjectMaker::Registry() const
 // ###################################################################
 /**Makes an object with the given parameters and places on the global
  * object stack. Returns a handle to the object.*/
-size_t ObjectMaker::MakeObject(const ParameterBlock& params) const
+size_t
+ChiObjectMaker::MakeObject(const chi_objects::ParameterBlock& params) const
 {
   const std::string fname = __PRETTY_FUNCTION__;
   if (not params.Has("type"))
@@ -55,8 +53,9 @@ size_t ObjectMaker::MakeObject(const ParameterBlock& params) const
 // ###################################################################
 /**Makes an object with the given parameters and places on the global
  * object stack. Returns a handle to the object.*/
-size_t ObjectMaker::MakeObjectType(const std::string& type,
-                                   const ParameterBlock& params) const
+size_t
+ChiObjectMaker::MakeObjectType(const std::string& type,
+                               const chi_objects::ParameterBlock& params) const
 {
   const std::string fname = __PRETTY_FUNCTION__;
 
@@ -80,7 +79,7 @@ size_t ObjectMaker::MakeObjectType(const std::string& type,
 
 // ##################################################################
 /**Dumps the registry to stdout.*/
-void ObjectMaker::DumpRegister() const
+void ChiObjectMaker::DumpRegister() const
 {
   chi::log.Log() << "\n\n";
   for (const auto& [key, entry] : object_registry_)
@@ -100,5 +99,3 @@ void ObjectMaker::DumpRegister() const
   }
   chi::log.Log() << "\n\n";
 }
-
-} // namespace chi_objects

@@ -18,22 +18,19 @@
 #define RegisterChiObject(namespace_name, object_name)                         \
   static char ChiObjectJoinWordsB(unique_var_name_object_##object_name##_,     \
                                   __COUNTER__) =                               \
-    chi_objects::ObjectMaker::AddObjectToRegistry<object_name,                 \
-                                                  chi_objects::ChiObject>(     \
+    ChiObjectMaker::AddObjectToRegistry<object_name, ChiObject>(  \
       #namespace_name, #object_name)
-
-namespace chi_objects
-{
 
 class ChiObject;
 
-class ObjectMaker
+class ChiObjectMaker
 {
 private:
   using ObjectPtr = std::shared_ptr<ChiObject>;
 
-  using ObjectGetInParamsFunc = InputParameters (*)();
-  using ObjectConstructorFunc = ObjectPtr (*)(const InputParameters&);
+  using ObjectGetInParamsFunc = chi_objects::InputParameters (*)();
+  using ObjectConstructorFunc =
+    ObjectPtr (*)(const chi_objects::InputParameters&);
 
   struct ObjectRegistryEntry
   {
@@ -44,14 +41,14 @@ private:
   std::map<std::string, ObjectRegistryEntry> object_registry_;
 
 private:
-  ObjectMaker() = default;
+  ChiObjectMaker() = default;
 
 public:
-  ObjectMaker(const ObjectMaker&) = delete;
-  ObjectMaker(const ObjectMaker&&) = delete;
-  ObjectMaker& operator=(const ObjectMaker&) = delete;
+  ChiObjectMaker(const ChiObjectMaker&) = delete;
+  ChiObjectMaker(const ChiObjectMaker&&) = delete;
+  ChiObjectMaker& operator=(const ChiObjectMaker&) = delete;
 
-  static ObjectMaker& GetInstance() noexcept;
+  static ChiObjectMaker& GetInstance() noexcept;
 
   const std::map<std::string, ObjectRegistryEntry>& Registry() const;
 
@@ -64,7 +61,7 @@ private:
 
   template <typename T, typename base_T>
   static std::shared_ptr<base_T>
-  CallObjectConstructor(const InputParameters& params)
+  CallObjectConstructor(const chi_objects::InputParameters& params)
   {
     return std::make_shared<T>(params);
   }
@@ -97,14 +94,12 @@ public:
     return 0;
   }
 
-  size_t MakeObject(const ParameterBlock& params) const;
+  size_t MakeObject(const chi_objects::ParameterBlock& params) const;
   size_t MakeObjectType(const std::string& type,
-                        const ParameterBlock& params) const;
+                        const chi_objects::ParameterBlock& params) const;
 
   /**Dumps the object registry to stdout.*/
   void DumpRegister() const;
 };
-
-} // namespace chi_objects
 
 #endif // CHITECH_OBJECT_MAKER_H

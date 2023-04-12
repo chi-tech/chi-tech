@@ -21,7 +21,7 @@ namespace chi_physics
  * \ingroup LuaPhysics*/
 
 //######################################################### Solver parent class
-class chi_physics::Solver : public chi_objects::ChiObject
+class chi_physics::Solver : public ChiObject
 {
 private:
   const std::string text_name_;
