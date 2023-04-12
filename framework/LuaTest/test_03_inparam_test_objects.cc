@@ -15,27 +15,33 @@ chi_objects::InputParameters TestObject::GetInputParameters()
 {
   chi_objects::InputParameters params;
 
-  params.AddOptionalParameter("solver_type", "A");
-  params.AddRequiredParameter<std::string>("coupled_field");
-  params.AddRequiredParameterBlock("sub_obj1");
+  params.AddOptionalParameter("solver_type", "A", "The solver type.");
+  params.AddRequiredParameter<std::string>(
+    "coupled_field", "The text name of the coupled field.");
+  params.AddRequiredParameterBlock(
+    "sub_obj1", "A block of parameters for chi_unit_tests::TestSubObject");
 
   chi_objects::ParameterBlock sub_obj2_param_block("sub_obj2");
   sub_obj2_param_block.AddParameter("num_groups", 99);
-  params.AddOptionalParameterBlock("sub_obj2", sub_obj2_param_block);
+  params.AddOptionalParameterBlock(
+    "sub_obj2",
+    sub_obj2_param_block,
+    "A block of parameters for chi_unit_tests::TestSubObject");
 
-  params.AddOptionalParameter("limiter_type", 1);
+  params.AddOptionalParameter(
+    "limiter_type", 1, "Type of limiter to use in the solver");
   params.MarkParamaterDeprecatedWarning("limiter_type");
 
-  params.AddOptionalParameter("scheme", "Zorba");
+  params.AddOptionalParameter("scheme", "Zorba", "What scheme to use");
   params.MarkParamaterDeprecatedError("scheme");
 
-  params.AddRequiredParameter<bool>("format");
+  params.AddRequiredParameter<bool>("format", "What output format to use");
   params.MarkParamaterDeprecatedError("format");
 
-  params.AddOptionalParameter("use_my_stuff", false);
+  params.AddOptionalParameter("use_my_stuff", false, "Yeah please do");
   params.MarkParamaterRenamed("use_my_stuff", "Renamed to \"use_zaks_stuff\".");
 
-  params.AddRequiredParameter<bool>("use_ragusas_stuff");
+  params.AddRequiredParameter<bool>("use_ragusas_stuff", "If you want");
   params.MarkParamaterRenamed("use_ragusas_stuff",
                               "Renamed to \"use_complicated_stuff\".");
 
@@ -58,7 +64,8 @@ chi_objects::InputParameters TestSubObject::GetInputParameters()
 {
   chi_objects::InputParameters params;
 
-  params.AddRequiredParameter<size_t>("num_groups");
+  params.AddRequiredParameter<size_t>(
+    "num_groups", "Number of groups to use in the simulation");
 
   return params;
 }
@@ -80,7 +87,8 @@ chi_objects::InputParameters ChildTestObject::GetInputParameters()
   params.ChangeExistingParamToOptional("coupled_field", "Q");
   params.ChangeExistingParamToRequired<std::string>("solver_type");
 
-  params.AddOptionalParameter("num_sub_groups", 1);
+  params.AddOptionalParameter(
+    "num_sub_groups", 1, "Number of sub-groups to use in the simultion");
 
   return params;
 }

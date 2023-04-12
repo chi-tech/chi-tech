@@ -19,13 +19,13 @@ enum class InputParameterTag
   REQUIRED = 2
 };
 
-/**Class for storing input parameters.*/
+/**Class for handling input parameters.*/
 class InputParameters : public ParameterBlock
 {
 private:
   std::string class_name_;
   std::map<std::string, InputParameterTag> parameter_tags_;
-  std::map<std::string, std::string> parameter_group_names_;
+  std::map<std::string, std::string> parameter_doc_string_;
 
   std::map<std::string, std::string> deprecation_warning_tags_;
   std::map<std::string, std::string> deprecation_error_tags_;
@@ -56,57 +56,57 @@ public:
   template <typename T>
   void AddOptionalParameter(const std::string& name,
                             T value,
-                            const std::string& grouping_name = "")
+                            const std::string& doc_string)
   {
     AddParameter(name, value);
     parameter_tags_[name] = InputParameterTag::OPTIONAL;
-    parameter_group_names_[name] = grouping_name;
+    parameter_doc_string_[name] = doc_string;
   }
   void AddOptionalParameterBlock(const std::string& name,
                                  ParameterBlock block,
-                                 const std::string& grouping_name = "");
+                                 const std::string& doc_string);
 
   template <typename T>
   void AddOptionalParameterBlock(const std::string& name,
                                  std::vector<T> array,
-                                 const std::string& grouping_name = "")
+                                 const std::string& doc_string)
   {
     AddParameter(name, array);
     parameter_tags_[name] = InputParameterTag::OPTIONAL;
-    parameter_group_names_[name] = grouping_name;
+    parameter_doc_string_[name] = doc_string;
   }
 
   template <typename T>
   void AddRequiredParameter(const std::string& name,
-                            const std::string& grouping_name = "")
+                            const std::string& doc_string)
   {
     AddParameter(name, chi_data_types::Varying::DefaultValue<T>());
     parameter_tags_[name] = InputParameterTag::REQUIRED;
-    parameter_group_names_[name] = grouping_name;
+    parameter_doc_string_[name] = doc_string;
   }
 
   void AddRequiredParameterBlock(const std::string& name,
-                                 const std::string& grouping_name = "");
+                                 const std::string& doc_string);
 
   template <typename T>
   void ChangeExistingParamToOptional(const std::string& name,
                                      T value,
-                                     const std::string& grouping_name = "")
+                                     const std::string& doc_string = "")
   {
     auto& param = GetParam(name);
     param = ParameterBlock(name, value);
     parameter_tags_[name] = InputParameterTag::OPTIONAL;
-    parameter_group_names_[name] = grouping_name;
+    if (not doc_string.empty()) parameter_doc_string_[name] = doc_string;
   }
 
   template <typename T>
   void ChangeExistingParamToRequired(const std::string& name,
-                                     const std::string& grouping_name = "")
+                                     const std::string& doc_string = "")
   {
     auto& param = GetParam(name);
     param = ParameterBlock(name, chi_data_types::Varying::DefaultValue<T>());
     parameter_tags_[name] = InputParameterTag::REQUIRED;
-    parameter_group_names_[name] = grouping_name;
+    if (not doc_string.empty()) parameter_doc_string_[name] = doc_string;
   }
 
 public:
@@ -122,6 +122,9 @@ public:
                             const std::string& renaming_description);
   void ConstrainParameterRange(const std::string& param_name,
                                AllowableRangePtr allowable_range);
+
+  /**Dumps the input parameters to stdout.*/
+  void DumpParameters() const;
 };
 
 } // namespace chi_objects

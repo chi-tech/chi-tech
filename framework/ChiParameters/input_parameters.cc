@@ -33,25 +33,24 @@ std::string InputParameters::ObjectType() const { return class_name_; }
 
 // #################################################################
 /**Specialization for block type parameters.*/
-void InputParameters::AddOptionalParameterBlock(
-  const std::string& name,
-  ParameterBlock block,
-  const std::string& grouping_name)
+void InputParameters::AddOptionalParameterBlock(const std::string& name,
+                                                ParameterBlock block,
+                                                const std::string& doc_string)
 {
   AddParameter(std::move(block));
   parameter_tags_[name] = InputParameterTag::OPTIONAL;
-  parameter_group_names_[name] = grouping_name;
+  parameter_doc_string_[name] = doc_string;
 }
 
 // #################################################################
 /**Specialization for block type parameters.*/
-void InputParameters::AddRequiredParameterBlock(
-  const std::string& name, const std::string& grouping_name)
+void InputParameters::AddRequiredParameterBlock(const std::string& name,
+                                                const std::string& doc_string)
 {
   ParameterBlock new_block(name);
   AddParameter(new_block);
   parameter_tags_[name] = InputParameterTag::REQUIRED;
-  parameter_group_names_[name] = grouping_name;
+  parameter_doc_string_[name] = doc_string;
 }
 
 // #################################################################
@@ -211,6 +210,54 @@ void InputParameters::ConstrainParameterRange(const std::string& param_name,
     constraint_tags_[param_name] = std::move(allowable_range);
   else
     ExceptionParamNotPresent(param_name);
+}
+
+// ##################################################################
+/**Dumps the input parameters to stdout.*/
+void InputParameters::DumpParameters() const
+{
+  const std::string sp2 = "  ";
+  const std::string sp4 = "    ";
+  for (const auto& param : Parameters())
+  {
+    const auto& param_name = param.Name();
+    chi::log.Log() << sp2 << "PARAM_BEGIN " << param_name;
+
+    const auto type = param.Type();
+
+    chi::log.Log() << sp4 << "TYPE " << ParameterBlockTypeName(type);
+
+    if (parameter_tags_.at(param_name) == InputParameterTag::OPTIONAL)
+    {
+      chi::log.Log() << sp4 << "TAG OPTIONAL";
+      if (type != ParameterBlockType::BLOCK and
+          type != ParameterBlockType::ARRAY)
+        chi::log.Log() << sp4 << "DEFAULT_VALUE " << param.Value().PrintStr();
+      else if (type == ParameterBlockType::ARRAY)
+      {
+        std::stringstream outstr;
+        outstr << sp4 << "DEFAULT_VALUE ";
+        for (size_t k = 0; k < param.NumParameters(); ++k)
+        {
+          const auto& sub_param = param.GetParam(k);
+          outstr << sub_param.Value().PrintStr() << ", ";
+        }
+        chi::log.Log() << outstr.str();
+      }
+    }
+    else
+      chi::log.Log() << sp4 << "TAG REQUIRED";
+
+    if (constraint_tags_.count(param_name) != 0)
+      chi::log.Log() << sp4 << "CONSTRAINT "
+                     << constraint_tags_.at(param_name)->PrintRange();
+
+    if (parameter_doc_string_.count(param_name) != 0)
+      chi::log.Log() << sp4 << "DOC_STRING "
+                     << parameter_doc_string_.at(param_name);
+
+    chi::log.Log() << sp2 << "PARAM_END";
+  }
 }
 
 } // namespace chi_objects

@@ -7,15 +7,17 @@ chi_objects::InputParameters chi_physics::Solver::GetInputParameters()
 {
   chi_objects::InputParameters params;
 
-  params.AddRequiredParameter<std::string>("name");
+  params.AddRequiredParameter<std::string>(
+    "name",
+    "A text name to associate with the solver. This name will be used "
+    "in status messages and verbose iterative convergence monitors.");
 
   return params;
 }
 
-chi_physics::Solver::Solver(const chi_objects::InputParameters& params) :
-  text_name_(params.GetParamValue<std::string>("name"))
+chi_physics::Solver::Solver(const chi_objects::InputParameters& params)
+  : text_name_(params.GetParamValue<std::string>("name"))
 {
-
 }
 
 void chi_physics::Solver::Initialize()
