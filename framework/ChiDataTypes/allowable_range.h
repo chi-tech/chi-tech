@@ -42,6 +42,9 @@ public:
     return outstr.str();
   }
 
+  /**Prints the allowable constraints to a string.*/
+  std::string PrintRange() { return AllowableRangeStr(); }
+
   virtual ~AllowableRange() = default;
 };
 
