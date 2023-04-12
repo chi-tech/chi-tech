@@ -1,4 +1,4 @@
-#include "reactor_point_kinetics.h"
+#include "point_reactor_kinetics.h"
 
 #include "ChiObject/object_maker.h"
 
@@ -25,14 +25,23 @@ chi_objects::InputParameters TransientSolver::GetInputParameters()
   std::vector<double> default_betas = {
     0.00021, 0.00142, 0.00127, 0.00257, 0.00075, 0.00027};
 
-  params.AddOptionalParameterBlock("precursor_lambdas", default_lambdas);
-  params.AddOptionalParameterBlock("precursor_betas", default_betas);
-  params.AddOptionalParameter("gen_time", 1.0e-5);
-  params.AddOptionalParameter("initial_rho", 0.0);
-  params.AddOptionalParameter("initial_source", 1.0);
-  params.AddOptionalParameter("initial_population", 1.0);
-  params.AddOptionalParameter("dt", 0.01);
-  params.AddOptionalParameter("time_integration", "implicit_euler");
+  params.AddOptionalParameterBlock(
+    "precursor_lambdas", default_lambdas, "An array of decay constants");
+  params.AddOptionalParameterBlock(
+    "precursor_betas",
+    default_betas,
+    "An array of fractional delayed neutron fractions");
+  params.AddOptionalParameter(
+    "gen_time", 1.0e-5, "Neutron generation time [s]");
+  params.AddOptionalParameter("initial_rho", 0.0, "Initial reactivity [$]");
+  params.AddOptionalParameter(
+    "initial_source", 1.0, "Initial source strength [/s]");
+  params.AddOptionalParameter(
+    "initial_population", 1.0, "Initial neutron population");
+  params.AddOptionalParameter("dt", 0.01, "Default timestep size [s]");
+
+  params.AddOptionalParameter(
+    "time_integration", "implicit_euler", "Time integration scheme to use");
 
   using namespace chi_data_types;
   auto time_intgl_list = AllowableRangeList::New(
@@ -170,4 +179,4 @@ void TransientSolver::Advance()
   x_t_ = x_tp1_;
 }
 
-} // namespace rpk
+} // namespace prk

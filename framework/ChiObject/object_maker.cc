@@ -1,6 +1,7 @@
 #include "object_maker.h"
 
 #include "chi_runtime.h"
+#include "chi_log.h"
 
 namespace chi_objects
 {
@@ -48,7 +49,7 @@ size_t ObjectMaker::MakeObject(const ParameterBlock& params) const
 
   chi::object_stack.push_back(new_object);
 
-  return chi::object_stack.size()-1;
+  return chi::object_stack.size() - 1;
 }
 
 // ###################################################################
@@ -74,7 +75,30 @@ size_t ObjectMaker::MakeObjectType(const std::string& type,
 
   chi::object_stack.push_back(new_object);
 
-  return chi::object_stack.size()-1;
+  return chi::object_stack.size() - 1;
+}
+
+// ##################################################################
+/**Dumps the registry to stdout.*/
+void ObjectMaker::DumpRegister() const
+{
+  chi::log.Log() << "\n\n";
+  for (const auto& [key, entry] : object_registry_)
+  {
+    if (chi::log.GetVerbosity() == 0)
+    {
+      chi::log.Log() << key;
+      continue;
+    }
+
+    chi::log.Log() << "OBJECT_BEGIN " << key;
+
+    const auto in_params = entry.get_in_params_func();
+    in_params.DumpParameters();
+
+    chi::log.Log() << "OBJECT_END\n\n";
+  }
+  chi::log.Log() << "\n\n";
 }
 
 } // namespace chi_objects

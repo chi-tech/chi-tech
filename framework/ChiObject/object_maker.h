@@ -100,6 +100,9 @@ public:
   size_t MakeObject(const ParameterBlock& params) const;
   size_t MakeObjectType(const std::string& type,
                         const ParameterBlock& params) const;
+
+  /**Dumps the object registry to stdout.*/
+  void DumpRegister() const;
 };
 
 } // namespace chi_objects

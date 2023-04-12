@@ -248,7 +248,7 @@ void InputParameters::DumpParameters() const
       chi::log.Log() << sp4 << "TAG REQUIRED";
 
     if (constraint_tags_.count(param_name) != 0)
-      chi::log.Log() << sp4 << "CONSTRAINT "
+      chi::log.Log() << sp4 << "CONSTRAINTS "
                      << constraint_tags_.at(param_name)->PrintRange();
 
     if (parameter_doc_string_.count(param_name) != 0)
