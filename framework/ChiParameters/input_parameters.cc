@@ -239,8 +239,7 @@ void InputParameters::DumpParameters() const
         outstr << sp4 << "DEFAULT_VALUE ";
         for (size_t k = 0; k < param.NumParameters(); ++k)
         {
-          const auto& sub_param = param.GetParam(k);
-          outstr << sub_param.Value().PrintStr() << ", ";
+          const auto& sub_param = param.GetParam(k);      outstr << sub_param.Value().PrintStr() << ", ";
         }
         chi::log.Log() << outstr.str();
       }
