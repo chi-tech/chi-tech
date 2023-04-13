@@ -126,9 +126,9 @@ void TransientSolver::Initialize()
   // there exists a unique solution.
   if (source_strength_ > 0.0 and rho_ < 0.0)
   {
-    const auto b_temp = -1.0 * q_;
+    const auto b_theta = -1.0 * q_;
 
-    x_t_ = A_.Inverse() * b_temp;
+    x_t_ = A_.Inverse() * b_theta;
   }
   // Otherwise we initialize the system as a critical system with
   // no source.
@@ -160,9 +160,9 @@ void TransientSolver::Step()
   const double inv_tau = theta * dt_;
 
   auto A_theta = I_ - inv_tau * A_;
-  auto b_temp = x_t_ + inv_tau * q_;
+  auto b_theta = x_t_ + inv_tau * q_;
 
-  auto x_theta = A_theta.Inverse() * b_temp;
+  auto x_theta = A_theta.Inverse() * b_theta;
 
   x_tp1_ = x_t_ + (1.0 / theta) * (x_theta - x_t_);
 
