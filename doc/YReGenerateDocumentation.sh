@@ -15,4 +15,15 @@ python3 "doc/scripts/MakeMainPage.py"
 
 #============================== Making main documentation
 echo "Running DoxyGen"
-doxygen "doc/DoxyfileLua"
+if [ "$1" == "input_doc_only" ]; then
+  echo "Doing input documentation"
+  grep -v "INPUT " doc/DoxyfileLua > doc/DoxyfileLuaLean
+  echo 'INPUT = "doc/generated_files" "doc/PAGES"' >> doc/DoxyfileLuaLean
+  for dee in $(find modules -type d -name "doc");
+  do echo "INPUT += $dee" >> doc/DoxyfileLuaLean; done
+  doxygen "doc/DoxyfileLuaLean"
+  rm doc/DoxyfileLuaLean
+else
+  doxygen "doc/DoxyfileLua"
+fi
+

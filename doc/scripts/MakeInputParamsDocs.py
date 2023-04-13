@@ -106,18 +106,25 @@ dropdn_list_script2 = '''
 }'''
 
 #background-color: #313335;
+#width: 100%;
+# padding: 2px 2px;
 
 button_style = '''
 "
 background-color: #edf0f5;
 color: #9373A5;
 cursor: pointer;
-padding: 9px;
-width: 100%;
 border: none;
 text-align: left;
 outline: none;
 font-size: 15px;
+margin: 2px 2px;
+border: 2px solid #687372;
+display: block;
+width: 100%;
+vertical-align: middle;
+padding-top: 4px;
+padding-bottom: 0px;
 "
 '''
 #<span class="arrow" style="padding-left: 0px;">▼
@@ -127,7 +134,7 @@ font-size: 15px;
     dropdown boxes.'''
 def WriteHTMLParameters(file, params):
     file.write('\htmlonly\n\n')
-    file.write('<div>\n')
+    file.write('<div style="display: block;">\n')
     droppy = "droppy2"
     for param in params:
         file.write('<button type="button" class="'+droppy+'" ' + \
@@ -157,7 +164,21 @@ for obj in obj_list:
     reduced_name = obj["name"].replace(":", "_")
     file = open("doc/generated_files/input_docs/" + reduced_name+".h", "w")
 
-    file.write("/** \\addtogroup " + reduced_name + " " + obj["name"] + "\n\n\n")
+    file.write("/** \\addtogroup " + reduced_name + "\n\n\n")
+
+    file.write(textwrap.dedent('''
+    ## Example usage:
+    Create this object:
+    \code
+    params = 
+    {
+        param_name1 = value1,
+        param_name2 = value2,
+        --etc.
+    }\n'''))
+    file.write(obj["name"].replace("::",".")+".Create(params)\n")
+
+    file.write("\endcode\n")
 
     if len(obj["required_params"]) > 0:
         file.write("## Required Input parameters\n")

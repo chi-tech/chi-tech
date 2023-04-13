@@ -6,16 +6,10 @@
 #include "ChiMath/dynamic_matrix.h"
 #include "ChiMath/dynamic_vector.h"
 
-/** \defgroup prk__TransientSolver prk::TransientSolver
- * \ingroup LuaModules
- * This is really cool
- * */
-
 namespace prk
 {
 /**General transient solver for point kinetics.
-*
-\copydoc prk__TransientSolver.txt
+
 * */
 class TransientSolver : public chi_physics::Solver
 {
