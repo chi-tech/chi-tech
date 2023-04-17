@@ -91,6 +91,8 @@ public:
 
   static std::vector<ChiObjectPtr> object_stack;
 
+  static const size_t SIZE_T_INVALID = ((size_t)-1);
+
   // #######################################################
   /**Data block for run-time quantities.*/
   class run_time

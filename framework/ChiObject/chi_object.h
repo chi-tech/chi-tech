@@ -1,29 +1,40 @@
 #ifndef CHITECH_CHI_OBJECT_H
 #define CHITECH_CHI_OBJECT_H
 
-
-
-namespace chi_objects
-{
-  class ChiLog;
-  class MPI_Info;
-
-}
+#include "chi_runtime.h"
+#include "ChiParameters/input_parameters.h"
 
 class ChiObject
 {
 private:
-  chi_objects::ChiLog& log_;   ///< Reference to the logger
-  chi_objects::MPI_Info& mpi_; ///< Reference to mpi information
+  size_t stack_id_ = chi::SIZE_T_INVALID;
+  chi_objects::ParameterBlock param_block_used_at_construction_;
+
 public:
+  static chi_objects::InputParameters GetInputParameters();
+  /**Default constructor. This will be removed in future.*/
   ChiObject();
 
-  /**Returns a reference to the logger instance. The logger is a singleton.*/
-  chi_objects::ChiLog& Log();
+  /**Constructor with input parameters.*/
+  explicit ChiObject(const chi_objects::InputParameters& params);
 
-  /**Returns a reference to the MPI_Info instance. The MPI_Info object is a
- * singleton.*/
-  chi_objects::MPI_Info& MPI();
+  // Setters
+  /**Sets the stack id of the object. This allows this
+   * object to know its place in the global space.*/
+  void SetStackID(size_t stack_id);
+
+  /**Copies the parameter block used to set the input parameters
+   * of this object. This is useful to know if an optional parameter
+   * was activated/used/set.*/
+  void
+  SetParamBlockUsedAtConstruction(const chi_objects::ParameterBlock& params);
+
+  // Getters
+  /**Returns the stack id of this object. This can be used
+   * with input language to connect objects together.*/
+  size_t StackID() const;
+
+  const chi_objects::ParameterBlock& ParamBlockUsedAtConstruction() const;
 
   virtual ~ChiObject() = default;
 };

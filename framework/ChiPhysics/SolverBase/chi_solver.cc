@@ -3,9 +3,11 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
+/**Returns the input parameters.*/
 chi_objects::InputParameters chi_physics::Solver::GetInputParameters()
 {
-  chi_objects::InputParameters params;
+  chi_objects::InputParameters params =
+    ChiObject::GetInputParameters();
 
   params.AddRequiredParameter<std::string>(
     "name",
@@ -16,7 +18,8 @@ chi_objects::InputParameters chi_physics::Solver::GetInputParameters()
 }
 
 chi_physics::Solver::Solver(const chi_objects::InputParameters& params)
-  : text_name_(params.GetParamValue<std::string>("name"))
+  : ChiObject(params),
+    text_name_(params.GetParamValue<std::string>("name"))
 {
 }
 

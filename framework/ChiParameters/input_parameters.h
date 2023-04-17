@@ -24,7 +24,7 @@ class InputParameters : public ParameterBlock
 {
 private:
   std::string class_name_;
-  std::map<std::string, InputParameterTag> parameter_tags_;
+  std::map<std::string, InputParameterTag> parameter_class_tags_;
   std::map<std::string, std::string> parameter_doc_string_;
 
   std::map<std::string, std::string> deprecation_warning_tags_;
@@ -33,6 +33,10 @@ private:
 
   typedef std::unique_ptr<chi_data_types::AllowableRange> AllowableRangePtr;
   std::map<std::string, AllowableRangePtr> constraint_tags_;
+
+  /**Parameter names to ignore when trying to assign. For now this
+  * "chi_obj_type"*/
+  static const std::vector<std::string> system_ignored_param_names_;
 
 public:
   InputParameters() = default;
@@ -51,6 +55,7 @@ public:
 
 private:
   using ParameterBlock::AddParameter;
+  static bool IsParameterIgnored(const std::string& param_name) ;
 
 public:
   template <typename T>
@@ -59,7 +64,7 @@ public:
                             const std::string& doc_string)
   {
     AddParameter(name, value);
-    parameter_tags_[name] = InputParameterTag::OPTIONAL;
+    parameter_class_tags_[name] = InputParameterTag::OPTIONAL;
     parameter_doc_string_[name] = doc_string;
   }
   void AddOptionalParameterBlock(const std::string& name,
@@ -72,7 +77,7 @@ public:
                                  const std::string& doc_string)
   {
     AddParameter(name, array);
-    parameter_tags_[name] = InputParameterTag::OPTIONAL;
+    parameter_class_tags_[name] = InputParameterTag::OPTIONAL;
     parameter_doc_string_[name] = doc_string;
   }
 
@@ -81,7 +86,7 @@ public:
                             const std::string& doc_string)
   {
     AddParameter(name, chi_data_types::Varying::DefaultValue<T>());
-    parameter_tags_[name] = InputParameterTag::REQUIRED;
+    parameter_class_tags_[name] = InputParameterTag::REQUIRED;
     parameter_doc_string_[name] = doc_string;
   }
 
@@ -95,7 +100,7 @@ public:
   {
     auto& param = GetParam(name);
     param = ParameterBlock(name, value);
-    parameter_tags_[name] = InputParameterTag::OPTIONAL;
+    parameter_class_tags_[name] = InputParameterTag::OPTIONAL;
     if (not doc_string.empty()) parameter_doc_string_[name] = doc_string;
   }
 
@@ -105,7 +110,7 @@ public:
   {
     auto& param = GetParam(name);
     param = ParameterBlock(name, chi_data_types::Varying::DefaultValue<T>());
-    parameter_tags_[name] = InputParameterTag::REQUIRED;
+    parameter_class_tags_[name] = InputParameterTag::REQUIRED;
     if (not doc_string.empty()) parameter_doc_string_[name] = doc_string;
   }
 

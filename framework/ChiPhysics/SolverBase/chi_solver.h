@@ -6,7 +6,6 @@
 
 #include "ChiPhysics/BasicOptions/basic_options.h"
 #include "ChiParameters/parameter_block.h"
-#include "ChiParameters/input_parameters.h"
 
 #include <iostream>
 #include <utility>

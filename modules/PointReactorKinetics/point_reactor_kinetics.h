@@ -19,9 +19,10 @@ private:
   double gen_time_;
   double rho_;
   double source_strength_;
-  size_t num_precursors_;
   double dt_;
+  std::string time_integration_;
 
+  size_t num_precursors_;
   chi_math::DynamicMatrix<double> A_, I_;
   chi_math::DynamicVector<double> x_t_, x_tp1_, q_;
   double beta_ = 1.0;
@@ -36,6 +37,17 @@ public:
   void Execute() override;
   void Step() override;
   void Advance() override;
+
+  // Getters and Setters
+  double PopulationPrev() const;
+  double PopulationNext() const;
+  double Period() const;
+  double TimePrev() const;
+  double TimeNext() const;
+  std::vector<double> SolutionPrev() const;
+  std::vector<double> SolutionNext() const;
+
+  void SetRho(double value);
 };
 } // namespace prk
 
