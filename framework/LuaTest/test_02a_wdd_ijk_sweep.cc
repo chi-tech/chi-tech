@@ -1,3 +1,5 @@
+#include "chi_lua.h"
+
 #include <array>
 #include <cstddef>
 #include <cmath>
@@ -99,9 +101,9 @@ IJKArrayDbl WDD_IJK_Sweep(const std::array<size_t, 3>& mesh_divs,
   return phi_0;
 }
 
-void Test_WDD_IJK_Sweep(bool verbose)
+int  Test_WDD_IJK_Sweep(lua_State* L)
 {
-
+  bool verbose = true;
   const std::array<size_t, 3> mesh_divisions = {1,1,10};
   const std::array<double, 3> mesh_lengths = {1.0,1.0,10.0};
   const std::array<double, 6> bcs = {0.0, 0.0,
@@ -133,7 +135,7 @@ void Test_WDD_IJK_Sweep(bool verbose)
   }
 
 
-
+  return 0;
 }
 
 }//namespace chi_unit_tests

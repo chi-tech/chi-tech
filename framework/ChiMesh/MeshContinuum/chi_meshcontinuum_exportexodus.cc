@@ -34,6 +34,22 @@ void chi_mesh::MeshContinuum::
 
   const auto& grid = *this;
 
+  //============================================= Check block consistency
+  std::map<int, chi_mesh::CellType> block_id_map;
+  for (const auto& cell : local_cells)
+  {
+    const int mat_id = cell.material_id_;
+    if (block_id_map.count(mat_id) == 0)
+      block_id_map[mat_id] = cell.SubType();
+    else
+    {
+      if (cell.SubType() != block_id_map.at(mat_id))
+        throw std::logic_error(fname + ": Material id " +
+                               std::to_string(mat_id) + " appearing for more "
+                               "than one cell type.");
+    }
+  }
+
   //============================================= Create unstructured meshes
   //                                              for each material-type pair
   vtkNew<vtkMultiBlockDataSet> grid_blocks;
@@ -159,6 +175,8 @@ void chi_mesh::MeshContinuum::
   for (const auto& [bndry_id, face_list] : boundary_id_faces_map)
   {
     const std::string block_name = grid.GetBoundaryIDMap().at(bndry_id);
+    chi::log.Log0Verbose1() << "bid: " + std::to_string(bndry_id) +
+                               " name=\"" + block_name + "\"";
 
     //====================================== NodeSet
     {

@@ -1,5 +1,6 @@
 #include "volmesher_predefunpart.h"
 
+#include "chi_runtime.h"
 #include "chi_mpi.h"
 
 

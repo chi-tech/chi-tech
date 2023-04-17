@@ -12,11 +12,11 @@ void chi_objects::ChiConsole::FlushConsole()
   {
     for (auto& command : command_buffer_)
     {
-      bool error = luaL_dostring(consoleState,command.c_str());
+      bool error = luaL_dostring(console_state_, command.c_str());
       if (error)
       {
-        chi::log.LogAll() << lua_tostring(consoleState,-1);
-        lua_pop(consoleState,1);
+        chi::log.LogAll() << lua_tostring(console_state_, -1);
+        lua_pop(console_state_, 1);
       }
     }
   }

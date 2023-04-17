@@ -2,7 +2,7 @@
 chiMeshHandlerCreate()
 
 mesh={}
-N=700
+N=100
 L=2
 xmin = -L/2
 dx = L/N
@@ -20,3 +20,7 @@ chiVolumeMesherExecute();
 chiVolumeMesherSetMatIDToAll(0)
 
 chiSimTest03_PWLC();
+chiMPIBarrier()
+if (chi_location_id == 0) then
+    os.execute("rm CodeTut3_PWLC*")
+end

@@ -31,7 +31,7 @@ int chiLBSAddPointSource(lua_State *L)
 
   //============================================= Get pointer to solver
   const int solver_handle = lua_tonumber(L,1);
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -73,7 +73,7 @@ int chiLBSClearPointSources(lua_State *L)
 
   //============================================= Get pointer to solver
   const int solver_handle = lua_tonumber(L,1);
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -102,7 +102,7 @@ int chiLBSInitializePointSources(lua_State *L)
 
   //============================================= Get pointer to solver
   const int solver_handle = lua_tonumber(L,1);
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 

@@ -75,7 +75,7 @@ size_t chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
   handler.SetVolumeMesher(std::make_shared<
     chi_mesh::VolumeMesherPredefinedUnpartitioned>(umesh));
 
-  handler.GetVolumeMesher().Execute();
+//  handler.GetVolumeMesher().Execute();
 
   return chi::unpartitionedmesh_stack.size()-1;
 }

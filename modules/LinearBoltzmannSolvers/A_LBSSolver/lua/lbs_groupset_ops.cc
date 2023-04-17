@@ -76,7 +76,7 @@ int chiLBSCreateGroupset(lua_State *L)
   const std::string fname = "chiLBSCreateGroupset";
   //============================================= Get pointer to solver
   const int solver_handle = lua_tonumber(L,1);
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -120,7 +120,7 @@ int chiLBSCreateGroup(lua_State *L)
   LuaCheckNumberValue(fname, L, 1);
   const int solver_handle = lua_tointeger(L,1);
 
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -180,7 +180,7 @@ int chiLBSGroupsetAddGroups(lua_State *L)
   int to   = lua_tonumber(L,4);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -273,7 +273,7 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
   int prquad_index = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -380,7 +380,7 @@ int chiLBSGroupsetSetAngleAggregationType(lua_State *L)
   int agg_type = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -463,7 +463,7 @@ int chiLBSGroupsetSetAngleAggDiv(lua_State *L)
   int num_div = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -531,7 +531,7 @@ int chiLBSGroupsetSetGroupSubsets(lua_State *L)
   int num_div = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -675,7 +675,7 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
   int iter_method  = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -792,7 +792,7 @@ int chiLBSGroupsetSetResidualTolerance(lua_State *L)
   double resid_tol = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -863,7 +863,7 @@ int chiLBSGroupsetSetMaxIterations(lua_State *L)
   int num_iter = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -931,7 +931,7 @@ int chiLBSGroupsetSetGMRESRestartIntvl(lua_State *L)
   int restart_intvl = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -1000,7 +1000,7 @@ int chiLBSGroupsetSetEnableSweepLog(lua_State *L)
   bool log_flag = lua_toboolean(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -1084,7 +1084,7 @@ int chiLBSGroupsetSetWGDSA(lua_State *L)
     petsc_string = lua_tostring(L,6);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -1174,7 +1174,7 @@ int chiLBSGroupsetSetTGDSA(lua_State *L)
     petsc_string = lua_tostring(L,6);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                        solver_handle,
                                                        fname);
 

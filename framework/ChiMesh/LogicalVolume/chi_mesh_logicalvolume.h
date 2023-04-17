@@ -5,28 +5,32 @@
 #include <chi_log.h>
 #include <array>
 
-#define SPHERE        1
-#define SPHERE_ORIGIN 2
-#define RPP           3
-#define RCC           4
-#define SURFACE       9
-#define BOOLEAN       10
+namespace chi_mesh
+{
+  enum class LogicalVolumeType
+  {
+    LVSPHERE = 1,
+    LVSPHERE_ORIGIN = 2,
+    LVRPP = 3,
+    LVRCC = 4,
+    LVSURFACE = 9,
+    LVBOOLEAN = 10
+  };
+}
 
 //###################################################################
 /** Class for defining base logical volumes.*/
 class chi_mesh::LogicalVolume
 {
+private:
+  const LogicalVolumeType type_;
+
+protected:
+  explicit LogicalVolume(LogicalVolumeType type) : type_(type) { }
 public:
-  int type_index;
-
-  LogicalVolume()
+  LogicalVolumeType Type() const
   {
-    type_index = 0;
-  }
-
-  int Type() const
-  {
-    return type_index;
+    return type_;
   }
 
   virtual bool Inside(const chi_mesh::Vector3& point) const
@@ -40,39 +44,39 @@ public:
 class chi_mesh::SphereLogicalVolume : public LogicalVolume
 {
 public:
-  double r;
-  double x0,y0,z0;
+  double r_;
+  double x0_,y0_,z0_;
 
-  SphereLogicalVolume()
+  SphereLogicalVolume() :
+    LogicalVolume(LogicalVolumeType::LVSPHERE_ORIGIN)
   {
-    type_index = SPHERE_ORIGIN;
-    r  = 1.0; x0 = 0.0; y0 = 0.0; z0 = 0.0;
+    r_  = 1.0; x0_ = 0.0; y0_ = 0.0; z0_ = 0.0;
   }
 
-  explicit SphereLogicalVolume(double in_radius)
+  explicit SphereLogicalVolume(double in_radius) :
+    LogicalVolume(LogicalVolumeType::LVSPHERE_ORIGIN)
   {
-    type_index = SPHERE_ORIGIN;
-    r  = in_radius; x0 = 0.0; y0 = 0.0; z0 = 0.0;
+    r_  = in_radius; x0_ = 0.0; y0_ = 0.0; z0_ = 0.0;
   }
 
-  SphereLogicalVolume(double in_radius,double in_x,double in_y, double in_z)
+  SphereLogicalVolume(double in_radius,double in_x,double in_y, double in_z) :
+    LogicalVolume(LogicalVolumeType::LVSPHERE)
   {
-    type_index = SPHERE;
-    r  = in_radius;
-    x0 = in_x;
-    y0 = in_y;
-    z0 = in_z;
+    r_  = in_radius;
+    x0_ = in_x;
+    y0_ = in_y;
+    z0_ = in_z;
   }
 
   bool Inside(const chi_mesh::Vector3& point) const override
   {
-    double dx = point.x - x0;
-    double dy = point.y - y0;
-    double dz = point.z - z0;
+    double dx = point.x - x0_;
+    double dy = point.y - y0_;
+    double dz = point.z - z0_;
 
     double R2 = dx*dx + dy*dy + dz*dz;
 
-    if (R2<= (r*r))
+    if (R2<= (r_ * r_))
       return true;
     else
       return false;
@@ -84,33 +88,32 @@ public:
 class chi_mesh::RPPLogicalVolume : public LogicalVolume
 {
 public:
-  double xmin,xmax;
-  double ymin,ymax;
-  double zmin,zmax;
+  double xmin_,xmax_;
+  double ymin_,ymax_;
+  double zmin_,zmax_;
 
-  RPPLogicalVolume()
+  RPPLogicalVolume() : LogicalVolume(LogicalVolumeType::LVRPP)
   {
-    type_index = RPP;
-    xmin = 0.0; xmax = 1.0;
-    ymin = 0.0; ymax = 1.0;
-    zmin = 0.0; zmax = 1.0;
+    xmin_ = 0.0; xmax_ = 1.0;
+    ymin_ = 0.0; ymax_ = 1.0;
+    zmin_ = 0.0; zmax_ = 1.0;
   }
 
   RPPLogicalVolume(double x0, double x1,
                    double y0, double y1,
-                   double z0, double z1)
+                   double z0, double z1) :
+    LogicalVolume(LogicalVolumeType::LVRPP)
   {
-    type_index = RPP;
-    xmin = x0; xmax = x1;
-    ymin = y0; ymax = y1;
-    zmin = z0; zmax = z1;
+    xmin_ = x0; xmax_ = x1;
+    ymin_ = y0; ymax_ = y1;
+    zmin_ = z0; zmax_ = z1;
   }
 
   bool Inside(const chi_mesh::Vector3& point) const override
   {
-    if ((point.x <= xmax) && (point.x >= xmin) &&
-        (point.y <= ymax) && (point.y >= ymin) &&
-        (point.z <= zmax) && (point.z >= zmin))
+    if ((point.x <= xmax_) && (point.x >= xmin_) &&
+        (point.y <= ymax_) && (point.y >= ymin_) &&
+        (point.z <= zmax_) && (point.z >= zmin_))
     {
       return true;
     }
@@ -127,26 +130,24 @@ public:
 class chi_mesh::RCCLogicalVolume : public LogicalVolume
 {
 public:
-  double x0,y0,z0;
-  double vx,vy,vz;
-  double r;
+  double x0_,y0_,z0_;
+  double vx_,vy_,vz_;
+  double r_;
 
-  RCCLogicalVolume()
+  RCCLogicalVolume() : LogicalVolume(LogicalVolumeType::LVRCC)
   {
-    type_index = RCC;
-    x0 = 0.0; y0 = 0.0; z0 = 0.0;
-    vx = 0.0; vy = 0.0; vz = 1.0;
-    r = 1.0;
+    x0_ = 0.0; y0_ = 0.0; z0_ = 0.0;
+    vx_ = 0.0; vy_ = 0.0; vz_ = 1.0;
+    r_ = 1.0;
   }
 
   RCCLogicalVolume(double ix0, double iy0, double iz0,
                    double ivx, double ivy, double ivz,
-                   double ir)
+                   double ir) : LogicalVolume(LogicalVolumeType::LVRCC)
   {
-    type_index = RCC;
-    x0 = ix0; y0 = iy0; z0 = iz0;
-    vx = ivx; vy = ivy; vz = ivz;
-    r = ir;
+    x0_ = ix0; y0_ = iy0; z0_ = iz0;
+    vx_ = ivx; vy_ = ivy; vz_ = ivz;
+    r_ = ir;
   }
 
   bool Inside(const chi_mesh::Vector3& point) const override
@@ -154,8 +155,8 @@ public:
     typedef chi_mesh::Vector3 Vec3;
 
     const auto& pr = point;              //reference point
-    const Vec3  p0(x0, y0, z0);          //cylinder root
-    const Vec3  cyl_dir_vec(vx, vy, vz); //cylinder direction vector
+    const Vec3  p0(x0_, y0_, z0_);          //cylinder root
+    const Vec3  cyl_dir_vec(vx_, vy_, vz_); //cylinder direction vector
     const Vec3  k_hat(0.0, 0.0, 1.0);    //k_hat
 
     const Vec3 p0r = pr - p0;
@@ -192,7 +193,7 @@ public:
     const Vec3 p0r_projected(p0r.Dot(tangent), p0r.Dot(binorm), 0.0);
 
     //====================================== Determine if point is within cylinder
-    if (p0r_projected.NormSquare() <= r*r)
+    if (p0r_projected.NormSquare() <= r_ * r_)
       return true;
     else
       return false;
@@ -205,9 +206,9 @@ class chi_mesh::SurfaceMeshLogicalVolume : public LogicalVolume
 {
 private:
   typedef std::shared_ptr<chi_mesh::SurfaceMesh> SurfaceMeshPtr;
-  std::array<double,2> xbounds;
-  std::array<double,2> ybounds;
-  std::array<double,2> zbounds;
+  std::array<double,2> xbounds_;
+  std::array<double,2> ybounds_;
+  std::array<double,2> zbounds_;
 public:
   const SurfaceMeshPtr surf_mesh = nullptr;
 
@@ -224,6 +225,8 @@ class chi_mesh::BooleanLogicalVolume : public LogicalVolume
 {
 public:
   std::vector<std::pair<bool,std::shared_ptr<LogicalVolume>>> parts;
+
+  BooleanLogicalVolume() : LogicalVolume(LogicalVolumeType::LVBOOLEAN) {}
 
   bool Inside(const chi_mesh::Vector3& point) const override
   {

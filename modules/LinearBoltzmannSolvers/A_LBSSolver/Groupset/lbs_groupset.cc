@@ -4,6 +4,7 @@
 
 #include "ChiMath/Quadratures/angular_product_quadrature.h"
 
+#include "chi_runtime.h"
 #include "ChiLog/chi_log.h"
 #include "ChiMPI/chi_mpi.h"
 

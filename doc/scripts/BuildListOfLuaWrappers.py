@@ -1,10 +1,13 @@
 """
 This script walks the modules- and framework-folders and
-looks for directories named "lua" or "LuaTest". When found
+looks for directories named "lua" or "LuaTest". When found,
 it adds all the .cc files in those folders to a list.
 """
 import os
 import re
+
+if not os.path.exists("doc/generated_files"):
+    os.mkdir("doc/generated_files")
 
 folders_to_walk = ["framework", "modules"]
 
@@ -16,8 +19,77 @@ for search_folder in folders_to_walk:
             for file_name in files:
                 base_name, extension = os.path.splitext(file_name)
                 if extension == ".cc":
-                    # print(dir_path + "/" + file_name)
                     wrapper_sources.append(dir_path + "/" + file_name)
+
+input_file_folders = ["tests", "doc/examples"]
+"""
+The following function finds all lua input files in the 
+input file folders. It then creates proxies for these files.
+"""
+input_files = []
+main_input_proxies_file = open("doc/generated_files/input_wrappers_main.h", "w")
+main_input_proxies_file.write("/** \page LuaInputExamples Lua Input Examples \n\n")
+
+
+for input_file_folder in input_file_folders:
+    # r=root, d=directories, f=files
+    for r, d, f in os.walk(input_file_folder):
+        for file_name in f:
+            if '.lua' in file_name:
+                file_path = r + "/" + file_name
+                input_files.append(file_path)
+
+                proxy_name = file_path.replace("/", "_")
+                proxy_name = proxy_name.replace(".", "_")
+
+                main_input_proxies_file.write("\subpage " + proxy_name + "  \n")
+
+                dirs = r.split("/")
+                incremental_root = "doc/generated_files"
+                for dir in dirs:
+                    incremental_root += "/" + dir
+                    if not os.path.exists(incremental_root):
+                        os.mkdir(incremental_root)
+
+                input_proxies_file = open("doc/generated_files/" + r + "/" +\
+                                          proxy_name + ".h", "w")
+
+                input_proxies_file.write("/** \page " + proxy_name + " " +\
+                                         file_path + "\n")
+                input_proxies_file.write("\ingroup LuaInputExamples\n\n")
+                input_proxies_file.write("\code\n")
+
+                temp_file = open(file_path, "r")
+                lines = temp_file.readlines()
+                for line in lines:
+                    input_proxies_file.write(line)
+                temp_file.close()
+
+                input_proxies_file.write("\endcode\n")
+                input_proxies_file.write("*/\n\n\n")
+
+                input_proxies_file.close()
+
+main_input_proxies_file.write("*/\n\n")
+main_input_proxies_file.close()
+
+"""
+The following function searches for the use of a function name in all
+the lua input files
+"""
+def SearchForFunction(function_name, input_files):
+    file_list = []
+
+    for input_file in input_files:
+        file = open(input_file, "r")
+        content = file.read()
+
+        if function_name in content:
+            file_list.append(input_file)
+
+        file.close()
+
+    return file_list
 
 """
 Next each file is scanned. Doxygen comments are extracted as well
@@ -41,11 +113,9 @@ The function (declaration and definition) is then reformatted when written, such
 that the return type replaces the classical `int` return and the parameters
 replace the `lua_State* L` parameter.
 """
-if not os.path.exists("doc/generated_files"):
-    os.mkdir("doc/generated_files")
-
 definition_file = open("doc/generated_files/lua_functions.c", "w")
 declaration_file = open("doc/generated_files/lua_namespace.h", "w")
+definition_file.write("namespace chi_lua\n{\n")
 declaration_file.write("namespace chi_lua\n{\n")
 for src_path in wrapper_sources:
     file = open(src_path, "r")
@@ -56,13 +126,15 @@ for src_path in wrapper_sources:
     in_comment = False
     params = []
     returns = []
+    comment_lines = []
+    function_line = ""
     for line in lines:
 
         if line.find("/**") >= 0:
             in_comment = True
 
         if in_comment:
-            definition_file.write(line)
+            comment_lines.append(line)
 
         if in_comment:
             param_start = line.find(r"\param")
@@ -82,42 +154,54 @@ for src_path in wrapper_sources:
         if line.find("int") >= 0 and line.find("chi") >= 0 and \
                 line.find("lua_State") >= 0:
             words = re.split(r"\(|\)|\s", line.strip())
-            # print(src_path, words)
 
+            # Build function name and filelist
             function_name = words[1]
+            file_list = SearchForFunction(function_name, input_files)
 
-            # Defintion file
+            def WriteUsageExamples():
+                if len(file_list) > 0:
+                    definition_file.write("### Usage Examples:\n")
+                    for usage_file in file_list:
+                        proxy_name = usage_file.replace("/", "_")
+                        proxy_name = proxy_name.replace(".", "_")
+                        definition_file.write("\\ref " + proxy_name + "  \n")
+
             if len(returns) > 0:
-                definition_file.write(returns[0] + " ")
+                function_line = returns[0] + " "
             else:
-                definition_file.write("void ")
+                function_line = "void "
 
-            definition_file.write("chi_lua::" + function_name + "(")
+            function_line += function_name + "("
             for k in range(0, len(params)):
-                definition_file.write(params[k])
+                function_line += params[k]
                 if k < (len(params)-1):
-                    definition_file.write(", ")
-            definition_file.write("){}\n")
+                    function_line += ", "
+            function_line += ")"
 
-            # Declaration file
-            if len(returns) > 0:
-                declaration_file.write(returns[0] + " ")
-            else:
-                declaration_file.write("void ")
+            num_comment_lines = len(comment_lines)
+            if num_comment_lines == 1:
+                line = comment_lines[0].replace("*/", "")
+                definition_file.write(line)
+                WriteUsageExamples()
+                definition_file.write("*/\n")
+            elif num_comment_lines > 1:
+                for k in range(0, num_comment_lines-1):
+                    definition_file.write(comment_lines[k])
+                WriteUsageExamples()
+                definition_file.write(comment_lines[num_comment_lines-1])
 
-            declaration_file.write(function_name + "(")
-            for k in range(0, len(params)):
-                declaration_file.write(params[k])
-                if k < (len(params)-1):
-                    declaration_file.write(", ")
-
-            declaration_file.write(");\n")
+            definition_file.write(function_line + "{}\n")
+            declaration_file.write(function_line + ";\n")
 
             params = []
             returns = []
+            comment_lines = []
+            function_line = ""
 
     file.close()
 
+definition_file.write("}//namespace chi_lua\n")
 definition_file.close()
 
 declaration_file.write("}//namespace chi_lua\n")

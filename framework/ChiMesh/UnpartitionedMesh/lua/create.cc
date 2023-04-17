@@ -2,6 +2,9 @@
 
 #include "ChiMesh/UnpartitionedMesh/chi_unpartitioned_mesh.h"
 #include "chi_runtime.h"
+#include "chi_log.h"
+
+#include "ChiConsole/chi_console.h"
 
 namespace chi_mesh::unpartition_mesh_lua_utils
 {
@@ -67,6 +70,9 @@ int chiDestroyUnpartitionedMesh(lua_State* L)
   mesh_ptr->CleanUp();
   chi::unpartitionedmesh_stack[handle] = nullptr;
 
+  chi::log.Log()
+  << "Unpartitioned mesh destroyed. Memory in use = "
+  << chi_objects::ChiConsole::GetMemoryUsageInMB() << " MB";
   return 0;
 }
 

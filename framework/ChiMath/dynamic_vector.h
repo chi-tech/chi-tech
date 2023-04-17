@@ -1,5 +1,5 @@
-#ifndef _chi_math_DVectorNX_h
-#define _chi_math_DVectorNX_h
+#ifndef CHI_MATH_DYNAMIC_VECTOR_H
+#define CHI_MATH_DYNAMIC_VECTOR_H
 
 #include <vector>
 #include <stdexcept>
@@ -7,18 +7,18 @@
 
 namespace chi_mesh
 {
-  struct Vector3;
+struct Vector3;
 }
 
 namespace chi_math
 {
-  template<class NumberFormat>
-  class DynamicVector;
+template <class NumberFormat>
+class DynamicVector;
 }
 
-//###################################################################
+// ###################################################################
 /** General dynamic vector utility.*/
-template<class NumberFormat>
+template <class NumberFormat>
 class chi_math::DynamicVector
 {
 public:
@@ -29,29 +29,27 @@ public:
   {
     static_assert(std::is_floating_point<NumberFormat>::value,
                   "Only floating point number formats are "
-                  "supported for DVectorNX." );
+                  "supported for DVectorNX.");
   }
 
   /**Constructor with number of entries. Value defaults.*/
-  DynamicVector(size_t N) :
-      elements_(N)
+  explicit DynamicVector(size_t N) : elements_(N)
   {
     static_assert(std::is_floating_point<NumberFormat>::value,
                   "Only floating point number formats are "
-                  "supported for DVectorNX." );
+                  "supported for DVectorNX.");
   }
 
   /**Constructor with number of entries and default value.*/
-  DynamicVector(size_t N, NumberFormat value) :
-      elements_(N, value)
+  DynamicVector(size_t N, NumberFormat value) : elements_(N, value)
   {
     static_assert(std::is_floating_point<NumberFormat>::value,
                   "Only floating point number formats are "
-                  "supported for DVectorNX." );
+                  "supported for DVectorNX.");
   }
 
   /**Copy constructor.*/
-  DynamicVector(const DynamicVector& other) { elements_ = other.elements_;}
+  DynamicVector(const DynamicVector& other) { elements_ = other.elements_; }
 
   /**Assignment operator.*/
   DynamicVector& operator=(const DynamicVector& other)
@@ -61,17 +59,20 @@ public:
   }
 
   /**Move constructor.*/
-  DynamicVector(DynamicVector&& other) { elements_ = std::move(other.elements_);}
+  DynamicVector(DynamicVector&& other) noexcept
+  {
+    elements_ = std::move(other.elements_);
+  }
 
   /**Move assignment operator.*/
-  DynamicVector& operator=(DynamicVector&& other)
+  DynamicVector& operator=(DynamicVector&& other) noexcept
   {
     elements_ = std::move(other.elements_);
     return *this;
   }
 
   /**Constructor with vector.*/
-  DynamicVector(const std::vector<double>& in) { elements_ = in;}
+  explicit DynamicVector(const std::vector<double>& in) { elements_ = in; }
 
   /**Copy constructor with vector.*/
   DynamicVector& operator=(const std::vector<double>& in)
@@ -81,7 +82,7 @@ public:
   }
 
   /**Constructor with vector.*/
-  DynamicVector(std::initializer_list<NumberFormat> in) { elements_ = in;}
+  DynamicVector(std::initializer_list<NumberFormat> in) { elements_ = in; }
 
   /**Copy constructor with vector.*/
   DynamicVector& operator=(std::initializer_list<NumberFormat> in)
@@ -91,20 +92,20 @@ public:
   }
 
   //============================================= Element access
-  NumberFormat& operator[](size_t i) {return elements_[i];}
-  const NumberFormat& operator[](size_t i) const {return elements_[i];}
+  NumberFormat& operator[](size_t i) { return elements_[i]; }
+  const NumberFormat& operator[](size_t i) const { return elements_[i]; }
 
-  NumberFormat& at(size_t i) {return elements_.at(i);}
+  NumberFormat& at(size_t i) { return elements_.at(i); }
 
-  NumberFormat& back() {return elements_.back();}
+  NumberFormat& back() { return elements_.back(); }
 
-  NumberFormat& front() {return elements_.front();}
+  NumberFormat& front() { return elements_.front(); }
 
-  NumberFormat* data() {return elements_.data();}
+  NumberFormat* data() { return elements_.data(); }
 
-  void clear() {elements_.clear();}
+  void clear() { elements_.clear(); }
 
-  void resize(size_t dim) {elements_.resize(dim); }
+  void resize(size_t dim) { elements_.resize(dim); }
   void resize(size_t dim, const NumberFormat& val)
   {
     elements_.resize(dim, val);
@@ -112,27 +113,26 @@ public:
       entry = val;
   }
 
-  void reserve(size_t dim) {elements_.reserve(dim);}
+  void reserve(size_t dim) { elements_.reserve(dim); }
 
-  void push_back(const NumberFormat& val) {elements_.push_back(val);}
-  void pop_back() {elements_.pop_back();}
+  void push_back(const NumberFormat& val) { elements_.push_back(val); }
+  void pop_back() { elements_.pop_back(); }
 
-  bool empty() const noexcept {return elements_.empty();}
+  bool empty() const noexcept { return elements_.empty(); }
 
   //============================================= Iterator access
-  typename std::vector<NumberFormat>::iterator begin() {return elements_.begin();}
+  typename std::vector<NumberFormat>::iterator begin()
+  {
+    return elements_.begin();
+  }
 
-  typename std::vector<NumberFormat>::iterator end() {return elements_.end();}
+  typename std::vector<NumberFormat>::iterator end() { return elements_.end(); }
 
-  size_t size() const {return elements_.size();}
+  size_t size() const { return elements_.size(); }
 
   void bounds_check(const size_t a, const size_t b) const
   {
-    if (a != b)
-    {
-      std::length_error excp("Mismatched sizes of DVectorNX");
-      throw excp;
-    }
+    if (a != b) { throw std::length_error("Mismatched sizes of DVectorNX"); }
   }
 
   //============================================= Addition
@@ -140,20 +140,20 @@ public:
    * \f$ \vec{w} = \vec{x} + \vec{y} \f$*/
   DynamicVector operator+(const DynamicVector& rhs) const
   {
-    bounds_check(size(),rhs.size());
+    bounds_check(size(), rhs.size());
     DynamicVector<NumberFormat> newVector(size());
-    for (int i = 0; i<size();++i)
+    for (int i = 0; i < size(); ++i)
       newVector.elements_[i] = elements_[i] + rhs.elements_[i];
 
     return newVector;
   }
 
   /**In-place component-wise addition of two vectors.
- * \f$ \vec{x} = \vec{x} + \vec{y} \f$*/
+   * \f$ \vec{x} = \vec{x} + \vec{y} \f$*/
   DynamicVector& operator+=(const DynamicVector& rhs)
   {
-    bounds_check(size(),rhs.size());
-    for (int i = 0; i<size();++i)
+    bounds_check(size(), rhs.size());
+    for (int i = 0; i < size(); ++i)
       elements_[i] += rhs.elements_[i];
 
     return *this;
@@ -161,23 +161,23 @@ public:
 
   //=========================================== Subtraction
   /**Component-wise subtraction.
- * \f$ \vec{w} = \vec{x} - \vec{y} \f$*/
+   * \f$ \vec{w} = \vec{x} - \vec{y} \f$*/
   DynamicVector operator-(const DynamicVector& rhs) const
   {
-    bounds_check(size(),rhs.size());
+    bounds_check(size(), rhs.size());
     DynamicVector<NumberFormat> newVector(size());
-    for (int i = 0; i<size();++i)
+    for (int i = 0; i < size(); ++i)
       newVector.elements_[i] = elements_[i] - rhs.elements_[i];
 
     return newVector;
   }
 
   /**In-place component-wise subtraction.
- * \f$ \vec{x} = \vec{x} - \vec{y} \f$*/
+   * \f$ \vec{x} = \vec{x} - \vec{y} \f$*/
   DynamicVector& operator-=(const DynamicVector& rhs)
   {
-    bounds_check(size(),rhs.size());
-    for (int i = 0; i<size();++i)
+    bounds_check(size(), rhs.size());
+    for (int i = 0; i < size(); ++i)
       elements_[i] -= rhs.elements_[i];
 
     return *this;
@@ -185,44 +185,44 @@ public:
 
   //=========================================== Multiplication
   /**Vector component-wise multiplication by scalar.
- * \f$ \vec{w} = \vec{x} \alpha \f$*/
+   * \f$ \vec{w} = \vec{x} \alpha \f$*/
   DynamicVector operator*(const NumberFormat value) const
   {
     DynamicVector<NumberFormat> newVector(size());
-    for (int i = 0;i<size();++i)
+    for (int i = 0; i < size(); ++i)
       newVector.elements_[i] = elements_[i] * value;
 
     return newVector;
   }
 
   /**Vector in-place component-wise multiplication by scalar.
- * \f$ \vec{x} = \vec{x} \alpha \f$*/
+   * \f$ \vec{x} = \vec{x} \alpha \f$*/
   DynamicVector& operator*=(const NumberFormat value)
   {
-    for (int i = 0;i<size();++i)
+    for (int i = 0; i < size(); ++i)
       elements_[i] *= value;
 
     return *this;
   }
 
   /**Vector component-wise multiplication.
- * \f$ w_i = x_i y_i \f$*/
+   * \f$ w_i = x_i y_i \f$*/
   DynamicVector operator*(const DynamicVector& rhs) const
   {
-    bounds_check(size(),rhs.size());
+    bounds_check(size(), rhs.size());
     DynamicVector<NumberFormat> newVector(size());
-    for (int i = 0; i<size(); ++i)
+    for (int i = 0; i < size(); ++i)
       newVector.elements_[i] = elements_[i] * rhs.elements_[i];
 
     return newVector;
   }
 
   /**Vector in-place component-wise multiplication.
- * \f$ x_i = x_i y_i \f$*/
+   * \f$ x_i = x_i y_i \f$*/
   DynamicVector& operator*=(const DynamicVector& rhs)
   {
-    bounds_check(size(),rhs.size());
-    for (int i = 0; i<size(); ++i)
+    bounds_check(size(), rhs.size());
+    for (int i = 0; i < size(); ++i)
       elements_[i] *= rhs.elements_[i];
 
     return *this;
@@ -230,44 +230,44 @@ public:
 
   //=========================================== Division
   /**Vector component-wise division by scalar.
- * \f$ w_i = \frac{x_i}{\alpha} \f$*/
+   * \f$ w_i = \frac{x_i}{\alpha} \f$*/
   DynamicVector operator/(const NumberFormat value) const
   {
     DynamicVector<NumberFormat> newVector(size());
-    for (int i = 0;i<size();++i)
+    for (int i = 0; i < size(); ++i)
       newVector.elements_[i] = elements_[i] / value;
 
     return newVector;
   }
 
   /**Vector in-place component-wise division by scalar.
- * \f$ x_i = \frac{x_i}{\alpha} \f$*/
+   * \f$ x_i = \frac{x_i}{\alpha} \f$*/
   DynamicVector& operator/=(const NumberFormat value)
   {
-    for (int i = 0;i<size();++i)
+    for (int i = 0; i < size(); ++i)
       elements_[i] /= value;
 
     return *this;
   }
 
   /**Vector component-wise division.
- * \f$ w_i = \frac{x_i}{y_i} \f$*/
+   * \f$ w_i = \frac{x_i}{y_i} \f$*/
   DynamicVector operator/(const DynamicVector& rhs) const
   {
-    bounds_check(size(),rhs.size());
+    bounds_check(size(), rhs.size());
     DynamicVector<NumberFormat> newVector(size());
-    for (int i = 0; i<size(); ++i)
+    for (int i = 0; i < size(); ++i)
       newVector.elements_[i] = elements_[i] / rhs.elements_[i];
 
     return newVector;
   }
 
   /**Vector in-place component-wise division.
-  * \f$ x_i = \frac{x_i}{y_i} \f$*/
+   * \f$ x_i = \frac{x_i}{y_i} \f$*/
   DynamicVector& operator/=(const DynamicVector& rhs)
   {
-    bounds_check(size(),rhs.size());
-    for (int i = 0; i<size(); ++i)
+    bounds_check(size(), rhs.size());
+    for (int i = 0; i < size(); ++i)
       elements_[i] /= rhs.elements_[i];
 
     return *this;
@@ -278,20 +278,20 @@ public:
    * \f$ \vec{w} = \vec{x} \bullet \vec{y} \f$ */
   NumberFormat Dot(const DynamicVector& rhs) const
   {
-    bounds_check(size(),rhs.size());
+    bounds_check(size(), rhs.size());
     NumberFormat value = 0.0;
-    for (int i = 0; i<size(); ++i)
+    for (int i = 0; i < size(); ++i)
       value += elements_[i] * rhs.elements_[i];
 
     return value;
   }
 
   /**Computes the L2-norm of the vector. Otherwise known as the length of
-    * a 3D vector.*/
+   * a 3D vector.*/
   NumberFormat Norm() const
   {
     NumberFormat value = 0.0;
-    for (int i = 0; i<size();++i)
+    for (int i = 0; i < size(); ++i)
       value += elements_[i] * elements_[i];
 
     value = sqrt(value);
@@ -299,12 +299,12 @@ public:
   }
 
   /**Computes the square of the L2-norm of the vector. This eliminates the
-  * usage of the square root and is therefore less expensive that a proper
-  * L2-norm. Useful if only comparing distances.*/
+   * usage of the square root and is therefore less expensive that a proper
+   * L2-norm. Useful if only comparing distances.*/
   NumberFormat NormSquare() const
   {
     NumberFormat value = 0.0;
-    for (int i = 0; i<size();++i)
+    for (int i = 0; i < size(); ++i)
       value += elements_[i] * elements_[i];
 
     return value;
@@ -314,7 +314,7 @@ public:
   void Normalize()
   {
     NumberFormat norm = this->Norm();
-    for (int i = 0;i<size();++i)
+    for (int i = 0; i < size(); ++i)
       elements_[i] = elements_[i] / norm;
   }
 
@@ -323,18 +323,25 @@ public:
   {
     NumberFormat norm = this->Norm();
     DynamicVector<NumberFormat> newVector(size());
-    for (int i = 0;i<size();++i)
+    for (int i = 0; i < size(); ++i)
       newVector.elements_[i] = elements_[i] / norm;
 
     return newVector;
+  }
+
+  /**Sets all the elements of the vector to the specified value.*/
+  void Set(NumberFormat value)
+  {
+    for (int i = 0; i < size(); ++i)
+      elements_[i] = value;
   }
 
   /**Prints the vector to a string and then returns the string.*/
   std::string PrintStr() const
   {
     std::stringstream out;
-    out<<"[";
-    for (int i = 0; i<(size()-1); ++i)
+    out << "[";
+    for (int i = 0; i < (size() - 1); ++i)
       out << elements_[i] << " ";
     out << elements_[size() - 1] << "]";
 
@@ -343,14 +350,14 @@ public:
 };
 
 /**Multiplication by a scalar from the left.*/
-template<class NumberFormat>
+template <class NumberFormat>
 chi_math::DynamicVector<NumberFormat>
-operator*(const double value,const chi_math::DynamicVector<NumberFormat>& that)
+operator*(const double value, const chi_math::DynamicVector<NumberFormat>& that)
 {
   chi_math::DynamicVector<NumberFormat> newVector(that.size());
-  for (int i = 0; i<that.size();++i)
+  for (int i = 0; i < that.size(); ++i)
     newVector.elements_[i] = that.elements_[i] * value;
   return newVector;
 }
 
-#endif
+#endif // CHI_MATH_DYNAMIC_VECTOR_H

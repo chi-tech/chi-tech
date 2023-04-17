@@ -11,3 +11,5 @@ include: modules/CFEMDiffusion/lua/mainpage_quickref.txt
 include: modules/DFEMDiffusion/lua/mainpage_quickref.txt
 
 include: modules/MGDiffusion/lua/mainpage_quickref.txt
+
+include: modules/ReactorPointKinetics/lua/mainpage_quickref.txt

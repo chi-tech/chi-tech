@@ -7,6 +7,8 @@
 
 #include "chi_log.h"
 
+#define scint static_cast<int>
+
 //###################################################################
 /** Creates a logical volume.
 
@@ -64,13 +66,21 @@ lv6 = chiLogicalVolumeCreate(BOOLEAN, {{true , lv5},  -- inside logical volume 5
 int chiLogicalVolumeCreate(lua_State *L)
 {
   const std::string fname = __FUNCTION__;
-  auto& handler = chi_mesh::GetCurrentHandler();
 
   const int num_args = lua_gettop(L);
   const int type_index = lua_tonumber(L,1);
 
+
+  const int LVSPHERE        = scint(chi_mesh::LogicalVolumeType::LVSPHERE);
+  const int LVSPHERE_ORIGIN = scint(chi_mesh::LogicalVolumeType::LVSPHERE_ORIGIN);
+  const int LVRPP           = scint(chi_mesh::LogicalVolumeType::LVRPP);
+  const int LVRCC           = scint(chi_mesh::LogicalVolumeType::LVRCC);
+  const int LVSURFACE       = scint(chi_mesh::LogicalVolumeType::LVSURFACE);
+  const int LVBOOLEAN       = scint(chi_mesh::LogicalVolumeType::LVBOOLEAN);
+
+
   //================================================== Sphere at origin
-  if (type_index == SPHERE_ORIGIN)
+  if (type_index == LVSPHERE_ORIGIN)
   {
     if (num_args!=2)
     {
@@ -87,7 +97,7 @@ int chiLogicalVolumeCreate(lua_State *L)
   }
 
   //================================================== Sphere at arb loc
-  else if (type_index == SPHERE)
+  else if (type_index == LVSPHERE)
   {
     if (num_args!=5)
     {
@@ -107,7 +117,7 @@ int chiLogicalVolumeCreate(lua_State *L)
   }
 
   //================================================== RPP
-  else if (type_index == RPP)
+  else if (type_index == LVRPP)
   {
     if (num_args!=7)
     {
@@ -129,7 +139,7 @@ int chiLogicalVolumeCreate(lua_State *L)
   }
 
   //================================================== RCC
-  else if (type_index == RCC)
+  else if (type_index == LVRCC)
   {
     if (num_args!=8)
     {
@@ -156,7 +166,7 @@ int chiLogicalVolumeCreate(lua_State *L)
       << vx << " " << vy << " " << vz << " "
       << r;
   }
-  else if (type_index == SURFACE)
+  else if (type_index == LVSURFACE)
   {
     if (num_args != 2)
       LuaPostArgAmountError("chiMeshCreateLogicalVolume:SURFACE",2,num_args);
@@ -173,7 +183,7 @@ int chiLogicalVolumeCreate(lua_State *L)
     lua_pushnumber(L,static_cast<lua_Number>(index));
   }
   //================================================== BOOLEAN
-  else if (type_index == BOOLEAN)
+  else if (type_index == LVBOOLEAN)
   {
     if (num_args%2 != 0)
     {

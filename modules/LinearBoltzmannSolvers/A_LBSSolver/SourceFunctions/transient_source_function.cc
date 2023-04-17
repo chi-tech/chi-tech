@@ -18,8 +18,8 @@ AddDelayedFission(const PrecursorList &precursors,
                   const std::vector<double> &nu_delayed_sigma_f,
                   const double *phi) const
 {
-  const auto& BackwardEuler = chi_math::SteppingMethod::BACKWARD_EULER;
-  const auto& CrankNicolson = chi_math::SteppingMethod::CRANK_NICHOLSON;
+  const auto& BackwardEuler = chi_math::SteppingMethod::IMPLICIT_EULER;
+  const auto& CrankNicolson = chi_math::SteppingMethod::CRANK_NICOLSON;
 
   double theta;
   if      (method_ == BackwardEuler) theta = 1.0;

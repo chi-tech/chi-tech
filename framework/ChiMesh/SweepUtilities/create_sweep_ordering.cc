@@ -5,8 +5,8 @@
 
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 
-#include "chi_mpi.h"
 #include "chi_runtime.h"
+#include "chi_mpi.h"
 #include "chi_log.h"
 #include "ChiConsole/chi_console.h"
 #include "ChiTimer/chi_timer.h"

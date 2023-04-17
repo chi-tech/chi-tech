@@ -173,7 +173,8 @@ add_subdirectory("${CHI_TECH_DIR}/framework/ChiLua")
 add_subdirectory("${CHI_TECH_DIR}/framework/ChiMath")
 add_subdirectory("${CHI_TECH_DIR}/framework/ChiPhysics")
 add_subdirectory("${CHI_TECH_DIR}/framework/ChiGraph")
-
+add_subdirectory("${CHI_TECH_DIR}/framework/ChiObject")
+add_subdirectory("${CHI_TECH_DIR}/framework/ChiParameters")
 add_subdirectory("${CHI_TECH_DIR}/framework/ChiTimer")
 add_subdirectory("${CHI_TECH_DIR}/framework/ChiMesh")
 add_subdirectory("${CHI_TECH_DIR}/framework/ChiMPI")
@@ -190,7 +191,18 @@ target_link_libraries(ChiLib ${CHI_LIBS} external)
 target_compile_options(ChiLib PUBLIC ${CHI_CXX_FLAGS})
 
 add_executable(${TARGET} "${CHI_TECH_DIR}/framework/chi_tech_main.cc")
-target_link_libraries(${TARGET} ChiLib)
+#if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+
+#else()
+#    target_link_libraries(${TARGET} -Wl,--whole-archive ChiLib -Wl,--no-whole-archive )
+#endif()
+
+if(UNIX AND NOT APPLE)
+    target_link_libraries(${TARGET} -Wl,--whole-archive ChiLib -Wl,--no-whole-archive )
+elseif(APPLE)
+    target_link_libraries(${TARGET} -Wl,-all_load ChiLib )
+endif()
+
 target_compile_options(${TARGET} PUBLIC ${CHI_CXX_FLAGS})
 
 # |------------ Write Makefile to root directory

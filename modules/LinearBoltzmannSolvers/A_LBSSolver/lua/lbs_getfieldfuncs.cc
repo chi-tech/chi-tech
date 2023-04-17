@@ -1,5 +1,7 @@
 #include "A_LBSSolver/lbs_solver.h"
 
+#include "chi_runtime.h"
+
 namespace lbs::common_lua_utils
 {
 
@@ -18,7 +20,7 @@ int chiLBSGetScalarFieldFunctionList(lua_State *L)
   const std::string fname = "chiLBSGetScalarFieldFunctionList";
   //============================================= Get pointer to solver
   const int solver_handle = lua_tonumber(L, 1);
-  const auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::solver_stack,
+  const auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
                                                              solver_handle,
                                                              fname);
 

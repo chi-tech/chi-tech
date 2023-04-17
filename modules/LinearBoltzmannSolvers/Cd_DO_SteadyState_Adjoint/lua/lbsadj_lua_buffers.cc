@@ -2,6 +2,8 @@
 
 #include "lbsadj_lua_utils.h"
 
+#include "chi_runtime.h"
+
 namespace lbs::adjoint_lua_utils
 {
 
@@ -26,7 +28,7 @@ int chiAdjointSolverReadFluxMomentsToBuffer(lua_State* L)
   const int solver_handle     = lua_tointeger(L, 1);
 
   auto& solver = chi::GetStackItem<lbs::DiscOrdSteadyStateAdjointSolver>(
-    chi::solver_stack, solver_handle, fname);
+    chi::object_stack, solver_handle, fname);
 
   const std::string file_basename = lua_tostring(L,2);
 
@@ -59,7 +61,7 @@ int chiAdjointSolverApplyFluxMomentBuffer(lua_State* L)
   const int solver_handle     = lua_tointeger(L, 1);
 
   auto& solver = chi::GetStackItem<lbs::DiscOrdSteadyStateAdjointSolver>(
-    chi::solver_stack, solver_handle, fname);
+    chi::object_stack, solver_handle, fname);
 
   const int buffer_handle = lua_tointeger(L,2);
 

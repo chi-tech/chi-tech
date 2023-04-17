@@ -226,7 +226,7 @@ int chiSimTest93_RayTracing(lua_State* Lstate)
   const auto PWLD =
     chi_math::SpatialDiscretizationType::PIECEWISE_LINEAR_DISCONTINUOUS;
 
-  const size_t num_particles = 1'000'000;
+  const size_t num_particles = 100'000;
   for (size_t n=0; n<num_particles; ++n)
   {
     if (n % size_t(num_particles/10.0) == 0)
@@ -362,7 +362,7 @@ int chiSimTest93_RayTracing(lua_State* Lstate)
   chi_physics::FieldFunction::FFList const_ff_list;
   for (const auto& ff_ptr : ff_list)
     const_ff_list.push_back(ff_ptr);
-  chi_physics::FieldFunction::ExportMultipleToVTK(fname,
+  chi_physics::FieldFunction::ExportMultipleToVTK("SimTest_93",
                                                   const_ff_list);
 
   return 0;

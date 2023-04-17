@@ -62,7 +62,12 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
       block_data.push_back({block_name, {}});
     }
 
-    if (first_word == "usemtl") ++material_id;
+    if (first_word == "usemtl")
+    {
+      chi::log.Log0Verbose1() << "New material at cell count: "
+                              << block_data.back().cells.size();
+      ++material_id;
+    }
 
     //================================================ Keyword "v" for Vertex
     if (first_word == "v")
@@ -95,7 +100,6 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
         //================================== Stop word extraction on line end
         if (end_of_word==std::string::npos) {break;}
       }
-//      this->vertices_.push_back(newVertex); //TODO: Remove
       file_vertices.push_back(newVertex);
     }//if (first_word == "v")
 
@@ -160,7 +164,6 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
         cell->faces.push_back(std::move(face));
       }//for v
 
-//      this->raw_cells_.push_back(cell);//TODO: Remove
       if (block_data.empty())
         throw std::logic_error(fname + ": Could not add cell to block-data. "
              "This normally indicates that the file does not have the "
@@ -205,6 +208,7 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
     }//if (first_word == "l")
   }
   file.close();
+  chi::log.Log0Verbose0() << "Max material id: " << material_id;
 
   //======================================================= Filter blocks
   std::vector<size_t> bndry_block_ids;

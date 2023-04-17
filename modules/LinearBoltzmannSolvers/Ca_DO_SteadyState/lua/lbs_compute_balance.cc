@@ -1,5 +1,6 @@
 #include "Ca_DO_SteadyState/lbs_DO_steady_state.h"
 
+#include "chi_runtime.h"
 namespace lbs::disc_ord_steady_state_lua_utils
 {
 
@@ -23,7 +24,7 @@ int chiLBSComputeBalance(lua_State *L)
   //============================================= Get pointer to solver
   const int solver_handle = lua_tonumber(L, 1);
 
-  auto& lbs_solver = chi::GetStackItem<lbs::DiscOrdSteadyStateSolver>(chi::solver_stack,
+  auto& lbs_solver = chi::GetStackItem<lbs::DiscOrdSteadyStateSolver>(chi::object_stack,
                                                                       solver_handle,
                                                                       fname);
 
