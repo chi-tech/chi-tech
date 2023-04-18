@@ -221,10 +221,10 @@
 \addcontentsline{toc}{section}{\nameref{abstract}}
 
 
-Work is work for some, but for some it is play.
+Implementation details of Point-Reactor Kinetics in ChiTech.
 \newline
 \newline\noindent
-\textbf{Keywords:} transport sweeps; discrete-ordinate method; radiation transport; massively parallel simulations; discontinuous Galerkin; unstructured mesh
+\textbf{Keywords:} point-reactor kinetics, transient analysis, implicit, explicit, crank-nicolson
 
 \newpage
 
@@ -305,7 +305,19 @@ From the equations above we devise an operator form by defining
 	\frac{d\mathbf{x}}{dt} = A \mathbf{x} + \mathbf{q}
 \end{equation}
 
-\subsection{$\theta$-scheme time stepping}
+\subsection{Time stepping schemes}
+There is currently only three time stepping schemes available, they are: \newline
+{\ttfamily explicit\_euler, crank\_nicolson, implicit\_euler}.
+\subsubsection{{\ttfamily explicit\_euler}}
+For explicit Euler timestepping the operator form of our equation becomes
+\beqn 
+\frac{1}{\Delta t} (\mathbf{x}^{t+1} - \mathbf{x}^t) &= A \mathbf{x}^t + \mathbf{q} \\
+\therefore \mathbf{x}^{t+1} &= \mathbf{x}^t + \Delta t A \mathbf{x}^t + \Delta t \mathbf{q}
+\eeqn 
+\subsubsection{{\ttfamily crank\_nicolson, implicit\_euler}, $\theta$-scheme time stepping}
+{\ttfamily crank\_nicolson, implicit\_euler} can both be represented using a $\theta$-scheme, i.e., $\theta = \frac{1}{2} \to ${\ttfamily crank\_nicolson} and $\theta = 1 \to ${\ttfamily implicit\_euler}.
+
+
 For $\theta$-scheme time stepping, we have
 \begin{equation}
 	\frac{1}{\Delta t} (\mathbf{x}^{t+1} - \mathbf{x}^t) = A(\theta \mathbf{x}^{t+1} + (1-\theta) \mathbf{x}^{t}) + \mathbf{q}
@@ -317,7 +329,7 @@ for which can make the convenient manipulation
 	\therefore \mathbf{x}^{t+1} &= \mathbf{x}^t + \frac{1}{\theta} (\mathbf{x}_\theta - \mathbf{x}^t),
 \end{aligned}
 \end{equation}
-where we plug the expression for $\mathbf{x}^{t+1}$ into eq. 1.4, to get
+then we plug the expression for $\mathbf{x}^{t+1}$ into eq. 1.4, to get
 \begin{equation}
 	\tau (\mathbf{x}_\theta - \mathbf{x}^t) = A\mathbf{x}_\theta  + \mathbf{q}
 \end{equation}
@@ -358,7 +370,7 @@ A: \text{ row 0 } = [1, 0, ..., 0] \to A_{temp} \\
 \newpage
 \begin{thebibliography}{1}
 	
-	\bibitem{LewisMiller} Lewis E.E., Miller W.F., {\em Computational Methods of Neutron Transport}, JohnWiley \& Sons, 1984
+	\bibitem{Ragusa NUEN618 slides} Ragusa J.C., {\em NUEN-618 slides} 2020.
 	   
 \end{thebibliography}
 
