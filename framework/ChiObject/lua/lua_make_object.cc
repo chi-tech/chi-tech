@@ -9,8 +9,8 @@ namespace chi_objects::lua_utils
 int chiMakeObject(lua_State* L);
 int chiMakeObjectType(lua_State* L);
 
-ChiConsoleRegisterLuaFunction(chiMakeObject);
-ChiConsoleRegisterLuaFunction(chiMakeObjectType);
+RegisterLuaFunctionAsIs(chiMakeObject);
+RegisterLuaFunctionAsIs(chiMakeObjectType);
 
 // #############################################################################
 /**Generic lua routine for the creation of objects.
@@ -31,8 +31,14 @@ ChiConsoleRegisterLuaFunction(chiMakeObjectType);
   const auto& object_maker = ChiObjectMaker::GetInstance();
   const size_t handle = object_maker.MakeObject(params);
 
+  const std::string type = params.GetParamValue<std::string>("chi_obj_type");
+
   lua_pushinteger(L, static_cast<lua_Integer>(handle));
-  return 1;
+
+  lua_newtable(L);
+  ChiConsole::SetObjectMethodsToTable(type, handle);
+
+  return 2;
 }
 
 // #############################################################################
@@ -57,7 +63,11 @@ int chiMakeObjectType(lua_State* L)
   const size_t handle = object_maker.MakeObjectType(type, params);
 
   lua_pushinteger(L, static_cast<lua_Integer>(handle));
-  return 1;
+
+  lua_newtable(L);
+  ChiConsole::SetObjectMethodsToTable(type, handle);
+
+  return 2;
 }
 
 } // namespace chi_objects::lua_utils

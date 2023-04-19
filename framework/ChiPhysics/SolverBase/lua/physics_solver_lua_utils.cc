@@ -1,4 +1,4 @@
-#include "ChiLua/chi_lua.h"
+#include "physics_solver_lua_utils.h"
 
 #include "ChiPhysics/SolverBase/chi_solver.h"
 
@@ -13,24 +13,15 @@
 
 namespace chi_physics::lua_utils
 {
-  int chiSolverCreate(lua_State* L);
-  int chiSolverInitialize(lua_State* L);
-  int chiSolverExecute(lua_State* L);
-  int chiSolverStep(lua_State* L);
-  int chiSolverAdvance(lua_State* L);
-  int chiSolverSetBasicOption(lua_State* L);
-  int chiSolverGetName(lua_State* L);
-  int chiSolverGetFieldFunctionList(lua_State* L);
+  RegisterLuaFunctionAsIs(chiSolverCreate);
 
-  ChiConsoleRegisterLuaFunction(chiSolverCreate);
-
-  ChiConsoleRegisterLuaFunction(chiSolverInitialize);
-  ChiConsoleRegisterLuaFunction(chiSolverExecute);
-  ChiConsoleRegisterLuaFunction(chiSolverStep);
-  ChiConsoleRegisterLuaFunction(chiSolverAdvance);
-  ChiConsoleRegisterLuaFunction(chiSolverSetBasicOption);
-  ChiConsoleRegisterLuaFunction(chiSolverGetName);
-  ChiConsoleRegisterLuaFunction(chiSolverGetFieldFunctionList);
+  RegisterLuaFunctionAsIs(chiSolverInitialize);
+  RegisterLuaFunctionAsIs(chiSolverExecute);
+  RegisterLuaFunctionAsIs(chiSolverStep);
+  RegisterLuaFunctionAsIs(chiSolverAdvance);
+  RegisterLuaFunctionAsIs(chiSolverSetBasicOption);
+  RegisterLuaFunctionAsIs(chiSolverGetName);
+  RegisterLuaFunctionAsIs(chiSolverGetFieldFunctionList);
 
 //#############################################################################
 /**Generic lua routine for the creation of solvers.

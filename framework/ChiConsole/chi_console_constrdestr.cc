@@ -55,15 +55,15 @@ void chi_objects::ChiConsole::LoadRegisteredLuaItems()
   chi_modules::lua_utils::RegisterLuaEntities(L);
 
   //=================================== Registering static-registration
-  //                                    functions
+  //                                    lua functions
   for (const auto& [key, entry] : lua_function_registry_)
-    lua_register(L, key.c_str(), entry.function_ptr);
+    SetLuaFuncNamespaceTableStructure(key, entry.function_ptr);
 
   //=================================== Registering solver-function
   //                                    scope resolution tables
   const auto& object_maker = ChiObjectMaker::GetInstance();
   for (const auto& entry : object_maker.Registry())
-    SetNamespaceTableStructure(entry.first);
+    SetObjectNamespaceTableStructure(entry.first);
 
 }
 

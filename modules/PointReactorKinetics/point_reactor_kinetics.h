@@ -47,6 +47,7 @@ public:
   std::vector<double> SolutionPrev() const;
   std::vector<double> SolutionNext() const;
 
+
   void SetRho(double value);
 };
 } // namespace prk
