@@ -45,8 +45,8 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   }
 
   //======================================== Get unpartitioned mesh
-  ChiLogicalError(umesh_ptr_ == nullptr,
-                  "nullptr encountered for unparitioned mesh")
+  ChiLogicalErrorIf(umesh_ptr_ == nullptr,
+                  "nullptr encountered for unparitioned mesh");
 
   chi::log.Log() << "Computed centroids";
   MPI_Barrier(MPI_COMM_WORLD);

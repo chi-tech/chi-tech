@@ -36,6 +36,7 @@ chi_objects::InputParameters TransientSolver::GetInputParameters()
   params.AddOptionalParameter("initial_rho", 0.0, "Initial reactivity [$]");
   params.AddOptionalParameter(
     "initial_source", 1.0, "Initial source strength [/s]");
+
   params.AddOptionalParameter(
     "initial_population", 1.0, "Initial neutron population");
   params.AddOptionalParameter("dt", 0.01, "Default timestep size [s]");
@@ -69,8 +70,9 @@ TransientSolver::TransientSolver(const chi_objects::InputParameters& params)
     gen_time_(params.GetParamValue<double>("gen_time")),
     rho_(params.GetParamValue<double>("initial_rho")),
     source_strength_(params.GetParamValue<double>("initial_source")),
-    num_precursors_(lambdas_.size()),
-    dt_(params.GetParamValue<double>("dt"))
+    dt_(params.GetParamValue<double>("dt")),
+    time_integration_(params.GetParamValue<std::string>("time_integration")),
+    num_precursors_(lambdas_.size())
 {
   chi::log.Log() << "Created solver " << TextName();
   {
@@ -126,9 +128,9 @@ void TransientSolver::Initialize()
   // there exists a unique solution.
   if (source_strength_ > 0.0 and rho_ < 0.0)
   {
-    const auto b_temp = -1.0 * q_;
+    const auto b_theta = -1.0 * q_;
 
-    x_t_ = A_.Inverse() * b_temp;
+    x_t_ = A_.Inverse() * b_theta;
   }
   // Otherwise we initialize the system as a critical system with
   // no source.
@@ -156,15 +158,30 @@ void TransientSolver::Step()
 {
   A_[0][0] = beta_ * (rho_ - 1.0) / gen_time_;
 
-  const double theta = 1.0;
-  const double inv_tau = theta * dt_;
+  if (time_integration_ == "implicit_euler" or
+      time_integration_ == "crank_nicolson")
+  {
+    double theta = 1.0;
 
-  auto A_theta = I_ - inv_tau * A_;
-  auto b_temp = x_t_ + inv_tau * q_;
+    if (time_integration_ == "implicit_euler") theta = 1.0;
+    else if (time_integration_ == "crank_nicolson")
+      theta = 0.5;
 
-  auto x_theta = A_theta.Inverse() * b_temp;
+    const double inv_tau = theta * dt_;
 
-  x_tp1_ = x_t_ + (1.0 / theta) * (x_theta - x_t_);
+    auto A_theta = I_ - inv_tau * A_;
+    auto b_theta = x_t_ + inv_tau * q_;
+
+    auto x_theta = A_theta.Inverse() * b_theta;
+
+    x_tp1_ = x_t_ + (1.0 / theta) * (x_theta - x_t_);
+  }
+  else if (time_integration_ == "explicit_euler")
+  {
+    x_tp1_ = x_t_ + dt_ * A_ * x_t_ + dt_ * q_;
+  }
+  else
+    ChiLogicalError("Unsupported time integration scheme.");
 
   period_tph_ = dt_ / log(x_tp1_[0] / x_t_[0]);
 
@@ -178,5 +195,35 @@ void TransientSolver::Advance()
   time_ += dt_;
   x_t_ = x_tp1_;
 }
+
+// ##################################################################
+/**Returns the population at the previous time step.*/
+double TransientSolver::PopulationPrev() const { return x_t_[0]; }
+/**Returns the population at the next time step.*/
+double TransientSolver::PopulationNext() const { return x_tp1_[0]; }
+
+/**Returns the period computed for the last time step.*/
+double TransientSolver::Period() const { return period_tph_; }
+
+/**Returns the time computed for the last time step.*/
+double TransientSolver::TimePrev() const { return time_; }
+
+/**Returns the time computed for the next time step.*/
+double TransientSolver::TimeNext() const { return time_ + dt_; }
+
+/**Returns the solution at the previous time step.*/
+std::vector<double> TransientSolver::SolutionPrev() const
+{
+  return x_t_.elements_;
+}
+/**Returns the solution at the next time step.*/
+std::vector<double> TransientSolver::SolutionNext() const
+{
+  return x_tp1_.elements_;
+}
+
+// ##################################################################
+/**Sets the value of rho.*/
+void TransientSolver::SetRho(double value) { rho_ = value; }
 
 } // namespace prk

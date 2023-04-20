@@ -1,10 +1,11 @@
 #ifndef CHITECH_OBJECT_MAKER_H
 #define CHITECH_OBJECT_MAKER_H
 
-#include <memory>
+
 #include "ChiParameters/input_parameters.h"
-#include "ChiParameters/parameter_block.h"
 #include "chi_object.h"
+
+#include "ChiLog/chi_log_exceptions.h"
 
 /**Small utility macro for joining two words.*/
 #define ChiObjectMakerJoinWordsA(x, y) x##y

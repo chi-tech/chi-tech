@@ -153,7 +153,7 @@ void chi_objects::ChiConsole::SetNamespaceTableStructure(const std::string& key)
       {
         lua_pushstring(L, "Create");
         std::string chunk_code = "local params = ...; ";
-        chunk_code += "return chiMakeObject(\"" + key + "\", params)";
+        chunk_code += "return chiMakeObjectType(\"" + key + "\", params)";
 
         luaL_loadstring(L, chunk_code.c_str());
         lua_settable(L, -3);

@@ -34,7 +34,7 @@ VertexAccessor::AddVertex(void* context)
 void chi_graph::DirectedGraph::
   VertexAccessor::RemoveVertex(size_t v)
 {
-  ChiLogicalError(v >= vertices_.size(), "Error removing vertex.")
+  ChiLogicalErrorIf(v >= vertices_.size(), "Error removing vertex.");
 
   auto& vertex = vertices_[v];
 

@@ -20,6 +20,9 @@
 namespace chi_objects
 {
 
+const std::vector<std::string> InputParameters::system_ignored_param_names_ = {
+  "chi_obj_type"};
+
 // #################################################################
 /**Sets the object type string for more descriptive error messages.*/
 void InputParameters::SetObjectType(const std::string& obj_type)
@@ -32,13 +35,28 @@ void InputParameters::SetObjectType(const std::string& obj_type)
 std::string InputParameters::ObjectType() const { return class_name_; }
 
 // #################################################################
+/**Determines if a parameter is ignored.*/
+bool InputParameters::IsParameterIgnored(const std::string& param_name)
+{
+  bool ignored = false;
+
+  {
+    auto& list = system_ignored_param_names_;
+    if (std::find(list.begin(), list.end(), param_name) != list.end())
+      ignored = true;
+  }
+
+  return ignored;
+}
+
+// #################################################################
 /**Specialization for block type parameters.*/
 void InputParameters::AddOptionalParameterBlock(const std::string& name,
                                                 ParameterBlock block,
                                                 const std::string& doc_string)
 {
   AddParameter(std::move(block));
-  parameter_tags_[name] = InputParameterTag::OPTIONAL;
+  parameter_class_tags_[name] = InputParameterTag::OPTIONAL;
   parameter_doc_string_[name] = doc_string;
 }
 
@@ -49,7 +67,7 @@ void InputParameters::AddRequiredParameterBlock(const std::string& name,
 {
   ParameterBlock new_block(name);
   AddParameter(new_block);
-  parameter_tags_[name] = InputParameterTag::REQUIRED;
+  parameter_class_tags_[name] = InputParameterTag::REQUIRED;
   parameter_doc_string_[name] = doc_string;
 }
 
@@ -62,8 +80,14 @@ void InputParameters::AssignParameters(const ParameterBlock& params)
 {
   std::stringstream err_stream;
 
+  if (chi::log.GetVerbosity() >= 1)
+    chi::log.Log() << "Number of parameters " << params.NumParameters();
+
   // ================================== Check required parameters
-  for (const auto& [param_index, tag] : parameter_tags_)
+  // Loops over all input-parameters that have been
+  // classed as being required. Input-parameters that
+  // have any form of deprecation is ignored.
+  for (const auto& [param_index, tag] : parameter_class_tags_)
   {
     if (tag != InputParameterTag::REQUIRED) continue;
 
@@ -83,10 +107,14 @@ void InputParameters::AssignParameters(const ParameterBlock& params)
   if (not err_stream.str().empty()) ThrowInputError;
 
   // ================================== Check unused parameters
+  // Loops over all candidate-parameters and
+  // checks whether they have an assignable
+  // input-parameter or if they have been renamed.
   {
     for (const auto& param : params.Parameters())
     {
       const auto& param_name = param.Name();
+      if (IsParameterIgnored(param_name)) continue;
       if (not this->Has(param_name))
         err_stream << "Invalid param \"" << param_name << "\" supplied.\n";
       else if (renamed_error_tags_.count(param_name) > 0)
@@ -101,11 +129,15 @@ void InputParameters::AssignParameters(const ParameterBlock& params)
   }
 
   // ================================== Check deprecation warnings
+  // Loops over all candidate-parameters and
+  // checks whether they have deprecation warnings.
   {
     const auto& dep_warns = deprecation_warning_tags_;
     for (const auto& param : params.Parameters())
     {
       const auto& param_name = param.Name();
+
+      if (IsParameterIgnored(param_name)) continue;
 
       if (this->Has(param_name) and (dep_warns.count(param_name) > 0))
         chi::log.Log0Warning()
@@ -116,11 +148,15 @@ void InputParameters::AssignParameters(const ParameterBlock& params)
   }
 
   // ================================== Check deprecation errors
+  // Loops over all candidate-parameters and
+  // checks whether they have deprecation errors.
   {
     const auto& dep_errs = deprecation_error_tags_;
     for (const auto& param : params.Parameters())
     {
       const auto& param_name = param.Name();
+
+      if (IsParameterIgnored(param_name)) continue;
 
       if (this->Has(param_name) and (dep_errs.count(param_name) > 0))
       {
@@ -135,14 +171,18 @@ void InputParameters::AssignParameters(const ParameterBlock& params)
   // ================================== Now attempt to assign values
   for (auto& param : params.Parameters())
   {
-    auto& input_param = GetParam(param.Name());
+    const auto& param_name = param.Name();
+
+    if (IsParameterIgnored(param_name)) continue;
+
+    auto& input_param = GetParam(param_name);
 
     // ====================== Check types match
     if (param.Type() != input_param.Type())
     {
       err_stream << "Invalid parameter type \""
                  << ParameterBlockTypeName(param.Type())
-                 << "\" for parameter \"" << param.Name()
+                 << "\" for parameter \"" << param_name
                  << "\". Expecting type \""
                  << ParameterBlockTypeName(input_param.Type()) << "\".\n";
       continue;
@@ -157,10 +197,12 @@ void InputParameters::AssignParameters(const ParameterBlock& params)
         err_stream << constraint->OutOfRangeString(input_param.Name(),
                                                    param.Value());
         err_stream << "\n";
+        continue;
       }
-      continue;
     } // if constraint
 
+    if (chi::log.GetVerbosity() >= 1)
+      chi::log.Log() << "Setting parameter " << param_name;
     input_param = param;
   } // for input params
 
@@ -227,7 +269,7 @@ void InputParameters::DumpParameters() const
 
     chi::log.Log() << sp4 << "TYPE " << ParameterBlockTypeName(type);
 
-    if (parameter_tags_.at(param_name) == InputParameterTag::OPTIONAL)
+    if (parameter_class_tags_.at(param_name) == InputParameterTag::OPTIONAL)
     {
       chi::log.Log() << sp4 << "TAG OPTIONAL";
       if (type != ParameterBlockType::BLOCK and
@@ -239,7 +281,8 @@ void InputParameters::DumpParameters() const
         outstr << sp4 << "DEFAULT_VALUE ";
         for (size_t k = 0; k < param.NumParameters(); ++k)
         {
-          const auto& sub_param = param.GetParam(k);      outstr << sub_param.Value().PrintStr() << ", ";
+          const auto& sub_param = param.GetParam(k);
+          outstr << sub_param.Value().PrintStr() << ", ";
         }
         chi::log.Log() << outstr.str();
       }
