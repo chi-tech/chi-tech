@@ -52,10 +52,12 @@ bool InputParameters::IsParameterIgnored(const std::string& param_name)
 // #################################################################
 /**Specialization for block type parameters.*/
 void InputParameters::AddOptionalParameterBlock(const std::string& name,
-                                                ParameterBlock block,
+                                                const ParameterBlock& block,
                                                 const std::string& doc_string)
 {
-  AddParameter(std::move(block));
+  auto new_block = block;
+  new_block.SetBlockName(name);
+  AddParameter(new_block);
   parameter_class_tags_[name] = InputParameterTag::OPTIONAL;
   parameter_doc_string_[name] = doc_string;
 }
@@ -66,6 +68,18 @@ void InputParameters::AddRequiredParameterBlock(const std::string& name,
                                                 const std::string& doc_string)
 {
   ParameterBlock new_block(name);
+  AddParameter(new_block);
+  parameter_class_tags_[name] = InputParameterTag::REQUIRED;
+  parameter_doc_string_[name] = doc_string;
+}
+
+// #################################################################
+/**Specialization for array type parameters.*/
+void InputParameters::AddRequiredParameterArray(const std::string& name,
+                                                const std::string& doc_string)
+{
+  ParameterBlock new_block(name);
+  new_block.ChangeToArray();
   AddParameter(new_block);
   parameter_class_tags_[name] = InputParameterTag::REQUIRED;
   parameter_doc_string_[name] = doc_string;

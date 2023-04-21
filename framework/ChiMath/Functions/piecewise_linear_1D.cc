@@ -10,16 +10,12 @@ RegisterChiObject(chi_math::functions, PiecewiseLinear1D);
 chi_objects::InputParameters PiecewiseLinear1D::GetInputParameters()
 {
   chi_objects::InputParameters params =
-    FunctionXYZDimAToDimB::GetInputParameters();
+    FunctionDimAToDimB::GetInputParameters();
 
-  params.AddOptionalParameterBlock(
-    "x_values",
-    std::vector<double>{},
-    "The x-values used in the interpolation function.");
-  params.AddOptionalParameterBlock(
-    "y_values",
-    std::vector<double>{},
-    "The x-values used in the interpolation function.");
+  params.AddRequiredParameterArray(
+    "x_values", "The x-values used in the interpolation function.");
+  params.AddRequiredParameterArray(
+    "y_values", "The x-values used in the interpolation function.");
 
   params.ChangeExistingParamToOptional("input_dimension", size_t{1});
   params.ChangeExistingParamToOptional("output_dimension", size_t{1});
@@ -28,11 +24,16 @@ chi_objects::InputParameters PiecewiseLinear1D::GetInputParameters()
 }
 
 PiecewiseLinear1D::PiecewiseLinear1D(const chi_objects::InputParameters& params)
-  : FunctionXYZDimAToDimB(params),
+  : FunctionDimAToDimB(params),
     x_values_(params.GetParamVectorValue<double>("x_values")),
     y_values_(params.GetParamVectorValue<double>("y_values")),
     num_vals_(x_values_.size())
 {
+  ChiInvalidArgumentIf(
+    y_values_.size() != num_vals_,
+    std::string("Number of y-values (") + std::to_string(y_values_.size()) +
+      ") must match number of x-values (" + std::to_string(num_vals_) + ".");
+
   delta_x_values_.resize(num_vals_ - 1, 0.0);
   const size_t max_k = num_vals_ - 1;
   for (size_t k = 0; k < max_k; ++k)
@@ -44,11 +45,11 @@ PiecewiseLinear1D::PiecewiseLinear1D(const chi_objects::InputParameters& params)
   }
 }
 
-std::vector<double> PiecewiseLinear1D::Evaluate(
-  double, double, double, const std::vector<double>& values) const
+std::vector<double>
+PiecewiseLinear1D::Evaluate(const std::vector<double>& values) const
 {
-  if (values.empty())
-    ChiInvalidArgument("Requires at least one value in `values`.");
+  if (values.size() != 1)
+    ChiInvalidArgument("Can only be called with 1 argument.");
 
   const double x = values.front();
   if (x < x_values_.front()) return {y_values_.front()};

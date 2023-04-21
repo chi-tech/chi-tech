@@ -28,6 +28,12 @@ std::string ParameterBlockTypeName(ParameterBlockType type)
 }
 
 // #################################################################
+void ParameterBlock::SetBlockName(const std::string& name)
+{
+  name_ = name;
+}
+
+// #################################################################
 ParameterBlock::ParameterBlock(const std::string& name)
   : type_(ParameterBlockType::BLOCK), name_(name)
 {

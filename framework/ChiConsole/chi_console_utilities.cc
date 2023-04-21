@@ -161,7 +161,6 @@ void chi_objects::ChiConsole::SetLuaFuncNamespaceTableStructure(
 void chi_objects::ChiConsole::SetObjectNamespaceTableStructure(
   const std::string& full_lua_name)
 {
-  std::cout << __FUNCTION__ << " " << full_lua_name << "\n";
   auto L = GetInstance().console_state_;
 
   /**Lambda for registering object type and creation function.*/
@@ -210,7 +209,6 @@ void chi_objects::ChiConsole::FleshOutLuaTableStructure(
       lua_getglobal(L, table_name.c_str());
       if (not lua_istable(L, -1))
       {
-        std::cout << "Creating base table " << table_name << "\n";
         lua_pop(L, 1);
         lua_newtable(L);
         lua_setglobal(L, table_name.c_str());
@@ -222,7 +220,6 @@ void chi_objects::ChiConsole::FleshOutLuaTableStructure(
       lua_getfield(L, -1, table_name.c_str());
       if (not lua_istable(L, -1))
       {
-        std::cout << "Creating sub-table " << table_name << "\n";
         lua_pop(L, 1);
         lua_pushstring(L, table_name.c_str());
         lua_newtable(L);
