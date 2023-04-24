@@ -1,13 +1,12 @@
 #ifndef CHITECH_LBS_DIFFUSION_MIP_H
 #define CHITECH_LBS_DIFFUSION_MIP_H
 
+#include "acceleration.h"
 #include "ChiMath/UnknownManager/unknown_manager.h"
 #include "petscksp.h"
 #include "ChiLua/chi_lua.h"
 
-#include <map>
-#include <memory>
-#include <array>
+
 
 //############################################### Forward declarations
 namespace chi_mesh
@@ -33,30 +32,7 @@ namespace lbs::acceleration
 
 struct Multigroup_D_and_sigR;
 
-/**Boundary condition type. We essentially only support two
- * types: Dirichlet and Reflecting, the latter is covered under
- * the ROBIN-type boundary condition.*/
-enum class BCType
-{
-  DIRICHLET = 1,
-  ROBIN = 2
-};
 
-/**Simple data structure to specify boundary conditions. Its stores the
- * BC-type in `type` and an array of 3 values in `values`. For a
- * Dirichlet-BC only `values[0]` is used to specify the value of the BC.
- * For a robin boundary condition we use all 3 values in the form
-\f[
-a\phi + b \mathbf{n} \frac{\partial \phi}{\partial \mathbf{x}} = f
-\f]
-where \f$ a \f$, \f$ b \f$ and \f$ f \f$ map to `values[0]`, `values[1]` and
-`values[2]`, respectively.
-*/
-struct BoundaryCondition
-{
-  BCType type = BCType::DIRICHLET;
-  std::array<double,3> values = {0,0,0};
-};
 
 /**Generalized diffusion solver for both WGDSA and TGDSA based on the MIP-method
  * of Bruno Turcksin and Jean Ragusa.*/
@@ -102,7 +78,6 @@ public:
   }
   //00
   DiffusionMIPSolver(std::string text_name,
-                     const chi_mesh::MeshContinuum& grid,
                      const chi_math::SpatialDiscretization& sdm,
                      const chi_math::UnknownManager& uk_man,
                      std::map<uint64_t, BoundaryCondition> bcs,

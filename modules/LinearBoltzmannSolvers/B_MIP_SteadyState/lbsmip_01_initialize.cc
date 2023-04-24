@@ -100,7 +100,7 @@ void lbs::MIPSteadyStateSolver::InitializeWGSSolvers()
     auto solver =
       std::make_shared<acceleration::DiffusionMIPSolver>(
         std::string(TextName()+"_WGSolver"),
-        *grid_ptr_, sdm,
+        sdm,
         uk_man,
         bcs,
         matid_2_mgxs_map,

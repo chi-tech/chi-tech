@@ -9,7 +9,6 @@
 /**Default constructor.*/
 lbs::acceleration::DiffusionMIPSolver::
   DiffusionMIPSolver(std::string text_name,
-                     const chi_mesh::MeshContinuum &grid,
                      const chi_math::SpatialDiscretization& sdm,
                      const chi_math::UnknownManager& uk_man,
                      std::map<uint64_t, BoundaryCondition>  bcs,
@@ -17,7 +16,7 @@ lbs::acceleration::DiffusionMIPSolver::
                      const std::vector<UnitCellMatrices>& unit_cell_matrices,
                      const bool verbose/*=false*/) :
     text_name_(std::move(text_name)),
-    grid_(grid),
+    grid_(*sdm.ref_grid_),
     sdm_(sdm),
     uk_man_(uk_man),
     bcs_(std::move(bcs)),

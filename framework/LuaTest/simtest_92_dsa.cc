@@ -148,7 +148,6 @@ int chiSimTest92_DSA(lua_State* L)
 
   //============================================= Make solver
   lbs::acceleration::DiffusionMIPSolver solver("SimTest92_DSA",
-                                               grid,
                                                sdm,
                                                OneDofPerNode,
                                                bcs,
