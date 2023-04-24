@@ -44,6 +44,10 @@ private:
   std::vector<ParameterBlock> parameters_;
 
 public:
+  /**Sets the name of the block.*/
+  void SetBlockName(const std::string& name);
+
+public:
   // Helpers
   template <typename T>
   struct IsBool

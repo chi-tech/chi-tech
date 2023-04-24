@@ -67,13 +67,14 @@ public:
     parameter_class_tags_[name] = InputParameterTag::OPTIONAL;
     parameter_doc_string_[name] = doc_string;
   }
+
   void AddOptionalParameterBlock(const std::string& name,
-                                 ParameterBlock block,
+                                 const ParameterBlock& block,
                                  const std::string& doc_string);
 
   template <typename T>
-  void AddOptionalParameterBlock(const std::string& name,
-                                 std::vector<T> array,
+  void AddOptionalParameterArray(const std::string& name,
+                                 const std::vector<T>& array,
                                  const std::string& doc_string)
   {
     AddParameter(name, array);
@@ -91,6 +92,9 @@ public:
   }
 
   void AddRequiredParameterBlock(const std::string& name,
+                                 const std::string& doc_string);
+
+  void AddRequiredParameterArray(const std::string& name,
                                  const std::string& doc_string);
 
   template <typename T>

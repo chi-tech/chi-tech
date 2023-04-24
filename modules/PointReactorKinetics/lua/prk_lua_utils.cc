@@ -2,16 +2,16 @@
 #include "ChiConsole/chi_console.h"
 
 #include "../point_reactor_kinetics.h"
+#include "prk_lua_utils.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
 
 namespace prk::lua_utils
 {
-int chiPRKGetParam(lua_State* L);
-int chiPRKSetParam(lua_State* L);
-ChiConsoleRegisterLuaFunction(chiPRKGetParam);
-ChiConsoleRegisterLuaFunction(chiPRKSetParam);
+
+RegisterLuaFunctionAsIs(chiPRKGetParam);
+RegisterLuaFunctionAsIs(chiPRKSetParam);
 
 /**Gets a parameter from the prk::TransientSolver.
 *
@@ -22,7 +22,7 @@ int chiPRKGetParam(lua_State* L)
 {
   const std::string fname = __FUNCTION__;
   const int num_args = lua_gettop(L);
-  if (num_args != 2) LuaPostArgAmountError(fname, num_args, 2);
+  if (num_args != 2) LuaPostArgAmountError(fname, 2, num_args);
 
   LuaCheckNilValue(fname, L, 1);
   LuaCheckStringValue(fname, L, 2);
@@ -35,35 +35,20 @@ int chiPRKGetParam(lua_State* L)
   const std::string param_name = lua_tostring(L, 2);
 
   if (param_name == "population_prev")
-  {
     lua_pushnumber(L, solver.PopulationPrev());
-    return 1;
-  }
   else if (param_name == "population_next")
-  {
     lua_pushnumber(L, solver.PopulationNext());
-    return 1;
-  }
   else if (param_name == "period")
-  {
     lua_pushnumber(L, solver.Period());
-    return 1;
-  }
   else if (param_name == "time_prev")
-  {
     lua_pushnumber(L, solver.TimePrev());
-    return 1;
-  }
   else if (param_name == "time_next")
-  {
     lua_pushnumber(L, solver.TimeNext());
-    return 1;
-  }
   else
     throw std::invalid_argument(fname + ": Invalid parameter \"" + param_name +
                                 "\".");
 
-  return 0;
+  return 1;
 }
 
 /**Gets a parameter from the prk::TransientSolver.
@@ -76,7 +61,7 @@ int chiPRKSetParam(lua_State* L)
 {
   const std::string fname = __FUNCTION__;
   const int num_args = lua_gettop(L);
-  if (num_args != 3) LuaPostArgAmountError(fname, num_args, 3);
+  if (num_args != 3) LuaPostArgAmountError(fname, 3, num_args);
 
   LuaCheckNilValue(fname, L, 1);
   LuaCheckStringValue(fname, L, 2);

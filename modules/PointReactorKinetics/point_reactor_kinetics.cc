@@ -25,12 +25,13 @@ chi_objects::InputParameters TransientSolver::GetInputParameters()
   std::vector<double> default_betas = {
     0.00021, 0.00142, 0.00127, 0.00257, 0.00075, 0.00027};
 
-  params.AddOptionalParameterBlock(
+  params.AddOptionalParameterArray(
     "precursor_lambdas", default_lambdas, "An array of decay constants");
-  params.AddOptionalParameterBlock(
+  params.AddOptionalParameterArray(
     "precursor_betas",
     default_betas,
     "An array of fractional delayed neutron fractions");
+
   params.AddOptionalParameter(
     "gen_time", 1.0e-5, "Neutron generation time [s]");
   params.AddOptionalParameter("initial_rho", 0.0, "Initial reactivity [$]");
