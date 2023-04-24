@@ -2,7 +2,7 @@
 chiMeshHandlerCreate()
 
 mesh={}
-N=50
+N=25
 L=2
 xmin = -L/2
 --xmin = 0.0
@@ -31,6 +31,10 @@ vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
 
 chiSimTest91_PWLD();
+chiMPIBarrier()
+if (chi_location_id == 0) then
+    os.execute("rm SimTest_91*")
+end
 
 --[0]  Iteration     0   1.000e+00
 --[0]  Iteration     1   2.016e+02

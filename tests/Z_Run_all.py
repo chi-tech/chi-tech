@@ -11,26 +11,32 @@ class CustomFormatter(argparse.RawTextHelpFormatter,
                       argparse.ArgumentDefaultsHelpFormatter):
     pass
 
+arguments_help = textwrap.dedent('''\
+Run the regression suite, or optionally, a series of individual
+tests or a range of tests. 
+
+To run all tests, use
+python test/Z_Run_all.py
+
+To run a list of individual tests, use 
+python test/Z_Run_all.py --test-list test1 test2 ... testN
+
+To run a range of tests, use
+python test/Z_Run_all.py --test-range test_start test_end
+
+For verbose fail messages, use
+python test/Z_Run_all.py --verbose_fail
+
+In each of the above examples, all arguments are separated by spaces 
+and each of the arguments are integers.
+''')
+
+print(arguments_help)
 
 parser = argparse.ArgumentParser(
     description="A script to run the regression test suite.",
     formatter_class=CustomFormatter,
-    epilog=textwrap.dedent('''\
-    Run the regression suite, or optionally, a series of individual
-    tests or a range of tests. 
-    
-    To run all tests, use
-    python test/Z_Run_all.py
-    
-    To run a list of individual tests, use 
-    python test/Z_Run_all.py --test-list test1 test2 ... testN
-    
-    To run a range of tests, use
-    python test/Z_Run_all.py --test-range test_start test_end
-    
-    In each of the above examples, all arguments are separated by spaces 
-    and each of the arguments are integers.
-    ''')
+    epilog=arguments_help
 )
 
 parser.add_argument(
@@ -48,6 +54,12 @@ parser.add_argument(
     type=int,
     required=False,
     help="The first and last test ID of a range of tests to run."
+)
+
+parser.add_argument(
+    '--verbose_fail',
+    action="store_true",
+    help="If set, prints the error stream if tests failed."
 )
 
 argv = parser.parse_args()
@@ -98,12 +110,7 @@ print()
 test_number = 0
 num_failed = 0
 
-# Determine if we are on TACC
-# (each test will require a separate job)
 hostname = subprocess.check_output(['hostname']).decode('utf-8')
-tacc = False
-if "tacc.utexas.edu" in hostname:
-    tacc = True
 
 print("Using mpiexec at: ", mpiexec)
 
@@ -130,7 +137,7 @@ def format_filename(filename):
 # search[2] = Which word
 # search[3] = value it should be
 
-def parse_output(out, search_strings_vals_tols):
+def parse_output(out, err, search_strings_vals_tols):
     global num_failed
     test_passed = True
     for search in search_strings_vals_tols:
@@ -154,14 +161,16 @@ def parse_output(out, search_strings_vals_tols):
                 test_val = float(out[test_str_end:test_str_line_end])
                 if not abs(test_val - true_val) < tolerance:
                     test_passed = False
-                    print("\nTest failed:\nLine:" +
-                          out[test_str_start:test_str_line_end] + "\n" +
-                          "Test:", search)
+                    if argv.verbose_fail:
+                        print("\nTest failed:\nLine:" +
+                              out[test_str_start:test_str_line_end] + "\n" +
+                              "Test:", search)
                     break
         else:
             test_passed = False
-            print("\nTest failed: identifying string not found",
-                  search[0])
+            if argv.verbose_fail:
+                print("\nTest failed: identifying string not found",
+                      search[0])
             break
 
     for search in search_strings_vals_tols:
@@ -176,8 +185,9 @@ def parse_output(out, search_strings_vals_tols):
         # If we didnt find this string we should quit
         if id_str_start < 0:
             test_passed = False
-            print("\nTest failed: identifying string not found\n",
-                  identifying_string)
+            if argv.verbose_fail:
+                print("\nTest failed: identifying string not found\n",
+                      identifying_string)
             break
 
         line = out[id_str_start:id_str_line_end]
@@ -189,9 +199,10 @@ def parse_output(out, search_strings_vals_tols):
         word_number = search[2]
         if word_number >= len(words):
             test_passed = False
-            print("\nTest failed Comparison word not found:\nLine:" +
-                  line + "\n" +
-                  "Test:", search)
+            if argv.verbose_fail:
+                print("\nTest failed Comparison word not found:\nLine:" +
+                      line + "\n" +
+                      "Test:", search)
             break
 
         if search[0] == "NumCompare":
@@ -206,9 +217,10 @@ def parse_output(out, search_strings_vals_tols):
 
                 if abs(trial_value - value_it_should_be) > tolerance:
                     test_passed = False
-                    print("\nTest failed:\nLine:" +
-                          line + "\n" +
-                          "Test:", search)
+                    if argv.verbose_fail:
+                        print("\nTest failed:\nLine:" +
+                              line + "\n" +
+                              "Test:", search)
                     break
 
             if numerical_format == "int":
@@ -216,9 +228,10 @@ def parse_output(out, search_strings_vals_tols):
 
                 if trial_value != value_it_should_be:
                     test_passed = False
-                    print("\nTest failed:\nLine:" +
-                          line + "\n" +
-                          "Test:", search)
+                    if argv.verbose_fail:
+                        print("\nTest failed:\nLine:" +
+                              line + "\n" +
+                              "Test:", search)
                     break
 
         if search[0] == "StrCompare":
@@ -228,9 +241,10 @@ def parse_output(out, search_strings_vals_tols):
 
             if trial_word != value_it_should_be:
                 test_passed = False
-                print("\nTest failed:\nLine:" +
-                      line + "\n" +
-                      "Test:", search)
+                if argv.verbose_fail:
+                    print("\nTest failed:\nLine:" +
+                          line + "\n" +
+                          "Test:", search)
                 break
 
     if test_passed:
@@ -238,55 +252,14 @@ def parse_output(out, search_strings_vals_tols):
     else:
         print(" - \033[31mFAILED!\033[39m")
         num_failed += 1
-        # print(out)
+        if argv.verbose_fail:
+            print(err, out)
 
     return test_passed
 
 
-def run_test_tacc(file_name, comment, num_procs, search_strings_vals_tols):
-    test_name = f"{format_filename(file_name)} {comment} " \
-                f"{num_procs} MPI Processes"
-
-    msg = f"Running Test {format3(test_number)} {test_name}"
-    print(msg, end='', flush=True)
-
-    if print_only:
-        print()
-        return
-
-    with open(f"tests/{file_name}.job", 'w') as job_file:
-        job_file.write(textwrap.dedent(f"""
-            #!/usr/bin/bash
-            #
-            #SBATCH -J {file_name} # Job name
-            #SBATCH -o tests/{file_name}.o # output file
-            #SBATCH -e tests/{file_name}.e # error file
-            #SBATCH -p skx-normal_ # Queue (partition) name
-            #SBATCH -N {num_procs // 48 + 1} # Total # of nodes
-            #SBATCH -n {num_procs} # Total # of mpi tasks
-            #SBATCH -t 00:05:00 # Runtime (hh:mm:ss)
-            #SBATCH -A Massively-Parallel-R # Allocation name (req'd if you have more than 1)
-
-            export I_MPI_SHM=disable
-
-            ibrun {kpath_to_exe} tests/{file_name}.lua master_export=false
-            """
-                                       ).strip())
-
-    # -W means wait for job to finish
-    os.system(f"sbatch -W tests/{file_name}.job > /dev/null")
-    with open(f"tests/{file_name}.o", 'r') as outfile:
-        out = outfile.read()
-
-    passed = parse_output(out, search_strings_vals_tols)
-
-    # Cleanup
-    if passed:
-        os.system(f"rm tests/{file_name}.job "
-                  f"tests/{file_name}.o tests/{file_name}.e")
-
-
-def run_test_local(file_name, comment, num_procs, search_strings_vals_tols):
+def run_test_local(file_name, comment, num_procs, search_strings_vals_tols,
+                   join_stdout_and_stderr = False):
     test_name = f"{format_filename(file_name)} - {comment} - " \
                 f"{num_procs} MPI Processes"
 
@@ -297,33 +270,183 @@ def run_test_local(file_name, comment, num_procs, search_strings_vals_tols):
         return
 
     cmd = f"{mpiexec} -np {num_procs} {kpath_to_exe} " \
-          f"tests/{file_name}.lua master_export=false"
+          f"tests/{file_name}.lua master_export=false --suppress_color"
     process = subprocess.Popen(cmd.split(),
                                cwd=kchi_src_pth,
                                stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE,
                                universal_newlines=True)
     process.wait()
     out, err = process.communicate()
 
-    parse_output(out, search_strings_vals_tols)
+    if join_stdout_and_stderr:
+        out += err
+
+    parse_output(out, err, search_strings_vals_tols)
 
 
-def run_test(file_name, comment, num_procs, search_strings_vals_tols):
+
+def run_test(file_name, comment, num_procs, search_strings_vals_tols,
+             join_stdout_and_stderr=False):
     global test_number
 
     test_number += 1
     if (tests_to_run and test_number in tests_to_run) or (not tests_to_run):
-        if tacc:
-            run_test_tacc(file_name, comment, num_procs,
-                          search_strings_vals_tols)
+        run_test_local(file_name, comment, num_procs,
+                       search_strings_vals_tols, join_stdout_and_stderr)
+
+
+def run_unit_test(file_name, comment, num_procs):
+    global test_number
+    test_number += 1
+
+    if (tests_to_run and test_number in tests_to_run) or (not tests_to_run):
+        global num_failed
+        test_name = f"{format_filename(file_name)} - {comment} - " \
+                    f"{num_procs} MPI Processes"
+
+        msg = f"Running Test {format3(test_number)} {test_name}"
+        print(msg, end='', flush=True)
+        if print_only:
+            print()
+            return
+
+        cmd = f"./tests/unit_test_inputs/ZUnitTestRunner.sh {mpiexec} " \
+              f"{num_procs} {kpath_to_exe} tests/{file_name}"
+        process = subprocess.Popen(cmd.split(),
+                                   cwd=kchi_src_pth,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE,
+                                   universal_newlines=True)
+        process.wait()
+        out, err = process.communicate()
+
+        if process.returncode == 0:
+            print(" - \033[32mPassed\033[39m")
         else:
-            run_test_local(file_name, comment, num_procs,
-                           search_strings_vals_tols)
+            print(" - \033[31mFAILED!\033[39m")
+            num_failed += 1
+            if argv.verbose_fail:
+                print(err)
+
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#                             Unit Tests
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+run_unit_test(file_name="unit_test_inputs/test_00_chi_math.lua",
+              comment="Testing objects in chi_math",
+              num_procs=1)
+run_unit_test(file_name="unit_test_inputs/test_01_chi_misc_utils.lua",
+              comment="Testing objects in chi_misc_utils",
+              num_procs=1)
+run_unit_test(file_name="unit_test_inputs/test_02_chi_data_types.lua",
+              comment="Testing chi_data_types",
+              num_procs=2)
+run_unit_test(file_name="unit_test_inputs/test_02a_wdd_ijk_sweep.lua",
+              comment="Testing utilities for orthogonal meshes",
+              num_procs=1)
+run_unit_test(file_name="unit_test_inputs/test_02b_paramblock.lua",
+              comment="Testing parameter blocks",
+              num_procs=1)
+
+run_test(
+    file_name="unit_test_inputs/test_03a_inparam_test_objects",
+    comment="Test A for input parameters",
+    num_procs=1,
+    join_stdout_and_stderr=True,
+    search_strings_vals_tols=[
+        ["StrCompare", '**WARNING** Parameter "limiter_type"'],
+        ["StrCompare", '**!**ERROR**!** Parameter "scheme" has been deprecated.']])
+
+run_test(
+    file_name="unit_test_inputs/test_03b_inparam_test_objects",
+    comment="Test B for input parameters",
+    num_procs=1,
+    join_stdout_and_stderr=True,
+    search_strings_vals_tols=[
+        ["StrCompare", 'TestSubObject created num_groups=99'],
+        ["StrCompare", '**!**ERROR**!** Parameter "format" has been deprecated.']])
+
+run_test(
+    file_name="unit_test_inputs/test_03c_inparam_test_objects",
+    comment="Test C for input parameters",
+    num_procs=1,
+    join_stdout_and_stderr=True,
+    search_strings_vals_tols=[
+        ["StrCompare", '**!**ERROR**!** Invalid param "use_my_stuff" supplied. '
+                       'The parameter has been renamed. '
+                       'Renamed to "use_zaks_stuff".']])
+
+run_test(
+    file_name="unit_test_inputs/test_03d_inparam_test_objects",
+    comment="Test D for input parameters",
+    num_procs=1,
+    join_stdout_and_stderr=True,
+    search_strings_vals_tols=[
+        ["StrCompare", '**!**ERROR**!** Invalid param "use_ragusas_stuff" '
+                       'supplied. The parameter has been renamed. Renamed '
+                       'to "use_complicated_stuff".']])
+
+# SimTests
+run_test(
+    file_name="unit_test_inputs/SimTest01_FV",
+    comment="Finite Volume developer's example",
+    num_procs=1,
+    search_strings_vals_tols=[
+        ["NumCompare", "iteration   10", 4, "float", 2.2349712e-07, 1.0e-10]])
+
+run_test(
+    file_name="unit_test_inputs/SimTest02_FV",
+    comment="Finite Volume gradient developer's example",
+    num_procs=1,
+    search_strings_vals_tols=[
+        ["NumCompare", "iteration   10", 4, "float", 2.2349712e-07, 1.0e-10]])
+
+run_test(
+    file_name="unit_test_inputs/SimTest03_PWLC",
+    comment="CFEM PWLC developer's example",
+    num_procs=4,
+    search_strings_vals_tols=[
+        ["NumCompare", "iteration   10", 4, "float", 1.3725535e-07, 1.0e-11]])
+
+run_test(
+    file_name="unit_test_inputs/SimTest04_PWLC",
+    comment="CFEM PWLC with MMS developer's example",
+    num_procs=4,
+    search_strings_vals_tols=[
+        ["NumCompare", "iteration    6", 4, "float", 1.1613008e-07, 1.0e-10],
+        ["NumCompare", "Error:"        , 1, "float", 7.032369e-02, 1.0e-7]])
+
+run_test(
+    file_name="unit_test_inputs/SimTest06_WDD",
+    comment="FV Transport WDD developer's example",
+    num_procs=1,
+    search_strings_vals_tols=[
+        ["NumCompare", "Iteration     8", 2, "float", 5.483e-07, 1.0e-10]])
+
+run_test(
+    file_name="unit_test_inputs/SimTest91_PWLD",
+    comment="DFEM Transport PWLD developer's example",
+    num_procs=1,
+    search_strings_vals_tols=[
+        ["NumCompare", "Iteration     8", 2, "float", 5.872e-07, 1.0e-10]])
+
+run_test(
+    file_name="unit_test_inputs/SimTest92_DSA",
+    comment="MIP Diffusion solver tests",
+    num_procs=1,
+    search_strings_vals_tols=[
+        ["NumCompare", "SimTest92_DSA iteration    8", 5, "float", 1.9731053e-11, 1.0e-14]])
+
+run_test(
+    file_name="unit_test_inputs/SimTest93_RayTracing",
+    comment="Raytracing Transport developer's example",
+    num_procs=1,
+    search_strings_vals_tols=[])
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                             Mesh IO tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 1 - 1
+# Tests 18 - 18
 run_test(
     file_name="MeshIO/ReadWavefrontObj1",
     comment="Mesh reading 2D Wavefront.obj",
@@ -334,7 +457,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                             CFEM Diffusion Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 2 - 6
+# Tests 19 - 23
 
 run_test(
     file_name="CFEM_Diffusion/cDiffusion_2D_1a_linear",
@@ -369,7 +492,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                             CFEM Diffusion Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 7 - 11
+# Tests 24 - 28
 
 run_test(
     file_name="DFEM_Diffusion/dDiffusion_2D_1a_linear",
@@ -404,7 +527,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                                  Diffusion Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 12 - 23
+# Tests 29 - 40
 
 
 run_test(
@@ -482,7 +605,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                     Steady State Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 24 - 40
+# Tests 41 - 57
 
 run_test(
     file_name="Transport_Steady/Transport1D_1",
@@ -629,7 +752,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                     k-Eigenvalue Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 41 - 43
+# Tests 58 - 60
 
 run_test(
     file_name="Transport_Keigen/KEigenvalueTransport1D_1G",
@@ -658,7 +781,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #         Steady-State Cylindrical Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 44 - 45
+# Tests 61 - 62
 
 run_test(
     file_name="Transport_Steady_Cyl/Transport2DCyl_1Monoenergetic",
@@ -676,7 +799,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #             Steady-State Adjoint Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 46 - 54
+# Tests 63 - 71
 
 run_test(
     file_name="Transport_Adjoint/Adjoint2D_1a_forward",
@@ -750,6 +873,7 @@ run_test(
 
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ END OF TESTS
+os.system("rm *.pvtu *.vtu *.e *.data")
 
 print()
 if num_failed == 0:

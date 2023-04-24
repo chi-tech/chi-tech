@@ -17,7 +17,7 @@ int chiDiffusionInitialize(lua_State *L)
 {
   int solver_index = lua_tonumber(L,1);
 
-  auto& solver = chi::GetStackItem<chi_diffusion::Solver>(chi::solver_stack,
+  auto& solver = chi::GetStackItem<chi_diffusion::Solver>(chi::object_stack,
                                                           solver_index,
                                                           __FUNCTION__);
 

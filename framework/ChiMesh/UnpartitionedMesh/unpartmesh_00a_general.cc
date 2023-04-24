@@ -7,6 +7,14 @@
 
 #include "ChiTimer/chi_timer.h"
 
+/**Destructor.*/
+chi_mesh::UnpartitionedMesh::~UnpartitionedMesh()
+{
+  for (auto& cell : raw_cells_)          delete cell;
+  for (auto& cell : raw_boundary_cells_) delete cell;
+  chi::log.Log0Verbose2() << "~UnpartitionedMesh";
+}
+
 /**Compute centroids for all cells.*/
 void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
 {

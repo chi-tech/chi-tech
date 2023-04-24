@@ -3,6 +3,7 @@
 #include "chi_lua.h"
 #include "lbkes_lua_utils.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 
 using namespace lbs;

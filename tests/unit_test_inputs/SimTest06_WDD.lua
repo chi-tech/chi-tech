@@ -22,3 +22,7 @@ chiVolumeMesherExecute();
 chiVolumeMesherSetMatIDToAll(0)
 
 chiSimTest06_WDD();
+chiMPIBarrier()
+if (chi_location_id == 0) then
+    os.execute("rm SimTest_06*")
+end

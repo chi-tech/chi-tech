@@ -2,6 +2,7 @@
 
 #include "Tools/lbs_bndry_func_lua.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 
 #define mk_shrd(x) std::make_shared<x>

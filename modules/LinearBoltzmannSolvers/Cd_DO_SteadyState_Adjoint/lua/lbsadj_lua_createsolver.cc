@@ -29,8 +29,8 @@ int chiAdjointSolverCreate(lua_State* L)
 
   auto solver = std::make_shared<lbs::DiscOrdSteadyStateAdjointSolver>(solver_name);
 
-  chi::solver_stack.push_back(solver);
-  const size_t handle = chi::solver_stack.size()-1;
+  chi::object_stack.push_back(solver);
+  const size_t handle = chi::object_stack.size()-1;
 
   lua_pushinteger(L,static_cast<lua_Integer>(handle));
   return 1;

@@ -8,15 +8,15 @@
 namespace chi_math
 {
 
-//#################################################################
+// #################################################################
 /**Different types of variables.*/
 enum class UnknownType
 {
-  SCALAR   = 1,
+  SCALAR = 1,
   VECTOR_2 = 2,
   VECTOR_3 = 3,
   VECTOR_N = 4,
-  TENSOR   = 5
+  TENSOR = 5
 };
 
 /**Nodal variable storage format.*/
@@ -26,7 +26,7 @@ enum class UnknownStorageType
   BLOCK = 2
 };
 
-//#################################################################
+// #################################################################
 /**Basic class for an variable.*/
 class Unknown
 {
@@ -40,56 +40,69 @@ public:
 
 public:
   explicit Unknown(UnknownType in_type,
-                   unsigned int in_num_components=1,
-                   unsigned int in_map_begin=0) :
-      type_(in_type),
-      num_components_((type_ == UnknownType::SCALAR  ) ? 1 :
-                   (type_ == UnknownType::VECTOR_2)? 2 :
-                   (type_ == UnknownType::VECTOR_3)? 3 : in_num_components),
+                   unsigned int in_num_components = 1,
+                   unsigned int in_map_begin = 0)
+    : type_(in_type),
+      num_components_((type_ == UnknownType::SCALAR)     ? 1
+                      : (type_ == UnknownType::VECTOR_2) ? 2
+                      : (type_ == UnknownType::VECTOR_3) ? 3
+                                                         : in_num_components),
       map_begin_(in_map_begin)
   {
     component_text_names_.resize(num_components_, std::string());
-    for (unsigned int c=0; c < num_components_; ++c)
+    for (unsigned int c = 0; c < num_components_; ++c)
     {
 
-      char buffer[100]; snprintf(buffer,100," %03d",c);
+      char buffer[100];
+      snprintf(buffer, 100, " %03d", c);
       component_text_names_[c] = buffer;
     }
     num_off_block_connections_.resize(num_components_, 0);
   }
 
-  unsigned int GetMap(unsigned int component_number=0) const
+  unsigned int GetMap(unsigned int component_number = 0) const
   {
     unsigned int map_value = 0;
     switch (type_)
     {
       case UnknownType::SCALAR:
         if (component_number >= num_components_)
-          throw std::out_of_range("Attempting to access component "+
-                                  std::to_string(component_number)+">=1"
-                                                                   " for a SCALAR unknown.");
+          throw std::out_of_range("Attempting to access component " +
+                                  std::to_string(component_number) +
+                                  ">=1"
+                                  " for a SCALAR unknown.");
         map_value = 0;
         break;
       case UnknownType::VECTOR_2:
         if (component_number >= num_components_)
-          throw std::out_of_range("Attempting to access component "+
-                                  std::to_string(component_number)+">=2"
-                                                                   " for a VECTOR_2 unknown.");
+          throw std::out_of_range("Attempting to access component " +
+                                  std::to_string(component_number) +
+                                  ">=2"
+                                  " for a VECTOR_2 unknown.");
         map_value = map_begin_ + component_number;
         break;
       case UnknownType::VECTOR_3:
         if (component_number >= num_components_)
-          throw std::out_of_range("Attempting to access component "+
-                                  std::to_string(component_number)+">=3"
-                                                                   " for a VECTOR_3 unknown.");
+          throw std::out_of_range("Attempting to access component " +
+                                  std::to_string(component_number) +
+                                  ">=3"
+                                  " for a VECTOR_3 unknown.");
         map_value = map_begin_ + component_number;
         break;
       case UnknownType::VECTOR_N:
         if (component_number >= num_components_)
           throw std::out_of_range("Attempting to access component " +
-                                  std::to_string(component_number) + ">=" +
-                                  std::to_string(num_components_) +
+                                  std::to_string(component_number) +
+                                  ">=" + std::to_string(num_components_) +
                                   " for a VECTOR_N unknown.");
+        map_value = map_begin_ + component_number;
+        break;
+      case UnknownType::TENSOR:
+        if (component_number >= num_components_)
+          throw std::out_of_range("Attempting to access component " +
+                                  std::to_string(component_number) +
+                                  ">=" + std::to_string(num_components_) +
+                                  " for a TENSOR unknown.");
         map_value = map_begin_ + component_number;
         break;
       default:
@@ -98,57 +111,56 @@ public:
 
     return map_value;
   }
-  unsigned int GetMapEnd() const {return map_begin_ + num_components_ - 1;}
+  unsigned int GetMapEnd() const { return map_begin_ + num_components_ - 1; }
 };
 
-//###################################################################
+// ###################################################################
 /**General object for the management of unknowns in mesh-based
  * mathematical model.*/
 class UnknownManager
 {
 private:
-
-
 public:
   std::vector<Unknown> unknowns_;
   UnknownStorageType dof_storage_type_;
 
   typedef std::pair<UnknownType, unsigned int> UnknownInfo;
-  //Constructors
-  explicit UnknownManager(UnknownStorageType in_storage_type=
-                                  UnknownStorageType::NODAL) noexcept :
-      dof_storage_type_(in_storage_type)
-  {}
+  // Constructors
+  explicit UnknownManager(
+    UnknownStorageType in_storage_type = UnknownStorageType::NODAL) noexcept
+    : dof_storage_type_(in_storage_type)
+  {
+  }
 
-  UnknownManager(std::initializer_list<UnknownInfo> unknown_info_list,
-                 UnknownStorageType in_storage_type=
-                        UnknownStorageType::NODAL) noexcept :
-      dof_storage_type_(in_storage_type)
+  UnknownManager(
+    std::initializer_list<UnknownInfo> unknown_info_list,
+    UnknownStorageType in_storage_type = UnknownStorageType::NODAL) noexcept
+    : dof_storage_type_(in_storage_type)
   {
     for (const auto& uk_info : unknown_info_list)
       AddUnknown(uk_info.first, uk_info.second);
   }
 
-  explicit UnknownManager(const std::vector<Unknown>& unknown_info_list,
-                          UnknownStorageType in_storage_type=
-                          UnknownStorageType::NODAL) noexcept :
-      dof_storage_type_(in_storage_type)
+  explicit UnknownManager(
+    const std::vector<Unknown>& unknown_info_list,
+    UnknownStorageType in_storage_type = UnknownStorageType::NODAL) noexcept
+    : dof_storage_type_(in_storage_type)
   {
     for (const auto& uk : unknown_info_list)
       AddUnknown(uk.type_, uk.num_components_);
   }
 
-  UnknownManager(std::initializer_list<Unknown> unknowns,
-                 UnknownStorageType in_storage_type =
-                     UnknownStorageType::NODAL) noexcept :
-      dof_storage_type_(in_storage_type)
+  UnknownManager(
+    std::initializer_list<Unknown> unknowns,
+    UnknownStorageType in_storage_type = UnknownStorageType::NODAL) noexcept
+    : dof_storage_type_(in_storage_type)
   {
-    size_t ukid=0;
+    size_t ukid = 0;
     for (const auto& uk : unknowns)
     {
       AddUnknown(uk.type_, uk.num_components_);
       SetUnknownTextName(ukid, uk.text_name_);
-      size_t compid=0;
+      size_t compid = 0;
       for (const auto& comp_text_name : uk.component_text_names_)
       {
         SetUnknownComponentTextName(ukid, compid, comp_text_name);
@@ -162,27 +174,29 @@ public:
   UnknownManager(const UnknownManager& other) = default;
   UnknownManager& operator=(const UnknownManager& other) = default;
 
-  //Utilities
+  // Utilities
   static UnknownManager GetUnitaryUnknownManager()
   {
-    return UnknownManager({std::make_pair(UnknownType::SCALAR,0)});
+    return UnknownManager({std::make_pair(UnknownType::SCALAR, 0)});
   }
 
   void SetDOFStorageType(const UnknownStorageType in_storage_type)
-  { dof_storage_type_ = in_storage_type;}
+  {
+    dof_storage_type_ = in_storage_type;
+  }
 
-  UnknownStorageType GetDOFStorageType() const {return dof_storage_type_;}
+  UnknownStorageType GetDOFStorageType() const { return dof_storage_type_; }
 
-  void Clear() {unknowns_.clear();}
+  void Clear() { unknowns_.clear(); }
 
-  unsigned int AddUnknown(UnknownType unk_type, unsigned int dimension= 0);
+  unsigned int AddUnknown(UnknownType unk_type, unsigned int dimension = 0);
 
-  unsigned int MapUnknown(unsigned int unknown_id, unsigned int component = 0) const;
+  unsigned int MapUnknown(unsigned int unknown_id,
+                          unsigned int component = 0) const;
 
   unsigned int GetTotalUnknownStructureSize() const;
 
-  void SetUnknownNumOffBlockConnections(unsigned int unknown_id,
-                                        int num_conn);
+  void SetUnknownNumOffBlockConnections(unsigned int unknown_id, int num_conn);
 
   void SetUnknownComponentNumOffBlockConnections(unsigned int unknown_id,
                                                  unsigned int component,
@@ -198,12 +212,6 @@ public:
   ~UnknownManager() = default;
 };
 
-
-
-
-
-
-
-}
+} // namespace chi_math
 
 #endif

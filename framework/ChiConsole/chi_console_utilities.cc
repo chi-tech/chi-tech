@@ -1,0 +1,269 @@
+#include "ChiConsole/chi_console.h"
+
+#include "chi_runtime.h"
+#include "chi_log.h"
+
+#include "chi_misc_utils.h"
+
+namespace chi_objects::lua_utils
+{
+int chiMakeObject(lua_State* L);
+}
+
+// #############################################################################
+// Execute file
+/** Executes the given file in the Lua engine.
+\author Jan*/
+int chi_objects::ChiConsole::ExecuteFile(const std::string& fileName,
+                                         int argc,
+                                         char** argv) const
+{
+  lua_State* L = this->console_state_;
+  if (not fileName.empty())
+  {
+    if (argc > 0)
+    {
+      lua_newtable(L);
+      for (int i = 1; i <= argc; i++)
+      {
+        lua_pushnumber(L, i);
+        lua_pushstring(L, argv[i - 1]);
+        lua_settable(L, -3);
+      }
+      lua_setglobal(L, "chiArgs");
+    }
+    int error = luaL_dofile(this->console_state_, fileName.c_str());
+
+    if (error > 0)
+    {
+      chi::log.LogAllError()
+        << "LuaError: " << lua_tostring(this->console_state_, -1);
+      return EXIT_FAILURE;
+    }
+  }
+  return EXIT_SUCCESS;
+}
+
+// ###################################################################
+/**Pushes location id and number of processes to lua state.*/
+void chi_objects::ChiConsole::PostMPIInfo(int location_id,
+                                          int number_of_processes) const
+{
+  lua_State* L = this->console_state_;
+
+  lua_pushnumber(L, location_id);
+  lua_setglobal(L, "chi_location_id");
+
+  lua_pushnumber(L, number_of_processes);
+  lua_setglobal(L, "chi_number_of_processes");
+}
+
+// ###################################################################
+/**Basic addition to registry. Used by the other public methods
+ * to registry a text-key to a lua function.*/
+void chi_objects::ChiConsole::AddFunctionToRegistry(
+  const std::string& name_in_lua, lua_CFunction function_ptr)
+{
+  auto& console = GetInstance();
+
+  // Check if the function name is already there
+  if (console.lua_function_registry_.count(name_in_lua) > 0)
+  {
+    const auto& current_entry = console.lua_function_registry_.at(name_in_lua);
+
+    throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
+                           ": Attempted "
+                           "to register lua function \"" +
+                           name_in_lua +
+                           "\" but the function "
+                           "is already taken by " +
+                           current_entry.function_raw_name);
+  }
+
+  console.lua_function_registry_.insert(std::make_pair(
+    name_in_lua, LuaFunctionRegistryEntry{function_ptr, name_in_lua}));
+}
+
+// ###################################################################
+/**Adds a lua_CFunction to the registry. The registry of functions gets
+ * parsed into the lua console when `chi::Initialize` is called. This
+ * particular function will strip the namespace from the the parameter
+ * `raw_name_in_lua` and cause the function to be registered in the
+ * global namespace of the lua console.*/
+char chi_objects::ChiConsole::AddFunctionToRegistryGlobalNamespace(
+  const std::string& raw_name_in_lua, lua_CFunction function_ptr)
+{
+  // Filter out namespace from the raw name
+  const std::string name_in_lua =
+    chi_misc_utils::StringUpToFirstReverse(raw_name_in_lua, "::");
+
+  AddFunctionToRegistry(name_in_lua, function_ptr);
+
+  return 0;
+}
+
+// ###################################################################
+/**Adds a lua_CFunction to the registry. The registry of functions gets
+ * parsed into the lua console when `chi::Initialize` is called. The full
+ * path of the function will be derived from `namespace_name` + "::" +
+ * `function_name`.*/
+char chi_objects::ChiConsole::AddFunctionToRegistryInNamespaceWithName(
+  lua_CFunction function_ptr,
+  const std::string& namespace_name,
+  const std::string& function_name,
+  bool self_callable /*=false*/)
+{
+  const std::string name_in_lua = namespace_name + "::" + function_name;
+
+  AddFunctionToRegistry(name_in_lua, function_ptr);
+
+  if (self_callable and not namespace_name.empty())
+  {
+    auto& console = ChiConsole::GetInstance();
+    console.class_method_registry_[namespace_name].push_back(function_name);
+  }
+
+  return 0;
+}
+
+// ###################################################################
+/**Sets/Forms a lua function in the state using a namespace structure.*/
+void chi_objects::ChiConsole::SetLuaFuncNamespaceTableStructure(
+  const std::string& full_lua_name, lua_CFunction function_ptr)
+{
+  auto L = GetInstance().console_state_;
+  const auto lua_name_split = chi_misc_utils::StringSplit(full_lua_name, "::");
+
+  if (lua_name_split.size() == 1)
+  {
+    lua_pushcfunction(L, function_ptr);
+    lua_setglobal(L, lua_name_split.back().c_str());
+    return;
+  }
+
+  const std::vector<std::string> table_names(lua_name_split.begin(),
+                                             lua_name_split.end() - 1);
+
+  FleshOutLuaTableStructure(table_names);
+
+  lua_pushstring(L, lua_name_split.back().c_str());
+  lua_pushcfunction(L, function_ptr);
+  lua_settable(L, -3);
+
+  lua_pop(L, lua_gettop(L));
+}
+
+// ###################################################################
+/**Sets/Forms a table structure that mimics the namespace structure of
+ * a string. For example the string "sing::sob::nook::Tigger" will be
+ * assigned a table structure
+ * `sing.sob.nook.Tigger = "sing::sob::nook::Tigger"`.*/
+void chi_objects::ChiConsole::SetObjectNamespaceTableStructure(
+  const std::string& full_lua_name)
+{
+  auto L = GetInstance().console_state_;
+
+  /**Lambda for registering object type and creation function.*/
+  auto RegisterObjectItems = [&L](const std::string& full_name)
+  {
+    lua_pushstring(L, "type");
+    lua_pushstring(L, full_name.c_str());
+    lua_settable(L, -3);
+
+    lua_pushstring(L, "Create");
+    std::string chunk_code = "local params = ...; ";
+    chunk_code += "return chiMakeObjectType(\"" + full_name + "\", ...)";
+
+    luaL_loadstring(L, chunk_code.c_str());
+    lua_settable(L, -3);
+  };
+
+  const auto table_names = chi_misc_utils::StringSplit(full_lua_name, "::");
+
+  FleshOutLuaTableStructure(table_names);
+
+  RegisterObjectItems(full_lua_name);
+
+  lua_pop(L, lua_gettop(L));
+}
+
+// ##################################################################
+/**Fleshes out a path in a table tree. For example, given
+ * "fee::foo::fah::koo, this routine will make sure that
+ * fee.foo.fah.koo is defined as a table tree structure. The routine will
+ * create a table structure where one is needed and leave existing ones alone.
+ *
+ * At the end of the routine the last table in the structure will be on top
+ * of the stack.*/
+void chi_objects::ChiConsole::FleshOutLuaTableStructure(
+  const std::vector<std::string>& table_names)
+{
+  auto L = GetInstance().console_state_;
+
+  for (const auto& table_name : table_names)
+  {
+    // The first entry needs to be in lua's global scope,
+    // so it looks a little different
+    if (table_name == table_names.front())
+    {
+      lua_getglobal(L, table_name.c_str());
+      if (not lua_istable(L, -1))
+      {
+        lua_pop(L, 1);
+        lua_newtable(L);
+        lua_setglobal(L, table_name.c_str());
+        lua_getglobal(L, table_name.c_str());
+      }
+    }
+    else
+    {
+      lua_getfield(L, -1, table_name.c_str());
+      if (not lua_istable(L, -1))
+      {
+        lua_pop(L, 1);
+        lua_pushstring(L, table_name.c_str());
+        lua_newtable(L);
+        lua_settable(L, -3);
+        lua_getfield(L, -1, table_name.c_str());
+      }
+    }
+  } // for table_key in table_keys
+}
+
+// ##################################################################
+/**Assumes a table is on top of the stack, then loads the table
+ * with chunks that call registered methods of the class with the first
+ * argument being the object's handle.*/
+void chi_objects::ChiConsole::SetObjectMethodsToTable(
+  const std::string& class_name, size_t handle)
+{
+  auto& console = GetInstance();
+  auto L = console.console_state_;
+
+  const auto& class_method_registry = console.class_method_registry_;
+  if (class_method_registry.count(class_name) == 0) return;
+
+  const auto& method_list = class_method_registry.at(class_name);
+  for (const auto& method_name : method_list)
+  {
+    std::string function_name = class_name;
+    function_name += "::";
+    function_name += method_name;
+
+    const auto path_names = chi_misc_utils::StringSplit(function_name, "::");
+    std::string path_dot_name;
+    for (const auto& name : path_names)
+    {
+      path_dot_name += name;
+      if (name != path_names.back()) path_dot_name += ".";
+    }
+
+    std::string chunk_code = "local params = ...; ";
+    chunk_code += "return " + path_dot_name + "(" + std::to_string(handle) +
+                  ", ...)";
+
+    lua_pushstring(L, method_name.c_str());
+    luaL_loadstring(L, chunk_code.c_str());
+    lua_settable(L, -3);
+  }
+}

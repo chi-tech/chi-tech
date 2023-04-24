@@ -29,3 +29,7 @@ function MMS_q(x,y,z)
 end
 
 chiSimTest04_PWLC();
+chiMPIBarrier()
+if (chi_location_id == 0) then
+    os.execute("rm CodeTut4_PWLC*")
+end

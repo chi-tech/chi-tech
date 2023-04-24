@@ -50,11 +50,11 @@ void chi_objects::ChiConsole::RunConsoleLoop(char*) const
   /** Executes a string within the lua-console. */
   auto LuaDoString = [this](const std::string& the_string)
   {
-    bool error = luaL_dostring(consoleState,the_string.c_str());
+    bool error = luaL_dostring(console_state_, the_string.c_str());
     if (error)
     {
-      chi::log.LogAll() << lua_tostring(consoleState,-1);
-      lua_pop(consoleState,1);
+      chi::log.LogAll() << lua_tostring(console_state_, -1);
+      lua_pop(console_state_, 1);
     }
   };
 

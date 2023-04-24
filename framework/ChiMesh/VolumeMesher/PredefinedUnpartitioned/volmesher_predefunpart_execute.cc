@@ -45,7 +45,8 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   }
 
   //======================================== Get unpartitioned mesh
-  auto umesh = umesh_ptr_;
+  ChiLogicalErrorIf(umesh_ptr_ == nullptr,
+                  "nullptr encountered for unparitioned mesh");
 
   chi::log.Log() << "Computed centroids";
   MPI_Barrier(MPI_COMM_WORLD);
@@ -55,25 +56,25 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   std::vector<int64_t> cell_pids;
   auto grid = chi_mesh::MeshContinuum::New();
 
-  grid->GetBoundaryIDMap() = umesh->GetMeshOptions().boundary_id_map;
+  grid->GetBoundaryIDMap() = umesh_ptr_->GetMeshOptions().boundary_id_map;
 
   if (options.partition_type == PartitionType::KBA_STYLE_XYZ)
-    cell_pids = KBA(*umesh);
+    cell_pids = KBA(*umesh_ptr_);
   else
-    cell_pids = PARMETIS(*umesh);
+    cell_pids = PARMETIS(*umesh_ptr_);
 
   //======================================== Load up the cells
-  auto& vertex_subs = umesh->GetVertextCellSubscriptions();
+  auto& vertex_subs = umesh_ptr_->GetVertextCellSubscriptions();
   size_t cell_globl_id = 0;
-  for (auto raw_cell : umesh->GetRawCells())
+  for (auto raw_cell : umesh_ptr_->GetRawCells())
   {
     if (CellHasLocalScope(*raw_cell, cell_globl_id, vertex_subs, cell_pids))
     {
       auto cell = MakeCell(*raw_cell, cell_globl_id,
-                           cell_pids[cell_globl_id], umesh->GetVertices());
+                           cell_pids[cell_globl_id], umesh_ptr_->GetVertices());
 
       for (uint64_t vid : cell->vertex_ids_)
-        grid->vertices.Insert(vid, umesh->GetVertices()[vid]);
+        grid->vertices.Insert(vid, umesh_ptr_->GetVertices()[vid]);
 
       grid->cells.push_back(std::move(cell));
     }
@@ -81,16 +82,16 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
     ++cell_globl_id;
   }//for raw_cell
 
-  grid->SetGlobalVertexCount(umesh->GetVertices().size());
+  grid->SetGlobalVertexCount(umesh_ptr_->GetVertices().size());
 
   chi::log.Log() << "Cells loaded.";
   MPI_Barrier(MPI_COMM_WORLD);
 
   SetContinuum(grid);
-  SetGridAttributes(umesh->GetMeshAttributes(),
-                    {umesh->GetMeshOptions().ortho_Nx,
-                     umesh->GetMeshOptions().ortho_Ny,
-                     umesh->GetMeshOptions().ortho_Nz});
+  SetGridAttributes(umesh_ptr_->GetMeshAttributes(),
+                    {umesh_ptr_->GetMeshOptions().ortho_Nx,
+                     umesh_ptr_->GetMeshOptions().ortho_Ny,
+                     umesh_ptr_->GetMeshOptions().ortho_Nz});
 
   //======================================== Concluding messages
   chi::log.LogAllVerbose1()
@@ -113,4 +114,5 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
     << total_global_cells
     << std::endl;
 
+  umesh_ptr_ = nullptr;
 }

@@ -134,24 +134,6 @@ bool chi_mesh::MeshContinuum::IsCellLocal(uint64_t cell_global_index) const
 //###################################################################
 /**Check whether a cell is a boundary by checking if the key is
  * found in the native or foreign cell maps.*/
-bool chi_mesh::MeshContinuum::IsCellBndry(uint64_t cell_global_index) const
-{
-  auto native_index = global_cell_id_to_local_id_map_.find(cell_global_index);
-  auto foreign_index = global_cell_id_to_nonlocal_id_map_.find(cell_global_index);
-
-  auto no_native = global_cell_id_to_local_id_map_.end();
-  auto no_foreign = global_cell_id_to_nonlocal_id_map_.end();
-
-  if ( (native_index == no_native) and (foreign_index == no_foreign))
-    return true;
-
-  return false;
-}
-
-
-//###################################################################
-/**Check whether a cell is a boundary by checking if the key is
- * found in the native or foreign cell maps.*/
 int chi_mesh::MeshContinuum::GetCellDimension(const chi_mesh::Cell& cell)
 {
   switch (cell.Type())

@@ -17,7 +17,7 @@ now we have only a couple of tutorials.\n
  <a href="https://www.lua.org/manual/5.3/"><B>Lua 5.3 Reference</B></a>\n
  <a href="https://www.mcs.anl.gov/petsc/documentation/index.html"><B>PETSc Documentation</B></a>\n
  <a href="https://lorensen.github.io/VTKExamples/site/"><B>Visualization Tool Kit (VTK) documentation</B></a>\n
-
+ <a href="https://clang.llvm.org/extra/clang-tidy/#suppressing-undesired-diagnostics"><B>clang-tidy Documentation</B></a>
 
 \n
 

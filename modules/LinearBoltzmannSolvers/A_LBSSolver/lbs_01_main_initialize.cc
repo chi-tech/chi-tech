@@ -1,6 +1,6 @@
 #include "lbs_solver.h"
 
-#include "ChiMPI/chi_mpi.h"
+#include "chi_runtime.h"
 #include "chi_log.h"
 
 //###################################################################

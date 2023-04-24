@@ -51,14 +51,14 @@ void chi_mesh::UnpartitionedMesh::
   {
     auto block_a = iter_a->GetCurrentDataObject();
 
-    const std::string block_name = chi_misc_utils::trim(
+    const std::string block_name = chi_misc_utils::StringTrim(
       iter_a->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME()));
 
     if (block_a->GetDataObjectType() == VTK_UNSTRUCTURED_GRID)
     {
       grid_blocks.emplace_back(
         vtkUnstructuredGrid::SafeDownCast(block_a),
-        chi_misc_utils::trim(
+        chi_misc_utils::StringTrim(
           iter_a->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME())));
 
       chi::log.Log()

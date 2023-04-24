@@ -1,0 +1,118 @@
+#include "chi_lua.h"
+
+#include "chi_runtime.h"
+#include "chi_log.h"
+
+#include "ChiParameters/parameter_block.h"
+
+namespace chi_unit_tests
+{
+
+int Test_paramblock(lua_State* L)
+{
+  const int num_args = lua_gettop(L);
+  bool verbose = false;
+  if (num_args >= 1)
+    verbose = lua_toboolean(L,1);
+
+  if (verbose)
+    chi::log.Log() << "Hello world";
+
+  if (num_args == 2)
+  {
+    if (lua_istable(L, 2))
+    {
+      chi::log.Log() << "It is a block";
+      const auto param_block =
+        chi_lua::TableParserAsParameterBlock::ParseTable(L, 2);
+
+      {
+        std::string outstr;
+        param_block.RecursiveDumpToString(outstr);
+
+        chi::log.Log() << outstr;
+      }
+
+      chi::log.Log() << param_block.GetParamValue<std::string>("it_method");
+
+      chi::log.Log() << param_block.GetParam("sub1").GetParamValue<int>(
+        "ax_method");
+
+      chi::log.Log() << param_block.GetParamValue<double>("nl_abs_tol");
+
+      chi::log.Log() << (param_block.GetParamValue<bool>("enabled") ? "true"
+                                                                    : "false");
+
+      chi::log.Log() << param_block.GetParamValue<size_t>("nl_max_its");
+
+      chi::log.Log() << "Has \"blocks\"?: "
+                     << param_block.GetParam("sub2").Has("blocks");
+
+      chi::log.Log()
+        << "Num Parameters: "
+        << param_block.GetParam("sub2").GetParam("blocks").NumParameters();
+
+      const auto vec =
+        param_block.GetParam("sub2").GetParamVectorValue<int>("blocks");
+
+      {
+        std::stringstream outstr;
+        for (auto val : vec)
+          outstr << val << " ";
+        chi::log.Log() << outstr.str();
+      }
+
+      chi::log.Log() << "Testing copy constructor";
+      const auto& param_block2 = param_block;
+      {
+        std::string outstr;
+        param_block2.RecursiveDumpToString(outstr);
+
+        chi::log.Log() << outstr;
+      }
+
+      chi::log.Log() << "Testing move constructor";
+      const chi_objects::ParameterBlock& param_block3(param_block2);
+      {
+        std::string outstr;
+        param_block3.RecursiveDumpToString(outstr);
+
+        chi::log.Log() << outstr;
+      }
+    }//if table
+  }//if num_args == 2
+
+  chi::log.Log() << "Testing varying";
+  {
+    chi_data_types::Varying v(12);
+    chi::log.Log() << "v(12)" << v.IntegerValue();
+    v = true;
+    chi::log.Log() << "v(bool)" << v.BoolValue();
+    chi::log.Log() << "v(bool)" << v.GetValue<bool>();
+  }
+  {
+    chi_data_types::Varying v(12);
+    chi::log.Log() << "v(12)" << v.IntegerValue();
+    v = 12.0;
+    chi::log.Log() << "v(12.0)" << v.FloatValue();
+    chi::log.Log() << "v(12.0)" << v.GetValue<double>();
+    chi::log.Log() << "v(12.0)" << v.GetValue<float>();
+  }
+  {
+    chi_data_types::Varying v(12.0);
+    chi::log.Log() << "v(12.0) bytesize" << v.ByteSize();
+    chi::log.Log() << "v(12.0)" << v.FloatValue();
+    v = 12;
+    chi::log.Log() << "v(12)" << v.IntegerValue();
+    chi::log.Log() << "v(12)" << v.GetValue<int>();
+    chi::log.Log() << "v(12)" << v.GetValue<size_t>();
+  }
+  {
+    chi_data_types::Varying v(std::string("Hello"));
+    chi::log.Log() << "hello" << v.StringValue();
+    chi::log.Log() << "hello" << v.GetValue<std::string>();
+  }
+  return 0;
+}
+
+}//namespace chi_unit_tests

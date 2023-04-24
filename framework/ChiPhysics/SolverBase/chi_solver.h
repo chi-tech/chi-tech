@@ -1,10 +1,14 @@
 #ifndef CHI_PHYSICS_SOLVER_H
 #define CHI_PHYSICS_SOLVER_H
-#include <iostream>
-#include <utility>
+
+#include "ChiObject/chi_object.h"
 #include "ChiPhysics/chi_physics_namespace.h"
 
 #include "ChiPhysics/BasicOptions/basic_options.h"
+#include "ChiParameters/parameter_block.h"
+
+#include <iostream>
+#include <utility>
 
 namespace chi_physics
 {
@@ -16,21 +20,23 @@ namespace chi_physics
  * \ingroup LuaPhysics*/
 
 //######################################################### Solver parent class
-class chi_physics::Solver
+class chi_physics::Solver : public ChiObject
 {
 private:
-  std::string text_name_;
+  const std::string text_name_;
 protected:
   BasicOptions basic_options_;
   std::vector<std::shared_ptr<FieldFunction>> field_functions_;
 
 public:
+  static chi_objects::InputParameters GetInputParameters();
   explicit
   Solver(std::string  in_text_name) : text_name_(std::move(in_text_name)) {}
   Solver(std::string  in_text_name,
          std::initializer_list<BasicOption> in_options) :
     text_name_(std::move(in_text_name)),
     basic_options_(in_options) {}
+  explicit Solver(const chi_objects::InputParameters& params);
   virtual ~Solver() = default;
 
   BasicOptions& GetBasicOptions() {return basic_options_;}
@@ -47,6 +53,7 @@ public:
   virtual void Initialize();
   virtual void Execute();
   virtual void Step();
+  virtual void Advance();
 };
 
 

@@ -1,5 +1,7 @@
 #include "pwlc.h"
 
+#include "chi_runtime.h"
+
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #define sc_int64 static_cast<int64_t>

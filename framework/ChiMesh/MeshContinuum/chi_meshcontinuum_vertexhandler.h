@@ -39,6 +39,16 @@ public:
   {
     m_global_id_vertex_map.insert(std::make_pair(global_id, vec));
   }
+
+  size_t NumLocallyStored() const
+  {
+    return m_global_id_vertex_map.size();
+  }
+
+  void Clear()
+  {
+    m_global_id_vertex_map.clear();
+  }
 };
 
 }//namespace chi_mesh

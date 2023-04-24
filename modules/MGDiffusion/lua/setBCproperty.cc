@@ -66,7 +66,7 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
   LuaCheckNumberValue(fname, L, 1);
   const int solver_index = lua_tonumber(L,1);
 
-  auto& solver = chi::GetStackItem<mg_diffusion::Solver>(chi::solver_stack,
+  auto& solver = chi::GetStackItem<mg_diffusion::Solver>(chi::object_stack,
                                                           solver_index,
                                                           fname);
 

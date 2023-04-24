@@ -29,9 +29,9 @@ int chiLBKESCreateSolver(lua_State* L)
 
   auto solver = std::make_shared<DiscOrdKEigenvalueSolver>(solver_name);
 
-  chi::solver_stack.push_back(solver);
+  chi::object_stack.push_back(solver);
 
-  auto n = static_cast<lua_Integer>(chi::solver_stack.size() - 1);
+  auto n = static_cast<lua_Integer>(chi::object_stack.size() - 1);
   lua_pushinteger(L, n);
   return 1;
 }

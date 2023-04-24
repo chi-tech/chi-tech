@@ -50,7 +50,7 @@ if (NOT DEFINED CHI_TECH_DIR)
 endif()
 message(STATUS "CHI_TECH_DIR set to ${CHI_TECH_DIR}")
 
-include("${CHI_TECH_DIR}/resources/Macros/Downstream.cmake")
+include("${CHI_TECH_DIR}/resources/CMakeMacros/Downstream.cmake")
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib")
@@ -58,7 +58,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
 
 file (GLOB_RECURSE SOURCES "*.cc")
 add_executable(${TARGET} "${SOURCES}")
-target_link_libraries(${TARGET} ${CHI_LIBS})
+if(UNIX AND NOT APPLE)
+    target_link_libraries(${TARGET} ${CHI_LIBS} -Wl,--whole-archive ChiLib -Wl,--no-whole-archive )
+elseif(APPLE)
+    target_link_libraries(${TARGET} ${CHI_LIBS} -Wl,-all_load ChiLib )
+endif()
 
 file(WRITE ${PROJECT_SOURCE_DIR}/Makefile "subsystem:\n" "\t$(MAKE) -C chi_build \n\n"
         "clean:\n\t$(MAKE) -C chi_build clean\n")

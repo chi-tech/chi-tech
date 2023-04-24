@@ -1,11 +1,55 @@
-#include "ChiLua/chi_lua.h"
-#include "physics_lua_utils.h"
+#include "physics_solver_lua_utils.h"
+
+#include "ChiPhysics/SolverBase/chi_solver.h"
+
+#include "ChiObject/object_maker.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
+#include "ChiConsole/chi_console.h"
 
 /** \defgroup LuaSolver Solvers
  * \ingroup LuaPhysics*/
+
+namespace chi_physics::lua_utils
+{
+  RegisterLuaFunctionAsIs(chiSolverCreate);
+
+  RegisterLuaFunctionAsIs(chiSolverInitialize);
+  RegisterLuaFunctionAsIs(chiSolverExecute);
+  RegisterLuaFunctionAsIs(chiSolverStep);
+  RegisterLuaFunctionAsIs(chiSolverAdvance);
+  RegisterLuaFunctionAsIs(chiSolverSetBasicOption);
+  RegisterLuaFunctionAsIs(chiSolverGetName);
+  RegisterLuaFunctionAsIs(chiSolverGetFieldFunctionList);
+
+//#############################################################################
+/**Generic lua routine for the creation of solvers.
+ * \param params ParameterBlock. A single block with at least one field
+ *                   \"type\", which contains a registered solver type.
+ * ## _
+ *
+ * Example:
+\code
+chiSolverCreate({type=cfem_diffusion.Solver})
+\endcode*/
+int chiSolverCreate(lua_State* L)
+{
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
+  if (num_args != 1)
+    LuaPostArgAmountError(fname, 1, num_args);
+
+  LuaCheckTableValue(fname, L, 1);
+
+  const auto params = chi_lua::TableParserAsParameterBlock::ParseTable(L, 1);
+
+  const auto& object_maker = ChiObjectMaker::GetInstance();
+  const size_t handle = object_maker.MakeObject(params);
+
+  lua_pushinteger(L, static_cast<lua_Integer>(handle));
+  return 1;
+}
 
 //#############################################################################
 /** Initializes the solver at the given handle.
@@ -26,7 +70,7 @@ int chiSolverInitialize(lua_State *L)
 
   const int solver_handle = lua_tonumber(L, 1);
 
-  auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::solver_stack,
+  auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::object_stack,
                                                         solver_handle,
                                                         fname);
 
@@ -54,7 +98,7 @@ int chiSolverExecute(lua_State *L)
 
   const int solver_handle = lua_tonumber(L, 1);
 
-  auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::solver_stack,
+  auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::object_stack,
                                                         solver_handle,
                                                         fname);
 
@@ -82,11 +126,39 @@ int chiSolverStep(lua_State *L)
 
   const int solver_handle = lua_tonumber(L, 1);
 
-  auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::solver_stack,
+  auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::object_stack,
                                                         solver_handle,
                                                         fname);
 
   solver.Step();
+
+  return 0;
+}
+
+//#############################################################################
+/** Advances the time values of the solver at the given handle.
+
+\param solver_handle int Handle to the solver.
+
+\ingroup LuaSolver
+\author Jan*/
+  int chiSolverAdvance(lua_State *L)
+{
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
+
+  if (num_args != 1)
+    LuaPostArgAmountError(fname, 1, num_args);
+  LuaCheckNilValue(fname, L, 1);
+  LuaCheckIntegerValue(fname, L, 1);
+
+  const int solver_handle = lua_tonumber(L, 1);
+
+  auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::object_stack,
+                                                        solver_handle,
+                                                        fname);
+
+  solver.Advance();
 
   return 0;
 }
@@ -117,7 +189,7 @@ int chiSolverSetBasicOption(lua_State* L)
   const int         solver_handle = lua_tointeger(L,1);
   const std::string option_name   = lua_tostring(L,2);
 
-  auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::solver_stack,
+  auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::object_stack,
                                                         solver_handle,
                                                         fname);
 
@@ -194,7 +266,7 @@ int chiSolverGetName(lua_State *L)
 
   const int solver_handle = lua_tonumber(L, 1);
 
-  const auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::solver_stack,
+  const auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::object_stack,
                                                               solver_handle,
                                                               fname);
 
@@ -219,7 +291,7 @@ int chiSolverGetFieldFunctionList(lua_State* L)
   //======================================================= Getting solver
   const int solver_handle = lua_tonumber(L,1);
 
-  const auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::solver_stack,
+  const auto& solver = chi::GetStackItem<chi_physics::Solver>(chi::object_stack,
                                                               solver_handle,
                                                               fname);
 
@@ -252,3 +324,5 @@ int chiSolverGetFieldFunctionList(lua_State* L)
 
   return 2;
 }
+//}//namespace temp
+}//namespace chi_physics::lua_utils

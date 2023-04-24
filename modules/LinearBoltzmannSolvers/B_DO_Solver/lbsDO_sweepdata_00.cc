@@ -3,6 +3,7 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/VolumeMesher/chi_volumemesher.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 #include "ChiTimer/chi_timer.h"
 

@@ -9,9 +9,10 @@
 /**Constructor to compute bound box information.*/
 chi_mesh::SurfaceMeshLogicalVolume::
   SurfaceMeshLogicalVolume(SurfaceMeshPtr in_surf_mesh) :
-  xbounds({1.0e6,-1.0e6}),
-  ybounds({1.0e6,-1.0e6}),
-  zbounds({1.0e6,-1.0e6}),
+  LogicalVolume(LogicalVolumeType::LVSURFACE),
+  xbounds_({1.0e6, -1.0e6}),
+  ybounds_({1.0e6, -1.0e6}),
+  zbounds_({1.0e6, -1.0e6}),
   surf_mesh(std::move(in_surf_mesh))
 {
   for (auto & vertice : surf_mesh->GetVertices())
@@ -20,13 +21,13 @@ chi_mesh::SurfaceMeshLogicalVolume::
     double y = vertice.y;
     double z = vertice.z;
 
-    if (x < xbounds[0]) xbounds[0] = x;
-    if (y < ybounds[0]) ybounds[0] = y;
-    if (z < zbounds[0]) zbounds[0] = z;
+    if (x < xbounds_[0]) xbounds_[0] = x;
+    if (y < ybounds_[0]) ybounds_[0] = y;
+    if (z < zbounds_[0]) zbounds_[0] = z;
 
-    if (x > xbounds[1]) xbounds[1] = x;
-    if (y > ybounds[1]) ybounds[1] = y;
-    if (z > zbounds[1]) zbounds[1] = z;
+    if (x > xbounds_[1]) xbounds_[1] = x;
+    if (y > ybounds_[1]) ybounds_[1] = y;
+    if (z > zbounds_[1]) zbounds_[1] = z;
   }
 }
 
@@ -42,11 +43,11 @@ bool chi_mesh::SurfaceMeshLogicalVolume::
   double y = point.y;
   double z = point.z;
 
-  if (not ((x >= xbounds[0]) and (x <= xbounds[1])))
+  if (not ((x >= xbounds_[0]) and (x <= xbounds_[1])))
     return false;
-  if (not ((y >= ybounds[0]) and (y <= ybounds[1])))
+  if (not ((y >= ybounds_[0]) and (y <= ybounds_[1])))
     return false;
-  if (not ((z >= zbounds[0]) and (z <= zbounds[1])))
+  if (not ((z >= zbounds_[0]) and (z <= zbounds_[1])))
     return false;
 
   //============================================= Cheapshot pass

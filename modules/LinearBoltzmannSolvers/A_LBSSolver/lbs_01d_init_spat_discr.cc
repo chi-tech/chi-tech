@@ -30,6 +30,7 @@ void lbs::LBSSolver::ComputeUnitIntegrals()
   {
     virtual double operator()(const chi_mesh::Vector3& pt) const
     { return 1.0; }
+    virtual ~SpatialWeightFunction() = default;
   };
 
   struct SphericalSWF : public SpatialWeightFunction
@@ -159,7 +160,25 @@ void lbs::LBSSolver::ComputeUnitIntegrals()
     unit_ghost_cell_matrices_[ghost_id] =
       ComputeCellUnitIntegrals(grid_ptr_->cells[ghost_id],*swf_ptr);
 
+  //============================================= Assessing global unit cell
+  //                                              matrix storage
+  std::array<size_t,2> num_local_ucms = {unit_cell_matrices_.size(),
+                                         unit_ghost_cell_matrices_.size()};
+  std::array<size_t,2> num_globl_ucms = {0,0};
+
+  MPI_Allreduce(num_local_ucms.data(), //sendbuf
+                num_globl_ucms.data(), //recvbuf
+                2, MPIU_SIZE_T,        //count+datatype
+                MPI_SUM,               //operation
+                MPI_COMM_WORLD);       //comm
+
+
+
   MPI_Barrier(MPI_COMM_WORLD);
+  chi::log.Log()
+  << "Ghost cell unit cell-matrix ratio: "
+  << (double)num_globl_ucms[1]*100/(double)num_globl_ucms[0]
+  << "%";
   chi::log.Log()
     << "Cell matrices computed.                   Process memory = "
     << std::setprecision(3)

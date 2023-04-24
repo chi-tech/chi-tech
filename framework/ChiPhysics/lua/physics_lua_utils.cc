@@ -11,12 +11,19 @@
 void chi_physics::lua_utils::RegisterLuaEntities(lua_State *L)
 {
   //=================================== Solver
-  LUA_FMACRO1(chiSolverInitialize);
-  LUA_FMACRO1(chiSolverExecute);
-  LUA_FMACRO1(chiSolverStep);
-  LUA_FMACRO1(chiSolverSetBasicOption);
-  LUA_FMACRO1(chiSolverGetName);
-  LUA_FMACRO1(chiSolverGetFieldFunctionList);
+//  LUA_FMACRO1(chiSolverInitialize);
+//  LUA_FMACRO1(chiSolverExecute);
+//  LUA_FMACRO1(chiSolverStep);
+//  LUA_FMACRO1(chiSolverSetBasicOption);
+//  LUA_FMACRO1(chiSolverGetName);
+//  LUA_FMACRO1(chiSolverGetFieldFunctionList);
+
+//  lua_register(L, "chiSolverInitialize", temp::chiSolverInitialize);
+//  lua_register(L, "chiSolverExecute", temp::chiSolverExecute);
+//  lua_register(L, "chiSolverStep", temp::chiSolverStep);
+//  lua_register(L, "chiSolverSetBasicOption", temp::chiSolverSetBasicOption);
+//  lua_register(L, "chiSolverGetName", temp::chiSolverGetName);
+//  lua_register(L, "chiSolverGetFieldFunctionList", temp::chiSolverGetFieldFunctionList);
 
   //=================================== Materials
   LUA_FMACRO1(chiPhysicsAddMaterial);

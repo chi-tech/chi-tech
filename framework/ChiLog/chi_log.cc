@@ -1,3 +1,4 @@
+#include "chi_runtime.h"
 #include "chi_log.h"
 #include "chi_mpi.h"
 #include "ChiTimer/chi_timer.h"
@@ -5,6 +6,14 @@
 #include "stringstream_color.h"
 
 #include <sstream>
+
+//###################################################################
+/**Access to the singleton*/
+chi_objects::ChiLog& chi_objects::ChiLog::GetInstance() noexcept
+{
+  static ChiLog instance;
+  return instance;
+}
 
 //###################################################################
 /** Default constructor*/

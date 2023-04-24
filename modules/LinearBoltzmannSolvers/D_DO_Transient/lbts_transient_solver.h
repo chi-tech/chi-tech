@@ -16,7 +16,7 @@ namespace lbs
 class DiscOrdTransientSolver : public DiscOrdKEigenvalueSolver
 {
 public:
-  chi_math::SteppingMethod method = chi_math::SteppingMethod::CRANK_NICHOLSON;
+  chi_math::SteppingMethod method = chi_math::SteppingMethod::CRANK_NICOLSON;
 
   /// Options for initial condition normalization
   enum class NormalizationMethod
@@ -60,7 +60,7 @@ public:
   //02
   void Execute() override;
   void Step() override;
-  void AdvanceTimeValues();
+  void Advance() override;
 
   //Iterative operations
   std::shared_ptr<SweepChunk> SetTransientSweepChunk(LBSGroupset& groupset);

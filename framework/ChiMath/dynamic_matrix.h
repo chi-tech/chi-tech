@@ -5,6 +5,8 @@
 #include <stdexcept>
 #include <sstream>
 
+#include "chi_math.h"
+
 namespace chi_math
 {
   template<class NumberFormat>
@@ -156,19 +158,20 @@ public:
       return {elements_.size(), elements_[0].size()};
   }
 
-  void bounds_check_rows_cols(const MatDim a, const MatDim b) const
+private:
+  static void bounds_check_rows_cols(const MatDim a, const MatDim b)
   {
     if ((a.first != b.first) or (a.second != b.second))
       throw std::length_error("Mismatched square sizes of DynamicMatrix");
   }
 
-  void bounds_check_colsA_rowsB(const MatDim a, const MatDim b) const
+  static void bounds_check_colsA_rowsB(const MatDim a, const MatDim b)
   {
     if (a.first != b.second)
       throw std::length_error("Mismatched matrix A rows with matrix B cols"
                               " in DynamicMatrix");
   }
-
+public:
   //============================================= Addition
   /**Component-wise addition of two matrices.
    * \f$ \vec{w} = \vec{x} + \vec{y} \f$*/
@@ -280,7 +283,7 @@ public:
   }
 
   /** Matrix-Vector multiplication */
-  DynamicVector<NumberFormat> operator*(DynamicVector<NumberFormat>& V)
+  DynamicVector<NumberFormat> operator*(const DynamicVector<NumberFormat>& V)
   {
     auto dimA = Dimensions();
     auto dimV = V.size();
@@ -330,6 +333,14 @@ public:
   }
 
   //============================================= Operations
+  /**Obtains the inverse with Gauss-Elimination.*/
+  DynamicMatrix Inverse() const
+  {
+    auto inv_elems = chi_math::InverseGEPivoting(elements_);
+
+    return DynamicMatrix<NumberFormat>(inv_elems);
+  }
+
   /** Set the diagonal using a vector.*/
   void SetDiagonal(DynamicVector<NumberFormat>& V)
   {

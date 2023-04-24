@@ -46,7 +46,7 @@ int chiLBTSGetProperty(lua_State* L)
   LuaCheckNilValue(fname, L, 1);
   const int solver_handle = lua_tointeger(L, 1);
 
-  auto& solver = chi::GetStackItem<lbs::DiscOrdTransientSolver>(chi::solver_stack,
+  auto& solver = chi::GetStackItem<lbs::DiscOrdTransientSolver>(chi::object_stack,
                                                                 solver_handle,
                                                                 fname);
 

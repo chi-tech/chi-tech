@@ -63,9 +63,9 @@ chiLBSGroupsetAddGroups(phys1,cur_gs,0,num_groups-1)
 chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
 chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
 chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
-chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_CLASSICRICHARDSON)
+chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_RICHARDSON)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,1)
+chiLBSGroupsetSetMaxIterations(phys1,cur_gs,0)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
 
 --############################################### Set boundary conditions
@@ -86,6 +86,10 @@ chiLBSSetProperty(phys1,SCATTERING_ORDER,0)
 chiSolverInitialize(phys1)
 chiSolverExecute(phys1)
 
-ff_m0 = chiGetFieldFunctionHandleByName(solver_name.."_Flux_g0_m0")
+ff_m0 = chiGetFieldFunctionHandleByName(solver_name.."_Flux_g000_m00")
 
-chiExportMultiFieldFunctionToVTK({ff_m0},"ZPhi_"..solver_name)
+chiExportMultiFieldFunctionToVTK({ff_m0},"SimTest_93_LBS_"..solver_name)
+chiMPIBarrier()
+if (chi_location_id == 0) then
+    os.execute("rm SimTest_93*")
+end

@@ -36,7 +36,7 @@ int chiAdjointSolverAddResponseFunction(lua_State* L)
   }
 
   auto& solver = chi::GetStackItem<lbs::DiscOrdSteadyStateAdjointSolver>(
-    chi::solver_stack, solver_handle, fname);
+    chi::object_stack, solver_handle, fname);
 
   auto p_logical_volume = chi::GetStackItemPtr(
     chi::logicvolume_stack, logvol_handle, fname);

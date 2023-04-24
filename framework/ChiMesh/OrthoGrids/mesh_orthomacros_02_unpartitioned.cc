@@ -13,7 +13,7 @@
 /**Creates a 1D slab mesh from a set of vertices.*/
 size_t chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
 {
-  ChiLogicalError(vertices.empty(), "Empty vertex list.")
+  ChiLogicalErrorIf(vertices.empty(), "Empty vertex list.");
 
   //======================================== Get current mesh handler
   auto& handler = chi_mesh::GetCurrentHandler();
@@ -75,7 +75,7 @@ size_t chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
   handler.SetVolumeMesher(std::make_shared<
     chi_mesh::VolumeMesherPredefinedUnpartitioned>(umesh));
 
-  handler.GetVolumeMesher().Execute();
+//  handler.GetVolumeMesher().Execute();
 
   return chi::unpartitionedmesh_stack.size()-1;
 }
@@ -97,8 +97,8 @@ size_t chi_mesh::CreateUnpartitioned2DOrthoMesh(
   std::vector<double>& vertices_1d_x,
   std::vector<double>& vertices_1d_y)
 {
-  ChiLogicalError(vertices_1d_x.empty() or vertices_1d_y.empty(),
-                  "Empty vertex list.")
+  ChiLogicalErrorIf(vertices_1d_x.empty() or vertices_1d_y.empty(),
+                  "Empty vertex list.");
 
   //======================================== Get current mesh handler
   auto& handler = chi_mesh::GetCurrentHandler();
@@ -212,9 +212,9 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
   std::vector<double>& vertices_1d_y,
   std::vector<double>& vertices_1d_z)
 {
-  ChiLogicalError(vertices_1d_x.empty() or
+  ChiLogicalErrorIf(vertices_1d_x.empty() or
                   vertices_1d_y.empty() or
-                  vertices_1d_z.empty(), "Empty vertex list.")
+                  vertices_1d_z.empty(), "Empty vertex list.");
 
   //======================================== Get current mesh handler
   auto& handler = chi_mesh::GetCurrentHandler();
