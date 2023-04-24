@@ -2,7 +2,6 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
 
 //###################################################################
 /**Executes the pass-through surface mesher.*/

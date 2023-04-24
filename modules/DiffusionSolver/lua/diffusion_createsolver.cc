@@ -6,7 +6,6 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
 
 //#############################################################################
 /** Creates a Diffusion solver.
