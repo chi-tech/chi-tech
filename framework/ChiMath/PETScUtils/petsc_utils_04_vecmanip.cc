@@ -1,7 +1,6 @@
 #include "petsc_utils.h"
 
 #include "chi_log.h"
-;
 
 //###################################################################
 /**Copies a PETSc vector to a STL vector. Only the local portion is

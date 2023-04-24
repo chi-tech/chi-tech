@@ -8,8 +8,6 @@
 
 #include <chi_log.h>
 
-;
-
 
 //#############################################################################
 /** Builds sweep ordering for a number of angles and checks whether any

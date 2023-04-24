@@ -2,7 +2,6 @@
 
 
 #include <chi_log.h>
-;
 
 #include <ChiTimer/chi_timer.h>
 

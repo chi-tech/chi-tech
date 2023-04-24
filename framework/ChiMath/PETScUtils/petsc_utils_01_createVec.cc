@@ -1,7 +1,6 @@
 #include "petsc_utils.h"
 
 #include "chi_log.h"
-;
 
 //###################################################################
 /**Creates a general vector.

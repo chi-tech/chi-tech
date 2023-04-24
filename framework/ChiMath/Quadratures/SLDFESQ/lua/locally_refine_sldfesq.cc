@@ -5,7 +5,6 @@
 #include "../sldfe_sq.h"
 
 #include "chi_log.h"
-;
 
 //###################################################################
 /** Applies a local refinement of angles.

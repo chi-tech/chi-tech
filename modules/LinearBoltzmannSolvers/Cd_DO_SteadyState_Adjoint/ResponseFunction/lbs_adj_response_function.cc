@@ -3,14 +3,8 @@
 #include "ChiLua/chi_lua.h"
 
 #include "chi_runtime.h"
-
 #include "ChiConsole/chi_console.h"
-
-#include "chi_runtime.h"
 #include "chi_log.h"
-
-
-;
 
 //###################################################################
 /** Calls the lua function associated with the response function and

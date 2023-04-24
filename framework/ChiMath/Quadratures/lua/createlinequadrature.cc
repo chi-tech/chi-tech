@@ -7,7 +7,6 @@
 #include "../quadrature_gausschebyshev.h"
 
 #include "chi_log.h"
-;
 
 //########################################################## Create empty system
 /** Creates a quadrature.

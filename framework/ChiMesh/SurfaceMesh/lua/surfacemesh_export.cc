@@ -7,7 +7,6 @@
 #include "chi_runtime.h"
 
 #include "chi_log.h"
-;
 
 //############################################################################# Create
 /** Exports mesh as a .obj format.

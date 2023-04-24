@@ -10,8 +10,6 @@
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-;
-
 
 //###################################################################
 /** Applies KBA-style partitioning to the mesh.*/
