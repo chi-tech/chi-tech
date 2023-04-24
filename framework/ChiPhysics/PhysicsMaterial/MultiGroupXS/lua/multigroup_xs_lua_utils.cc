@@ -8,7 +8,6 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
 
 //###################################################################
 /**Creates a stand-alone transport cross section.
