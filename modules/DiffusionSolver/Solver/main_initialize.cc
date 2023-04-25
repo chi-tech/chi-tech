@@ -31,13 +31,15 @@ int chi_diffusion::Solver::Initialize(bool verbose)
     if      (sdm_string == "PWLC")
     {
       discretization_ =
-        chi_math::SpatialDiscretization_PWLC::New(grid_, COMPUTE_UNIT_INTEGRALS);
+        chi_math::SpatialDiscretization_PWLC::New(
+        *grid_ptr_, COMPUTE_UNIT_INTEGRALS);
       unknown_manager_.AddUnknown(chi_math::UnknownType::SCALAR);
     }
     else if (sdm_string == "PWLD_MIP")
     {
       discretization_ =
-        chi_math::SpatialDiscretization_PWLD::New(grid_, COMPUTE_UNIT_INTEGRALS);
+        chi_math::SpatialDiscretization_PWLD::New(
+        *grid_ptr_, COMPUTE_UNIT_INTEGRALS);
       unknown_manager_.AddUnknown(chi_math::UnknownType::SCALAR);
     }
 //    else if (sdm_string == "PWLD_MIP_GAGG")
@@ -141,7 +143,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
   //seemed to have caused a lot of trouble for Slab
   //geometries. This section makes some custom options
   //per cell type
-  auto first_cell = &grid_->local_cells[0];
+  auto first_cell = &grid_ptr_->local_cells[0];
 
   if (first_cell->Type() == chi_mesh::CellType::SLAB)
   {

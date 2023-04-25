@@ -47,7 +47,7 @@ public:
 public:
   BoundaryPreferences                      boundary_preferences_;
   std::map<uint64_t,chi_diffusion::Boundary*> boundaries_;
-  chi_mesh::MeshContinuumPtr               grid_ = nullptr;
+  chi_mesh::MeshContinuumPtr grid_ptr_ = nullptr;
 
   std::shared_ptr<chi_math::SpatialDiscretization>  discretization_;
 

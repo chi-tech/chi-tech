@@ -11,14 +11,14 @@
 void chi_diffusion::Solver::InitializeCommonItems()
 {
   const std::string fname = "chi_diffusion::Solver::InitializeCommonItems";
-  grid_ = chi_mesh::GetCurrentHandler().GetGrid();
+  grid_ptr_ = chi_mesh::GetCurrentHandler().GetGrid();
 
-  if (grid_ == nullptr)
+  if (grid_ptr_ == nullptr)
     throw std::logic_error(fname + " No grid defined.");
 
-  auto globl_unique_bndry_ids = grid_->GetDomainUniqueBoundaryIDs();
+  auto globl_unique_bndry_ids = grid_ptr_->GetDomainUniqueBoundaryIDs();
 
-  const auto& grid_boundary_id_map = grid_->GetBoundaryIDMap();
+  const auto& grid_boundary_id_map = grid_ptr_->GetBoundaryIDMap();
   for (uint64_t bndry_id : globl_unique_bndry_ids)
   {
     if (grid_boundary_id_map.count(bndry_id) == 0)

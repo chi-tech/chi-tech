@@ -55,7 +55,7 @@ int chiSimTest91_PWLD(lua_State* L)
 
   //============================================= Make SDM
   typedef std::shared_ptr<chi_math::SpatialDiscretization> SDMPtr;
-  SDMPtr sdm_ptr = chi_math::SpatialDiscretization_PWLD::New(grid_ptr);
+  SDMPtr sdm_ptr = chi_math::SpatialDiscretization_PWLD::New(grid);
   const auto& sdm = *sdm_ptr;
 
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;

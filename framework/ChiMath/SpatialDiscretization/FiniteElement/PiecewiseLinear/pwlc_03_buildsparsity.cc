@@ -91,7 +91,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   nodal_nnz_in_diag .resize(local_base_block_size_, 0);
   nodal_nnz_off_diag.resize(local_base_block_size_, 0);
 
-  for (auto& cell : ref_grid_->local_cells)
+  for (auto& cell : ref_grid_.local_cells)
   {
     const auto& cell_mapping = GetCellMapping(cell);
     for (unsigned int i=0; i<cell_mapping.NumNodes(); ++i)
@@ -129,7 +129,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   typedef std::pair<int64_t,std::vector<int64_t>> ROWJLINKS;
   std::vector<ROWJLINKS> ir_links;
 
-  for (auto& cell : ref_grid_->local_cells)
+  for (auto& cell : ref_grid_.local_cells)
   {
     const auto& cell_mapping = GetCellMapping(cell);
 

@@ -4,7 +4,6 @@
 #include "chi_log.h"
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteVolume/fv.h"
 #include "ChiMath/PETScUtils/petsc_utils.h"
@@ -18,7 +17,7 @@ namespace chi_unit_sim_tests
 
 /**This is a simple test of the Finite Volume spatial discretization applied
  * to Laplace's problem. */
-int chiSimTest02_FV(lua_State* L)
+int chiSimTest02_FV(lua_State*)
 {
   chi::log.Log() << "Coding Tutorial 2";
 
@@ -30,7 +29,7 @@ int chiSimTest02_FV(lua_State* L)
 
   //============================================= Make SDM
   typedef std::shared_ptr<chi_math::SpatialDiscretization> SDMPtr;
-  SDMPtr sdm_ptr = chi_math::SpatialDiscretization_FV::New(grid_ptr);
+  SDMPtr sdm_ptr = chi_math::SpatialDiscretization_FV::New(grid);
   const auto& sdm = *sdm_ptr;
 
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;

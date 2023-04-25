@@ -11,7 +11,7 @@
 //###################################################################
 /**Constructor.*/
 chi_math::SpatialDiscretization_PWLD::
-  SpatialDiscretization_PWLD(chi_mesh::MeshContinuumPtr& in_grid,
+  SpatialDiscretization_PWLD(const chi_mesh::MeshContinuum& in_grid,
                              chi_math::finite_element::SetupFlags setup_flags,
                              chi_math::QuadratureOrder qorder,
                              chi_math::CoordinateSystemType in_cs_type) :
@@ -83,15 +83,12 @@ chi_math::SpatialDiscretization_PWLD::
 /**Construct a shared object using the protected constructor.*/
 std::shared_ptr<chi_math::SpatialDiscretization_PWLD>
 chi_math::SpatialDiscretization_PWLD::
-  New(chi_mesh::MeshContinuumPtr& in_grid,
+  New(const chi_mesh::MeshContinuum& in_grid,
       finite_element::SetupFlags setup_flags/*=finite_element::NO_FLAGS_SET*/,
       QuadratureOrder qorder/*=QuadratureOrder::SECOND*/,
       CoordinateSystemType in_cs_type/*=CoordinateSystemType::CARTESIAN*/)
 
 {
-  if (in_grid == nullptr)
-    throw std::invalid_argument(
-      "Null supplied as grid to SpatialDiscretization_PWLD.");
   return std::shared_ptr<SpatialDiscretization_PWLD>(
     new SpatialDiscretization_PWLD(in_grid, setup_flags, qorder, in_cs_type));
 }
