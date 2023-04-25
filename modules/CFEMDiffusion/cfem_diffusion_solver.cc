@@ -122,7 +122,7 @@ void cfem_diffusion::Solver::Initialize()
   }//for bndry
   
   //============================================= Make SDM
-  sdm_ptr_ = chi_math::SpatialDiscretization_PWLC::New(grid_ptr_);
+  sdm_ptr_ = chi_math::SpatialDiscretization_PWLC::New(*grid_ptr_);
   const auto& sdm = *sdm_ptr_;
  
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;

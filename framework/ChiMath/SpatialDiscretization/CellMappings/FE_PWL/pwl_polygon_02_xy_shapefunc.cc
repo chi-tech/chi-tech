@@ -10,7 +10,7 @@ double chi_math::PolygonMappingFE_PWL::
 {
   for (int s=0; s < num_of_subtris_; s++)
   {
-    const auto& p0 = grid_ptr_->vertices[sides_[s].v_index[0]];
+    const auto& p0 = ref_grid_.vertices[sides_[s].v_index[0]];
     chi_mesh::Vector3 xyz_ref = xyz - p0;
 
     chi_mesh::Vector3 xi_eta_zeta   = sides_[s].Jinv * xyz_ref;
@@ -53,7 +53,7 @@ void chi_math::PolygonMappingFE_PWL::
   shape_values.resize(num_nodes_, 0.0);
   for (int s=0; s < num_of_subtris_; s++)
   {
-    const auto& p0 = grid_ptr_->vertices[sides_[s].v_index[0]];
+    const auto& p0 = ref_grid_.vertices[sides_[s].v_index[0]];
     chi_mesh::Vector3 xi_eta_zeta   = sides_[s].Jinv * (xyz - p0);
 
     double xi  = xi_eta_zeta.x;
@@ -97,7 +97,7 @@ chi_mesh::Vector3 chi_math::PolygonMappingFE_PWL::
 
   for (int e=0; e < num_of_subtris_; e++)
   {
-    const auto& p0 = grid_ptr_->vertices[sides_[e].v_index[0]];
+    const auto& p0 = ref_grid_.vertices[sides_[e].v_index[0]];
     chi_mesh::Vector3 xyz_ref = xyz - p0;
 
     chi_mesh::Vector3 xi_eta_zeta = sides_[e].Jinv * xyz_ref;

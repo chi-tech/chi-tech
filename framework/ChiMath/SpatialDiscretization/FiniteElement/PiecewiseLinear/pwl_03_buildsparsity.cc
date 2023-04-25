@@ -23,7 +23,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   nodal_nnz_off_diag.resize(local_dof_count,0);
 
   int lc=0;
-  for (const auto& cell : ref_grid_->local_cells)
+  for (const auto& cell : ref_grid_.local_cells)
   {
     const auto& cell_mapping = GetCellMapping(cell);
     size_t num_nodes = cell_mapping.NumNodes();
@@ -38,9 +38,9 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
     //==================================== Local adjacent cell connections
     for (auto& face : cell.faces_)
     {
-      if (face.has_neighbor_ and face.IsNeighborLocal(*ref_grid_))
+      if (face.has_neighbor_ and face.IsNeighborLocal(ref_grid_))
       {
-        const auto& adj_cell = ref_grid_->cells[face.neighbor_id_];
+        const auto& adj_cell = ref_grid_.cells[face.neighbor_id_];
         const auto& adj_cell_mapping = GetCellMapping(adj_cell);
 
         for (int i=0; i<num_nodes; ++i)
@@ -56,16 +56,16 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% NEIGHBORING CONNECTIVITY
   lc=0;
-  for (auto& cell : ref_grid_->local_cells)
+  for (auto& cell : ref_grid_.local_cells)
   {
     const auto& cell_mapping = GetCellMapping(cell);
 
     //==================================== Local adjacent cell connections
     for (auto& face : cell.faces_)
     {
-      if (face.has_neighbor_ and (not face.IsNeighborLocal(*ref_grid_)))
+      if (face.has_neighbor_ and (not face.IsNeighborLocal(ref_grid_)))
       {
-        const auto& adj_cell = ref_grid_->cells[face.neighbor_id_];
+        const auto& adj_cell = ref_grid_.cells[face.neighbor_id_];
         const auto& adj_cell_mapping = GetCellMapping(adj_cell);
 
         for (int i=0; i < cell_mapping.NumNodes(); ++i)

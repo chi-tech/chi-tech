@@ -21,7 +21,7 @@ namespace chi_math
 
   protected:
     explicit
-    SpatialDiscretization_PWLBase(chi_mesh::MeshContinuumPtr& in_grid,
+    SpatialDiscretization_PWLBase(const chi_mesh::MeshContinuum& in_grid,
                                   finite_element::SetupFlags in_setup_flags,
                                   QuadratureOrder qorder,
                                   SDMType in_type,

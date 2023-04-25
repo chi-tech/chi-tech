@@ -26,7 +26,7 @@ namespace chi_math
 
     /**Constructor for a slab view.*/
     SlabMappingFE_PWL(const chi_mesh::Cell& slab_cell,
-                      const chi_mesh::MeshContinuumConstPtr& ref_grid,
+                      const chi_mesh::MeshContinuum& ref_grid,
                       const QuadratureLine& volume_quadrature);
 
     void ComputeUnitIntegrals(

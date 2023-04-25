@@ -40,7 +40,7 @@ protected:
                              double&,
                              std::vector<double>&)> VandAFunction;
 protected:
-  chi_mesh::MeshContinuumConstPtr grid_ptr_;
+  const chi_mesh::MeshContinuum& ref_grid_;
   const chi_mesh::Cell& cell_;
   const size_t num_nodes_;
   double volume_ = 0.0;
@@ -52,7 +52,7 @@ protected:
      *  contains the corresponding cell node index. */
   const std::vector<std::vector<int>> face_node_mappings_;
 
-  CellMapping(chi_mesh::MeshContinuumConstPtr   in_grid,
+  CellMapping(const chi_mesh::MeshContinuum& in_grid,
               const chi_mesh::Cell& in_cell,
               size_t in_num_nodes,
               std::vector<std::vector<int>> in_face_node_mappings,

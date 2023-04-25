@@ -20,7 +20,7 @@ void chi_math::SpatialDiscretization_PWLC::OrderNodes()
   //============================================= Build set of local scope nodes
   // ls_node_id = local scope node id
   std::set<uint64_t> ls_node_ids_set;
-  for (const auto& cell : ref_grid_->local_cells)
+  for (const auto& cell : ref_grid_.local_cells)
     for (uint64_t node_id : cell.vertex_ids_)
       ls_node_ids_set.insert(node_id);
 
@@ -38,10 +38,10 @@ void chi_math::SpatialDiscretization_PWLC::OrderNodes()
 
   // Now we add the partitions assoc. with the
   // ghost cells.
-  const auto ghost_cell_ids = ref_grid_->cells.GetGhostGlobalIDs();
+  const auto ghost_cell_ids = ref_grid_.cells.GetGhostGlobalIDs();
   for (const uint64_t ghost_id : ghost_cell_ids)
   {
-    const auto& ghost_cell = ref_grid_->cells[ghost_id];
+    const auto& ghost_cell = ref_grid_.cells[ghost_id];
     for (const uint64_t vid : ghost_cell.vertex_ids_)
       ls_node_ids_psubs[vid].insert(ghost_cell.partition_id_);
   }//for ghost_id

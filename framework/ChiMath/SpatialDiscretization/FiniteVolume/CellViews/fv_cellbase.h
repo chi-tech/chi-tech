@@ -17,11 +17,11 @@ namespace chi_math
 class CellFVValues : public CellMapping
 {
 public:
-  explicit CellFVValues(chi_mesh::MeshContinuumConstPtr grid,
+  explicit CellFVValues(const chi_mesh::MeshContinuum& grid,
                         const chi_mesh::Cell& cell,
                         const chi_mesh::Vector3& cc,
                         std::vector<std::vector<int>> face_node_mappings) :
-    CellMapping(std::move(grid), cell, 1, std::move(face_node_mappings),
+    CellMapping(grid, cell, 1, std::move(face_node_mappings),
                 &CellMapping::ComputeCellVolumeAndAreas)
     {}
 
@@ -29,7 +29,7 @@ public:
   //02 Shapefuncs
   double ShapeValue(int i, const chi_mesh::Vector3& xyz) const override
   {
-    if (grid_ptr_->CheckPointInsideCell(cell_, xyz))
+    if (ref_grid_.CheckPointInsideCell(cell_, xyz))
       return 1.0;
     else
       return 0.0;
@@ -37,7 +37,7 @@ public:
   void ShapeValues(const chi_mesh::Vector3& xyz,
                    std::vector<double>& shape_values) const override
   {
-    if (grid_ptr_->CheckPointInsideCell(cell_, xyz))
+    if (ref_grid_.CheckPointInsideCell(cell_, xyz))
       shape_values.assign(num_nodes_, 1.0);
     else
       shape_values.assign(num_nodes_, 0.0);

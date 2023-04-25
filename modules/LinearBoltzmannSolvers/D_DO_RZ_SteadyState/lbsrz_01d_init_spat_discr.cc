@@ -45,7 +45,7 @@ void lbs_curvilinear::DiscOrdSteadyStateSolver::
   }
 
   typedef chi_math::SpatialDiscretization_PWLD SDM_PWLD;
-  discretization_ = SDM_PWLD::New(grid_ptr_, setup_flags, qorder, system);
+  discretization_ = SDM_PWLD::New(*grid_ptr_, setup_flags, qorder, system);
 
   ComputeUnitIntegrals();
 
@@ -78,7 +78,7 @@ void lbs_curvilinear::DiscOrdSteadyStateSolver::
     }
   }
 
-  discretization_secondary_ = SDM_PWLD::New(grid_ptr_, setup_flags, qorder, system);
+  discretization_secondary_ = SDM_PWLD::New(*grid_ptr_, setup_flags, qorder, system);
 
   ComputeSecondaryUnitIntegrals();
 }
