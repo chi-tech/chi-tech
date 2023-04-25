@@ -129,6 +129,7 @@ public:
   const std::map<int, IsotropicSrcPtr>& GetMatID2IsoSrcMap() const;
 
   const chi_math::SpatialDiscretization& SpatialDiscretization() const;
+  const std::vector<UnitCellMatrices>& GetUnitCellMatrices() const;
   const chi_mesh::MeshContinuum& Grid() const;
 
   const std::vector<lbs::CellLBSView>&
@@ -149,6 +150,12 @@ public:
   const std::vector<double>& PhiOldLocal() const;
   std::vector<double>& PhiNewLocal();
   const std::vector<double>& PhiNewLocal() const;
+  std::vector<double>& PrecursorsNewLocal();
+  const std::vector<double>& PrecursorsNewLocal() const;
+
+  /**Returns the sweep boundaries as a read only reference*/
+  const std::map<uint64_t, std::shared_ptr<SweepBndry>>&
+    SweepBoundaries() const;
 
   SetSourceFunction GetActiveSetSourceFunction() const
   {
@@ -257,7 +264,7 @@ public:
   double ComputeFissionRate(const std::vector<double>& phi);
 
   //06c
-protected:
+public:
   void ComputePrecursors();
 
   //07 Vector assembly

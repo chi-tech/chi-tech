@@ -1,4 +1,4 @@
-#include "diffusion_mip.h"
+#include "diffusion.h"
 
 #include "ChiMath/PETScUtils/petsc_utils.h"
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
@@ -14,7 +14,7 @@
  * \param solution Vector in to which the solution will be parsed.
  * \param use_initial_guess bool [Default:False] Flag, when set, will
  *                 use the values of the output solution as initial guess.*/
-void lbs::acceleration::DiffusionMIPSolver::
+void lbs::acceleration::DiffusionSolver::
   Solve(std::vector<double>& solution, bool use_initial_guess/*=false*/)
 {
   const std::string fname = "lbs::acceleration::DiffusionMIPSolver::Solve";
@@ -95,7 +95,7 @@ void lbs::acceleration::DiffusionMIPSolver::
  * \param petsc_solution Vector in to which the solution will be parsed.
  * \param use_initial_guess bool [Default:False] Flag, when set, will
  *                 use the values of the output solution as initial guess.*/
-void lbs::acceleration::DiffusionMIPSolver::
+void lbs::acceleration::DiffusionSolver::
   Solve(Vec petsc_solution, bool use_initial_guess/*=false*/)
 {
   const std::string fname = "lbs::acceleration::DiffusionMIPSolver::Solve";

@@ -1,4 +1,4 @@
-#include "diffusion_mip.h"
+#include "diffusion.h"
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
@@ -15,7 +15,7 @@
  * for Hypre's BooomerAMG. Note: `PCSetFromOptions` and
  * `KSPSetFromOptions` are called at the end. Therefore, any number of
  * additional PETSc options can be passed via the commandline.*/
-void lbs::acceleration::DiffusionMIPSolver::Initialize()
+void lbs::acceleration::DiffusionSolver::Initialize()
 {
   if (options.verbose)
     chi::log.Log() << text_name_ << ": Initializing PETSc items";

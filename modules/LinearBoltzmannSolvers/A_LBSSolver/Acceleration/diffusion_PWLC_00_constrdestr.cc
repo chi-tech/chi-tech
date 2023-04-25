@@ -1,19 +1,18 @@
-#include "diffusion_mip.h"
+#include "diffusion_PWLC.h"
 
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 
-#include <utility>
+namespace lbs::acceleration
+{
 
-// ###################################################################
-/**Default constructor.*/
-lbs::acceleration::DiffusionMIPSolver::DiffusionMIPSolver(
+DiffusionPWLCSolver::DiffusionPWLCSolver(
   std::string text_name,
   const chi_math::SpatialDiscretization& sdm,
   const chi_math::UnknownManager& uk_man,
   std::map<uint64_t, BoundaryCondition> bcs,
   MatID2XSMap map_mat_id_2_xs,
   const std::vector<UnitCellMatrices>& unit_cell_matrices,
-  const bool verbose /*=false*/)
+  bool verbose)
   : DiffusionSolver(std::move(text_name),
                     sdm,
                     uk_man,
@@ -23,9 +22,11 @@ lbs::acceleration::DiffusionMIPSolver::DiffusionMIPSolver(
                     verbose)
 {
   using SDM_TYPE = chi_math::SpatialDiscretizationType;
-  const auto& PWLD = SDM_TYPE ::PIECEWISE_LINEAR_DISCONTINUOUS;
+  const auto& PWLC = SDM_TYPE ::PIECEWISE_LINEAR_CONTINUOUS;
 
-  if (sdm_.type_ != PWLD)
-    throw std::logic_error("lbs::acceleration::DiffusionMIPSolver: can only be"
-                           " used with PWLD.");
+  if (sdm_.type_ != PWLC)
+    throw std::logic_error("lbs::acceleration::DiffusionPWLCSolver: can only be"
+                           " used with PWLC.");
 }
+
+} // namespace lbs::acceleration
