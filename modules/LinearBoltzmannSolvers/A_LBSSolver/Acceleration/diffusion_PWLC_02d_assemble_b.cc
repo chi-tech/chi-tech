@@ -27,6 +27,11 @@
 void lbs::acceleration::DiffusionPWLCSolver::Assemble_b(
   const std::vector<double>& q_vector)
 {
+  const size_t num_local_dofs = sdm_.GetNumLocalAndGhostDOFs(uk_man_);
+  ChiInvalidArgumentIf(q_vector.size() != num_local_dofs,
+                       std::string("q_vector size mismatch. ") +
+                         std::to_string(q_vector.size()) + " vs " +
+                         std::to_string(num_local_dofs));
   const std::string fname = "lbs::acceleration::DiffusionMIPSolver::"
                             "Assemble_b";
   if (A_ == nullptr or rhs_ == nullptr or ksp_ == nullptr)
@@ -47,11 +52,15 @@ void lbs::acceleration::DiffusionPWLCSolver::Assemble_b(
     const auto cc_nodes = cell_mapping.GetNodeLocations();
     const auto& unit_cell_matrices = unit_cell_matrices_[cell.local_id_];
 
+    const auto& cell_K_matrix = unit_cell_matrices.K_matrix;
     const auto& cell_M_matrix = unit_cell_matrices.M_matrix;
     const auto& cell_Vi = unit_cell_matrices.Vi_vectors;
 
+    const auto& xs = mat_id_2_xs_map_.at(cell.material_id_);
+
     //=========================================== Mark dirichlet nodes
-    std::vector<bool> node_is_dirichlet(num_nodes, false);
+    typedef std::pair<bool, double> DirichFlagVal;
+    std::vector<DirichFlagVal> node_is_dirichlet(num_nodes, {false, 0.0});
     for (size_t f = 0; f < num_faces; ++f)
     {
       const auto& face = cell.faces_[f];
@@ -64,7 +73,8 @@ void lbs::acceleration::DiffusionPWLCSolver::Assemble_b(
 
         const size_t num_face_nodes = cell_mapping.NumFaceNodes(f);
         for (size_t fi = 0; fi < num_face_nodes; ++fi)
-          node_is_dirichlet[cell_mapping.MapFaceNode(f, fi)] = true;
+          node_is_dirichlet[cell_mapping.MapFaceNode(f, fi)] = {true,
+                                                                bc.values[0]};
       }
     }
 
@@ -76,13 +86,27 @@ void lbs::acceleration::DiffusionPWLCSolver::Assemble_b(
         qg[j] = q_vector[sdm_.MapDOFLocal(cell, j, uk_man_, 0, g)];
 
       //==================================== Assemble continuous terms
+      const double Dg = xs.Dg[g];
+      const double sigr_g = xs.sigR[g];
+
       for (size_t i = 0; i < num_nodes; i++)
       {
-        if (node_is_dirichlet[i]) continue;
+        if (node_is_dirichlet[i].first) continue;
         const int64_t imap = sdm_.MapDOF(cell, i, uk_man_, 0, g);
         double entry_rhs_i = 0.0;
         for (size_t j = 0; j < num_nodes; j++)
+        {
+          if (node_is_dirichlet[j].first)
+          {
+            const double entry_aij =
+              Dg * cell_K_matrix[i][j] + sigr_g * cell_M_matrix[i][j];
+
+            const double bcvalue = node_is_dirichlet[j].second;
+            VecSetValue(rhs_, imap, -entry_aij * bcvalue, ADD_VALUES);
+          }
+
           entry_rhs_i += qg[j] * cell_M_matrix[i][j];
+        } // for j
 
         VecSetValue(rhs_, imap, entry_rhs_i, ADD_VALUES);
       } // for i
@@ -111,7 +135,8 @@ void lbs::acceleration::DiffusionPWLCSolver::Assemble_b(
               const int i = cell_mapping.MapFaceNode(f, fi);
               const int64_t imap = sdm_.MapDOF(cell, i, uk_man_, 0, g);
 
-              VecSetValue(rhs_, imap, bc_value * cell_Vi[i], ADD_VALUES);
+              // VecSetValue(rhs_, imap, bc_value * cell_Vi[i], ADD_VALUES);
+              VecSetValue(rhs_, imap, bc_value, ADD_VALUES);
             } // for fi
 
           } // Dirichlet BC

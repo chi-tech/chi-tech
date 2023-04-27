@@ -19,7 +19,8 @@ DiffusionPWLCSolver::DiffusionPWLCSolver(
                     std::move(bcs),
                     std::move(map_mat_id_2_xs),
                     unit_cell_matrices,
-                    verbose)
+                    verbose,
+                    /*requires_ghosts=*/true)
 {
   using SDM_TYPE = chi_math::SpatialDiscretizationType;
   const auto& PWLC = SDM_TYPE ::PIECEWISE_LINEAR_CONTINUOUS;

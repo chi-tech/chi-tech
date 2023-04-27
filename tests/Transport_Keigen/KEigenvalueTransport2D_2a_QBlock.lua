@@ -27,7 +27,7 @@ chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
 --chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_RICHARDSON_CYCLES)
 chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-10)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,50)
+chiLBSGroupsetSetMaxIterations(phys1,cur_gs,5)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,50)
 --chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-8,false)
 --chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-8,false)
@@ -54,7 +54,7 @@ chiSolverInitialize(phys1)
 k_solver = lbs.XXPowerIterationKEigenSCDSA.Create
 ({
     lbs_solver_handle = phys1,
-
+    diff_accel_sdm = "pwld"
 })
 chiSolverExecute(k_solver)
 --chiSolverExecute(phys1)

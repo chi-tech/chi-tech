@@ -52,6 +52,8 @@ protected:
   Vec rhs_ = nullptr;
   KSP ksp_ = nullptr;
 
+  const bool requires_ghosts_;
+
 public:
   struct Options
   {
@@ -73,7 +75,8 @@ public:
                   std::map<uint64_t, BoundaryCondition> bcs,
                   MatID2XSMap map_mat_id_2_xs,
                   const std::vector<UnitCellMatrices>& unit_cell_matrices,
-                  bool verbose = false);
+                  bool verbose,
+                  bool requires_ghosts);
 
   std::string TextName() const;
   const Vec& RHS() const;

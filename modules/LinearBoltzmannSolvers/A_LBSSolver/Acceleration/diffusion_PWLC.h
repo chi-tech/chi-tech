@@ -15,7 +15,7 @@ public:
                       std::map<uint64_t, BoundaryCondition> bcs,
                       MatID2XSMap map_mat_id_2_xs,
                       const std::vector<UnitCellMatrices>& unit_cell_matrices,
-                      bool verbose = false);
+                      bool verbose);
 
   //02c
   void AssembleAand_b(const std::vector<double>& q_vector) override;

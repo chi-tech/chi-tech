@@ -14,9 +14,10 @@ DiffusionSolver::DiffusionSolver(
   std::map<uint64_t, BoundaryCondition> bcs,
   MatID2XSMap map_mat_id_2_xs,
   const std::vector<UnitCellMatrices>& unit_cell_matrices,
-  const bool verbose /*=false*/)
+  const bool verbose,
+  const bool requires_ghosts)
   : text_name_(std::move(text_name)),
-    grid_(*sdm.ref_grid_),
+    grid_(sdm.ref_grid_),
     sdm_(sdm),
     uk_man_(uk_man),
     bcs_(std::move(bcs)),
@@ -26,7 +27,8 @@ DiffusionSolver::DiffusionSolver(
     num_global_dofs_(static_cast<int64_t>(sdm_.GetNumGlobalDOFs(uk_man_))),
     A_(nullptr),
     rhs_(nullptr),
-    ksp_(nullptr)
+    ksp_(nullptr),
+    requires_ghosts_(requires_ghosts)
 {
   options.verbose = verbose;
 }

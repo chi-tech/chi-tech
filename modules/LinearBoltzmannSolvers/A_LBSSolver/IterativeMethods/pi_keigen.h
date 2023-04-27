@@ -1,5 +1,5 @@
-#ifndef CHITECH_XXPOWERITERATION_KEIGEN_H
-#define CHITECH_XXPOWERITERATION_KEIGEN_H
+#ifndef CHITECH_PI_KEIGEN_H
+#define CHITECH_PI_KEIGEN_H
 
 #include "ChiPhysics/SolverBase/chi_solver.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/lbs_solver.h"
@@ -38,9 +38,9 @@ public:
 protected:
   void SetLBSFissionSource(const VecDbl& input, bool additive);
   void SetLBSScatterSource(const VecDbl& input, bool additive,
-                           bool suppress_wgs = false);
+                           bool suppress_wg_scat = false);
 };
 
 }
 
-#endif // CHITECH_XXPOWERITERATION_KEIGEN_H
+#endif // CHITECH_PI_KEIGEN_H
