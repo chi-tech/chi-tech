@@ -81,11 +81,6 @@ public:
 
     return node_locations;
   }
-
-  void LocalizePETScVector(Vec petsc_vector,
-                           std::vector<double>& local_vector,
-                           const UnknownManager& unknown_manager)
-                           const override;
 };
 
 }//namespace chi_math

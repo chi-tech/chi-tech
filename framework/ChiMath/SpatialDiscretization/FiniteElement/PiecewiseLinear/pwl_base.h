@@ -61,11 +61,6 @@ namespace chi_math
     std::vector<chi_mesh::Vector3>
     GetCellNodeLocations(const chi_mesh::Cell& cell) const override;
 
-    void LocalizePETScVector(Vec petsc_vector,
-                             std::vector<double>& local_vector,
-                             const UnknownManager& unknown_manager)
-    const override;
-
     //FE-utils
     const finite_element::UnitIntegralData&
     GetUnitIntegrals(const chi_mesh::Cell& cell) override;

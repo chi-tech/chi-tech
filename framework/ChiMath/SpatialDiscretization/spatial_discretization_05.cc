@@ -1,8 +1,9 @@
 #include "spatial_discretization.h"
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "ChiMath/PETScUtils/petsc_utils.h"
 
-//###################################################################
+// ###################################################################
 /**For each cell, for each face of that cell, for each node on that face,
  * maps to which local node on the adjacent cell that node position corresponds.
  *
@@ -38,8 +39,9 @@ mapping[102][3][1] = 1
 \endverbatim
 
 */
-std::vector<std::vector<std::vector<int>>> chi_math::SpatialDiscretization::
-    MakeInternalFaceNodeMappings(const double tolerance/*=1.0e-12*/) const
+std::vector<std::vector<std::vector<int>>>
+chi_math::SpatialDiscretization::MakeInternalFaceNodeMappings(
+  const double tolerance /*=1.0e-12*/) const
 {
   typedef std::vector<int> FaceAdjMapping;
   typedef std::vector<FaceAdjMapping> PerFaceAdjMapping;
@@ -56,11 +58,11 @@ std::vector<std::vector<std::vector<int>>> chi_math::SpatialDiscretization::
 
     PerFaceAdjMapping per_face_adj_mapping;
 
-    for (size_t f=0; f<num_faces; ++f)
+    for (size_t f = 0; f < num_faces; ++f)
     {
       const auto& face = cell.faces_[f];
       const auto num_face_nodes = cell_mapping.NumFaceNodes(f);
-      FaceAdjMapping face_adj_mapping(num_face_nodes,-1);
+      FaceAdjMapping face_adj_mapping(num_face_nodes, -1);
       if (face.has_neighbor_)
       {
         const auto& adj_cell = grid.cells[face.neighbor_id_];
@@ -68,36 +70,35 @@ std::vector<std::vector<std::vector<int>>> chi_math::SpatialDiscretization::
         const auto& adj_node_locations = adj_cell_mapping.GetNodeLocations();
         const size_t adj_num_nodes = adj_cell_mapping.NumNodes();
 
-        for (size_t fi=0; fi<num_face_nodes; ++fi)
+        for (size_t fi = 0; fi < num_face_nodes; ++fi)
         {
-          const int i = cell_mapping.MapFaceNode(f,fi);
+          const int i = cell_mapping.MapFaceNode(f, fi);
           const auto& ivec3 = node_locations[i];
 
-          for (size_t ai=0; ai<adj_num_nodes; ++ai)
+          for (size_t ai = 0; ai < adj_num_nodes; ++ai)
           {
             const auto& aivec3 = adj_node_locations[ai];
-            if ((ivec3-aivec3).NormSquare()<tolerance)
+            if ((ivec3 - aivec3).NormSquare() < tolerance)
             {
               face_adj_mapping[fi] = static_cast<int>(ai);
               break;
             }
-          }//for ai
+          } // for ai
           if (face_adj_mapping[fi] < 0)
             throw std::logic_error("Face node mapping failed");
-        }//for fi
-      }//if internal face
+        } // for fi
+      }   // if internal face
 
       per_face_adj_mapping.push_back(std::move(face_adj_mapping));
-    }//for face
+    } // for face
 
     cell_adj_mapping.push_back(std::move(per_face_adj_mapping));
-  }//for cell
+  } // for cell
 
   return cell_adj_mapping;
 }
 
-
-//###################################################################
+// ###################################################################
 /**Copy part of vector A to vector B. Suppose vector A's entries are
  * managed `chi_math::UnknownManager` A (`uk_manA`) and that the
  * entries of the vector B are managed by `chi_math::UnknownManager` B
@@ -113,13 +114,13 @@ std::vector<std::vector<std::vector<int>>> chi_math::SpatialDiscretization::
 \param to_vec_uk_structure Unknown manager for vector B.
 \param to_vec_uk_id Unknown-id in unknown manager B.
  */
-void chi_math::SpatialDiscretization::
-  CopyVectorWithUnknownScope(const std::vector<double> &from_vector,
-                                   std::vector<double> &to_vector,
-                             const UnknownManager &from_vec_uk_structure,
-                             const unsigned int from_vec_uk_id,
-                             const UnknownManager &to_vec_uk_structure,
-                             const unsigned int to_vec_uk_id) const
+void chi_math::SpatialDiscretization::CopyVectorWithUnknownScope(
+  const std::vector<double>& from_vector,
+  std::vector<double>& to_vector,
+  const UnknownManager& from_vec_uk_structure,
+  const unsigned int from_vec_uk_id,
+  const UnknownManager& to_vec_uk_structure,
+  const unsigned int to_vec_uk_id) const
 {
   const std::string fname = "chi_math::SpatialDiscretization::"
                             "CopyVectorWithUnknownScope";
@@ -143,22 +144,49 @@ void chi_math::SpatialDiscretization::
       const auto& cell_mapping = this->GetCellMapping(cell);
       const size_t num_nodes = cell_mapping.NumNodes();
 
-      for (size_t i=0; i<num_nodes; ++i)
+      for (size_t i = 0; i < num_nodes; ++i)
       {
-        for (size_t c=0; c < num_comps; ++c)
+        for (size_t c = 0; c < num_comps; ++c)
         {
           const int64_t fmap = MapDOFLocal(cell, i, ukmanF, ukidF, c);
           const int64_t imap = MapDOFLocal(cell, i, ukmanT, ukidT, c);
 
           to_vector[imap] = from_vector[fmap];
-        }//for component c
-      }//for node i
-    }//for cell
+        } // for component c
+      }   // for node i
+    }     // for cell
   }
   catch (const std::out_of_range& oor)
   {
-    throw std::out_of_range(fname + ": either from_vec_uk_id or to_vec_uk_id is "
-                                    "out of range for its respective "
-                                    "unknown manager.");
+    throw std::out_of_range(fname +
+                            ": either from_vec_uk_id or to_vec_uk_id is "
+                            "out of range for its respective "
+                            "unknown manager.");
   }
+}
+
+// ###################################################################
+/**Develops a localized view of a petsc vector.*/
+void chi_math::SpatialDiscretization::LocalizePETScVector(
+  Vec petsc_vector,
+  std::vector<double>& local_vector,
+  const chi_math::UnknownManager& unknown_manager) const
+{
+  size_t num_local_dofs = GetNumLocalDOFs(unknown_manager);
+
+  chi_math::PETScUtils::CopyVecToSTLvector(
+    petsc_vector, local_vector, num_local_dofs);
+}
+
+// ###################################################################
+/**Develops a localized view of a petsc vector.*/
+void chi_math::SpatialDiscretization::LocalizePETScVectorWithGhosts(
+  Vec petsc_vector,
+  std::vector<double>& local_vector,
+  const chi_math::UnknownManager& unknown_manager) const
+{
+  size_t num_local_dofs = GetNumLocalAndGhostDOFs(unknown_manager);
+
+  chi_math::PETScUtils::CopyVecToSTLvectorWithGhosts(
+    petsc_vector, local_vector, num_local_dofs);
 }

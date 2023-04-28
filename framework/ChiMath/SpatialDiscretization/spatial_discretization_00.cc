@@ -2,8 +2,8 @@
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
-const chi_math::CellMapping& chi_math::SpatialDiscretization::
-  GetCellMapping(const chi_mesh::Cell& cell) const
+const chi_math::CellMapping& chi_math::SpatialDiscretization::GetCellMapping(
+  const chi_mesh::Cell& cell) const
 {
   constexpr std::string_view fname = "chi_math::SpatialDiscretization::"
                                      "GetCellMapping";
@@ -13,14 +13,17 @@ const chi_math::CellMapping& chi_math::SpatialDiscretization::
     {
       return *cell_mappings_.at(cell.local_id_);
     }
-    else
-    {
-      return *nb_cell_mappings_.at(cell.global_id_);
-    }
+    else { return *nb_cell_mappings_.at(cell.global_id_); }
   }
   catch (const std::out_of_range& oor)
   {
-    throw std::out_of_range(
-      std::string(fname) + ": Failed to obtain cell mapping.");
+    throw std::out_of_range(std::string(fname) +
+                            ": Failed to obtain cell mapping.");
   }
+}
+
+size_t chi_math::SpatialDiscretization::GetNumLocalAndGhostDOFs(
+  const UnknownManager& unknown_manager) const
+{
+  return GetNumLocalDOFs(unknown_manager) + GetNumGhostDOFs(unknown_manager);
 }
