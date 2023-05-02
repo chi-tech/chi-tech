@@ -77,10 +77,9 @@ ChiObjectMaker::MakeObjectType(const std::string& type,
 
   auto new_object = object_entry.constructor_func(input_params);
 
-  chi::object_stack.push_back(new_object);
-
-  new_object->SetStackID(chi::object_stack.size() - 1);
   new_object->SetParamBlockUsedAtConstruction(params);
+
+  new_object->PushOntoStack(new_object);
 
   if (chi::log.GetVerbosity() >= 2)
     chi::log.Log() << "Done making object type " << type << " with handle "

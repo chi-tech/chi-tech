@@ -11,7 +11,10 @@ private:
   chi_objects::ParameterBlock param_block_used_at_construction_;
 
 public:
+  /**Returns the input parameters. For the base ChiObject, there
+  * are now parameters loaded.*/
   static chi_objects::InputParameters GetInputParameters();
+
   /**Default constructor. This will be removed in future.*/
   ChiObject();
 
@@ -34,7 +37,14 @@ public:
    * with input language to connect objects together.*/
   size_t StackID() const;
 
+  /**Sets the parameter block used at construction which allows developers
+  * to check for supplied parameters.*/
   const chi_objects::ParameterBlock& ParamBlockUsedAtConstruction() const;
+
+  /**An overridable callback that is called by the ObjectMaker and by default
+  * adds the object onto the object stack. This function can be used to
+  * place the object on a different stack.*/
+  virtual void PushOntoStack(std::shared_ptr<ChiObject>& new_object);
 
   virtual ~ChiObject() = default;
 };

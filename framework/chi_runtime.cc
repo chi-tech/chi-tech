@@ -43,6 +43,7 @@ std::vector<chi_math::QuadraturePtr> chi::quadrature_stack;
 std::vector<chi_math::AngularQuadraturePtr> chi::angular_quadrature_stack;
 
 std::vector<ChiObjectPtr> chi::object_stack;
+std::vector<chi_math::SpatialDiscretizationPtr> chi::sdm_stack;
 
 //================================ run_time quantities
 bool chi::run_time::termination_posted_ = false;

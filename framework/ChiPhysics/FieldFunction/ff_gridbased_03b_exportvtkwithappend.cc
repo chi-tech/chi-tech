@@ -1,4 +1,4 @@
-#include "fieldfunction.h"
+#include "fieldfunction_gridbased.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -14,10 +14,10 @@
 
 //###################################################################
 /**Export multiple field functions to VTK.*/
-void chi_physics::FieldFunction::
+void chi_physics::FieldFunctionGridBased::
   ExportMultipleToVTK(
     const std::string &file_base_name,
-    const std::vector<std::shared_ptr<const FieldFunction>> &ff_list)
+    const std::vector<std::shared_ptr<const FieldFunctionGridBased>> &ff_list)
 {
   const std::string fname = "chi_physics::FieldFunction::ExportMultipleToVTK";
   chi::log.Log() << "Exporting field functions to VTK with file base \""
@@ -49,13 +49,13 @@ void chi_physics::FieldFunction::
   {
     const auto field_vector = ff_ptr->GetGhostedFieldVector();
 
-    const auto& uk_man = ff_ptr->unknown_manager_;
-    const auto& unknown = ff_ptr->unknown_;
+    const auto& uk_man = ff_ptr->UnkManager();
+    const auto& unknown = ff_ptr->Unknown();
     const auto& sdm = ff_ptr->sdm_;
 
     for (uint c=0; c<unknown.num_components_; ++c)
     {
-      const std::string component_name = ff_ptr->text_name_ +
+      const std::string component_name = ff_ptr->TextName() +
                                          unknown.text_name_ +
                                          unknown.component_text_names_[c];
       vtkNew<vtkDoubleArray> point_array;

@@ -27,3 +27,9 @@ ChiObject::ParamBlockUsedAtConstruction() const
 {
   return param_block_used_at_construction_;
 }
+
+void ChiObject::PushOntoStack(std::shared_ptr<ChiObject>& new_object)
+{
+  chi::object_stack.push_back(new_object);
+  new_object->SetStackID(chi::object_stack.size() - 1);
+}

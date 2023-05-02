@@ -22,6 +22,23 @@ const chi_math::CellMapping& chi_math::SpatialDiscretization::GetCellMapping(
   }
 }
 
+chi_math::SpatialDiscretizationType
+chi_math::SpatialDiscretization::Type() const
+{
+  return type_;
+}
+
+const chi_mesh::MeshContinuum& chi_math::SpatialDiscretization::Grid() const
+{
+  return ref_grid_;
+}
+
+chi_math::CoordinateSystemType
+chi_math::SpatialDiscretization::GetCoordinateSystemType() const
+{
+  return coord_sys_type_;
+}
+
 size_t chi_math::SpatialDiscretization::GetNumLocalAndGhostDOFs(
   const UnknownManager& unknown_manager) const
 {

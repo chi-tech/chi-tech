@@ -6,8 +6,8 @@
 
 namespace chi_physics
 {
-  class FieldFunction;
-  typedef std::shared_ptr<FieldFunction> FieldFunctionPtr;
+  class FieldFunctionGridBased;
+  typedef std::shared_ptr<FieldFunctionGridBased> FieldFunctionGridBasedPtr;
 }
 
 namespace chi_mesh::ff_interpolation
@@ -60,14 +60,14 @@ class FieldFunctionInterpolation
 protected:
   ff_interpolation::Type type_;
   unsigned int ref_component_ = 0;
-  std::vector<chi_physics::FieldFunctionPtr> field_functions_;
+  std::vector<chi_physics::FieldFunctionGridBasedPtr> field_functions_;
 
 public:
   explicit
   FieldFunctionInterpolation(ff_interpolation::Type type) :
     type_(type) {}
 
-  std::vector<chi_physics::FieldFunctionPtr>& GetFieldFunctions()
+  std::vector<chi_physics::FieldFunctionGridBasedPtr>& GetFieldFunctions()
   {return field_functions_;}
 
   ff_interpolation::Type Type() const {return type_;}

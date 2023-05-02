@@ -1,8 +1,8 @@
-#include "fieldfunction.h"
+#include "fieldfunction_gridbased.h"
 
 //###################################################################
 /**Updates the field data with a STL vector.*/
-void chi_physics::FieldFunction::
+void chi_physics::FieldFunctionGridBased::
   UpdateFieldVector(const std::vector<double> &field_vector)
 {
   if (field_vector.size() < field_vector_.size())
@@ -14,7 +14,7 @@ void chi_physics::FieldFunction::
 
 //###################################################################
 /**Updates the field data with a PETSc vector.*/
-void chi_physics::FieldFunction::
+void chi_physics::FieldFunctionGridBased::
   UpdateFieldVector(const Vec& field_vector)
 {
   PetscInt n;

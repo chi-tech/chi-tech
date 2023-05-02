@@ -53,6 +53,10 @@ protected:
   // 01 AddViewOfContinuum
 public:
   const CellMapping& GetCellMapping(const chi_mesh::Cell& cell) const;
+  SpatialDiscretizationType Type() const;
+  /**Returns the reference grid on which this discretization is based.*/
+  const chi_mesh::MeshContinuum& Grid() const;
+  CoordinateSystemType GetCoordinateSystemType() const;
 
   // 02 OrderNodes
 

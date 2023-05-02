@@ -59,9 +59,54 @@ k_solver = lbs.XXPowerIterationKEigenSCDSA.Create
 chiSolverExecute(k_solver)
 --chiSolverExecute(phys1)
 
+ff_power = chi_physics.FieldFunctionGridBased.Create
+({
+    name = "fission_power",
+    sdm_type = "PWLD",
+    initial_value = 0.0
+})
+
+function ComputePower(params)
+    local x = params[1]
+    local y = params[2]
+    local z = params[3]
+
+    local mat_id = tostring(math.floor(params[4]))
+
+    local xs_vals = chiPhysicsTransportXSGet(xs[mat_id])
+
+    if (not xs_vals.is_fissionable) then return {0.0} end
+
+    local FR = 0.0
+    local g=0
+    for k=5, rawlen(params) do
+        g = g + 1
+        FR = FR + xs_vals.sigma_f[g] * params[k]
+    end
+
+    return {FR}
+end
 
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 
---chiExportMultiFieldFunctionToVTK(fflist,"tests/BigTests/QBlock/solutions/Flux")
+op = chi_physics.field_operations.MultiFieldOperation.Create
+({
+    result_field_handle = ff_power,
+    dependent_field_handles = fflist,
+    function_handle = chi_math.functions.LuaDimAToDimB.Create
+    ({
+        input_dimension = 4+num_groups,
+        output_dimension = 1,
+        lua_function_name = "ComputePower"
+    })
+})
+
+chiFieldOperationExecute(op)
+
+
+fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
+table.insert(fflist, ff_power)
+
+chiExportMultiFieldFunctionToVTK(fflist,"ZPhi2a")
 
 -- Reference value k_eff = 0.5969127

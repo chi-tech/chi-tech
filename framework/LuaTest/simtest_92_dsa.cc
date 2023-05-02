@@ -9,7 +9,7 @@
 #include "A_LBSSolver/Acceleration/diffusion_mip.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/lbs_structs.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -176,7 +176,7 @@ int chiSimTest92_DSA(lua_State* L)
   solver.Solve(x_vector);
 
   //============================================= Make Field-Function
-  auto ff = std::make_shared<chi_physics::FieldFunction>(
+  auto ff = std::make_shared<chi_physics::FieldFunctionGridBased>(
     "Phi",
     sdm_ptr,
     OneDofPerNode.unknowns_.front()
@@ -184,7 +184,7 @@ int chiSimTest92_DSA(lua_State* L)
 
   ff->UpdateFieldVector(x_vector);
 
-  chi_physics::FieldFunction::ExportMultipleToVTK("SimTest_92a_DSA", {ff});
+  chi_physics::FieldFunctionGridBased::ExportMultipleToVTK("SimTest_92a_DSA", {ff});
 
   //============================================= Compute error
   //First get ghosted values

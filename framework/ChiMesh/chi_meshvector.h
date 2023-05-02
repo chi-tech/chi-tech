@@ -1,5 +1,5 @@
-#ifndef _chi_meshvector_h
-#define _chi_meshvector_h
+#ifndef CHI_MESH_VECTOR3_H
+#define CHI_MESH_VECTOR3_H
 #include<iostream>
 #include<cmath>
 #include <sstream>
@@ -445,4 +445,4 @@ chi_mesh::Vector3 operator*(double value,const chi_mesh::Vector3& that);
 
 //}//namespace chi_mesh
 
-#endif
+#endif //CHI_MESH_VECTOR3_H

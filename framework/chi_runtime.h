@@ -34,7 +34,6 @@ class Material;
 class MultiGroupXS;
 class FieldFunction;
 
-typedef std::shared_ptr<Solver> SolverPtr;
 typedef std::shared_ptr<Material> MaterialPtr;
 typedef std::shared_ptr<MultiGroupXS> MultiGroupXSPtr;
 typedef std::shared_ptr<FieldFunction> FieldFunctionPtr;
@@ -44,9 +43,11 @@ namespace chi_math
 {
 class Quadrature;
 class AngularQuadrature;
+class SpatialDiscretization;
 
 typedef std::shared_ptr<Quadrature> QuadraturePtr;
 typedef std::shared_ptr<AngularQuadrature> AngularQuadraturePtr;
+typedef std::shared_ptr<SpatialDiscretization> SpatialDiscretizationPtr;
 
 class UnknownManager;
 } // namespace chi_math
@@ -81,7 +82,6 @@ public:
   static std::vector<chi_mesh::FFInterpPtr> field_func_interpolation_stack;
   static std::vector<chi_mesh::UnpartMeshPtr> unpartitionedmesh_stack;
 
-  // static std::vector<chi_physics::SolverPtr> object_stack;
   static std::vector<chi_physics::MaterialPtr> material_stack;
   static std::vector<chi_physics::MultiGroupXSPtr> multigroup_xs_stack;
   static std::vector<chi_physics::FieldFunctionPtr> field_function_stack;
@@ -90,6 +90,7 @@ public:
   static std::vector<chi_math::AngularQuadraturePtr> angular_quadrature_stack;
 
   static std::vector<ChiObjectPtr> object_stack;
+  static std::vector<chi_math::SpatialDiscretizationPtr> sdm_stack;
 
   static const size_t SIZE_T_INVALID = ((size_t)-1);
 

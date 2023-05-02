@@ -1,6 +1,6 @@
 #include "lbs_solver.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -193,7 +193,7 @@ void lbs::LBSSolver::InitializeParrays()
         const std::string text_name = std::string(buff);
 
         using namespace chi_math;
-        auto group_ff = std::make_shared<chi_physics::FieldFunction>(
+        auto group_ff = std::make_shared<chi_physics::FieldFunctionGridBased>(
           text_name,                     //Field name
           discretization_,                //Spatial discretization
           Unknown(UnknownType::SCALAR)); //Unknown/Variable

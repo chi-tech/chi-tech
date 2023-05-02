@@ -1,5 +1,7 @@
 #include "A_LBSSolver/lbs_solver.h"
 
+#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
+
 #include "chi_runtime.h"
 
 namespace lbs::common_lua_utils
@@ -45,7 +47,7 @@ int chiLBSGetScalarFieldFunctionList(lua_State *L)
           ++pff_count;
           if (pff == lbs_solver.GetFieldFunctions()[ff])
           {
-            lua_pushnumber(L,pff_count);
+            lua_pushinteger(L,pff_count);
             found = true;
             break;
           }

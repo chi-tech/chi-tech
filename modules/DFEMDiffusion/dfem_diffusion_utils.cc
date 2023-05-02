@@ -2,7 +2,7 @@
 #include "ChiLua/chi_lua.h"
 #include "dfem_diffusion_solver.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 

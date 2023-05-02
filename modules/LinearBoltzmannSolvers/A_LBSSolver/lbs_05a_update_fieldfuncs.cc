@@ -1,6 +1,6 @@
 #include "lbs_solver.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 
 //###################################################################
 /**Copy relevant section of phi_old to the field functions.*/
