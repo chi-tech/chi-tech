@@ -27,7 +27,7 @@ chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
 --chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_RICHARDSON_CYCLES)
 chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-10)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,5)
+chiLBSGroupsetSetMaxIterations(phys1,cur_gs,10)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,50)
 --chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-8,false)
 --chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-8,false)
@@ -39,6 +39,7 @@ chiLBSSetProperty(phys1,BOUNDARY_CONDITION,YMIN,LBSBoundaryTypes.REFLECTING);
 
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 chiLBSSetProperty(phys1,SCATTERING_ORDER,2)
+chiLBSSetProperty(phys1,SAVE_ANGULAR_FLUX,true)
 
 chiSolverSetBasicOption(phys1, "K_EIGEN_METHOD", "power")
 chiSolverSetBasicOption(phys1, "PI_MAX_ITS", 1000)
@@ -54,10 +55,14 @@ chiSolverInitialize(phys1)
 k_solver = lbs.XXPowerIterationKEigenSCDSA.Create
 ({
     lbs_solver_handle = phys1,
-    diff_accel_sdm = "pwld"
+    diff_accel_sdm = "pwlc",
+    accel_pi_verbose = false
 })
 chiSolverExecute(k_solver)
 --chiSolverExecute(phys1)
+
+--SCDSA 40 * 4 0.597 7278
+--SMM   40 * 4 0.606 3770
 
 ff_power = chi_physics.FieldFunctionGridBased.Create
 ({
