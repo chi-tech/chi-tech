@@ -152,6 +152,8 @@ public:
   const std::vector<double>& PhiNewLocal() const;
   std::vector<double>& PrecursorsNewLocal();
   const std::vector<double>& PrecursorsNewLocal() const;
+  std::vector<VecDbl>& PsiNewLocal();
+  const std::vector<VecDbl>& PsiNewLocal() const;
 
   /**Returns the sweep boundaries as a read only reference*/
   const std::map<uint64_t, std::shared_ptr<SweepBndry>>&

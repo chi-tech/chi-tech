@@ -87,6 +87,9 @@ public:
   const std::vector<double>& DiffusionCoefficient() const override
   { return xs_.DiffusionCoefficient(); }
 
+  std::vector<double> SigmaTransport() const override
+  { return xs_.SigmaTransport();}
+
   const std::vector<double>& SigmaRemoval() const override
   { return xs_.SigmaRemoval(); }
 

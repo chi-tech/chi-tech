@@ -80,6 +80,7 @@ public:
 
   std::string TextName() const;
   const Vec& RHS() const;
+  const std::map<uint64_t, BoundaryCondition>& BCS() const {return bcs_;}
 
   const chi_math::UnknownManager& UnknownStructure() const;
   const chi_math::SpatialDiscretization& SpatialDiscretization() const;
@@ -93,6 +94,7 @@ public:
   virtual void AssembleAand_b(const std::vector<double>& q_vector) = 0;
   virtual void Assemble_b(const std::vector<double>& q_vector) = 0;
   virtual void Assemble_b(Vec petsc_q_vector) = 0;
+  void AddToRHS(const std::vector<double>& values);
 
   void Solve(std::vector<double>& solution, bool use_initial_guess=false);
   void Solve(Vec petsc_solution, bool use_initial_guess=false);

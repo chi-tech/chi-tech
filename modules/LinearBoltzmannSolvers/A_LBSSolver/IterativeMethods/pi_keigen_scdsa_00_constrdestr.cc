@@ -9,6 +9,7 @@
 #include "A_LBSSolver/Acceleration/diffusion_PWLC.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+#include "ChiMath/PETScUtils/petsc_utils.h"
 
 namespace lbs
 {
@@ -116,7 +117,12 @@ XXPowerIterationKEigenSCDSA::XXPowerIterationKEigenSCDSA(
       unit_cell_matrices,
       true); // verbosity
     requires_ghosts_ = true;
-    pwld_ghost_info_ = MakePWLDVecGhostCommInfo();
+    lbs_pwld_ghost_info_ = MakePWLDVecGhostCommInfo(
+      lbs_solver_.SpatialDiscretization(), lbs_solver_.UnknownManager());
+
+    const auto& cfem_sdm = *continuous_sdm_ptr_;
+    const auto ghost_dof_ids =
+      cfem_sdm.GetGhostDOFIndices(lbs_solver_.UnknownManager());
   }
 
   {

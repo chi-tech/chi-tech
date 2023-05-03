@@ -1,6 +1,10 @@
 #include "diffusion.h"
 
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+
+#include "chi_runtime.h"
+#include "chi_log.h"
 
 namespace lbs::acceleration
 {
@@ -44,7 +48,7 @@ DiffusionSolver::~DiffusionSolver()
 
 // ###################################################################
 /**Returns the assigned text name.*/
-std::string DiffusionSolver::TextName() const {return text_name_;}
+std::string DiffusionSolver::TextName() const { return text_name_; }
 
 // ###################################################################
 /**Returns the right-hand side petsc vector.*/
@@ -71,6 +75,41 @@ lbs::acceleration::DiffusionSolver::GetNumPhiIterativeUnknowns()
   return {sdm_.GetNumLocalDOFs(uk_man_), sdm_.GetNumGlobalDOFs(uk_man_)};
 }
 
+// ##################################################################
+/**Adds to the right-hand side without applying spatial discretization.*/
+void lbs::acceleration::DiffusionSolver::AddToRHS(
+  const std::vector<double>& values)
+{
+  typedef unsigned int uint;
+  typedef const int64_t cint64_t;
+  const size_t num_local_dofs = sdm_.GetNumLocalDOFs(uk_man_);
 
+  ChiInvalidArgumentIf(num_local_dofs != values.size(),
+                       "Vector size mismatched with spatial discretization");
+
+  const size_t num_unknowns = uk_man_.NumberOfUnknowns();
+
+  for (const auto& cell : grid_.local_cells)
+  {
+    const auto& cell_mapping = sdm_.GetCellMapping(cell);
+
+    for (size_t i = 0; i < cell_mapping.NumNodes(); ++i)
+    {
+      for (size_t u = 0; u < num_unknowns; ++u)
+      {
+        for (uint c = 0; c < uk_man_.GetUnknown(u).NumComponents(); ++c)
+        {
+          cint64_t dof_map_local = sdm_.MapDOFLocal(cell, i, uk_man_, u, c);
+          cint64_t dof_map = sdm_.MapDOF(cell, i, uk_man_, u, c);
+
+          VecSetValue(rhs_, dof_map, values[dof_map_local], ADD_VALUES);
+        } // for component c
+      }   // for unknown u
+    }     // for node i
+  }       // for cell
+
+  VecAssemblyBegin(rhs_);
+  VecAssemblyEnd(rhs_);
+}
 
 } // namespace lbs::acceleration

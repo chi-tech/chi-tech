@@ -129,6 +129,15 @@ public:
   const std::vector<double>& DiffusionCoefficient() const override
   { return diffusion_coeff_; }
 
+  std::vector<double> SigmaTransport() const override
+  {
+    std::vector<double> sigma_tr(num_groups_, 0.0);
+    for (size_t g = 0; g < num_groups_; ++g)
+      sigma_tr[g] = (1.0/diffusion_coeff_[g])/3.0;
+
+    return sigma_tr;
+  }
+
   const std::vector<double>& SigmaRemoval() const override
   { return sigma_removal_; }
 

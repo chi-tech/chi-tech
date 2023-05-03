@@ -194,6 +194,14 @@ const std::vector<double>& lbs::LBSSolver::PrecursorsNewLocal() const
   return phi_new_local_;
 }
 
+/**Read/write access to newest updated angular flux vector.*/
+std::vector<VecDbl>& lbs::LBSSolver::PsiNewLocal() { return psi_new_local_; }
+/**Read access to newest updated angular flux vector.*/
+const std::vector<VecDbl>& lbs::LBSSolver::PsiNewLocal() const
+{
+  return psi_new_local_;
+}
+
 /**Returns the sweep boundaries as a read only reference*/
 const std::map<uint64_t, std::shared_ptr<SweepBndry>>&
 lbs::LBSSolver::SweepBoundaries() const

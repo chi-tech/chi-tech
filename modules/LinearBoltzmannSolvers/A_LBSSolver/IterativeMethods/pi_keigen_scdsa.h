@@ -33,7 +33,7 @@ protected:
     VecGhostCommPtr vector_ghost_communicator = nullptr;
     std::map<int64_t, int64_t> ghost_global_id_2_local_map;
   };
-  GhostInfo pwld_ghost_info_;
+  GhostInfo lbs_pwld_ghost_info_;
 
 public:
   static chi_objects::InputParameters GetInputParameters();
@@ -49,8 +49,15 @@ public:
                        const std::vector<double>& input,
                        std::vector<double>& output);
 
-  GhostInfo MakePWLDVecGhostCommInfo();
-  std::vector<double> MakeContinuousVersion(const std::vector<double>& input);
+  GhostInfo MakePWLDVecGhostCommInfo(const chi_math::SpatialDiscretization& sdm,
+                                     const chi_math::UnknownManager& uk_man);
+
+  static std::vector<double> NodallyAveragedPWLDVector(
+    const std::vector<double>& input,
+    const chi_math::SpatialDiscretization& pwld_sdm,
+    const chi_math::SpatialDiscretization& pwlc_sdm,
+    const chi_math::UnknownManager& uk_man,
+    const XXPowerIterationKEigenSCDSA::GhostInfo& ghost_info);
 };
 
 } // namespace lbs

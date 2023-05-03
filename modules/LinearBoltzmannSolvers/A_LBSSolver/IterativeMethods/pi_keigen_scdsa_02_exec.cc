@@ -47,8 +47,8 @@ void XXPowerIterationKEigenSCDSA::Execute()
     SetLBSFissionSource(phi_old_local_, /*additive=*/false);
     Scale(q_moments_local_, 1.0 / k_eff_);
 
-    auto Sf_all_moments = q_moments_local_;
-    auto Sf = CopyOnlyPhi0(front_gs_, q_moments_local_);
+    auto Sf_ell = q_moments_local_;
+    auto Sf0_ell = CopyOnlyPhi0(front_gs_, q_moments_local_);
 
     //================================= This solves the inners for transport
     primary_ags_solver_.Setup();
@@ -58,7 +58,7 @@ void XXPowerIterationKEigenSCDSA::Execute()
     auto phi0_lph_i = CopyOnlyPhi0(front_gs_, phi_new_local_);
 
     // Now we produce lph_ip1 = l + 1/2, i+1
-    q_moments_local_ = Sf_all_moments; // Restore 1/k F phi_l
+    q_moments_local_ = Sf_ell; // Restore 1/k F phi_l
     SetLBSScatterSource(phi_new_local_, /*additive=*/true);
 
     front_wgs_context_->ApplyInverseTransportOperator(NO_FLAGS_SET); // Sweep
@@ -101,7 +101,7 @@ void XXPowerIterationKEigenSCDSA::Execute()
         auto Ss = CopyOnlyPhi0(front_gs_, q_moments_local_);
 
         // Solve the diffusion system
-        diffusion_solver_->Assemble_b(Ss + Sfaux + Ss_res - Sf);
+        diffusion_solver_->Assemble_b(Ss + Sfaux + Ss_res - Sf0_ell);
         diffusion_solver_->Solve(epsilon_kp1, /*use_initial_guess=*/true);
 
         epsilon_k = epsilon_kp1;
@@ -118,7 +118,7 @@ void XXPowerIterationKEigenSCDSA::Execute()
 
       const double lambda_change = std::fabs(1.0 - lambda_kp1 / lambda_k);
       if (accel_pi_verbose_ >= 1)
-        chi::log.Log() << "PISA iteration " << k << " lambda " << lambda_kp1
+        chi::log.Log() << "PISCDSA iteration " << k << " lambda " << lambda_kp1
                        << " lambda change " << lambda_change;
 
       if (lambda_change < accel_pi_k_tol_) break;
