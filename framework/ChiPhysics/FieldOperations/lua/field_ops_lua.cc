@@ -1,5 +1,5 @@
 #include "field_ops_lua.h"
-#include "../multifield.h"
+#include "../field_operation.h"
 
 #include "ChiConsole/chi_console.h"
 
@@ -20,8 +20,9 @@ int chiFieldOperationExecute(lua_State* L)
 
   const size_t handle = lua_tointeger(L, 1);
 
-  auto operation = chi::GetStackItem<chi_physics::field_operations::MultiFieldOperation>(
-    chi::object_stack, handle, fname);
+  auto& operation =
+    chi::GetStackItem<chi_physics::field_operations::FieldOperation>(
+      chi::object_stack, handle, fname);
 
   operation.Execute();
 

@@ -1,14 +1,16 @@
 #ifndef CHITECH_FIELD_OPERATIONS_MULTIFIELD_H
 #define CHITECH_FIELD_OPERATIONS_MULTIFIELD_H
 
-#include "ChiObject/chi_object.h"
+#include "field_operation.h"
 #include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 #include "ChiMath/Functions/function_dimA_to_dimB.h"
 
 namespace chi_physics::field_operations
 {
 
-class MultiFieldOperation : public ChiObject
+/**A field operation to manipulate a single field on the hand
+* of a number of other fields.*/
+class MultiFieldOperation : public FieldOperation
 {
 private:
   const size_t result_field_handle_;
@@ -27,7 +29,7 @@ public:
 
   explicit MultiFieldOperation(const chi_objects::InputParameters& params);
 
-  void Execute();
+  void Execute() override;
 };
 
 }

@@ -14,7 +14,7 @@ RegisterChiObject(chi_physics::field_operations, MultiFieldOperation);
 /**Returns the input parameters.*/
 chi_objects::InputParameters MultiFieldOperation::GetInputParameters()
 {
-  chi_objects::InputParameters params = ChiObject::GetInputParameters();
+  chi_objects::InputParameters params = FieldOperation::GetInputParameters();
 
   params.AddRequiredParameter<size_t>(
     "result_field_handle",
@@ -45,7 +45,7 @@ chi_objects::InputParameters MultiFieldOperation::GetInputParameters()
 /**Constructor.*/
 MultiFieldOperation::MultiFieldOperation(
   const chi_objects::InputParameters& params)
-  : ChiObject(params),
+  : FieldOperation(params),
     result_field_handle_(params.GetParamValue<size_t>("result_field_handle")),
     dependent_field_handles_(
       params.GetParamVectorValue<size_t>("dependent_field_handles")),
