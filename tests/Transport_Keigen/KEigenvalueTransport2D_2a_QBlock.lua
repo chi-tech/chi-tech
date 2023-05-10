@@ -9,8 +9,8 @@ dofile("tests/Transport_Keigen/QBlock_materials.lua") --num_groups assigned here
 pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,4, 4)
 chiOptimizeAngularQuadratureForPolarSymmetry(pqaud, 4.0*math.pi)
 
-phys1 = lbs.DiscOrdSteadyStateSolver.Create
-({
+lbs_block =
+{
   num_groups = num_groups,
   groupsets =
   {
@@ -22,28 +22,43 @@ phys1 = lbs.DiscOrdSteadyStateSolver.Create
       l_abs_tol = 1.0e-6
     }
   }
-})
+}
 
-chiLBSSetOptions(phys1,
-  {
-    boundary_conditions = { { name = "xmin", type = "reflecting"},
-                            { name = "ymin", type = "reflecting"} },
-    spatial_discretization = "pwld",
-    scattering_order = 2,
-    save_angular_flux = true,
+lbs_options =
+{
+  boundary_conditions = { { name = "xmin", type = "reflecting"},
+                          { name = "ymin", type = "reflecting"} },
+  spatial_discretization = "pwld",
+  scattering_order = 2,
+  save_angular_flux = true,
 
-    use_precursors = false,
+  use_precursors = false,
 
-    verbose_inner_iterations = false,
-    verbose_outer_iterations = true,
+  verbose_inner_iterations = false,
+  verbose_outer_iterations = true,
 
-    power_field_function_on = true,
-    power_default_kappa = 1.0,
-    power_normalization = -1.0, --Disabled
-  })
+  power_field_function_on = true,
+  power_default_kappa = 1.0,
+  power_normalization = -1.0, --Disabled
+
+  field_function_prefix_option = "solver_name"
+}
+
+--phys1 = lbs.DiffusionDFEMSolver.Create(lbs_block)
+phys1 = lbs.LBSDiscreteOrdinatesSolver.Create(lbs_block)
+
+
+chiLBSSetOptions(phys1, lbs_options)
 
 --############################################### Initialize and Execute Solver
 chiSolverInitialize(phys1)
+
+--k_solver = lbs.XXPowerIterationKEigen.Create
+--({
+--  lbs_solver_handle = phys1,
+--})
+--chiSolverExecute(k_solver)
+
 --k_solver = lbs.XXPowerIterationKEigenSCDSA.Create
 --({
 --  lbs_solver_handle = phys1,
@@ -65,7 +80,7 @@ chiSolverExecute(k_solver)
 
 ff_power = chi_physics.FieldFunctionGridBased.Create
 ({
-  name = "fission_power",
+  name = "LBSDiscreteOrdinatesSolver_fission_power",
   sdm_type = "PWLD",
   initial_value = 0.0
 })
@@ -110,7 +125,7 @@ chiFieldOperationExecute(op)
 
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 table.insert(fflist, ff_power)
-table.insert(fflist, chiGetFieldFunctionHandleByName("power_generation"))
+table.insert(fflist, chiGetFieldFunctionHandleByName("LBSDiscreteOrdinatesSolver_power_generation"))
 
 chiExportMultiFieldFunctionToVTK(fflist,"ZPhi2a")
 
