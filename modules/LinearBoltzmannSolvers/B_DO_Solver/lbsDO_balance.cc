@@ -9,7 +9,7 @@
 //###################################################################
 /**Zeroes all the outflow data-structures required to compute
  * balance.*/
-void lbs::LBSDiscreteOrdinatesSolver::ZeroOutflowBalanceVars(LBSGroupset& groupset)
+void lbs::DiscreteOrdinatesSolver::ZeroOutflowBalanceVars(LBSGroupset& groupset)
 {
   for (auto& cell_transport_view : cell_transport_views_)
     for (auto& group : groupset.groups_)
@@ -18,7 +18,7 @@ void lbs::LBSDiscreteOrdinatesSolver::ZeroOutflowBalanceVars(LBSGroupset& groups
 
 //###################################################################
 /**Compute balance.*/
-void lbs::LBSDiscreteOrdinatesSolver::ComputeBalance()
+void lbs::DiscreteOrdinatesSolver::ComputeBalance()
 {
   MPI_Barrier(MPI_COMM_WORLD);
   chi::log.Log() << "\n********** Computing balance\n";

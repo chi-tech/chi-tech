@@ -4,17 +4,17 @@
 
 namespace lbs
 {
-RegisterChiObject(lbs, LBSDiscreteOrdinatesSolver);
+RegisterChiObject(lbs, DiscreteOrdinatesSolver);
 }
 
-lbs::LBSDiscreteOrdinatesSolver::LBSDiscreteOrdinatesSolver(
+lbs::DiscreteOrdinatesSolver::DiscreteOrdinatesSolver(
   const std::string& text_name)
   : LBSSolver(text_name)
 {
 }
 
 chi_objects::InputParameters
-lbs::LBSDiscreteOrdinatesSolver::GetInputParameters()
+lbs::DiscreteOrdinatesSolver::GetInputParameters()
 {
   chi_objects::InputParameters params = LBSSolver::GetInputParameters();
 
@@ -24,14 +24,14 @@ lbs::LBSDiscreteOrdinatesSolver::GetInputParameters()
 }
 
 /**Static registration based constructor.*/
-lbs::LBSDiscreteOrdinatesSolver::LBSDiscreteOrdinatesSolver(
+lbs::DiscreteOrdinatesSolver::DiscreteOrdinatesSolver(
   const chi_objects::InputParameters& params)
   : LBSSolver(params)
 {
 }
 
 /**Destructor for LBS*/
-lbs::LBSDiscreteOrdinatesSolver::~LBSDiscreteOrdinatesSolver()
+lbs::DiscreteOrdinatesSolver::~DiscreteOrdinatesSolver()
 {
   for (auto& groupset : groupsets_)
   {
@@ -46,7 +46,7 @@ lbs::LBSDiscreteOrdinatesSolver::~LBSDiscreteOrdinatesSolver()
  * only the flux moments, however, the sweep based solvers might include
  * delayed angular fluxes in this number.*/
 std::pair<size_t, size_t>
-lbs::LBSDiscreteOrdinatesSolver::GetNumPhiIterativeUnknowns()
+lbs::DiscreteOrdinatesSolver::GetNumPhiIterativeUnknowns()
 {
   const auto& sdm = *discretization_;
   const size_t num_local_phi_dofs = sdm.GetNumLocalDOFs(flux_moments_uk_man_);

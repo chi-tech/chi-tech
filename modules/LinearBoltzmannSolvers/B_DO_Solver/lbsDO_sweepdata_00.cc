@@ -31,7 +31,7 @@ namespace lbs
  *
  * The Template FLUDS can be scaled with number of angles and groups which
  * provides us with the angle-set-subset- and groupset-subset capability.*/
-void LBSDiscreteOrdinatesSolver::InitializeSweepDataStructures()
+void DiscreteOrdinatesSolver::InitializeSweepDataStructures()
 {
   chi::log.Log() << chi::program_timer.GetTimeString()
                  << " Initializing sweep datastructures.\n";

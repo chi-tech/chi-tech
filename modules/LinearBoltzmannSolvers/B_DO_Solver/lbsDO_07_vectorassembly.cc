@@ -4,7 +4,7 @@
 //###################################################################
 /**Scales a flux moment vector. For sweep methods the delayed angular
  * fluxes will also be scaled.*/
-void lbs::LBSDiscreteOrdinatesSolver::
+void lbs::DiscreteOrdinatesSolver::
   ScalePhiVector(PhiSTLOption which_phi, double value)
 {
   std::vector<double>* y_ptr;
@@ -41,7 +41,7 @@ void lbs::LBSDiscreteOrdinatesSolver::
 }
 //###################################################################
 /**Assembles a vector for a given groupset from a source vector.*/
-void lbs::LBSDiscreteOrdinatesSolver::
+void lbs::DiscreteOrdinatesSolver::
   SetGSPETScVecFromPrimarySTLvector(LBSGroupset& groupset, Vec x,
                                     PhiSTLOption which_phi)
 {
@@ -95,7 +95,7 @@ void lbs::LBSDiscreteOrdinatesSolver::
 
 //###################################################################
 /**Assembles a vector for a given groupset from a source vector.*/
-void lbs::LBSDiscreteOrdinatesSolver::
+void lbs::DiscreteOrdinatesSolver::
   SetPrimarySTLvectorFromGSPETScVec(LBSGroupset& groupset, Vec x_src,
                                     PhiSTLOption which_phi)
 {
@@ -148,7 +148,7 @@ void lbs::LBSDiscreteOrdinatesSolver::
 
 //###################################################################
 /**Assembles a vector for a given groupset from a source vector.*/
-void lbs::LBSDiscreteOrdinatesSolver::
+void lbs::DiscreteOrdinatesSolver::
   GSScopedCopyPrimarySTLvectors(LBSGroupset& groupset,
                                 PhiSTLOption from_which_phi,
                                 PhiSTLOption to_which_phi)
@@ -201,7 +201,7 @@ void lbs::LBSDiscreteOrdinatesSolver::
 
 //###################################################################
 /**Assembles a PETSc vector from multiple groupsets.*/
-void lbs::LBSDiscreteOrdinatesSolver::
+void lbs::DiscreteOrdinatesSolver::
 SetMultiGSPETScVecFromPrimarySTLvector(const std::vector<int> &gs_ids,
                                        Vec x, PhiSTLOption which_phi)
 {
@@ -260,7 +260,7 @@ SetMultiGSPETScVecFromPrimarySTLvector(const std::vector<int> &gs_ids,
 
 //###################################################################
 /**Disassembles a multiple Groupset PETSc vector STL vectors.*/
-void lbs::LBSDiscreteOrdinatesSolver::
+void lbs::DiscreteOrdinatesSolver::
 SetPrimarySTLvectorFromMultiGSPETScVecFrom(const std::vector<int> &gs_ids,
                                            Vec x_src,
                                            PhiSTLOption which_phi)

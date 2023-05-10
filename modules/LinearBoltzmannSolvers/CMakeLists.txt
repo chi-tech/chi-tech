@@ -7,5 +7,8 @@ add_subdirectory("Cd_DO_SteadyState_Adjoint")
 add_subdirectory("D_DO_RZ_SteadyState")
 add_subdirectory("B_MIP_SteadyState")
 
+add_subdirectory("B_DiffusionDFEM_Solver")
+add_subdirectory("C_kEigenvalue_Solvers")
+
 
 set(SOURCES ${SOURCES} ${MORE_SOURCES} PARENT_SCOPE)

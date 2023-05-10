@@ -11,7 +11,7 @@ typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
 
 //###################################################################
 /** Initialize the solver.*/
-void lbs::LBSDiscreteOrdinatesSolver::Initialize()
+void lbs::DiscreteOrdinatesSolver::Initialize()
 {
   LBSSolver::Initialize();
 
@@ -38,7 +38,7 @@ void lbs::LBSDiscreteOrdinatesSolver::Initialize()
 }
 
 /**Initializes Within-GroupSet solvers.*/
-void lbs::LBSDiscreteOrdinatesSolver::InitializeWGSSolvers()
+void lbs::DiscreteOrdinatesSolver::InitializeWGSSolvers()
 {
   wgs_solvers_.clear(); //this is required
   for (auto& groupset : groupsets_)

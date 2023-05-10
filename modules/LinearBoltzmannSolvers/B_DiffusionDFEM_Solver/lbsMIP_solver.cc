@@ -1,12 +1,45 @@
-#include "lbsmip_steady_solver.h"
+#include "lbsMIP_solver.h"
 
-#include "A_LBSSolver/Acceleration/diffusion_mip.h"
-#include "LinearBoltzmannSolvers/B_MIP_SteadyState/IterativeOperations/mip_wgs_context.h"
-#include "A_LBSSolver/IterativeMethods/wgs_linear_solver.h"
+#include "ChiObject/object_maker.h"
+
 #include "A_LBSSolver/SourceFunctions/source_function.h"
+#include "A_LBSSolver/Acceleration/diffusion_mip.h"
+#include "A_LBSSolver/IterativeMethods/wgs_linear_solver.h"
+#include "IterativeMethods/mip_wgs_context2.h"
 
+namespace lbs
+{
+
+RegisterChiObject(lbs, DiffusionDFEMSolver);
+
+// ##################################################################
+chi_objects::InputParameters DiffusionDFEMSolver::GetInputParameters()
+{
+  chi_objects::InputParameters params = LBSSolver::GetInputParameters();
+
+  params.ChangeExistingParamToOptional("name", "LBSDiffusionDFEMSolver");
+
+  return params;
+}
+
+// ##################################################################
+DiffusionDFEMSolver::DiffusionDFEMSolver(
+  const chi_objects::InputParameters& params)
+  : LBSSolver(params)
+{
+}
+
+// ##################################################################
+/**Destructor to cleanup TGDSA*/
+DiffusionDFEMSolver::~DiffusionDFEMSolver()
+{
+  for (auto& groupset : groupsets_)
+    CleanUpTGDSA(groupset);
+}
+
+// ##################################################################
 /**Initializing.*/
-void lbs::MIPSteadyStateSolver::Initialize()
+void DiffusionDFEMSolver::Initialize()
 {
   options_.scattering_order = 0; //overwrite any setting otherwise
   LBSSolver::Initialize();
@@ -26,8 +59,9 @@ void lbs::MIPSteadyStateSolver::Initialize()
   LBSSolver::InitializeSolverSchemes();
 }
 
+// ##################################################################
 /**Initializes Within-GroupSet solvers.*/
-void lbs::MIPSteadyStateSolver::InitializeWGSSolvers()
+void DiffusionDFEMSolver::InitializeWGSSolvers()
 {
   //============================================= Initialize groupset solvers
   gs_mip_solvers_.assign(groupsets_.size(), nullptr);
@@ -126,13 +160,13 @@ void lbs::MIPSteadyStateSolver::InitializeWGSSolvers()
   {
 
     auto mip_wgs_context_ptr =
-    std::make_shared<MIPWGSContext<Mat, Vec, KSP>>(
-      *this, groupset,
+      std::make_shared<MIPWGSContext2<Mat, Vec, KSP>>(
+        *this, groupset,
         active_set_source_function_,
         APPLY_WGS_SCATTER_SOURCES | APPLY_WGS_FISSION_SOURCES |
-        SUPPRESS_WG_SCATTER,                                    //lhs_scope
+          SUPPRESS_WG_SCATTER,                                    //lhs_scope
         APPLY_FIXED_SOURCES | APPLY_AGS_SCATTER_SOURCES |
-        APPLY_AGS_FISSION_SOURCES,                             //rhs_scope
+          APPLY_AGS_FISSION_SOURCES,                             //rhs_scope
         options_.verbose_inner_iterations);
 
     auto wgs_solver =
@@ -142,3 +176,5 @@ void lbs::MIPSteadyStateSolver::InitializeWGSSolvers()
   }//for groupset
 
 }
+
+} // namespace lbs

@@ -1,8 +1,12 @@
 module: Linear Boltzmann Solvers
 print: \ref LuaLBS Documentation page
+print: \ref lbs__LBSDiscreteOrdinatesSolver
+print: \ref lbs__DiffusionDFEMSolver
 
-function: chiLBSSetProperty
 function: chiLBSSetOptions
+module_end
+
+module: Utilities
 function: chiLBSGetScalarFieldFunctionList
 function: chiLBSWriteGroupsetAngularFlux
 function: chiLBSReadGroupsetAngularFlux
@@ -15,6 +19,11 @@ function: chiLBSReadFluxMoments
 function: chiLBSAddPointSource
 function: chiLBSClearPointSources
 function: chiLBSInitializePointSources
+function: chiLBSSetPhiFromFieldFunction
+module_end
+
+module: Deprecated
+function: chiLBSSetProperty
 module_end
 
 module: Linear Boltzmann Solvers - Groupset manipulation

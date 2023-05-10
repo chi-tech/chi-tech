@@ -21,7 +21,7 @@
 //###################################################################
 /**Initializes fluds data structures.*/
 
-void lbs::LBSDiscreteOrdinatesSolver::
+void lbs::DiscreteOrdinatesSolver::
   InitFluxDataStructures(LBSGroupset& groupset)
 {
   namespace sweep_namespace = chi_mesh::sweep_management;

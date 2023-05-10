@@ -8,7 +8,7 @@
 
 namespace lbs
 {
-  class LBSDiscreteOrdinatesSolver;
+  class DiscreteOrdinatesSolver;
 }
 
 namespace lbs
@@ -20,9 +20,10 @@ struct SweepWGSContext : public WGSContext<MatType,VecType,SolverType>
   std::shared_ptr<chi_mesh::sweep_management::SweepChunk> sweep_chunk_;
   chi_mesh::sweep_management::SweepScheduler sweep_scheduler_;
 
-  LBSDiscreteOrdinatesSolver& lbs_ss_solver_;
+  DiscreteOrdinatesSolver& lbs_ss_solver_;
 
-  SweepWGSContext(LBSDiscreteOrdinatesSolver& lbs_solver,
+  SweepWGSContext(
+    DiscreteOrdinatesSolver& lbs_solver,
                   LBSGroupset& groupset,
                   const SetSourceFunction& set_source_function,
                   int lhs_scope, int rhs_scope,

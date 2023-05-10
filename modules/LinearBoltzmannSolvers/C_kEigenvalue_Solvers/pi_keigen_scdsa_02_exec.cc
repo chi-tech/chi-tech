@@ -133,9 +133,9 @@ void XXPowerIterationKEigenSCDSA::Execute()
                                               /*in*/ phi_new_local_,
                                               /*out*/ phi_old_local_);
 
-    //const double production =
-    //  lbs_solver_.ComputeFissionProduction(phi_old_local_);
-    //lbs_solver_.ScalePhiVector(PhiSTLOption::PHI_OLD, lambda_kp1 / production);
+    const double production =
+      lbs_solver_.ComputeFissionProduction(phi_old_local_);
+    lbs_solver_.ScalePhiVector(PhiSTLOption::PHI_OLD, lambda_kp1 / production);
 
     //================================= Recompute k-eigenvalue
     k_eff_ = lambda_kp1;

@@ -10,7 +10,7 @@
 
 void lbs::DiscOrdSteadyStateAdjointSolver::Initialize()
 {
-  lbs::LBSDiscreteOrdinatesSolver::Initialize();
+  lbs::DiscreteOrdinatesSolver::Initialize();
 
   //============================================= Create adjoint cross sections
   using AdjXS = chi_physics::AdjointMGXS;

@@ -7,7 +7,7 @@ namespace lbs
 {
 //################################################################### Class def
 /**A neutral particle transport solver.*/
-class DiscOrdSteadyStateSolver : public LBSDiscreteOrdinatesSolver
+class DiscOrdSteadyStateSolver : public DiscreteOrdinatesSolver
 {
 public:
   static chi_objects::InputParameters GetInputParameters();
@@ -15,7 +15,7 @@ public:
   explicit DiscOrdSteadyStateSolver(const chi_objects::InputParameters& params);
 
   explicit DiscOrdSteadyStateSolver(const std::string& in_text_name) :
-    lbs::LBSDiscreteOrdinatesSolver(in_text_name) {}
+    lbs::DiscreteOrdinatesSolver(in_text_name) {}
 
   DiscOrdSteadyStateSolver (const DiscOrdSteadyStateSolver&) = delete;
   DiscOrdSteadyStateSolver& operator= (const DiscOrdSteadyStateSolver&) = delete;

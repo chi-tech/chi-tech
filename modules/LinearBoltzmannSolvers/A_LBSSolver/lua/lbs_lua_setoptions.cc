@@ -15,7 +15,7 @@ RegisterLuaFunctionAsIs(chiLBSSetOptions);
 /**Sets an LBS option.
  *
  * \param handle int Handle to the lbs-based object.
- * \param specs Table Various options in a table.
+ * \param specs Table Various options in a table. Detailed below.
 
 ##_
 

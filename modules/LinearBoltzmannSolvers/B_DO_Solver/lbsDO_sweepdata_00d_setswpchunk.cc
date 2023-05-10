@@ -6,7 +6,7 @@ typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
 
 //###################################################################
 /**Sets up the sweek chunk for the given discretization method.*/
-std::shared_ptr<SweepChunk> lbs::LBSDiscreteOrdinatesSolver::
+std::shared_ptr<SweepChunk> lbs::DiscreteOrdinatesSolver::
   SetSweepChunk(LBSGroupset& groupset)
 {
   //================================================== Setting up required

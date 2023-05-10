@@ -4,6 +4,8 @@
 
 #include "ChiObject/object_maker.h"
 
+#include "IterativeMethods/wgs_context.h"
+
 namespace lbs
 {
 RegisterChiObject(lbs, LBSSolver);
@@ -260,6 +262,33 @@ const std::map<uint64_t, std::shared_ptr<SweepBndry>>&
 lbs::LBSSolver::SweepBoundaries() const
 {
   return sweep_boundaries_;
+}
+
+lbs::SetSourceFunction lbs::LBSSolver::GetActiveSetSourceFunction() const
+{
+  return active_set_source_function_;
+}
+
+lbs::LBSSolver::AGSLinSolverPtr lbs::LBSSolver::GetPrimaryAGSSolver()
+{
+  return primary_ags_solver_;
+}
+
+std::vector<lbs::LBSSolver::LinSolvePtr>& lbs::LBSSolver::GetWGSSolvers()
+{
+  return wgs_solvers_;
+}
+
+lbs::WGSContext<Mat, Vec, KSP>& lbs::LBSSolver::GetWGSContext(int groupset_id)
+{
+  auto& wgs_solver = wgs_solvers_[groupset_id];
+  auto& raw_context = wgs_solver->GetContext();
+
+  typedef lbs::WGSContext<Mat, Vec, KSP> LBSWGSContext;
+  auto wgs_context_ptr = std::dynamic_pointer_cast<LBSWGSContext>(raw_context);
+
+  ChiLogicalErrorIf(not wgs_context_ptr, "Failed to cast WGSContext");
+  return *wgs_context_ptr;
 }
 
 /**Read/Write access to the boundary preferences.*/

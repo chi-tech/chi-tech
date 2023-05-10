@@ -13,7 +13,7 @@ namespace lbs
 {
 
 //###################################################################
-class DiscOrdSteadyStateAdjointSolver : public lbs::LBSDiscreteOrdinatesSolver
+class DiscOrdSteadyStateAdjointSolver : public lbs::DiscreteOrdinatesSolver
 {
 protected:
   typedef std::vector<size_t> VecSize_t;

@@ -17,6 +17,8 @@ protected:
   std::shared_ptr<NLKEigenAGSContext<Vec,SNES>> nl_context_;
   NLKEigenvalueAGSSolver<Mat,Vec,SNES> nl_solver_;
 
+  bool reinit_phi_1_;
+
 public:
   static chi_objects::InputParameters GetInputParameters();
   explicit XXNonLinearKEigen(const chi_objects::InputParameters& params);

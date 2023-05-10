@@ -6,6 +6,7 @@
 namespace lbs::common_lua_utils
 {
 int chiLBSSetOptions(lua_State* L);
+int chiLBSSetPhiFromFieldFunction(lua_State* L);
 void RegisterLuaEntities(lua_State* L);
 }
 

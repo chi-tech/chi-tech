@@ -4,7 +4,7 @@
 /**Constructor.*/
 lbs::DiscOrdSteadyStateAdjointSolver::
   DiscOrdSteadyStateAdjointSolver(const std::string &solver_name) :
-    lbs::LBSDiscreteOrdinatesSolver(solver_name)
+    lbs::DiscreteOrdinatesSolver(solver_name)
 {
   basic_options_.AddOption<std::string>("REFERENCE_RF", std::string());
 }

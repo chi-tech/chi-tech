@@ -6,7 +6,7 @@
 
 \return The leakage as a value.
 */
-std::vector<double> lbs::LBSDiscreteOrdinatesSolver::
+std::vector<double> lbs::DiscreteOrdinatesSolver::
   ComputeLeakage(const int groupset_id, const uint64_t boundary_id) const
 {
   const std::string fname = "lbs::SteadySolver::ComputeLeakage";

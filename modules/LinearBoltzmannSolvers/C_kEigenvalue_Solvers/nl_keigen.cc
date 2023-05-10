@@ -37,6 +37,9 @@ chi_objects::InputParameters XXNonLinearKEigen::GetInputParameters()
   params.AddOptionalParameter(
     "l_gmres_breakdown_tol", 1.0e6, "GMRes breakdown tolerance");
 
+  params.AddOptionalParameter(
+    "reinit_phi_1", true, "If true, reinitializes scalar phi fluxes to 1");
+
   return params;
 }
 
@@ -45,7 +48,8 @@ XXNonLinearKEigen::XXNonLinearKEigen(const chi_objects::InputParameters& params)
     lbs_solver_(chi::GetStackItem<LBSSolver>(
       chi::object_stack, params.GetParamValue<size_t>("lbs_solver_handle"))),
     nl_context_(std::make_shared<NLKEigenAGSContext<Vec, SNES>>(lbs_solver_)),
-    nl_solver_(SNESNEWTONLS, nl_context_)
+    nl_solver_(SNESNEWTONLS, nl_context_),
+    reinit_phi_1_(params.GetParamValue<bool>("reinit_phi_1"))
 {
   auto& tolerances = nl_solver_.ToleranceOptions();
 
@@ -71,7 +75,9 @@ void XXNonLinearKEigen::Initialize()
 
 void XXNonLinearKEigen::Execute()
 {
-  lbs_solver_.SetPhiVectorScalarValues(lbs_solver_.PhiOldLocal(), 1.0);
+  if (reinit_phi_1_)
+    lbs_solver_.SetPhiVectorScalarValues(lbs_solver_.PhiOldLocal(), 1.0);
+
   nl_solver_.Setup();
   nl_solver_.Solve();
 

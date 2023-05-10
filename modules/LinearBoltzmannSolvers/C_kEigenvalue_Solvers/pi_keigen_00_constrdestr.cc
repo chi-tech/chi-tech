@@ -30,6 +30,9 @@ chi_objects::InputParameters XXPowerIterationKEigen::GetInputParameters()
     "Flag, if set to true will initialize the phi-solution to all 1's before "
     "executing");
 
+  params.AddOptionalParameter(
+    "reinit_phi_1", true, "If true, reinitializes scalar phi fluxes to 1");
+
   return params;
 }
 
@@ -40,7 +43,7 @@ XXPowerIterationKEigen::XXPowerIterationKEigen(
       chi::object_stack, params.GetParamValue<size_t>("lbs_solver_handle"))),
     max_iters_(params.GetParamValue<size_t>("max_iters")),
     k_tolerance_(params.GetParamValue<double>("k_tol")),
-    reset_solution_(params.GetParamValue<bool>("reset_solution")),
+    reinit_phi_1_(params.GetParamValue<bool>("reinit_phi_1")),
 
     q_moments_local_(lbs_solver_.QMomentsLocal()),
     phi_old_local_(lbs_solver_.PhiOldLocal()),
@@ -60,9 +63,14 @@ XXPowerIterationKEigen::XXPowerIterationKEigen(
 
     ChiLogicalErrorIf(not wgs_context, fname + ": Cast failed");
 
-    wgs_context->lhs_src_scope_ = APPLY_WGS_SCATTER_SOURCES;
+    //wgs_context->lhs_src_scope_ = APPLY_WGS_SCATTER_SOURCES;
+    //wgs_context->rhs_src_scope_ =
+    //  APPLY_AGS_SCATTER_SOURCES | APPLY_FIXED_SOURCES;
+
+    wgs_context->lhs_src_scope_ =
+      wgs_context->lhs_src_scope_ & (~APPLY_WGS_FISSION_SOURCES);  //lhs_scope
     wgs_context->rhs_src_scope_ =
-      APPLY_AGS_SCATTER_SOURCES | APPLY_FIXED_SOURCES;
+      wgs_context->rhs_src_scope_ & (~APPLY_AGS_FISSION_SOURCES);  //rhs_scope
   }
 
   primary_ags_solver_.SetVerbosity(
@@ -75,7 +83,7 @@ XXPowerIterationKEigen::XXPowerIterationKEigen(
 
   ChiLogicalErrorIf(not front_wgs_context_, fname + ": Casting failure");
 
-  if (reset_solution_)
+  if (reinit_phi_1_)
     lbs_solver_.SetPhiVectorScalarValues(phi_old_local_, 1.0);
 }
 

@@ -17,7 +17,7 @@ RegisterChiObject(lbs,DiscOrdSteadyStateSolver);
 chi_objects::InputParameters DiscOrdSteadyStateSolver::GetInputParameters()
 {
   chi_objects::InputParameters params =
-    LBSDiscreteOrdinatesSolver::GetInputParameters();
+    DiscreteOrdinatesSolver::GetInputParameters();
 
   params.ChangeExistingParamToOptional("name", "DiscOrdSteadyStateSolver");
 
@@ -28,7 +28,7 @@ chi_objects::InputParameters DiscOrdSteadyStateSolver::GetInputParameters()
 /**Static registration based constructor.*/
 DiscOrdSteadyStateSolver::DiscOrdSteadyStateSolver(
   const chi_objects::InputParameters& params)
-  : LBSDiscreteOrdinatesSolver(params)
+  : DiscreteOrdinatesSolver(params)
 {
 }
 

@@ -13,7 +13,7 @@
 //###################################################################
 /**Clears all the sweep orderings for a groupset in preperation for
  * another.*/
-void lbs::LBSDiscreteOrdinatesSolver::ResetSweepOrderings(LBSGroupset& groupset)
+void lbs::DiscreteOrdinatesSolver::ResetSweepOrderings(LBSGroupset& groupset)
 {
   chi::log.Log0Verbose1()
     << "Resetting SPDS and FLUDS";

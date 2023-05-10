@@ -11,7 +11,7 @@ namespace lbs
 
 /**A k-eigenvalue solver based on the linear boltzmann transport solver.
 \author Zachary Hardy.*/
-class DiscOrdKEigenvalueSolver : public lbs::LBSDiscreteOrdinatesSolver
+class DiscOrdKEigenvalueSolver : public lbs::DiscreteOrdinatesSolver
 {
 private:
   /**The current k-eigenvalue estimate.*/
@@ -19,7 +19,7 @@ private:
 
 public:
   explicit DiscOrdKEigenvalueSolver(const std::string& in_text_name) :
-    lbs::LBSDiscreteOrdinatesSolver(in_text_name)
+    lbs::DiscreteOrdinatesSolver(in_text_name)
   {
     basic_options_.AddOption("K_EIGEN_METHOD", std::string("power"));
     basic_options_.AddOption("K_EIGEN_RESET_SOLUTION", bool(true));

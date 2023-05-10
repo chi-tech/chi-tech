@@ -20,6 +20,8 @@ namespace lbs
   class AGSLinearSolver;
   template<class MatType, class VecType, class SolverType>
   class WGSLinearSolver;
+  template<class MatType, class VecType, class SolverType>
+  class WGSContext;
 }
 
 namespace chi_objects
@@ -41,10 +43,12 @@ namespace lbs
 /**Base class for all Linear Boltzmann Solvers.*/
 class LBSSolver : public chi_physics::Solver
 {
-protected:
-  typedef chi_mesh::sweep_management::CellFaceNodalMapping CellFaceNodalMapping;
+public:
   typedef std::shared_ptr<AGSLinearSolver<Mat,Vec,KSP>> AGSLinSolverPtr;
   typedef std::shared_ptr<chi_math::LinearSolver<Mat,Vec,KSP>> LinSolvePtr;
+
+protected:
+  typedef chi_mesh::sweep_management::CellFaceNodalMapping CellFaceNodalMapping;
 
   size_t source_event_tag_=0;
   double last_restart_write_=0.0;
@@ -164,20 +168,13 @@ public:
   const std::map<uint64_t, std::shared_ptr<SweepBndry>>&
     SweepBoundaries() const;
 
-  SetSourceFunction GetActiveSetSourceFunction() const
-  {
-    return active_set_source_function_;
-  }
+  SetSourceFunction GetActiveSetSourceFunction() const;
 
-  AGSLinSolverPtr GetPrimaryAGSSolver()
-  {
-    return primary_ags_solver_;
-  }
+  AGSLinSolverPtr GetPrimaryAGSSolver();
 
-  std::vector<LinSolvePtr>& GetWGSSolvers()
-  {
-    return wgs_solvers_;
-  }
+  std::vector<LinSolvePtr>& GetWGSSolvers();
+
+  WGSContext<Mat, Vec, KSP>& GetWGSContext(int groupset_id);
 
   virtual std::pair<size_t, size_t> GetNumPhiIterativeUnknowns();
 
@@ -273,6 +270,9 @@ public:
 
   //05a
   void UpdateFieldFunctions();
+  void SetPhiFromFieldFunctions(PhiSTLOption which_phi,
+                                const std::vector<size_t>& m_indices,
+                                const std::vector<size_t>& g_indices);
 
   //06b
 public:

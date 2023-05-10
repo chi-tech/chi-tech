@@ -14,7 +14,7 @@ protected:
   LBSSolver& lbs_solver_;
   size_t max_iters_;
   double k_tolerance_;
-  bool reset_solution_;
+  bool reinit_phi_1_;
 
   VecDbl& q_moments_local_;
   VecDbl& phi_old_local_;
@@ -27,6 +27,7 @@ protected:
   std::shared_ptr<lbs::WGSContext<Mat, Vec, KSP>> front_wgs_context_;
 
   double k_eff_ = 1.0;
+
 public:
   static chi_objects::InputParameters GetInputParameters();
 

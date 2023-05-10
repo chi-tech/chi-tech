@@ -9,7 +9,7 @@ namespace lbs
 /**Base class for Discrete Ordinates solvers. This class mostly establishes
  * utilities related to sweeping. From here we can derive a steady-state,
  * transient, adjoint, and k-eigenvalue solver.*/
-class LBSDiscreteOrdinatesSolver : public LBSSolver
+class DiscreteOrdinatesSolver : public LBSSolver
 {
 protected:
   typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
@@ -32,13 +32,13 @@ protected:
 
 public:
   static chi_objects::InputParameters GetInputParameters();
-  explicit LBSDiscreteOrdinatesSolver(
+  explicit DiscreteOrdinatesSolver(
     const chi_objects::InputParameters& params);
 protected:
-  explicit LBSDiscreteOrdinatesSolver(const std::string& text_name);
+  explicit DiscreteOrdinatesSolver(const std::string& text_name);
 
 public:
-  virtual ~LBSDiscreteOrdinatesSolver() override;
+  virtual ~DiscreteOrdinatesSolver() override;
 
   std::pair<size_t, size_t> GetNumPhiIterativeUnknowns() override;
 
