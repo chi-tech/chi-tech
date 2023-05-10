@@ -95,11 +95,11 @@ chi_objects::InputParameters lbs::LBSGroupset::GetInputParameters()
     "angle_aggregation_type",
     AllowableRangeList::New({"polar", "single", "azimuthal"}));
 
-  params.ConstrainParameterRange("angle_aggregation_num_subsets",
-                                 AllowableRangeLowLimit::New(1));
-
-  params.ConstrainParameterRange("groupset_num_subsets",
-                                 AllowableRangeLowLimit::New(1));
+  //params.ConstrainParameterRange("angle_aggregation_num_subsets",
+  //                               AllowableRangeLowLimit::New(1));
+  //
+  //params.ConstrainParameterRange("groupset_num_subsets",
+  //                               AllowableRangeLowLimit::New(1));
 
   params.ConstrainParameterRange(
     "inner_linear_method",
