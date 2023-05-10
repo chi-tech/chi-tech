@@ -35,8 +35,10 @@ private:
   std::map<std::string, AllowableRangePtr> constraint_tags_;
 
   /**Parameter names to ignore when trying to assign. For now this
-  * "chi_obj_type"*/
+   * "chi_obj_type"*/
   static const std::vector<std::string> system_ignored_param_names_;
+
+  ParameterBlock param_block_at_assignment_;
 
 public:
   InputParameters() = default;
@@ -55,7 +57,7 @@ public:
 
 private:
   using ParameterBlock::AddParameter;
-  static bool IsParameterIgnored(const std::string& param_name) ;
+  static bool IsParameterIgnored(const std::string& param_name);
 
 public:
   template <typename T>
@@ -120,6 +122,13 @@ public:
 
 public:
   void AssignParameters(const ParameterBlock& params);
+
+  /**Returns the raw parameter block used at assignment. This can be used
+  * to see if a user supplied an optional parameter or not.*/
+  const ParameterBlock& ParametersAtAssignment() const
+  {
+    return param_block_at_assignment_;
+  }
 
   void
   MarkParamaterDeprecatedWarning(const std::string& param_name,

@@ -29,7 +29,7 @@ RegisterLuaFunctionAsIs(chiMakeObjectType);
   const auto params = chi_lua::TableParserAsParameterBlock::ParseTable(L, 1);
 
   const auto& object_maker = ChiObjectMaker::GetInstance();
-  const size_t handle = object_maker.MakeObject(params);
+  const size_t handle = object_maker.MakeRegisteredObject(params);
 
   const std::string type = params.GetParamValue<std::string>("chi_obj_type");
 
@@ -60,7 +60,7 @@ int chiMakeObjectType(lua_State* L)
   const auto params = chi_lua::TableParserAsParameterBlock::ParseTable(L, 2);
 
   const auto& object_maker = ChiObjectMaker::GetInstance();
-  const size_t handle = object_maker.MakeObjectType(type, params);
+  const size_t handle = object_maker.MakeRegisteredObjectOfType(type, params);
 
   lua_pushinteger(L, static_cast<lua_Integer>(handle));
 

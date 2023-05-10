@@ -1,7 +1,6 @@
 #ifndef CHITECH_OBJECT_MAKER_H
 #define CHITECH_OBJECT_MAKER_H
 
-
 #include "ChiParameters/input_parameters.h"
 #include "chi_object.h"
 
@@ -19,14 +18,17 @@
 #define RegisterChiObject(namespace_name, object_name)                         \
   static char ChiObjectJoinWordsB(unique_var_name_object_##object_name##_,     \
                                   __COUNTER__) =                               \
-    ChiObjectMaker::AddObjectToRegistry<object_name, ChiObject>(  \
+    ChiObjectMaker::AddObjectToRegistry<object_name, ChiObject>(               \
       #namespace_name, #object_name)
 
 class ChiObject;
 
+
+// ##################################################################
+/**Singleton object for handling the registration and making of objects.*/
 class ChiObjectMaker
 {
-private:
+public:
   using ObjectPtr = std::shared_ptr<ChiObject>;
 
   using ObjectGetInParamsFunc = chi_objects::InputParameters (*)();
@@ -39,12 +41,6 @@ private:
     ObjectConstructorFunc constructor_func = nullptr;
   };
 
-  std::map<std::string, ObjectRegistryEntry> object_registry_;
-
-private:
-  ChiObjectMaker() = default;
-
-public:
   ChiObjectMaker(const ChiObjectMaker&) = delete;
   ChiObjectMaker(const ChiObjectMaker&&) = delete;
   ChiObjectMaker& operator=(const ChiObjectMaker&) = delete;
@@ -53,21 +49,6 @@ public:
 
   const std::map<std::string, ObjectRegistryEntry>& Registry() const;
 
-private:
-  template <typename T>
-  static chi_objects::InputParameters CallGetInputParamsFunction()
-  {
-    return T::GetInputParameters();
-  }
-
-  template <typename T, typename base_T>
-  static std::shared_ptr<base_T>
-  CallObjectConstructor(const chi_objects::InputParameters& params)
-  {
-    return std::make_shared<T>(params);
-  }
-
-public:
   template <typename T, typename base_T>
   static char AddObjectToRegistry(const std::string& namespace_name,
                                   const std::string& object_name)
@@ -95,12 +76,38 @@ public:
     return 0;
   }
 
-  size_t MakeObject(const chi_objects::ParameterBlock& params) const;
-  size_t MakeObjectType(const std::string& type,
-                        const chi_objects::ParameterBlock& params) const;
+  size_t MakeRegisteredObject(const chi_objects::ParameterBlock& params) const;
+  size_t
+  MakeRegisteredObjectOfType(const std::string& type,
+                             const chi_objects::ParameterBlock& params) const;
 
   /**Dumps the object registry to stdout.*/
   void DumpRegister() const;
+
+private:
+  std::map<std::string, ObjectRegistryEntry> object_registry_;
+
+private:
+  /**Private constructor because this is a singleton.*/
+  ChiObjectMaker() = default;
+
+private:
+  /**Utility redirection to call an object's static `GetInputParameters`
+   * function.*/
+  template <typename T>
+  static chi_objects::InputParameters CallGetInputParamsFunction()
+  {
+    return T::GetInputParameters();
+  }
+
+  /**Utility redirection to call an object's constructor with a specified list
+   * of input parameters.*/
+  template <typename T, typename base_T>
+  static std::shared_ptr<base_T>
+  CallObjectConstructor(const chi_objects::InputParameters& params)
+  {
+    return std::make_shared<T>(params);
+  }
 };
 
 #endif // CHITECH_OBJECT_MAKER_H

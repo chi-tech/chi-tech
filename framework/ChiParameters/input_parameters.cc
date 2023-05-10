@@ -92,6 +92,7 @@ void InputParameters::AddRequiredParameterArray(const std::string& name,
  * */
 void InputParameters::AssignParameters(const ParameterBlock& params)
 {
+  param_block_at_assignment_ = params;
   std::stringstream err_stream;
 
   if (chi::log.GetVerbosity() >= 1)
@@ -263,7 +264,16 @@ void InputParameters::ConstrainParameterRange(const std::string& param_name,
                                               AllowableRangePtr allowable_range)
 {
   if (Has(param_name))
+  {
+    const auto& param_type = GetParam(param_name).Type();
+    ChiInvalidArgumentIf(param_type == ParameterBlockType::BLOCK or
+                           param_type == ParameterBlockType::ARRAY,
+                         std::string("Parameter \"") + param_name +
+                           "\" is of type " +
+                           ParameterBlockTypeName(param_type) +
+                           " to which constraints cannot be applied");
     constraint_tags_[param_name] = std::move(allowable_range);
+  }
   else
     ExceptionParamNotPresent(param_name);
 }

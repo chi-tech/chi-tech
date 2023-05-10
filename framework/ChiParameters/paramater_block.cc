@@ -28,10 +28,7 @@ std::string ParameterBlockTypeName(ParameterBlockType type)
 }
 
 // #################################################################
-void ParameterBlock::SetBlockName(const std::string& name)
-{
-  name_ = name;
-}
+void ParameterBlock::SetBlockName(const std::string& name) { name_ = name; }
 
 // #################################################################
 ParameterBlock::ParameterBlock(const std::string& name)
@@ -101,7 +98,9 @@ const chi_data_types::Varying& ParameterBlock::Value() const
     }
     default:
       throw std::logic_error(
-        std::string(__PRETTY_FUNCTION__) + ": Called for block of type " +
+        std::string(__PRETTY_FUNCTION__) + ":\"" + this->Name() +
+        "\""
+        " Called for block of type " +
         ParameterBlockTypeName(this->Type()) + " which has no value.");
   }
 }
@@ -138,6 +137,39 @@ void ParameterBlock::ChangeToArray()
         fname + ": Cannot change ParameterBlock to "
                 "array. It has existing parameters and they are not of the same"
                 "type.");
+}
+
+// #################################################################
+// NOLINTBEGIN(misc-no-recursion)
+/**Sets a string to be displayed alongside exceptions that give some
+ * notion of the origin of the error.*/
+void ParameterBlock::SetErrorOriginScope(const std::string& scope)
+{
+  error_origin_scope_ = scope;
+  for (auto& param : parameters_)
+    param.SetErrorOriginScope(scope);
+}
+// NOLINTEND(misc-no-recursion)
+
+// #################################################################
+/**Checks that the block is of the given type. If it is not it
+ * will throw an exception `std::logic_error`.*/
+void ParameterBlock::RequireBlockTypeIs(ParameterBlockType type) const
+{
+  if (Type() != type)
+    throw std::logic_error(error_origin_scope_ + ":" + Name() +
+                           " Is required to be of type " +
+                           ParameterBlockTypeName(type) + " but is " +
+                           ParameterBlockTypeName(Type()));
+}
+
+/**Check that the parameter with the given name exists otherwise
+ * throws a `std::logic_error`.*/
+void ParameterBlock::RequireParameter(const std::string& param_name) const
+{
+  if (not Has(param_name))
+    throw std::logic_error(error_origin_scope_ + ":" + Name() +
+                           " Is required to have parameter " + param_name);
 }
 
 // #################################################################
@@ -191,7 +223,8 @@ ParameterBlock& ParameterBlock::GetParam(const std::string& param_name)
   for (auto& param : parameters_)
     if (param.Name() == param_name) return param;
 
-  throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + ": Parameter \"" +
+  throw std::out_of_range(error_origin_scope_ + ":" +
+                          std::string(__PRETTY_FUNCTION__) + ": Parameter \"" +
                           param_name + "\" not present in block");
 }
 

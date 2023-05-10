@@ -8,7 +8,6 @@ class ChiObject
 {
 private:
   size_t stack_id_ = chi::SIZE_T_INVALID;
-  chi_objects::ParameterBlock param_block_used_at_construction_;
 
 public:
   /**Returns the input parameters. For the base ChiObject, there
@@ -26,20 +25,10 @@ public:
    * object to know its place in the global space.*/
   void SetStackID(size_t stack_id);
 
-  /**Copies the parameter block used to set the input parameters
-   * of this object. This is useful to know if an optional parameter
-   * was activated/used/set.*/
-  void
-  SetParamBlockUsedAtConstruction(const chi_objects::ParameterBlock& params);
-
   // Getters
   /**Returns the stack id of this object. This can be used
    * with input language to connect objects together.*/
   size_t StackID() const;
-
-  /**Sets the parameter block used at construction which allows developers
-  * to check for supplied parameters.*/
-  const chi_objects::ParameterBlock& ParamBlockUsedAtConstruction() const;
 
   /**An overridable callback that is called by the ObjectMaker and by default
   * adds the object onto the object stack. This function can be used to

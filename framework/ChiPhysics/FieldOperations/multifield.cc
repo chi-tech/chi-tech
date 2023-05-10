@@ -52,7 +52,7 @@ MultiFieldOperation::MultiFieldOperation(
     function_handle_(params.GetParamValue<size_t>("function_handle"))
 {
   //============================================= Make component references
-  const auto& user_supplied_params = ParamBlockUsedAtConstruction();
+  const auto& user_supplied_params = params.ParametersAtAssignment();
   if (user_supplied_params.Has("dependent_component_references"))
   {
     dependent_field_ref_component_ =

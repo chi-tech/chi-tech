@@ -300,6 +300,9 @@ public:
     CheckTypeMatch(type_, VaryingDataType::STRING);
     CheckDataInitialized();
 
+    if (not raw_data_.data()) //Covers construction from null
+      return std::string();
+
     return std::string(reinterpret_cast<const char*>(raw_data_.data()));
   }
 

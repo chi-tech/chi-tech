@@ -52,12 +52,15 @@ void chi_physics::FieldFunctionGridBased::
     const auto& uk_man = ff_ptr->UnkManager();
     const auto& unknown = ff_ptr->Unknown();
     const auto& sdm = ff_ptr->sdm_;
+    const size_t num_comps = unknown.NumComponents();
 
-    for (uint c=0; c<unknown.num_components_; ++c)
+    for (uint c=0; c<num_comps; ++c)
     {
-      const std::string component_name = ff_ptr->TextName() +
-                                         unknown.text_name_ +
-                                         unknown.component_text_names_[c];
+      std::string component_name = ff_ptr->TextName() +
+                                         unknown.text_name_;
+      if (num_comps > 1)
+        component_name += unknown.component_text_names_[c];
+
       vtkNew<vtkDoubleArray> point_array;
       vtkNew<vtkDoubleArray> cell_array;
 

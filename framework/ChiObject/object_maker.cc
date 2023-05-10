@@ -24,7 +24,7 @@ ChiObjectMaker::Registry() const
  * object stack. Returns a handle to the object. The object type is
  * obtained from a string parameter name `chi_obj_type`.*/
 size_t
-ChiObjectMaker::MakeObject(const chi_objects::ParameterBlock& params) const
+ChiObjectMaker::MakeRegisteredObject(const chi_objects::ParameterBlock& params) const
 {
   if (chi::log.GetVerbosity() >= 2)
     chi::log.Log() << "Making object with type from parameters";
@@ -39,14 +39,14 @@ ChiObjectMaker::MakeObject(const chi_objects::ParameterBlock& params) const
 
   const auto type = params.GetParamValue<std::string>("chi_obj_type");
 
-  return MakeObjectType(type, params);
+  return MakeRegisteredObjectOfType(type, params);
 }
 
 // ###################################################################
 /**Makes an object with the given parameters and places on the global
  * object stack. Returns a handle to the object.*/
 size_t
-ChiObjectMaker::MakeObjectType(const std::string& type,
+ChiObjectMaker::MakeRegisteredObjectOfType(const std::string& type,
                                const chi_objects::ParameterBlock& params) const
 {
   if (chi::log.GetVerbosity() >= 2)
@@ -76,8 +76,6 @@ ChiObjectMaker::MakeObjectType(const std::string& type,
     chi::log.Log() << "Constructing object " << type;
 
   auto new_object = object_entry.constructor_func(input_params);
-
-  new_object->SetParamBlockUsedAtConstruction(params);
 
   new_object->PushOntoStack(new_object);
 

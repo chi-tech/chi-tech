@@ -42,6 +42,7 @@ private:
   std::string name_;
   std::unique_ptr<chi_data_types::Varying> value_ptr_ = nullptr;
   std::vector<ParameterBlock> parameters_;
+  std::string error_origin_scope_ = "Unknown Scope";
 
 public:
   /**Sets the name of the block.*/
@@ -120,7 +121,26 @@ public:
   const std::vector<ParameterBlock>& Parameters() const;
 
   // Mutators
+  /**Changes the block type to array, making it accessible via integer
+ * keys.*/
   void ChangeToArray();
+
+  /**Sets a string to be displayed alongside exceptions that give some
+  * notion of the origin of the error.*/
+  void SetErrorOriginScope(const std::string& scope);
+
+  // Requirements
+  /**Checks that the block is of the given type. If it is not it
+  * will throw an exception `std::logic_error`.*/
+  void RequireBlockTypeIs(ParameterBlockType type) const;
+  void RequireParameterBlockTypeIs(const std::string& param_name,
+                                   ParameterBlockType type) const
+  {
+    GetParam(param_name).RequireBlockTypeIs(type);
+  }
+  /**Check that the parameter with the given name exists otherwise
+  * throws a `std::logic_error`.*/
+  void RequireParameter(const std::string& param_name) const;
 
 public:
   // utilities
@@ -162,7 +182,15 @@ public:
       throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
                              ": Value not available for block type " +
                              ParameterBlockTypeName(Type()));
-    return Value().GetValue<T>();
+    try
+    {
+      return Value().GetValue<T>();
+    }
+    catch (const std::exception& exc)
+    {
+      throw std::logic_error(error_origin_scope_ + ":" + Name() + " " +
+                             exc.what());
+    }
   }
 
   /**Fetches the parameter with the given name and returns it value.*/
