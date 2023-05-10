@@ -1,9 +1,62 @@
 #include "lbs_solver.h"
 
+#include "chi_log.h"
+
+#include "ChiObject/object_maker.h"
+
+namespace lbs
+{
+RegisterChiObject(lbs, LBSSolver);
+}
+
 /**Base class constructor.*/
 lbs::LBSSolver::LBSSolver(const std::string& text_name)
   : chi_physics::Solver(text_name)
 {
+}
+
+/**Returns the input parameters for this object.*/
+chi_objects::InputParameters lbs::LBSSolver::GetInputParameters()
+{
+  chi_objects::InputParameters params =
+    chi_physics::Solver::GetInputParameters();
+
+  params.ChangeExistingParamToOptional("name", "LBSDatablock");
+
+  params.AddRequiredParameter<size_t>(
+    "num_groups", "The total number of groups within the solver");
+
+  params.AddRequiredParameterArray(
+    "groupsets",
+    "An array of blocks each specifying the input parameters for a groupsets");
+
+  return params;
+}
+
+/**Input parameters based construction.*/
+lbs::LBSSolver::LBSSolver(const chi_objects::InputParameters& params)
+  : chi_physics::Solver(params)
+{
+  //=================================== Make groups
+  const size_t num_groups = params.GetParamValue<size_t>("num_groups");
+  for (size_t g = 0; g < num_groups; ++g)
+    groups_.push_back(LBSGroup(static_cast<int>(g)));
+
+  //=================================== Make groupsets
+  const auto& groupsets_array = params.GetParam("groupsets");
+
+  const size_t num_gs = groupsets_array.NumParameters();
+  for (size_t gs = 0; gs < num_gs; ++gs)
+  {
+    const auto& groupset_params = groupsets_array.GetParam(gs);
+
+    chi_objects::InputParameters gs_input_params =
+      LBSGroupset::GetInputParameters();
+    gs_input_params.SetObjectType("LBSSolver:LBSGroupset");
+    gs_input_params.AssignParameters(groupset_params);
+
+    groupsets_.emplace_back(gs_input_params, gs, *this);
+  } // for gs
 }
 
 /**Returns the source event tag used for logging the time it
@@ -226,4 +279,24 @@ std::pair<size_t, size_t> lbs::LBSSolver::GetNumPhiIterativeUnknowns()
   const size_t num_globl_phi_dofs = sdm.GetNumGlobalDOFs(flux_moments_uk_man_);
 
   return {num_local_phi_dofs, num_globl_phi_dofs};
+}
+
+/**Gets the local handle of a flux-moment based field function.*/
+size_t lbs::LBSSolver::MapPhiFieldFunction(size_t g, size_t m) const
+{
+  ChiLogicalErrorIf(phi_field_functions_local_map_.count({g, m}) == 0,
+                    std::string("Failure to map phi field function g") +
+                      std::to_string(g) + " m" + std::to_string(m));
+
+  return phi_field_functions_local_map_.at({g, m});
+}
+
+/**Returns the local handle to the power generation field function, if
+ * enabled.*/
+size_t lbs::LBSSolver::GetHandleToPowerGenFieldFunc() const
+{
+  ChiLogicalErrorIf(not options_.power_field_function_on,
+                    "Called when options_.power_field_function_on == false");
+
+  return power_gen_fieldfunc_local_handle_;
 }

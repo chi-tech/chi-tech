@@ -12,7 +12,7 @@ namespace lbs::disc_ord_steady_state_lua_utils
 
 \param SolverName string String name of the solver.
 
-\return SolverHandle int Handle to the solver created.
+\return SolverHandle int Handle to the solver created. Default: `"LBSolver"`.
 
 \code
 phys1 = chiLBSCreateSolver()

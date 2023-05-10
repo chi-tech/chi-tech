@@ -3,66 +3,87 @@
 #include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 
 #include "chi_runtime.h"
+#include "chi_log.h"
 
 namespace lbs::common_lua_utils
 {
 
-//###################################################################
+// ###################################################################
 /**Obtains a list of field functions, related only to scalar flux,
 from the transport solver.
 
-\param SolverIndex int Handle to the solver for which the list is to be obtained.
+\param SolverIndex int Handle to the solver for which the list is to be
+obtained.
 
-\return Pair Table and count. Returns an array of handles and the amount of elements in
-        it (indexed from 1).
-\ingroup LuaLBS
-\author Jan*/
-int chiLBSGetScalarFieldFunctionList(lua_State *L)
+\return Pair Table and count. Returns an array of handles and the amount of
+elements in it (indexed from 1). \ingroup LuaLBS \author Jan*/
+int chiLBSGetScalarFieldFunctionList(lua_State* L)
 {
-  const std::string fname = "chiLBSGetScalarFieldFunctionList";
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
+  if (num_args != 1)
+    LuaPostArgAmountError(fname, 1, num_args);
+
+  LuaCheckNilValue(fname, L, 1);
+  LuaCheckNumberValue(fname, L, 1);
+
   //============================================= Get pointer to solver
   const int solver_handle = lua_tonumber(L, 1);
-  const auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
-                                                             solver_handle,
-                                                             fname);
+  const auto& lbs_solver =
+    chi::GetStackItem<lbs::LBSSolver>(chi::object_stack, solver_handle, fname);
 
-  //============================================= Push up new table
-  lua_newtable(L);
-  int ff=-1;
-  int count=0;
-
-  for (int g=0; g<lbs_solver.NumGroups(); g++)
+  /**Lambda for matching a field function smart pointer to one on
+  * the runtime stack.*/
+  auto GetStackFFHandle =
+    [](std::shared_ptr<chi_physics::FieldFunctionGridBased>& local_ff)
   {
-    for (int m=0; m<lbs_solver.NumMoments(); m++)
+    size_t stack_ff_counter = 0;
+    for (auto& stack_ff : chi::field_function_stack)
     {
-      ff++;
-      if (m==0)
-      {
-        count++;
-        lua_pushnumber(L,count);
-        int pff_count = -1;
-        bool found = false;
-        for (auto& pff : chi::field_function_stack)
-        {
-          ++pff_count;
-          if (pff == lbs_solver.GetFieldFunctions()[ff])
-          {
-            lua_pushinteger(L,pff_count);
-            found = true;
-            break;
-          }
-        }
+      if (stack_ff == local_ff)
+        return stack_ff_counter;
 
-        if (not found)
-          throw std::logic_error(fname + ": SteadyStateSolver field functions not found "
-                                         "in global stack.");
-        lua_settable(L,-3);
-      }
+      ++stack_ff_counter;
+    }
+
+    ChiLogicalError("Scalar field function lookup error");
+  };
+
+  //======================================== Building table of handles
+  lua_newtable(L);
+  lua_Integer count = 0;
+
+  // Flux moments first
+  for (int g = 0; g < lbs_solver.NumGroups(); g++)
+  {
+    for (int m = 0; m < lbs_solver.NumMoments(); m++)
+    {
+      const size_t ff = lbs_solver.MapPhiFieldFunction(g, m);
+      auto local_ff = lbs_solver.GetFieldFunctions()[ff];
+
+      if (m != 0) continue;
+
+      lua_pushinteger(L, 1 + count++);
+      lua_pushinteger(L, static_cast<lua_Integer>(GetStackFFHandle(local_ff)));
+
+      lua_settable(L, -3);
     }
   }
 
-  lua_pushnumber(L,count);
+  //// Power generation
+  //if (lbs_solver.Options().power_field_function_on)
+  //{
+  //  const size_t ff = lbs_solver.GetHandleToPowerGenFieldFunc();
+  //  auto local_ff = lbs_solver.GetFieldFunctions()[ff];
+  //
+  //  lua_pushinteger(L, 1 + count++);
+  //  lua_pushinteger(L, static_cast<lua_Integer>(GetStackFFHandle(local_ff)));
+  //
+  //  lua_settable(L, -3);
+  //}
+
+  lua_pushinteger(L, count);
   return 2;
 }
 
-}//namespace lbs::common_lua_utils
+} // namespace lbs::common_lua_utils

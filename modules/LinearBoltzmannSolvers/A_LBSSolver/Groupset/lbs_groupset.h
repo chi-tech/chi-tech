@@ -1,6 +1,8 @@
 #ifndef LBS_GROUPSET_H
 #define LBS_GROUPSET_H
 
+#include "ChiObject/chi_object.h"
+
 #include "lbs_group.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/IterativeMethods/lbs_iterativemethods.h"
 
@@ -25,12 +27,13 @@ namespace lbs::acceleration
 namespace lbs
 {
 
+class LBSSolver;
+
 //################################################################### Class def
 /**Group set functioning as a collection of groups*/
-class LBSGroupset
+class LBSGroupset : public ChiObject
 {
 protected:
-  typedef std::shared_ptr<chi_mesh::sweep_management::SPDS> SPDS_ptr;
   typedef std::shared_ptr<chi_mesh::sweep_management::AngleAggregation> AngleAggPtr;
 public:
   int                                          id_;
@@ -79,6 +82,10 @@ public:
   chi_math::UnknownManager psi_uk_man_;
 
   //lbs_groupset.cc
+  static chi_objects::InputParameters GetInputParameters();
+  explicit LBSGroupset(const chi_objects::InputParameters& params,
+                       int id,
+                       const LBSSolver& lbs_solver);
   LBSGroupset() : LBSGroupset(-1) {};
   explicit LBSGroupset(int id) : id_(id) {}
 

@@ -117,7 +117,7 @@ struct Options
   typedef chi_math::SpatialDiscretizationType SDMType;
 
   GeometryType geometry_type = GeometryType::NO_GEOMETRY_SET;
-  SDMType sd_type = SDMType::UNDEFINED;
+  SDMType sd_type = SDMType::PIECEWISE_LINEAR_DISCONTINUOUS;
   unsigned int scattering_order=1;
   int  sweep_eager_limit= 32000; //see chiLBSSetProperty documentation
 
@@ -138,6 +138,13 @@ struct Options
   bool verbose_inner_iterations = true;
   bool verbose_ags_iterations = false;
   bool verbose_outer_iterations = true;
+
+  bool power_field_function_on = false;
+  double power_default_kappa = 3.20435e-11; //200MeV to Joule
+  double power_normalization = -1.0;
+
+  std::string field_function_prefix_option = "prefix";
+  std::string field_function_prefix; //Default is empty
 
   Options() = default;
 

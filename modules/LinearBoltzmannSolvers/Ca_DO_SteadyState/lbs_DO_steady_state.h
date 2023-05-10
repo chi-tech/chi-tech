@@ -10,7 +10,10 @@ namespace lbs
 class DiscOrdSteadyStateSolver : public LBSDiscreteOrdinatesSolver
 {
 public:
-  //00
+  static chi_objects::InputParameters GetInputParameters();
+
+  explicit DiscOrdSteadyStateSolver(const chi_objects::InputParameters& params);
+
   explicit DiscOrdSteadyStateSolver(const std::string& in_text_name) :
     lbs::LBSDiscreteOrdinatesSolver(in_text_name) {}
 

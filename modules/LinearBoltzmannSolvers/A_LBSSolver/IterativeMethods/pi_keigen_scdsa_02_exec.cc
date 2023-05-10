@@ -41,8 +41,6 @@ void XXPowerIterationKEigenSCDSA::Execute()
   bool converged = false;
   while (nit < max_iters_)
   {
-    auto phi0_l = CopyOnlyPhi0(front_gs_, phi_old_local_);
-
     //================================= Set the fission source
     SetLBSFissionSource(phi_old_local_, /*additive=*/false);
     Scale(q_moments_local_, 1.0 / k_eff_);
@@ -66,8 +64,12 @@ void XXPowerIterationKEigenSCDSA::Execute()
     auto phi0_lph_ip1 = CopyOnlyPhi0(front_gs_, phi_new_local_);
 
     //====================================== Power Iteration Acceleration
-    // solve
-    VecDbl epsilon_k(phi0_l.size(), 0.0);
+    SetLBSScatterSourcePhi0(phi0_lph_ip1 - phi0_lph_i, /*additive=*/false);
+    auto Ss_res = CopyOnlyPhi0(front_gs_, q_moments_local_);
+
+    double production_k = lbs_solver_.ComputeFissionProduction(phi_new_local_);
+
+    VecDbl epsilon_k(phi0_lph_ip1.size(), 0.0);
     auto epsilon_kp1 = epsilon_k;
 
     double lambda_k = k_eff_;
@@ -79,16 +81,12 @@ void XXPowerIterationKEigenSCDSA::Execute()
                       /*in*/ epsilon_k + phi0_lph_ip1,
                       /*out*/ phi_temp);
 
-      double production_k = lbs_solver_.ComputeFissionProduction(phi_temp);
+      //double production_k = lbs_solver_.ComputeFissionProduction(phi_temp);
 
       SetLBSFissionSource(phi_temp, /*additive=*/false);
       Scale(q_moments_local_, 1.0 / lambda_k);
 
       auto Sfaux = CopyOnlyPhi0(front_gs_, q_moments_local_);
-
-      SetLBSScatterSourcePhi0(phi0_lph_ip1 - phi0_lph_i, /*additive=*/false);
-
-      auto Ss_res = CopyOnlyPhi0(front_gs_, q_moments_local_);
 
       // Inner iterations seems extremely wasteful therefore I
       // am leaving this at 1 iteration here for further investigation.
@@ -125,6 +123,7 @@ void XXPowerIterationKEigenSCDSA::Execute()
 
       lambda_k = lambda_kp1;
       epsilon_k = epsilon_kp1;
+      production_k = production_kp1;
     } // acceleration
 
     ProjectBackPhi0(front_gs_,
@@ -134,9 +133,9 @@ void XXPowerIterationKEigenSCDSA::Execute()
                                               /*in*/ phi_new_local_,
                                               /*out*/ phi_old_local_);
 
-    const double production =
-      lbs_solver_.ComputeFissionProduction(phi_old_local_);
-    lbs_solver_.ScalePhiVector(PhiSTLOption::PHI_OLD, lambda_kp1 / production);
+    //const double production =
+    //  lbs_solver_.ComputeFissionProduction(phi_old_local_);
+    //lbs_solver_.ScalePhiVector(PhiSTLOption::PHI_OLD, lambda_kp1 / production);
 
     //================================= Recompute k-eigenvalue
     k_eff_ = lambda_kp1;

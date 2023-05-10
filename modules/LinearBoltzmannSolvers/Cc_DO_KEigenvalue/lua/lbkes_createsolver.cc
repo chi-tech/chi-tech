@@ -10,7 +10,7 @@ using namespace lbs;
 //###################################################################
 /**Create the solver.
 \param SolverName string Optional. A string name to use for the solver.
-                         [Default="KEigenvalueSolver"].
+                         Default: `"KEigenvalueSolver"`.
  *
 \return Handle A handle to the created solver.*/
 int chiLBKESCreateSolver(lua_State* L)

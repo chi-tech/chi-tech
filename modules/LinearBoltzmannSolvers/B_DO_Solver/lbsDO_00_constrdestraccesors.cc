@@ -1,7 +1,32 @@
 #include "lbs_discrete_ordinates_solver.h"
 
-lbs::LBSDiscreteOrdinatesSolver::LBSDiscreteOrdinatesSolver(const std::string &text_name) :
-  LBSSolver(text_name)
+#include "ChiObject/object_maker.h"
+
+namespace lbs
+{
+RegisterChiObject(lbs, LBSDiscreteOrdinatesSolver);
+}
+
+lbs::LBSDiscreteOrdinatesSolver::LBSDiscreteOrdinatesSolver(
+  const std::string& text_name)
+  : LBSSolver(text_name)
+{
+}
+
+chi_objects::InputParameters
+lbs::LBSDiscreteOrdinatesSolver::GetInputParameters()
+{
+  chi_objects::InputParameters params = LBSSolver::GetInputParameters();
+
+  params.ChangeExistingParamToOptional("name", "LBSDiscreteOrdinatesSolver");
+
+  return params;
+}
+
+/**Static registration based constructor.*/
+lbs::LBSDiscreteOrdinatesSolver::LBSDiscreteOrdinatesSolver(
+  const chi_objects::InputParameters& params)
+  : LBSSolver(params)
 {
 }
 
@@ -20,8 +45,8 @@ lbs::LBSDiscreteOrdinatesSolver::~LBSDiscreteOrdinatesSolver()
 /**Gets the local and global number of iterative unknowns. This normally is
  * only the flux moments, however, the sweep based solvers might include
  * delayed angular fluxes in this number.*/
-std::pair<size_t, size_t> lbs::LBSDiscreteOrdinatesSolver::
-GetNumPhiIterativeUnknowns()
+std::pair<size_t, size_t>
+lbs::LBSDiscreteOrdinatesSolver::GetNumPhiIterativeUnknowns()
 {
   const auto& sdm = *discretization_;
   const size_t num_local_phi_dofs = sdm.GetNumLocalDOFs(flux_moments_uk_man_);

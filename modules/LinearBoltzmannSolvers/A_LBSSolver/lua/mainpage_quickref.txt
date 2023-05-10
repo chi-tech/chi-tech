@@ -2,7 +2,7 @@ module: Linear Boltzmann Solvers
 print: \ref LuaLBS Documentation page
 
 function: chiLBSSetProperty
-function: chiLBSGetFieldFunctionList
+function: chiLBSSetOptions
 function: chiLBSGetScalarFieldFunctionList
 function: chiLBSWriteGroupsetAngularFlux
 function: chiLBSReadGroupsetAngularFlux

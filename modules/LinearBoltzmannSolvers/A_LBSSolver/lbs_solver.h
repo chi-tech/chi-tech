@@ -92,8 +92,13 @@ protected:
   std::vector<AGSLinSolverPtr> ags_solvers_;
   std::vector<LinSolvePtr>     wgs_solvers_;
   AGSLinSolverPtr              primary_ags_solver_;
+
+  std::map<std::pair<size_t, size_t>, size_t> phi_field_functions_local_map_;
+  size_t power_gen_fieldfunc_local_handle_ = 0;
 public:
+  static chi_objects::InputParameters GetInputParameters();
   explicit LBSSolver(const std::string& text_name);
+  explicit LBSSolver(const chi_objects::InputParameters& params);
 
   LBSSolver (const LBSSolver&) = delete;
   LBSSolver& operator= (const LBSSolver&) = delete;
@@ -176,6 +181,13 @@ public:
 
   virtual std::pair<size_t, size_t> GetNumPhiIterativeUnknowns();
 
+  /**Gets the local handle of a flux-moment based field function.*/
+  size_t MapPhiFieldFunction(size_t g, size_t m) const;
+
+  /**Returns the local handle to the power generation field function, if
+  * enabled.*/
+  size_t GetHandleToPowerGenFieldFunc() const;
+
   //01
   void Initialize() override;
 protected:
@@ -196,6 +208,8 @@ protected:
   void ComputeNumberOfMoments();
   //01g
   virtual void InitializeParrays();
+  //   a
+  void InitializeFieldFunctions();
   //01h
   void InitializeBoundaries();
 public:

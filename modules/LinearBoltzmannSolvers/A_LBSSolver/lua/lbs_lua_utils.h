@@ -5,7 +5,8 @@
 
 namespace lbs::common_lua_utils
 {
-  void RegisterLuaEntities(lua_State* L);
+int chiLBSSetOptions(lua_State* L);
+void RegisterLuaEntities(lua_State* L);
 }
 
 #endif //CHITECH_LBS_LUA_UTILS_H
