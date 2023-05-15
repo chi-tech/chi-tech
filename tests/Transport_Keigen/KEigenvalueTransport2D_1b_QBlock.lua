@@ -5,52 +5,45 @@ dofile("tests/Transport_Keigen/QBlock_mesh.lua")
 dofile("tests/Transport_Keigen/QBlock_materials.lua") --num_groups assigned here
 
 --############################################### Setup Physics
-phys1 = chiLBKESCreateSolver()
-
---========== Groups
-grp = {}
-for g=1,num_groups do
-    grp[g] = chiLBSCreateGroup(phys1)
-end
-
---========== ProdQuad
 pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,4, 4)
 chiOptimizeAngularQuadratureForPolarSymmetry(pqaud, 4.0*math.pi)
 
---========== Groupset def
-gs0 = chiLBSCreateGroupset(phys1)
-cur_gs = gs0
-chiLBSGroupsetAddGroups(phys1,cur_gs,0,num_groups-1)
-chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
-chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
-chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
---chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_RICHARDSON_CYCLES)
-chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
-chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-8)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,50)
-chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,10)
---chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-8,false)
---chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-8,false)
+lbs_block =
+{
+    num_groups = num_groups,
+    groupsets =
+    {
+        {
+            groups_from_to = {0, num_groups-1},
+            angular_quadrature_handle = pquad,
+            inner_linear_method = "gmres",
+            l_max_its = 50,
+            gmres_restart_interval = 50,
+            l_abs_tol = 1.0e-10,
+            groupset_num_subsets = 2,
+        }
+    }
+}
 
+lbs_options =
+{
+    boundary_conditions = { { name = "xmin", type = "reflecting"},
+                            { name = "ymin", type = "reflecting"} },
+    scattering_order = 2,
 
---############################################### Set boundary conditions
-chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,LBSBoundaryTypes.REFLECTING);
-chiLBSSetProperty(phys1,BOUNDARY_CONDITION,YMIN,LBSBoundaryTypes.REFLECTING);
+    use_precursors = false,
 
-chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
-chiLBSSetProperty(phys1,SCATTERING_ORDER,2)
+    verbose_inner_iterations = false,
+    verbose_outer_iterations = true,
+}
 
-chiSolverSetBasicOption(phys1, "K_EIGEN_METHOD", "nonlinear")
-chiSolverSetBasicOption(phys1, "NLK_ABS_TOL", 1.0e-8)
+phys1 = lbs.DiscreteOrdinatesSolver.Create(lbs_block)
+chiLBSSetOptions(phys1, lbs_options)
 
-chiLBSSetProperty(phys1, USE_PRECURSORS, false)
-
-chiLBSSetProperty(phys1, VERBOSE_INNER_ITERATIONS, false)
-chiLBSSetProperty(phys1, VERBOSE_OUTER_ITERATIONS, true)
-
---############################################### Initialize and Execute Solver
 chiSolverInitialize(phys1)
-chiSolverExecute(phys1)
+
+k_solver0 = lbs.XXNonLinearKEigen.Create({ lbs_solver_handle = phys1, })
+chiSolverExecute(k_solver0)
 
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 

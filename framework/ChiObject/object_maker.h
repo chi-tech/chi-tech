@@ -13,7 +13,9 @@
 
 /**Macro for registering an object within the ObjectMaker singleton.
  * Example:
- *
+ * \code
+ * RegisterChiObject(kaka, Zorba);
+ * \endcode
  * \note Remember to include the header "ChiObject/object_maker.h"*/
 #define RegisterChiObject(namespace_name, object_name)                         \
   static char ChiObjectJoinWordsB(unique_var_name_object_##object_name##_,     \
@@ -21,8 +23,21 @@
     ChiObjectMaker::AddObjectToRegistry<object_name, ChiObject>(               \
       #namespace_name, #object_name)
 
-class ChiObject;
+/**Macro for registering an object (parameters only) within the
+ * ObjectMaker singleton.
+ * Example:
+ * \code
+ * RegisterChiObjectParametersOnly(kaka, Zorba);
+ * \endcode
+ *
+ * \note Remember to include the header "ChiObject/object_maker.h"*/
+#define RegisterChiObjectParametersOnly(namespace_name, object_name)           \
+  static char ChiObjectJoinWordsB(unique_var_name_object_##object_name##_,     \
+                                  __COUNTER__) =                               \
+    ChiObjectMaker::AddObjectToRegistryParamsOnly<object_name>(                \
+      #namespace_name, #object_name)
 
+class ChiObject;
 
 // ##################################################################
 /**Singleton object for handling the registration and making of objects.*/
@@ -76,12 +91,38 @@ public:
     return 0;
   }
 
+  template <typename T>
+  static char AddObjectToRegistryParamsOnly(const std::string& namespace_name,
+                                            const std::string& object_name)
+  {
+    const std::string name = namespace_name + "::" + object_name;
+
+    auto& object_maker = GetInstance();
+
+    // Check if the function name is already there
+    if (object_maker.object_registry_.count(name) > 0)
+    {
+      throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
+                             ": Attempted "
+                             "to register Object \"" +
+                             name +
+                             "\" but an object with the same name is"
+                             " already registered.");
+    }
+
+    ObjectRegistryEntry reg_entry;
+    reg_entry.get_in_params_func = &CallGetInputParamsFunction<T>;
+    object_maker.object_registry_.insert(std::make_pair(name, reg_entry));
+
+    return 0;
+  }
+
   size_t MakeRegisteredObject(const chi_objects::ParameterBlock& params) const;
   size_t
   MakeRegisteredObjectOfType(const std::string& type,
                              const chi_objects::ParameterBlock& params) const;
 
-  /**Dumps the object registry to stdout.*/
+  /**\brief Dumps the object registry to stdout.*/
   void DumpRegister() const;
 
 private:

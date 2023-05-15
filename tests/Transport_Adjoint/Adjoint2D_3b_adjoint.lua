@@ -77,38 +77,33 @@ chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 src[1] = 1.0
 
 --############################################### Setup Physics
-solver_name = "LBAdjoint"
-phys1 = chiAdjointSolverCreate(solver_name)
+pquad0 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,12, 2)
+chiOptimizeAngularQuadratureForPolarSymmetry(pqaud0, 4.0*math.pi)
 
---========== Groups
-grp = {}
-for g=1,num_groups do
-    grp[g] = chiLBSCreateGroup(phys1)
-end
+lbs_block =
+{
+    num_groups = num_groups,
+    groupsets =
+    {
+        {
+            groups_from_to = {0, num_groups-1},
+            angular_quadrature_handle = pquad0,
+            inner_linear_method = "gmres",
+            l_abs_tol = 1.0e-6,
+            l_max_its = 500,
+            gmres_restart_interval = 100,
+        },
+    }
+}
 
---========== ProdQuad
-pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,12, 2)
+lbs_options =
+{
+    scattering_order = 1,
+}
 
---========== Groupset def
-gs0 = chiLBSCreateGroupset(phys1)
-cur_gs = gs0
-chiLBSGroupsetAddGroups(phys1,cur_gs,0,num_groups-1)
-chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
-chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
-chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
-chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
-chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,500)
-chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
-
---############################################### Set boundary conditions
-
---############################################### Add point source
-chiLBSAddPointSource(phys1, 1.25 - 0.5*ds, 1.5*ds, 0.0, src)
-
---############################################### Set solver properties
-chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
-chiLBSSetProperty(phys1,SCATTERING_ORDER,1)
+--############################################### Initialize and Execute Solver
+phys1 = lbs.DiscreteOrdinatesAdjointSolver.Create(lbs_block)
+chiLBSSetOptions(phys1, lbs_options)
 
 --############################################### Create QOIs
 tvol0 = chiLogicalVolumeCreate(RPP,2.3333,2.6666,4.16666,4.33333,-1000,1000)
@@ -128,18 +123,15 @@ chiAdjointSolverAddResponseFunction(phys1,"QOI0",tvol0,"ResponseFunction")
 chiAdjointSolverAddResponseFunction(phys1,"QOI1",tvol1,"ResponseFunction")
 chiSolverSetBasicOption(phys1, "REFERENCE_RF", "QOI1")
 
---############################################### Initialize and Execute Solver
 chiSolverInitialize(phys1)
 chiSolverExecute(phys1)
 
 chiLBSWriteFluxMoments(phys1, "Adjoint2D_3b_adjoint")
 
-
-
 --############################################### Get field functions
-ff_m0 = chiGetFieldFunctionHandleByName(solver_name.."_Flux_g000_m00")
-ff_m1 = chiGetFieldFunctionHandleByName(solver_name.."_Flux_g000_m01")
-ff_m2 = chiGetFieldFunctionHandleByName(solver_name.."_Flux_g000_m02")
+ff_m0 = chiGetFieldFunctionHandleByName("phi_g000_m00")
+ff_m1 = chiGetFieldFunctionHandleByName("phi_g000_m01")
+ff_m2 = chiGetFieldFunctionHandleByName("phi_g000_m02")
 
 
 --############################################### Slice plot
@@ -147,18 +139,7 @@ ff_m2 = chiGetFieldFunctionHandleByName(solver_name.."_Flux_g000_m02")
 --############################################### Volume integrations
 
 
-
-
-
-
-
-
-
-
-
-
 --############################################### Exports
 if master_export == nil then
-    chiExportMultiFieldFunctionToVTK({ff_m0, ff_m1, ff_m2},"ZPhi_"..solver_name)
-    chiExportFieldFunctionToVTKG(ff_m0, "ZPhi_"..solver_name)
+    chiExportMultiFieldFunctionToVTK({ff_m0, ff_m1, ff_m2},"ZPhi_LBAdjoint")
 end

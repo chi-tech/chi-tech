@@ -23,8 +23,8 @@ ChiObjectMaker::Registry() const
 /**Makes an object with the given parameters and places on the global
  * object stack. Returns a handle to the object. The object type is
  * obtained from a string parameter name `chi_obj_type`.*/
-size_t
-ChiObjectMaker::MakeRegisteredObject(const chi_objects::ParameterBlock& params) const
+size_t ChiObjectMaker::MakeRegisteredObject(
+  const chi_objects::ParameterBlock& params) const
 {
   if (chi::log.GetVerbosity() >= 2)
     chi::log.Log() << "Making object with type from parameters";
@@ -45,9 +45,8 @@ ChiObjectMaker::MakeRegisteredObject(const chi_objects::ParameterBlock& params) 
 // ###################################################################
 /**Makes an object with the given parameters and places on the global
  * object stack. Returns a handle to the object.*/
-size_t
-ChiObjectMaker::MakeRegisteredObjectOfType(const std::string& type,
-                               const chi_objects::ParameterBlock& params) const
+size_t ChiObjectMaker::MakeRegisteredObjectOfType(
+  const std::string& type, const chi_objects::ParameterBlock& params) const
 {
   if (chi::log.GetVerbosity() >= 2)
     chi::log.Log() << "Making object with specified type";
@@ -62,6 +61,10 @@ ChiObjectMaker::MakeRegisteredObjectOfType(const std::string& type,
     chi::log.Log() << "Making object type " << type;
 
   auto object_entry = object_registry_.at(type);
+
+  ChiLogicalErrorIf(not object_entry.constructor_func,
+                    "Object is not constructable since it has no registered "
+                    "constructor");
 
   auto input_params = object_entry.get_in_params_func();
 
@@ -100,6 +103,9 @@ void ChiObjectMaker::DumpRegister() const
     }
 
     chi::log.Log() << "OBJECT_BEGIN " << key;
+
+    if (entry.constructor_func == nullptr)
+      chi::log.Log() << "NOT_CONSTRUCTIBLE";
 
     const auto in_params = entry.get_in_params_func();
     in_params.DumpParameters();

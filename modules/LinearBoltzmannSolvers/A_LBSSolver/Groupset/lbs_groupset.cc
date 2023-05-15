@@ -9,6 +9,13 @@
 
 #include <fstream>
 
+#include "ChiObject/object_maker.h"
+
+namespace lbs
+{
+RegisterChiObjectParametersOnly(lbs, LBSGroupset);
+}
+
 // ##################################################################
 /***/
 chi_objects::InputParameters lbs::LBSGroupset::GetInputParameters()
@@ -16,7 +23,8 @@ chi_objects::InputParameters lbs::LBSGroupset::GetInputParameters()
   chi_objects::InputParameters params = ChiObject::GetInputParameters();
 
   params.AddRequiredParameterArray(
-    "groups_from_to", "The first and last group id this groupset operates on");
+    "groups_from_to", "The first and last group id this groupset operates on."
+                      " e.g. A 4 group problem <TT>groups_from_to= {0, 3}</TT>");
 
   params.AddRequiredParameter<size_t>("angular_quadrature_handle",
                                       "A handle to an angular quadrature");
@@ -107,7 +115,7 @@ chi_objects::InputParameters lbs::LBSGroupset::GetInputParameters()
 
   params.ConstrainParameterRange("l_abs_tol",
                                  AllowableRangeLowLimit::New(1.0e-18));
-  params.ConstrainParameterRange("l_max_its", AllowableRangeLowLimit::New(0));
+  //params.ConstrainParameterRange("l_max_its", AllowableRangeLowLimit::New(0));
   params.ConstrainParameterRange("gmres_restart_interval",
                                  AllowableRangeLowLimit::New(1));
 

@@ -21,7 +21,8 @@ lbs_block =
       angular_quadrature_handle = pquadB,
       inner_linear_method = "gmres",
       l_max_its = 10,
-      l_abs_tol = 1.0e-6
+      l_abs_tol = 1.0e-6,
+      groupset_num_subsets = 2,
     }
   }
 }

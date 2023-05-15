@@ -88,4 +88,116 @@ int chiPRKSetParam(lua_State* L)
   return 0;
 }
 
+// ##################################################################
+RegisterWrapperFunction(/*namespace_in_lua=*/prk,
+                        /*name_in_lua=*/SetParam,
+                        /*syntax_function=*/SetParamSyntax,
+                        /*actual_function=*/SetParam);
+
+chi_objects::InputParameters SetParamSyntax()
+{
+  chi_objects::InputParameters params;
+
+  params.SetGeneralDescription(
+    "\\defgroup prk__SetParam prk.SetParam \n"
+    "\\ingroup prk\n"
+    "Lua wrapper function for setting parameters in the PointReactorKinetics"
+    " module.");
+
+  params.AddRequiredParameter<size_t>(
+    "arg0", "Handle to a <TT>prk::TransientSolver</TT> object.");
+  params.AddRequiredParameter<std::string>(
+    "arg1", "Text name of the parameter to set.");
+
+  params.AddRequiredParameter<double>(
+    "arg2", "Value to set to the parameter pointed to by arg1");
+
+  using namespace chi_data_types;
+  params.ConstrainParameterRange("arg1", AllowableRangeList::New({"rho"}));
+
+  return params;
+}
+
+chi_objects::ParameterBlock SetParam(const chi_objects::InputParameters& params)
+{
+  const std::string fname = __FUNCTION__;
+  const size_t handle = params.GetParamValue<size_t>("arg0");
+
+  auto& solver =
+    chi::GetStackItem<TransientSolver>(chi::object_stack, handle, fname);
+
+  const auto param_name = params.GetParamValue<std::string>("arg1");
+  const auto& value_param = params.GetParam("arg2");
+
+  using namespace chi_objects;
+  if (param_name == "rho")
+  {
+    ChiInvalidArgumentIf(value_param.Type() != ParameterBlockType::FLOAT,
+                         "If arg1 is \"rho\" then arg2 must be of type FLOAT");
+    solver.SetRho(value_param.GetValue<double>());
+  }
+  else
+    ChiInvalidArgument("Invalid property name \"" + param_name);
+
+  return chi_objects::ParameterBlock(); // Return empty param block
+}
+
+// ##################################################################
+RegisterWrapperFunction(/*namespace_in_lua=*/prk,
+                        /*name_in_lua=*/GetParam,
+                        /*syntax_function=*/GetParamSyntax,
+                        /*actual_function=*/GetParam);
+
+chi_objects::InputParameters GetParamSyntax()
+{
+  chi_objects::InputParameters params;
+
+  params.SetGeneralDescription(
+    "\\defgroup prk__GetParam prk.GetParam \n"
+    "\\ingroup prk\n"
+    "Lua wrapper function for getting parameters from the PointReactorKinetics"
+    " module.");
+
+  params.AddRequiredParameter<size_t>(
+    "arg0", "Handle to a <TT>prk::TransientSolver</TT> object.");
+  params.AddRequiredParameter<std::string>(
+    "arg1", "Text name of the parameter to get.");
+  using namespace chi_data_types;
+  params.ConstrainParameterRange("arg1",
+                                 AllowableRangeList::New({"population_prev",
+                                                          "population_next",
+                                                          "period",
+                                                          "time_prev",
+                                                          "time_next"}));
+
+  return params;
+}
+
+chi_objects::ParameterBlock GetParam(const chi_objects::InputParameters& params)
+{
+  const std::string fname = __FUNCTION__;
+  const size_t handle = params.GetParamValue<size_t>("arg0");
+
+  auto& solver =
+    chi::GetStackItem<TransientSolver>(chi::object_stack, handle, fname);
+
+  const auto param_name = params.GetParamValue<std::string>("arg1");
+  chi_objects::ParameterBlock outputs;
+
+  if (param_name == "population_prev")
+    outputs.AddParameter("", solver.PopulationPrev());
+  else if (param_name == "population_next")
+    outputs.AddParameter("", solver.PopulationNext());
+  else if (param_name == "period")
+    outputs.AddParameter("", solver.Period());
+  else if (param_name == "time_prev")
+    outputs.AddParameter("", solver.TimePrev());
+  else if (param_name == "time_next")
+    outputs.AddParameter("", solver.TimeNext());
+  else
+    ChiInvalidArgument("Invalid property name \"" + param_name);
+
+  return outputs;
+}
+
 } // namespace prk::lua_utils

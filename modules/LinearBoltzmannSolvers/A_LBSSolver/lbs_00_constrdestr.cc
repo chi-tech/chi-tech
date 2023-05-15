@@ -30,7 +30,9 @@ chi_objects::InputParameters lbs::LBSSolver::GetInputParameters()
 
   params.AddRequiredParameterArray(
     "groupsets",
-    "An array of blocks each specifying the input parameters for a groupsets");
+    "An array of blocks each specifying the input parameters for a "
+    "<TT>lbs::LBSGroupset</TT>."
+    "$(lbs::LBSGroupset$)");
 
   return params;
 }

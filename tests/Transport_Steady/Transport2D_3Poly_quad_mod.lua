@@ -9,17 +9,17 @@ num_procs = 4
 
 --############################################### Check num_procs
 if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
-    chiLog(LOG_0ERROR,"Incorrect amount of processors. " ..
-                      "Expected "..tostring(num_procs)..
-                      ". Pass check_num_procs=false to override if possible.")
-    os.exit(false)
+  chiLog(LOG_0ERROR,"Incorrect amount of processors. " ..
+    "Expected "..tostring(num_procs)..
+    ". Pass check_num_procs=false to override if possible.")
+  os.exit(false)
 end
 
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
 umesh = chiUnpartitionedMeshFromWavefrontOBJ(
-        "resources/TestMeshes/SquareMesh2x2QuadsBlock.obj")
+  "resources/TestMeshes/SquareMesh2x2QuadsBlock.obj")
 
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
 chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED, umesh);
@@ -52,74 +52,80 @@ chiPhysicsMaterialAddProperty(materials[2],ISOTROPIC_MG_SOURCE)
 
 num_groups = 168
 chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,
-        CHI_XSFILE,"tests/Transport_Steady/xs_3_170.cxs")
+  CHI_XSFILE,"tests/Transport_Steady/xs_3_170.cxs")
 chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,
-        CHI_XSFILE,"tests/Transport_Steady/xs_3_170.cxs")
+  CHI_XSFILE,"tests/Transport_Steady/xs_3_170.cxs")
 
 --chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,SIMPLEXS0,num_groups,0.1)
 --chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,SIMPLEXS0,num_groups,0.1)
 
 src={}
 for g=1,num_groups do
-    src[g] = 0.0
+  src[g] = 0.0
 end
 --src[1] = 1.0
 chiPhysicsMaterialSetProperty(materials[1],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 
 --############################################### Setup Physics
-phys1 = chiLBSCreateSolver()
-
---========== Groups
-grp = {}
-for g=1,num_groups do
-    grp[g] = chiLBSCreateGroup(phys1)
-end
-
---========== ProdQuad
-pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 1)
+pquad0 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 1)
 chiOptimizeAngularQuadratureForPolarSymmetry(pqaud, 4.0*math.pi)
 
---========== Groupset def
-gs0 = chiLBSCreateGroupset(phys1)
-cur_gs = gs0
-chiLBSGroupsetAddGroups(phys1,cur_gs,0,62)
-chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
-chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
-chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,2)
-chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES)
-chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
-chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
-
-gs1 = chiLBSCreateGroupset(phys1)
-cur_gs = gs1
-chiLBSGroupsetAddGroups(phys1,cur_gs,63,167)
-chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
-chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
-chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,2)
-chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES)
-chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
-chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
---chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false," ")
---chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
-
---############################################### Set boundary conditions
+lbs_block =
+{
+  num_groups = num_groups,
+  groupsets =
+  {
+    {
+      groups_from_to = {0, 62},
+      angular_quadrature_handle = pquad0,
+      angle_aggregation_num_subsets = 1,
+      groupset_num_subsets = 2,
+      inner_linear_method = "gmres",
+      l_abs_tol = 1.0e-6,
+      l_max_its = 300,
+      gmres_restart_interval = 100,
+    },
+    {
+      groups_from_to = {63, num_groups-1},
+      angular_quadrature_handle = pquad0,
+      angle_aggregation_num_subsets = 1,
+      groupset_num_subsets = 2,
+      inner_linear_method = "gmres",
+      l_abs_tol = 1.0e-6,
+      l_max_its = 300,
+      gmres_restart_interval = 100,
+    },
+  }
+}
 bsrc={}
 for g=1,num_groups do
-    bsrc[g] = 0.0
+  bsrc[g] = 0.0
 end
 bsrc[1] = 1.0/4.0/math.pi
-chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,
-                        LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
 
-chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
-chiLBSSetProperty(phys1,SCATTERING_ORDER,1)
+lbs_options =
+{
+  boundary_conditions =
+  {
+    {
+      name = "xmin",
+      type = "incident_isotropic",
+      group_strength = bsrc
+    }
+  },
+  scattering_order = 1,
+}
+
+phys1 = lbs.DiscreteOrdinatesSolver.Create(lbs_block)
+chiLBSSetOptions(phys1, lbs_options)
 
 --############################################### Initialize and Execute Solver
 chiSolverInitialize(phys1)
-chiSolverExecute(phys1)
+
+ss_solver = lbs.SteadyStateSolver.Create({lbs_solver_handle = phys1})
+
+chiSolverExecute(ss_solver)
 
 --############################################### Get field functions
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
@@ -160,10 +166,10 @@ chiLog(LOG_0,string.format("Max-value2=%.5e", maxval))
 
 --############################################### Exports
 if master_export == nil then
-    chiFFInterpolationExportPython(slice2)
+  chiFFInterpolationExportPython(slice2)
 end
 
 --############################################### Plots
 if (chi_location_id == 0 and master_export == nil) then
-    local handle = io.popen("python ZPFFI00.py")
+  local handle = io.popen("python ZPFFI00.py")
 end

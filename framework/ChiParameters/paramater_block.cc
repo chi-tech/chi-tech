@@ -78,6 +78,10 @@ ParameterBlock::ParameterBlock(ParameterBlock&& other) noexcept
 
 // Accessors
 ParameterBlockType ParameterBlock::Type() const { return type_; }
+std::string ParameterBlock::TypeName() const
+{
+  return ParameterBlockTypeName(type_);
+}
 std::string ParameterBlock::Name() const { return name_; }
 
 // #################################################################

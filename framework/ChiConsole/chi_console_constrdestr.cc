@@ -59,6 +59,10 @@ void chi_objects::ChiConsole::LoadRegisteredLuaItems()
   for (const auto& [key, entry] : lua_function_registry_)
     SetLuaFuncNamespaceTableStructure(key, entry.function_ptr);
 
+  //=================================== Registering LuaFunctionWrappers
+  for (const auto& [key, _] : function_wrapper_registry_)
+    SetLuaFuncWrapperNamespaceTableStructure(key);
+
   //=================================== Registering solver-function
   //                                    scope resolution tables
   const auto& object_maker = ChiObjectMaker::GetInstance();

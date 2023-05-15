@@ -127,6 +127,40 @@ char chi_objects::ChiConsole::AddFunctionToRegistryInNamespaceWithName(
 }
 
 // ###################################################################
+/**Wrapper functions operate with input and output parameters, essentially
+* hiding the lua interface.*/
+char chi_objects::ChiConsole::AddWrapperToRegistryInNamespaceWithName(
+  const std::string& namespace_name,
+  const std::string& name_in_lua,
+  WrapperGetInParamsFunc syntax_function,
+  WrapperCallFunc actual_function)
+{
+  const std::string name = (namespace_name.empty())
+                             ? name_in_lua
+                             : namespace_name + "::" + name_in_lua;
+
+  auto& console = GetInstance();
+  auto& registry = console.function_wrapper_registry_;
+
+  ChiLogicalErrorIf(
+    registry.count(name) > 0,
+    std::string("Attempted to register lua-function wrapper \"") + name +
+      "\" but a wrapper with the same name already exists");
+
+  ChiLogicalErrorIf(not syntax_function, "Problem with get_in_params_func");
+
+  ChiLogicalErrorIf(not actual_function, "Problem with get_in_params_func");
+
+  LuaFuncWrapperRegEntry reg_entry;
+  reg_entry.get_in_params_func = syntax_function;
+  reg_entry.call_func = actual_function;
+
+  registry.insert(std::make_pair(name, reg_entry));
+
+  return 0;
+}
+
+// ###################################################################
 /**Sets/Forms a lua function in the state using a namespace structure.*/
 void chi_objects::ChiConsole::SetLuaFuncNamespaceTableStructure(
   const std::string& full_lua_name, lua_CFunction function_ptr)
@@ -149,6 +183,50 @@ void chi_objects::ChiConsole::SetLuaFuncNamespaceTableStructure(
   lua_pushstring(L, lua_name_split.back().c_str());
   lua_pushcfunction(L, function_ptr);
   lua_settable(L, -3);
+
+  lua_pop(L, lua_gettop(L));
+}
+
+// ###################################################################
+/**Sets/Forms a table structure that mimics the namespace structure of
+ * a string. For example the string "sing::sob::nook::Tigger" will be
+ * assigned a table structure
+ * `sing.sob.nook.Tigger = "sing::sob::nook::Tigger"`. Then finally assigns
+ * lua call to this table.*/
+void chi_objects::ChiConsole::SetLuaFuncWrapperNamespaceTableStructure(
+  const std::string& full_lua_name)
+{
+  auto L = GetInstance().console_state_;
+
+  /**Lambda for making a chunk*/
+  auto MakeChunk = [&L, &full_lua_name]()
+  {
+    std::string chunk_code = "local params = ...; ";
+    chunk_code +=
+      "return chi_console.LuaWrapperCall(\"" + full_lua_name + "\", ...)";
+
+    luaL_loadstring(L, chunk_code.c_str());
+  };
+
+  const auto table_names = chi_misc_utils::StringSplit(full_lua_name, "::");
+  std::vector<std::string> namespace_names;
+  for (const auto& table_name : table_names)
+    if (table_name != table_names.back()) namespace_names.push_back(table_name);
+
+  const auto& function_name = table_names.back();
+
+  if (not namespace_names.empty())
+  {
+    FleshOutLuaTableStructure(namespace_names);
+    lua_pushstring(L, function_name.c_str());
+    MakeChunk();
+    lua_settable(L, -3);
+  }
+  else
+  {
+    MakeChunk();
+    lua_setglobal(L, function_name.c_str());
+  }
 
   lua_pop(L, lua_gettop(L));
 }
@@ -259,11 +337,35 @@ void chi_objects::ChiConsole::SetObjectMethodsToTable(
     }
 
     std::string chunk_code = "local params = ...; ";
-    chunk_code += "return " + path_dot_name + "(" + std::to_string(handle) +
-                  ", ...)";
+    chunk_code +=
+      "return " + path_dot_name + "(" + std::to_string(handle) + ", ...)";
 
     lua_pushstring(L, method_name.c_str());
     luaL_loadstring(L, chunk_code.c_str());
     lua_settable(L, -3);
   }
+}
+
+// ##################################################################
+/**Makes a formatted output, readible by the documentation scripts,
+* of all the lua wrapper functions.*/
+void chi_objects::ChiConsole::DumpRegister() const
+{
+  chi::log.Log() << "\n\n";
+  for (const auto& [key, entry] : function_wrapper_registry_)
+  {
+    if (chi::log.GetVerbosity() == 0)
+    {
+      chi::log.Log() << key;
+      continue;
+    }
+
+    chi::log.Log() << "LUA_FUNCWRAPPER_BEGIN " << key;
+
+    const auto in_params = entry.get_in_params_func();
+    in_params.DumpParameters();
+
+    chi::log.Log() << "LUA_FUNCWRAPPER_END\n\n";
+  }
+  chi::log.Log() << "\n\n";
 }

@@ -16,9 +16,7 @@ if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
     os.exit(false)
 end
 
---------------------------------------------------------------------------------
---  mesh
---------------------------------------------------------------------------------
+--############################################### Setup mesh
 chiMeshHandlerCreate()
 dim = 2
 length = {1, 2, }
@@ -35,12 +33,11 @@ surf_mesh = chiMeshCreateUnpartitioned2DOrthoMesh(nodes[1], nodes[2])
 chiVolumeMesherSetProperty(PARTITION_TYPE, PARMETIS)
 chiVolumeMesherExecute()
 
+--############################################### Set Material IDs
 vol0 = chiLogicalVolumeCreate(RPP, 0, length[1], 0, length[2], 0, 0)
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
 
---------------------------------------------------------------------------------
---  materials
---------------------------------------------------------------------------------
+--############################################### Add materials
 ngrp = 2
 sigmat = 20.0
 ratioc = 0.4
@@ -58,70 +55,48 @@ chiPhysicsMaterialSetProperty(material0, TRANSPORT_XSECTIONS,
 chiPhysicsMaterialSetProperty(material0, ISOTROPIC_MG_SOURCE,
                               FROM_ARRAY, source)
 
---------------------------------------------------------------------------------
---  physics
---------------------------------------------------------------------------------
-phys0 = chiLBSCurvilinearCreateSolver(LBSCurvilinear.CYLINDRICAL)
+--############################################### Setup Physics
+pquad0 = chiCreateCylindricalProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV, 4, 8)
 
---  angular quadrature
-pquad = chiCreateCylindricalProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV, 4, 8)
+lbs_block =
+{
+  num_groups = ngrp,
+  groupsets =
+  {
+    {
+      groups_from_to = {0, ngrp-1},
+      angular_quadrature_handle = pquad0,
+      angle_aggregation_type = "azimuthal",
+      inner_linear_method = "gmres",
+      l_max_its = 100,
+      l_abs_tol = 1.0e-12,
+      apply_wgdsa = true,
+      wgdsa_l_abs_tol = 1.0e-9,
+      wgdsa_l_max_its = 50
+    }
+  }
+}
 
---  groups
-groups = {}
-for g = 1, ngrp do
-  groups[g] = chiLBSCreateGroup(phys0)
-end
+lbs_options =
+{
+  boundary_conditions = { { name = "xmin", type = "reflecting"} },
+  scattering_order = 0,
+}
+lbs_block.coord_system = 2
+phys1 = lbs.DiscreteOrdinatesCurvilinearSolver.Create(lbs_block)
+chiLBSSetOptions(phys1, lbs_options)
 
---  groupsets
-gs0 = chiLBSCreateGroupset(phys0)
-chiLBSGroupsetAddGroups(phys0, gs0, 0, ngrp-1)
-chiLBSGroupsetSetQuadrature(phys0, gs0, pquad)
-chiLBSGroupsetSetAngleAggregationType(phys0, gs0, LBSGroupset.ANGLE_AGG_AZIMUTHAL)
-chiLBSGroupsetSetIterativeMethod(phys0, gs0, KRYLOV_GMRES_CYCLES)
-chiLBSGroupsetSetResidualTolerance(phys0, gs0, 1.0e-12)
-chiLBSGroupsetSetMaxIterations(phys0, gs0, 100)
-chiLBSGroupsetSetGMRESRestartIntvl(phys0, gs0, 30)
-petsc_options = ""
-chiLBSGroupsetSetWGDSA(phys0, gs0, 50, 1.0e-09, false, petsc_options)
---chiLBSGroupsetSetTGDSA(phys0, gs0, 50, 1.0e-09, false, petsc_options)
+--############################################### Initialize and Execute Solver
+chiSolverInitialize(phys1)
 
---  spatial discretisation
-chiLBSSetProperty(phys0, DISCRETIZATION_METHOD, PWLD)
+ss_solver = lbs.SteadyStateSolver.Create({lbs_solver_handle = phys1})
 
---  scattering order
-chiLBSSetProperty(phys0, SCATTERING_ORDER, 0)
+chiSolverExecute(ss_solver)
 
---------------------------------------------------------------------------------
---  boundary conditions
---------------------------------------------------------------------------------
-dirichlet_value = {}
-for g = 1, ngrp do
-  dirichlet_value[g] = 0
-end
-chiLBSSetProperty(phys0, BOUNDARY_CONDITION,
-                  XMIN, LBSBoundaryTypes.REFLECTING)
-chiLBSSetProperty(phys0, BOUNDARY_CONDITION,
-                  XMAX, LBSBoundaryTypes.INCIDENT_ISOTROPIC, dirichlet_value)
-chiLBSSetProperty(phys0, BOUNDARY_CONDITION,
-                  YMIN, LBSBoundaryTypes.INCIDENT_ISOTROPIC, dirichlet_value)
-chiLBSSetProperty(phys0, BOUNDARY_CONDITION,
-                  YMAX, LBSBoundaryTypes.INCIDENT_ISOTROPIC, dirichlet_value)
-
---------------------------------------------------------------------------------
---  solvers
---------------------------------------------------------------------------------
-chiSolverInitialize(phys0)
-chiSolverExecute(phys0)
-
---------------------------------------------------------------------------------
---  output
---------------------------------------------------------------------------------
---  field functions
-fflist, count = chiLBSGetScalarFieldFunctionList(phys0)
+--############################################### Exports
+fflist, count = chiLBSGetScalarFieldFunctionList(phys1)
 if master_export == nil then
-  chiExportFieldFunctionToVTKG(fflist,
-                               "Transport2DCyl2-scalar_flux",
-                               "scalar_flux")
+  chiExportMultiFieldFunctionToVTK(fflist, "ZRZPhi")
 end
 
 --  volume integrations - energy group 1

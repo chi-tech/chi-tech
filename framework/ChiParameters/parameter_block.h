@@ -115,6 +115,7 @@ public:
 
   // Accessors
   ParameterBlockType Type() const;
+  std::string TypeName() const;
   std::string Name() const;
   const chi_data_types::Varying& Value() const;
   size_t NumParameters() const;
@@ -122,16 +123,20 @@ public:
 
   // Mutators
   /**Changes the block type to array, making it accessible via integer
- * keys.*/
+   * keys.*/
   void ChangeToArray();
 
   /**Sets a string to be displayed alongside exceptions that give some
-  * notion of the origin of the error.*/
+   * notion of the origin of the error.*/
   void SetErrorOriginScope(const std::string& scope);
+
+  /**Gets a string that allows error messages to print the scope of an
+   * error.*/
+  std::string GetErrorOriginScope() const { return error_origin_scope_; }
 
   // Requirements
   /**Checks that the block is of the given type. If it is not it
-  * will throw an exception `std::logic_error`.*/
+   * will throw an exception `std::logic_error`.*/
   void RequireBlockTypeIs(ParameterBlockType type) const;
   void RequireParameterBlockTypeIs(const std::string& param_name,
                                    ParameterBlockType type) const
@@ -139,7 +144,7 @@ public:
     GetParam(param_name).RequireBlockTypeIs(type);
   }
   /**Check that the parameter with the given name exists otherwise
-  * throws a `std::logic_error`.*/
+   * throws a `std::logic_error`.*/
   void RequireParameter(const std::string& param_name) const;
 
 public:

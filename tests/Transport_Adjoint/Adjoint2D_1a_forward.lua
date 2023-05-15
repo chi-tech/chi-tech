@@ -9,10 +9,10 @@ num_procs = 4
 
 --############################################### Check num_procs
 if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
-    chiLog(LOG_0ERROR,"Incorrect amount of processors. " ..
-                      "Expected "..tostring(num_procs)..
-                      ". Pass check_num_procs=false to override if possible.")
-    os.exit(false)
+  chiLog(LOG_0ERROR,"Incorrect amount of processors. " ..
+    "Expected "..tostring(num_procs)..
+    ". Pass check_num_procs=false to override if possible.")
+  os.exit(false)
 end
 
 --############################################### Setup mesh
@@ -24,7 +24,7 @@ L=5.0
 ds=L/N
 xmin=0.0
 for i=0,N do
-    nodes[i+1] = xmin + i*ds
+  nodes[i+1] = xmin + i*ds
 end
 mesh,region0 = chiMeshCreateUnpartitioned2DOrthoMesh(nodes,nodes)
 chiVolumeMesherExecute();
@@ -66,18 +66,18 @@ chiPhysicsMaterialAddProperty(materials[3],ISOTROPIC_MG_SOURCE)
 
 num_groups = 1
 chiPhysicsMaterialSetProperty(materials[1],
-                              TRANSPORT_XSECTIONS,
-                              SIMPLEXS1,1,0.01,0.01)
+  TRANSPORT_XSECTIONS,
+  SIMPLEXS1,1,0.01,0.01)
 chiPhysicsMaterialSetProperty(materials[2],
-                              TRANSPORT_XSECTIONS,
-                              SIMPLEXS1,1,0.1*20,0.8)
+  TRANSPORT_XSECTIONS,
+  SIMPLEXS1,1,0.1*20,0.8)
 chiPhysicsMaterialSetProperty(materials[3],
-                              TRANSPORT_XSECTIONS,
-                              SIMPLEXS1,1,0.3*20,0.0)
+  TRANSPORT_XSECTIONS,
+  SIMPLEXS1,1,0.3*20,0.0)
 
 src={}
 for g=1,num_groups do
-    src[g] = 0.0
+  src[g] = 0.0
 end
 src[1] = 0.0
 chiPhysicsMaterialSetProperty(materials[1],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
@@ -88,56 +88,48 @@ chiPhysicsMaterialSetProperty(materials[3],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 
 
 --############################################### Setup Physics
-solver_name = "LBS"
-phys1 = chiLBSCreateSolver(solver_name)
+pquad0 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,48, 6)
+chiOptimizeAngularQuadratureForPolarSymmetry(pqaud0, 4.0*math.pi)
 
---========== Groups
-grp = {}
-for g=1,num_groups do
-    grp[g] = chiLBSCreateGroup(phys1)
-end
+lbs_block =
+{
+  num_groups = num_groups,
+  groupsets =
+  {
+    {
+      groups_from_to = {0, num_groups-1},
+      angular_quadrature_handle = pquad0,
+      inner_linear_method = "gmres",
+      l_abs_tol = 1.0e-6,
+      l_max_its = 500,
+      gmres_restart_interval = 100,
+    },
+  }
+}
 
---========== ProdQuad
-pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,48, 6)
+lbs_options =
+{
+  scattering_order = 1,
+}
 
---========== Groupset def
-gs0 = chiLBSCreateGroupset(phys1)
-cur_gs = gs0
-chiLBSGroupsetAddGroups(phys1,cur_gs,0,num_groups-1)
-chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
-chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
-chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
-chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
-chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,500)
-chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
+phys1 = lbs.DiscreteOrdinatesSolver.Create(lbs_block)
+chiLBSSetOptions(phys1, lbs_options)
 
---############################################### Set boundary conditions
+--############################################### Initialize and Execute Solver
+chiSolverInitialize(phys1)
 
---############################################### Set solver properties
-chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
-chiLBSSetProperty(phys1,SCATTERING_ORDER,1)
+ss_solver = lbs.SteadyStateSolver.Create({lbs_solver_handle = phys1})
+
+chiSolverExecute(ss_solver)
 
 --############################################### Create QOIs
 tvol0 = chiLogicalVolumeCreate(RPP,2.3333,2.6666,4.16666,4.33333,-1000,1000)
 tvol1 = chiLogicalVolumeCreate(RPP,0.5   ,0.8333,4.16666,4.33333,-1000,1000)
 
-
-
-
-
---############################################### Initialize and Execute Solver
-chiSolverInitialize(phys1)
-chiSolverExecute(phys1)
-
-
-
-
-
 --############################################### Get field functions
-ff_m0 = chiGetFieldFunctionHandleByName(solver_name.."_Flux_g0_m0")
-ff_m1 = chiGetFieldFunctionHandleByName(solver_name.."_Flux_g0_m1")
-ff_m2 = chiGetFieldFunctionHandleByName(solver_name.."_Flux_g0_m2")
+ff_m0 = chiGetFieldFunctionHandleByName("phi_g000_m00")
+ff_m1 = chiGetFieldFunctionHandleByName("phi_g000_m01")
+ff_m2 = chiGetFieldFunctionHandleByName("phi_g000_m02")
 
 
 --############################################### Slice plot
@@ -157,5 +149,5 @@ chiLog(LOG_0,string.format("QOI-value=%.5e", QOI_value))
 
 --############################################### Exports
 if master_export == nil then
-    chiExportMultiFieldFunctionToVTK({ff_m0, ff_m1, ff_m2},"ZPhi_"..solver_name)
+  chiExportMultiFieldFunctionToVTK({ff_m0, ff_m1, ff_m2},"ZPhi_LBS")
 end

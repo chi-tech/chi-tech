@@ -67,67 +67,65 @@ src[1] = 1.0
 chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 
 --############################################### Setup Physics
-phys1 = chiLBSCreateSolver()
-
---========== Groups
-grp = {}
-for g=1,num_groups do
-    grp[g] = chiLBSCreateGroup(phys1)
-end
-
---========== ProdQuad
 fac=1
-pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,4*fac, 3*fac)
+pquad0 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,4*fac, 3*fac)
 chiOptimizeAngularQuadratureForPolarSymmetry(pqaud, 4.0*math.pi)
---========== Groupset def
--- gs0 = chiLBSCreateGroupset(phys1)
--- cur_gs = gs0
--- chiLBSGroupsetAddGroups(phys1,cur_gs,0,0)
--- chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
--- chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
--- chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
--- chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
--- chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-8)
--- chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
--- chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
 
-gs0 = chiLBSCreateGroupset(phys1)
-cur_gs = gs0
-chiLBSGroupsetAddGroups(phys1,cur_gs,0,62)
-chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
-chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
-chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
-chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
-chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
-chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
-
-gs1 = chiLBSCreateGroupset(phys1)
-cur_gs = gs1
-chiLBSGroupsetAddGroups(phys1,cur_gs,63,167)
-chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
-chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
-chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
-chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
-chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
-chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
-
---############################################### Set boundary conditions
+lbs_block =
+{
+    num_groups = num_groups,
+    groupsets =
+    {
+        {
+            groups_from_to = {0, 62},
+            angular_quadrature_handle = pquad0,
+            angle_aggregation_num_subsets = 1,
+            groupset_num_subsets = 1,
+            inner_linear_method = "gmres",
+            l_abs_tol = 1.0e-4,
+            l_max_its = 300,
+            gmres_restart_interval = 100,
+        },
+        {
+            groups_from_to = {63, num_groups-1},
+            angular_quadrature_handle = pquad0,
+            angle_aggregation_num_subsets = 1,
+            groupset_num_subsets = 1,
+            inner_linear_method = "gmres",
+            l_abs_tol = 1.0e-4,
+            l_max_its = 300,
+            gmres_restart_interval = 100,
+        },
+    }
+}
 bsrc={}
 for g=1,num_groups do
     bsrc[g] = 0.0
 end
 bsrc[1] = 1.0/4.0/math.pi
-chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,
-                        LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
 
-chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
-chiLBSSetProperty(phys1,SCATTERING_ORDER,0)
+lbs_options =
+{
+    boundary_conditions =
+    {
+        {
+            name = "xmin",
+            type = "incident_isotropic",
+            group_strength = bsrc
+        }
+    },
+    scattering_order = 0,
+}
+
+phys1 = lbs.DiscreteOrdinatesSolver.Create(lbs_block)
+chiLBSSetOptions(phys1, lbs_options)
 
 --############################################### Initialize and Execute Solver
 chiSolverInitialize(phys1)
-chiSolverExecute(phys1)
+
+ss_solver = lbs.SteadyStateSolver.Create({lbs_solver_handle = phys1})
+
+chiSolverExecute(ss_solver)
 
 chiLBSComputeBalance(phys1)
 

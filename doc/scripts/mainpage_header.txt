@@ -21,8 +21,9 @@ now we have only a couple of tutorials.\n
 
 \n
 
+\tableofcontents
 
- ## Variables defined in lua
+ \section MainPage0 Variables defined in lua
 Variable Name        | Description                            | Variable Name        | Description
 ---------------------|------------------                      |--------------------- |---------------------
  `chi_version`       | Version string, e.g., "1.2.3"          | `chi_minor_version`  | Minor version, e.g., 2, as an integer
@@ -32,5 +33,5 @@ Variable Name        | Description                            | Variable Name   
 \n
 
 
- ## Input Functions
+ \section MainPage1 Input Functions
 

@@ -72,15 +72,34 @@ def write_table(table_entries):
     output_file.write("</table>\n\n")
 
 table_entries = []
+section_num = 1
+sub_section_num = 1
+sub_sub_section_num = 1
 for line in lines:
+
     words = line.split()
     if len(words) == 0:
         continue
 
     first_word = words[0]
 
+    if line.find("\section") >= 0:
+        section_num += 1
+        sub_section_num = 1
+
     if first_word == "module:":
-        output_file.write("### " + line[len(first_word):].strip() + "\n")
+        output_file.write(
+            f"\\subsection MainPage{section_num}_{sub_section_num} " +
+            f"{section_num}.{sub_section_num} " +
+            line[len(first_word):].strip() + "\n")
+        sub_section_num += 1
+
+    if first_word == "submodule:":
+        output_file.write(
+            f"\\subsubsection MainPage{section_num}_" +
+            f"{sub_section_num}_{sub_sub_section_num} " +
+            line[len(first_word):].strip() + "\n")
+        sub_sub_section_num += 1
 
     if first_word == "print:":
         output_file.write(line[len(first_word):].strip() + "\n\n")

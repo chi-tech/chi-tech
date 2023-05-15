@@ -1,7 +1,5 @@
 #include "input_parameters.h"
 
-#include "parameter_block.h"
-
 #include "chi_runtime.h"
 #include "chi_log.h"
 
@@ -10,8 +8,9 @@
 #include <utility>
 
 #define ThrowInputError                                                        \
-  throw std::invalid_argument("Input error: " + ObjectType() + "\n" +          \
-                              err_stream.str())
+  throw std::invalid_argument(                                                 \
+    (GetErrorOriginScope().empty() ? "" : GetErrorOriginScope() + "\n") +      \
+    "Input error: " + ObjectType() + "\n" + err_stream.str())
 
 #define ExceptionParamNotPresent(param_name)                                   \
   throw std::logic_error(std::string(__PRETTY_FUNCTION__) + ": Parameter \"" + \
@@ -33,6 +32,16 @@ void InputParameters::SetObjectType(const std::string& obj_type)
 // #################################################################
 /**Returns the object type string.*/
 std::string InputParameters::ObjectType() const { return class_name_; }
+
+// #################################################################
+/**Returns the parameter's doc string.*/
+std::string
+InputParameters::GetParameterDocString(const std::string& param_name)
+{
+  ChiInvalidArgumentIf(parameter_doc_string_.count(param_name) == 0,
+                       "Invalid parameter \"" + param_name + "\".");
+  return parameter_doc_string_.at(param_name);
+}
 
 // #################################################################
 /**Determines if a parameter is ignored.*/
@@ -114,9 +123,10 @@ void InputParameters::AssignParameters(const ParameterBlock& params)
         renamed_error_tags_.count(req_param_name) > 0)
       continue;
 
-    if (not params.Has(req_param.Name()))
-      err_stream << "Required param \"" << req_param.Name()
-                 << "\" not supplied.\n";
+    if (not params.Has(req_param_name))
+      err_stream << "Required param \"" << req_param_name
+                 << "\" not supplied.\ndoc-string: "
+                 << GetParameterDocString(req_param_name);
   }
 
   if (not err_stream.str().empty()) ThrowInputError;
@@ -195,12 +205,16 @@ void InputParameters::AssignParameters(const ParameterBlock& params)
     // ====================== Check types match
     if (param.Type() != input_param.Type())
     {
-      err_stream << "Invalid parameter type \""
-                 << ParameterBlockTypeName(param.Type())
-                 << "\" for parameter \"" << param_name
-                 << "\". Expecting type \""
-                 << ParameterBlockTypeName(input_param.Type()) << "\".\n";
-      continue;
+      if (type_mismatch_allowed_tags_.count(param_name) == 0)
+      {
+        err_stream << "Invalid parameter type \""
+                   << ParameterBlockTypeName(param.Type())
+                   << "\" for parameter \"" << param_name
+                   << "\". Expecting type \""
+                   << ParameterBlockTypeName(input_param.Type()) << "\".\n"
+                   << "doc-string: " << GetParameterDocString(param_name);
+        continue;
+      }//if not mismatch allowed
     } // if type mismatch
 
     // ====================== Check constraint
@@ -279,9 +293,25 @@ void InputParameters::ConstrainParameterRange(const std::string& param_name,
 }
 
 // ##################################################################
+/**Useful for accepting varying datatypes or making a choice based
+ * upon the type of a parameter.*/
+void InputParameters::SetParameterTypeMismatchAllowed(
+  const std::string& param_name)
+{
+  ChiInvalidArgumentIf(not Has(param_name),
+                       "Parameter \"" + param_name + "\" not present.");
+  type_mismatch_allowed_tags_[param_name] = true;
+}
+
+// ##################################################################
 /**Dumps the input parameters to stdout.*/
 void InputParameters::DumpParameters() const
 {
+
+  chi::log.Log() << "DESCRIPTION_BEGIN";
+  std::cout << GetGeneralDescription() << "\n";
+  chi::log.Log() << "DESCRIPTION_END\n";
+
   const std::string sp2 = "  ";
   const std::string sp4 = "    ";
   for (const auto& param : Parameters())
@@ -319,8 +349,11 @@ void InputParameters::DumpParameters() const
                      << constraint_tags_.at(param_name)->PrintRange();
 
     if (parameter_doc_string_.count(param_name) != 0)
-      chi::log.Log() << sp4 << "DOC_STRING "
-                     << parameter_doc_string_.at(param_name);
+    {
+      chi::log.Log() << "DOC_STRING_BEGIN";
+      std::cout << parameter_doc_string_.at(param_name) << "\n";
+      chi::log.Log() << "DOC_STRING_END";
+    }
 
     chi::log.Log() << sp2 << "PARAM_END";
   }

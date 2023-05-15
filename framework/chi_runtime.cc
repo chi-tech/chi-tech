@@ -153,7 +153,11 @@ void chi::run_time::ParseArguments(int argc, char** argv)
   } // for argument
 
   if (chi::run_time::dump_registry_)
+  {
     ChiObjectMaker::GetInstance().DumpRegister();
+    chi::console.DumpRegister();
+  }
+
 }
 
 // ############################################### Initialize ChiTech

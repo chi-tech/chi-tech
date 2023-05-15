@@ -30,9 +30,12 @@ private:
   std::map<std::string, std::string> deprecation_warning_tags_;
   std::map<std::string, std::string> deprecation_error_tags_;
   std::map<std::string, std::string> renamed_error_tags_;
+  std::map<std::string, bool> type_mismatch_allowed_tags_;
 
   typedef std::unique_ptr<chi_data_types::AllowableRange> AllowableRangePtr;
   std::map<std::string, AllowableRangePtr> constraint_tags_;
+
+  std::string general_description_;
 
   /**Parameter names to ignore when trying to assign. For now this
    * "chi_obj_type"*/
@@ -54,6 +57,14 @@ public:
 public:
   void SetObjectType(const std::string& obj_type);
   std::string ObjectType() const;
+
+  void SetGeneralDescription(const std::string& desription)
+  {
+    general_description_ = desription;
+  }
+  std::string GetGeneralDescription() const { return general_description_; }
+
+  std::string GetParameterDocString(const std::string& param_name);
 
 private:
   using ParameterBlock::AddParameter;
@@ -121,10 +132,12 @@ public:
   }
 
 public:
+  /**\brief Assigns parameters with thorough type checks, deprecation checks,
+   * unused parameter checks.*/
   void AssignParameters(const ParameterBlock& params);
 
   /**Returns the raw parameter block used at assignment. This can be used
-  * to see if a user supplied an optional parameter or not.*/
+   * to see if a user supplied an optional parameter or not.*/
   const ParameterBlock& ParametersAtAssignment() const
   {
     return param_block_at_assignment_;
@@ -140,6 +153,9 @@ public:
                             const std::string& renaming_description);
   void ConstrainParameterRange(const std::string& param_name,
                                AllowableRangePtr allowable_range);
+  /**\brief Sets a tag for the given parameter that will allow its type to be
+   * mismatched upon assignment.*/
+  void SetParameterTypeMismatchAllowed(const std::string& param_name);
 
   /**Dumps the input parameters to stdout.*/
   void DumpParameters() const;

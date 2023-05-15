@@ -11,6 +11,8 @@ extern "C"
 #include "ChiParameters/parameter_block.h"
 #include "ChiParameters/input_parameters.h"
 
+#include "chi_log_exceptions.h"
+
 #include <vector>
 #include <string>
 #include <map>
@@ -64,6 +66,13 @@ class chi;
     chi_objects::ChiConsole::AddFunctionToRegistryInNamespaceWithName(         \
       function, #namespace_name, #func_name, true)
 
+#define RegisterWrapperFunction(                                               \
+  namespace_name, name_in_lua, syntax_function, actual_function)               \
+  static char ChiConsoleJoinWordsB(unique_var_name_luacfunc_##name_in_lua##_,  \
+                                   __COUNTER__) =                              \
+    chi_objects::ChiConsole::AddWrapperToRegistryInNamespaceWithName(          \
+      #namespace_name, #name_in_lua, syntax_function, actual_function)
+
 namespace chi_physics
 {
 class Solver;
@@ -77,11 +86,21 @@ namespace chi_objects
 /** Class for handling the console and scripting.*/
 class ChiConsole
 {
+public:
+  using WrapperGetInParamsFunc = chi_objects::InputParameters (*)();
+  using WrapperCallFunc =
+    chi_objects::ParameterBlock (*)(const chi_objects::InputParameters&);
+
 private:
   struct LuaFunctionRegistryEntry
   {
     lua_CFunction function_ptr;
     std::string function_raw_name;
+  };
+  struct LuaFuncWrapperRegEntry
+  {
+    WrapperGetInParamsFunc get_in_params_func = nullptr;
+    WrapperCallFunc call_func = nullptr;
   };
 
 private:
@@ -93,6 +112,8 @@ private:
   std::map<std::string, LuaFunctionRegistryEntry> lua_function_registry_;
 
   std::map<std::string, std::vector<std::string>> class_method_registry_;
+
+  std::map<std::string, LuaFuncWrapperRegEntry> function_wrapper_registry_;
 
   // 00
   ChiConsole() noexcept;
@@ -120,34 +141,63 @@ private:
                                     lua_CFunction function_ptr);
 
 public:
+  /**\brief Adds a lua_CFunction to the registry.*/
   static char
   AddFunctionToRegistryGlobalNamespace(const std::string& raw_name_in_lua,
                                        lua_CFunction function_ptr);
 
+  /**\brief Adds a lua_CFunction to the registry. With namespace-table analogy.*/
   static char
   AddFunctionToRegistryInNamespaceWithName(lua_CFunction function_ptr,
                                            const std::string& namespace_name,
                                            const std::string& function_name,
                                            bool self_callable = false);
 
+  /**\brief Adds a function wrapper to the lua registry.*/
+  static char AddWrapperToRegistryInNamespaceWithName(
+    const std::string& namespace_name,
+    const std::string& name_in_lua,
+    WrapperGetInParamsFunc syntax_function,
+    WrapperCallFunc actual_function);
+
+  /**\brief Formats a namespace structure as table.*/
   static void
   SetLuaFuncNamespaceTableStructure(const std::string& full_lua_name,
                                     lua_CFunction function_ptr);
 
+  /**\brief Formats a namespace structure as a table, but the last entry
+  * is a function call.*/
+  static void
+  SetLuaFuncWrapperNamespaceTableStructure(const std::string& full_lua_name);
+
+  /**\brief Formats a namespace structure as a table, but the last entry
+  * contains a "Create" function and a type.*/
   static void
   SetObjectNamespaceTableStructure(const std::string& full_lua_name);
 
+  /**\brief Makes sure a table structure exists for the list of table names.*/
   static void
   FleshOutLuaTableStructure(const std::vector<std::string>& table_names);
 
-  static void
-  SetObjectMethodsToTable(const std::string& class_name, size_t handle);
+  /**\brief Attaches methods to a table.*/
+  static void SetObjectMethodsToTable(const std::string& class_name,
+                                      size_t handle);
 
   // 03
+  /**\brief Flushes any commands in the command buffer.*/
   void FlushConsole();
   // 05 Memory
+  /**\brief Get current memory usage.*/
   static CSTMemory GetMemoryUsage();
+  /**\brief Get current memory usage in Megabytes.*/
   static double GetMemoryUsageInMB();
+
+  // fwrapper_call
+  /**\brief Generic entry point for wrapper calls.*/
+  static int LuaWrapperCall(lua_State* L);
+
+  /**\brief Dumps the object registry to stdout.*/
+  void DumpRegister() const;
 };
 } // namespace chi_objects
 
