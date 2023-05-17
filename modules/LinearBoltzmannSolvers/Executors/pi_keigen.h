@@ -19,7 +19,7 @@ protected:
   VecDbl& phi_old_local_;
   VecDbl& phi_new_local_;
   std::vector<LBSGroupset>& groupsets_;
-  AGSLinearSolver<Mat, Vec, KSP>& primary_ags_solver_;
+  std::shared_ptr<AGSLinearSolver<Mat, Vec, KSP>> primary_ags_solver_;
   lbs::SetSourceFunction active_set_source_function_;
   LBSGroupset& front_gs_;
   std::shared_ptr<chi_math::LinearSolver<Mat, Vec, KSP>> front_wgs_solver_;

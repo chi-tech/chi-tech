@@ -96,7 +96,6 @@ lbs_options =
 
 phys = lbs.DiscreteOrdinatesSolver.Create(lbs_block)
 chiLBSSetOptions(phys, lbs_options)
-chiSolverInitialize(phys)
 
 k_solver0 = lbs.XXNonLinearKEigen.Create
 ({
@@ -104,6 +103,7 @@ k_solver0 = lbs.XXNonLinearKEigen.Create
   nl_max_its = kes_max_iterations,
   nl_abs_tol = kes_tolerance
 })
+chiSolverInitialize(k_solver0)
 chiSolverExecute(k_solver0)
 
 --############################################### Get field functions

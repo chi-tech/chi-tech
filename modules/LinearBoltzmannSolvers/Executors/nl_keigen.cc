@@ -75,7 +75,7 @@ XXNonLinearKEigen::XXNonLinearKEigen(const chi_objects::InputParameters& params)
 
 void XXNonLinearKEigen::Initialize()
 {
-  chi::log.Log0Warning() << "XXNonLinearKEigen::Initialize is empty";
+  lbs_solver_.Initialize();
 }
 
 void XXNonLinearKEigen::Execute()

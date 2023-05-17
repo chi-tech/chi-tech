@@ -4,8 +4,6 @@
 
 #include "chi_runtime.h"
 
-#include "A_LBSSolver/IterativeMethods/ags_linear_solver.h"
-
 namespace lbs
 {
 
@@ -55,37 +53,8 @@ XXPowerIterationKEigen::XXPowerIterationKEigen(
     phi_old_local_(lbs_solver_.PhiOldLocal()),
     phi_new_local_(lbs_solver_.PhiNewLocal()),
     groupsets_(lbs_solver_.Groupsets()),
-    primary_ags_solver_(*lbs_solver_.GetPrimaryAGSSolver()),
-    active_set_source_function_(lbs_solver_.GetActiveSetSourceFunction()),
     front_gs_(groupsets_.front())
 {
-  const std::string fname = __PRETTY_FUNCTION__;
-
-  for (auto& wgs_solver : lbs_solver_.GetWGSSolvers())
-  {
-    auto context = wgs_solver->GetContext();
-    auto wgs_context =
-      std::dynamic_pointer_cast<lbs::WGSContext<Mat, Vec, KSP>>(context);
-
-    ChiLogicalErrorIf(not wgs_context, fname + ": Cast failed");
-
-    wgs_context->lhs_src_scope_ =
-      wgs_context->lhs_src_scope_ & (~APPLY_WGS_FISSION_SOURCES); // lhs_scope
-    wgs_context->rhs_src_scope_ =
-      wgs_context->rhs_src_scope_ & (~APPLY_AGS_FISSION_SOURCES); // rhs_scope
-  }
-
-  primary_ags_solver_.SetVerbosity(
-    lbs_solver_.Options().verbose_ags_iterations);
-
-  front_wgs_solver_ = lbs_solver_.GetWGSSolvers().at(front_gs_.id_);
-  front_wgs_context_ =
-    std::dynamic_pointer_cast<lbs::WGSContext<Mat, Vec, KSP>>(
-      front_wgs_solver_->GetContext());
-
-  ChiLogicalErrorIf(not front_wgs_context_, fname + ": Casting failure");
-
-  if (reinit_phi_1_) lbs_solver_.SetPhiVectorScalarValues(phi_old_local_, 1.0);
 }
 
 } // namespace lbs

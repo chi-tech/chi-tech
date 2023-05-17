@@ -102,6 +102,11 @@ lbs_options =
 phys1 = lbs.DiscreteOrdinatesSolver.Create(lbs_block)
 chiLBSSetOptions(phys1, lbs_options)
 
+ss_solver = lbs.SteadyStateSolver.Create({lbs_solver_handle = phys1})
+
+chiSolverInitialize(ss_solver)
+chiSolverExecute(ss_solver)
+
 chiLBSComputeBalance(phys1)
 
 --############################################### Get field functions

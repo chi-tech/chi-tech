@@ -16,6 +16,7 @@ public:
 
   explicit SteadyStateSolver(const chi_objects::InputParameters& params);
 
+  void Initialize() override;
   void Execute() override;
 };
 

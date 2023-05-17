@@ -108,8 +108,10 @@ chiLBSSetOptions(phys1, lbs_options)
 --############################################### Add point source
 chiLBSAddPointSource(phys1, 1.25 - 0.5*ds, 1.5*ds, 0.0, src)
 
-chiSolverInitialize(phys1)
---chiSolverExecute(phys1)
+ss_solver = lbs.SteadyStateSolver.Create({lbs_solver_handle = phys1})
+
+chiSolverInitialize(ss_solver)
+--chiSolverExecute(ss_solver)
 
 chiLBSReadFluxMoments(phys1, "Adjoint2D_3b_adjoint")
 value = chiAdjointSolverComputeInnerProduct(phys1)

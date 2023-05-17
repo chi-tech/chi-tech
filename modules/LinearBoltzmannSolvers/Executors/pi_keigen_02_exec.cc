@@ -12,10 +12,6 @@ namespace lbs
 {
 
 // ##################################################################
-/**Empty initialization function.*/
-void XXPowerIterationKEigen::Initialize() {}
-
-// ##################################################################
 /**Executes the solver.*/
 void XXPowerIterationKEigen::Execute()
 {
@@ -36,8 +32,8 @@ void XXPowerIterationKEigen::Execute()
     Scale(q_moments_local_, 1.0 / k_eff_);
 
     //================================= This solves the inners for transport
-    primary_ags_solver_.Setup();
-    primary_ags_solver_.Solve();
+    primary_ags_solver_->Setup();
+    primary_ags_solver_->Solve();
 
     //================================= Recompute k-eigenvalue
     double F_new = lbs_solver_.ComputeFissionProduction(phi_new_local_);

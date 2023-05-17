@@ -49,8 +49,8 @@ void XXPowerIterationKEigenSCDSA::Execute()
     auto Sf0_ell = CopyOnlyPhi0(front_gs_, q_moments_local_);
 
     //================================= This solves the inners for transport
-    primary_ags_solver_.Setup();
-    primary_ags_solver_.Solve();
+    primary_ags_solver_->Setup();
+    primary_ags_solver_->Solve();
 
     // lph_i = l + 1/2,i
     auto phi0_lph_i = CopyOnlyPhi0(front_gs_, phi_new_local_);

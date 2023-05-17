@@ -75,11 +75,7 @@ void LBSSweepChunk::Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
       for (int gsg = 0; gsg < gs_ss_size_; ++gsg)
         b_[gsg].assign(cell_num_nodes_, 0.0);
 
-      for (auto& callback : direction_data_callbacks_)
-        callback();
-
-      // ======================================== Gradient matrix
-      VolumetricGradientTerm();
+      ExecuteKernels(direction_data_callbacks_and_kernels_);
 
       // ======================================== Upwinding structure
       sweep_surface_status_info_.in_face_counter = 0;
@@ -122,30 +118,25 @@ void LBSSweepChunk::Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
         sweep_surface_status_info_.on_boundary = boundary;
 
         // IntSf_mu_psi_Mij_dA
-        UpwindSurfaceIntegrals(f);
+        ExecuteKernels(surface_integral_kernels_);
       } // for f
 
       // ======================================== Looping over groups,
       //                                          Assembling mass terms
       for (int gsg = 0; gsg < gs_ss_size_; ++gsg)
       {
-        const int g = gs_gi_ + gsg;
+        g_ = gs_gi_ + gsg;
+        gsg_ = gsg;
+        sigma_tg_ = sigma_t[g_];
 
-        AssembleMassTerms(g, gsg, sigma_t[g]);
+        ExecuteKernels(mass_term_kernels_);
 
         // ================================= Solve system
         chi_math::GaussElimination(Atemp_, b_[gsg], scint(cell_num_nodes_));
       }
 
-      // ======================================== Moment integrals
-      ContributeDirectionToFluxMomentIntgls();
-
-      for (auto& callback : moment_callbacks)
-        callback(this, angle_set);
-
-      // ======================================== Save angular fluxes if
-      //                                               needed
-      if (save_angular_flux_) UpdateAngularFluxes();
+      // ======================================== Flux updates
+      ExecuteKernels(flux_update_kernels_);
 
       // ======================================== Perform outgoing
       //                                               surface operations
@@ -176,11 +167,10 @@ void LBSSweepChunk::Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
         sweep_surface_status_info_.on_boundary = boundary;
         sweep_surface_status_info_.is_reflecting_bndry_ = reflecting_bndry;
 
-        OutgoingSurfaceOperations(f);
+        OutgoingSurfaceOperations();
       } // for face
 
-      for (auto& callback : post_cell_dir_sweep_callbacks_)
-        callback();
+      ExecuteKernels(post_cell_dir_sweep_callbacks_);
     }   // for n
   }     // for cell
 }

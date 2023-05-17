@@ -49,6 +49,7 @@ class LBSSweepChunk : public chi_mesh::sweep_management::SweepChunk
 {
 protected:
   typedef std::function<void()> CallbackFunction;
+
 protected:
   const chi_mesh::MeshContinuum& grid_;
   const chi_math::SpatialDiscretization& grid_fe_view_;
@@ -80,9 +81,11 @@ protected:
   size_t cell_num_faces_ = 0;
   size_t cell_num_nodes_ = 0;
   const MatVec3* G_ = nullptr;
-  const MatDbl*  M_ = nullptr;
+  const MatDbl* M_ = nullptr;
   const std::vector<MatDbl>* M_surf_ = nullptr;
   const std::vector<VecDbl>* IntS_shapeI_ = nullptr;
+
+  /**Callbacks at phase 1 : cell data established*/
   std::vector<CallbackFunction> cell_data_callbacks_;
 
   std::vector<bool> face_incident_flags_;
@@ -91,9 +94,27 @@ protected:
   chi_mesh::Vector3 omega_;
   double direction_qweight_ = 0.0;
 
-  std::vector<CallbackFunction> direction_data_callbacks_;
+  /**Callbacks at phase 2 : direction data established*/
+  std::vector<CallbackFunction> direction_data_callbacks_and_kernels_;
 
+  /**Callbacks at phase 3 : Surface integrals*/
+  std::vector<CallbackFunction> surface_integral_kernels_;
+
+  size_t g_ = 0;
+  size_t gsg_ = 0;
+  double sigma_tg_ = 0.0;
+
+  /**Callbacks at phase 4 : group by group mass terms*/
+  std::vector<CallbackFunction> mass_term_kernels_;
+
+  /**Callbacks at phase 5 : flux updates*/
+  std::vector<CallbackFunction> flux_update_kernels_;
+
+  /**Callbacks at phase 6 : Post cell-dir sweep*/
   std::vector<CallbackFunction> post_cell_dir_sweep_callbacks_;
+
+private:
+  std::map<std::string, CallbackFunction> kernels_;
 
 public:
   LBSSweepChunk(const chi_mesh::MeshContinuum& grid,
@@ -110,18 +131,20 @@ public:
 
   // 01
   void Sweep(chi_mesh::sweep_management::AngleSet* angle_set) override;
-  // 01a
-  virtual void VolumetricGradientTerm();
-  virtual void UpwindSurfaceIntegrals(size_t f);
-  virtual void AssembleMassTerms(int g,
-                                 int gsg,
-                                 double sigma_tg);
-  virtual void ContributeDirectionToFluxMomentIntgls();
 
-  virtual void UpdateAngularFluxes();
+protected:
+  // 02 operations
+  void RegisterKernel(const std::string& name, CallbackFunction function);
+  CallbackFunction Kernel(const std::string& name) const;
+  static void ExecuteKernels(const std::vector<CallbackFunction>& kernels);
+  virtual void OutgoingSurfaceOperations();
 
-  virtual void
-  OutgoingSurfaceOperations(size_t f);
+  // 03 kernels
+  void KernelFEMVolumetricGradientTerm();
+  void KernelFEMUpwindSurfaceIntegrals();
+  void KernelFEMSTDMassTerms();
+  void KernelPhiUpdate();
+  void KernelPsiUpdate();
 };
 
 } // namespace lbs

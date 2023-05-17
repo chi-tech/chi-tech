@@ -36,11 +36,17 @@ protected:
   };
   GhostInfo lbs_pwld_ghost_info_;
 
+  double diff_accel_diffusion_l_abs_tol_;
+  int diff_accel_diffusion_max_iters_;
+  bool diff_accel_diffusion_verbose_;
+  std::string diff_accel_diffusion_petsc_options_;
+
 public:
   static chi_objects::InputParameters GetInputParameters();
   explicit XXPowerIterationKEigenSCDSA(
     const chi_objects::InputParameters& params);
 
+  void Initialize() override;
   void Execute() override;
 
   std::vector<double> CopyOnlyPhi0(const LBSGroupset& groupset,

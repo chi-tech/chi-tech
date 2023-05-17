@@ -124,8 +124,10 @@ chiAdjointSolverAddResponseFunction(phys1,"QOI0",tvol0)
 chiAdjointSolverAddResponseFunction(phys1,"QOI1",tvol1)
 chiSolverSetBasicOption(phys1, "REFERENCE_RF", "QOI1")
 
-chiSolverInitialize(phys1)
---chiSolverExecute(phys1)
+ss_solver = lbs.SteadyStateSolver.Create({lbs_solver_handle = phys1})
+
+chiSolverInitialize(ss_solver)
+--chiSolverExecute(ss_solver)
 
 chiLBSReadFluxMoments(phys1, "Adjoint2D_1b_adjoint")
 value = chiAdjointSolverComputeInnerProduct(phys1)

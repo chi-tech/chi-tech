@@ -36,6 +36,11 @@ SteadyStateSolver::SteadyStateSolver(const chi_objects::InputParameters& params)
 
 }
 
+void SteadyStateSolver::Initialize()
+{
+  lbs_solver_.Initialize();
+}
+
 void SteadyStateSolver::Execute()
 {
   auto& ags_solver = *lbs_solver_.GetPrimaryAGSSolver();

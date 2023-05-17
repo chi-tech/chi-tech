@@ -69,13 +69,24 @@ SweepChunkPWLRZ::SweepChunkPWLRZ(
   normal_vector_boundary_ = chi_mesh::Vector3(0.0, 0.0, 0.0);
   normal_vector_boundary_(d) = 1;
 
+  RegisterKernel("FEMRZVolumetricGradTerm",
+    std::bind(&SweepChunkPWLRZ::KernelFEMRZVolumetricGradientTerm, this));
+  RegisterKernel("FEMRZUpwindSurfaceIntegrals",
+    std::bind(&SweepChunkPWLRZ::KernelFEMRZUpwindSurfaceIntegrals, this));
+
+  // ================================== Setup callbacks
   cell_data_callbacks_.push_back(
     std::bind(&SweepChunkPWLRZ::CellDataCallback, this));
 
-  direction_data_callbacks_.push_back(
-    std::bind(&SweepChunkPWLRZ::DirectionDataCallback, this));
-  direction_data_callbacks_.push_back(
-    std::bind(&SweepChunkPWLRZ::VolumetricGradientTermRHS, this));
+  direction_data_callbacks_and_kernels_ = {
+    std::bind(&SweepChunkPWLRZ::DirectionDataCallback, this),
+    Kernel("FEMRZVolumetricGradTerm")};
+
+  surface_integral_kernels_ = {Kernel("FEMUpwindSurfaceIntegrals")};
+
+  mass_term_kernels_ = {Kernel("FEMSSTDMassTerms")};
+
+  // flux_update_kernels_ unchanged
 
   post_cell_dir_sweep_callbacks_.push_back(
     std::bind(&SweepChunkPWLRZ::PostCellDirSweepCallback, this));
@@ -111,26 +122,31 @@ void SweepChunkPWLRZ::DirectionDataCallback()
 }
 
 // ##################################################################
+/**Applies diamond differencing on azimuthal directions.*/
+void SweepChunkPWLRZ::PostCellDirSweepCallback()
+{
+  const auto f0 = 1 / fac_diamond_difference_;
+  const auto f1 = f0 - 1;
+  for (size_t i = 0; i < cell_num_nodes_; ++i)
+  {
+    const auto ir = grid_fe_view_.MapDOFLocal(
+      *cell_, i, unknown_manager_, polar_level_, gs_gi_);
+    for (int gsg = 0; gsg < gs_ss_size_; ++gsg)
+      psi_sweep_[ir + gsg] = f0 * b_[gsg][i] - f1 * psi_sweep_[ir + gsg];
+  }
+}
+
+// ##################################################################
 /**Assembles the volumetric gradient term.*/
-void SweepChunkPWLRZ::VolumetricGradientTerm()
+void SweepChunkPWLRZ::KernelFEMRZVolumetricGradientTerm()
 {
   const auto& G = *G_;
   const auto& Maux = *Maux_;
 
   for (int i = 0; i < cell_num_nodes_; ++i)
     for (int j = 0; j < cell_num_nodes_; ++j)
-      Amat_[i][j] = omega_.Dot(G[i][j]) + fac_streaming_operator_ * Maux[i][j];
-}
-
-// ##################################################################
-/**Assembles the volumetric gradient term.*/
-void SweepChunkPWLRZ::VolumetricGradientTermRHS()
-{
-  const auto& Maux = *Maux_;
-
-  for (size_t i = 0; i < cell_num_nodes_; ++i)
-    for (size_t j = 0; j < cell_num_nodes_; ++j)
     {
+      Amat_[i][j] = omega_.Dot(G[i][j]) + fac_streaming_operator_ * Maux[i][j];
       const auto jr = grid_fe_view_.MapDOFLocal(
         *cell_, j, unknown_manager_, polar_level_, gs_gi_);
       for (int gsg = 0; gsg < gs_ss_size_; ++gsg)
@@ -141,9 +157,9 @@ void SweepChunkPWLRZ::VolumetricGradientTermRHS()
 
 // ##################################################################
 /**Performs the integral over the surface of a face.*/
-void SweepChunkPWLRZ::UpwindSurfaceIntegrals(size_t f)
+void SweepChunkPWLRZ::KernelFEMRZUpwindSurfaceIntegrals()
 {
-
+  const size_t f = sweep_surface_status_info_.f;
   if (sweep_surface_status_info_.on_boundary)
   {
     const auto& face_normal = cell_->faces_[f].normal_;
@@ -180,23 +196,6 @@ void SweepChunkPWLRZ::UpwindSurfaceIntegrals(size_t f)
         b_[gsg][i] += psi[gsg] * mu_Nij;
     } // for face node j
   }   // for face node i
-}
-
-
-
-// ##################################################################
-/**Applies diamond differencing on azimuthal directions.*/
-void SweepChunkPWLRZ::PostCellDirSweepCallback()
-{
-  const auto f0 = 1 / fac_diamond_difference_;
-  const auto f1 = f0 - 1;
-  for (size_t i = 0; i < cell_num_nodes_; ++i)
-  {
-    const auto ir = grid_fe_view_.MapDOFLocal(
-      *cell_, i, unknown_manager_, polar_level_, gs_gi_);
-    for (int gsg = 0; gsg < gs_ss_size_; ++gsg)
-      psi_sweep_[ir + gsg] = f0 * b_[gsg][i] - f1 * psi_sweep_[ir + gsg];
-  }
 }
 
 } // namespace lbs

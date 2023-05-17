@@ -47,15 +47,15 @@ public:
     int num_moments,
     int max_num_cell_dofs);
 
+protected:
+  // operations
   void CellDataCallback();
   void DirectionDataCallback();
-
-  void VolumetricGradientTerm() override;
-  void VolumetricGradientTermRHS();
-
-  virtual void UpwindSurfaceIntegrals(size_t f) override;
-
   void PostCellDirSweepCallback();
+
+  // rz kernels
+  void KernelFEMRZVolumetricGradientTerm();
+  void KernelFEMRZUpwindSurfaceIntegrals();
 };
 
 } // namespace lbs

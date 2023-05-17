@@ -40,9 +40,9 @@ lbs_options =
 phys1 = lbs.DiffusionDFEMSolver.Create(lbs_block)
 chiLBSSetOptions(phys1, lbs_options)
 
-chiSolverInitialize(phys1)
 
 k_solver0 = lbs.XXNonLinearKEigen.Create({ lbs_solver_handle = phys1, })
+chiSolverInitialize(k_solver0)
 chiSolverExecute(k_solver0)
 
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)

@@ -23,6 +23,13 @@ typedef std::vector<VecVec3> MatVec3;
 typedef std::shared_ptr<chi_physics::MultiGroupXS> XSPtr;
 typedef std::shared_ptr<chi_physics::IsotropicMultiGrpSource> IsotropicSrcPtr;
 
+enum class SolverType
+{
+  DISCRETE_ORDINATES = 1,
+  DIFFUSION_DFEM     = 2,
+  DIFFUSION_CFEM     = 3,
+};
+
 enum class GeometryType
 {
   NO_GEOMETRY_SET  = 0,

@@ -31,6 +31,33 @@ LBSSweepChunk::LBSSweepChunk(
   Atemp_.resize(max_num_cell_dofs, std::vector<double>(max_num_cell_dofs));
   b_.resize(num_groups_, std::vector<double>(max_num_cell_dofs, 0.0));
   source_.resize(max_num_cell_dofs, 0.0);
+
+  // ================================== Register kernels
+  RegisterKernel("FEMVolumetricGradTerm",
+    std::bind(&LBSSweepChunk::KernelFEMVolumetricGradientTerm, this));
+  RegisterKernel("FEMUpwindSurfaceIntegrals",
+    std::bind(&LBSSweepChunk::KernelFEMUpwindSurfaceIntegrals, this));
+  RegisterKernel("FEMSSTDMassTerms",
+    std::bind(&LBSSweepChunk::KernelFEMSTDMassTerms, this));
+  RegisterKernel("KernelPhiUpdate",
+    std::bind(&LBSSweepChunk::KernelPhiUpdate, this));
+  RegisterKernel("KernelPsiUpdate",
+    std::bind(&LBSSweepChunk::KernelPsiUpdate, this));
+
+  // ================================== Setup callbacks
+  cell_data_callbacks_ = {};
+
+  direction_data_callbacks_and_kernels_ = {
+    Kernel("FEMVolumetricGradTerm")};
+
+  surface_integral_kernels_ = {Kernel("FEMUpwindSurfaceIntegrals")};
+
+  mass_term_kernels_ = {Kernel("FEMSSTDMassTerms")};
+
+  flux_update_kernels_ = {Kernel("KernelPhiUpdate"),
+                          Kernel("KernelPsiUpdate")};
+
+  post_cell_dir_sweep_callbacks_ = {};
 }
 
 } // namespace lbs
