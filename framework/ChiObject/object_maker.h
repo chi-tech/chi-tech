@@ -37,6 +37,20 @@
     ChiObjectMaker::AddObjectToRegistryParamsOnly<object_name>(                \
       #namespace_name, #object_name)
 
+/**Macro for registering an object (parameters only) within the
+ * ObjectMaker singleton.
+ * Example:
+ * \code
+ * RegisterChiObjectParametersOnly(kaka, Zorba);
+ * \endcode
+ *
+ * \note Remember to include the header "ChiObject/object_maker.h"*/
+#define RegisterSyntaxBlock(namespace_name, block_name, syntax_function)       \
+  static char ChiObjectJoinWordsB(unique_var_name_syntax_##block_name##_,      \
+                                  __COUNTER__) =                               \
+    ChiObjectMaker::AddSyntaxBlockToRegistry(                                  \
+      #namespace_name, #block_name, syntax_function)
+
 class ChiObject;
 
 // ##################################################################
@@ -54,6 +68,7 @@ public:
   {
     ObjectGetInParamsFunc get_in_params_func = nullptr;
     ObjectConstructorFunc constructor_func = nullptr;
+    bool is_syntax_block = false;
   };
 
   ChiObjectMaker(const ChiObjectMaker&) = delete;
@@ -63,25 +78,16 @@ public:
   static ChiObjectMaker& GetInstance() noexcept;
 
   const std::map<std::string, ObjectRegistryEntry>& Registry() const;
+  bool RegistryHasKey(const std::string& key) const;
 
   template <typename T, typename base_T>
   static char AddObjectToRegistry(const std::string& namespace_name,
                                   const std::string& object_name)
   {
-    const std::string name = namespace_name + "::" + object_name;
-
     auto& object_maker = GetInstance();
 
-    // Check if the function name is already there
-    if (object_maker.object_registry_.count(name) > 0)
-    {
-      throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
-                             ": Attempted "
-                             "to register Object \"" +
-                             name +
-                             "\" but an object with the same name is"
-                             " already registered.");
-    }
+    const std::string name = namespace_name + "::" + object_name;
+    object_maker.AssertRegistryKeyAvailable(name, __PRETTY_FUNCTION__);
 
     ObjectRegistryEntry reg_entry;
     reg_entry.get_in_params_func = &CallGetInputParamsFunction<T>;
@@ -95,23 +101,30 @@ public:
   static char AddObjectToRegistryParamsOnly(const std::string& namespace_name,
                                             const std::string& object_name)
   {
-    const std::string name = namespace_name + "::" + object_name;
-
     auto& object_maker = GetInstance();
 
-    // Check if the function name is already there
-    if (object_maker.object_registry_.count(name) > 0)
-    {
-      throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
-                             ": Attempted "
-                             "to register Object \"" +
-                             name +
-                             "\" but an object with the same name is"
-                             " already registered.");
-    }
+    const std::string name = namespace_name + "::" + object_name;
+    object_maker.AssertRegistryKeyAvailable(name, __PRETTY_FUNCTION__);
 
     ObjectRegistryEntry reg_entry;
     reg_entry.get_in_params_func = &CallGetInputParamsFunction<T>;
+    object_maker.object_registry_.insert(std::make_pair(name, reg_entry));
+
+    return 0;
+  }
+
+  static char AddSyntaxBlockToRegistry(const std::string& namespace_name,
+                                       const std::string& block_name,
+                                       ObjectGetInParamsFunc syntax_function)
+  {
+    auto& object_maker = GetInstance();
+
+    const std::string name = namespace_name + "::" + block_name;
+    object_maker.AssertRegistryKeyAvailable(name, __PRETTY_FUNCTION__);
+
+    ObjectRegistryEntry reg_entry;
+    reg_entry.get_in_params_func = syntax_function;
+    reg_entry.is_syntax_block = true;
     object_maker.object_registry_.insert(std::make_pair(name, reg_entry));
 
     return 0;
@@ -149,6 +162,9 @@ private:
   {
     return std::make_shared<T>(params);
   }
+
+  void AssertRegistryKeyAvailable(const std::string& key,
+                                  const std::string& calling_function) const;
 };
 
 #endif // CHITECH_OBJECT_MAKER_H

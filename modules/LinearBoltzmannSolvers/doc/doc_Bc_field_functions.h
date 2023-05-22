@@ -1,4 +1,4 @@
-/** \page LBSFieldFunctions LBS Field Functions
+/** \page LBSFieldFunctions Field Functions
 
 LBS solvers create a number of field functions. Here is the logic for it:
 - Field functions are by default named `phi_gXXX_mYYY` where
@@ -90,4 +90,4 @@ chiLBSSetOptions(phys1,
 })
 \endcode
 
-\ingroup LuaLBS*/
+\ingroup LBSUtilities*/

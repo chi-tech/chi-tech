@@ -48,6 +48,7 @@ ParameterBlock::ParameterBlock(const ParameterBlock& other)
     value_ptr_ = std::make_unique<Varying>(*other.value_ptr_);
 
   parameters_ = other.parameters_;
+  error_origin_scope_ = other.error_origin_scope_;
 }
 
 // #################################################################
@@ -62,6 +63,7 @@ ParameterBlock& ParameterBlock::operator=(const ParameterBlock& other)
     value_ptr_ = std::make_unique<Varying>(*other.value_ptr_);
 
   parameters_ = other.parameters_;
+  error_origin_scope_ = other.error_origin_scope_;
 
   return *this;
 }
@@ -74,6 +76,7 @@ ParameterBlock::ParameterBlock(ParameterBlock&& other) noexcept
   std::swap(name_, other.name_);
   std::swap(value_ptr_, other.value_ptr_);
   std::swap(parameters_, other.parameters_);
+  std::swap(error_origin_scope_, other.error_origin_scope_);
 }
 
 // Accessors
@@ -95,14 +98,15 @@ const chi_data_types::Varying& ParameterBlock::Value() const
     case ParameterBlockType::INTEGER:
     {
       if (value_ptr_ == nullptr)
-        throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +
-                                 ": Uninitialized Varying value for block " +
-                                 this->Name());
+        throw std::runtime_error(
+          error_origin_scope_ + std::string(__PRETTY_FUNCTION__) +
+          ": Uninitialized Varying value for block " + this->Name());
       return *value_ptr_;
     }
     default:
       throw std::logic_error(
-        std::string(__PRETTY_FUNCTION__) + ":\"" + this->Name() +
+        error_origin_scope_ + std::string(__PRETTY_FUNCTION__) + ":\"" +
+        this->Name() +
         "\""
         " Called for block of type " +
         ParameterBlockTypeName(this->Type()) + " which has no value.");
@@ -138,9 +142,10 @@ void ParameterBlock::ChangeToArray()
   for (const auto& param : parameters_)
     if (param.Type() != first_param.Type())
       throw std::logic_error(
-        fname + ": Cannot change ParameterBlock to "
-                "array. It has existing parameters and they are not of the same"
-                "type.");
+        error_origin_scope_ + fname +
+        ": Cannot change ParameterBlock to "
+        "array. It has existing parameters and they are not of the same"
+        "type.");
 }
 
 // #################################################################
@@ -182,12 +187,12 @@ void ParameterBlock::AddParameter(ParameterBlock block)
 {
   for (const auto& param : parameters_)
     if (param.Name() == block.Name())
-      throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) +
-                                  ": Attempting to add duplicate parameter " +
-                                  param.Name() +
-                                  " to "
-                                  "block " +
-                                  this->Name());
+      throw std::invalid_argument(
+        error_origin_scope_ + std::string(__PRETTY_FUNCTION__) +
+        ": Attempting to add duplicate parameter " + param.Name() +
+        " to "
+        "block " +
+        this->Name());
   parameters_.push_back(std::move(block));
 
   SortParameters();
@@ -242,7 +247,8 @@ ParameterBlock& ParameterBlock::GetParam(size_t index)
   }
   catch (const std::out_of_range& oor)
   {
-    throw std::out_of_range(std::string(__PRETTY_FUNCTION__) +
+    throw std::out_of_range(error_origin_scope_ +
+                            std::string(__PRETTY_FUNCTION__) +
                             ": Parameter with index " + std::to_string(index) +
                             " not present in block");
   }
@@ -256,7 +262,8 @@ ParameterBlock::GetParam(const std::string& param_name) const
   for (const auto& param : parameters_)
     if (param.Name() == param_name) return param;
 
-  throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + ": Parameter \"" +
+  throw std::out_of_range(error_origin_scope_ +
+                          std::string(__PRETTY_FUNCTION__) + ": Parameter \"" +
                           param_name + "\" not present in block");
 }
 
@@ -270,7 +277,8 @@ const ParameterBlock& ParameterBlock::GetParam(size_t index) const
   }
   catch (const std::out_of_range& oor)
   {
-    throw std::out_of_range(std::string(__PRETTY_FUNCTION__) +
+    throw std::out_of_range(error_origin_scope_ +
+                            std::string(__PRETTY_FUNCTION__) +
                             ": Parameter with index " + std::to_string(index) +
                             " not present in block");
   }

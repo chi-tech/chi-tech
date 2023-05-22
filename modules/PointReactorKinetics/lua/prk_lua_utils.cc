@@ -91,10 +91,10 @@ int chiPRKSetParam(lua_State* L)
 // ##################################################################
 RegisterWrapperFunction(/*namespace_in_lua=*/prk,
                         /*name_in_lua=*/SetParam,
-                        /*syntax_function=*/SetParamSyntax,
+                        /*syntax_function=*/GetSyntax_SetParam,
                         /*actual_function=*/SetParam);
 
-chi_objects::InputParameters SetParamSyntax()
+chi_objects::InputParameters GetSyntax_SetParam()
 {
   chi_objects::InputParameters params;
 
@@ -162,14 +162,12 @@ chi_objects::InputParameters GetParamSyntax()
     "arg0", "Handle to a <TT>prk::TransientSolver</TT> object.");
   params.AddRequiredParameter<std::string>(
     "arg1", "Text name of the parameter to get.");
-  using namespace chi_data_types;
-  params.ConstrainParameterRange("arg1",
-                                 AllowableRangeList::New({"population_prev",
-                                                          "population_next",
-                                                          "period",
-                                                          "time_prev",
-                                                          "time_next"}));
 
+  // clang-format off
+  using namespace chi_data_types;
+  params.ConstrainParameterRange("arg1", AllowableRangeList::New({
+    "population_prev", "population_next", "period", "time_prev", "time_next"}));
+  // clang-format on
   return params;
 }
 

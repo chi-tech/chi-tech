@@ -15,7 +15,7 @@ chi_objects::InputParameters XXNonLinearKEigen::GetInputParameters()
 
   params.SetGeneralDescription(
     "\\defgroup lbs__XXNonLinearKEigen lbs.XXNonLinearKEigen \n"
-    "\\ingroup lbs__LBSSolver\n"
+    "\\ingroup LBSExecutors\n"
     "Generalized implementation of a non-linear k-Eigenvalue solver");
 
   params.ChangeExistingParamToOptional("name", "XXPowerIterationKEigen");

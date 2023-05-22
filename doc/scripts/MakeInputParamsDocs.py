@@ -35,6 +35,9 @@ for ell in range(0, len(lines)):
     if words[1] == "NOT_CONSTRUCTIBLE":
         object_dict["constructible"] = False
 
+    if words[1] == "SYNTAX_BLOCK":
+        object_dict["function_wrapper"] = False
+
     if words[1] == "OBJECT_END":
         obj_list.append(object_dict)
         object_dict = {"optional_params": [], "required_params": []}
@@ -314,27 +317,28 @@ for obj in obj_list:
             file.write("<B>Note:</B> This object is not constructable\n")
 
     if "function_wrapper" in obj:
-        file.write(textwrap.dedent('''
-            ## Function Syntax:
-            \\code
-            '''))
-        file.write(obj["name"].replace("::", ".") + "(")
-        for p in range(0, num_args):
-            type_str = "UNKNOWN_TYPE"
-            for param in obj["required_params"]:
-                if param["name"] == f"arg{p}":
-                    type_str = param["TYPE"]
-                    break
-            for param in obj["optional_params"]:
-                if param["name"] == f"arg{p}":
-                    type_str = param["TYPE"]
-                    break
+        if obj["function_wrapper"]:
+            file.write(textwrap.dedent('''
+                ## Function Syntax:
+                \\code
+                '''))
+            file.write(obj["name"].replace("::", ".") + "(")
+            for p in range(0, num_args):
+                type_str = "UNKNOWN_TYPE"
+                for param in obj["required_params"]:
+                    if param["name"] == f"arg{p}":
+                        type_str = param["TYPE"]
+                        break
+                for param in obj["optional_params"]:
+                    if param["name"] == f"arg{p}":
+                        type_str = param["TYPE"]
+                        break
 
-            file.write(f"{type_str} arg{p}")
-            if p < num_args-1:
-                file.write(", ")
-        file.write(")\n")
-        file.write("\\endcode\n")
+                file.write(f"{type_str} arg{p}")
+                if p < num_args-1:
+                    file.write(", ")
+            file.write(")\n")
+            file.write("\\endcode\n")
 
     if len(obj["required_params"]) > 0:
         file.write("## Required Input parameters\n")

@@ -8,7 +8,7 @@ namespace prk::lua_utils
 int chiPRKGetParam(lua_State* L);
 int chiPRKSetParam(lua_State* L);
 
-chi_objects::InputParameters SetParamSyntax();
+chi_objects::InputParameters GetSyntax_SetParam();
 chi_objects::ParameterBlock
 SetParam(const chi_objects::InputParameters& params);
 

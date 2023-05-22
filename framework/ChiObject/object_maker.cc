@@ -20,6 +20,13 @@ ChiObjectMaker::Registry() const
 }
 
 // ###################################################################
+/**Checks if the object registry has a specific text key.*/
+bool ChiObjectMaker::RegistryHasKey(const std::string& key) const
+{
+  return object_registry_.count(key) > 0;
+}
+
+// ###################################################################
 /**Makes an object with the given parameters and places on the global
  * object stack. Returns a handle to the object. The object type is
  * obtained from a string parameter name `chi_obj_type`.*/
@@ -113,4 +120,16 @@ void ChiObjectMaker::DumpRegister() const
     chi::log.Log() << "OBJECT_END\n\n";
   }
   chi::log.Log() << "\n\n";
+}
+
+// ##################################################################
+/**Checks that the registry key is available and throws a
+ * `std::logical_error` if it is not.*/
+void ChiObjectMaker::AssertRegistryKeyAvailable(
+  const std::string& key, const std::string& calling_function) const
+{
+  if (RegistryHasKey(key))
+    ChiLogicalError(
+      calling_function + ": Attempted to register Object \"" + key +
+      "\" but an object with the same name is already registered.");
 }

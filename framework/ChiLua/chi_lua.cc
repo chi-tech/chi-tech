@@ -6,6 +6,8 @@
 #include <sstream>
 #include <map>
 
+static int a = 15;
+
 
 /**Posts a generalized error message indicating that the
  * expected amount of arguments don't match the given amount.*/

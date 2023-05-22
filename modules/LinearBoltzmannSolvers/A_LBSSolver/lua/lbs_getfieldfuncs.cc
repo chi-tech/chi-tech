@@ -16,7 +16,7 @@ from the transport solver.
 obtained.
 
 \return Pair Table and count. Returns an array of handles and the amount of
-elements in it (indexed from 1). \ingroup LuaLBS \author Jan*/
+elements in it (indexed from 1). \ingroup LBSLuaFunctions \author Jan*/
 int chiLBSGetScalarFieldFunctionList(lua_State* L)
 {
   const std::string fname = __FUNCTION__;

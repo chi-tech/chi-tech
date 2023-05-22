@@ -45,9 +45,15 @@ namespace chi_lua
     void RecursivelyParseTableKeys(
       lua_State* L, int t, chi_objects::ParameterBlock& block);
   public:
+    /**\brief Parses a lua table into a hierarchical parameter block.*/
     static
     chi_objects::ParameterBlock ParseTable(lua_State* L, int table_stack_index);
   };
+
+  /**\brief This recursive routine operates on a parameter block and passes
+  * the parameters to the lua stack.*/
+  void PushParameterBlock(
+    lua_State* L, const chi_objects::ParameterBlock& block, int level = 0);
 }//namespace chi_lua
 
 #endif

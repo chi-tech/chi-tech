@@ -184,7 +184,8 @@ public:
   T GetValue() const
   {
     if (value_ptr_ == nullptr)
-      throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
+      throw std::logic_error(error_origin_scope_ +
+                             std::string(__PRETTY_FUNCTION__) +
                              ": Value not available for block type " +
                              ParameterBlockTypeName(Type()));
     try
@@ -209,9 +210,9 @@ public:
     }
     catch (const std::out_of_range& oor)
     {
-      throw std::out_of_range(std::string(__PRETTY_FUNCTION__) +
-                              ": Parameter \"" + param_name +
-                              "\" not present in block");
+      throw std::out_of_range(
+        error_origin_scope_ + std::string(__PRETTY_FUNCTION__) +
+        ": Parameter \"" + param_name + "\" not present in block");
     }
   }
 
@@ -221,7 +222,8 @@ public:
   std::vector<T> GetVectorValue() const
   {
     if (Type() != ParameterBlockType::ARRAY)
-      throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
+      throw std::logic_error(error_origin_scope_ +
+                             std::string(__PRETTY_FUNCTION__) +
                              ": Invalid type requested for parameter of type " +
                              ParameterBlockTypeName(Type()));
 
@@ -235,7 +237,7 @@ public:
     for (const auto& param : parameters_)
       if (param.Type() != front_param.Type())
         throw std::logic_error(
-          std::string(__PRETTY_FUNCTION__) +
+          error_origin_scope_ + std::string(__PRETTY_FUNCTION__) +
           ": Cannot construct vector from block because "
           "the sub_parameters do not all have the correct type.");
 

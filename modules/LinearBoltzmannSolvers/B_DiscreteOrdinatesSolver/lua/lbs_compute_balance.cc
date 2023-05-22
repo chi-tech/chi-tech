@@ -17,7 +17,7 @@ RegisterLuaFunctionAsIs(chiLBSComputeBalance);
 \param SolverIndex int Handle to the solver for which the list is to be
 obtained.
 
-\ingroup LuaLBS
+\ingroup LBSLuaFunctions
 \author Jan*/
 int chiLBSComputeBalance(lua_State* L)
 {

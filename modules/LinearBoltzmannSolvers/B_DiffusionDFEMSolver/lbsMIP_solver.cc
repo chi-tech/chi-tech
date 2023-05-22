@@ -17,6 +17,10 @@ chi_objects::InputParameters DiffusionDFEMSolver::GetInputParameters()
 {
   chi_objects::InputParameters params = LBSSolver::GetInputParameters();
 
+  params.SetGeneralDescription(
+    "\\defgroup lbs__DiffusionDFEMSolver DiffusionDFEMSolver\n"
+    "\\ingroup lbs__LBSSolver");
+
   params.ChangeExistingParamToOptional("name", "LBSDiffusionDFEMSolver");
 
   return params;
@@ -41,7 +45,7 @@ DiffusionDFEMSolver::~DiffusionDFEMSolver()
 /**Initializing.*/
 void DiffusionDFEMSolver::Initialize()
 {
-  options_.scattering_order = 0; //overwrite any setting otherwise
+  options_.scattering_order = 0; // overwrite any setting otherwise
   LBSSolver::Initialize();
 
   auto src_function = std::make_shared<SourceFunction>(*this);
@@ -66,7 +70,7 @@ void DiffusionDFEMSolver::InitializeWGSSolvers()
   //============================================= Initialize groupset solvers
   gs_mip_solvers_.assign(groupsets_.size(), nullptr);
   const size_t num_groupsets = groupsets_.size();
-  for (size_t gs=0; gs<num_groupsets; ++gs)
+  for (size_t gs = 0; gs < num_groupsets; ++gs)
   {
     const auto& groupset = groupsets_[gs];
 
@@ -84,22 +88,20 @@ void DiffusionDFEMSolver::InitializeWGSSolvers()
     for (auto& [bid, lbs_bndry] : sweep_boundaries_)
     {
       if (lbs_bndry->Type() == SwpBndryType::REFLECTING)
-        bcs[bid] = {BCType::ROBIN,{0.0,1.0,0.0}};
+        bcs[bid] = {BCType::ROBIN, {0.0, 1.0, 0.0}};
       else if (lbs_bndry->Type() == SwpBndryType::INCIDENT_ISOTROPIC_HOMOGENOUS)
       {
         const bool has_bndry_preference = boundary_preferences_.count(bid) > 0;
-        if (not has_bndry_preference)
-          bcs[bid] = {BCType::ROBIN,{0.25,0.5}};
+        if (not has_bndry_preference) bcs[bid] = {BCType::ROBIN, {0.25, 0.5}};
 
         const auto& bpref = boundary_preferences_.at(bid);
         const bool is_vaccuum = bpref.type == BoundaryType::VACUUM;
-        if (is_vaccuum)
-          bcs[bid] = {BCType::ROBIN,{0.25,0.5}};
+        if (is_vaccuum) bcs[bid] = {BCType::ROBIN, {0.25, 0.5}};
         else
           throw std::logic_error("Dirichlet boundary conditions not supported"
                                  "for diffusion solvers.");
       }
-    }//for sweep-boundary
+    } // for sweep-boundary
 
     //=========================================== Make xs map
     typedef lbs::acceleration::Multigroup_D_and_sigR MGXS;
@@ -108,22 +110,23 @@ void DiffusionDFEMSolver::InitializeWGSSolvers()
     for (const auto& matid_xs_pair : matid_to_xs_map_)
     {
       const auto& mat_id = matid_xs_pair.first;
-      const auto& xs     = matid_xs_pair.second;
+      const auto& xs = matid_xs_pair.second;
 
       const auto& diffusion_coeff = xs->DiffusionCoefficient();
       const auto& sigma_r = xs->SigmaRemoval();
 
-      std::vector<double> Dg  (gs_G, 0.0);
+      std::vector<double> Dg(gs_G, 0.0);
       std::vector<double> sigR(gs_G, 0.0);
 
       size_t g = 0;
-      for (size_t gprime=groupset.groups_.front().id_;
-           gprime<=groupset.groups_.back().id_; ++gprime)
+      for (size_t gprime = groupset.groups_.front().id_;
+           gprime <= groupset.groups_.back().id_;
+           ++gprime)
       {
-        Dg[g]   = diffusion_coeff[gprime];
+        Dg[g] = diffusion_coeff[gprime];
         sigR[g] = sigma_r[gprime];
         ++g;
-      }//for g
+      } // for g
 
       matid_2_mgxs_map.insert(std::make_pair(mat_id, MGXS{Dg, sigR}));
     }
@@ -131,50 +134,48 @@ void DiffusionDFEMSolver::InitializeWGSSolvers()
     //=========================================== Create solver
     const auto& sdm = *discretization_;
 
-    auto solver =
-      std::make_shared<acceleration::DiffusionMIPSolver>(
-        std::string(TextName()+"_WGSolver"),
-        sdm,
-        uk_man,
-        bcs,
-        matid_2_mgxs_map,
-        unit_cell_matrices_,
-        true); //verbosity
+    auto solver = std::make_shared<acceleration::DiffusionMIPSolver>(
+      std::string(TextName() + "_WGSolver"),
+      sdm,
+      uk_man,
+      bcs,
+      matid_2_mgxs_map,
+      unit_cell_matrices_,
+      true); // verbosity
 
-    solver->options.residual_tolerance        = groupset.wgdsa_tol_;
-    solver->options.max_iters                 = groupset.wgdsa_max_iters_;
-    solver->options.verbose                   = groupset.wgdsa_verbose_;
+    solver->options.residual_tolerance = groupset.wgdsa_tol_;
+    solver->options.max_iters = groupset.wgdsa_max_iters_;
+    solver->options.verbose = groupset.wgdsa_verbose_;
     solver->options.additional_options_string = groupset.wgdsa_string_;
 
     solver->Initialize();
 
-    std::vector<double> dummy_rhs(sdm.GetNumLocalDOFs(uk_man),0.0);
+    std::vector<double> dummy_rhs(sdm.GetNumLocalDOFs(uk_man), 0.0);
 
     solver->AssembleAand_b(dummy_rhs);
 
     gs_mip_solvers_[gs] = solver;
-  }//for groupset
+  } // for groupset
 
-  wgs_solvers_.clear(); //this is required
+  wgs_solvers_.clear(); // this is required
   for (auto& groupset : groupsets_)
   {
 
-    auto mip_wgs_context_ptr =
-      std::make_shared<MIPWGSContext2<Mat, Vec, KSP>>(
-        *this, groupset,
-        active_set_source_function_,
-        APPLY_WGS_SCATTER_SOURCES | APPLY_WGS_FISSION_SOURCES |
-          SUPPRESS_WG_SCATTER,                                    //lhs_scope
-        APPLY_FIXED_SOURCES | APPLY_AGS_SCATTER_SOURCES |
-          APPLY_AGS_FISSION_SOURCES,                             //rhs_scope
-        options_.verbose_inner_iterations);
+    auto mip_wgs_context_ptr = std::make_shared<MIPWGSContext2<Mat, Vec, KSP>>(
+      *this,
+      groupset,
+      active_set_source_function_,
+      APPLY_WGS_SCATTER_SOURCES | APPLY_WGS_FISSION_SOURCES |
+        SUPPRESS_WG_SCATTER, // lhs_scope
+      APPLY_FIXED_SOURCES | APPLY_AGS_SCATTER_SOURCES |
+        APPLY_AGS_FISSION_SOURCES, // rhs_scope
+      options_.verbose_inner_iterations);
 
     auto wgs_solver =
-      std::make_shared<WGSLinearSolver<Mat,Vec,KSP>>(mip_wgs_context_ptr);
+      std::make_shared<WGSLinearSolver<Mat, Vec, KSP>>(mip_wgs_context_ptr);
 
     wgs_solvers_.push_back(wgs_solver);
-  }//for groupset
-
+  } // for groupset
 }
 
 } // namespace lbs

@@ -1,4 +1,4 @@
-/** \page LBSBCs LBS Boundary Conditions
+/** \page LBSBCs Boundary Conditions
 
 LBS supports the boundary condition `"incident_anisotropic_heterogeneous"`,
 which allows for a very intricate type of boundary condition to be specified.
@@ -70,4 +70,4 @@ end
 An example of a very intricate use of this functionality can be seen in the
 test \ref tests_Transport_Steady_Transport2D_5PolyA_AniHeteroBndry_lua
 
-\ingroup LuaLBS */
+\ingroup LBSUtilities */

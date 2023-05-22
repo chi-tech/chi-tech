@@ -219,7 +219,7 @@ on the given platform will start to suffer. One can gain a small amount of
 parallel efficiency by lowering this limit, however, there is a point where
 the parallel efficiency will actually get worse so use with caution.
 
-\ingroup LuaLBS*/
+\ingroup LBSLuaFunctions*/
 int chiLBSSetProperty(lua_State* L)
 {
   const std::string fname = __FUNCTION__;

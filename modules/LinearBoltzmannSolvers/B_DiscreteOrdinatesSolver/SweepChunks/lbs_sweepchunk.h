@@ -10,7 +10,7 @@ namespace lbs
 {
 
 // ##################################################################
-/**Simple utility structure for controll counters and calls
+/**Simple utility structure for controlling counters and calls
  * to upstream data.*/
 struct SweepSurfaceStatusInfo
 {
@@ -56,7 +56,7 @@ protected:
   const std::vector<UnitCellMatrices>& unit_cell_matrices_;
   std::vector<lbs::CellLBSView>& grid_transport_view_;
   const std::vector<double>& q_moments_;
-  LBSGroupset& groupset_;
+  const LBSGroupset& groupset_;
   const std::map<int, XSPtr>& xs_;
   const int num_moments_;
   const size_t num_groups_;
@@ -124,7 +124,7 @@ public:
                 std::vector<double>& destination_phi,
                 std::vector<double>& destination_psi,
                 const std::vector<double>& source_moments,
-                LBSGroupset& groupset,
+                const LBSGroupset& groupset,
                 const std::map<int, XSPtr>& xs,
                 int num_moments,
                 int max_num_cell_dofs);

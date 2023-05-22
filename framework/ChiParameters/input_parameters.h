@@ -58,9 +58,9 @@ public:
   void SetObjectType(const std::string& obj_type);
   std::string ObjectType() const;
 
-  void SetGeneralDescription(const std::string& desription)
+  void SetGeneralDescription(const std::string& description)
   {
-    general_description_ = desription;
+    general_description_ = description;
   }
   std::string GetGeneralDescription() const { return general_description_; }
 
@@ -94,6 +94,10 @@ public:
     parameter_class_tags_[name] = InputParameterTag::OPTIONAL;
     parameter_doc_string_[name] = doc_string;
   }
+
+  void AddOptionalParameterArray(const std::string& name,
+                                 const std::vector<ParameterBlock>& array,
+                                 const std::string& doc_string);
 
   template <typename T>
   void AddRequiredParameter(const std::string& name,

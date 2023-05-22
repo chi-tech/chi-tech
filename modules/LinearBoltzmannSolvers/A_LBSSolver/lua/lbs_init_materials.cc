@@ -13,7 +13,7 @@ namespace lbs::common_lua_utils
  *
 \param SolverIndex int Handle to the solver maintaining the information.
 
-\ingroup LuaLBS
+\ingroup LBSLuaFunctions
 \author Jan*/
 int chiLBSInitializeMaterials(lua_State *L)
 {

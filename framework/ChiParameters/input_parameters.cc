@@ -73,6 +73,23 @@ void InputParameters::AddOptionalParameterBlock(const std::string& name,
 
 // #################################################################
 /**Specialization for block type parameters.*/
+void InputParameters::AddOptionalParameterArray(
+  const std::string& name,
+  const std::vector<ParameterBlock>& array,
+  const std::string& doc_string)
+{
+  ParameterBlock new_block(name);
+  new_block.ChangeToArray();
+  for (auto& block : array)
+    new_block.AddParameter(block);
+
+  AddParameter(new_block);
+  parameter_class_tags_[name] = InputParameterTag::OPTIONAL;
+  parameter_doc_string_[name] = doc_string;
+}
+
+// #################################################################
+/**Specialization for block type parameters.*/
 void InputParameters::AddRequiredParameterBlock(const std::string& name,
                                                 const std::string& doc_string)
 {
@@ -214,8 +231,8 @@ void InputParameters::AssignParameters(const ParameterBlock& params)
                    << ParameterBlockTypeName(input_param.Type()) << "\".\n"
                    << "doc-string: " << GetParameterDocString(param_name);
         continue;
-      }//if not mismatch allowed
-    } // if type mismatch
+      } // if not mismatch allowed
+    }   // if type mismatch
 
     // ====================== Check constraint
     if (constraint_tags_.count(input_param.Name()) != 0)

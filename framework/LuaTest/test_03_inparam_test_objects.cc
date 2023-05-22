@@ -13,7 +13,9 @@ RegisterChiObject(chi_unit_tests, TestObject);
 
 chi_objects::InputParameters TestObject::GetInputParameters()
 {
-  chi_objects::InputParameters params;
+  chi_objects::InputParameters params = ChiObject::GetInputParameters();
+
+  params.SetGeneralDescription("General test object");
 
   params.AddOptionalParameter("solver_type", "A", "The solver type.");
   params.AddRequiredParameter<std::string>(

@@ -22,6 +22,12 @@ chi_objects::InputParameters lbs::LBSGroupset::GetInputParameters()
 {
   chi_objects::InputParameters params = ChiObject::GetInputParameters();
 
+  // clang-format off
+  params.SetGeneralDescription(
+    "\\defgroup lbs__LBSGroupset Groupset Input Parameters\n"
+    "\\ingroup LuaLBSGroupsets\n"
+    "Input Parameters for groupsets.");
+
   params.AddRequiredParameterArray(
     "groups_from_to", "The first and last group id this groupset operates on."
                       " e.g. A 4 group problem <TT>groups_from_to= {0, 3}</TT>");
@@ -118,6 +124,8 @@ chi_objects::InputParameters lbs::LBSGroupset::GetInputParameters()
   //params.ConstrainParameterRange("l_max_its", AllowableRangeLowLimit::New(0));
   params.ConstrainParameterRange("gmres_restart_interval",
                                  AllowableRangeLowLimit::New(1));
+
+  // clang-format on
 
   return params;
 }

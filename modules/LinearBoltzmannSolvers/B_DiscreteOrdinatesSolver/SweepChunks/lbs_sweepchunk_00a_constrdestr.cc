@@ -11,7 +11,7 @@ LBSSweepChunk::LBSSweepChunk(
   std::vector<double>& destination_phi,
   std::vector<double>& destination_psi,
   const std::vector<double>& source_moments,
-  LBSGroupset& groupset,
+  const LBSGroupset& groupset,
   const std::map<int, XSPtr>& xs,
   int num_moments,
   int max_num_cell_dofs)

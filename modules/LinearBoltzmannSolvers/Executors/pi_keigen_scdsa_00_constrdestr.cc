@@ -18,7 +18,7 @@ chi_objects::InputParameters XXPowerIterationKEigenSCDSA::GetInputParameters()
   params.SetGeneralDescription(
     "\\defgroup lbs__XXPowerIterationKEigenSCDSA "
     "lbs.XXPowerIterationKEigenSCDSA \n"
-    "\\ingroup lbs__LBSSolver\n"
+    "\\ingroup LBSExecutors\n"
     "Generalized implementation of a k-Eigenvalue solver using Power "
     "Iteration and with SCDSA acceleration.");
 

@@ -146,7 +146,8 @@ public:
   AddFunctionToRegistryGlobalNamespace(const std::string& raw_name_in_lua,
                                        lua_CFunction function_ptr);
 
-  /**\brief Adds a lua_CFunction to the registry. With namespace-table analogy.*/
+  /**\brief Adds a lua_CFunction to the registry. With namespace-table
+   * analogy.*/
   static char
   AddFunctionToRegistryInNamespaceWithName(lua_CFunction function_ptr,
                                            const std::string& namespace_name,
@@ -158,7 +159,8 @@ public:
     const std::string& namespace_name,
     const std::string& name_in_lua,
     WrapperGetInParamsFunc syntax_function,
-    WrapperCallFunc actual_function);
+    WrapperCallFunc actual_function,
+    bool ignore_null_call_func=false);
 
   /**\brief Formats a namespace structure as table.*/
   static void
@@ -166,12 +168,12 @@ public:
                                     lua_CFunction function_ptr);
 
   /**\brief Formats a namespace structure as a table, but the last entry
-  * is a function call.*/
+   * is a function call.*/
   static void
   SetLuaFuncWrapperNamespaceTableStructure(const std::string& full_lua_name);
 
   /**\brief Formats a namespace structure as a table, but the last entry
-  * contains a "Create" function and a type.*/
+   * contains a "Create" function and a type.*/
   static void
   SetObjectNamespaceTableStructure(const std::string& full_lua_name);
 

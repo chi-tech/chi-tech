@@ -20,7 +20,7 @@ RegisterLuaFunctionAsIs(chiLBSComputeLeakage);
 
 \return The leakage on a per group basis.
 
-\ingroup LuaLBS
+\ingroup LBSLuaFunctions
 \author Jan*/
 int chiLBSComputeLeakage(lua_State* L)
 {

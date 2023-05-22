@@ -46,8 +46,14 @@ int ChiConsole::LuaWrapperCall(lua_State* L)
     else if (lua_isstring(L, p))
       main_arguments_block.AddParameter(arg_name, lua_tostring(L, p));
     else if (lua_istable(L, p))
-      main_arguments_block.AddParameter(
-        chi_lua::TableParserAsParameterBlock::ParseTable(L, p));
+    {
+      auto block = chi_lua::TableParserAsParameterBlock::ParseTable(L, p);
+      block.SetBlockName(arg_name);
+      std::string scope = fname + ":";
+      scope.append(arg_name + " ");
+      block.SetErrorOriginScope(scope);
+      main_arguments_block.AddParameter(block);
+    }
     else
       ChiInvalidArgument("In call to \"" + fname +
                          "\": Unsupported argument "
@@ -60,7 +66,10 @@ int ChiConsole::LuaWrapperCall(lua_State* L)
 
   auto output_params = reg_entry.call_func(input_params);
 
-  return 0;
+  output_params.SetErrorOriginScope(fname + ":output:");
+  chi_lua::PushParameterBlock(L, output_params);
+
+  return static_cast<int>(output_params.NumParameters());
 }
 
 } // namespace chi_objects

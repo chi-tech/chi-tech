@@ -133,7 +133,8 @@ char chi_objects::ChiConsole::AddWrapperToRegistryInNamespaceWithName(
   const std::string& namespace_name,
   const std::string& name_in_lua,
   WrapperGetInParamsFunc syntax_function,
-  WrapperCallFunc actual_function)
+  WrapperCallFunc actual_function,
+  bool ignore_null_call_func/*=false*/)
 {
   const std::string name = (namespace_name.empty())
                              ? name_in_lua
@@ -149,7 +150,8 @@ char chi_objects::ChiConsole::AddWrapperToRegistryInNamespaceWithName(
 
   ChiLogicalErrorIf(not syntax_function, "Problem with get_in_params_func");
 
-  ChiLogicalErrorIf(not actual_function, "Problem with get_in_params_func");
+  if (not ignore_null_call_func)
+    ChiLogicalErrorIf(not actual_function, "Problem with get_in_params_func");
 
   LuaFuncWrapperRegEntry reg_entry;
   reg_entry.get_in_params_func = syntax_function;
@@ -361,6 +363,9 @@ void chi_objects::ChiConsole::DumpRegister() const
     }
 
     chi::log.Log() << "LUA_FUNCWRAPPER_BEGIN " << key;
+
+    if (not entry.call_func)
+      chi::log.Log() << "SYNTAX_BLOCK";
 
     const auto in_params = entry.get_in_params_func();
     in_params.DumpParameters();
