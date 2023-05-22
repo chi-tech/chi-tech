@@ -12,9 +12,11 @@ std::string SteppingMethodStringName(SteppingMethod method)
 {
   switch (method)
   {
+    case SteppingMethod::NONE: return "none";
     case SteppingMethod::EXPLICIT_EULER: return "explicit_euler";
     case SteppingMethod::IMPLICIT_EULER: return "implicit_euler";
     case SteppingMethod::CRANK_NICOLSON: return "crank_nicholson";
+    case SteppingMethod::THETA_SCHEME: return "theta_scheme";
     default:
       throw std::logic_error(__PRETTY_FUNCTION__);
   }
