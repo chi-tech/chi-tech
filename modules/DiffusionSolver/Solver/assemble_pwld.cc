@@ -65,7 +65,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
 
     if (face.has_neighbor_)
     {
-      const auto& adj_cell = grid_->cells[face.neighbor_id_];
+      const auto& adj_cell = grid_ptr_->cells[face.neighbor_id_];
       const auto& adj_fe_intgrl_values = pwl_sdm->GetUnitIntegrals(adj_cell);
 
 

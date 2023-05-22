@@ -69,7 +69,7 @@ FieldFunction::FieldFunction(std::string text_name,
   const size_t num_local_dofs = sdm_->GetNumLocalDOFs(unknown_manager_);
   field_vector_.assign(num_local_dofs, 0.0);
 
-  const auto& grid = *sdm_ptr->ref_grid_;
+  const auto& grid = sdm_ptr->ref_grid_;
   for (const auto& cell : grid.local_cells)
   {
     const size_t num_nodes = sdm_->GetCellNumNodes(cell);

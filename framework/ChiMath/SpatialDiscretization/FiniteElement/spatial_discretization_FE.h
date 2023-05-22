@@ -40,7 +40,7 @@ namespace chi_math
 
   protected:
     explicit
-    SpatialDiscretization_FE(chi_mesh::MeshContinuumPtr& in_grid,
+    SpatialDiscretization_FE(const chi_mesh::MeshContinuum& in_grid,
                              CoordinateSystemType in_cs_type =
                              CoordinateSystemType::CARTESIAN,
                              SDMType in_type =

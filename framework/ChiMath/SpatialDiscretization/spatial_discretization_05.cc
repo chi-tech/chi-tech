@@ -45,7 +45,7 @@ std::vector<std::vector<std::vector<int>>> chi_math::SpatialDiscretization::
   typedef std::vector<FaceAdjMapping> PerFaceAdjMapping;
   typedef std::vector<PerFaceAdjMapping> CellAdjMapping;
 
-  const auto& grid = *this->ref_grid_;
+  const auto& grid = this->ref_grid_;
 
   CellAdjMapping cell_adj_mapping;
   for (const auto& cell : grid.local_cells)
@@ -138,7 +138,7 @@ void chi_math::SpatialDiscretization::
 
     const size_t num_comps = ukA.num_components_;
 
-    for (const auto& cell : ref_grid_->local_cells)
+    for (const auto& cell : ref_grid_.local_cells)
     {
       const auto& cell_mapping = this->GetCellMapping(cell);
       const size_t num_nodes = cell_mapping.NumNodes();

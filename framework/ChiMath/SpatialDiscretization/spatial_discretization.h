@@ -20,7 +20,7 @@ namespace chi_math
   public:
     const SpatialDiscretizationType type_;
 
-    const chi_mesh::MeshContinuumConstPtr ref_grid_;
+    const chi_mesh::MeshContinuum& ref_grid_;
     const CoordinateSystemType coord_sys_type_;
 
     const UnknownManager UNITARY_UNKNOWN_MANAGER;
@@ -40,7 +40,7 @@ namespace chi_math
     typedef SpatialDiscretizationType SDMType;
     //00
     explicit
-    SpatialDiscretization(chi_mesh::MeshContinuumPtr& in_grid,
+    SpatialDiscretization(const chi_mesh::MeshContinuum& in_grid,
                           CoordinateSystemType in_cs_type,
                           SDMType in_type = SDMType::UNDEFINED) :
         type_(in_type),

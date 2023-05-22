@@ -13,13 +13,13 @@
 chi_math::PolyhedronMappingFE_PWL::
   PolyhedronMappingFE_PWL(
     const chi_mesh::Cell& polyh_cell,
-    const chi_mesh::MeshContinuumConstPtr& ref_grid,
+    const chi_mesh::MeshContinuum& ref_grid,
     const chi_math::QuadratureTetrahedron& volume_quadrature,
     const chi_math::QuadratureTriangle&    surface_quadrature):
     CellMappingFE_PWL(ref_grid,
                     polyh_cell,
                     polyh_cell.vertex_ids_.size(), //num_nodes
-                    GetVertexLocations(*ref_grid, polyh_cell),
+                    GetVertexLocations(ref_grid, polyh_cell),
                     MakeFaceNodeMapping(polyh_cell)),
     volume_quadrature_(volume_quadrature),
     surface_quadrature_(surface_quadrature)
@@ -58,9 +58,9 @@ chi_math::PolyhedronMappingFE_PWL::
       side_data.v_index[0] = v0index;
       side_data.v_index[1] = v1index;
 
-      const auto& v0 = grid_ptr_->vertices[v0index];
+      const auto& v0 = ref_grid_.vertices[v0index];
       const auto& v1 = vfc;
-      const auto& v2 = grid_ptr_->vertices[v1index];
+      const auto& v2 = ref_grid_.vertices[v1index];
       const auto& v3 = vcc;
 
       side_data.v0 = v0;

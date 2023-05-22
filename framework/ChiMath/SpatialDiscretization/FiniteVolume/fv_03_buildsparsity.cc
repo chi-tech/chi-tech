@@ -16,7 +16,7 @@ void chi_math::SpatialDiscretization_FV::BuildSparsityPattern(
   nodal_nnz_in_diag.clear();
   nodal_nnz_off_diag.clear();
 
-  const size_t num_local_cells = ref_grid_->local_cells.size();
+  const size_t num_local_cells = ref_grid_.local_cells.size();
 
   nodal_nnz_in_diag.resize(num_local_cells*N,0.0);
   nodal_nnz_off_diag.resize(num_local_cells*N,0.0);
@@ -26,7 +26,7 @@ void chi_math::SpatialDiscretization_FV::BuildSparsityPattern(
     const unsigned int num_comps = unknown_manager.unknowns_[uk].num_components_;
     for (int comp=0; comp<num_comps; ++comp)
     {
-      for (auto& cell : ref_grid_->local_cells)
+      for (auto& cell : ref_grid_.local_cells)
       {
         const int64_t i = MapDOFLocal(cell,0,unknown_manager,uk,comp);
 
@@ -36,7 +36,7 @@ void chi_math::SpatialDiscretization_FV::BuildSparsityPattern(
         {
           if (not face.has_neighbor_) continue;
 
-          if (face.IsNeighborLocal(*ref_grid_))
+          if (face.IsNeighborLocal(ref_grid_))
             nodal_nnz_in_diag[i] += 1;
           else
             nodal_nnz_off_diag[i] += 1;

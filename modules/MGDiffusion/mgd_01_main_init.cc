@@ -95,7 +95,7 @@ void mg_diffusion::Solver::Initialize()
   mg_diffusion::Solver::Set_BCs(globl_unique_bndry_ids);
   
   //============================================= Make SDM
-  sdm_ptr_ = chi_math::SpatialDiscretization_PWLC::New(grid_ptr_);
+  sdm_ptr_ = chi_math::SpatialDiscretization_PWLC::New(*grid_ptr_);
   const auto& sdm = *sdm_ptr_;
  
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;

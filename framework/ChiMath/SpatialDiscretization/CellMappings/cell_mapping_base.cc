@@ -7,17 +7,16 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 chi_math::CellMapping::
-  CellMapping(chi_mesh::MeshContinuumConstPtr   in_grid,
+  CellMapping(const chi_mesh::MeshContinuum& in_grid,
               const chi_mesh::Cell& in_cell,
               size_t in_num_nodes,
               std::vector<std::vector<int>> in_face_node_mappings,
-              const VandAFunction& volume_area_function) :
-    grid_ptr_(std::move(in_grid)),
+              const VandAFunction& volume_area_function) : ref_grid_(in_grid),
     cell_(in_cell),
     num_nodes_(in_num_nodes),
     face_node_mappings_(std::move(in_face_node_mappings))
 {
-  volume_area_function(*grid_ptr_, in_cell, volume_, areas_);
+  volume_area_function(ref_grid_, in_cell, volume_, areas_);
 }
 
 void chi_math::CellMapping::ComputeCellVolumeAndAreas(

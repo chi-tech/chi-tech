@@ -34,17 +34,17 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
   if (fem_method == "PWLC")
   {
     if (!suppress_assembly)
-      for (auto& cell : grid_->local_cells)
+      for (auto& cell : grid_ptr_->local_cells)
         CFEM_Assemble_A_and_b(cell, gi_);
     else {}
   }
   else if (fem_method == "PWLD_MIP")
   {
     if (!suppress_assembly)
-      for (auto& cell : grid_->local_cells)
+      for (auto& cell : grid_ptr_->local_cells)
         PWLD_Assemble_A_and_b(cell, gi_);
     else
-      for (auto& cell : grid_->local_cells)
+      for (auto& cell : grid_ptr_->local_cells)
         PWLD_Assemble_b(cell, gi_);
   }
   else

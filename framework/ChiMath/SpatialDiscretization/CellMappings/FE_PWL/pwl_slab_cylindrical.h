@@ -15,7 +15,7 @@ namespace chi_math
   public:
     SlabMappingFE_PWL_Cylindrical(
       const chi_mesh::Cell& slab_cell,
-      const chi_mesh::MeshContinuumConstPtr& ref_grid,
+      const chi_mesh::MeshContinuum& ref_grid,
       const QuadratureLine& volume_quadrature) :
         SlabMappingFE_PWL(slab_cell, ref_grid, volume_quadrature)
     {}

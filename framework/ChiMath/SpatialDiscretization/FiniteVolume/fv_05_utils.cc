@@ -15,7 +15,7 @@ size_t chi_math::SpatialDiscretization_FV::
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
-  return ref_grid_->local_cells.size() * N;
+  return ref_grid_.local_cells.size() * N;
 }
 
 //###################################################################
@@ -25,7 +25,7 @@ size_t chi_math::SpatialDiscretization_FV::
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
-  const int num_globl_cells = ref_grid_->GetGlobalNumberOfCells();
+  const int num_globl_cells = ref_grid_.GetGlobalNumberOfCells();
 
   return num_globl_cells*N;
 }
@@ -37,7 +37,7 @@ size_t chi_math::SpatialDiscretization_FV::
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
-  return ref_grid_->cells.GetNumGhosts() * N;
+  return ref_grid_.cells.GetNumGhosts() * N;
 }
 
 //###################################################################
@@ -48,13 +48,13 @@ std::vector<int64_t> chi_math::SpatialDiscretization_FV::
   std::vector<int64_t> dof_ids;
   dof_ids.reserve(GetNumGhostDOFs(unknown_manager));
 
-  std::vector<uint64_t> ghost_cell_ids = ref_grid_->cells.GetGhostGlobalIDs();
+  std::vector<uint64_t> ghost_cell_ids = ref_grid_.cells.GetGhostGlobalIDs();
 
   const size_t num_uks = unknown_manager.unknowns_.size();
 
   for (const auto cell_id : ghost_cell_ids)
   {
-    const auto& cell = ref_grid_->cells[cell_id];
+    const auto& cell = ref_grid_.cells[cell_id];
     for (size_t u=0; u<num_uks; ++u)
     {
       const auto& unkn = unknown_manager.unknowns_[u];

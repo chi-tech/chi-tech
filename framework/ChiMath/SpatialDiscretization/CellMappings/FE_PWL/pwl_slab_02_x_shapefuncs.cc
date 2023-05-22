@@ -5,8 +5,8 @@
 double chi_math::SlabMappingFE_PWL::
   ShapeValue(const int i, const chi_mesh::Vector3& xyz) const
 {
-  const auto& p0 = grid_ptr_->vertices[v0i_];
-  const auto& p1 = grid_ptr_->vertices[v1i_];
+  const auto& p0 = ref_grid_.vertices[v0i_];
+  const auto& p1 = ref_grid_.vertices[v1i_];
   chi_mesh::Vector3 xyz_ref = xyz - p0;
 
   chi_mesh::Vector3 v01 = p1 - p0;
@@ -32,8 +32,8 @@ void chi_math::SlabMappingFE_PWL::
               std::vector<double>& shape_values) const
 {
   shape_values.resize(num_nodes_, 0.0);
-  const auto& p0 = grid_ptr_->vertices[v0i_];
-  const auto& p1 = grid_ptr_->vertices[v1i_];
+  const auto& p0 = ref_grid_.vertices[v0i_];
+  const auto& p1 = ref_grid_.vertices[v1i_];
   chi_mesh::Vector3 xyz_ref = xyz - p0;
 
   chi_mesh::Vector3 v01 = p1 - p0;

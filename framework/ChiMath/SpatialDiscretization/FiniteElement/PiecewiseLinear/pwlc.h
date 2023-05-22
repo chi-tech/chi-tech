@@ -20,7 +20,7 @@ namespace chi_math
   private:
     //00
     explicit
-    SpatialDiscretization_PWLC(chi_mesh::MeshContinuumPtr& in_grid,
+    SpatialDiscretization_PWLC(const chi_mesh::MeshContinuum& in_grid,
                                finite_element::SetupFlags setup_flags,
                                QuadratureOrder qorder,
                                CoordinateSystemType in_cs_type);
@@ -29,7 +29,7 @@ namespace chi_math
     //prevent anything else other than a shared pointer
     static
     std::shared_ptr<SpatialDiscretization_PWLC>
-    New(chi_mesh::MeshContinuumPtr& in_grid,
+    New(const chi_mesh::MeshContinuum& in_grid,
         finite_element::SetupFlags setup_flags = finite_element::NO_FLAGS_SET,
         QuadratureOrder qorder = QuadratureOrder::SECOND,
         CoordinateSystemType in_cs_type = CoordinateSystemType::CARTESIAN);
