@@ -37,6 +37,7 @@ function: chiUnpartitionedMeshFromVTU
 function: chiUnpartitionedMeshFromEnsightGold
 function: chiUnpartitionedMeshFromWavefrontOBJ
 function: chiUnpartitionedMeshFromMshFormat
+function: chiUnpartitionedMeshFromExodusII
 module_end
 
 module: Manual Unpartitioned Mesh
@@ -131,7 +132,7 @@ function: chiPhysicsTransportXSGet
 function: chiPhysicsTransportXSExportToChiTechFormat
 module_end
 
-print: ## Modules
+print: \section MainPage2 Modules
 include: modules/mainpage_quickref.txt
 
 module: Test scripts

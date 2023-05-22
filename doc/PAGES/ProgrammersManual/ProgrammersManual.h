@@ -6,6 +6,7 @@
 -# \subpage DevManCodeConventions \n
 -# \subpage DevManGlobalVars \n
 -# \subpage DevManAddingLua \n
+-# \subpage DevManStaticRegistration \n
 
 ##--
 

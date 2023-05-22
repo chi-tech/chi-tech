@@ -29,9 +29,7 @@ public:
   std::shared_ptr<SpatialDiscretization_FV>
   New(const chi_mesh::MeshContinuum& in_grid,
       CoordinateSystemType in_cs_type =
-      CoordinateSystemType::CARTESIAN)
-  { return std::shared_ptr<SpatialDiscretization_FV>(
-    new SpatialDiscretization_FV(in_grid, in_cs_type));}
+      CoordinateSystemType::CARTESIAN);
 
   //01
   void CreateCellMappings();
@@ -81,11 +79,6 @@ public:
 
     return node_locations;
   }
-
-  void LocalizePETScVector(Vec petsc_vector,
-                           std::vector<double>& local_vector,
-                           const UnknownManager& unknown_manager)
-                           const override;
 };
 
 }//namespace chi_math

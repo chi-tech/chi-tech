@@ -30,13 +30,18 @@ private:
   std::map<std::string, std::string> deprecation_warning_tags_;
   std::map<std::string, std::string> deprecation_error_tags_;
   std::map<std::string, std::string> renamed_error_tags_;
+  std::map<std::string, bool> type_mismatch_allowed_tags_;
 
   typedef std::unique_ptr<chi_data_types::AllowableRange> AllowableRangePtr;
   std::map<std::string, AllowableRangePtr> constraint_tags_;
 
+  std::string general_description_;
+
   /**Parameter names to ignore when trying to assign. For now this
-  * "chi_obj_type"*/
+   * "chi_obj_type"*/
   static const std::vector<std::string> system_ignored_param_names_;
+
+  ParameterBlock param_block_at_assignment_;
 
 public:
   InputParameters() = default;
@@ -53,9 +58,17 @@ public:
   void SetObjectType(const std::string& obj_type);
   std::string ObjectType() const;
 
+  void SetGeneralDescription(const std::string& description)
+  {
+    general_description_ = description;
+  }
+  std::string GetGeneralDescription() const { return general_description_; }
+
+  std::string GetParameterDocString(const std::string& param_name);
+
 private:
   using ParameterBlock::AddParameter;
-  static bool IsParameterIgnored(const std::string& param_name) ;
+  static bool IsParameterIgnored(const std::string& param_name);
 
 public:
   template <typename T>
@@ -81,6 +94,10 @@ public:
     parameter_class_tags_[name] = InputParameterTag::OPTIONAL;
     parameter_doc_string_[name] = doc_string;
   }
+
+  void AddOptionalParameterArray(const std::string& name,
+                                 const std::vector<ParameterBlock>& array,
+                                 const std::string& doc_string);
 
   template <typename T>
   void AddRequiredParameter(const std::string& name,
@@ -119,7 +136,16 @@ public:
   }
 
 public:
+  /**\brief Assigns parameters with thorough type checks, deprecation checks,
+   * unused parameter checks.*/
   void AssignParameters(const ParameterBlock& params);
+
+  /**Returns the raw parameter block used at assignment. This can be used
+   * to see if a user supplied an optional parameter or not.*/
+  const ParameterBlock& ParametersAtAssignment() const
+  {
+    return param_block_at_assignment_;
+  }
 
   void
   MarkParamaterDeprecatedWarning(const std::string& param_name,
@@ -131,6 +157,9 @@ public:
                             const std::string& renaming_description);
   void ConstrainParameterRange(const std::string& param_name,
                                AllowableRangePtr allowable_range);
+  /**\brief Sets a tag for the given parameter that will allow its type to be
+   * mismatched upon assignment.*/
+  void SetParameterTypeMismatchAllowed(const std::string& param_name);
 
   /**Dumps the input parameters to stdout.*/
   void DumpParameters() const;

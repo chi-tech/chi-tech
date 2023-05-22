@@ -8,7 +8,7 @@
 #include "ChiMath/SpatialDiscretization/FiniteVolume/fv.h"
 #include "ChiMath/PETScUtils/petsc_utils.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 
 #include "ChiMath/VectorGhostCommunicator/vector_ghost_communicator.h"
 
@@ -141,7 +141,7 @@ int chiSimTest02_FV(lua_State*)
   chi::log.Log() << "Done cleanup";
 
   //============================================= Create Field Function
-  auto ff = std::make_shared<chi_physics::FieldFunction>(
+  auto ff = std::make_shared<chi_physics::FieldFunctionGridBased>(
     "Phi",
     sdm_ptr,
     chi_math::Unknown(chi_math::UnknownType::SCALAR)
@@ -149,7 +149,7 @@ int chiSimTest02_FV(lua_State*)
 
   ff->UpdateFieldVector(field);
 
-  chi_physics::FieldFunction::ExportMultipleToVTK("CodeTut2_FV", {ff});
+  chi_physics::FieldFunctionGridBased::ExportMultipleToVTK("CodeTut2_FV", {ff});
 
   //============================================= Make ghosted vectors
   std::vector<int64_t> ghost_ids = sdm.GetGhostDOFIndices(OneDofPerNode);
@@ -215,7 +215,7 @@ int chiSimTest02_FV(lua_State*)
   }//for cell
 
   //============================================= Create Field Function
-  auto ff_grad = std::make_shared<chi_physics::FieldFunction>(
+  auto ff_grad = std::make_shared<chi_physics::FieldFunctionGridBased>(
     "GradPhi",
     sdm_ptr,
     chi_math::Unknown(chi_math::UnknownType::VECTOR_3)
@@ -223,7 +223,7 @@ int chiSimTest02_FV(lua_State*)
 
   ff_grad->UpdateFieldVector(grad_phi);
 
-  chi_physics::FieldFunction::ExportMultipleToVTK("CodeTut2_FV_grad", {ff_grad});
+  chi_physics::FieldFunctionGridBased::ExportMultipleToVTK("CodeTut2_FV_grad", {ff_grad});
 
   return 0;
 }

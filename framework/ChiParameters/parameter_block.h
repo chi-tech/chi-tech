@@ -42,6 +42,7 @@ private:
   std::string name_;
   std::unique_ptr<chi_data_types::Varying> value_ptr_ = nullptr;
   std::vector<ParameterBlock> parameters_;
+  std::string error_origin_scope_ = "Unknown Scope";
 
 public:
   /**Sets the name of the block.*/
@@ -114,13 +115,37 @@ public:
 
   // Accessors
   ParameterBlockType Type() const;
+  std::string TypeName() const;
   std::string Name() const;
   const chi_data_types::Varying& Value() const;
   size_t NumParameters() const;
   const std::vector<ParameterBlock>& Parameters() const;
 
   // Mutators
+  /**Changes the block type to array, making it accessible via integer
+   * keys.*/
   void ChangeToArray();
+
+  /**Sets a string to be displayed alongside exceptions that give some
+   * notion of the origin of the error.*/
+  void SetErrorOriginScope(const std::string& scope);
+
+  /**Gets a string that allows error messages to print the scope of an
+   * error.*/
+  std::string GetErrorOriginScope() const { return error_origin_scope_; }
+
+  // Requirements
+  /**Checks that the block is of the given type. If it is not it
+   * will throw an exception `std::logic_error`.*/
+  void RequireBlockTypeIs(ParameterBlockType type) const;
+  void RequireParameterBlockTypeIs(const std::string& param_name,
+                                   ParameterBlockType type) const
+  {
+    GetParam(param_name).RequireBlockTypeIs(type);
+  }
+  /**Check that the parameter with the given name exists otherwise
+   * throws a `std::logic_error`.*/
+  void RequireParameter(const std::string& param_name) const;
 
 public:
   // utilities
@@ -159,10 +184,19 @@ public:
   T GetValue() const
   {
     if (value_ptr_ == nullptr)
-      throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
+      throw std::logic_error(error_origin_scope_ +
+                             std::string(__PRETTY_FUNCTION__) +
                              ": Value not available for block type " +
                              ParameterBlockTypeName(Type()));
-    return Value().GetValue<T>();
+    try
+    {
+      return Value().GetValue<T>();
+    }
+    catch (const std::exception& exc)
+    {
+      throw std::logic_error(error_origin_scope_ + ":" + Name() + " " +
+                             exc.what());
+    }
   }
 
   /**Fetches the parameter with the given name and returns it value.*/
@@ -176,9 +210,9 @@ public:
     }
     catch (const std::out_of_range& oor)
     {
-      throw std::out_of_range(std::string(__PRETTY_FUNCTION__) +
-                              ": Parameter \"" + param_name +
-                              "\" not present in block");
+      throw std::out_of_range(
+        error_origin_scope_ + std::string(__PRETTY_FUNCTION__) +
+        ": Parameter \"" + param_name + "\" not present in block");
     }
   }
 
@@ -188,7 +222,8 @@ public:
   std::vector<T> GetVectorValue() const
   {
     if (Type() != ParameterBlockType::ARRAY)
-      throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
+      throw std::logic_error(error_origin_scope_ +
+                             std::string(__PRETTY_FUNCTION__) +
                              ": Invalid type requested for parameter of type " +
                              ParameterBlockTypeName(Type()));
 
@@ -202,7 +237,7 @@ public:
     for (const auto& param : parameters_)
       if (param.Type() != front_param.Type())
         throw std::logic_error(
-          std::string(__PRETTY_FUNCTION__) +
+          error_origin_scope_ + std::string(__PRETTY_FUNCTION__) +
           ": Cannot construct vector from block because "
           "the sub_parameters do not all have the correct type.");
 

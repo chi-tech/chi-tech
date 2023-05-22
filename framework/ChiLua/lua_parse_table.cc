@@ -1,43 +1,45 @@
 #include "chi_lua.h"
 
 #include "chi_runtime.h"
+#include "chi_log_exceptions.h"
 
 #include "ChiDataTypes/chi_data_types.h"
 #include "ChiParameters/parameter_block.h"
 
-#define ExceptionLuaNilValue \
-throw std::logic_error(std::string(__PRETTY_FUNCTION__) + \
-": Encountered nil value assigned to key " + key_str_name)
+#define ExceptionLuaNilValue                                                   \
+  throw std::logic_error(std::string(__PRETTY_FUNCTION__) +                    \
+                         ": Encountered nil value assigned to key " +          \
+                         key_str_name)
 
-#define ExceptionLuaUnsupportedValue \
-throw std::logic_error(std::string(__PRETTY_FUNCTION__) + \
-": Encountered unsupported value type " + lua_typename(L, lua_type(L, -2)) + \
-" for key " + key_str_name)
+#define ExceptionLuaUnsupportedValue                                           \
+  throw std::logic_error(std::string(__PRETTY_FUNCTION__) +                    \
+                         ": Encountered unsupported value type " +             \
+                         lua_typename(L, lua_type(L, -2)) + " for key " +      \
+                         key_str_name)
 
-#define ExceptionMixStringNumberKeys \
-throw std::logic_error(std::string(__PRETTY_FUNCTION__) + \
-": Encountered mixed key types (string and number)")
+#define ExceptionMixStringNumberKeys                                           \
+  throw std::logic_error(std::string(__PRETTY_FUNCTION__) +                    \
+                         ": Encountered mixed key types (string and number)")
 
 namespace chi_lua
 {
 
 typedef chi_objects::ParameterBlock ParamBlock;
 
-
-//###################################################################
-// NOLINTBEGIN(misc-no-recursion)
+// ###################################################################
+//  NOLINTBEGIN(misc-no-recursion)
 /**This function recursively processes table values. If the value is
  * a primitive type the recursion stops and the parameter block, which is
  * currently active, will be extended with a parameter of this primitive
  * type. If the value is another table, a new `Block`-type will be instantiated
  * and the table recursion will then operate on this new block.*/
-void TableParserAsParameterBlock::
-  RecursivelyParseTableValues(
-    lua_State* L, ParamBlock &block, const std::string& key_str_name)
+void TableParserAsParameterBlock::RecursivelyParseTableValues(
+  lua_State* L, ParamBlock& block, const std::string& key_str_name)
 {
   switch (lua_type(L, -1))
   {
-    case LUA_TNIL:     ExceptionLuaNilValue;
+    case LUA_TNIL:
+      ExceptionLuaNilValue;
     case LUA_TBOOLEAN:
     {
       const bool bool_value = lua_toboolean(L, -1);
@@ -72,27 +74,26 @@ void TableParserAsParameterBlock::
       block.AddParameter(new_block);
       break;
     }
-    default:           ExceptionLuaUnsupportedValue;
-  }//switch on value types
+    default:
+      ExceptionLuaUnsupportedValue;
+  } // switch on value types
 }
 // NOLINTEND(misc-no-recursion)
 
-
-//###################################################################
-// NOLINTBEGIN(misc-no-recursion)
+// ###################################################################
+//  NOLINTBEGIN(misc-no-recursion)
 /**This function operates on table keys recursively. It has a specific
  * behavior if it detects an array.*/
-void TableParserAsParameterBlock::
-  RecursivelyParseTableKeys(
-    lua_State* L, int t, chi_objects::ParameterBlock& block)
+void TableParserAsParameterBlock::RecursivelyParseTableKeys(
+  lua_State* L, int t, chi_objects::ParameterBlock& block)
 {
   bool number_key_encountered = false;
   bool string_key_encountered = false;
 
   int key_number_index = 0;
 
-  lua_pushnil(L); //first key
-  while (lua_next(L, t) != 0) //pops the key, pushes next key and value
+  lua_pushnil(L);             // first key
+  while (lua_next(L, t) != 0) // pops the key, pushes next key and value
   {
     if (lua_type(L, -2) == LUA_TSTRING)
     {
@@ -101,7 +102,7 @@ void TableParserAsParameterBlock::
       string_key_encountered = true;
       const std::string key_str_name = lua_tostring(L, -2);
       RecursivelyParseTableValues(L, block, key_str_name);
-    }//if key is string
+    } // if key is string
 
     // If the key is a number then the following apply:
     // - This must be an array of items
@@ -124,7 +125,7 @@ void TableParserAsParameterBlock::
 }
 // NOLINTEND(misc-no-recursion)
 
-//###################################################################
+// ###################################################################
 /**This is the root command for parsing a table as a parameter block.
  * Example table:
 \code
@@ -150,8 +151,8 @@ block =
 
 chiUnitTests_Test_paramblock(--[[verbose=]]true, block)
 \endcode*/
-chi_objects::ParameterBlock TableParserAsParameterBlock::
-  ParseTable(lua_State* L, int table_stack_index)
+chi_objects::ParameterBlock
+TableParserAsParameterBlock::ParseTable(lua_State* L, int table_stack_index)
 {
   ParamBlock param_block;
 
@@ -160,4 +161,60 @@ chi_objects::ParameterBlock TableParserAsParameterBlock::
   return param_block;
 }
 
-}//namespace chi_lua
+// ###################################################################
+//  NOLINTBEGIN(misc-no-recursion)
+/**If the `level` parameter is left as default then the zeroth level of
+ * the parameter block will have its individual parameters exported as single
+ * values, otherwise the block is exported as a table.*/
+void PushParameterBlock(lua_State* L,
+                        const chi_objects::ParameterBlock& block,
+                        int level /*=0*/)
+{
+  using namespace chi_objects;
+
+  switch (block.Type())
+  {
+    case ParameterBlockType::BOOLEAN:
+      lua_pushboolean(L, block.GetValue<bool>());
+      break;
+    case ParameterBlockType::FLOAT:
+      lua_pushnumber(L, block.GetValue<double>());
+      break;
+    case ParameterBlockType::STRING:
+      lua_pushstring(L, block.GetValue<std::string>().c_str());
+      break;
+    case ParameterBlockType::INTEGER:
+      lua_pushinteger(L, block.GetValue<lua_Integer>());
+      break;
+    case ParameterBlockType::ARRAY:
+    {
+      if (level > 0) lua_newtable(L);
+      const size_t num_params = block.NumParameters();
+      for (size_t k = 0; k < num_params; ++k)
+      {
+        if (level > 0) lua_pushinteger(L, static_cast<lua_Integer>(k) + 1);
+        PushParameterBlock(L, block.GetParam(k), level + 1);
+        if (level > 0) lua_settable(L, -3);
+      }
+      break;
+    }
+    case ParameterBlockType::BLOCK:
+    {
+      if (level > 0) lua_newtable(L);
+      const size_t num_params = block.NumParameters();
+      for (size_t k = 0; k < num_params; ++k)
+      {
+        const auto& param = block.GetParam(k);
+        if (level > 0) lua_pushstring(L, param.Name().c_str());
+        PushParameterBlock(L, block.GetParam(k), level + 1);
+        if (level > 0) lua_settable(L, -3);
+      }
+      break;
+    }
+    default:
+      ChiLogicalError("Attempting to push unsupport ParameterBlockType to lua");
+  }
+}
+//  NOLINTEND(misc-no-recursion)
+
+} // namespace chi_lua

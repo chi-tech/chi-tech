@@ -1,4 +1,4 @@
-module: Diffusion
+submodule: Diffusion
 function: chiDiffusionCreateSolver
 function: chiDiffusionInitialize
 function: chiDiffusionExecute

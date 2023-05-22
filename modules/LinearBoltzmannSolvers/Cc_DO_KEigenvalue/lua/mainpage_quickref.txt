@@ -1,5 +1,0 @@
-module: LinearBoltzmann - KEigenvalueSolver
-print: \ref LBSDOKeigen Documentation page
-function: chiLBKESCreateSolver
-function: chiLBKESSetProperty
-module_end

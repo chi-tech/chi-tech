@@ -71,7 +71,7 @@ int chiCreateProductQuadrature(lua_State *L)
 
     chi::angular_quadrature_stack.push_back(new_quad);
     const size_t index = chi::angular_quadrature_stack.size() - 1;
-    lua_pushnumber(L,static_cast<lua_Number>(index));
+    lua_pushinteger(L,static_cast<lua_Integer>(index));
 
     if (verbose)
     {
@@ -102,7 +102,7 @@ int chiCreateProductQuadrature(lua_State *L)
 
     chi::angular_quadrature_stack.push_back(new_quad);
     const size_t index = chi::angular_quadrature_stack.size() - 1;
-    lua_pushnumber(L,static_cast<lua_Number>(index));
+    lua_pushinteger(L,static_cast<lua_Integer>(index));
 
     if (verbose)
     {
@@ -133,7 +133,7 @@ int chiCreateProductQuadrature(lua_State *L)
 
     chi::angular_quadrature_stack.push_back(new_quad);
     const size_t index = chi::angular_quadrature_stack.size() - 1;
-    lua_pushnumber(L,static_cast<lua_Number>(index));
+    lua_pushinteger(L,static_cast<lua_Integer>(index));
 
     if (verbose)
     {
@@ -215,7 +215,7 @@ int chiCreateProductQuadrature(lua_State *L)
 
     chi::angular_quadrature_stack.push_back(new_quad);
     const size_t index = chi::angular_quadrature_stack.size() - 1;
-    lua_pushnumber(L,static_cast<lua_Number>(index));
+    lua_pushinteger(L,static_cast<lua_Integer>(index));
 
     if (verbose)
     {

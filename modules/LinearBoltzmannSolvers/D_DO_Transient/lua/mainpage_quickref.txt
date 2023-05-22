@@ -1,4 +1,4 @@
-module: LBS Transient SteadyStateSolver
+submodule: LBS Transient SteadyStateSolver
 function: chiLBSCreateTransientSolver
 function: chiLBTSSetProperty
 function: chiLBTSGetProperty

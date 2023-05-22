@@ -78,7 +78,7 @@ unsigned int chi_math::UnknownManager::
   if (unknown_id < 0 or unknown_id >= unknowns_.size())
   {
     log.LogAllError()
-      << "UnknownManager failed call to MapUnknown";
+      << "UnknownManager failed call to MapUnknown " << unknown_id;
    chi::Exit(EXIT_FAILURE);
   }
   return unknowns_[unknown_id].GetMap(component);

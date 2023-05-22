@@ -15,7 +15,7 @@ namespace chi_math
   {
   protected:
     std::map<uint64_t, int64_t> node_mapping_;
-    std::map<uint64_t, int64_t> m_ghost_node_mapping_;
+    std::map<uint64_t, int64_t> ghost_node_mapping_;
 
   private:
     //00

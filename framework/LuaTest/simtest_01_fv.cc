@@ -8,7 +8,7 @@
 #include "ChiMath/SpatialDiscretization/FiniteVolume/fv.h"
 #include "ChiMath/PETScUtils/petsc_utils.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 
 namespace chi_unit_sim_tests
 {
@@ -139,7 +139,7 @@ int chiSimTest01_FV(lua_State*)
   chi::log.Log() << "Done cleanup";
 
   //============================================= Create Field Function
-  auto ff = std::make_shared<chi_physics::FieldFunction>(
+  auto ff = std::make_shared<chi_physics::FieldFunctionGridBased>(
     "Phi",
     sdm_ptr,
     chi_math::Unknown(chi_math::UnknownType::SCALAR)
@@ -147,7 +147,7 @@ int chiSimTest01_FV(lua_State*)
 
   ff->UpdateFieldVector(field);
 
-  chi_physics::FieldFunction::ExportMultipleToVTK("CodeTut1_FV", {ff});
+  chi_physics::FieldFunctionGridBased::ExportMultipleToVTK("CodeTut1_FV", {ff});
 
   return 0;
 }

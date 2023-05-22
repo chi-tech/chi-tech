@@ -1100,5 +1100,8 @@ void chi_physics::SingleStateMGXS::
             "The estimated fission neutron yield must be either zero "
             "or in the range (1.0, 10.0).");
     }
+
+    ChiLogicalErrorIf(sigma_f_.empty(), "After reading xs, a fissionable "
+                                        "material's sigma_f is not defined");
   }//if fissionable
 }

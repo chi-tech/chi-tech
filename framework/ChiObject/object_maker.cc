@@ -20,11 +20,18 @@ ChiObjectMaker::Registry() const
 }
 
 // ###################################################################
+/**Checks if the object registry has a specific text key.*/
+bool ChiObjectMaker::RegistryHasKey(const std::string& key) const
+{
+  return object_registry_.count(key) > 0;
+}
+
+// ###################################################################
 /**Makes an object with the given parameters and places on the global
  * object stack. Returns a handle to the object. The object type is
  * obtained from a string parameter name `chi_obj_type`.*/
-size_t
-ChiObjectMaker::MakeObject(const chi_objects::ParameterBlock& params) const
+size_t ChiObjectMaker::MakeRegisteredObject(
+  const chi_objects::ParameterBlock& params) const
 {
   if (chi::log.GetVerbosity() >= 2)
     chi::log.Log() << "Making object with type from parameters";
@@ -39,15 +46,14 @@ ChiObjectMaker::MakeObject(const chi_objects::ParameterBlock& params) const
 
   const auto type = params.GetParamValue<std::string>("chi_obj_type");
 
-  return MakeObjectType(type, params);
+  return MakeRegisteredObjectOfType(type, params);
 }
 
 // ###################################################################
 /**Makes an object with the given parameters and places on the global
  * object stack. Returns a handle to the object.*/
-size_t
-ChiObjectMaker::MakeObjectType(const std::string& type,
-                               const chi_objects::ParameterBlock& params) const
+size_t ChiObjectMaker::MakeRegisteredObjectOfType(
+  const std::string& type, const chi_objects::ParameterBlock& params) const
 {
   if (chi::log.GetVerbosity() >= 2)
     chi::log.Log() << "Making object with specified type";
@@ -63,6 +69,10 @@ ChiObjectMaker::MakeObjectType(const std::string& type,
 
   auto object_entry = object_registry_.at(type);
 
+  ChiLogicalErrorIf(not object_entry.constructor_func,
+                    "Object is not constructable since it has no registered "
+                    "constructor");
+
   auto input_params = object_entry.get_in_params_func();
 
   input_params.SetObjectType(type);
@@ -77,10 +87,7 @@ ChiObjectMaker::MakeObjectType(const std::string& type,
 
   auto new_object = object_entry.constructor_func(input_params);
 
-  chi::object_stack.push_back(new_object);
-
-  new_object->SetStackID(chi::object_stack.size() - 1);
-  new_object->SetParamBlockUsedAtConstruction(params);
+  new_object->PushOntoStack(new_object);
 
   if (chi::log.GetVerbosity() >= 2)
     chi::log.Log() << "Done making object type " << type << " with handle "
@@ -104,10 +111,25 @@ void ChiObjectMaker::DumpRegister() const
 
     chi::log.Log() << "OBJECT_BEGIN " << key;
 
+    if (entry.constructor_func == nullptr)
+      chi::log.Log() << "NOT_CONSTRUCTIBLE";
+
     const auto in_params = entry.get_in_params_func();
     in_params.DumpParameters();
 
     chi::log.Log() << "OBJECT_END\n\n";
   }
   chi::log.Log() << "\n\n";
+}
+
+// ##################################################################
+/**Checks that the registry key is available and throws a
+ * `std::logical_error` if it is not.*/
+void ChiObjectMaker::AssertRegistryKeyAvailable(
+  const std::string& key, const std::string& calling_function) const
+{
+  if (RegistryHasKey(key))
+    ChiLogicalError(
+      calling_function + ": Attempted to register Object \"" + key +
+      "\" but an object with the same name is already registered.");
 }

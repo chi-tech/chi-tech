@@ -16,8 +16,8 @@ namespace chi_physics
     CHI_XSFILE   = 23
   };
 
-  class FieldFunction;
-  class FieldFunction;
+  class FieldFunctionGridBased;
+  class FieldFunctionGridBased;
   class Solver;
 
   //03 Utils

@@ -1,4 +1,7 @@
-cd ../
+cd generated_files/
+rm -rf *
+
+cd ../../
 
 ./bin/ChiTech --suppress_color --dump-object-registry -v 2 > doc/generated_files/test.txt
 

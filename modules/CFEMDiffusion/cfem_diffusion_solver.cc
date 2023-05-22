@@ -9,7 +9,7 @@
 
 #include "cfem_diffusion_bndry.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 
@@ -157,7 +157,7 @@ void cfem_diffusion::Solver::Initialize()
 
     using namespace chi_math;
     auto initial_field_function =
-      std::make_shared<chi_physics::FieldFunction>(
+      std::make_shared<chi_physics::FieldFunctionGridBased>(
           text_name,                     //Text name
           sdm_ptr_,                      //Spatial Discretization
           Unknown(UnknownType::SCALAR)); //Unknown/Variable

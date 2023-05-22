@@ -20,6 +20,26 @@ void chi_math::PETScUtils::CopyVecToSTLvector(
 }
 
 //###################################################################
+/**Copies a PETSc vector to a STL vector. Only the local portion is
+ * copied.*/
+void chi_math::PETScUtils::CopyVecToSTLvectorWithGhosts(
+  Vec x, std::vector<double>& data, size_t N)
+{
+  data.clear();
+  data.resize(N,0.0);
+
+  auto info = GetGhostVectorLocalViewRead(x);
+  const double* x_ref = info.x_localized_raw;
+  //VecGetArrayRead(x,&x_ref);
+
+  for (size_t i=0; i<N; ++i)
+    data[i] = x_ref[i];
+
+  //VecRestoreArrayRead(x,&x_ref);
+  RestoreGhostVectorLocalViewRead(x, info);
+}
+
+//###################################################################
 /**Copies global values from a PETSc vector to a STL vector.*/
 void chi_math::PETScUtils::CopyGlobalVecToSTLvector(
   Vec x,

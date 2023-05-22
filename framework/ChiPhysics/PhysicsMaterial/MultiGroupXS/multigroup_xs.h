@@ -68,6 +68,8 @@ public:
 
   virtual const std::vector<double>& DiffusionCoefficient() const = 0;
 
+  virtual std::vector<double> SigmaTransport() const = 0;
+
   virtual const std::vector<double>& SigmaRemoval() const = 0;
 
   virtual const std::vector<double>& SigmaSGtoG() const = 0;

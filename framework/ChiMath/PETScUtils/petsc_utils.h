@@ -27,7 +27,7 @@ namespace chi_math::PETScUtils
 
   Vec CreateVectorWithGhosts(int64_t local_size, int64_t global_size,
                              int64_t nghosts,
-                             std::vector<int64_t>& ghost_indices);
+                             const std::vector<int64_t>& ghost_indices);
 
   //02
   Mat CreateSquareMatrix(int64_t local_size, int64_t global_size);
@@ -63,6 +63,7 @@ namespace chi_math::PETScUtils
 
   //04
   void CopyVecToSTLvector(Vec x, std::vector<double>& data, size_t N);
+  void CopyVecToSTLvectorWithGhosts(Vec x, std::vector<double>& data, size_t N);
 
   void CopyGlobalVecToSTLvector(
     Vec x,
@@ -75,8 +76,8 @@ namespace chi_math::PETScUtils
    * localized views.*/
   struct GhostVecLocalRaw
   {
-    Vec     x_localized;
-    double* x_localized_raw;
+    Vec     x_localized = nullptr;
+    double* x_localized_raw = nullptr;
 
     /**Returns a copy of the value at the specified index.*/
     double operator[](int index)

@@ -1,33 +1,7 @@
 #include "A_LBSSolver/lbs_solver.h"
 
-#define DISCRETIZATION_METHOD 1
-  #define PWLD   3
-
-#define BOUNDARY_CONDITION 3
-  #define XMAX 31
-  #define XMIN 32
-  #define YMAX 33
-  #define YMIN 34
-  #define ZMAX 35
-  #define ZMIN 36
-
-#define SCATTERING_ORDER 4
-
-#define SWEEP_EAGER_LIMIT 5
-
-#define READ_RESTART_DATA 6
-
-#define WRITE_RESTART_DATA 7
-
-#define SAVE_ANGULAR_FLUX 8
-
-#define USE_SOURCE_MOMENTS 9
-
-#define VERBOSE_INNER_ITERATIONS 10
-
-#define VERBOSE_OUTER_ITERATIONS 11
-
-#define USE_PRECURSORS 12
+#define scpcode static_cast<PropertyCode>
+#define scint static_cast<int>
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -35,8 +9,29 @@
 namespace lbs::common_lua_utils
 {
 
+enum class PropertyCode : int
+{
+  DISCRETIZATION_METHOD = 1,
+  PWLD = 3,
+  BOUNDARY_CONDITION = 3,
+  XMAX = 31,
+  XMIN = 32,
+  YMAX = 33,
+  YMIN = 34,
+  ZMAX = 35,
+  ZMIN = 36,
+  SCATTERING_ORDER = 4,
+  SWEEP_EAGER_LIMIT = 5,
+  READ_RESTART_DATA = 6,
+  WRITE_RESTART_DATA = 7,
+  SAVE_ANGULAR_FLUX = 8,
+  USE_SOURCE_MOMENTS = 9,
+  VERBOSE_INNER_ITERATIONS = 10,
+  VERBOSE_OUTER_ITERATIONS = 11,
+  USE_PRECURSORS = 12,
+};
 
-//###################################################################
+// ###################################################################
 /**Set LBS property.
 \param SolverIndex int Handle to the solver for which the set is to be created.
 \param PropertyIndex int Code for a specific property.
@@ -224,59 +219,59 @@ on the given platform will start to suffer. One can gain a small amount of
 parallel efficiency by lowering this limit, however, there is a point where
 the parallel efficiency will actually get worse so use with caution.
 
-\ingroup LuaLBS*/
-int chiLBSSetProperty(lua_State *L)
+\ingroup LBSLuaFunctions*/
+int chiLBSSetProperty(lua_State* L)
 {
-  const std::string fname = "chiLBSSetProperty";
+  const std::string fname = __FUNCTION__;
+
+  chi::log.Log0Warning()
+    << fname + " has been deprecated. Use chiLBSSetOptions instead.";
+
   const int numArgs = lua_gettop(L);
-  if (numArgs < 2)
-    LuaPostArgAmountError(fname, 2, numArgs);
+  if (numArgs < 2) LuaPostArgAmountError(fname, 2, numArgs);
 
   LuaCheckNilValue(fname, L, 1);
 
   //============================================= Get pointer to solver
   const int solver_handle = lua_tonumber(L, 1);
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
-                                                       solver_handle,
-                                                       fname);
+  auto& lbs_solver =
+    chi::GetStackItem<lbs::LBSSolver>(chi::object_stack, solver_handle, fname);
 
   //============================================= Get property index
   LuaCheckNilValue(fname, L, 2);
 
-  const int property = lua_tonumber(L,2);
-
+  const int property = lua_tonumber(L, 2);
 
   //============================================= Handle properties
-  if (property == DISCRETIZATION_METHOD)
+  if (scpcode(property) == PropertyCode::DISCRETIZATION_METHOD)
   {
     LuaCheckNilValue(fname, L, 3);
 
-    const int method = lua_tonumber(L,3);
+    const int method = lua_tonumber(L, 3);
 
     typedef chi_math::SpatialDiscretizationType SDMType;
 
-    if (method == PWLD)
+    if (scpcode(method) == PropertyCode::PWLD)
       lbs_solver.Options().sd_type = SDMType::PIECEWISE_LINEAR_DISCONTINUOUS;
     else
       throw std::invalid_argument(
         "Invalid option for Discretization method in chiLBSSetProperty.\n");
   }
-  else if (property == BOUNDARY_CONDITION)
+  else if (scpcode(property) == PropertyCode::BOUNDARY_CONDITION)
   {
-    if (numArgs<4)
-      LuaPostArgAmountError("chiLBSSetProperty",4,numArgs);
+    if (numArgs < 4) LuaPostArgAmountError("chiLBSSetProperty", 4, numArgs);
 
     LuaCheckNilValue(fname, L, 3);
     LuaCheckNilValue(fname, L, 4);
 
-    const int bident = lua_tonumber(L,3);
-    const int btype  = lua_tonumber(L,4);
+    const int bident = lua_tonumber(L, 3);
+    const int btype = lua_tonumber(L, 4);
 
-    if (!((bident>=XMAX) && (bident<=ZMIN)))
+    if (!((bident >= scint(PropertyCode::XMAX)) &&
+          (bident <= scint(PropertyCode::ZMIN))))
     {
-      chi::log.LogAllError()
-        << "Unknown boundary identifier encountered "
-           "in call to chiLBSSetProperty";
+      chi::log.LogAllError() << "Unknown boundary identifier encountered "
+                                "in call to chiLBSSetProperty";
       chi::Exit(EXIT_FAILURE);
     }
 
@@ -289,8 +284,7 @@ int chiLBSSetProperty(lua_State *L)
     }
     else if (btype == (int)lbs::BoundaryType::INCIDENT_ISOTROPIC)
     {
-      if (numArgs!=5)
-        LuaPostArgAmountError("chiLBSSetProperty",5,numArgs);
+      if (numArgs != 5) LuaPostArgAmountError("chiLBSSetProperty", 5, numArgs);
 
       if (lbs_solver.Groups().empty())
       {
@@ -302,7 +296,7 @@ int chiLBSSetProperty(lua_State *L)
         chi::Exit(EXIT_FAILURE);
       }
 
-      if (!lua_istable(L,5))
+      if (!lua_istable(L, 5))
       {
         chi::log.LogAllError()
           << "In call to chiLBSSetProperty, setting "
@@ -312,14 +306,14 @@ int chiLBSSetProperty(lua_State *L)
         chi::Exit(EXIT_FAILURE);
       }
 
-      const size_t table_len = lua_rawlen(L,5);
+      const size_t table_len = lua_rawlen(L, 5);
       std::vector<double> group_strength(table_len, 0.0);
-      for (int g=0; g<table_len; g++)
+      for (int g = 0; g < table_len; g++)
       {
-        lua_pushnumber(L,g+1);
-        lua_gettable(L,5);
+        lua_pushnumber(L, g + 1);
+        lua_gettable(L, 5);
         group_strength[g] = lua_tonumber(L, -1);
-        lua_pop(L,1);
+        lua_pop(L, 1);
       }
 
       if (table_len != lbs_solver.Groups().size())
@@ -327,18 +321,17 @@ int chiLBSSetProperty(lua_State *L)
         chi::log.Log0Error()
           << "In call to chiLBSSetProperty, setting "
           << "incident isotropic flux boundary type: "
-          << "Number of groups in boundary flux specification is "
-          << table_len << " but solver has a total of "
-          << lbs_solver.Groups().size() << " groups. These two must be equal.";
+          << "Number of groups in boundary flux specification is " << table_len
+          << " but solver has a total of " << lbs_solver.Groups().size()
+          << " groups. These two must be equal.";
         chi::Exit(EXIT_FAILURE);
       }
 
-      lbs_solver.BoundaryPreferences()[bid] =
-        {lbs::BoundaryType::INCIDENT_ISOTROPIC, group_strength};
+      lbs_solver.BoundaryPreferences()[bid] = {
+        lbs::BoundaryType::INCIDENT_ISOTROPIC, group_strength};
 
-      chi::log.Log()
-        << "Isotropic boundary condition for boundary " << bid
-        << " loaded with " << table_len << " groups.";
+      chi::log.Log() << "Isotropic boundary condition for boundary " << bid
+                     << " loaded with " << table_len << " groups.";
     }
     else if (btype == (int)lbs::BoundaryType::REFLECTING)
     {
@@ -350,55 +343,55 @@ int chiLBSSetProperty(lua_State *L)
       LuaCheckNilValue(fname, L, 5);
 
       const std::string lua_func_name = lua_tostring(L, 5);
-      lbs_solver.BoundaryPreferences()[bid] =
-        {lbs::BoundaryType::INCIDENT_ANISTROPIC_HETEROGENEOUS,{},lua_func_name};
-      chi::log.Log() << "Boundary " << bid << " set to Incident anistoropic"
-                                              " heterogeneous.";
+      lbs_solver.BoundaryPreferences()[bid] = {
+        lbs::BoundaryType::INCIDENT_ANISTROPIC_HETEROGENEOUS,
+        {},
+        lua_func_name};
+      chi::log.Log() << "Boundary " << bid
+                     << " set to Incident anistoropic"
+                        " heterogeneous.";
     }
     else
     {
-      chi::log.LogAllError()
-        << "Unsupported boundary type encountered "
-           "in call to " << LuaSourceInfo(L,"chiLBSSetProperty");
+      chi::log.LogAllError() << "Unsupported boundary type encountered "
+                                "in call to "
+                             << LuaSourceInfo(L, "chiLBSSetProperty");
       chi::Exit(EXIT_FAILURE);
     }
-
   }
-  else if (property == SCATTERING_ORDER)
+  else if (scpcode(property) == PropertyCode::SCATTERING_ORDER)
   {
     LuaCheckNilValue(fname, L, 3);
 
-    const int scattering_order = lua_tonumber(L,3);
+    const int scattering_order = lua_tonumber(L, 3);
 
-    if (scattering_order<0)
+    if (scattering_order < 0)
     {
-      chi::log.Log0Error()
-        << "Invalid scattering order in call to "
-        << "chiLBSSetProperty:SCATTERING_ORDER. "
-           "Value must be > 0.";
+      chi::log.Log0Error() << "Invalid scattering order in call to "
+                           << "chiLBSSetProperty:SCATTERING_ORDER. "
+                              "Value must be > 0.";
       chi::Exit(EXIT_FAILURE);
     }
 
     lbs_solver.Options().scattering_order = scattering_order;
   }
-  else if (property == SWEEP_EAGER_LIMIT)
+  else if (scpcode(property) == PropertyCode::SWEEP_EAGER_LIMIT)
   {
-    if (numArgs!=3)
-      LuaPostArgAmountError("chiLBSSetProperty:SWEEP_EAGER_LIMIT",
-                            3,numArgs);
+    if (numArgs != 3)
+      LuaPostArgAmountError("chiLBSSetProperty:SWEEP_EAGER_LIMIT", 3, numArgs);
 
     LuaCheckNilValue(fname, L, 3);
 
-    const int limit = lua_tonumber(L,3);
+    const int limit = lua_tonumber(L, 3);
     lbs_solver.Options().sweep_eager_limit = limit;
   }
-  else if (property == READ_RESTART_DATA)
+  else if (scpcode(property) == PropertyCode::READ_RESTART_DATA)
   {
     if (numArgs >= 3)
     {
       LuaCheckNilValue(fname, L, 3);
 
-      const std::string folder = lua_tostring(L,3);
+      const std::string folder = lua_tostring(L, 3);
       lbs_solver.Options().read_restart_folder_name = std::string(folder);
       chi::log.Log() << "Restart input folder set to " << folder;
     }
@@ -406,19 +399,19 @@ int chiLBSSetProperty(lua_State *L)
     {
       LuaCheckNilValue(fname, L, 4);
 
-      const std::string filebase = lua_tostring(L,4);
+      const std::string filebase = lua_tostring(L, 4);
       lbs_solver.Options().read_restart_file_base = std::string(filebase);
       chi::log.Log() << "Restart input filebase set to " << filebase;
     }
     lbs_solver.Options().read_restart_data = true;
   }
-  else if (property == WRITE_RESTART_DATA)
+  else if (scpcode(property) == PropertyCode::WRITE_RESTART_DATA)
   {
     if (numArgs >= 3)
     {
       LuaCheckNilValue(fname, L, 3);
 
-      const std::string folder = lua_tostring(L,3);
+      const std::string folder = lua_tostring(L, 3);
       lbs_solver.Options().write_restart_folder_name = std::string(folder);
       chi::log.Log() << "Restart output folder set to " << folder;
     }
@@ -426,7 +419,7 @@ int chiLBSSetProperty(lua_State *L)
     {
       LuaCheckNilValue(fname, L, 4);
 
-      const std::string filebase = lua_tostring(L,4);
+      const std::string filebase = lua_tostring(L, 4);
       lbs_solver.Options().write_restart_file_base = std::string(filebase);
       chi::log.Log() << "Restart output filebase set to " << filebase;
     }
@@ -434,12 +427,12 @@ int chiLBSSetProperty(lua_State *L)
     {
       LuaCheckNilValue(fname, L, 5);
 
-      const double interval = lua_tonumber(L,5);
+      const double interval = lua_tonumber(L, 5);
       lbs_solver.Options().write_restart_interval = interval;
     }
     lbs_solver.Options().write_restart_data = true;
   }
-  else if (property == SAVE_ANGULAR_FLUX)
+  else if (scpcode(property) == PropertyCode::SAVE_ANGULAR_FLUX)
   {
     LuaCheckNilValue(fname, L, 3);
 
@@ -449,7 +442,7 @@ int chiLBSSetProperty(lua_State *L)
 
     chi::log.Log() << "LBS option to save angular flux set to " << save_flag;
   }
-  else if (property == USE_SOURCE_MOMENTS)
+  else if (scpcode(property) == PropertyCode::USE_SOURCE_MOMENTS)
   {
     LuaCheckNilValue(fname, L, 3);
 
@@ -459,7 +452,7 @@ int chiLBSSetProperty(lua_State *L)
 
     chi::log.Log() << "LBS option to use source moments set to " << use_flag;
   }
-  else if (property == VERBOSE_INNER_ITERATIONS)
+  else if (scpcode(property) == PropertyCode::VERBOSE_INNER_ITERATIONS)
   {
     LuaCheckNilValue(fname, L, 3);
 
@@ -469,7 +462,7 @@ int chiLBSSetProperty(lua_State *L)
 
     chi::log.Log() << "LBS option: verbose_inner_iterations set to " << flag;
   }
-  else if (property == VERBOSE_OUTER_ITERATIONS)
+  else if (scpcode(property) == PropertyCode::VERBOSE_OUTER_ITERATIONS)
   {
     LuaCheckNilValue(fname, L, 3);
 
@@ -479,7 +472,7 @@ int chiLBSSetProperty(lua_State *L)
 
     chi::log.Log() << "LBS option: verbose_outer_iterations set to " << flag;
   }
-  else if (property == USE_PRECURSORS)
+  else if (scpcode(property) == PropertyCode::USE_PRECURSORS)
   {
     LuaCheckNilValue(fname, L, 3);
 
@@ -490,9 +483,10 @@ int chiLBSSetProperty(lua_State *L)
     chi::log.Log() << "LBS option: use_precursors set to " << flag;
   }
   else
-    throw std::logic_error(fname+": Invalid property in chiLBSSetProperty.\n");
+    throw std::logic_error(fname +
+                           ": Invalid property in chiLBSSetProperty.\n");
 
   return 0;
 }
 
-}//namespace lbs::common_lua_utils
+} // namespace lbs::common_lua_utils

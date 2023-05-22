@@ -66,7 +66,7 @@ return x;
 Vec chi_math::PETScUtils::
 CreateVectorWithGhosts(int64_t local_size, int64_t global_size,
                        int64_t nghosts,
-                       std::vector<int64_t>& ghost_indices)
+                       const std::vector<int64_t>& ghost_indices)
 {
   Vec x;
   VecCreateGhost(PETSC_COMM_WORLD,

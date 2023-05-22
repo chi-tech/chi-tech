@@ -1,6 +1,6 @@
 #include "diffusion_solver.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
@@ -77,7 +77,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
 
     using namespace chi_math;
     auto initial_field_function =
-      std::make_shared<chi_physics::FieldFunction>(
+      std::make_shared<chi_physics::FieldFunctionGridBased>(
         text_name,                     //Text name
         sdm_ptr,                       //Spatial Discretization
         Unknown(UnknownType::SCALAR)); //Unknown/Variable

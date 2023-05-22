@@ -16,6 +16,9 @@ public:
   static chi_objects::InputParameters GetInputParameters();
   explicit FunctionDimAToDimB(const chi_objects::InputParameters& params);
 
+  size_t InputDimension() const {return input_dimension_;}
+  size_t OutputDimension() const {return output_dimension_;}
+
   virtual std::vector<double>
   Evaluate(const std::vector<double>& vals) const = 0;
 };

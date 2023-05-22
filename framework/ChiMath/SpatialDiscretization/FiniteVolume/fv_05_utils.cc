@@ -69,17 +69,3 @@ std::vector<int64_t> chi_math::SpatialDiscretization_FV::
 
   return dof_ids;
 }
-
-//###################################################################
-/**Develops a localized view of a petsc vector.*/
-void chi_math::SpatialDiscretization_FV::
-  LocalizePETScVector(Vec petsc_vector,
-                      std::vector<double>& local_vector,
-                      const chi_math::UnknownManager& unknown_manager) const
-{
-  size_t num_local_dofs = GetNumLocalDOFs(unknown_manager);
-
-  chi_math::PETScUtils::CopyVecToSTLvector(petsc_vector,
-                                           local_vector,
-                                           num_local_dofs);
-}

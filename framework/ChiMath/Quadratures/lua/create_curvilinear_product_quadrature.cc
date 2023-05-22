@@ -106,8 +106,8 @@ int chiCreateCylindricalProductQuadrature(lua_State *L)
         std::make_shared<chi_math::CylindricalAngularQuadrature>(quad_pol, quad_azi, verbose);
 
       chi::angular_quadrature_stack.push_back(new_quad);
-      const int index = chi::angular_quadrature_stack.size() - 1;
-      lua_pushnumber(L,index);
+      const size_t index = chi::angular_quadrature_stack.size() - 1;
+      lua_pushinteger(L,static_cast<lua_Integer>(index));
 
       return 1;
     }
@@ -126,7 +126,7 @@ int chiCreateCylindricalProductQuadrature(lua_State *L)
 
       chi::angular_quadrature_stack.push_back(new_quad);
       const size_t index = chi::angular_quadrature_stack.size() - 1;
-      lua_pushnumber(L,static_cast<lua_Number>(index));
+      lua_pushinteger(L,static_cast<lua_Integer>(index));
 
       return 1;
     }

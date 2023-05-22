@@ -4,7 +4,7 @@
 #include "ChiMath/SpatialDiscretization/FiniteElement/finite_element.h"
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -69,7 +69,7 @@ namespace chi_unit_sim_tests
 
     auto unk_man = OneDofPerNode;
     auto ff =
-      std::make_shared<chi_physics::FieldFunction>(
+      std::make_shared<chi_physics::FieldFunctionGridBased>(
         std::string("phi"),        //Text name
         solver.sdm_ptr_,            //Spatial Discretization
         unk_man.unknowns_.front()); //Unknown Manager

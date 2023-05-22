@@ -34,7 +34,6 @@ class Material;
 class MultiGroupXS;
 class FieldFunction;
 
-typedef std::shared_ptr<Solver> SolverPtr;
 typedef std::shared_ptr<Material> MaterialPtr;
 typedef std::shared_ptr<MultiGroupXS> MultiGroupXSPtr;
 typedef std::shared_ptr<FieldFunction> FieldFunctionPtr;
@@ -44,9 +43,11 @@ namespace chi_math
 {
 class Quadrature;
 class AngularQuadrature;
+class SpatialDiscretization;
 
 typedef std::shared_ptr<Quadrature> QuadraturePtr;
 typedef std::shared_ptr<AngularQuadrature> AngularQuadraturePtr;
+typedef std::shared_ptr<SpatialDiscretization> SpatialDiscretizationPtr;
 
 class UnknownManager;
 } // namespace chi_math
@@ -81,7 +82,6 @@ public:
   static std::vector<chi_mesh::FFInterpPtr> field_func_interpolation_stack;
   static std::vector<chi_mesh::UnpartMeshPtr> unpartitionedmesh_stack;
 
-  // static std::vector<chi_physics::SolverPtr> object_stack;
   static std::vector<chi_physics::MaterialPtr> material_stack;
   static std::vector<chi_physics::MultiGroupXSPtr> multigroup_xs_stack;
   static std::vector<chi_physics::FieldFunctionPtr> field_function_stack;
@@ -90,6 +90,7 @@ public:
   static std::vector<chi_math::AngularQuadraturePtr> angular_quadrature_stack;
 
   static std::vector<ChiObjectPtr> object_stack;
+  static std::vector<chi_math::SpatialDiscretizationPtr> sdm_stack;
 
   static const size_t SIZE_T_INVALID = ((size_t)-1);
 
@@ -192,8 +193,45 @@ public:
     }
   }
 
-  /**Attempts to object of type `shared_ptr<T>` at the given
-   * handle.
+  /**Attempts to obtain object of type `shared_ptr<T>` at the given
+   * handle of a stack with parent type P.
+   * \n
+   * \n
+   * Example usage:
+   *
+   * \code
+   * auto surf_mesh_ptr = chi::GetStackItemPtr<chi_mesh::SurfaceMesh>(
+      chi::surface_mesh_stack, surf_mesh_hndle, fname);
+   * \endcode
+   * */
+  template <class T, class P>
+  static std::shared_ptr<T>
+  GetStackItemPtrAsType(std::vector<std::shared_ptr<P>>& stack,
+                  const size_t handle,
+                  const std::string& calling_function_name = "Unknown")
+  {
+    std::shared_ptr<P> item_type_P;
+    try
+    {
+      item_type_P = stack.at(handle);
+    }
+    catch (const std::out_of_range& oor)
+    {
+      throw std::out_of_range("chi::GetStackItem: Invalid handle used. "
+                              "Calling function: " +
+                              calling_function_name);
+    }
+
+    auto item_type_T = std::dynamic_pointer_cast<T>(item_type_P);
+    if (not item_type_T)
+      throw std::logic_error(calling_function_name +
+                             "Failed to cast to requested type");
+
+    return item_type_T;
+  }
+
+  /**Attempts to obtain object of type `shared_ptr<T>` at the given
+   * handle of a stack ALSO OF TYPE T.
    * \n
    * \n
    * Example usage:

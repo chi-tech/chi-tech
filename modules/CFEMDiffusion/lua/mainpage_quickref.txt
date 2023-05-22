@@ -1,4 +1,4 @@
-module: CFEM Diffusion solver
+submodule: CFEM Diffusion solver
 function: chiCFEMDiffusionSolverCreate
 function: chiCFEMDiffusionSetBCProperty
 module_end

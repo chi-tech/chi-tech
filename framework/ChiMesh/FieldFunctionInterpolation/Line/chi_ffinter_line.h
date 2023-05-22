@@ -10,7 +10,7 @@ namespace chi_mesh
 {
   struct FieldFunctionContext
   {
-    std::shared_ptr<chi_physics::FieldFunction>    ref_ff;
+    std::shared_ptr<chi_physics::FieldFunctionGridBased>    ref_ff;
     std::vector<double>            interpolation_points_values;
     std::vector<uint64_t>          interpolation_points_ass_cell;
     std::vector<bool>              interpolation_points_has_ass_cell;

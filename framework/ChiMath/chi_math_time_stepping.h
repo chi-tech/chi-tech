@@ -8,9 +8,11 @@ namespace chi_math
 
 enum class SteppingMethod
 {
-  EXPLICIT_EULER = 0,
-  IMPLICIT_EULER = 1,
-  CRANK_NICOLSON = 2
+  NONE = 0,
+  EXPLICIT_EULER = 1,
+  IMPLICIT_EULER = 2,
+  CRANK_NICOLSON = 3,
+  THETA_SCHEME = 4,
 };
 
 std::string SteppingMethodStringName(SteppingMethod);
