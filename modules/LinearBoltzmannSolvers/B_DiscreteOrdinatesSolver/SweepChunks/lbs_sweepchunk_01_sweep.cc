@@ -39,7 +39,7 @@ void LBSSweepChunk::Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
 
     cell_num_faces_ = cell_->faces_.size();
     cell_num_nodes_ = cell_mapping_->NumNodes();
-    const auto& sigma_t = cell_transport_view_->XS().SigmaTotal();
+    const auto& sigma_t = xs_.at(cell_->material_id_)->SigmaTotal();
 
     sweep_surface_status_info_.spls_index = spls_index;
     sweep_surface_status_info_.cell_local_id = cell_local_id_;

@@ -95,7 +95,7 @@ lbs_options =
 }
 
 phys = lbs.DiscreteOrdinatesSolver.Create(lbs_block)
-chiLBSSetOptions(phys, lbs_options)
+lbs.SetOptions(phys, lbs_options)
 
 k_solver0 = lbs.XXNonLinearKEigen.Create
 ({

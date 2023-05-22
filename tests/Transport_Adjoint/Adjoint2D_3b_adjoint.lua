@@ -103,7 +103,7 @@ lbs_options =
 
 --############################################### Initialize and Execute Solver
 phys1 = lbs.DiscreteOrdinatesAdjointSolver.Create(lbs_block)
-chiLBSSetOptions(phys1, lbs_options)
+lbs.SetOptions(phys1, lbs_options)
 
 --############################################### Create QOIs
 tvol0 = chiLogicalVolumeCreate(RPP,2.3333,2.6666,4.16666,4.33333,-1000,1000)

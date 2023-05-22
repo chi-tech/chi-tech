@@ -103,7 +103,7 @@ lbs_options =
 
 --############################################### Initialize and Execute Solver
 phys1 = lbs.DiscreteOrdinatesAdjointSolver.Create(lbs_block)
-chiLBSSetOptions(phys1, lbs_options)
+lbs.SetOptions(phys1, lbs_options)
 
 --############################################### Add point source
 chiLBSAddPointSource(phys1, 1.25 - 0.5*ds, 1.5*ds, 0.0, src)

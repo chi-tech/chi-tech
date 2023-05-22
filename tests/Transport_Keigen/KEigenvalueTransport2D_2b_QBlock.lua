@@ -53,8 +53,8 @@ lbs_block.name = "DO"
 lbs_block.groupsets[1].angular_quadrature_handle = pquad
 phys1 = lbs.DiscreteOrdinatesSolver.Create(lbs_block)
 
-chiLBSSetOptions(phys0, lbs_options)
-chiLBSSetOptions(phys1, lbs_options)
+lbs.SetOptions(phys0, lbs_options)
+lbs.SetOptions(phys1, lbs_options)
 
 --############################################### Initialize and Execute Solver
 chiSolverInitialize(phys0)

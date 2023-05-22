@@ -22,23 +22,34 @@ lbs_block =
       l_abs_tol = 1.0e-10,
       groupset_num_subsets = 2,
     }
+  },
+  options =
+  {
+    boundary_conditions = { { name = "xmin", type = "reflecting"},
+                            { name = "ymin", type = "reflecting"} },
+    scattering_order = 2,
+
+    use_precursors = false,
+
+    verbose_inner_iterations = false,
+    verbose_outer_iterations = true,
   }
 }
 
-lbs_options =
-{
-  boundary_conditions = { { name = "xmin", type = "reflecting"},
-                          { name = "ymin", type = "reflecting"} },
-  scattering_order = 2,
-
-  use_precursors = false,
-
-  verbose_inner_iterations = false,
-  verbose_outer_iterations = true,
-}
+--lbs_options =
+--{
+--  boundary_conditions = { { name = "xmin", type = "reflecting"},
+--                          { name = "ymin", type = "reflecting"} },
+--  scattering_order = 2,
+--
+--  use_precursors = false,
+--
+--  verbose_inner_iterations = false,
+--  verbose_outer_iterations = true,
+--}
 
 phys1 = lbs.DiscreteOrdinatesSolver.Create(lbs_block)
-chiLBSSetOptions(phys1, lbs_options)
+--lbs.SetOptions(phys1, lbs_options)
 
 
 k_solver0 = lbs.XXPowerIterationKEigen.Create({ lbs_solver_handle = phys1, })

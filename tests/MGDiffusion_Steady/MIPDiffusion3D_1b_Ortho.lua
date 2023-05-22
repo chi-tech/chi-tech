@@ -94,7 +94,7 @@ if (reflecting) then
 end
 
 phys1 = lbs.DiffusionDFEMSolver.Create(lbs_block)
-chiLBSSetOptions(phys1, lbs_options)
+lbs.SetOptions(phys1, lbs_options)
 
 --############################################### Initialize and Execute Solver
 ss_solver = lbs.SteadyStateSolver.Create({lbs_solver_handle = phys1})

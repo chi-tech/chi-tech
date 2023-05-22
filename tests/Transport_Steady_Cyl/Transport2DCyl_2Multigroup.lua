@@ -84,7 +84,7 @@ lbs_options =
 }
 lbs_block.coord_system = 2
 phys1 = lbs.DiscreteOrdinatesCurvilinearSolver.Create(lbs_block)
-chiLBSSetOptions(phys1, lbs_options)
+lbs.SetOptions(phys1, lbs_options)
 
 --############################################### Initialize and Execute Solver
 ss_solver = lbs.SteadyStateSolver.Create({lbs_solver_handle = phys1})

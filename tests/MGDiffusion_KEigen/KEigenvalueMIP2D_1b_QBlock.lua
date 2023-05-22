@@ -38,7 +38,7 @@ lbs_options =
 }
 
 phys1 = lbs.DiffusionDFEMSolver.Create(lbs_block)
-chiLBSSetOptions(phys1, lbs_options)
+lbs.SetOptions(phys1, lbs_options)
 
 
 k_solver0 = lbs.XXNonLinearKEigen.Create({ lbs_solver_handle = phys1, })

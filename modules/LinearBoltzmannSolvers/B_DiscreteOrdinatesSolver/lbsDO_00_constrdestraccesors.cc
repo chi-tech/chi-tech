@@ -13,10 +13,13 @@ lbs::DiscreteOrdinatesSolver::DiscreteOrdinatesSolver(
 {
 }
 
-chi_objects::InputParameters
-lbs::DiscreteOrdinatesSolver::GetInputParameters()
+chi_objects::InputParameters lbs::DiscreteOrdinatesSolver::GetInputParameters()
 {
   chi_objects::InputParameters params = LBSSolver::GetInputParameters();
+
+  params.SetGeneralDescription(
+    "\\defgroup lbs__DiscreteOrdinatesSolver DiscreteOrdinatesSolver\n"
+    "\\ingroup lbs__LBSSolver");
 
   params.ChangeExistingParamToOptional("name", "LBSDiscreteOrdinatesSolver");
 
