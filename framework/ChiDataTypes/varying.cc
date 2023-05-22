@@ -137,6 +137,8 @@ std::string chi_data_types::Varying::StringValue() const
   CheckTypeMatch(type_, VaryingDataType::STRING);
   CheckDataInitialized();
 
+  if (reinterpret_cast<const char*>(raw_data_.data()) == nullptr)
+    return std::string();
   return std::string(reinterpret_cast<const char*>(raw_data_.data()));
 }
 

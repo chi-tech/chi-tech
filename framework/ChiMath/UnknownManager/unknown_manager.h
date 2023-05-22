@@ -112,6 +112,8 @@ public:
     return map_value;
   }
   unsigned int GetMapEnd() const { return map_begin_ + num_components_ - 1; }
+
+  unsigned int NumComponents() const {return num_components_;}
 };
 
 // ###################################################################
@@ -179,6 +181,9 @@ public:
   {
     return UnknownManager({std::make_pair(UnknownType::SCALAR, 0)});
   }
+
+  size_t NumberOfUnknowns() const { return unknowns_.size(); }
+  const Unknown& GetUnknown(size_t id) const {return unknowns_[id];}
 
   void SetDOFStorageType(const UnknownStorageType in_storage_type)
   {

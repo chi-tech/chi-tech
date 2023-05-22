@@ -16,7 +16,7 @@ void chi_math::SpatialDiscretization_FV::
   OrderNodes()
 {
   //============================================= Communicate node counts
-  const uint64_t local_num_nodes = ref_grid_->local_cells.size();
+  const uint64_t local_num_nodes = ref_grid_.local_cells.size();
   locJ_block_size_.assign(chi::mpi.process_count, 0);
   MPI_Allgather(&local_num_nodes,       // sendbuf
                 1, MPI_UINT64_T,        // sendcount, sendtype
@@ -39,11 +39,11 @@ void chi_math::SpatialDiscretization_FV::
   globl_base_block_size_ = global_num_nodes;
 
   //============================================= Sort neigbor ids
-  const auto neighbor_gids = ref_grid_->cells.GetGhostGlobalIDs();
+  const auto neighbor_gids = ref_grid_.cells.GetGhostGlobalIDs();
   std::map<uint64_t, std::vector<uint64_t>> sorted_nb_gids;
   for (uint64_t gid : neighbor_gids)
   {
-    const auto& cell = ref_grid_->cells[gid];
+    const auto& cell = ref_grid_.cells[gid];
     sorted_nb_gids[cell.partition_id_].push_back(gid);
   }
 
@@ -65,10 +65,10 @@ void chi_math::SpatialDiscretization_FV::
     local_ids.reserve(gids.size());
     for (uint64_t gid : gids)
     {
-      if (not ref_grid_->IsCellLocal(gid))
+      if (not ref_grid_.IsCellLocal(gid))
         throw std::logic_error(MappingError);
 
-      const auto& local_cell = ref_grid_->cells[gid];
+      const auto& local_cell = ref_grid_.cells[gid];
       local_ids.push_back(local_cell.local_id_);
     }//for gid
   }//for pid_list_pair

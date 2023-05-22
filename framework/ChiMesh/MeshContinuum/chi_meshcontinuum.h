@@ -4,6 +4,7 @@
 #include <memory>
 #include <array>
 
+
 #include "../chi_mesh.h"
 #include "chi_meshcontinuum_localcellhandler.h"
 #include "chi_meshcontinuum_globalcellhandler.h"
@@ -133,6 +134,8 @@ public:
   std::array<size_t,3> GetIJKInfo() const;
   chi_data_types::NDArray<uint64_t> MakeIJKToGlobalIDMapping() const;
   std::vector<chi_mesh::Vector3> MakeCellOrthoSizes() const;
+
+  std::pair<chi_mesh::Vector3, chi_mesh::Vector3> GetLocalBoundingBox() const;
 
 private:
   friend class chi_mesh::VolumeMesher;

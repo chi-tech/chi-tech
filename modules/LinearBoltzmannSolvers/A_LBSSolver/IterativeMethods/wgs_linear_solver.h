@@ -4,7 +4,6 @@
 #include "ChiMath/LinearSolver/linear_solver.h"
 
 #include "wgs_context.h"
-#include "wgs_context.h"
 
 #include <memory>
 #include <vector>

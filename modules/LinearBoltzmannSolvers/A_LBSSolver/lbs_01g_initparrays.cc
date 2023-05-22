@@ -1,11 +1,11 @@
 #include "lbs_solver.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
-
 #include "chi_runtime.h"
 #include "chi_log.h"
 #include "chi_mpi.h"
 #include "ChiConsole/chi_console.h"
+
+#include <iomanip>
 
 
 //###################################################################
@@ -175,34 +175,9 @@ void lbs::LBSSolver::InitializeParrays()
   //================================================== Make face histogram
   grid_face_histogram_ = grid_ptr_->MakeGridFaceHistogram();
 
-  //================================================== Initialize Field Functions
-  if (field_functions_.empty())
-  {
-    for (size_t g = 0; g < groups_.size(); ++g)
-    {
-      for (size_t m=0; m < num_moments_; m++)
-      {
-        std::string solver_name;
-        if (not TextName().empty()) solver_name = TextName();
-
-        char buff[100];
-        snprintf(buff, 99, "%s_Flux_g%03d_m%02d",
-                 solver_name.c_str(),
-                 static_cast<int>(g),
-                 static_cast<int>(m));
-        const std::string text_name = std::string(buff);
-
-        using namespace chi_math;
-        auto group_ff = std::make_shared<chi_physics::FieldFunction>(
-          text_name,                     //Field name
-          discretization_,                //Spatial discretization
-          Unknown(UnknownType::SCALAR)); //Unknown/Variable
-
-        chi::field_function_stack.push_back(group_ff);
-        field_functions_.push_back(group_ff);
-      }//for m
-    }//for g
-  }//if empty
+  //================================================== Initialize
+  //                                                   Field Functions
+  InitializeFieldFunctions();
 
   MPI_Barrier(MPI_COMM_WORLD);
   chi::log.Log()

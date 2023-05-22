@@ -21,7 +21,7 @@ namespace chi_math
 
   protected:
     explicit
-    SpatialDiscretization_PWLBase(chi_mesh::MeshContinuumPtr& in_grid,
+    SpatialDiscretization_PWLBase(const chi_mesh::MeshContinuum& in_grid,
                                   finite_element::SetupFlags in_setup_flags,
                                   QuadratureOrder qorder,
                                   SDMType in_type,
@@ -60,11 +60,6 @@ namespace chi_math
 
     std::vector<chi_mesh::Vector3>
     GetCellNodeLocations(const chi_mesh::Cell& cell) const override;
-
-    void LocalizePETScVector(Vec petsc_vector,
-                             std::vector<double>& local_vector,
-                             const UnknownManager& unknown_manager)
-    const override;
 
     //FE-utils
     const finite_element::UnitIntegralData&

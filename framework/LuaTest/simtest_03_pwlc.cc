@@ -9,14 +9,14 @@
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 #include "ChiMath/PETScUtils/petsc_utils.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 
 namespace chi_unit_sim_tests
 {
 
 /**This is a simple test of the Finite Volume spatial discretization applied
  * to Laplace's problem. */
-int chiSimTest03_PWLC(lua_State* L)
+int chiSimTest03_PWLC(lua_State*)
 {
   chi::log.Log() << "Coding Tutorial 3";
 
@@ -28,7 +28,7 @@ int chiSimTest03_PWLC(lua_State* L)
 
   //============================================= Make SDM
   typedef std::shared_ptr<chi_math::SpatialDiscretization> SDMPtr;
-  SDMPtr sdm_ptr = chi_math::SpatialDiscretization_PWLC::New(grid_ptr);
+  SDMPtr sdm_ptr = chi_math::SpatialDiscretization_PWLC::New(grid);
   const auto& sdm = *sdm_ptr;
 
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;
@@ -165,7 +165,7 @@ int chiSimTest03_PWLC(lua_State* L)
   chi::log.Log() << "Done cleanup";
 
   //============================================= Create Field Function
-  auto ff = std::make_shared<chi_physics::FieldFunction>(
+  auto ff = std::make_shared<chi_physics::FieldFunctionGridBased>(
     "Phi",                                           //Text name
     sdm_ptr,                                         //Spatial Discr.
     chi_math::Unknown(chi_math::UnknownType::SCALAR) //Unknown
@@ -174,7 +174,7 @@ int chiSimTest03_PWLC(lua_State* L)
   ff->UpdateFieldVector(field);
 
 
-  chi_physics::FieldFunction::ExportMultipleToVTK("CodeTut3_PWLC", {ff});
+  chi_physics::FieldFunctionGridBased::ExportMultipleToVTK("CodeTut3_PWLC", {ff});
 
   return 0;
 }

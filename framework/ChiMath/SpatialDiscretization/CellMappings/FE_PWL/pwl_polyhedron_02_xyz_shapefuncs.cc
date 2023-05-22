@@ -12,7 +12,7 @@ double chi_math::PolyhedronMappingFE_PWL::
     for (size_t s=0; s < face_data_[f].sides.size(); s++)
     {
       //Map xyz to xi_eta_zeta
-      const auto& p0 = grid_ptr_->vertices[face_data_[f].sides[s].v_index[0]];
+      const auto& p0 = ref_grid_.vertices[face_data_[f].sides[s].v_index[0]];
       chi_mesh::Vector3 xyz_ref = xyz - p0;
 
       chi_mesh::Vector3 xi_eta_zeta   = face_data_[f].sides[s].Jinv * xyz_ref;
@@ -65,7 +65,7 @@ void chi_math::PolyhedronMappingFE_PWL::
     {
       auto& side_fe_info = face_data_[f].sides[s];
       //Map xyz to xi_eta_zeta
-      const auto& p0 = grid_ptr_->vertices[side_fe_info.v_index[0]];
+      const auto& p0 = ref_grid_.vertices[side_fe_info.v_index[0]];
       chi_mesh::Vector3 xi_eta_zeta   = side_fe_info.Jinv * (xyz - p0);
 
       double xi  = xi_eta_zeta.x;
@@ -113,7 +113,7 @@ chi_mesh::Vector3 chi_math::PolyhedronMappingFE_PWL::
     for (size_t s=0; s < face_data_[f].sides.size(); s++)
     {
       //Map xyz to xi_eta_zeta
-      const auto& p0 = grid_ptr_->vertices[face_data_[f].sides[s].v_index[0]];
+      const auto& p0 = ref_grid_.vertices[face_data_[f].sides[s].v_index[0]];
       chi_mesh::Vector3 xyz_ref = xyz - p0;
 
       chi_mesh::Vector3 xi_eta_zeta = face_data_[f].sides[s].Jinv * xyz_ref;

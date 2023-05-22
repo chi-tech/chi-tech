@@ -603,9 +603,34 @@ run_test(
     search_strings_vals_tols=[["[0]  Max-value=", 0.29632, 1.0e-4]])
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#                           Steady State MIP Tests
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# Tests 41 - 42
+
+run_test(
+    file_name="MGDiffusion_Steady/MIPDiffusion3D_1b_Ortho",
+    comment="3D LBS MIP Test - PWLD Reflecting BC",
+    num_procs=4,
+    search_strings_vals_tols=[["[0]  Max-value1=", 2.74873e-01, 1.0e-4],
+                              ["[0]  Max-value2=", 9.47508e-05, 1.0e-4]])
+
+run_test(
+    file_name="MGDiffusion_Steady/MIPDiffusion3D_3a_DSA_ortho",
+    comment="3D LBS MIP test of a block of graphite "
+            "with an air cavity. TG",
+    num_procs=4,
+    search_strings_vals_tols=[
+        ["StrCompare", "WGS groups [0-62] Iteration    21", 7, "CONVERGED"],
+        ["StrCompare", "WGS groups [63-167] Iteration    48", 7, "CONVERGED"],
+        ["NumCompare", "WGS groups [0-62] Iteration    21", 6, "float",
+         6.66145e-07, 1.0e-9],
+        ["NumCompare", "WGS groups [63-167] Iteration    48", 6, "float",
+         8.73619e-07, 1.0e-9]])
+
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                     Steady State Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 41 - 57
+# Tests 43 - 59
 
 run_test(
     file_name="Transport_Steady/Transport1D_1",
@@ -752,7 +777,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                     k-Eigenvalue Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 58 - 60
+# Tests 60 - 62
 
 run_test(
     file_name="Transport_Keigen/KEigenvalueTransport1D_1G",
@@ -779,9 +804,39 @@ run_test(
         ["NumCompare", "Final k-eigenvalue", 3, "float", 0.5969127, 1.0e-7] ])
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#                           k-Eigenvalue MIP Tests
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# Tests 63 - 65
+
+run_test(
+    file_name="MGDiffusion_KEigen/KEigenvalueMIP1D_1G",
+    comment="1D KSolver LinearBSolver Test - PWLD",
+    num_procs=4,
+    search_strings_vals_tols=[
+        # ["[0]          Final k-eigenvalue    :", 0.99954, 1.0e-5],
+        ["NumCompare", "Final k-eigenvalue", 3, "float", 0.9995301, 1.0e-5]])
+
+run_test(
+    file_name="MGDiffusion_KEigen/KEigenvalueMIP2D_1a_QBlock",
+    comment="2D 2G KEigenvalue::Solver test using Power Iteration",
+    num_procs=4,
+    search_strings_vals_tols=[
+        ["StrCompare", "Iteration    22", 9, "CONVERGED"],
+        ["NumCompare", "Final k-eigenvalue", 3, "float", 0.5219942, 1.0e-7] ])
+
+run_test(
+    file_name="MGDiffusion_KEigen/KEigenvalueMIP2D_1b_QBlock",
+    comment="2D 2G KEigenvalue::Solver test using NonLinearK",
+    num_procs=4,
+    search_strings_vals_tols=[
+        ["NumCompare", "Iteration     4", 5, "float", 0.5220271, 1.0e-7],
+        ["NumCompare", "Final k-eigenvalue", 3, "float", 0.5220271, 1.0e-7] ])
+
+
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #         Steady-State Cylindrical Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 61 - 62
+# Tests 66 - 67
 
 run_test(
     file_name="Transport_Steady_Cyl/Transport2DCyl_1Monoenergetic",
@@ -799,7 +854,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #             Steady-State Adjoint Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Tests 63 - 71
+# Tests 68 - 76
 
 run_test(
     file_name="Transport_Adjoint/Adjoint2D_1a_forward",

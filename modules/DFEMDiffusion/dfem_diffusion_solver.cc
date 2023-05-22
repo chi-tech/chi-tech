@@ -9,7 +9,7 @@
 
 #include "dfem_diffusion_bndry.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
@@ -124,7 +124,7 @@ void dfem_diffusion::Solver::Initialize()
   }//for bndry
   
   //============================================= Make SDM
-  sdm_ptr_ = chi_math::SpatialDiscretization_PWLD::New(grid_ptr_);
+  sdm_ptr_ = chi_math::SpatialDiscretization_PWLD::New(*grid_ptr_);
   const auto& sdm = *sdm_ptr_;
  
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;
@@ -160,7 +160,7 @@ void dfem_diffusion::Solver::Initialize()
 
     using namespace chi_math;
     auto initial_field_function =
-      std::make_shared<chi_physics::FieldFunction>(
+      std::make_shared<chi_physics::FieldFunctionGridBased>(
           text_name,                     //Text name
           sdm_ptr_,                       //Spatial Discretization
           Unknown(UnknownType::SCALAR)); //Unknown/Variable

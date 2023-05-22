@@ -22,7 +22,7 @@ namespace chi_math
 
   public:
     /** Constructor. */
-    explicit CellMappingFE_PWL(const chi_mesh::MeshContinuumConstPtr& ref_grid,
+    explicit CellMappingFE_PWL(const chi_mesh::MeshContinuum& ref_grid,
                                const chi_mesh::Cell& cell,
                                size_t num_nodes,
                                std::vector<chi_mesh::Vector3> vertices,

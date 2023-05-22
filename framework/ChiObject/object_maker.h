@@ -1,7 +1,6 @@
 #ifndef CHITECH_OBJECT_MAKER_H
 #define CHITECH_OBJECT_MAKER_H
 
-
 #include "ChiParameters/input_parameters.h"
 #include "chi_object.h"
 
@@ -14,19 +13,51 @@
 
 /**Macro for registering an object within the ObjectMaker singleton.
  * Example:
- *
+ * \code
+ * RegisterChiObject(kaka, Zorba);
+ * \endcode
  * \note Remember to include the header "ChiObject/object_maker.h"*/
 #define RegisterChiObject(namespace_name, object_name)                         \
   static char ChiObjectJoinWordsB(unique_var_name_object_##object_name##_,     \
                                   __COUNTER__) =                               \
-    ChiObjectMaker::AddObjectToRegistry<object_name, ChiObject>(  \
+    ChiObjectMaker::AddObjectToRegistry<object_name, ChiObject>(               \
       #namespace_name, #object_name)
+
+/**Macro for registering an object (parameters only) within the
+ * ObjectMaker singleton.
+ * Example:
+ * \code
+ * RegisterChiObjectParametersOnly(kaka, Zorba);
+ * \endcode
+ *
+ * \note Remember to include the header "ChiObject/object_maker.h"*/
+#define RegisterChiObjectParametersOnly(namespace_name, object_name)           \
+  static char ChiObjectJoinWordsB(unique_var_name_object_##object_name##_,     \
+                                  __COUNTER__) =                               \
+    ChiObjectMaker::AddObjectToRegistryParamsOnly<object_name>(                \
+      #namespace_name, #object_name)
+
+/**Macro for registering an object (parameters only) within the
+ * ObjectMaker singleton.
+ * Example:
+ * \code
+ * RegisterChiObjectParametersOnly(kaka, Zorba);
+ * \endcode
+ *
+ * \note Remember to include the header "ChiObject/object_maker.h"*/
+#define RegisterSyntaxBlock(namespace_name, block_name, syntax_function)       \
+  static char ChiObjectJoinWordsB(unique_var_name_syntax_##block_name##_,      \
+                                  __COUNTER__) =                               \
+    ChiObjectMaker::AddSyntaxBlockToRegistry(                                  \
+      #namespace_name, #block_name, syntax_function)
 
 class ChiObject;
 
+// ##################################################################
+/**Singleton object for handling the registration and making of objects.*/
 class ChiObjectMaker
 {
-private:
+public:
   using ObjectPtr = std::shared_ptr<ChiObject>;
 
   using ObjectGetInParamsFunc = chi_objects::InputParameters (*)();
@@ -37,14 +68,9 @@ private:
   {
     ObjectGetInParamsFunc get_in_params_func = nullptr;
     ObjectConstructorFunc constructor_func = nullptr;
+    bool is_syntax_block = false;
   };
 
-  std::map<std::string, ObjectRegistryEntry> object_registry_;
-
-private:
-  ChiObjectMaker() = default;
-
-public:
   ChiObjectMaker(const ChiObjectMaker&) = delete;
   ChiObjectMaker(const ChiObjectMaker&&) = delete;
   ChiObjectMaker& operator=(const ChiObjectMaker&) = delete;
@@ -52,40 +78,16 @@ public:
   static ChiObjectMaker& GetInstance() noexcept;
 
   const std::map<std::string, ObjectRegistryEntry>& Registry() const;
+  bool RegistryHasKey(const std::string& key) const;
 
-private:
-  template <typename T>
-  static chi_objects::InputParameters CallGetInputParamsFunction()
-  {
-    return T::GetInputParameters();
-  }
-
-  template <typename T, typename base_T>
-  static std::shared_ptr<base_T>
-  CallObjectConstructor(const chi_objects::InputParameters& params)
-  {
-    return std::make_shared<T>(params);
-  }
-
-public:
   template <typename T, typename base_T>
   static char AddObjectToRegistry(const std::string& namespace_name,
                                   const std::string& object_name)
   {
-    const std::string name = namespace_name + "::" + object_name;
-
     auto& object_maker = GetInstance();
 
-    // Check if the function name is already there
-    if (object_maker.object_registry_.count(name) > 0)
-    {
-      throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
-                             ": Attempted "
-                             "to register Object \"" +
-                             name +
-                             "\" but an object with the same name is"
-                             " already registered.");
-    }
+    const std::string name = namespace_name + "::" + object_name;
+    object_maker.AssertRegistryKeyAvailable(name, __PRETTY_FUNCTION__);
 
     ObjectRegistryEntry reg_entry;
     reg_entry.get_in_params_func = &CallGetInputParamsFunction<T>;
@@ -95,12 +97,74 @@ public:
     return 0;
   }
 
-  size_t MakeObject(const chi_objects::ParameterBlock& params) const;
-  size_t MakeObjectType(const std::string& type,
-                        const chi_objects::ParameterBlock& params) const;
+  template <typename T>
+  static char AddObjectToRegistryParamsOnly(const std::string& namespace_name,
+                                            const std::string& object_name)
+  {
+    auto& object_maker = GetInstance();
 
-  /**Dumps the object registry to stdout.*/
+    const std::string name = namespace_name + "::" + object_name;
+    object_maker.AssertRegistryKeyAvailable(name, __PRETTY_FUNCTION__);
+
+    ObjectRegistryEntry reg_entry;
+    reg_entry.get_in_params_func = &CallGetInputParamsFunction<T>;
+    object_maker.object_registry_.insert(std::make_pair(name, reg_entry));
+
+    return 0;
+  }
+
+  static char AddSyntaxBlockToRegistry(const std::string& namespace_name,
+                                       const std::string& block_name,
+                                       ObjectGetInParamsFunc syntax_function)
+  {
+    auto& object_maker = GetInstance();
+
+    const std::string name = namespace_name + "::" + block_name;
+    object_maker.AssertRegistryKeyAvailable(name, __PRETTY_FUNCTION__);
+
+    ObjectRegistryEntry reg_entry;
+    reg_entry.get_in_params_func = syntax_function;
+    reg_entry.is_syntax_block = true;
+    object_maker.object_registry_.insert(std::make_pair(name, reg_entry));
+
+    return 0;
+  }
+
+  size_t MakeRegisteredObject(const chi_objects::ParameterBlock& params) const;
+  size_t
+  MakeRegisteredObjectOfType(const std::string& type,
+                             const chi_objects::ParameterBlock& params) const;
+
+  /**\brief Dumps the object registry to stdout.*/
   void DumpRegister() const;
+
+private:
+  std::map<std::string, ObjectRegistryEntry> object_registry_;
+
+private:
+  /**Private constructor because this is a singleton.*/
+  ChiObjectMaker() = default;
+
+private:
+  /**Utility redirection to call an object's static `GetInputParameters`
+   * function.*/
+  template <typename T>
+  static chi_objects::InputParameters CallGetInputParamsFunction()
+  {
+    return T::GetInputParameters();
+  }
+
+  /**Utility redirection to call an object's constructor with a specified list
+   * of input parameters.*/
+  template <typename T, typename base_T>
+  static std::shared_ptr<base_T>
+  CallObjectConstructor(const chi_objects::InputParameters& params)
+  {
+    return std::make_shared<T>(params);
+  }
+
+  void AssertRegistryKeyAvailable(const std::string& key,
+                                  const std::string& calling_function) const;
 };
 
 #endif // CHITECH_OBJECT_MAKER_H

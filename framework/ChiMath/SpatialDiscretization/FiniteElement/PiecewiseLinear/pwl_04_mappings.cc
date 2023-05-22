@@ -15,9 +15,6 @@ MapDOF(const chi_mesh::Cell& cell,
        const unsigned int unknown_id,
        const unsigned int component) const
 {
-  if (component < 0) throw std::logic_error(__FUNCTION__);
-  if (node < 0) throw std::logic_error(__FUNCTION__);
-
   auto storage = unknown_manager.dof_storage_type_;
 
   size_t num_unknowns = unknown_manager.GetTotalUnknownStructureSize();
@@ -93,9 +90,6 @@ MapDOFLocal(const chi_mesh::Cell& cell,
             const unsigned int unknown_id,
             const unsigned int component) const
 {
-  if (component < 0) throw std::logic_error(__FUNCTION__);
-  if (node < 0) throw std::logic_error(__FUNCTION__);
-
   auto storage = unknown_manager.dof_storage_type_;
 
   size_t num_unknowns = unknown_manager.GetTotalUnknownStructureSize();

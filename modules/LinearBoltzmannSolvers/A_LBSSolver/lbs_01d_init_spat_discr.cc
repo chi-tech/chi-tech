@@ -15,7 +15,7 @@ void lbs::LBSSolver::InitializeSpatialDiscretization()
 {
   using namespace chi_math::finite_element;
   chi::log.Log() << "Initializing spatial discretization.\n";
-  discretization_ = chi_math::SpatialDiscretization_PWLD::New(grid_ptr_);
+  discretization_ = chi_math::SpatialDiscretization_PWLD::New(*grid_ptr_);
 
   ComputeUnitIntegrals();
 }

@@ -67,43 +67,44 @@ chiPhysicsMaterialSetProperty(materials[1], TRANSPORT_XSECTIONS,
                               CHI_XSFILE, xs_file)
 
 --############################################### Setup Physics
--- Define solver
-phys = chiLBKESCreateSolver()
-
-chiLBSSetProperty(phys, DISCRETIZATION_METHOD, PWLD)
-
--- Create quadrature and define scattering order
-pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE,n_angles)
-chiLBSSetProperty(phys,SCATTERING_ORDER,scat_order)
-
--- Create groups
 num_groups = 1
-for g=0, num_groups - 1 do
-    chiLBSCreateGroup(phys)
-end
+lbs_block =
+{
+  num_groups = num_groups,
+  groupsets =
+  {
+    {
+      groups_from_to = {0, num_groups-1},
+      angular_quadrature_handle =
+        chiCreateProductQuadrature(GAUSS_LEGENDRE,n_angles),
+      inner_linear_method = "gmres",
+      l_max_its = si_max_iterations,
+      l_abs_tol = si_tolerance,
+    }
+  }
+}
 
--- Create groupset
-gs = chiLBSCreateGroupset(phys)
-chiLBSGroupsetAddGroups(phys, gs, 0, num_groups-1)
-chiLBSGroupsetSetQuadrature(phys, gs, pquad)
-chiLBSGroupsetSetMaxIterations(phys, gs, si_max_iterations)
-chiLBSGroupsetSetResidualTolerance(phys, gs, si_tolerance)
-chiLBSGroupsetSetIterativeMethod(phys, gs, KRYLOV_GMRES_CYCLES)
-chiLBSGroupsetSetAngleAggregationType(phys, gs, LBSGroupset.ANGLE_AGG_SINGLE)
+lbs_options =
+{
+  scattering_order = scat_order,
 
--- Additional parameters
-chiLBSSetProperty(phys, USE_PRECURSORS, use_precursors)
+  use_precursors = use_precursors ,
 
-chiSolverSetBasicOption(phys, "K_EIGEN_METHOD", "nonlinear")
-chiSolverSetBasicOption(phys, "NLK_MAX_ITS", kes_max_iterations)
-chiSolverSetBasicOption(phys, "NLK_ABS_TOL", kes_tolerance)
+  verbose_inner_iterations = false,
+  verbose_outer_iterations = true,
+}
 
-chiLBSSetProperty(phys, VERBOSE_INNER_ITERATIONS, false)
-chiLBSSetProperty(phys, VERBOSE_OUTER_ITERATIONS, true)
+phys = lbs.DiscreteOrdinatesSolver.Create(lbs_block)
+lbs.SetOptions(phys, lbs_options)
 
---############################################### Initialize and Execute Solver
-chiSolverInitialize(phys)
-chiSolverExecute(phys)
+k_solver0 = lbs.XXNonLinearKEigen.Create
+({
+  lbs_solver_handle = phys,
+  nl_max_its = kes_max_iterations,
+  nl_abs_tol = kes_tolerance
+})
+chiSolverInitialize(k_solver0)
+chiSolverExecute(k_solver0)
 
 --############################################### Get field functions
 --############################################### Line plot

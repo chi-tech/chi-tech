@@ -20,7 +20,7 @@ void chi_math::SpatialDiscretization_PWLD::OrderNodes()
 
   t_stage[0].Reset();
   //================================================== Check cell views avail
-  size_t num_loc_cells = ref_grid_->local_cells.size();
+  size_t num_loc_cells = ref_grid_.local_cells.size();
 
   //================================================== Get local DOF count
   //                                                   and set
@@ -28,7 +28,7 @@ void chi_math::SpatialDiscretization_PWLD::OrderNodes()
   cell_local_block_address_.resize(num_loc_cells, 0);
 
   uint64_t local_node_count=0;
-  for (const auto& cell : ref_grid_->local_cells)
+  for (const auto& cell : ref_grid_.local_cells)
   {
     const auto& cell_mapping = GetCellMapping(cell);
     cell_local_block_address_[cell.local_id_] =
@@ -62,9 +62,9 @@ void chi_math::SpatialDiscretization_PWLD::OrderNodes()
   //                                                   needing block addresses
   std::map<int, std::vector<uint64_t>> ghost_cell_ids_consolidated;
 
-  for (uint64_t global_id : ref_grid_->cells.GetGhostGlobalIDs())
+  for (uint64_t global_id : ref_grid_.cells.GetGhostGlobalIDs())
   {
-    const auto& cell = ref_grid_->cells[global_id];
+    const auto& cell = ref_grid_.cells[global_id];
     const int locI = static_cast<int>(cell.partition_id_);
 
     std::vector<uint64_t>& locI_cell_id_list = ghost_cell_ids_consolidated[locI];
@@ -86,7 +86,7 @@ void chi_math::SpatialDiscretization_PWLD::OrderNodes()
 
     for (uint64_t cell_global_id : cell_id_list)
     {
-      const auto& cell = ref_grid_->cells[cell_global_id];
+      const auto& cell = ref_grid_.cells[cell_global_id];
 
       const uint64_t cell_block_address = local_block_address_ +
                                           cell_local_block_address_[cell.local_id_];

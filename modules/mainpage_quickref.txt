@@ -1,15 +1,17 @@
 include: modules/LinearBoltzmannSolvers/A_LBSSolver/lua/mainpage_quickref.txt
-include: modules/LinearBoltzmannSolvers/Ca_DO_SteadyState/lua/mainpage_quickref.txt
-include: modules/LinearBoltzmannSolvers/Cc_DO_KEigenvalue/lua/mainpage_quickref.txt
-include: modules/LinearBoltzmannSolvers/Cd_DO_SteadyState_Adjoint/lua/mainpage_quickref.txt
-include: modules/LinearBoltzmannSolvers/D_DO_RZ_SteadyState/lua/mainpage_quickref.txt
+include: modules/LinearBoltzmannSolvers/B_DiscreteOrdinatesSolver/lua/mainpage_quickref.txt
+include: modules/LinearBoltzmannSolvers/C_DiscreteOrdinatesAdjointSolver/lua/mainpage_quickref.txt
 include: modules/LinearBoltzmannSolvers/D_DO_Transient/lua/mainpage_quickref.txt
 
+#-----------
+module: Diffusion Solvers
 include: modules/DiffusionSolver/lua/mainpage_quickref.txt
 
 include: modules/CFEMDiffusion/lua/mainpage_quickref.txt
 include: modules/DFEMDiffusion/lua/mainpage_quickref.txt
+include: modules/FVDiffusion/lua/mainpage_quickref.txt
 
 include: modules/MGDiffusion/lua/mainpage_quickref.txt
 
+#-----------
 include: modules/PointReactorKinetics/lua/mainpage_quickref.txt

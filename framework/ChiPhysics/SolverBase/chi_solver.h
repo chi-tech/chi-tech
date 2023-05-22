@@ -12,7 +12,7 @@
 
 namespace chi_physics
 {
-  class FieldFunction;
+  class FieldFunctionGridBased;
 }
 
 
@@ -26,7 +26,7 @@ private:
   const std::string text_name_;
 protected:
   BasicOptions basic_options_;
-  std::vector<std::shared_ptr<FieldFunction>> field_functions_;
+  std::vector<std::shared_ptr<FieldFunctionGridBased>> field_functions_;
 
 public:
   static chi_objects::InputParameters GetInputParameters();
@@ -42,10 +42,10 @@ public:
   BasicOptions& GetBasicOptions() {return basic_options_;}
   const BasicOptions& GetBasicOptions() const {return basic_options_;}
 
-  std::vector<std::shared_ptr<FieldFunction>>&
+  std::vector<std::shared_ptr<FieldFunctionGridBased>>&
   GetFieldFunctions() {return field_functions_;}
 
-  const std::vector<std::shared_ptr<FieldFunction>>&
+  const std::vector<std::shared_ptr<FieldFunctionGridBased>>&
   GetFieldFunctions() const {return field_functions_;}
 
   std::string TextName() const {return text_name_;}

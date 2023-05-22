@@ -58,7 +58,7 @@ namespace chi_math
   public:
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constructor
     PolygonMappingFE_PWL(const chi_mesh::Cell& poly_cell,
-                         const chi_mesh::MeshContinuumConstPtr& ref_grid,
+                         const chi_mesh::MeshContinuum& ref_grid,
                          const QuadratureTriangle& volume_quadrature,
                          const QuadratureLine&     surface_quadrature);
 

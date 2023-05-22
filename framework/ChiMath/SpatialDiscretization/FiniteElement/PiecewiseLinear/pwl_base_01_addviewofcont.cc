@@ -11,7 +11,7 @@
 /**Adds a PWL Finite Element for each cell of the local problem.*/
 void chi_math::SpatialDiscretization_PWLBase::PreComputeCellSDValues()
 {
-  size_t num_local_cells = ref_grid_->local_cells.size();
+  size_t num_local_cells = ref_grid_.local_cells.size();
 
   //============================================= Unit integrals
   {
@@ -23,7 +23,7 @@ void chi_math::SpatialDiscretization_PWLBase::PreComputeCellSDValues()
         chi::log.Log() << chi::program_timer.GetTimeString()
                        << " Computing unit integrals.";
         fe_unit_integrals_.reserve(num_local_cells);
-        for (const auto& cell : ref_grid_->local_cells)
+        for (const auto& cell : ref_grid_.local_cells)
         {
           UIData ui_data;
 
@@ -50,7 +50,7 @@ void chi_math::SpatialDiscretization_PWLBase::PreComputeCellSDValues()
                        << " Computing quadrature data.";
         fe_vol_qp_data_.reserve(num_local_cells);
         fe_srf_qp_data_.reserve(num_local_cells);
-        for (const auto& cell : ref_grid_->local_cells)
+        for (const auto& cell : ref_grid_.local_cells)
         {
           fe_vol_qp_data_.emplace_back();
           fe_srf_qp_data_.emplace_back();
@@ -81,10 +81,10 @@ void chi_math::SpatialDiscretization_PWLBase::PreComputeNeighborCellSDValues()
       {
         chi::log.Log() << chi::program_timer.GetTimeString()
                        << " Computing neighbor unit integrals.";
-        const auto ghost_ids = ref_grid_->cells.GetGhostGlobalIDs();
+        const auto ghost_ids = ref_grid_.cells.GetGhostGlobalIDs();
         for (uint64_t cell_gid : ghost_ids)
         {
-          const auto& cell = ref_grid_->cells[cell_gid];
+          const auto& cell = ref_grid_.cells[cell_gid];
           const auto& cell_mapping = GetCellMapping(cell);
 
           UIData ui_data;
@@ -108,10 +108,10 @@ void chi_math::SpatialDiscretization_PWLBase::PreComputeNeighborCellSDValues()
       {
         chi::log.Log() << chi::program_timer.GetTimeString()
                        << " Computing neighbor quadrature data.";
-        const auto ghost_ids = ref_grid_->cells.GetGhostGlobalIDs();
+        const auto ghost_ids = ref_grid_.cells.GetGhostGlobalIDs();
         for (uint64_t cell_gid : ghost_ids)
         {
-          const auto& cell = ref_grid_->cells[cell_gid];
+          const auto& cell = ref_grid_.cells[cell_gid];
           const auto& cell_mapping = GetCellMapping(cell);
 
           QPDataVol qp_data_vol;

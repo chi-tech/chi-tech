@@ -15,7 +15,7 @@ namespace lbs::common_lua_utils
 
 \return double The fission rate.
 
-\ingroup LuaLBS
+\ingroup LBSLuaFunctions
 \author Jan*/
 int chiLBSComputeFissionRate(lua_State *L)
 {

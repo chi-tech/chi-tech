@@ -89,7 +89,7 @@ namespace chi_math
   public:
     //00_constrdestr.cc
     PolyhedronMappingFE_PWL(const chi_mesh::Cell& polyh_cell,
-                            const chi_mesh::MeshContinuumConstPtr& ref_grid,
+                            const chi_mesh::MeshContinuum& ref_grid,
                             const QuadratureTetrahedron& volume_quadrature,
                             const QuadratureTriangle&    surface_quadrature);
 

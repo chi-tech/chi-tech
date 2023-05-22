@@ -4,12 +4,11 @@
 #include "chi_log.h"
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteVolume/fv.h"
 #include "ChiMath/PETScUtils/petsc_utils.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 
 #include "ChiMath/VectorGhostCommunicator/vector_ghost_communicator.h"
 
@@ -18,7 +17,7 @@ namespace chi_unit_sim_tests
 
 /**This is a simple test of the Finite Volume spatial discretization applied
  * to Laplace's problem. */
-int chiSimTest02_FV(lua_State* L)
+int chiSimTest02_FV(lua_State*)
 {
   chi::log.Log() << "Coding Tutorial 2";
 
@@ -30,7 +29,7 @@ int chiSimTest02_FV(lua_State* L)
 
   //============================================= Make SDM
   typedef std::shared_ptr<chi_math::SpatialDiscretization> SDMPtr;
-  SDMPtr sdm_ptr = chi_math::SpatialDiscretization_FV::New(grid_ptr);
+  SDMPtr sdm_ptr = chi_math::SpatialDiscretization_FV::New(grid);
   const auto& sdm = *sdm_ptr;
 
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;
@@ -142,7 +141,7 @@ int chiSimTest02_FV(lua_State* L)
   chi::log.Log() << "Done cleanup";
 
   //============================================= Create Field Function
-  auto ff = std::make_shared<chi_physics::FieldFunction>(
+  auto ff = std::make_shared<chi_physics::FieldFunctionGridBased>(
     "Phi",
     sdm_ptr,
     chi_math::Unknown(chi_math::UnknownType::SCALAR)
@@ -150,7 +149,7 @@ int chiSimTest02_FV(lua_State* L)
 
   ff->UpdateFieldVector(field);
 
-  chi_physics::FieldFunction::ExportMultipleToVTK("CodeTut2_FV", {ff});
+  chi_physics::FieldFunctionGridBased::ExportMultipleToVTK("CodeTut2_FV", {ff});
 
   //============================================= Make ghosted vectors
   std::vector<int64_t> ghost_ids = sdm.GetGhostDOFIndices(OneDofPerNode);
@@ -216,7 +215,7 @@ int chiSimTest02_FV(lua_State* L)
   }//for cell
 
   //============================================= Create Field Function
-  auto ff_grad = std::make_shared<chi_physics::FieldFunction>(
+  auto ff_grad = std::make_shared<chi_physics::FieldFunctionGridBased>(
     "GradPhi",
     sdm_ptr,
     chi_math::Unknown(chi_math::UnknownType::VECTOR_3)
@@ -224,7 +223,7 @@ int chiSimTest02_FV(lua_State* L)
 
   ff_grad->UpdateFieldVector(grad_phi);
 
-  chi_physics::FieldFunction::ExportMultipleToVTK("CodeTut2_FV_grad", {ff_grad});
+  chi_physics::FieldFunctionGridBased::ExportMultipleToVTK("CodeTut2_FV_grad", {ff_grad});
 
   return 0;
 }

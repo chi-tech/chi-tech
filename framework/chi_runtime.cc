@@ -43,6 +43,7 @@ std::vector<chi_math::QuadraturePtr> chi::quadrature_stack;
 std::vector<chi_math::AngularQuadraturePtr> chi::angular_quadrature_stack;
 
 std::vector<ChiObjectPtr> chi::object_stack;
+std::vector<chi_math::SpatialDiscretizationPtr> chi::sdm_stack;
 
 //================================ run_time quantities
 bool chi::run_time::termination_posted_ = false;
@@ -152,7 +153,11 @@ void chi::run_time::ParseArguments(int argc, char** argv)
   } // for argument
 
   if (chi::run_time::dump_registry_)
+  {
     ChiObjectMaker::GetInstance().DumpRegister();
+    chi::console.DumpRegister();
+  }
+
 }
 
 // ############################################### Initialize ChiTech

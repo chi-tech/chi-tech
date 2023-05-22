@@ -1,6 +1,6 @@
 #include "adjoint_src_function.h"
 
-#include "Cd_DO_SteadyState_Adjoint/lbsadj_solver.h"
+#include "C_DiscreteOrdinatesAdjointSolver/lbsadj_solver.h"
 
 namespace lbs
 {
@@ -22,7 +22,7 @@ void AdjointSourceFunction::
 {
   const std::string fname = "AdjointSourceFunction::AddVolumetricQOISources";
 
-  typedef const DiscOrdSteadyStateAdjointSolver CAdjointSolver;
+  typedef const DiscreteOrdinatesAdjointSolver CAdjointSolver;
   const auto adjoint_solver_ptr = dynamic_cast<CAdjointSolver*>(&lbs_solver_);
   if (not adjoint_solver_ptr)
     throw std::logic_error(fname + ": Failed to cast lbs_solver_ to adjoint.");

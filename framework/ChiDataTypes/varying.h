@@ -121,10 +121,16 @@ public:
   /**Constructor for a string value.*/
   explicit Varying(const std::string& value);
   /**Constructor for a string literal value.*/
-  //explicit Varying(const char*& value) : Varying(std::string(value)) {}
-  explicit Varying(const char* value) : Varying(std::string(value)) {}
+  // explicit Varying(const char*& value) : Varying(std::string(value)) {}
+  explicit Varying(const char* value)
+    : Varying((not value) ? std::string() : std::string(value))
+  {
+  }
   template <std::size_t N>
-  explicit Varying(const char(&value)[N]) : Varying(static_cast<const char*>(value)) {}
+  explicit Varying(const char (&value)[N])
+    : Varying(static_cast<const char*>(value))
+  {
+  }
 
   /**Copy constructor.*/
   Varying(const Varying& other);
@@ -299,6 +305,9 @@ public:
   {
     CheckTypeMatch(type_, VaryingDataType::STRING);
     CheckDataInitialized();
+
+    if (not raw_data_.data()) // Covers construction from null
+      return std::string();
 
     return std::string(reinterpret_cast<const char*>(raw_data_.data()));
   }

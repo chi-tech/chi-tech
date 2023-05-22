@@ -14,7 +14,7 @@ namespace lbs::common_lua_utils
 \param Location_z double Z-location.
 \param Strength table Source strength as a multigroup vector.
 
- \ingroup LuaLBS
+ \ingroup LBSLuaFunctions
  */
 int chiLBSAddPointSource(lua_State *L)
 {
@@ -60,7 +60,7 @@ int chiLBSAddPointSource(lua_State *L)
  * useful for adjoint response calculations.
 \param SolverIndex int Handle to the solver.
 
- \ingroup LuaLBS
+ \ingroup LBSLuaFunctions
  */
 int chiLBSClearPointSources(lua_State *L)
 {
@@ -89,7 +89,7 @@ int chiLBSClearPointSources(lua_State *L)
  * useful for adjoint response calculations.
 \param SolverIndex int Handle to the solver.
 
- \ingroup LuaLBS
+ \ingroup LBSLuaFunctions
  */
 int chiLBSInitializePointSources(lua_State *L)
 {

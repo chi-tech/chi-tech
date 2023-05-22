@@ -7,7 +7,7 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 
@@ -95,7 +95,7 @@ void mg_diffusion::Solver::Initialize()
   mg_diffusion::Solver::Set_BCs(globl_unique_bndry_ids);
   
   //============================================= Make SDM
-  sdm_ptr_ = chi_math::SpatialDiscretization_PWLC::New(grid_ptr_);
+  sdm_ptr_ = chi_math::SpatialDiscretization_PWLC::New(*grid_ptr_);
   const auto& sdm = *sdm_ptr_;
  
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;
@@ -186,7 +186,7 @@ void mg_diffusion::Solver::Initialize()
 
       using namespace chi_math;
       auto initial_field_function =
-        std::make_shared<chi_physics::FieldFunction>(
+        std::make_shared<chi_physics::FieldFunctionGridBased>(
             text_name,                     //Text name
             sdm_ptr_,                       //Spatial Discretization
             Unknown(UnknownType::SCALAR)); //Unknown Manager

@@ -24,8 +24,8 @@ L=5
 xmin = -L/2
 dx = L/N
 for i=1,(N+1) do
-    k=i-1
-    mesh[i] = xmin + k*dx
+  k=i-1
+  mesh[i] = xmin + k*dx
 end
 chiMeshCreateUnpartitioned2DOrthoMesh(mesh,mesh)
 chiVolumeMesherExecute();
@@ -51,83 +51,61 @@ chiPhysicsMaterialAddProperty(materials[2],ISOTROPIC_MG_SOURCE)
 
 num_groups = 1
 chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,
-        CHI_XSFILE,"tests/Transport_Steady/simple_scatter.cxs")
+  CHI_XSFILE,"tests/Transport_Steady/simple_scatter.cxs")
 chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,
-        CHI_XSFILE,"tests/Transport_Steady/simple_scatter.cxs")
+  CHI_XSFILE,"tests/Transport_Steady/simple_scatter.cxs")
 
 --chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,SIMPLEXS0,num_groups,0.1)
 --chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,SIMPLEXS0,num_groups,0.1)
 
 src={}
 for g=1,num_groups do
-    src[g] = 0.0
+  src[g] = 0.0
 end
 chiPhysicsMaterialSetProperty(materials[1],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 src[1] = 1.0
 chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 
 --############################################### Setup Physics
-phys1 = chiLBSCreateSolver()
-
---========== Groups
-grp = {}
-for g=1,num_groups do
-    grp[g] = chiLBSCreateGroup(phys1)
-end
-
---========== ProdQuad
 fac=1
 pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,4*fac, 3*fac)
 chiOptimizeAngularQuadratureForPolarSymmetry(pqaud, 4.0*math.pi)
---========== Groupset def
-gs0 = chiLBSCreateGroupset(phys1)
-cur_gs = gs0
-chiLBSGroupsetAddGroups(phys1,cur_gs,0,0)
-chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
-chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
-chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
-chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
-chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-8)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
-chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
 
--- gs0 = chiLBSCreateGroupset(phys1)
--- cur_gs = gs0
--- chiLBSGroupsetAddGroups(phys1,cur_gs,1,62)
--- chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
--- chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
--- chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,2)
--- chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES)
--- chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
--- chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
--- chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
+lbs_block =
+{
+  num_groups = num_groups,
+  groupsets =
+  {
+    {
+      groups_from_to = {0, 0},
+      angular_quadrature_handle = pquad0,
+      angle_aggregation_num_subsets = 1,
+      groupset_num_subsets = 1,
+      inner_linear_method = "gmres",
+      l_abs_tol = 1.0e-8,
+      l_max_its = 300,
+      gmres_restart_interval = 100,
+    },
+  }
+}
+bsrc={}
+for g=1,num_groups do
+  bsrc[g] = 0.0
+end
+bsrc[1] = 1.0/4.0/math.pi
 
--- gs1 = chiLBSCreateGroupset(phys1)
--- cur_gs = gs1
--- chiLBSGroupsetAddGroups(phys1,cur_gs,63,167)
--- chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
--- chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
--- chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,2)
--- chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES)
--- chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
--- chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
--- chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
+lbs_options =
+{
+  scattering_order = 0,
+}
 
---############################################### Set boundary conditions
--- bsrc={}
--- for g=1,num_groups do
---     bsrc[g] = 0.0
--- end
--- bsrc[1] = 1.0/4.0/math.pi
--- chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,
---                         LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
+phys1 = lbs.DiscreteOrdinatesSolver.Create(lbs_block)
+lbs.SetOptions(phys1, lbs_options)
 
-chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
-chiLBSSetProperty(phys1,SCATTERING_ORDER,0)
+ss_solver = lbs.SteadyStateSolver.Create({lbs_solver_handle = phys1})
 
---############################################### Initialize and Execute Solver
-chiSolverInitialize(phys1)
-chiSolverExecute(phys1)
+chiSolverInitialize(ss_solver)
+chiSolverExecute(ss_solver)
 
 chiLBSComputeBalance(phys1)
 
@@ -170,11 +148,11 @@ chiLog(LOG_0,string.format("Max-value2=%.5e", maxval))
 
 --############################################### Exports
 if master_export == nil then
-    chiFFInterpolationExportPython(slice2)
-    chiExportFieldFunctionToVTKG(fflist[1],"ZPhi3D","Phi")
+  chiFFInterpolationExportPython(slice2)
+  chiExportFieldFunctionToVTKG(fflist[1],"ZPhi3D","Phi")
 end
 
 --############################################### Plots
 if (chi_location_id == 0 and master_export == nil) then
-    local handle = io.popen("python ZPFFI00.py")
+  local handle = io.popen("python ZPFFI00.py")
 end

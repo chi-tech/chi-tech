@@ -1,6 +1,6 @@
 #include "diffusion_solver.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
@@ -31,13 +31,15 @@ int chi_diffusion::Solver::Initialize(bool verbose)
     if      (sdm_string == "PWLC")
     {
       discretization_ =
-        chi_math::SpatialDiscretization_PWLC::New(grid_, COMPUTE_UNIT_INTEGRALS);
+        chi_math::SpatialDiscretization_PWLC::New(
+        *grid_ptr_, COMPUTE_UNIT_INTEGRALS);
       unknown_manager_.AddUnknown(chi_math::UnknownType::SCALAR);
     }
     else if (sdm_string == "PWLD_MIP")
     {
       discretization_ =
-        chi_math::SpatialDiscretization_PWLD::New(grid_, COMPUTE_UNIT_INTEGRALS);
+        chi_math::SpatialDiscretization_PWLD::New(
+        *grid_ptr_, COMPUTE_UNIT_INTEGRALS);
       unknown_manager_.AddUnknown(chi_math::UnknownType::SCALAR);
     }
 //    else if (sdm_string == "PWLD_MIP_GAGG")
@@ -75,7 +77,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
 
     using namespace chi_math;
     auto initial_field_function =
-      std::make_shared<chi_physics::FieldFunction>(
+      std::make_shared<chi_physics::FieldFunctionGridBased>(
         text_name,                     //Text name
         sdm_ptr,                       //Spatial Discretization
         Unknown(UnknownType::SCALAR)); //Unknown/Variable
@@ -141,7 +143,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
   //seemed to have caused a lot of trouble for Slab
   //geometries. This section makes some custom options
   //per cell type
-  auto first_cell = &grid_->local_cells[0];
+  auto first_cell = &grid_ptr_->local_cells[0];
 
   if (first_cell->Type() == chi_mesh::CellType::SLAB)
   {

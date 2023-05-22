@@ -8,7 +8,7 @@
 #include "ChiMath/RandomNumberGeneration/random_number_generator.h"
 #include "ChiMath/Quadratures/LegendrePoly/legendrepoly.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -57,7 +57,7 @@ int chiSimTest93_RayTracing(lua_State* Lstate)
 
   //============================================= Make SDM
   typedef std::shared_ptr<chi_math::SpatialDiscretization> SDMPtr;
-  SDMPtr sdm_ptr = chi_math::SpatialDiscretization_PWLD::New(grid_ptr);
+  SDMPtr sdm_ptr = chi_math::SpatialDiscretization_PWLD::New(grid);
   const auto& sdm = *sdm_ptr;
 
   chi_math::UnknownManager phi_uk_man;
@@ -331,9 +331,9 @@ int chiSimTest93_RayTracing(lua_State* Lstate)
   }//for cell
 
   //============================================= Create Field Functions
-  std::vector<std::shared_ptr<chi_physics::FieldFunction>> ff_list;
+  std::vector<std::shared_ptr<chi_physics::FieldFunctionGridBased>> ff_list;
 
-  ff_list.push_back(std::make_shared<chi_physics::FieldFunction>(
+  ff_list.push_back(std::make_shared<chi_physics::FieldFunctionGridBased>(
     "Phi",                                           //Text name
     sdm_ptr,                                         //Spatial Discr.
     chi_math::Unknown(chi_math::UnknownType::VECTOR_N,num_groups) //Unknown
@@ -359,10 +359,10 @@ int chiSimTest93_RayTracing(lua_State* Lstate)
 
 
   //============================================= Update field function
-  chi_physics::FieldFunction::FFList const_ff_list;
+  chi_physics::FieldFunctionGridBased::FFList const_ff_list;
   for (const auto& ff_ptr : ff_list)
     const_ff_list.push_back(ff_ptr);
-  chi_physics::FieldFunction::ExportMultipleToVTK("SimTest_93",
+  chi_physics::FieldFunctionGridBased::ExportMultipleToVTK("SimTest_93",
                                                   const_ff_list);
 
   return 0;

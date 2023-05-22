@@ -11,10 +11,10 @@ num_procs = 4
 
 --############################################### Check num_procs
 if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
-    chiLog(LOG_0ERROR,"Incorrect amount of processors. " ..
-                      "Expected "..tostring(num_procs)..
-                      ". Pass check_num_procs=false to override if possible.")
-    os.exit(false)
+  chiLog(LOG_0ERROR,"Incorrect amount of processors. " ..
+    "Expected "..tostring(num_procs)..
+    ". Pass check_num_procs=false to override if possible.")
+  os.exit(false)
 end
 
 --############################################### Setup mesh
@@ -46,13 +46,13 @@ chiPhysicsMaterialAddProperty(materials[2],ISOTROPIC_MG_SOURCE)
 
 num_groups = 5
 chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,
-        CHI_XSFILE,"tests/Transport_Steady/xs_graphite_pure.cxs")
+  CHI_XSFILE,"tests/Transport_Steady/xs_graphite_pure.cxs")
 chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,
-        CHI_XSFILE,"tests/Transport_Steady/xs_graphite_pure.cxs")
+  CHI_XSFILE,"tests/Transport_Steady/xs_graphite_pure.cxs")
 
 src={}
 for g=1,num_groups do
-    src[g] = 0.0
+  src[g] = 0.0
 end
 
 chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
@@ -60,49 +60,40 @@ src[1]=1.0
 chiPhysicsMaterialSetProperty(materials[1],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 
 --############################################### Setup Physics
+pquad0 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 2)
 
-phys1 = chiLBSCreateSolver()
+lbs_block =
+{
+  num_groups = num_groups,
+  groupsets =
+  {
+    {
+      groups_from_to = {0, num_groups-1},
+      angular_quadrature_handle = pquad0,
+      angle_aggregation_type = "single",
+      angle_aggregation_num_subsets = 1,
+      groupset_num_subsets = 1,
+      inner_linear_method = "gmres",
+      l_abs_tol = 1.0e-6,
+      l_max_its = 300,
+      gmres_restart_interval = 100,
+    },
+  }
+}
 
---========== Groups
-grp = {}
-for g=1,num_groups do
-    grp[g] = chiLBSCreateGroup(phys1)
-end
+lbs_options =
+{
+  scattering_order = 0,
+}
 
---========== ProdQuad
-pquad  = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 2)
-pquad2 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,12, 8)
-
---========== Groupset def
-gs0 = chiLBSCreateGroupset(phys1)
-cur_gs = gs0
-chiLBSGroupsetAddGroups(phys1,cur_gs,0,num_groups-1)
-chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
-chiLBSGroupsetSetAngleAggregationType(phys1,cur_gs,LBSGroupset.ANGLE_AGG_SINGLE)
-chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
-chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
-chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
-chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
-if (master_export == nil) then
-    --chiLBSGroupsetSetEnableSweepLog(phys1,cur_gs,true)
-end
---chiLBSGroupsetSetMaxIterations(phys1,cur_gs,10)
-chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
-
---############################################### Set boundary conditions
-bsrc={}
-for g=1,num_groups do
-    bsrc[g] = 0.0
-end
-bsrc[1] = 1.0/4.0/math.pi;
---chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
-
-chiLBSSetProperty(phys1,SCATTERING_ORDER,0)
-chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
+phys1 = lbs.DiscreteOrdinatesSolver.Create(lbs_block)
+lbs.SetOptions(phys1, lbs_options)
 
 --############################################### Initialize and Execute Solver
-chiSolverInitialize(phys1)
-chiSolverExecute(phys1)
+ss_solver = lbs.SteadyStateSolver.Create({lbs_solver_handle = phys1})
+
+chiSolverInitialize(ss_solver)
+chiSolverExecute(ss_solver)
 
 --############################################### Get field functions
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
@@ -149,13 +140,13 @@ chiLog(LOG_0,string.format("Max-value2=%.5e", maxval))
 
 --############################################### Exports
 if (master_export == nil) then
-    chiExportMultiFieldFunctionToVTK(fflist,"ZPhi3D")
-    chiExportFieldFunctionToVTK(fflist[1],"ZPhi3D_g0")
+  chiExportMultiFieldFunctionToVTK(fflist,"ZPhi3D")
+  chiExportFieldFunctionToVTK(fflist[1],"ZPhi3D_g0")
 end
 
 --############################################### Plots
 if (chi_location_id == 0 and master_export == nil) then
-    print("Execution completed")
+  print("Execution completed")
 end
 
 

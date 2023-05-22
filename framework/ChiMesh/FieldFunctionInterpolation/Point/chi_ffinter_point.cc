@@ -1,6 +1,6 @@
 #include "chi_ffinter_point.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
@@ -12,7 +12,7 @@
 void chi_mesh::FieldFunctionInterpolationPoint::Initialize()
 {
   const std::string fname = "FieldFunctionInterpolationPoint::Initialize";
-  const auto& grid = *field_functions_.front()->SDM().ref_grid_;
+  const auto& grid = field_functions_.front()->SDM().ref_grid_;
 
   std::vector<uint64_t> cells_potentially_owning_point;
   for (const auto& cell : grid.local_cells)
@@ -76,7 +76,7 @@ void chi_mesh::FieldFunctionInterpolationPoint::Execute()
 
   const auto& ref_ff = *field_functions_.front();
   const auto& sdm    = ref_ff.SDM();
-  const auto& grid   = *sdm.ref_grid_;
+  const auto& grid   = sdm.ref_grid_;
 
   const auto& uk_man = ref_ff.UnkManager();
   const auto uid = 0;

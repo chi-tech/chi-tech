@@ -4,7 +4,7 @@
 #include "ChiMath/SpatialDiscretization/FiniteElement/finite_element.h"
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -36,7 +36,7 @@ namespace chi_unit_sim_tests
     const auto& field = solver.field_;
 
     double local_error = 0.0;
-    for (const auto& cell : sdm.ref_grid_->local_cells)
+    for (const auto& cell : sdm.ref_grid_.local_cells)
     {
       const int mat_id = cell.material_id_;
       const auto& cell_mapping = sdm.GetCellMapping(cell);
@@ -69,7 +69,7 @@ namespace chi_unit_sim_tests
 
     auto unk_man = OneDofPerNode;
     auto ff =
-      std::make_shared<chi_physics::FieldFunction>(
+      std::make_shared<chi_physics::FieldFunctionGridBased>(
         std::string("phi"),        //Text name
         solver.sdm_ptr_,            //Spatial Discretization
         unk_man.unknowns_.front()); //Unknown Manager
@@ -92,7 +92,7 @@ namespace chi_unit_sim_tests
     global_error = std::sqrt(global_error);
 
     chi::log.Log() << "Error: " << std::scientific << global_error
-                   << " Num-cells: " << sdm.ref_grid_->GetGlobalNumberOfCells();
+                   << " Num-cells: " << sdm.ref_grid_.GetGlobalNumberOfCells();
 
     auto stl_vector = new std::vector<double>();
     sdm.LocalizePETScVector(solver.x_, *stl_vector, OneDofPerNode);

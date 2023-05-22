@@ -2,7 +2,7 @@
 
 #include "ChiMath/VectorGhostCommunicator/vector_ghost_communicator.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
@@ -19,7 +19,7 @@ void chi_mesh::FieldFunctionInterpolationLine::Execute()
           auto& ff_ctx = ff_contexts_[ff];
     const auto& ref_ff = *ff_ctx.ref_ff;
     const auto& sdm    = ref_ff.SDM();
-    const auto& grid   = *sdm.ref_grid_;
+    const auto& grid   = sdm.ref_grid_;
 
     const auto& uk_man = ref_ff.UnkManager();
     const auto uid = 0;

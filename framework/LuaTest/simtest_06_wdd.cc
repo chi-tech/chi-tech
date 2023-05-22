@@ -11,7 +11,7 @@
 #include "ChiMath/Quadratures/angular_product_quadrature.h"
 #include "ChiMath/chi_math_range.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 #include "ChiPhysics/PhysicsMaterial/MultiGroupXS/single_state_mgxs.h"
 
 #include "ChiDataTypes/ndarray.h"
@@ -76,7 +76,7 @@ int chiSimTest06_WDD(lua_State* L)
 
   //============================================= Make SDM
   typedef std::shared_ptr<chi_math::SpatialDiscretization> SDMPtr;
-  SDMPtr sdm_ptr = chi_math::SpatialDiscretization_FV::New(grid_ptr);
+  SDMPtr sdm_ptr = chi_math::SpatialDiscretization_FV::New(grid);
   const auto& sdm = *sdm_ptr;
 
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;
@@ -322,7 +322,7 @@ int chiSimTest06_WDD(lua_State* L)
                                  0);          //to unknown-id
 
   //============================================= Create Field Function
-  auto phi_ff = std::make_shared<chi_physics::FieldFunction>(
+  auto phi_ff = std::make_shared<chi_physics::FieldFunctionGridBased>(
     "Phi",                                           //Text name
     sdm_ptr,                                         //Spatial Discr.
     chi_math::Unknown(chi_math::UnknownType::VECTOR_N,num_groups) //Unknown
@@ -330,7 +330,7 @@ int chiSimTest06_WDD(lua_State* L)
 
   phi_ff->UpdateFieldVector(m0_phi);
 
-  chi_physics::FieldFunction::ExportMultipleToVTK("SimTest_06_WDD", {phi_ff});
+  chi_physics::FieldFunctionGridBased::ExportMultipleToVTK("SimTest_06_WDD", {phi_ff});
 
   return 0;
 }
