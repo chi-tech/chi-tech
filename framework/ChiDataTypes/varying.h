@@ -162,12 +162,23 @@ public:
   /**Equality operator*/
   bool operator==(const Varying& that) const
   {
-    bool is_same = true;
-
     if (this->Type() != that.type_) return false;
-    if (this->raw_data_ != that.raw_data_) return false;
-
-    return is_same;
+    switch (this->Type())
+    {
+      case VaryingDataType::ARBITRARY_BYTES:
+        return raw_data_ == that.raw_data_;
+      case VaryingDataType::STRING:
+        return StringValue() == that.StringValue();
+      case VaryingDataType::BOOL:
+        return BoolValue() == that.BoolValue();
+      case VaryingDataType::INTEGER:
+        return IntegerValue() == that.IntegerValue();
+      case VaryingDataType::FLOAT:
+        return FloatValue() == that.FloatValue();
+      case VaryingDataType::VOID:
+      default:
+        return false;
+    }
   }
 
   /**Inequality operator*/

@@ -109,11 +109,11 @@ chi_objects::InputParameters lbs::LBSGroupset::GetInputParameters()
     "angle_aggregation_type",
     AllowableRangeList::New({"polar", "single", "azimuthal"}));
 
-  //params.ConstrainParameterRange("angle_aggregation_num_subsets",
-  //                               AllowableRangeLowLimit::New(1));
-  //
-  //params.ConstrainParameterRange("groupset_num_subsets",
-  //                               AllowableRangeLowLimit::New(1));
+  params.ConstrainParameterRange("angle_aggregation_num_subsets",
+                                 AllowableRangeLowLimit::New(1));
+
+  params.ConstrainParameterRange("groupset_num_subsets",
+                                 AllowableRangeLowLimit::New(1));
 
   params.ConstrainParameterRange(
     "inner_linear_method",
@@ -121,7 +121,7 @@ chi_objects::InputParameters lbs::LBSGroupset::GetInputParameters()
 
   params.ConstrainParameterRange("l_abs_tol",
                                  AllowableRangeLowLimit::New(1.0e-18));
-  //params.ConstrainParameterRange("l_max_its", AllowableRangeLowLimit::New(0));
+  params.ConstrainParameterRange("l_max_its", AllowableRangeLowLimit::New(0));
   params.ConstrainParameterRange("gmres_restart_interval",
                                  AllowableRangeLowLimit::New(1));
 
