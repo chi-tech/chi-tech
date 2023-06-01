@@ -1,6 +1,8 @@
 #ifndef CHITECH_CHI_LOG_EXCEPTIONS_H
 #define CHITECH_CHI_LOG_EXCEPTIONS_H
 
+#include <stdexcept>
+
 #define ChiInvalidArgumentIf(condition, message)                               \
   if (condition)                                                               \
   throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + ": " +        \
