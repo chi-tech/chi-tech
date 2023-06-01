@@ -74,6 +74,7 @@ into the directory containing the "configure" script and execute the following:
 --download-superlu_dist=1  \
 --with-cxx-dialect=C++11  \
 --with-64-bit-indices \
+CC=$CC CXX=$CXX FC=$FC \
 CFLAGS='-fPIC -fopenmp'  \
 CXXFLAGS='-fPIC -fopenmp'  \
 FFLAGS='-fPIC -fopenmp'  \
