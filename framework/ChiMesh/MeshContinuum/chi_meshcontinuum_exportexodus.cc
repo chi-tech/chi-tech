@@ -60,6 +60,8 @@ void chi_mesh::MeshContinuum::
     vtkNew<vtkUnstructuredGrid> ugrid;
     vtkNew<vtkPoints> points;
 
+    points->SetDataType(VTK_DOUBLE);
+
     vtkNew<vtkIdTypeArray> global_node_id_list;
     global_node_id_list->SetName("GlobalNodeId");
 
@@ -185,6 +187,8 @@ void chi_mesh::MeshContinuum::
       vtkNew<vtkUnstructuredGrid> ugrid;
       vtkNew<vtkPoints> points;
 
+      points->SetDataType(VTK_DOUBLE);
+
       vtkNew<vtkIdTypeArray> node_global_ids;
       node_global_ids->SetName("GlobalNodeId");
 
@@ -241,6 +245,8 @@ void chi_mesh::MeshContinuum::
     {
       vtkNew<vtkUnstructuredGrid> ugrid;
       vtkNew<vtkPoints> points;
+
+      points->SetDataType(VTK_DOUBLE);
 
       vtkNew<vtkIdTypeArray> src_cell_global_ids;
       vtkNew<vtkIntArray>    src_cell_face_id;
@@ -312,6 +318,7 @@ void chi_mesh::MeshContinuum::
   writer->SetBlockIdArrayName("BlockID");
 
   writer->SetFileName((file_base_name + ".e").c_str());
+  writer->SetStoreDoubles(1);
 
   writer->SetInputData(main_block);
 
@@ -345,6 +352,8 @@ void chi_mesh::MeshContinuum::
   chi::log.Log() << "Num Node Sets:  " << em->GetNumberOfNodeSets();
   chi::log.Log() << "Num Side Sets:  " << em->GetNumberOfSideSets();
   chi::log.Log() << "Dimension    :  " << em->GetDimension();
+
+  writer->PrintSelf(std::cout, vtkIndent());
 
   chi::log.Log() << "Done exporting mesh to VTK.";
   MPI_Barrier(MPI_COMM_WORLD);
