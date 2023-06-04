@@ -18,6 +18,13 @@ chi_objects::InputParameters LuaDimAToDimB::GetInputParameters()
 
   // Inherits input_dimension and output_dimension
 
+  // clang-format off
+  params.SetGeneralDescription(
+  "\\defgroup chi_math__functions__LuaDimAToDimB "
+  " chi_math.functions.LuaDimAToDimB\n"
+  "\\ingroup DocMathFunctions");
+  // clang-format on
+
   params.AddRequiredParameter<std::string>("lua_function_name",
                                            "Name of the lua function");
 

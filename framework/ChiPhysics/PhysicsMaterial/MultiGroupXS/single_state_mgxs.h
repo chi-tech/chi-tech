@@ -3,10 +3,6 @@
 
 #include "multigroup_xs.h"
 
-
-/**\defgroup LuaTransportXSs Transport Cross Sections
- * \ingroup LuaPhysics*/
-
 namespace chi_physics
 {
 

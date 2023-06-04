@@ -15,6 +15,13 @@ chi_objects::InputParameters FieldCopyOperation::GetInputParameters()
 {
   chi_objects::InputParameters params = FieldOperation::GetInputParameters();
 
+  // clang-format off
+  params.SetGeneralDescription(
+  "\\defgroup chi_physics__field_operations__FieldCopyOperation "
+  " chi_physics.field_operations.FieldCopyOperation\n"
+  "\\ingroup DocFieldOperation");
+  // clang-format on
+
   params.AddRequiredParameter<size_t>(
     "to",
     "Handle to the field function that should "

@@ -14,6 +14,13 @@ chi_objects::InputParameters ImplicitEulerTimeIntegration::GetInputParameters()
   chi_objects::InputParameters params =
     ThetaSchemeTimeIntegration::GetInputParameters();
 
+  // clang-format off
+  params.SetGeneralDescription(
+  "\\defgroup chi_math__ImplicitEulerTimeIntegration "
+  " chi_math.ImplicitEulerTimeIntegration\n"
+  "\\ingroup DocTimeIntegrations");
+  // clang-format on
+
   params.ChangeExistingParamToOptional("method",
                                        scint(SteppingMethod::IMPLICIT_EULER));
   params.ChangeExistingParamToOptional("theta", 1.0);

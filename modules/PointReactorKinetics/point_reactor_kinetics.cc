@@ -18,7 +18,13 @@ chi_objects::InputParameters TransientSolver::GetInputParameters()
   chi_objects::InputParameters params =
     chi_physics::Solver::GetInputParameters();
 
-  params.ChangeExistingParamToOptional("name", "rpk_TransientSolver");
+  // clang-format off
+  params.SetGeneralDescription(
+  "\\defgroup prk__TransientSolver prk.TransientSolver\n"
+  "\\ingorup prk");
+  // clang-format on
+
+  params.ChangeExistingParamToOptional("name", "prk_TransientSolver");
 
   std::vector<double> default_lambdas = {
     0.0124, 0.0304, 0.111, 0.301, 1.14, 3.01};

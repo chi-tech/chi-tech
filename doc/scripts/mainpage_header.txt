@@ -12,7 +12,6 @@ now we have only a couple of tutorials.\n
  # Index
 
  \subpage Tutorial00 \n
- \subpage MeshTutorials \n
  \subpage ProgrammerManual \n
  <a href="https://www.lua.org/manual/5.3/"><B>Lua 5.3 Reference</B></a>\n
  <a href="https://www.mcs.anl.gov/petsc/documentation/index.html"><B>PETSc Documentation</B></a>\n
@@ -23,7 +22,7 @@ now we have only a couple of tutorials.\n
 
 \tableofcontents
 
- \section MainPage0 Variables defined in lua
+# Variables defined in lua
 Variable Name        | Description                            | Variable Name        | Description
 ---------------------|------------------                      |--------------------- |---------------------
  `chi_version`       | Version string, e.g., "1.2.3"          | `chi_minor_version`  | Minor version, e.g., 2, as an integer

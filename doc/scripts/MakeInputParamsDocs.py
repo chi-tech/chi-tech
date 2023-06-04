@@ -298,6 +298,9 @@ for obj in obj_list:
 
     if "description" in obj:
         file.write(obj["description"] + "\n")
+        if obj["description"].find("\ingroup") < 0 and \
+            obj["description"].find("\\ingroup") < 0:
+            file.write("\\ingroup DocExperimental\n")
 
     if "constructible" in obj:
         if obj["constructible"]:
