@@ -47,6 +47,15 @@ chi_objects::InputParameters TestObject::GetInputParameters()
   params.MarkParamaterRenamed("use_ragusas_stuff",
                               "Renamed to \"use_complicated_stuff\".");
 
+  params.AddOptionalParameter<int>(
+    "groupset_num_subsets",
+    1,
+    "The number of subsets to apply to the set of groups in this set. This is "
+    "useful for increasing pipeline size for parallel simulations");
+
+  using namespace chi_data_types;
+  params.ConstrainParameterRange("groupset_num_subsets",
+                                 AllowableRangeLowLimit::New<int>(1));
   return params;
 }
 

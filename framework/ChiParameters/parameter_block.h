@@ -239,7 +239,9 @@ public:
         throw std::logic_error(
           error_origin_scope_ + std::string(__PRETTY_FUNCTION__) +
           ": Cannot construct vector from block because "
-          "the sub_parameters do not all have the correct type.");
+          "the sub_parameters do not all have the correct type. param->" +
+          ParameterBlockTypeName(param.Type()) + " vs param0->" +
+          ParameterBlockTypeName(front_param.Type()));
 
     const size_t num_params = parameters_.size();
     for (size_t k = 0; k < num_params; ++k)
