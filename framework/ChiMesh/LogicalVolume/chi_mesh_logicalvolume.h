@@ -21,16 +21,11 @@ enum class LogicalVolumeType
 /** Class for defining base logical volumes.*/
 class LogicalVolume
 {
-private:
-  const LogicalVolumeType type_;
+public:
+  virtual bool Inside(const chi_mesh::Vector3& point) const { return false; }
 
 protected:
-  explicit LogicalVolume(LogicalVolumeType type) : type_(type) {}
-
-public:
-  LogicalVolumeType Type() const { return type_; }
-
-  virtual bool Inside(const chi_mesh::Vector3& point) const { return false; }
+  explicit LogicalVolume() {}
 };
 
 } // namespace chi_mesh
@@ -43,7 +38,7 @@ public:
   double r_;
   double x0_, y0_, z0_;
 
-  SphereLogicalVolume() : LogicalVolume(LogicalVolumeType::LVSPHERE_ORIGIN)
+  SphereLogicalVolume() : LogicalVolume()
   {
     r_ = 1.0;
     x0_ = 0.0;
@@ -52,7 +47,7 @@ public:
   }
 
   explicit SphereLogicalVolume(double in_radius)
-    : LogicalVolume(LogicalVolumeType::LVSPHERE_ORIGIN)
+    : LogicalVolume()
   {
     r_ = in_radius;
     x0_ = 0.0;
@@ -61,7 +56,7 @@ public:
   }
 
   SphereLogicalVolume(double in_radius, double in_x, double in_y, double in_z)
-    : LogicalVolume(LogicalVolumeType::LVSPHERE)
+    : LogicalVolume()
   {
     r_ = in_radius;
     x0_ = in_x;
@@ -92,7 +87,7 @@ public:
   double ymin_, ymax_;
   double zmin_, zmax_;
 
-  RPPLogicalVolume() : LogicalVolume(LogicalVolumeType::LVRPP)
+  RPPLogicalVolume() : LogicalVolume()
   {
     xmin_ = 0.0;
     xmax_ = 1.0;
@@ -104,7 +99,7 @@ public:
 
   RPPLogicalVolume(
     double x0, double x1, double y0, double y1, double z0, double z1)
-    : LogicalVolume(LogicalVolumeType::LVRPP)
+    : LogicalVolume()
   {
     xmin_ = x0;
     xmax_ = x1;
@@ -138,7 +133,7 @@ public:
   double vx_, vy_, vz_;
   double r_;
 
-  RCCLogicalVolume() : LogicalVolume(LogicalVolumeType::LVRCC)
+  RCCLogicalVolume() : LogicalVolume()
   {
     x0_ = 0.0;
     y0_ = 0.0;
@@ -156,7 +151,7 @@ public:
                    double ivy,
                    double ivz,
                    double ir)
-    : LogicalVolume(LogicalVolumeType::LVRCC)
+    : LogicalVolume()
   {
     x0_ = ix0;
     y0_ = iy0;
@@ -241,7 +236,7 @@ class chi_mesh::BooleanLogicalVolume : public LogicalVolume
 public:
   std::vector<std::pair<bool, std::shared_ptr<LogicalVolume>>> parts;
 
-  BooleanLogicalVolume() : LogicalVolume(LogicalVolumeType::LVBOOLEAN) {}
+  BooleanLogicalVolume() : LogicalVolume() {}
 
   bool Inside(const chi_mesh::Vector3& point) const override
   {

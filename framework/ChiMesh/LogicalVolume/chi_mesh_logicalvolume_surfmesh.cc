@@ -9,7 +9,7 @@
 /**Constructor to compute bound box information.*/
 chi_mesh::SurfaceMeshLogicalVolume::
   SurfaceMeshLogicalVolume(SurfaceMeshPtr in_surf_mesh) :
-  LogicalVolume(LogicalVolumeType::LVSURFACE),
+  LogicalVolume(),
   xbounds_({1.0e6, -1.0e6}),
   ybounds_({1.0e6, -1.0e6}),
   zbounds_({1.0e6, -1.0e6}),
