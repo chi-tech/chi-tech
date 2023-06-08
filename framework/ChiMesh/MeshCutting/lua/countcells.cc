@@ -28,7 +28,7 @@ int chiCountMeshInLogicalVolume(lua_State* L)
   auto& handler = chi_mesh::GetCurrentHandler();
 
   const auto& log_vol = chi::GetStackItem<chi_mesh::LogicalVolume>(
-    chi::logicvolume_stack, log_vol_handle, fname);
+    chi::object_stack, log_vol_handle, fname);
 
   auto& grid = handler.GetGrid();
 

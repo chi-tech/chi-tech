@@ -1,31 +1,24 @@
 #ifndef CHI_MESH_LOGICALVOLUME_H
 #define CHI_MESH_LOGICALVOLUME_H
 
+#include "ChiObject/chi_object.h"
+
 #include "../chi_mesh.h"
 #include <chi_log.h>
 #include <array>
 
 namespace chi_mesh
 {
-enum class LogicalVolumeType
-{
-  LVSPHERE = 1,
-  LVSPHERE_ORIGIN = 2,
-  LVRPP = 3,
-  LVRCC = 4,
-  LVSURFACE = 9,
-  LVBOOLEAN = 10
-};
 
 // ###################################################################
 /** Class for defining base logical volumes.*/
-class LogicalVolume
+class LogicalVolume : public ChiObject
 {
 public:
   virtual bool Inside(const chi_mesh::Vector3& point) const { return false; }
 
 protected:
-  explicit LogicalVolume() {}
+  explicit LogicalVolume() : ChiObject() {}
 };
 
 } // namespace chi_mesh
