@@ -5,7 +5,7 @@
 #include "ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h"
 
 #include "chi_runtime.h"
-#include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
+#include "ChiMesh/LogicalVolume/LogicalVolume.h"
 
 #include <iostream>
 

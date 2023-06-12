@@ -2,7 +2,7 @@
 #define CHI_FFINTER_VOLUME_H
 
 #include "../chi_ffinterpolation.h"
-#include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
+#include "ChiMesh/LogicalVolume/LogicalVolume.h"
 
 #include <petscksp.h>
 

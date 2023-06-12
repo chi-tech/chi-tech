@@ -1,6 +1,9 @@
 #include "chi_lua.h"
 
-#include "../chi_mesh_logicalvolume.h"
+#include "../LogicalVolume.h"
+#include "../SphereLogicalVolume.h"
+
+#include "ChiObject/object_maker.h"
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "chi_runtime.h"
@@ -15,9 +18,11 @@
 \param TypeIndex int Volume type.
 \param Values varying Parameters.
 
+\warning This function is deprecated
+
 ##_
 
-###TypeIndex\n
+### TypeIndex
 SPHERE_ORIGIN =  Sphere at the origin. [Requires: R]\n
 SPHERE  =  Sphere at user supplied location. [Requires: x,y,z,R]\n
 RPP=  Rectangular ParalleliPiped. [Requires: xmin,xmax,ymin,ymax,zmin,zmax]\n
@@ -87,6 +92,8 @@ int chiLogicalVolumeCreate(lua_State* L)
   const int LVSURFACE = scint(LogicalVolumeType::LVSURFACE);
   const int LVBOOLEAN = scint(LogicalVolumeType::LVBOOLEAN);
 
+  auto& object_maker = ChiObjectMaker::GetInstance();
+
   //================================================== Sphere at origin
   if (type_index == LVSPHERE_ORIGIN)
   {
@@ -97,11 +104,20 @@ int chiLogicalVolumeCreate(lua_State* L)
       chi::Exit(EXIT_FAILURE);
     }
     double r = lua_tonumber(L, 2);
-    auto log_vol = std::make_shared<chi_mesh::SphereLogicalVolume>(r);
+    // auto log_vol = std::make_shared<chi_mesh::SphereLogicalVolume>(r);
+    //
+    // chi::object_stack.push_back(log_vol);
+    // const size_t index = chi::object_stack.size() - 1;
+    // lua_pushinteger(L, static_cast<lua_Integer>(index));
 
-    chi::object_stack.push_back(log_vol);
-    const size_t index = chi::object_stack.size() - 1;
-    lua_pushinteger(L, static_cast<lua_Integer>(index));
+    chi_objects::ParameterBlock params;
+    params.AddParameter("r", r);
+
+    const size_t handle = object_maker.MakeRegisteredObjectOfType(
+      "chi_mesh::SphereLogicalVolume", params);
+
+    lua_pushinteger(L, static_cast<lua_Integer>(handle));
+    return 1;
   }
 
   //================================================== Sphere at arb loc
@@ -117,11 +133,24 @@ int chiLogicalVolumeCreate(lua_State* L)
     double y = lua_tonumber(L, 3);
     double z = lua_tonumber(L, 4);
     double r = lua_tonumber(L, 5);
-    auto log_vol = std::make_shared<chi_mesh::SphereLogicalVolume>(x, y, z, r);
+    // auto log_vol = std::make_shared<chi_mesh::SphereLogicalVolume>(x, y, z,
+    // r);
+    //
+    // chi::object_stack.push_back(log_vol);
+    // const size_t index = chi::object_stack.size() - 1;
+    // lua_pushinteger(L, static_cast<lua_Integer>(index));
 
-    chi::object_stack.push_back(log_vol);
-    const size_t index = chi::object_stack.size() - 1;
-    lua_pushinteger(L, static_cast<lua_Integer>(index));
+    chi_objects::ParameterBlock params;
+    params.AddParameter("r", r);
+    params.AddParameter("x", x);
+    params.AddParameter("y", y);
+    params.AddParameter("z", z);
+
+    const size_t handle = object_maker.MakeRegisteredObjectOfType(
+      "chi_mesh::SphereLogicalVolume", params);
+
+    lua_pushinteger(L, static_cast<lua_Integer>(handle));
+    return 1;
   }
 
   //================================================== RPP
@@ -139,12 +168,26 @@ int chiLogicalVolumeCreate(lua_State* L)
     double ymax = lua_tonumber(L, 5);
     double zmin = lua_tonumber(L, 6);
     double zmax = lua_tonumber(L, 7);
-    auto log_vol = std::make_shared<chi_mesh::RPPLogicalVolume>(
-      xmin, xmax, ymin, ymax, zmin, zmax);
+    // auto log_vol = std::make_shared<chi_mesh::RPPLogicalVolume>(
+    //   xmin, xmax, ymin, ymax, zmin, zmax);
+    //
+    // chi::object_stack.push_back(log_vol);
+    // const size_t index = chi::object_stack.size() - 1;
+    // lua_pushinteger(L, static_cast<lua_Integer>(index));
 
-    chi::object_stack.push_back(log_vol);
-    const size_t index = chi::object_stack.size() - 1;
-    lua_pushinteger(L, static_cast<lua_Integer>(index));
+    chi_objects::ParameterBlock params;
+    params.AddParameter("xmin", xmin);
+    params.AddParameter("xmax", xmax);
+    params.AddParameter("ymin", ymin);
+    params.AddParameter("ymax", ymax);
+    params.AddParameter("zmin", zmin);
+    params.AddParameter("zmax", zmax);
+
+    const size_t handle = object_maker.MakeRegisteredObjectOfType(
+      "chi_mesh::RPPLogicalVolume", params);
+
+    lua_pushinteger(L, static_cast<lua_Integer>(handle));
+    return 1;
   }
 
   //================================================== RCC
@@ -163,17 +206,34 @@ int chiLogicalVolumeCreate(lua_State* L)
     double vy = lua_tonumber(L, 6);
     double vz = lua_tonumber(L, 7);
     double r = lua_tonumber(L, 8);
-    auto log_vol =
-      std::make_shared<chi_mesh::RCCLogicalVolume>(x0, y0, z0, vx, vy, vz, r);
+    // auto log_vol =
+    //   std::make_shared<chi_mesh::RCCLogicalVolume>(x0, y0, z0, vx, vy, vz,
+    //   r);
+    //
+    // chi::object_stack.push_back(log_vol);
+    // const size_t index = chi::object_stack.size() - 1;
+    // lua_pushinteger(L, static_cast<lua_Integer>(index));
 
-    chi::object_stack.push_back(log_vol);
-    const size_t index = chi::object_stack.size() - 1;
-    lua_pushinteger(L, static_cast<lua_Integer>(index));
+    chi_objects::ParameterBlock params;
+    params.AddParameter("x0", x0);
+    params.AddParameter("y0", y0);
+    params.AddParameter("z0", z0);
+    params.AddParameter("vx", vx);
+    params.AddParameter("vy", vy);
+    params.AddParameter("vz", vz);
+    params.AddParameter("r", r);
+
+    const size_t handle = object_maker.MakeRegisteredObjectOfType(
+      "chi_mesh::RCCLogicalVolume", params);
 
     chi::log.Log0Verbose1()
       << "Created RCC Logical volume with x0,y0,z0,vx,vy,vz,r = " << x0 << " "
       << y0 << " " << z0 << " " << vx << " " << vy << " " << vz << " " << r;
+
+    lua_pushinteger(L, static_cast<lua_Integer>(handle));
+    return 1;
   }
+  //================================================== SURFACE
   else if (type_index == LVSURFACE)
   {
     if (num_args != 2)
@@ -181,79 +241,143 @@ int chiLogicalVolumeCreate(lua_State* L)
 
     int surf_mesh_hndle = lua_tonumber(L, 2);
 
-    auto surf_mesh_ptr = chi::GetStackItemPtr<chi_mesh::SurfaceMesh>(
-      chi::surface_mesh_stack, surf_mesh_hndle, fname);
+    // auto surf_mesh_ptr = chi::GetStackItemPtr<chi_mesh::SurfaceMesh>(
+    //   chi::surface_mesh_stack, surf_mesh_hndle, fname);
+    //
+    // auto log_vol =
+    //   std::make_shared<chi_mesh::SurfaceMeshLogicalVolume>(surf_mesh_ptr);
+    //
+    // chi::object_stack.push_back(log_vol);
+    // const size_t index = chi::object_stack.size() - 1;
+    // lua_pushinteger(L, static_cast<lua_Integer>(index));
+    chi_objects::ParameterBlock params;
+    params.AddParameter("surface_mesh_handle", surf_mesh_hndle);
 
-    auto log_vol =
-      std::make_shared<chi_mesh::SurfaceMeshLogicalVolume>(surf_mesh_ptr);
+    const size_t handle = object_maker.MakeRegisteredObjectOfType(
+      "chi_mesh::SurfaceMeshLogicalVolume", params);
 
-    chi::object_stack.push_back(log_vol);
-    const size_t index = chi::object_stack.size() - 1;
-    lua_pushinteger(L, static_cast<lua_Integer>(index));
+    lua_pushinteger(L, static_cast<lua_Integer>(handle));
+    return 1;
   }
   //================================================== BOOLEAN
   else if (type_index == LVBOOLEAN)
   {
-    if (num_args % 2 != 0)
-    {
-      chi::log.Log0Error() << "Incorrect amount of arguments provided "
-                              "for chiMeshCreateLogicalVolume(BOOLEAN..."
-                              " Expected pairs of (bool,volumeHandle)";
-      chi::Exit(EXIT_FAILURE);
-    }
+    // if (num_args % 2 != 0)
+    //{
+    //   chi::log.Log0Error() << "Incorrect amount of arguments provided "
+    //                           "for chiMeshCreateLogicalVolume(BOOLEAN..."
+    //                           " Expected pairs of (bool,volumeHandle)";
+    //   chi::Exit(EXIT_FAILURE);
+    // }
 
-    auto bool_vol = std::make_shared<chi_mesh::BooleanLogicalVolume>();
+    // auto bool_vol = std::make_shared<chi_mesh::BooleanLogicalVolume>();
+    //
+    // int num_pairs = num_args / 2;
+    // for (int p = 0; p < num_pairs; p++)
+    //{
+    //   //==================================== Checking first part of pair
+    //   if (not lua_isboolean(L, 2 * p))
+    //   {
+    //     chi::log.Log0Error() << "chiMeshCreateLogicalVolume(BOOLEAN..."
+    //                             " argument "
+    //                          << 2 * p
+    //                          << " expected to be "
+    //                             "Boolean. Found not to be";
+    //     chi::Exit(EXIT_FAILURE);
+    //   }
+    //   //==================================== Checking second part of pair
+    //   if (not lua_isnumber(L, 2 * p + 1))
+    //   {
+    //     chi::log.Log0Error() << "chiMeshCreateLogicalVolume(BOOLEAN..."
+    //                             " argument "
+    //                          << 2 * p + 1
+    //                          << " expected to be "
+    //                             "number. Found not to be";
+    //     chi::Exit(EXIT_FAILURE);
+    //   }
+    //   if (lua_tonumber(L, 2 * p + 1) >=
+    //       static_cast<lua_Number>(chi::object_stack.size()))
+    //   {
+    //     chi::log.Log0Error() << "chiMeshCreateLogicalVolume(BOOLEAN..."
+    //                             " argument "
+    //                          << 2 * p + 1 << " points to non-existent
+    //                          volume.";
+    //     chi::Exit(EXIT_FAILURE);
+    //   }
+    //
+    //   bool logic = lua_toboolean(L, 2 * p);
+    //   bool handle = lua_tonumber(L, 2 * p + 1);
+    //
+    //   auto obj_ptr = chi::GetStackItemPtr(chi::object_stack, handle, fname);
+    //
+    //   typedef std::shared_ptr<chi_mesh::LogicalVolume> LogVolPtr;
+    //   auto p_ref_vol =
+    //     std::dynamic_pointer_cast<chi_mesh::LogicalVolume>(obj_ptr);
+    //
+    //   std::pair<bool, LogVolPtr> combo(logic, p_ref_vol);
+    //
+    //   bool_vol->parts.push_back(combo);
+    // }
+    //
+    // chi::object_stack.push_back(bool_vol);
+    // const size_t index = chi::object_stack.size() - 1;
+    // lua_pushinteger(L, static_cast<lua_Integer>(index));
+
+    ChiInvalidArgumentIf(num_args % 2 != 0,
+                         "Incorrect amount of arguments provided for "
+                         "chiMeshCreateLogicalVolume(BOOLEAN..."
+                         " Expected pairs of (bool,volumeHandle)");
+
+    chi_objects::ParameterBlock params;
 
     int num_pairs = num_args / 2;
     for (int p = 0; p < num_pairs; p++)
     {
-      //==================================== Checking first part of pair
-      if (not lua_isboolean(L, 2 * p))
-      {
-        chi::log.Log0Error() << "chiMeshCreateLogicalVolume(BOOLEAN..."
-                                " argument "
-                             << 2 * p
-                             << " expected to be "
-                                "Boolean. Found not to be";
-        chi::Exit(EXIT_FAILURE);
-      }
-      //==================================== Checking second part of pair
-      if (not lua_isnumber(L, 2 * p + 1))
-      {
-        chi::log.Log0Error() << "chiMeshCreateLogicalVolume(BOOLEAN..."
-                                " argument "
-                             << 2 * p + 1
-                             << " expected to be "
-                                "number. Found not to be";
-        chi::Exit(EXIT_FAILURE);
-      }
-      if (lua_tonumber(L, 2 * p + 1) >=
-          static_cast<lua_Number>(chi::object_stack.size()))
-      {
-        chi::log.Log0Error() << "chiMeshCreateLogicalVolume(BOOLEAN..."
-                                " argument "
-                             << 2 * p + 1 << " points to non-existent volume.";
-        chi::Exit(EXIT_FAILURE);
-      }
+       //==================================== Checking first part of pair
+       if (not lua_isboolean(L, 2 * p))
+       {
+         chi::log.Log0Error() << "chiMeshCreateLogicalVolume(BOOLEAN..."
+                                 " argument "
+                              << 2 * p
+                              << " expected to be "
+                                 "Boolean. Found not to be";
+         chi::Exit(EXIT_FAILURE);
+       }
+       //==================================== Checking second part of pair
+       if (not lua_isnumber(L, 2 * p + 1))
+       {
+         chi::log.Log0Error() << "chiMeshCreateLogicalVolume(BOOLEAN..."
+                                 " argument "
+                              << 2 * p + 1
+                              << " expected to be "
+                                 "number. Found not to be";
+         chi::Exit(EXIT_FAILURE);
+       }
+       if (lua_tointeger(L, 2 * p + 1) >=
+           static_cast<lua_Number>(chi::object_stack.size()))
+       {
+         chi::log.Log0Error() << "chiMeshCreateLogicalVolume(BOOLEAN..."
+                                 " argument "
+                              << 2 * p + 1 << " points to non-existent volume.";
+         chi::Exit(EXIT_FAILURE);
+       }
 
-      bool logic = lua_toboolean(L, 2 * p);
-      bool handle = lua_tonumber(L, 2 * p + 1);
+       const bool logic = lua_toboolean(L, 2 * p);
+       const bool handle = lua_tonumber(L, 2 * p + 1);
 
-      auto obj_ptr =
-        chi::GetStackItemPtr(chi::object_stack, handle, fname);
+       chi_objects::ParameterBlock block;
+       block.AddParameter("op", logic);
+       block.AddParameter("lv", handle);
 
-      typedef std::shared_ptr<chi_mesh::LogicalVolume> LogVolPtr;
-      auto p_ref_vol =
-        std::dynamic_pointer_cast<chi_mesh::LogicalVolume>(obj_ptr);
+       params.AddParameter(block);
+     }
+     params.ChangeToArray();
 
-      std::pair<bool, LogVolPtr> combo(logic, p_ref_vol);
+     const size_t handle = object_maker.MakeRegisteredObjectOfType(
+       "chi_mesh::BooleanLogicalVolume", params);
 
-      bool_vol->parts.push_back(combo);
-    }
-
-    chi::object_stack.push_back(bool_vol);
-    const size_t index = chi::object_stack.size() - 1;
-    lua_pushinteger(L, static_cast<lua_Integer>(index));
+     lua_pushinteger(L, static_cast<lua_Integer>(handle));
+     return 1;
   }
 
   //================================================== Unrecognized option

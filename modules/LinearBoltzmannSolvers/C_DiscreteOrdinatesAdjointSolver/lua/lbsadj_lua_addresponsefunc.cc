@@ -3,7 +3,7 @@
 #include "C_DiscreteOrdinatesAdjointSolver/lbsadj_solver.h"
 
 #include "chi_runtime.h"
-#include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
+#include "ChiMesh/LogicalVolume/LogicalVolume.h"
 
 #include "ChiConsole/chi_console.h"
 
