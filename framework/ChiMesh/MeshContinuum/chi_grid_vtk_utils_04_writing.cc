@@ -24,6 +24,8 @@ vtkNew<vtkUnstructuredGrid> chi_mesh::
   vtkNew<vtkIntArray>                 material_array;
   vtkNew<vtkUnsignedIntArray>         partition_id_array;
 
+  points->SetDataType(VTK_DOUBLE);
+
   //============================================= Set names
   material_array->SetName("Material");
   partition_id_array->SetName("Partition");

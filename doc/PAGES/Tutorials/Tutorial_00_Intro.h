@@ -1,10 +1,16 @@
 /** \page Tutorial00 User Tutorials
- * ## Fully commented tutorials
- *
- * \subpage Tutorial01 \n
- * \subpage Tutorial02 \n
- * \subpage Tutorial03 \n
- *
+ ## Fully commented tutorials
+
+ \subpage Tutorial01 \n
+ \subpage Tutorial02 \n
+ \subpage Tutorial03 \n
+
+ ## Meshing tutorials
+ \subpage MeshTutorials \n
+
+ ## Lua Input Examples
+ \subpage LuaInputExamples \n
+
  ## Examples taken from the regression-test suite
 
  Examples from the regression-test suite (folder ``tests``) may also serve as

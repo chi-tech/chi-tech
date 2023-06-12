@@ -50,6 +50,8 @@ if [ "$1" == "input_doc_only" ]; then
   echo 'INPUT = "doc/generated_files" "doc/PAGES"' >> doc/DoxyfileLuaLean
   for dee in $(find modules -type d -name "doc");
   do echo "INPUT += $dee" >> doc/DoxyfileLuaLean; done
+  for dee in $(find framework -type d -name "doc");
+  do echo "INPUT += $dee" >> doc/DoxyfileLuaLean; done
   echo "Running DoxyGen"
   doxygen "doc/DoxyfileLuaLean"
   rm doc/DoxyfileLuaLean

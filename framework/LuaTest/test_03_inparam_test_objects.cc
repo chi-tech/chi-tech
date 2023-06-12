@@ -15,7 +15,12 @@ chi_objects::InputParameters TestObject::GetInputParameters()
 {
   chi_objects::InputParameters params = ChiObject::GetInputParameters();
 
-  params.SetGeneralDescription("General test object");
+  // clang-format off
+  params.SetGeneralDescription(
+  "\\defgroup chi_unit_tests__TestObject chi_unit_tests.TestObject\n"
+  "\\ingroup DocUnitTests\n"
+  "General test object");
+  // clang-format on
 
   params.AddOptionalParameter("solver_type", "A", "The solver type.");
   params.AddRequiredParameter<std::string>(
@@ -75,6 +80,13 @@ chi_objects::InputParameters TestSubObject::GetInputParameters()
 {
   chi_objects::InputParameters params;
 
+  // clang-format off
+  params.SetGeneralDescription(
+  "\\defgroup chi_unit_tests__TestSubObject chi_unit_tests.TestSubObject\n"
+  "\\ingroup DocUnitTests\n"
+  "General test sub-object");
+  // clang-format on
+
   params.AddRequiredParameter<size_t>(
     "num_groups", "Number of groups to use in the simulation");
 
@@ -94,6 +106,13 @@ RegisterChiObject(chi_unit_tests, ChildTestObject);
 chi_objects::InputParameters ChildTestObject::GetInputParameters()
 {
   chi_objects::InputParameters params = TestObject::GetInputParameters();
+
+  // clang-format off
+  params.SetGeneralDescription(
+  "\\defgroup chi_unit_tests__ChildTestObject chi_unit_tests.ChildTestObject\n"
+  "\\ingroup DocUnitTests\n"
+  "General test child-object inheriting option from parent");
+  // clang-format on
 
   params.ChangeExistingParamToOptional("coupled_field", "Q");
   params.ChangeExistingParamToRequired<std::string>("solver_type");

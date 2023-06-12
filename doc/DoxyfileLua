@@ -113,14 +113,13 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # Configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = "doc/generated_files" "framework" "doc/PAGES"
+INPUT                  = "doc/generated_files" "framework" "doc/PAGES" "LuaTest/doc/"
 INPUT                 += "modules"
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          =
 RECURSIVE              = YES
 
 EXCLUDE                = "framework/ChiLua/"
-EXCLUDE               += "framework/LuaTest"
 
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = "*.py"

@@ -13,6 +13,13 @@ chi_objects::InputParameters ThetaSchemeTimeIntegration::GetInputParameters()
 {
   chi_objects::InputParameters params = TimeIntegration::GetInputParameters();
 
+  // clang-format off
+  params.SetGeneralDescription(
+  "\\defgroup chi_math__ThetaSchemeTimeIntegration "
+  " chi_math.ThetaSchemeTimeIntegration\n"
+  "\\ingroup DocTimeIntegrations");
+  // clang-format on
+
   params.ChangeExistingParamToOptional("method",
                                        scint(SteppingMethod::THETA_SCHEME));
 
