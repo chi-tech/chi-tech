@@ -46,6 +46,8 @@ resources/\.DS_Store
 ._.DS_Store
 *.pyc
 *.pmesh
+__pycache__
+**/__pycache__
 
 *-private.sh
 

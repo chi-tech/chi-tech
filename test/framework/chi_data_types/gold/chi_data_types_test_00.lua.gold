@@ -3,6 +3,7 @@
 [0m[0]  Parsing argument 3 --supress_beg_end_timelog
 [0]  Parsing argument 4 master_export=false
 [0]  ChiTech number of arguments supplied: 4
+[0]  GOLD_BEGIN
 [0]  Testing chi_data_types::ByteArray Write and Read
 [0]  EndOfBuffer 0
 [0]  Offset 0
@@ -37,5 +38,6 @@
 [0]  empty() 0Should be 2x2x2=8 ones
 [0]  1 1 1 1 1 1 1 1 
 [0]  Done10
+[0]  GOLD_END
 
 

@@ -31,6 +31,7 @@ chi_data_types_Test00(const chi_objects::InputParameters&)
 
   //======================================================= Byte array
   //write/read
+  chi::log.Log() << "GOLD_BEGIN";
   chi::log.Log() << "Testing chi_data_types::ByteArray Write and Read\n";
   chi_data_types::ByteArray barr;
 
@@ -398,6 +399,8 @@ chi_data_types_Test00(const chi_objects::InputParameters&)
   }
 
   chi::log.Log() << dummy.str();
+
+  chi::log.Log() << "GOLD_END";
 
   return chi_objects::ParameterBlock();
 }
