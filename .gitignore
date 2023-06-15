@@ -61,6 +61,8 @@ doc/generated_files
 #Unit test outputs
 ChiTech/UnitTests/Output
 
+test/**/out/
+
 #Scratch directory
 scratch/
 

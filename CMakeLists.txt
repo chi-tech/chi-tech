@@ -186,12 +186,15 @@ add_subdirectory("${CHI_TECH_DIR}/framework/LuaTest")
 
 add_subdirectory("${CHI_TECH_MOD}")
 
+add_subdirectory("${CHI_TECH_DIR}/test")
+
 #================================================ Define targets
 add_library(ChiLib STATIC ${SOURCES})
 target_link_libraries(ChiLib ${CHI_LIBS} external)
 target_compile_options(ChiLib PUBLIC ${CHI_CXX_FLAGS})
 
 add_executable(${TARGET} "${CHI_TECH_DIR}/framework/chi_tech_main.cc")
+add_executable(${TARGET}_test ${TEST_SOURCES})
 #if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
 #else()
@@ -200,11 +203,21 @@ add_executable(${TARGET} "${CHI_TECH_DIR}/framework/chi_tech_main.cc")
 
 if(UNIX AND NOT APPLE)
     target_link_libraries(${TARGET} -Wl,--whole-archive ChiLib -Wl,--no-whole-archive )
+    target_link_libraries(${TARGET}_test -Wl,--whole-archive ChiLib -Wl,--no-whole-archive )
 elseif(APPLE)
     target_link_libraries(${TARGET} -Wl,-all_load ChiLib )
+    target_link_libraries(${TARGET}_test -Wl,-all_load ChiLib )
 endif()
 
 target_compile_options(${TARGET} PUBLIC ${CHI_CXX_FLAGS})
+target_compile_options(${TARGET}_test PUBLIC ${CHI_CXX_FLAGS})
+
+set_target_properties( ${TARGET}_test
+        PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/test/lib"
+        LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/test/lib"
+        RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/test/bin"
+        )
 
 # |------------ Write Makefile to root directory
 file(WRITE ${PROJECT_SOURCE_DIR}/Makefile "subsystem:\n" "\t$(MAKE) -C chi_build \n\n"
