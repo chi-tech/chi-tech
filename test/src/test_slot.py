@@ -25,6 +25,8 @@ class TestSlot:
         cmd += "--suppress_color "
         cmd += "--supress_beg_end_timelog "
         cmd += "master_export=false "
+        for arg in test.args:
+            cmd += arg + " "
         # cmd += f"> out/{test.filename}.out "
         # cmd += "2>&1 "
         self.process = subprocess.Popen(cmd,
