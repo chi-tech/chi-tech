@@ -9,12 +9,11 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-//###################################################################
+// ###################################################################
 /**Copies the vtk data structures to the current object's internal
  * data.*/
-void chi_mesh::UnpartitionedMesh::
-  CopyUGridCellsAndPoints(vtkUnstructuredGrid& ugrid,
-                          const double scale)
+void chi_mesh::UnpartitionedMesh::CopyUGridCellsAndPoints(
+  vtkUnstructuredGrid& ugrid, const double scale)
 {
   const std::string fname =
     "chi_mesh::UnpartitionedMesh::CopyUGridCellsAndPoints";
@@ -22,18 +21,21 @@ void chi_mesh::UnpartitionedMesh::
   typedef Vec3* Vec3Ptr;
   typedef LightWeightCell* CellPtr;
 
-  const vtkIdType total_cell_count  = ugrid.GetNumberOfCells();
+  const vtkIdType total_cell_count = ugrid.GetNumberOfCells();
   const vtkIdType total_point_count = ugrid.GetNumberOfPoints();
 
   bool has_cell_gids = ugrid.GetCellData()->GetGlobalIds();
   bool has_pnts_gids = ugrid.GetPointData()->GetGlobalIds();
   bool has_global_ids = has_cell_gids and has_pnts_gids;
 
-  if (not ugrid.GetCellData()->GetArray("BlockID"))
-    throw std::logic_error(fname + ": grid had not \"BlockID\" array.");
+  const auto& block_id_array_name = mesh_options_.material_id_fieldname;
 
-  auto block_id_array =
-    vtkIntArray::SafeDownCast(ugrid.GetCellData()->GetArray("BlockID"));
+  if (not ugrid.GetCellData()->GetArray(block_id_array_name.c_str()))
+    throw std::logic_error(fname + ": grid had not \"" + block_id_array_name +
+                           "\" array.");
+
+  auto block_id_array = vtkIntArray::SafeDownCast(
+    ugrid.GetCellData()->GetArray(block_id_array_name.c_str()));
 
   if (has_global_ids)
   {
@@ -51,34 +53,33 @@ void chi_mesh::UnpartitionedMesh::
     // are indexed with a 1 base instead of 0
     int cid_offset = 0, pid_offset = 0;
     {
-      vtkIdType min_cid = total_point_count; //Minimum cell-id
-      vtkIdType min_pid = total_point_count; //Minimum point-id
+      vtkIdType min_cid = total_point_count; // Minimum cell-id
+      vtkIdType min_pid = total_point_count; // Minimum point-id
 
-      for (vtkIdType c=0; c<total_cell_count; ++c)
+      for (vtkIdType c = 0; c < total_cell_count; ++c)
         min_cid = std::min(min_cid, cell_gids->GetValue(c));
 
-      for (vtkIdType p=0; p<total_point_count; ++p)
+      for (vtkIdType p = 0; p < total_point_count; ++p)
         min_pid = std::min(min_pid, pnts_gids->GetValue(p));
 
       cid_offset -= static_cast<int>(min_cid);
       pid_offset -= static_cast<int>(min_pid);
-    }//build offset
+    } // build offset
 
     //=========================================== Build node map
     std::vector<vtkIdType> node_map(total_point_count, 0);
-    for (vtkIdType p=0; p<total_point_count; ++p)
+    for (vtkIdType p = 0; p < total_point_count; ++p)
       node_map[p] = pnts_gids->GetValue(p) + pid_offset;
 
     //=========================================== Load cells
-    for (vtkIdType c=0; c<total_cell_count; ++c)
+    for (vtkIdType c = 0; c < total_cell_count; ++c)
     {
       auto vtk_cell = ugrid.GetCell(static_cast<vtkIdType>(c));
       auto vtk_celldim = vtk_cell->GetCellDimension();
       const vtkIdType cell_gid = cell_gids->GetValue(c) + cid_offset;
 
       CellPtr raw_cell;
-      if (vtk_celldim == 3)
-        raw_cell = CreateCellFromVTKPolyhedron(vtk_cell);
+      if (vtk_celldim == 3) raw_cell = CreateCellFromVTKPolyhedron(vtk_cell);
       else if (vtk_celldim == 2)
         raw_cell = CreateCellFromVTKPolygon(vtk_cell);
       else if (vtk_celldim == 1)
@@ -88,23 +89,22 @@ void chi_mesh::UnpartitionedMesh::
       else
         throw std::logic_error(fname + ": Unsupported cell dimension.");
 
-      //Map the cell vertex-ids
+      // Map the cell vertex-ids
       for (uint64_t& vid : raw_cell->vertex_ids)
         vid = node_map[vid];
 
-      //Map face vertex-ids
+      // Map face vertex-ids
       for (auto& face : raw_cell->faces)
         for (uint64_t& vid : face.vertex_ids)
           vid = node_map[vid];
 
-
       raw_cell->material_id = block_id_array->GetValue(c);
 
       cells[cell_gid] = raw_cell;
-    }//for cell c
+    } // for cell c
 
     //=========================================== Load points
-    for (vtkIdType p=0; p<total_point_count; ++p)
+    for (vtkIdType p = 0; p < total_point_count; ++p)
     {
       auto point = ugrid.GetPoint(static_cast<vtkIdType>(p));
       const vtkIdType point_gid = pnts_gids->GetValue(p) + pid_offset;
@@ -114,15 +114,15 @@ void chi_mesh::UnpartitionedMesh::
       *vertex *= scale;
 
       vertices.at(point_gid) = vertex;
-    }//for point p
+    } // for point p
 
     //=========================================== Check all cells assigned
-    for (vtkIdType c=0; c<total_cell_count; ++c)
+    for (vtkIdType c = 0; c < total_cell_count; ++c)
       if (cells[c] == nullptr)
         throw std::logic_error(fname + ": Cell pointer not assigned ");
 
     //=========================================== Check all points assigned
-    for (vtkIdType p=0; p<total_point_count; ++p)
+    for (vtkIdType p = 0; p < total_point_count; ++p)
       if (vertices[p] == nullptr)
         throw std::logic_error(fname + ": Vertex pointer not assigned");
 
@@ -130,11 +130,11 @@ void chi_mesh::UnpartitionedMesh::
     vertices_.reserve(total_point_count);
     for (auto& vertex_ptr : vertices)
       vertices_.push_back(*vertex_ptr);
-  }//If global-ids available
+  } // If global-ids available
   else
   {
     //======================================== Push cells
-    for (vtkIdType c=0; c<total_cell_count; ++c)
+    for (vtkIdType c = 0; c < total_cell_count; ++c)
     {
       auto vtk_cell = ugrid.GetCell(static_cast<vtkIdType>(c));
       auto vtk_celldim = vtk_cell->GetCellDimension();
@@ -151,10 +151,10 @@ void chi_mesh::UnpartitionedMesh::
         throw std::logic_error(fname + ": Unsupported cell dimension.");
 
       raw_cells_.back()->material_id = block_id_array->GetValue(c);
-    }//for c
+    } // for c
 
     //======================================== Push points
-    for (size_t p=0; p<total_point_count; ++p)
+    for (size_t p = 0; p < total_point_count; ++p)
     {
       auto point = ugrid.GetPoint(static_cast<vtkIdType>(p));
 
@@ -164,16 +164,15 @@ void chi_mesh::UnpartitionedMesh::
 
       vertices_.emplace_back(point[0], point[1], point[2]);
     }
-  }//if no global-ids
+  } // if no global-ids
 
   //================================================== Determine bound box
-  for (size_t p=0; p<total_point_count; ++p)
+  for (size_t p = 0; p < total_point_count; ++p)
   {
     const auto& vertex = vertices_[p];
     if (not bound_box_)
-      bound_box_ = std::shared_ptr<BoundBox>(new BoundBox{vertex.x,vertex.x,
-                                                          vertex.y,vertex.y,
-                                                          vertex.z,vertex.z});
+      bound_box_ = std::shared_ptr<BoundBox>(new BoundBox{
+        vertex.x, vertex.x, vertex.y, vertex.y, vertex.z, vertex.z});
 
     bound_box_->xmin = std::min(bound_box_->xmin, vertex.x);
     bound_box_->xmax = std::max(bound_box_->xmax, vertex.x);
@@ -186,11 +185,10 @@ void chi_mesh::UnpartitionedMesh::
   chi::log.Log() << fname + ": Done";
 }
 
-
-//###################################################################
+// ###################################################################
 /**Set material-ids from list.*/
-void chi_mesh::UnpartitionedMesh::
-  SetMaterialIDsFromList(const std::vector<int> &material_ids)
+void chi_mesh::UnpartitionedMesh::SetMaterialIDsFromList(
+  const std::vector<int>& material_ids)
 {
   const size_t total_cell_count = raw_cells_.size();
 
@@ -198,20 +196,17 @@ void chi_mesh::UnpartitionedMesh::
     raw_cells_[c]->material_id = material_ids[c];
 }
 
-
-//###################################################################
+// ###################################################################
 /**Set boundary-ids from boundary grid_blocks.*/
-void chi_mesh::UnpartitionedMesh::
-  SetBoundaryIDsFromBlocks(
-    std::vector<vtkUGridPtrAndName> &bndry_grid_blocks)
+void chi_mesh::UnpartitionedMesh::SetBoundaryIDsFromBlocks(
+  std::vector<vtkUGridPtrAndName>& bndry_grid_blocks)
 {
   const double EPSILON = 1.0e-12;
   //======================================== Build boundary faces
   std::vector<LightWeightFace*> bndry_faces;
   for (auto& cell_ptr : raw_cells_)
     for (auto& face : cell_ptr->faces)
-      if (not face.has_neighbor)
-        bndry_faces.push_back(&face);
+      if (not face.has_neighbor) bndry_faces.push_back(&face);
 
   chi::log.Log() << "Number of boundary faces: " << bndry_faces.size();
 
@@ -231,8 +226,8 @@ void chi_mesh::UnpartitionedMesh::
 
     //================================= Build vertex map
     bool mapping_failed = false;
-    std::vector<size_t> vertex_map(ugrid->GetNumberOfPoints(),0);
-    for (size_t p=0; p<ugrid->GetNumberOfPoints(); ++p)
+    std::vector<size_t> vertex_map(ugrid->GetNumberOfPoints(), 0);
+    for (size_t p = 0; p < ugrid->GetNumberOfPoints(); ++p)
     {
       chi_mesh::Vector3 point;
       ugrid->GetPoint(static_cast<vtkIdType>(p), &point.x);
@@ -248,20 +243,21 @@ void chi_mesh::UnpartitionedMesh::
 
       if (not map_found)
       {
-        chi::log.Log0Warning() << "chi_mesh::UnpartitionedMesh::"
-          "SetBoundaryIDsFromBlocks: Failed to map a vertex. " +
-          point.PrintStr() + " for boundary " + ugrid_name.second +
-          " therefore the boundary assignment was skipped.";
+        chi::log.Log0Warning()
+          << "chi_mesh::UnpartitionedMesh::"
+             "SetBoundaryIDsFromBlocks: Failed to map a vertex. " +
+               point.PrintStr() + " for boundary " + ugrid_name.second +
+               " therefore the boundary assignment was skipped.";
         mapping_failed = true;
         break;
       }
-    }//for point in boundary block
+    } // for point in boundary block
 
     if (mapping_failed) continue;
 
     //================================= Build vertex subscriptions
-    std::map<uint64_t , std::set<size_t>> vertex_face_subs;
-    for (size_t f=0; f<bndry_faces.size(); ++f)
+    std::map<uint64_t, std::set<size_t>> vertex_face_subs;
+    for (size_t f = 0; f < bndry_faces.size(); ++f)
       for (const auto vid : bndry_faces[f]->vertex_ids)
         vertex_face_subs[vid].insert(f);
 
@@ -269,7 +265,7 @@ void chi_mesh::UnpartitionedMesh::
     size_t num_faces_boundarified = 0;
     auto& bndry_block = ugrid_name.first;
     size_t num_bndry_block_cells = bndry_block->GetNumberOfCells();
-    for (size_t bc=0; bc<num_bndry_block_cells; ++bc)
+    for (size_t bc = 0; bc < num_bndry_block_cells; ++bc)
     {
       auto bndry_cell = bndry_block->GetCell(static_cast<vtkIdType>(bc));
 
@@ -278,13 +274,13 @@ void chi_mesh::UnpartitionedMesh::
       std::set<size_t> face_ids_short_list;
       std::set<uint64_t> bndry_cell_id_set;
       size_t num_points = bndry_cell->GetNumberOfPoints();
-      for (size_t p=0; p<num_points; ++p)
+      for (size_t p = 0; p < num_points; ++p)
       {
         auto point_id = bndry_cell->GetPointId(static_cast<int>(p));
         bndry_cell_id_set.insert(vertex_map[point_id]);
         for (size_t face_id : vertex_face_subs[vertex_map[point_id]])
           face_ids_short_list.insert(face_id);
-      }//for point p
+      } // for point p
 
       for (size_t face_id : face_ids_short_list)
       {
@@ -297,14 +293,13 @@ void chi_mesh::UnpartitionedMesh::
           face->neighbor = bndry_id;
           ++num_faces_boundarified;
         }
-      }//for face_id
-    }//for boundary cell bc
+      } // for face_id
+    }   // for boundary cell bc
 
-    chi::log.Log()
-    << "UnpartitionedMesh: assigned " << num_faces_boundarified
-    << " to boundary id " << bndry_id
-    << " with name " << ugrid_name.second;
+    chi::log.Log() << "UnpartitionedMesh: assigned " << num_faces_boundarified
+                   << " to boundary id " << bndry_id << " with name "
+                   << ugrid_name.second;
 
     ++bndry_id;
-  }//for boundary_block
+  } // for boundary_block
 }

@@ -335,7 +335,8 @@ int chiFFInterpolationSetProperty(lua_State* L)
     int logvol_hndle = lua_tonumber(L, 3);
 
     auto p_logical_volume =
-      chi::GetStackItemPtr(chi::logicvolume_stack, logvol_hndle, fname);
+      std::dynamic_pointer_cast<chi_mesh::LogicalVolume>(
+      chi::GetStackItemPtr(chi::object_stack, logvol_hndle, fname));
 
     if (p_ffi->Type() != chi_mesh::ff_interpolation::Type::VOLUME)
       throw std::logic_error(

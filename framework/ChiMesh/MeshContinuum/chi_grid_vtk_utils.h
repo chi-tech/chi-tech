@@ -39,7 +39,8 @@ namespace chi_mesh
   int FindHighestDimension(std::vector<vtkUGridPtrAndName>& ugrid_blocks);
 
   vtkUGridPtr
-  ConsolidateGridBlocks(std::vector<vtkUGridPtrAndName>& ugrid_blocks);
+  ConsolidateGridBlocks(std::vector<vtkUGridPtrAndName>& ugrid_blocks,
+                        const std::string& block_id_array_name = "BlockID");
 
   std::vector<vtkUGridPtrAndName>
     GetBlocksOfDesiredDimension(std::vector<vtkUGridPtrAndName>& ugrid_blocks,
@@ -58,7 +59,8 @@ namespace chi_mesh
 
   //04 Writing VTK files
   vtkNew<vtkUnstructuredGrid>
-    PrepareVtkUnstructuredGrid(const chi_mesh::MeshContinuum& grid);
+    PrepareVtkUnstructuredGrid(const chi_mesh::MeshContinuum& grid,
+                              bool discontinuous = true);
 
   void WritePVTUFiles(vtkNew<vtkUnstructuredGrid> &ugrid,
                       const std::string &file_base_name);

@@ -4,7 +4,7 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
+#include "ChiMesh/LogicalVolume/LogicalVolume.h"
 
 #include "chi_runtime.h"
 
@@ -28,7 +28,7 @@ int chiCountMeshInLogicalVolume(lua_State* L)
   auto& handler = chi_mesh::GetCurrentHandler();
 
   const auto& log_vol = chi::GetStackItem<chi_mesh::LogicalVolume>(
-    chi::logicvolume_stack, log_vol_handle, fname);
+    chi::object_stack, log_vol_handle, fname);
 
   auto& grid = handler.GetGrid();
 

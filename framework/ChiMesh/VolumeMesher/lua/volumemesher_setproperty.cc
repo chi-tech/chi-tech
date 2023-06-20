@@ -5,7 +5,7 @@
 #include "ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h"
 
 #include "chi_runtime.h"
-#include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
+#include "ChiMesh/LogicalVolume/LogicalVolume.h"
 
 #include <iostream>
 
@@ -209,7 +209,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
     if (num_args==4) sense = lua_toboolean(L,4);
 
     const auto& log_vol = chi::GetStackItem<chi_mesh::LogicalVolume>(
-      chi::logicvolume_stack, volume_hndl, fname);
+      chi::object_stack, volume_hndl, fname);
 
     chi_mesh::VolumeMesher::SetMatIDFromLogical(log_vol,sense,mat_id);
   }
@@ -235,7 +235,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
                                           "an empty string.");
 
     const auto& log_vol = chi::GetStackItem<chi_mesh::LogicalVolume>(
-      chi::logicvolume_stack, volume_hndl, fname);
+      chi::object_stack, volume_hndl, fname);
 
     chi_mesh::VolumeMesher::SetBndryIDFromLogical(log_vol,sense,bndry_name);
   }

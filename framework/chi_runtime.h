@@ -78,7 +78,6 @@ public:
   static int current_mesh_handler;
 
   static std::vector<chi_mesh::SurfaceMeshPtr> surface_mesh_stack;
-  static std::vector<chi_mesh::LogicalVolumePtr> logicvolume_stack;
   static std::vector<chi_mesh::FFInterpPtr> field_func_interpolation_stack;
   static std::vector<chi_mesh::UnpartMeshPtr> unpartitionedmesh_stack;
 
