@@ -20,6 +20,7 @@ protected:
   double xmin_, xmax_;
   double ymin_, ymax_;
   double zmin_, zmax_;
+  bool infx_, infy_, infz_;
 };
 
 } // namespace chi_mesh

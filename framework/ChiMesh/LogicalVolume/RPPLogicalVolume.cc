@@ -41,19 +41,34 @@ RPPLogicalVolume::RPPLogicalVolume(const chi_objects::InputParameters& params)
     ymin_(params.GetParamValue<double>("ymin")),
     ymax_(params.GetParamValue<double>("ymax")),
     zmin_(params.GetParamValue<double>("zmin")),
-    zmax_(params.GetParamValue<double>("zmax"))
+    zmax_(params.GetParamValue<double>("zmax")),
+    infx_(params.GetParamValue<bool>("infx")),
+    infy_(params.GetParamValue<bool>("infy")),
+    infz_(params.GetParamValue<bool>("infz"))
 {
 }
 
+#define XMAX 0
+#define XMIN 1
+#define YMAX 2
+#define YMIN 3
+#define ZMAX 4
+#define ZMIN 5
+
 bool RPPLogicalVolume::Inside(const chi_mesh::Vector3& point) const
 {
-  if ((point.x <= xmax_) && (point.x >= xmin_) && (point.y <= ymax_) &&
-      (point.y >= ymin_) && (point.z <= zmax_) && (point.z >= zmin_))
-  {
-    return true;
-  }
-  else
-    return false;
+  constexpr std::array<bool, 6> true_condition = {
+    true, true, true, true, true, true};
+  std::array<bool, 6> condition = {false, false, false, false, false, false};
+
+  if (point.x <= xmax_ or infx_) condition[XMAX] = true;
+  if (point.x >= xmin_ or infx_) condition[XMIN] = true;
+  if (point.y <= ymax_ or infy_) condition[YMAX] = true;
+  if (point.y >= ymin_ or infy_) condition[YMIN] = true;
+  if (point.z <= zmax_ or infz_) condition[ZMAX] = true;
+  if (point.z >= zmin_ or infz_) condition[ZMIN] = true;
+
+  return condition == true_condition;
 }
 
 } // namespace chi_mesh

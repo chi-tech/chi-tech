@@ -19,17 +19,7 @@ chi_objects::InputParameters BooleanLogicalVolume::GetInputParameters()
   // clang-format off
   params.SetGeneralDescription(
   "\\defgroup chi_mesh__BooleanLogicalVolume BooleanLogicalVolume\n"
-  "\\ingroup LuaLogicVolumes\n"
-  "## Example \n"
-  "The code below defines a logical volume that is within logical volume 1 but "
-  "outside logical volume 2\n"
-  "\\code\n"
-  ""
-  "chi_mesh.BooleanLogicalVolume.Create\n"
-  "({\n"
-  "  params = {{true, lv1}, {false, lv2}}\n"
-  "})\n"
-  "\\endcode\n");
+  "\\ingroup LuaLogicVolumes\n");
   // clang-format on
 
   params.AddRequiredParameterArray(
@@ -88,7 +78,7 @@ bool BooleanLogicalVolume::Inside(const chi_mesh::Vector3& point) const
 {
   for (const auto& part : parts)
   {
-    if (not(part.first && part.second->Inside(point))) return false;
+    if (part.first != part.second->Inside(point)) return false;
   }
 
   return true;

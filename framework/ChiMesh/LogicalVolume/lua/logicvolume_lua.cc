@@ -399,6 +399,7 @@ int chiLogicalVolumeCreate(lua_State* L)
 \param Point_z double Z-coordinate of the point.
 
 \return Sense true if inside the logical volume and false if outside.
+\ingroup LuaLogicVolumes
 */
 int chiLogicalVolumePointSense(lua_State* L)
 {
