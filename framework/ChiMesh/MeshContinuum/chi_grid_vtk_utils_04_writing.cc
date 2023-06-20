@@ -16,7 +16,8 @@
 /**Uploads vertices and cells to an unstructured grid. This routine
  * also uploads cell material ids (sub-domain ids) and partition ids.*/
 vtkNew<vtkUnstructuredGrid> chi_mesh::
-  PrepareVtkUnstructuredGrid(const chi_mesh::MeshContinuum& grid)
+  PrepareVtkUnstructuredGrid(const chi_mesh::MeshContinuum& grid,
+                             bool discontinuous/*=true*/)
 {
   //============================================= Instantiate VTK items
   vtkNew<vtkUnstructuredGrid>         ugrid;
@@ -24,15 +25,35 @@ vtkNew<vtkUnstructuredGrid> chi_mesh::
   vtkNew<vtkIntArray>                 material_array;
   vtkNew<vtkUnsignedIntArray>         partition_id_array;
 
+  points->SetDataType(VTK_DOUBLE);
+
   //============================================= Set names
   material_array->SetName("Material");
   partition_id_array->SetName("Partition");
+
+  std::vector<uint64_t> vertex_map;
+  if (not discontinuous)
+  {
+    vertex_map.assign(grid.GetGlobalVertexCount(), 0);
+    const size_t num_verts = grid.GetGlobalVertexCount();
+    for (size_t v=0; v<num_verts; ++v)
+    {
+      vertex_map[v] = v;
+      const auto& vertex = grid.vertices[v];
+      points->InsertNextPoint(vertex.x,vertex.y,vertex.z);
+    }
+  }
 
   //############################################# Populate cell information
   int64_t node_count=0;
   for (const auto& cell : grid.local_cells)
   {
-    chi_mesh::UploadCellGeometryDiscontinuous(grid, cell, node_count, points, ugrid);
+    if (discontinuous)
+      chi_mesh::UploadCellGeometryDiscontinuous(grid, cell, node_count, points, ugrid);
+    else
+    {
+      chi_mesh::UploadCellGeometryContinuous(cell, vertex_map, ugrid);
+    }
 
     material_array->InsertNextValue(cell.material_id_);
     partition_id_array->InsertNextValue(cell.partition_id_);

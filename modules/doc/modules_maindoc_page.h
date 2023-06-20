@@ -12,6 +12,3 @@ An additional function of modules is to allow us to segregate open source
 
  */
 
-/**\defgroup LuaGeneralUtilities G General utilities
-
-<sub>Group name: LuaGeneralUtilities</sub>*/

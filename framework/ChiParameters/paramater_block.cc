@@ -146,6 +146,8 @@ void ParameterBlock::ChangeToArray()
         ": Cannot change ParameterBlock to "
         "array. It has existing parameters and they are not of the same"
         "type.");
+
+  type_ = ParameterBlockType::ARRAY;
 }
 
 // #################################################################

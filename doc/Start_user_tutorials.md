@@ -2,7 +2,7 @@
 
 ## Lua for users
 
-Chi-Tech input filenames are written in Lua: 
+Chi-Tech input files are written in Lua: 
 - Some of the code objects are directly accessible in the Lua console,
 - Portion of the input can often be generated using Lua scripting.
 

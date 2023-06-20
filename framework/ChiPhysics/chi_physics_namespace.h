@@ -1,6 +1,5 @@
 #ifndef CHI_PHYSICS_NAMESPACE_H
 #define CHI_PHYSICS_NAMESPACE_H
-/**\defgroup LuaPhysics C Physics*/
 
 #include <petscksp.h>
 

@@ -1,7 +1,7 @@
 #include "chi_meshcontinuum.h"
 #include "ChiMesh/Cell/cell.h"
 
-#include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
+#include "ChiMesh/LogicalVolume/LogicalVolume.h"
 #include "ChiMesh/MeshContinuum/chi_grid_face_histogram.h"
 
 #include "ChiDataTypes/ndarray.h"

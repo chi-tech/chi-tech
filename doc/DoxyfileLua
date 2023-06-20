@@ -119,8 +119,7 @@ INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          =
 RECURSIVE              = YES
 
-EXCLUDE                = "framework/ChiLua/"
-EXCLUDE               += "framework/LuaTest"
+EXCLUDE                = "framework/ChiLua/" "framework/LuaTest/lua_test.cc"
 
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = "*.py"

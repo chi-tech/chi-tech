@@ -31,7 +31,6 @@ std::vector<chi_mesh::MeshHandlerPtr> chi::meshhandler_stack;
 int chi::current_mesh_handler = -1;
 
 std::vector<chi_mesh::SurfaceMeshPtr> chi::surface_mesh_stack;
-std::vector<chi_mesh::LogicalVolumePtr> chi::logicvolume_stack;
 std::vector<chi_mesh::FFInterpPtr> chi::field_func_interpolation_stack;
 std::vector<chi_mesh::UnpartMeshPtr> chi::unpartitionedmesh_stack;
 
@@ -213,7 +212,7 @@ void chi::Finalize()
   meshhandler_stack.clear();
 
   surface_mesh_stack.clear();
-  logicvolume_stack.clear();
+  object_stack.clear();
   field_func_interpolation_stack.clear();
   unpartitionedmesh_stack.clear();
 

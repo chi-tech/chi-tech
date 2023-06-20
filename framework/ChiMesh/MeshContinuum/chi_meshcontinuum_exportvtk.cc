@@ -17,7 +17,7 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const std::string& file_base_name
 
   const auto& grid = *this;
 
-  auto ugrid = chi_mesh::PrepareVtkUnstructuredGrid(grid);
+  auto ugrid = chi_mesh::PrepareVtkUnstructuredGrid(grid, false);
 
   chi_mesh::WritePVTUFiles(ugrid, file_base_name);
 

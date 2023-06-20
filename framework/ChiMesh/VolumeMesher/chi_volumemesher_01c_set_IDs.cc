@@ -2,7 +2,7 @@
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-#include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
+#include "ChiMesh/LogicalVolume/LogicalVolume.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

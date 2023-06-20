@@ -1,4 +1,4 @@
-\defgroup prk Point Reactor Kinetics
+/**\defgroup prk Point Reactor Kinetics
 \ingroup LuaModules
 
 This module concerns itself with the solution of the Point-Reactor Kinetics
@@ -27,4 +27,5 @@ are in units of \f$ [s^{-1}]\f$ and the delayed neutron fractions,
 and \f$ \Lambda_0 \f$ is the neutron generation time.
 
 Consult the whitepaper for this solver at `modules/PointReactorKinetics/doc`.
+*/
 

@@ -12,6 +12,13 @@ chi_objects::InputParameters PiecewiseLinear1D::GetInputParameters()
   chi_objects::InputParameters params =
     FunctionDimAToDimB::GetInputParameters();
 
+  // clang-format off
+  params.SetGeneralDescription(
+  "\\defgroup chi_math__functions__PiecewiseLinear1D "
+  " chi_math.functions.PiecewiseLinear1D\n"
+  "\\ingroup DocMathFunctions");
+  // clang-format on
+
   params.AddRequiredParameterArray(
     "x_values", "The x-values used in the interpolation function.");
   params.AddRequiredParameterArray(

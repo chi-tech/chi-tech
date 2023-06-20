@@ -9,9 +9,6 @@
 
 #include <memory>
 
-
-/**\defgroup LuaMath B Math*/
-
 typedef std::vector<double> VecDbl;
 typedef std::vector<VecDbl> MatDbl;
 

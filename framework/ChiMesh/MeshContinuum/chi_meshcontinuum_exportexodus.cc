@@ -23,7 +23,9 @@
 //###################################################################
 /**Exports just the portion of the mesh to ExodusII format.*/
 void chi_mesh::MeshContinuum::
-  ExportCellsToExodus(const std::string& file_base_name) const
+  ExportCellsToExodus(const std::string& file_base_name,
+                      bool suppress_node_sets/*= false*/,
+                      bool suppress_side_sets/*= false*/) const
 {
   const std::string fname = "chi_mesh::MeshContinuum::ExportCellsToExodus";
   chi::log.Log() << "Exporting mesh to Exodus file with base " << file_base_name;
@@ -57,6 +59,8 @@ void chi_mesh::MeshContinuum::
   {
     vtkNew<vtkUnstructuredGrid> ugrid;
     vtkNew<vtkPoints> points;
+
+    points->SetDataType(VTK_DOUBLE);
 
     vtkNew<vtkIdTypeArray> global_node_id_list;
     global_node_id_list->SetName("GlobalNodeId");
@@ -169,7 +173,7 @@ void chi_mesh::MeshContinuum::
     }
   }
 
-  //============================================= Make
+  //============================================= Make NodeSets and/or SideSets
   vtkNew<vtkMultiBlockDataSet> nodesets_blocks;
   vtkNew<vtkMultiBlockDataSet> sidesets_blocks;
   for (const auto& [bndry_id, face_list] : boundary_id_faces_map)
@@ -182,6 +186,8 @@ void chi_mesh::MeshContinuum::
     {
       vtkNew<vtkUnstructuredGrid> ugrid;
       vtkNew<vtkPoints> points;
+
+      points->SetDataType(VTK_DOUBLE);
 
       vtkNew<vtkIdTypeArray> node_global_ids;
       node_global_ids->SetName("GlobalNodeId");
@@ -240,6 +246,8 @@ void chi_mesh::MeshContinuum::
       vtkNew<vtkUnstructuredGrid> ugrid;
       vtkNew<vtkPoints> points;
 
+      points->SetDataType(VTK_DOUBLE);
+
       vtkNew<vtkIdTypeArray> src_cell_global_ids;
       vtkNew<vtkIntArray>    src_cell_face_id;
       src_cell_global_ids->SetName("SourceElementId");
@@ -290,17 +298,27 @@ void chi_mesh::MeshContinuum::
   }
 
   //============================================= Write the file
+  unsigned int next_block = 0;
   vtkNew<vtkMultiBlockDataSet> main_block;
-  main_block->SetBlock(0, grid_blocks);
-  main_block->SetBlock(1, nodesets_blocks);
-  main_block->GetMetaData(1)->Set(vtkCompositeDataSet::NAME(), "Node Sets");
-  main_block->SetBlock(2, sidesets_blocks);
-  main_block->GetMetaData(2)->Set(vtkCompositeDataSet::NAME(), "Side Sets");
+  main_block->SetBlock(next_block++, grid_blocks);
+  if (not suppress_node_sets)
+  {
+    chi::log.Log0Verbose1() << "Exporting nodeset";
+    main_block->SetBlock(next_block, nodesets_blocks);
+    main_block->GetMetaData(next_block++)->Set(vtkCompositeDataSet::NAME(), "Node Sets");
+  }
+  if (not suppress_side_sets)
+  {
+    chi::log.Log0Verbose1() << "Exporting sideset";
+    main_block->SetBlock(next_block, sidesets_blocks);
+    main_block->GetMetaData(next_block++)->Set(vtkCompositeDataSet::NAME(), "Side Sets");
+  }
 
   vtkNew<vtkExodusIIWriter> writer;
   writer->SetBlockIdArrayName("BlockID");
 
   writer->SetFileName((file_base_name + ".e").c_str());
+  writer->SetStoreDoubles(1);
 
   writer->SetInputData(main_block);
 
@@ -334,6 +352,8 @@ void chi_mesh::MeshContinuum::
   chi::log.Log() << "Num Node Sets:  " << em->GetNumberOfNodeSets();
   chi::log.Log() << "Num Side Sets:  " << em->GetNumberOfSideSets();
   chi::log.Log() << "Dimension    :  " << em->GetDimension();
+
+  writer->PrintSelf(std::cout, vtkIndent());
 
   chi::log.Log() << "Done exporting mesh to VTK.";
   MPI_Barrier(MPI_COMM_WORLD);
