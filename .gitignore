@@ -31,6 +31,8 @@ resources/Dependencies/glew-2.1.0/
 # All vtk mesh files
 /*.vtu
 /*.pvtu
+test/**/.pvtu
+test/**/.vtu
 
 tests/BigTests/*/solutions/
 

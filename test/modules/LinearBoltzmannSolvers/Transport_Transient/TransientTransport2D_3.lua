@@ -33,7 +33,9 @@ chiVolumeMesherExecute();
 --############################################### Set Material IDs
 chiVolumeMesherSetMatIDToAll(0)
 
-vol0 = chiLogicalVolumeCreate(RPP,-L/16,L/16,-L/16,L/16,-L/16,L/16)
+vol0 = chi_mesh.RPPLogicalVolume.Create({xmin=-L/16, xmax=L/16,
+                                         ymin=-L/16, ymax=L/16,
+                                         zmin=-L/16, zmax=L/16})
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,1)
 
 chiMeshHandlerExportMeshToVTK("TheMesh")
