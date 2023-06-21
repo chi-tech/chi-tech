@@ -26,11 +26,11 @@ CreatePolygonCells(const chi_mesh::UnpartitionedMesh& umesh,
     // Check valid template cell
     if (raw_cell->type != chi_mesh::CellType::POLYGON)
     {
-      chi::log.LogAllError()
+      Chi::log.LogAllError()
         << "chi_mesh::VolumeMesher::CreatePolygonCells "
            "called with a cell not being of primary type"
            " chi_mesh::CellType::POLYGON.";
-     chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
 
     //====================================== Make cell
@@ -39,7 +39,7 @@ CreatePolygonCells(const chi_mesh::UnpartitionedMesh& umesh,
 
     cell->global_id_ = num_cells;
     cell->local_id_  = num_cells;
-    cell->partition_id_ = chi::mpi.location_id;
+    cell->partition_id_ = Chi::mpi.location_id;
 
     cell->centroid_    = raw_cell->centroid;
     cell->material_id_ = raw_cell->material_id;

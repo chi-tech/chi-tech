@@ -14,7 +14,8 @@
 int chiDiffusionExecute(lua_State *L)
 {
   const size_t solver_index = lua_tonumber(L,1);
-  auto& solver = chi::GetStackItem<chi_diffusion::Solver>(chi::object_stack,
+  auto& solver = Chi::GetStackItem<chi_diffusion::Solver>(
+    Chi::object_stack,
                                        solver_index, __FUNCTION__);
 
   solver.ExecuteS();

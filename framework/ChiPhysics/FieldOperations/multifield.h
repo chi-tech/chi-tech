@@ -25,9 +25,9 @@ private:
 
   std::shared_ptr<const chi_math::FunctionDimAToDimB> function_ptr_;
 public:
-  static chi_objects::InputParameters GetInputParameters();
+  static chi::InputParameters GetInputParameters();
 
-  explicit MultiFieldOperation(const chi_objects::InputParameters& params);
+  explicit MultiFieldOperation(const chi::InputParameters& params);
 
   void Execute() override;
 };

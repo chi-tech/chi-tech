@@ -20,5 +20,5 @@ void lbs::LBSSolver::Initialize()
   InitializeBoundaries();              //h
   InitializePointSources();            //i
 
-  source_event_tag_ = chi::log.GetRepeatingEventTag("Set Source");
+  source_event_tag_ = Chi::log.GetRepeatingEventTag("Set Source");
 }

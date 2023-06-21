@@ -17,13 +17,13 @@ void lbs::LBSSolver::WriteRestartData(const std::string& folder_name,
   Stat st;
 
   //======================================== Make sure folder exists
-  if (chi::mpi.location_id == 0)
+  if (Chi::mpi.location_id == 0)
   {
     if (stat(folder_name.c_str(),&st) != 0) //if not exist, make it
       if ( (mkdir(folder_name.c_str(),S_IRWXU | S_IRWXG | S_IRWXO) != 0) and
            (errno != EEXIST) )
       {
-        chi::log.Log0Warning()
+        Chi::log.Log0Warning()
           << "Failed to create restart directory: " << folder_name;
         return;
       }
@@ -38,7 +38,7 @@ void lbs::LBSSolver::WriteRestartData(const std::string& folder_name,
   //the process as whole succeeded.
   bool location_succeeded = true;
   char location_cstr[20];
-  snprintf(location_cstr,20,"%d.r",chi::mpi.location_id);
+  snprintf(location_cstr,20,"%d.r", Chi::mpi.location_id);
 
   std::string file_name = folder_name + std::string("/") +
                           file_base + std::string(location_cstr);
@@ -48,7 +48,7 @@ void lbs::LBSSolver::WriteRestartData(const std::string& folder_name,
 
   if (not ofile.is_open())
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "Failed to create restart file: " << file_name;
     ofile.close();
     location_succeeded = false;
@@ -76,12 +76,12 @@ void lbs::LBSSolver::WriteRestartData(const std::string& folder_name,
 
   //======================================== Write status message
   if (global_succeeded)
-    chi::log.Log()
+    Chi::log.Log()
       << "Successfully wrote restart data: "
       << folder_name + std::string("/") +
          file_base + std::string("X.r");
   else
-    chi::log.Log0Error()
+    Chi::log.Log0Error()
       << "Failed to write restart data: "
       << folder_name + std::string("/") +
          file_base + std::string("X.r");
@@ -101,7 +101,7 @@ void lbs::LBSSolver::ReadRestartData(const std::string& folder_name,
   //the process as whole succeeded.
   bool location_succeeded = true;
   char location_cstr[20];
-  snprintf(location_cstr,20,"%d.r",chi::mpi.location_id);
+  snprintf(location_cstr,20,"%d.r", Chi::mpi.location_id);
 
   std::string file_name = folder_name + std::string("/") +
                           file_base + std::string(location_cstr);
@@ -159,10 +159,9 @@ void lbs::LBSSolver::ReadRestartData(const std::string& folder_name,
                 MPI_COMM_WORLD);       //Communicator
 
   //======================================== Write status message
-  if (global_succeeded)
-    chi::log.Log() << "Successfully read restart data";
+  if (global_succeeded) Chi::log.Log() << "Successfully read restart data";
   else
-    chi::log.Log0Error()
+    Chi::log.Log0Error()
       << "Failed to read restart data: "
       << folder_name + std::string("/") +
          file_base + std::string("X.r");

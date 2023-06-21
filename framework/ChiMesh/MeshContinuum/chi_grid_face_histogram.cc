@@ -35,7 +35,7 @@ size_t GridFaceHistogram::GetFaceHistogramBinDOFSize(size_t bin_number) const
     face_dof_size = face_categories_.at(bin_number).first;
   }
   catch (std::out_of_range& o){
-    chi::log.LogAllWarning()
+    Chi::log.LogAllWarning()
       << "Fault detected in chi_mesh::MeshContinuum::"
       << "GetFaceHistogramBinDOFSize.";
     return 0;

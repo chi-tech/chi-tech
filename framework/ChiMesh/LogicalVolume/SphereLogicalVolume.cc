@@ -7,9 +7,9 @@ namespace chi_mesh
 
 RegisterChiObject(chi_mesh, SphereLogicalVolume);
 
-chi_objects::InputParameters SphereLogicalVolume::GetInputParameters()
+chi::InputParameters SphereLogicalVolume::GetInputParameters()
 {
-  chi_objects::InputParameters params = ChiObject::GetInputParameters();
+  chi::InputParameters params = ChiObject::GetInputParameters();
 
   // clang-format off
   params.SetGeneralDescription(
@@ -30,7 +30,7 @@ chi_objects::InputParameters SphereLogicalVolume::GetInputParameters()
 }
 
 SphereLogicalVolume::SphereLogicalVolume(
-  const chi_objects::InputParameters& params)
+  const chi::InputParameters& params)
   : LogicalVolume(params),
     r_(params.GetParamValue<double>("r")),
     x0_(params.GetParamValue<double>("x")),

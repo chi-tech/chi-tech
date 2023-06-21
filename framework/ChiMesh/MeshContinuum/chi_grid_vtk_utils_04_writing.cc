@@ -75,11 +75,11 @@ void chi_mesh::WritePVTUFiles(vtkNew<vtkUnstructuredGrid> &ugrid,
   std::string base_filename     = std::string(file_base_name);
   std::string location_filename = base_filename +
                                   std::string("_") +
-                                  std::to_string(chi::mpi.location_id) +
+                                  std::to_string(Chi::mpi.location_id) +
                                   std::string(".vtu");
 
   //============================================= Write master file
-  if (chi::mpi.location_id == 0)
+  if (Chi::mpi.location_id == 0)
   {
     std::string pvtu_file_name = base_filename + std::string(".pvtu");
 
@@ -87,9 +87,9 @@ void chi_mesh::WritePVTUFiles(vtkNew<vtkUnstructuredGrid> &ugrid,
 
     pgrid_writer->EncodeAppendedDataOff();
     pgrid_writer->SetFileName(pvtu_file_name.c_str());
-    pgrid_writer->SetNumberOfPieces(chi::mpi.process_count);
-    pgrid_writer->SetStartPiece(chi::mpi.location_id);
-    pgrid_writer->SetEndPiece(chi::mpi.process_count-1);
+    pgrid_writer->SetNumberOfPieces(Chi::mpi.process_count);
+    pgrid_writer->SetStartPiece(Chi::mpi.location_id);
+    pgrid_writer->SetEndPiece(Chi::mpi.process_count-1);
     pgrid_writer->SetInputData(ugrid);
 
     pgrid_writer->Write();

@@ -16,9 +16,9 @@ LBSSolver::LBSSolver(const std::string& text_name)
 }
 
 /**Returns the input parameters for this object.*/
-chi_objects::InputParameters LBSSolver::GetInputParameters()
+chi::InputParameters LBSSolver::GetInputParameters()
 {
-  chi_objects::InputParameters params =
+  chi::InputParameters params =
     chi_physics::Solver::GetInputParameters();
 
   // clang-format off
@@ -33,7 +33,7 @@ chi_objects::InputParameters LBSSolver::GetInputParameters()
     "<TT>lbs::LBSGroupset</TT>."
     "$(lbs::LBSGroupset$)");
 
-  params.AddOptionalParameterBlock("options", chi_objects::ParameterBlock(),
+  params.AddOptionalParameterBlock("options", chi::ParameterBlock(),
     "Block of options. See <TT>lbs::OptionsBlock</TT>. $(lbs::OptionsBlock$)");
   // clang-format on
 
@@ -41,7 +41,7 @@ chi_objects::InputParameters LBSSolver::GetInputParameters()
 }
 
 /**Input parameters based construction.*/
-LBSSolver::LBSSolver(const chi_objects::InputParameters& params)
+LBSSolver::LBSSolver(const chi::InputParameters& params)
   : chi_physics::Solver(params)
 {
   //=================================== Make groups
@@ -57,7 +57,7 @@ LBSSolver::LBSSolver(const chi_objects::InputParameters& params)
   {
     const auto& groupset_params = groupsets_array.GetParam(gs);
 
-    chi_objects::InputParameters gs_input_params =
+    chi::InputParameters gs_input_params =
       LBSGroupset::GetInputParameters();
     gs_input_params.SetObjectType("LBSSolver:LBSGroupset");
     gs_input_params.AssignParameters(groupset_params);

@@ -5,9 +5,9 @@
 
 namespace chi_mesh::lua_utils
 {
-chi_objects::InputParameters MeshModifiersApply_Syntax();
-chi_objects::ParameterBlock
-MeshModifiersApply(const chi_objects::InputParameters& params);
+chi::InputParameters MeshModifiersApply_Syntax();
+chi::ParameterBlock
+MeshModifiersApply(const chi::InputParameters& params);
 } // namespace chi_mesh::lua_utils
 
 #endif // CHITECH_LUA_MESHMODIFIERS_H

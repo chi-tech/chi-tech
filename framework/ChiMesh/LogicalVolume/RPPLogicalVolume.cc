@@ -7,9 +7,9 @@ namespace chi_mesh
 
 RegisterChiObject(chi_mesh, RPPLogicalVolume);
 
-chi_objects::InputParameters RPPLogicalVolume::GetInputParameters()
+chi::InputParameters RPPLogicalVolume::GetInputParameters()
 {
-  chi_objects::InputParameters params = LogicalVolume::GetInputParameters();
+  chi::InputParameters params = LogicalVolume::GetInputParameters();
 
   // clang-format off
   params.SetGeneralDescription(
@@ -34,7 +34,7 @@ chi_objects::InputParameters RPPLogicalVolume::GetInputParameters()
   return params;
 }
 
-RPPLogicalVolume::RPPLogicalVolume(const chi_objects::InputParameters& params)
+RPPLogicalVolume::RPPLogicalVolume(const chi::InputParameters& params)
   : LogicalVolume(params),
     xmin_(params.GetParamValue<double>("xmin")),
     xmax_(params.GetParamValue<double>("xmax")),

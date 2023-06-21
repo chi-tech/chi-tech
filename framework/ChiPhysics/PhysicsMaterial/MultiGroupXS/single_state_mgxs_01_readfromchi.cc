@@ -21,7 +21,7 @@ void chi_physics::SingleStateMGXS::
   // Open Chi XS file
   //============================================================
 
-  chi::log.Log()
+  Chi::log.Log()
       << "Reading Chi cross section file \"" << file_name << "\"\n";
 
   //opens and checks if open
@@ -370,7 +370,7 @@ void chi_physics::SingleStateMGXS::
 
         if (not HasNonZero(sigma_f_))
         {
-          chi::log.Log0Warning()
+          Chi::log.Log0Warning()
               << "The fission cross section specified in "
               << "\"" << file_name << "\" is uniformly zero..."
               << "Clearing it.";
@@ -388,7 +388,7 @@ void chi_physics::SingleStateMGXS::
 
         if (not HasNonZero(nu_sigma_f_))
         {
-          chi::log.Log0Warning()
+          Chi::log.Log0Warning()
               << "The production cross-section specified in "
               << "\"" << file_name << "\" is uniformly zero..."
               << "Clearing it.";
@@ -410,7 +410,7 @@ void chi_physics::SingleStateMGXS::
 
         if (not HasNonZero(nu))
         {
-          chi::log.Log0Warning()
+          Chi::log.Log0Warning()
               << "The total fission neutron yield specified in "
               << "\"" << file_name << "\" is uniformly zero..."
               << "Clearing it.";
@@ -445,7 +445,7 @@ void chi_physics::SingleStateMGXS::
 
         if (not HasNonZero(nu_prompt))
         {
-          chi::log.Log0Warning()
+          Chi::log.Log0Warning()
               << "The prompt fission neutron yield specified in "
               << "\"" << file_name << "\" is uniformly zero..."
               << "Clearing it.";
@@ -466,7 +466,7 @@ void chi_physics::SingleStateMGXS::
 
         if (not HasNonZero(nu_delayed))
         {
-          chi::log.Log0Warning()
+          Chi::log.Log0Warning()
               << "The delayed fission neutron yield specified in "
               << "\"" << file_name << "\" is uniformly zero..."
               << "Clearing it.";
@@ -484,7 +484,7 @@ void chi_physics::SingleStateMGXS::
 
         if (not HasNonZero(beta))
         {
-          chi::log.Log0Warning()
+          Chi::log.Log0Warning()
               << "The delayed neutron fraction specified in "
               << "\"" << file_name << "\" is uniformly zero..."
               << "Clearing it.";

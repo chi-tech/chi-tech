@@ -29,12 +29,12 @@ int chiCFEMDiffusionSolverCreate(lua_State *L)
 
   auto new_solver = std::make_shared<cfem_diffusion::Solver>(solver_name);
 
-  chi::object_stack.push_back(new_solver);
+  Chi::object_stack.push_back(new_solver);
 
   lua_pushinteger(L,
-      static_cast<lua_Integer>(chi::object_stack.size()-1));
+      static_cast<lua_Integer>(Chi::object_stack.size()-1));
 
-  chi::log.LogAllVerbose1()
+  Chi::log.LogAllVerbose1()
     << "\nCFEMDiffusionSolverCreate: CFEM Diffusion solver created"
     << std::endl;
   return 1;

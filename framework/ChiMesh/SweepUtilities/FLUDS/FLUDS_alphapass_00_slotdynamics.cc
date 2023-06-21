@@ -95,7 +95,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
         }
         if (!found)
         {
-          chi::log.LogAllError()
+          Chi::log.LogAllError()
             << "Lock-box location not found in call to "
             << "InitializeAlphaElements. Local Cell "
             << cell.local_id_
@@ -106,7 +106,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
             << " cat: " << face_categ
             << " omg=" << spds.omega.PrintS()
             << " lbsize=" << lock_box.size();
-          chi::Exit(EXIT_FAILURE);
+          Chi::Exit(EXIT_FAILURE);
         }
 
       }//if local

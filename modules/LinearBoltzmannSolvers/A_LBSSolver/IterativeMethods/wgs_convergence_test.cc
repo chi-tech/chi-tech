@@ -57,7 +57,7 @@ PetscErrorCode GSConvergenceTest(KSP ksp, PetscInt n, PetscReal rnorm,
 
   std::stringstream iter_info;
   iter_info
-    << chi::program_timer.GetTimeString() << " "
+    << Chi::program_timer.GetTimeString() << " "
     << offset
     << "WGS groups ["
     << context->groupset_.groups_.front().id_
@@ -73,8 +73,7 @@ PetscErrorCode GSConvergenceTest(KSP ksp, PetscInt n, PetscReal rnorm,
     iter_info << " CONVERGED\n";
   }
 
-  if (context->log_info_)
-    chi::log.Log() << iter_info.str() << std::endl;
+  if (context->log_info_) Chi::log.Log() << iter_info.str() << std::endl;
 
   return KSP_CONVERGED_ITERATING;
 }

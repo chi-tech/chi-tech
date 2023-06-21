@@ -32,7 +32,8 @@ int chiLBSWriteFluxMoments(lua_State *L)
   const std::string file_base = lua_tostring(L,2);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
+  auto& lbs_solver =
+    Chi::GetStackItem<lbs::LBSSolver>(Chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -67,7 +68,8 @@ int chiLBSCreateAndWriteSourceMoments(lua_State *L)
   const std::string file_base = lua_tostring(L,2);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
+  auto& lbs_solver =
+    Chi::GetStackItem<lbs::LBSSolver>(Chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -115,7 +117,8 @@ int chiLBSReadFluxMomentsAndMakeSourceMoments(lua_State *L)
   }
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
+  auto& lbs_solver =
+    Chi::GetStackItem<lbs::LBSSolver>(Chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -123,7 +126,7 @@ int chiLBSReadFluxMomentsAndMakeSourceMoments(lua_State *L)
                           lbs_solver.ExtSrcMomentsLocal(),
                           single_file_flag);
 
-  chi::log.Log() << "Making source moments from flux file.";
+  Chi::log.Log() << "Making source moments from flux file.";
   auto temp_phi = lbs_solver.PhiOldLocal();
   lbs_solver.PhiOldLocal() = lbs_solver.ExtSrcMomentsLocal();
   lbs_solver.ExtSrcMomentsLocal() = lbs_solver.MakeSourceMomentsFromPhi();
@@ -169,7 +172,8 @@ int chiLBSReadSourceMoments(lua_State *L)
   }
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
+  auto& lbs_solver =
+    Chi::GetStackItem<lbs::LBSSolver>(Chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -216,7 +220,8 @@ int chiLBSReadFluxMoments(lua_State *L)
   }
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
+  auto& lbs_solver =
+    Chi::GetStackItem<lbs::LBSSolver>(Chi::object_stack,
                                                        solver_handle,
                                                        fname);
 

@@ -14,8 +14,8 @@
 namespace chi_unit_tests
 {
 
-chi_objects::ParameterBlock
-chi_math_Test01_WDD_IJK_Sweep(const chi_objects::InputParameters& params);
+chi::ParameterBlock
+chi_math_Test01_WDD_IJK_Sweep(const chi::InputParameters& params);
 
 RegisterWrapperFunction(/*namespace_name=*/chi_unit_tests,
                         /*name_in_lua=*/chi_math_Test01_WDD_IJK_Sweep,
@@ -52,7 +52,7 @@ IJKArrayDbl WDD_IJK_Sweep2(const std::array<size_t, 3>& mesh_divs,
   int n = 0;
   for (const auto& omega_n : quad.omegas_)
   {
-    if (chi::mpi.location_id == 0 and verbose)
+    if (Chi::mpi.location_id == 0 and verbose)
       std::cout << "Sweep angle " << n << " " << omega_n.PrintStr()
                 << std::endl;
 
@@ -117,8 +117,8 @@ IJKArrayDbl WDD_IJK_Sweep2(const std::array<size_t, 3>& mesh_divs,
   return phi_0;
 }
 
-chi_objects::ParameterBlock
-chi_math_Test01_WDD_IJK_Sweep(const chi_objects::InputParameters&)
+chi::ParameterBlock
+chi_math_Test01_WDD_IJK_Sweep(const chi::InputParameters&)
 {
   bool verbose = true;
   const std::array<size_t, 3> mesh_divisions = {1, 1, 10};
@@ -139,14 +139,14 @@ chi_math_Test01_WDD_IJK_Sweep(const chi_objects::InputParameters&)
   auto phi = WDD_IJK_Sweep2(
     mesh_divisions, mesh_lengths, bcs, sigma_t, q, *pquad, verbose);
 
-  if (chi::mpi.location_id == 0 and verbose)
+  if (Chi::mpi.location_id == 0 and verbose)
   {
     std::cout << "order:\n";
     for (auto i : phi)
       std::cout << i << "\n";
   }
 
-  return chi_objects::ParameterBlock();
+  return chi::ParameterBlock();
 }
 
 } // namespace chi_unit_tests

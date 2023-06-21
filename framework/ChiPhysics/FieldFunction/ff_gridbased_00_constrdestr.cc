@@ -12,9 +12,9 @@ namespace chi_physics
 
 RegisterChiObject(chi_physics, FieldFunctionGridBased);
 
-chi_objects::InputParameters FieldFunctionGridBased::GetInputParameters()
+chi::InputParameters FieldFunctionGridBased::GetInputParameters()
 {
-  chi_objects::InputParameters params = FieldFunction::GetInputParameters();
+  chi::InputParameters params = FieldFunction::GetInputParameters();
 
   // clang-format off
   params.SetGeneralDescription(
@@ -35,7 +35,7 @@ chi_objects::InputParameters FieldFunctionGridBased::GetInputParameters()
 // ##################################################################
 /**ObjectMaker based constructor.*/
 FieldFunctionGridBased::FieldFunctionGridBased(
-  const chi_objects::InputParameters& params)
+  const chi::InputParameters& params)
   : FieldFunction(params),
     local_grid_bounding_box_(
       chi_mesh::GetCurrentHandler().GetGrid()->GetLocalBoundingBox())

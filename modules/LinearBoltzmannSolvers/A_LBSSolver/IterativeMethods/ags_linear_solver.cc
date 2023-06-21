@@ -110,7 +110,7 @@ void AGSLinearSolver<Mat,Vec,KSP>::Solve()
 
 
     if (verbose_)
-      chi::log.Log()
+      Chi::log.Log()
       << "********** AGS solver iteration " << std::setw(3) << iter << " "
       << " Relative change " << std::setw(10) << std::setprecision(4)
       << error_norm/sol_norm;

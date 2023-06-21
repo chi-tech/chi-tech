@@ -37,7 +37,8 @@ int chiLBSWriteGroupsetAngularFlux(lua_State *L)
   const std::string file_base  = lua_tostring(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
+  auto& lbs_solver =
+    Chi::GetStackItem<lbs::LBSSolver>(Chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -48,10 +49,10 @@ int chiLBSWriteGroupsetAngularFlux(lua_State *L)
   }
   catch (const std::out_of_range& o)
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "Invalid handle to groupset "
       << "in call to " << fname;
-    chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   lbs_solver.WriteGroupsetAngularFluxes(*groupset, file_base);
@@ -89,7 +90,8 @@ int chiLBSReadGroupsetAngularFlux(lua_State *L)
   const std::string file_base  = lua_tostring(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
+  auto& lbs_solver =
+    Chi::GetStackItem<lbs::LBSSolver>(Chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -100,10 +102,10 @@ int chiLBSReadGroupsetAngularFlux(lua_State *L)
   }
   catch (const std::out_of_range& o)
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "Invalid handle to groupset "
       << "in call to " << fname;
-    chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   lbs_solver.ReadGroupsetAngularFluxes(*groupset, file_base);

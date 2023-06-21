@@ -12,11 +12,11 @@
 \author Jan*/
 chi_mesh::MeshHandler& chi_mesh::GetCurrentHandler()
 {
-  if (chi::meshhandler_stack.empty())
+  if (Chi::meshhandler_stack.empty())
     throw std::logic_error("chi_mesh::GetCurrentHandler: No handlers on stack");
 
-  return chi::GetStackItem<chi_mesh::MeshHandler>(chi::meshhandler_stack,
-                                                  chi::current_mesh_handler);
+  return Chi::GetStackItem<chi_mesh::MeshHandler>(Chi::meshhandler_stack,
+                                                  Chi::current_mesh_handler);
 }
 
 //###################################################################
@@ -24,10 +24,10 @@ chi_mesh::MeshHandler& chi_mesh::GetCurrentHandler()
  * and returns a handle to it.*/
 size_t chi_mesh::PushNewHandlerAndGetIndex()
 {
-  chi::meshhandler_stack.push_back(std::make_shared<chi_mesh::MeshHandler>());
+  Chi::meshhandler_stack.push_back(std::make_shared<chi_mesh::MeshHandler>());
 
-  int index = (int)chi::meshhandler_stack.size() - 1;
-  chi::current_mesh_handler = index;
+  int index = (int)Chi::meshhandler_stack.size() - 1;
+  Chi::current_mesh_handler = index;
 
   return index;
 }

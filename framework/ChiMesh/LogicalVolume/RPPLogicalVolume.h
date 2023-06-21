@@ -11,8 +11,8 @@ namespace chi_mesh
 class RPPLogicalVolume : public LogicalVolume
 {
 public:
-  static chi_objects::InputParameters GetInputParameters();
-  explicit RPPLogicalVolume(const chi_objects::InputParameters& params);
+  static chi::InputParameters GetInputParameters();
+  explicit RPPLogicalVolume(const chi::InputParameters& params);
 
   bool Inside(const chi_mesh::Vector3& point) const override;
 

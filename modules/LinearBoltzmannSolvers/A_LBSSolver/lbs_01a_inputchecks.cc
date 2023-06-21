@@ -11,45 +11,45 @@ void lbs::LBSSolver::PerformInputChecks()
 {
   if (groups_.empty())
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "LinearBoltzmann::SteadyStateSolver: No groups added to solver.";
-    chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   num_groups_ = groups_.size();
 
   if (groupsets_.empty())
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "LinearBoltzmann::SteadyStateSolver: No group-sets added to solver.";
-    chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
   int grpset_counter=0;
   for (auto& group_set : groupsets_)
   {
     if (group_set.groups_.empty())
     {
-      chi::log.LogAllError()
+      Chi::log.LogAllError()
         << "LinearBoltzmann::SteadyStateSolver: No groups added to groupset "
         << grpset_counter << ".";
-      chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
     ++grpset_counter;
   }
   if (options_.sd_type == chi_math::SpatialDiscretizationType::UNDEFINED)
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "LinearBoltzmann::SteadyStateSolver: No discretization_ method set.";
-    chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   grid_ptr_ = chi_mesh::GetCurrentHandler().GetGrid();
 
   if (grid_ptr_ == nullptr)
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "LinearBoltzmann::SteadyStateSolver: No grid_ptr_ available from region.";
-    chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   //======================================== Determine geometry type

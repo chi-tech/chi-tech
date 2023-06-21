@@ -37,7 +37,7 @@ void lbs::LBSSolver::InitWGDSA(LBSGroupset& groupset,
       matid_2_mgxs_map,
       unit_cell_matrices_,
       true); // verbosity
-    chi_objects::ParameterBlock block;
+    chi::ParameterBlock block;
 
     solver->options.residual_tolerance = groupset.wgdsa_tol_;
     solver->options.max_iters = groupset.wgdsa_max_iters_;

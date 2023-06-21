@@ -29,7 +29,7 @@ void lbs::acceleration::DiffusionMIPSolver::
     throw std::logic_error(fname + ": Some or all PETSc elements are null. "
                                    "Check that Initialize has been called.");
   if (options.verbose)
-    chi::log.Log() << chi::program_timer.GetTimeString() << " Starting assembly";
+    Chi::log.Log() << Chi::program_timer.GetTimeString() << " Starting assembly";
 
   const size_t num_groups   = uk_man_.unknowns_.front().num_components_;
 
@@ -288,7 +288,7 @@ void lbs::acceleration::DiffusionMIPSolver::
     MatInfo info;
     MatGetInfo(A_, MAT_GLOBAL_SUM, &info);
 
-    chi::log.Log() << "Number of mallocs used = " << info.mallocs
+    Chi::log.Log() << "Number of mallocs used = " << info.mallocs
                    << "\nNumber of non-zeros allocated = "
                    << info.nz_allocated
                    << "\nNumber of non-zeros used = "
@@ -308,7 +308,7 @@ void lbs::acceleration::DiffusionMIPSolver::
   KSPSetOperators(ksp_, A_, A_);
 
   if (options.verbose)
-    chi::log.Log() << chi::program_timer.GetTimeString() << " Assembly completed";
+    Chi::log.Log() << Chi::program_timer.GetTimeString() << " Assembly completed";
 
   PC pc;
   KSPGetPC(ksp_, &pc);

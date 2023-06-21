@@ -3,7 +3,7 @@
 #include "ChiObject/object_maker.h"
 #include "chi_runtime.h"
 
-namespace chi_objects
+namespace chi
 {
 
 RegisterChiObject(chi_objects, MaterialPropertyScalarFuncXYZTV);
@@ -30,7 +30,7 @@ MaterialPropertyScalarFuncXYZTV::MaterialPropertyScalarFuncXYZTV(
   const InputParameters& params)
   : MaterialProperty(params),
     function_(
-      chi::GetStackItem<SFXYZV>(chi::object_stack,
+      Chi::GetStackItem<SFXYZV>(Chi::object_stack,
                                 params.GetParamValue<size_t>("function_handle"),
                                 __FUNCTION__)),
     dependent_variables_(

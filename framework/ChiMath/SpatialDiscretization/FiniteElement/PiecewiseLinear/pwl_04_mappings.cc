@@ -20,7 +20,7 @@ MapDOF(const chi_mesh::Cell& cell,
   size_t num_unknowns = unknown_manager.GetTotalUnknownStructureSize();
   size_t block_id     = unknown_manager.MapUnknown(unknown_id, component);
 
-  if (cell.partition_id_ == chi::mpi.location_id)
+  if (cell.partition_id_ == Chi::mpi.location_id)
   {
     if (storage == chi_math::UnknownStorageType::BLOCK)
     {
@@ -53,11 +53,11 @@ MapDOF(const chi_mesh::Cell& cell,
 
     if (!found)
     {
-      chi::log.LogAllError()
+      Chi::log.LogAllError()
         << "SpatialDiscretization_PWL::MapDFEMDOF. Mapping failed for cell "
         << "with global index " << cell.global_id_ << " and partition-ID "
         << cell.partition_id_;
-     chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
 
     if (storage == chi_math::UnknownStorageType::BLOCK)
@@ -95,7 +95,7 @@ MapDOFLocal(const chi_mesh::Cell& cell,
   size_t num_unknowns = unknown_manager.GetTotalUnknownStructureSize();
   size_t block_id     = unknown_manager.MapUnknown(unknown_id, component);
 
-  if (cell.partition_id_ == chi::mpi.location_id)
+  if (cell.partition_id_ == Chi::mpi.location_id)
   {
     if (storage == chi_math::UnknownStorageType::BLOCK)
     {
@@ -127,11 +127,11 @@ MapDOFLocal(const chi_mesh::Cell& cell,
 
     if (!found)
     {
-      chi::log.LogAllError()
+      Chi::log.LogAllError()
         << "SpatialDiscretization_PWL::MapDFEMDOF. Mapping failed for cell "
         << "with global index " << cell.global_id_ << " and partition-ID "
         << cell.partition_id_;
-     chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
 
     if (storage == chi_math::UnknownStorageType::BLOCK)

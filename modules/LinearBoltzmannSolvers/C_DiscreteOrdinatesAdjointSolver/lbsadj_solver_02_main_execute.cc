@@ -14,7 +14,7 @@ void lbs::DiscreteOrdinatesAdjointSolver::Execute()
   primary_ags_solver_->Solve();
 
   //============================================= Apply post processing
-  chi::log.Log() << "LBAdjointSolver: post-processing.";
+  Chi::log.Log() << "LBAdjointSolver: post-processing.";
   std::set<int> set_group_numbers;
   for (const auto& groupset : groupsets_)
     for (const auto& group : groupset.groups_)

@@ -43,7 +43,7 @@ void lbs::LBSSolver::InitializeBoundaries()
     std::vector<uint64_t> local_unique_bids(local_unique_bids_set.begin(),
                                             local_unique_bids_set.end());
     const int local_num_unique_bids = static_cast<int>(local_unique_bids.size());
-    std::vector<int> recvcounts(chi::mpi.process_count, 0);
+    std::vector<int> recvcounts(Chi::mpi.process_count, 0);
 
     MPI_Allgather(&local_num_unique_bids,      //sendbuf
                   1, MPI_INT,                  //sendcount+type
@@ -51,10 +51,10 @@ void lbs::LBSSolver::InitializeBoundaries()
                   1, MPI_INT,              //recvcount+type
                   MPI_COMM_WORLD);             //comm
 
-    std::vector<int> recvdispls(chi::mpi.process_count, 0);
+    std::vector<int> recvdispls(Chi::mpi.process_count, 0);
 
     int running_displacement = 0;
-    for (int locI=0; locI<chi::mpi.process_count; ++locI)
+    for (int locI=0; locI< Chi::mpi.process_count; ++locI)
     {
       recvdispls[locI] = running_displacement;
       running_displacement += recvcounts[locI];
@@ -126,8 +126,8 @@ void lbs::LBSSolver::InitializeBoundaries()
         const int local_has_bid = n_ptr != nullptr ? 1 : 0;
         const Vec3 local_normal = local_has_bid ? *n_ptr : Vec3(0.0,0.0,0.0);
 
-        std::vector<int> locJ_has_bid(chi::mpi.process_count, 1);
-        std::vector<double> locJ_n_val(chi::mpi.process_count*3, 0.0);
+        std::vector<int> locJ_has_bid(Chi::mpi.process_count, 1);
+        std::vector<double> locJ_n_val(Chi::mpi.process_count*3, 0.0);
 
         MPI_Allgather(&local_has_bid,       //sendbuf
                       1, MPI_INT,           //sendcount + datatype
@@ -142,7 +142,7 @@ void lbs::LBSSolver::InitializeBoundaries()
                       MPI_COMM_WORLD);   //communicator
 
         Vec3 global_normal;
-        for (int j=0; j<chi::mpi.process_count; ++j)
+        for (int j=0; j< Chi::mpi.process_count; ++j)
         {
           if (locJ_has_bid[j])
           {

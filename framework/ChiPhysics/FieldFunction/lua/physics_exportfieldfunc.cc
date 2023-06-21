@@ -25,7 +25,7 @@ int chiExportFieldFunctionToVTK(lua_State* L)
   typedef chi_physics::FieldFunctionGridBased FFGridBased;
 
   auto ff_base =
-    chi::GetStackItemPtr(chi::field_function_stack, ff_handle, fname);
+    Chi::GetStackItemPtr(Chi::field_function_stack, ff_handle, fname);
   auto ff = std::dynamic_pointer_cast<FFGridBased>(ff_base);
 
   ChiLogicalErrorIf(not ff, "Only grid-based field functions can be exported");
@@ -66,7 +66,7 @@ int chiExportMultiFieldFunctionToVTK(lua_State* L)
     lua_pop(L, 1);
 
     auto ff_base =
-      chi::GetStackItemPtr(chi::field_function_stack, ff_handle, fname);
+      Chi::GetStackItemPtr(Chi::field_function_stack, ff_handle, fname);
 
     typedef chi_physics::FieldFunctionGridBased FFGridBased;
     auto ff = std::dynamic_pointer_cast<FFGridBased>(ff_base);

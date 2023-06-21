@@ -43,7 +43,7 @@ IJKArrayDbl WDD_IJK_Sweep(const std::array<size_t, 3>& mesh_divs,
   int n = 0;
   for (const auto& omega_n : quad.omegas_)
   {
-    if (chi::mpi.location_id == 0 and verbose)
+    if (Chi::mpi.location_id == 0 and verbose)
       std::cout << "Sweep angle " << n << " " << omega_n.PrintStr() << std::endl;
 
     //====================================== Determine sweep ordering
@@ -127,7 +127,7 @@ int  Test_WDD_IJK_Sweep(lua_State* L)
                            bcs,sigma_t,q,*pquad,
                            verbose);
 
-  if (chi::mpi.location_id == 0 and verbose)
+  if (Chi::mpi.location_id == 0 and verbose)
   {
     std::cout << "order:\n";
     for (auto i : phi)

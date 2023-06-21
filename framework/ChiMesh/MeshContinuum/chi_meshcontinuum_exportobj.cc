@@ -22,9 +22,9 @@ void chi_mesh::MeshContinuum::
 
     if (of == nullptr)
     {
-      chi::log.LogAllError() << "Could not open file: "
+      Chi::log.LogAllError() << "Could not open file: "
                                   << std::string(fileName);
-      chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
 
     //====================================== Develop list of faces and nodes
@@ -94,7 +94,7 @@ void chi_mesh::MeshContinuum::
 
     fclose(of);
 
-    chi::log.Log()
+    Chi::log.Log()
      << "Exported Volume mesh to "
      << str_file_name;
   }//Whole mesh
@@ -106,15 +106,15 @@ void chi_mesh::MeshContinuum::
     std::string file_base_name =
       str_file_name.substr(0,str_file_name.find('.'));
 
-    if (chi::material_stack.empty())
+    if (Chi::material_stack.empty())
     {
-      chi::log.Log0Warning()
+      Chi::log.Log0Warning()
         << "ExportCellsToObj: No mesh will be exported because there "
         << "are no physics materials present";
     }
 
 
-    for (int mat=0; mat<chi::material_stack.size(); mat++)
+    for (int mat=0; mat< Chi::material_stack.size(); mat++)
     {
       std::string mat_base_name = file_base_name +
                                   std::string("_m") +
@@ -125,9 +125,9 @@ void chi_mesh::MeshContinuum::
 
       if (of == nullptr)
       {
-        chi::log.LogAllError() << "Could not open file: "
+        Chi::log.LogAllError() << "Could not open file: "
                                   << mat_file_name;
-        chi::Exit(EXIT_FAILURE);
+        Chi::Exit(EXIT_FAILURE);
       }
 
       //====================================== Develop list of faces and nodes
@@ -210,7 +210,7 @@ void chi_mesh::MeshContinuum::
 
       fclose(of);
 
-      chi::log.Log()
+      Chi::log.Log()
         << "Exported Material Volume mesh to "
         << mat_file_name;
     }//for mat

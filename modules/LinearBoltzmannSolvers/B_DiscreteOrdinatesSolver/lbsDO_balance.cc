@@ -21,7 +21,7 @@ void lbs::DiscreteOrdinatesSolver::ZeroOutflowBalanceVars(LBSGroupset& groupset)
 void lbs::DiscreteOrdinatesSolver::ComputeBalance()
 {
   MPI_Barrier(MPI_COMM_WORLD);
-  chi::log.Log() << "\n********** Computing balance\n";
+  Chi::log.Log() << "\n********** Computing balance\n";
 
   //======================================== Get material source
   // This is done using the SetSource routine
@@ -143,7 +143,7 @@ void lbs::DiscreteOrdinatesSolver::ComputeBalance()
   double globl_balance    = globl_balance_table.at(4);
   double globl_gain       = globl_balance_table.at(5);
 
-  chi::log.Log() << "Balance table:\n"
+  Chi::log.Log() << "Balance table:\n"
     << std::setprecision(5) << std::scientific
     << " Absorption rate              = " << globl_absorption               << "\n"
     << " Production rate              = " << globl_production               << "\n"
@@ -153,7 +153,7 @@ void lbs::DiscreteOrdinatesSolver::ComputeBalance()
     << " Net Balance                  = " << globl_balance                  << "\n"
     << " (Net Balance)/(Net Gain)     = " << globl_balance/globl_gain       << "\n";
 
-  chi::log.Log() << "\n********** Done computing balance\n";
+  Chi::log.Log() << "\n********** Done computing balance\n";
 
   MPI_Barrier(MPI_COMM_WORLD);
 }

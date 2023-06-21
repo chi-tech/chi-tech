@@ -4,16 +4,16 @@
 #include <mpi.h>
 #include <set>
 
-class chi;
+class Chi;
 
-namespace chi_objects
+namespace chi
 {
 
 //################################################################### Class def
 /**An object for storing various MPI states.*/
 class MPI_Info
 {
-  friend class ::chi;
+  friend class ::Chi;
 private:
   int location_id_ = 0;
   int process_count_ = 1;

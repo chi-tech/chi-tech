@@ -3,9 +3,9 @@
 namespace chi_math
 {
 
-chi_objects::InputParameters FunctionDimAToDimB::GetInputParameters()
+chi::InputParameters FunctionDimAToDimB::GetInputParameters()
 {
-  chi_objects::InputParameters params = ChiObject::GetInputParameters();
+  chi::InputParameters params = ChiObject::GetInputParameters();
 
   params.AddRequiredParameter<size_t>(
     "input_dimension",
@@ -19,7 +19,7 @@ chi_objects::InputParameters FunctionDimAToDimB::GetInputParameters()
 }
 
 FunctionDimAToDimB::FunctionDimAToDimB(
-  const chi_objects::InputParameters& params) :
+  const chi::InputParameters& params) :
   ChiObject(params),
   input_dimension_(params.GetParamValue<size_t>("input_dimension")),
   output_dimension_(params.GetParamValue<size_t>("output_dimension"))

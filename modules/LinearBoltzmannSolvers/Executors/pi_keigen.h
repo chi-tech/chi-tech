@@ -28,9 +28,9 @@ protected:
   double k_eff_ = 1.0;
 
 public:
-  static chi_objects::InputParameters GetInputParameters();
+  static chi::InputParameters GetInputParameters();
 
-  explicit XXPowerIterationKEigen(const chi_objects::InputParameters& params);
+  explicit XXPowerIterationKEigen(const chi::InputParameters& params);
 
   void Initialize() override;
   void Execute() override;

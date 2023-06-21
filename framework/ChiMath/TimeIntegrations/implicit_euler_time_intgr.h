@@ -9,9 +9,9 @@ namespace chi_math
 class ImplicitEulerTimeIntegration : public ThetaSchemeTimeIntegration
 {
 public:
-  static chi_objects::InputParameters GetInputParameters();
+  static chi::InputParameters GetInputParameters();
   explicit ImplicitEulerTimeIntegration(
-    const chi_objects::InputParameters& params);
+    const chi::InputParameters& params);
 };
 
 } // namespace chi_math

@@ -110,7 +110,7 @@ void NLKEigenDiffSolver::PostSolveCallback()
 
   //================================================== Print summary
   if (nl_context_ptr->verbosity_level_ >= 1)
-  chi::log.Log()
+    Chi::log.Log()
                  << "        Final lambda-eigenvalue    :        "
                  << std::fixed << std::setw(10) << std::setprecision(7)
                  << k_eff

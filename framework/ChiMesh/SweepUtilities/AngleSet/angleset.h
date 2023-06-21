@@ -49,7 +49,7 @@ public:
            std::vector<size_t>& angle_indices,
            std::map<uint64_t, std::shared_ptr<SweepBndry>>& sim_boundaries,
            int sweep_eager_limit,
-           const chi_objects::ChiMPICommunicatorSet& in_comm_set);
+           const chi::ChiMPICommunicatorSet& in_comm_set);
 
   void InitializeDelayedUpstreamData();
 

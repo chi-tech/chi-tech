@@ -44,7 +44,7 @@ void LBSSolver::InitializeFieldFunctions()
         discretization_,               // Spatial discretization
         Unknown(UnknownType::SCALAR)); // Unknown/Variable
 
-      chi::field_function_stack.push_back(group_ff);
+      Chi::field_function_stack.push_back(group_ff);
       field_functions_.push_back(group_ff);
 
       phi_field_functions_local_map_[{g, m}] = field_functions_.size() - 1;
@@ -69,7 +69,7 @@ void LBSSolver::InitializeFieldFunctions()
       discretization_,                  // Spatial discretization
       Unknown(UnknownType::SCALAR));    // Unknown/Variable
 
-    chi::field_function_stack.push_back(power_ff);
+    Chi::field_function_stack.push_back(power_ff);
     field_functions_.push_back(power_ff);
 
     power_gen_fieldfunc_local_handle_ = field_functions_.size() - 1;

@@ -34,7 +34,7 @@ void lbs::DiscreteOrdinatesSolver::Initialize()
   }
 
   InitializeSolverSchemes();           //j
-  source_event_tag_ = chi::log.GetRepeatingEventTag("Set Source");
+  source_event_tag_ = Chi::log.GetRepeatingEventTag("Set Source");
 }
 
 /**Initializes Within-GroupSet solvers.*/

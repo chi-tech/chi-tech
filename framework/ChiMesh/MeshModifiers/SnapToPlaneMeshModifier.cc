@@ -14,9 +14,9 @@ namespace chi_mesh
 
 RegisterChiObject(chi_mesh, SnapToPlaneMeshModifier);
 
-chi_objects::InputParameters SnapToPlaneMeshModifier::GetInputParameters()
+chi::InputParameters SnapToPlaneMeshModifier::GetInputParameters()
 {
-  chi_objects::InputParameters params = ChiObject::GetInputParameters();
+  chi::InputParameters params = ChiObject::GetInputParameters();
 
   params.SetGeneralDescription(
     "\\defgroup chi_mesh__SnapToPlaneMeshModifier "
@@ -51,7 +51,7 @@ chi_objects::InputParameters SnapToPlaneMeshModifier::GetInputParameters()
 }
 
 SnapToPlaneMeshModifier::SnapToPlaneMeshModifier(
-  const chi_objects::InputParameters& params)
+  const chi::InputParameters& params)
   : MeshModifier(params),
     normal_(params.GetParamVectorValue<double>("normal")),
     point_(params.GetParamVectorValue<double>("point")),
@@ -59,7 +59,7 @@ SnapToPlaneMeshModifier::SnapToPlaneMeshModifier(
     check_face_alignment_(params.GetParamValue<bool>("check_face_alignment")),
     tol_(params.GetParamValue<double>("tolerance"))
 {
-  ChiLogicalErrorIf(chi::mpi.process_count != 1,
+  ChiLogicalErrorIf(Chi::mpi.process_count != 1,
                     "Cannot only be used in serial");
 }
 
@@ -119,7 +119,7 @@ void SnapToPlaneMeshModifier::Apply()
     //  chi::log.Log() << face.normal_.PrintStr();
   }
 
-  chi::log.Log0Verbose1() << "Number of cells modified "
+  Chi::log.Log0Verbose1() << "Number of cells modified "
                           << cell_ids_modified.size();
 }
 

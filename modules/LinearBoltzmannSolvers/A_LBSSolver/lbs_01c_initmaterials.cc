@@ -15,7 +15,7 @@
 void lbs::LBSSolver::InitMaterials()
 {
   const std::string fname = "lbs::SteadyStateSolver::InitMaterials";
-  chi::log.Log0Verbose1() << "Initializing Materials";
+  Chi::log.Log0Verbose1() << "Initializing Materials";
 
   //================================================== Create set of material
   //                                                   ids locally relevant
@@ -38,7 +38,7 @@ void lbs::LBSSolver::InitMaterials()
 
   if (invalid_mat_cell_count>0)
   {
-    chi::log.LogAllWarning()
+    Chi::log.LogAllWarning()
       << "Number of invalid material cells: " << invalid_mat_cell_count;
   }
 
@@ -48,7 +48,7 @@ void lbs::LBSSolver::InitMaterials()
   matid_to_src_map_.clear();
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Process materials found
-  const size_t num_physics_mats = chi::material_stack.size();
+  const size_t num_physics_mats = Chi::material_stack.size();
 
   for (const int& mat_id : unique_material_ids)
   {
@@ -63,7 +63,8 @@ void lbs::LBSSolver::InitMaterials()
                                      " matches no material in physics material "
                                      "library.");
 
-    auto current_material = chi::GetStackItemPtr(chi::material_stack,
+    auto current_material =
+      Chi::GetStackItemPtr(Chi::material_stack,
                                                  mat_id, fname);
 
     //====================================== Extract properties
@@ -85,7 +86,7 @@ void lbs::LBSSolver::InitMaterials()
 
         if (mg_source->source_value_g_.size() < groups_.size())
         {
-          chi::log.LogAllWarning()
+          Chi::log.LogAllWarning()
             << fname + ": Isotropic Multigroup source specified in "
             << "material \"" << current_material->name_ << "\" has fewer "
             << "energy groups than called for in the simulation. "
@@ -101,26 +102,26 @@ void lbs::LBSSolver::InitMaterials()
     //====================================== Check valid property
     if (!found_transport_xs)
     {
-      chi::log.LogAllError()
+      Chi::log.LogAllError()
         << fname + ": Found no transport cross-section property for "
         << "material \"" << current_material->name_ << "\".";
-      chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
     //====================================== Check number of groups legal
     if (matid_to_xs_map_[mat_id]->NumGroups() < groups_.size())
     {
-      chi::log.LogAllError()
+      Chi::log.LogAllError()
           << fname + ": Found material \"" << current_material->name_ << "\" has "
           << matid_to_xs_map_[mat_id]->NumGroups() << " groups and"
           << " the simulation has " << groups_.size() << " groups."
           << " The material must have a greater or equal amount of groups.";
-      chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
 
     //====================================== Check number of moments
     if (matid_to_xs_map_[mat_id]->ScatteringOrder() < options_.scattering_order)
     {
-      chi::log.Log0Warning()
+      Chi::log.Log0Warning()
           << fname + ": Found material \"" << current_material->name_
           << "\" has a scattering order of "
           << matid_to_xs_map_[mat_id]->ScatteringOrder()
@@ -177,7 +178,7 @@ void lbs::LBSSolver::InitMaterials()
       transport_view.ReassingXS(*xs_ptr);
     }
 
-  chi::log.Log0Verbose1()
+  Chi::log.Log0Verbose1()
     << "Materials Initialized:\n" << materials_list.str() << "\n";
 
   MPI_Barrier(MPI_COMM_WORLD);

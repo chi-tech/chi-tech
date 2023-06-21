@@ -11,7 +11,7 @@ void chi_mesh::sweep_management::
     const std::vector<int> &location_dependencies,
     std::vector<std::vector<int>> &global_dependencies)
 {
-  int P = chi::mpi.process_count;
+  int P = Chi::mpi.process_count;
 
   //============================================= Communicate location dep counts
   std::vector<int> depcount_per_loc(P, 0);

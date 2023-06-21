@@ -159,8 +159,8 @@ void mg_diffusion::Solver::Assemble_A_bext()
           MatSetValue(A_[g], imap[i], imap[j], Acell[g][i][j], ADD_VALUES);
 
   }//for cell
- 
-  chi::log.Log() << "Global assembly";
+
+  Chi::log.Log() << "Global assembly";
 
   for (uint g=0; g < num_groups_; ++g)
   {
@@ -185,6 +185,6 @@ void mg_diffusion::Solver::Assemble_A_bext()
 //  PetscViewerPopFormat(viewer);
 //  PetscViewerDestroy(&viewer);
 
-  chi::log.Log() << "Done global assembly";
+  Chi::log.Log() << "Done global assembly";
 
 }

@@ -5,7 +5,7 @@
 
 #include "chi_misc_utils.h"
 
-namespace chi_objects::lua_utils
+namespace chi::lua_utils
 {
 int chiMakeObject(lua_State* L);
 }
@@ -14,7 +14,7 @@ int chiMakeObject(lua_State* L);
 // Execute file
 /** Executes the given file in the Lua engine.
 \author Jan*/
-int chi_objects::ChiConsole::ExecuteFile(const std::string& fileName,
+int chi::ChiConsole::ExecuteFile(const std::string& fileName,
                                          int argc,
                                          char** argv) const
 {
@@ -36,7 +36,7 @@ int chi_objects::ChiConsole::ExecuteFile(const std::string& fileName,
 
     if (error > 0)
     {
-      chi::log.LogAllError()
+      Chi::log.LogAllError()
         << "LuaError: " << lua_tostring(this->console_state_, -1);
       return EXIT_FAILURE;
     }
@@ -46,7 +46,7 @@ int chi_objects::ChiConsole::ExecuteFile(const std::string& fileName,
 
 // ###################################################################
 /**Pushes location id and number of processes to lua state.*/
-void chi_objects::ChiConsole::PostMPIInfo(int location_id,
+void chi::ChiConsole::PostMPIInfo(int location_id,
                                           int number_of_processes) const
 {
   lua_State* L = this->console_state_;
@@ -61,7 +61,7 @@ void chi_objects::ChiConsole::PostMPIInfo(int location_id,
 // ###################################################################
 /**Basic addition to registry. Used by the other public methods
  * to registry a text-key to a lua function.*/
-void chi_objects::ChiConsole::AddFunctionToRegistry(
+void chi::ChiConsole::AddFunctionToRegistry(
   const std::string& name_in_lua, lua_CFunction function_ptr)
 {
   auto& console = GetInstance();
@@ -90,7 +90,7 @@ void chi_objects::ChiConsole::AddFunctionToRegistry(
  * particular function will strip the namespace from the the parameter
  * `raw_name_in_lua` and cause the function to be registered in the
  * global namespace of the lua console.*/
-char chi_objects::ChiConsole::AddFunctionToRegistryGlobalNamespace(
+char chi::ChiConsole::AddFunctionToRegistryGlobalNamespace(
   const std::string& raw_name_in_lua, lua_CFunction function_ptr)
 {
   // Filter out namespace from the raw name
@@ -107,7 +107,7 @@ char chi_objects::ChiConsole::AddFunctionToRegistryGlobalNamespace(
  * parsed into the lua console when `chi::Initialize` is called. The full
  * path of the function will be derived from `namespace_name` + "::" +
  * `function_name`.*/
-char chi_objects::ChiConsole::AddFunctionToRegistryInNamespaceWithName(
+char chi::ChiConsole::AddFunctionToRegistryInNamespaceWithName(
   lua_CFunction function_ptr,
   const std::string& namespace_name,
   const std::string& function_name,
@@ -127,7 +127,7 @@ char chi_objects::ChiConsole::AddFunctionToRegistryInNamespaceWithName(
 }
 
 // ###################################################################
-chi_objects::InputParameters chi_objects::ChiConsole::DefaultGetInParamsFunc()
+chi::InputParameters chi::ChiConsole::DefaultGetInParamsFunc()
 {
   return InputParameters();
 }
@@ -135,7 +135,7 @@ chi_objects::InputParameters chi_objects::ChiConsole::DefaultGetInParamsFunc()
 // ###################################################################
 /**Wrapper functions operate with input and output parameters, essentially
  * hiding the lua interface.*/
-char chi_objects::ChiConsole::AddWrapperToRegistryInNamespaceWithName(
+char chi::ChiConsole::AddWrapperToRegistryInNamespaceWithName(
   const std::string& namespace_name,
   const std::string& name_in_lua,
   WrapperGetInParamsFunc syntax_function,
@@ -171,7 +171,7 @@ char chi_objects::ChiConsole::AddWrapperToRegistryInNamespaceWithName(
 
 // ###################################################################
 /**Sets/Forms a lua function in the state using a namespace structure.*/
-void chi_objects::ChiConsole::SetLuaFuncNamespaceTableStructure(
+void chi::ChiConsole::SetLuaFuncNamespaceTableStructure(
   const std::string& full_lua_name, lua_CFunction function_ptr)
 {
   auto L = GetInstance().console_state_;
@@ -202,7 +202,7 @@ void chi_objects::ChiConsole::SetLuaFuncNamespaceTableStructure(
  * assigned a table structure
  * `sing.sob.nook.Tigger = "sing::sob::nook::Tigger"`. Then finally assigns
  * lua call to this table.*/
-void chi_objects::ChiConsole::SetLuaFuncWrapperNamespaceTableStructure(
+void chi::ChiConsole::SetLuaFuncWrapperNamespaceTableStructure(
   const std::string& full_lua_name)
 {
   auto L = GetInstance().console_state_;
@@ -245,7 +245,7 @@ void chi_objects::ChiConsole::SetLuaFuncWrapperNamespaceTableStructure(
  * a string. For example the string "sing::sob::nook::Tigger" will be
  * assigned a table structure
  * `sing.sob.nook.Tigger = "sing::sob::nook::Tigger"`.*/
-void chi_objects::ChiConsole::SetObjectNamespaceTableStructure(
+void chi::ChiConsole::SetObjectNamespaceTableStructure(
   const std::string& full_lua_name)
 {
   auto L = GetInstance().console_state_;
@@ -282,7 +282,7 @@ void chi_objects::ChiConsole::SetObjectNamespaceTableStructure(
  *
  * At the end of the routine the last table in the structure will be on top
  * of the stack.*/
-void chi_objects::ChiConsole::FleshOutLuaTableStructure(
+void chi::ChiConsole::FleshOutLuaTableStructure(
   const std::vector<std::string>& table_names)
 {
   auto L = GetInstance().console_state_;
@@ -321,7 +321,7 @@ void chi_objects::ChiConsole::FleshOutLuaTableStructure(
 /**Assumes a table is on top of the stack, then loads the table
  * with chunks that call registered methods of the class with the first
  * argument being the object's handle.*/
-void chi_objects::ChiConsole::SetObjectMethodsToTable(
+void chi::ChiConsole::SetObjectMethodsToTable(
   const std::string& class_name, size_t handle)
 {
   auto& console = GetInstance();
@@ -358,25 +358,25 @@ void chi_objects::ChiConsole::SetObjectMethodsToTable(
 // ##################################################################
 /**Makes a formatted output, readible by the documentation scripts,
  * of all the lua wrapper functions.*/
-void chi_objects::ChiConsole::DumpRegister() const
+void chi::ChiConsole::DumpRegister() const
 {
-  chi::log.Log() << "\n\n";
+  Chi::log.Log() << "\n\n";
   for (const auto& [key, entry] : function_wrapper_registry_)
   {
-    if (chi::log.GetVerbosity() == 0)
+    if (Chi::log.GetVerbosity() == 0)
     {
-      chi::log.Log() << key;
+      Chi::log.Log() << key;
       continue;
     }
 
-    chi::log.Log() << "LUA_FUNCWRAPPER_BEGIN " << key;
+    Chi::log.Log() << "LUA_FUNCWRAPPER_BEGIN " << key;
 
-    if (not entry.call_func) chi::log.Log() << "SYNTAX_BLOCK";
+    if (not entry.call_func) Chi::log.Log() << "SYNTAX_BLOCK";
 
     const auto in_params = entry.get_in_params_func();
     in_params.DumpParameters();
 
-    chi::log.Log() << "LUA_FUNCWRAPPER_END\n\n";
+    Chi::log.Log() << "LUA_FUNCWRAPPER_END\n\n";
   }
-  chi::log.Log() << "\n\n";
+  Chi::log.Log() << "\n\n";
 }

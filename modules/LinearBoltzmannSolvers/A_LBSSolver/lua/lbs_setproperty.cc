@@ -224,7 +224,7 @@ int chiLBSSetProperty(lua_State* L)
 {
   const std::string fname = __FUNCTION__;
 
-  chi::log.Log0Warning()
+  Chi::log.Log0Warning()
     << fname + " has been deprecated. Use chiLBSSetOptions instead.";
 
   const int numArgs = lua_gettop(L);
@@ -235,7 +235,7 @@ int chiLBSSetProperty(lua_State* L)
   //============================================= Get pointer to solver
   const int solver_handle = lua_tonumber(L, 1);
   auto& lbs_solver =
-    chi::GetStackItem<lbs::LBSSolver>(chi::object_stack, solver_handle, fname);
+    Chi::GetStackItem<lbs::LBSSolver>(Chi::object_stack, solver_handle, fname);
 
   //============================================= Get property index
   LuaCheckNilValue(fname, L, 2);
@@ -270,9 +270,9 @@ int chiLBSSetProperty(lua_State* L)
     if (!((bident >= scint(PropertyCode::XMAX)) &&
           (bident <= scint(PropertyCode::ZMIN))))
     {
-      chi::log.LogAllError() << "Unknown boundary identifier encountered "
+      Chi::log.LogAllError() << "Unknown boundary identifier encountered "
                                 "in call to chiLBSSetProperty";
-      chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
 
     const int bid = bident - 31;
@@ -280,7 +280,7 @@ int chiLBSSetProperty(lua_State* L)
     if (btype == (int)lbs::BoundaryType::VACUUM)
     {
       lbs_solver.BoundaryPreferences()[bid] = {lbs::BoundaryType::VACUUM};
-      chi::log.Log() << "Boundary " << bid << " set to Vacuum.";
+      Chi::log.Log() << "Boundary " << bid << " set to Vacuum.";
     }
     else if (btype == (int)lbs::BoundaryType::INCIDENT_ISOTROPIC)
     {
@@ -288,22 +288,22 @@ int chiLBSSetProperty(lua_State* L)
 
       if (lbs_solver.Groups().empty())
       {
-        chi::log.Log0Error()
+        Chi::log.Log0Error()
           << "In call to chiLBSSetProperty, setting "
           << "incident isotropic flux boundary type: Number of solver groups"
           << " is zero. Boundary fluxes can only be set after group structure"
           << " has been defined.";
-        chi::Exit(EXIT_FAILURE);
+        Chi::Exit(EXIT_FAILURE);
       }
 
       if (!lua_istable(L, 5))
       {
-        chi::log.LogAllError()
+        Chi::log.LogAllError()
           << "In call to chiLBSSetProperty, setting "
           << "incident isotropic flux boundary type,"
           << " argument 5 should be a lua table and was detected as"
              " not being one.";
-        chi::Exit(EXIT_FAILURE);
+        Chi::Exit(EXIT_FAILURE);
       }
 
       const size_t table_len = lua_rawlen(L, 5);
@@ -318,25 +318,25 @@ int chiLBSSetProperty(lua_State* L)
 
       if (table_len != lbs_solver.Groups().size())
       {
-        chi::log.Log0Error()
+        Chi::log.Log0Error()
           << "In call to chiLBSSetProperty, setting "
           << "incident isotropic flux boundary type: "
           << "Number of groups in boundary flux specification is " << table_len
           << " but solver has a total of " << lbs_solver.Groups().size()
           << " groups. These two must be equal.";
-        chi::Exit(EXIT_FAILURE);
+        Chi::Exit(EXIT_FAILURE);
       }
 
       lbs_solver.BoundaryPreferences()[bid] = {
         lbs::BoundaryType::INCIDENT_ISOTROPIC, group_strength};
 
-      chi::log.Log() << "Isotropic boundary condition for boundary " << bid
+      Chi::log.Log() << "Isotropic boundary condition for boundary " << bid
                      << " loaded with " << table_len << " groups.";
     }
     else if (btype == (int)lbs::BoundaryType::REFLECTING)
     {
       lbs_solver.BoundaryPreferences()[bid] = {lbs::BoundaryType::REFLECTING};
-      chi::log.Log() << "Boundary " << bid << " set to Reflecting.";
+      Chi::log.Log() << "Boundary " << bid << " set to Reflecting.";
     }
     else if (btype == (int)lbs::BoundaryType::INCIDENT_ANISTROPIC_HETEROGENEOUS)
     {
@@ -347,16 +347,16 @@ int chiLBSSetProperty(lua_State* L)
         lbs::BoundaryType::INCIDENT_ANISTROPIC_HETEROGENEOUS,
         {},
         lua_func_name};
-      chi::log.Log() << "Boundary " << bid
+      Chi::log.Log() << "Boundary " << bid
                      << " set to Incident anistoropic"
                         " heterogeneous.";
     }
     else
     {
-      chi::log.LogAllError() << "Unsupported boundary type encountered "
+      Chi::log.LogAllError() << "Unsupported boundary type encountered "
                                 "in call to "
                              << LuaSourceInfo(L, "chiLBSSetProperty");
-      chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
   }
   else if (scpcode(property) == PropertyCode::SCATTERING_ORDER)
@@ -367,10 +367,10 @@ int chiLBSSetProperty(lua_State* L)
 
     if (scattering_order < 0)
     {
-      chi::log.Log0Error() << "Invalid scattering order in call to "
+      Chi::log.Log0Error() << "Invalid scattering order in call to "
                            << "chiLBSSetProperty:SCATTERING_ORDER. "
                               "Value must be > 0.";
-      chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
 
     lbs_solver.Options().scattering_order = scattering_order;
@@ -393,7 +393,7 @@ int chiLBSSetProperty(lua_State* L)
 
       const std::string folder = lua_tostring(L, 3);
       lbs_solver.Options().read_restart_folder_name = std::string(folder);
-      chi::log.Log() << "Restart input folder set to " << folder;
+      Chi::log.Log() << "Restart input folder set to " << folder;
     }
     if (numArgs >= 4)
     {
@@ -401,7 +401,7 @@ int chiLBSSetProperty(lua_State* L)
 
       const std::string filebase = lua_tostring(L, 4);
       lbs_solver.Options().read_restart_file_base = std::string(filebase);
-      chi::log.Log() << "Restart input filebase set to " << filebase;
+      Chi::log.Log() << "Restart input filebase set to " << filebase;
     }
     lbs_solver.Options().read_restart_data = true;
   }
@@ -413,7 +413,7 @@ int chiLBSSetProperty(lua_State* L)
 
       const std::string folder = lua_tostring(L, 3);
       lbs_solver.Options().write_restart_folder_name = std::string(folder);
-      chi::log.Log() << "Restart output folder set to " << folder;
+      Chi::log.Log() << "Restart output folder set to " << folder;
     }
     if (numArgs >= 4)
     {
@@ -421,7 +421,7 @@ int chiLBSSetProperty(lua_State* L)
 
       const std::string filebase = lua_tostring(L, 4);
       lbs_solver.Options().write_restart_file_base = std::string(filebase);
-      chi::log.Log() << "Restart output filebase set to " << filebase;
+      Chi::log.Log() << "Restart output filebase set to " << filebase;
     }
     if (numArgs == 5)
     {
@@ -440,7 +440,7 @@ int chiLBSSetProperty(lua_State* L)
 
     lbs_solver.Options().save_angular_flux = save_flag;
 
-    chi::log.Log() << "LBS option to save angular flux set to " << save_flag;
+    Chi::log.Log() << "LBS option to save angular flux set to " << save_flag;
   }
   else if (scpcode(property) == PropertyCode::USE_SOURCE_MOMENTS)
   {
@@ -450,7 +450,7 @@ int chiLBSSetProperty(lua_State* L)
 
     lbs_solver.Options().use_src_moments = use_flag;
 
-    chi::log.Log() << "LBS option to use source moments set to " << use_flag;
+    Chi::log.Log() << "LBS option to use source moments set to " << use_flag;
   }
   else if (scpcode(property) == PropertyCode::VERBOSE_INNER_ITERATIONS)
   {
@@ -460,7 +460,7 @@ int chiLBSSetProperty(lua_State* L)
 
     lbs_solver.Options().verbose_inner_iterations = flag;
 
-    chi::log.Log() << "LBS option: verbose_inner_iterations set to " << flag;
+    Chi::log.Log() << "LBS option: verbose_inner_iterations set to " << flag;
   }
   else if (scpcode(property) == PropertyCode::VERBOSE_OUTER_ITERATIONS)
   {
@@ -470,7 +470,7 @@ int chiLBSSetProperty(lua_State* L)
 
     lbs_solver.Options().verbose_outer_iterations = flag;
 
-    chi::log.Log() << "LBS option: verbose_outer_iterations set to " << flag;
+    Chi::log.Log() << "LBS option: verbose_outer_iterations set to " << flag;
   }
   else if (scpcode(property) == PropertyCode::USE_PRECURSORS)
   {
@@ -480,7 +480,7 @@ int chiLBSSetProperty(lua_State* L)
 
     lbs_solver.Options().use_precursors = flag;
 
-    chi::log.Log() << "LBS option: use_precursors set to " << flag;
+    Chi::log.Log() << "LBS option: use_precursors set to " << flag;
   }
   else
     throw std::logic_error(fname +

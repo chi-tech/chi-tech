@@ -11,9 +11,9 @@ namespace chi_math::functions
 
 RegisterChiObject(chi_math::functions, LuaDimAToDimB);
 
-chi_objects::InputParameters LuaDimAToDimB::GetInputParameters()
+chi::InputParameters LuaDimAToDimB::GetInputParameters()
 {
-  chi_objects::InputParameters params =
+  chi::InputParameters params =
     FunctionDimAToDimB::GetInputParameters();
 
   // Inherits input_dimension and output_dimension
@@ -31,7 +31,7 @@ chi_objects::InputParameters LuaDimAToDimB::GetInputParameters()
   return params;
 }
 
-LuaDimAToDimB::LuaDimAToDimB(const chi_objects::InputParameters& params)
+LuaDimAToDimB::LuaDimAToDimB(const chi::InputParameters& params)
   : FunctionDimAToDimB(params),
     lua_function_name_(params.GetParamValue<std::string>("lua_function_name"))
 {
@@ -41,7 +41,7 @@ std::vector<double>
 LuaDimAToDimB::Evaluate(const std::vector<double>& vals) const
 {
   const std::string fname = __PRETTY_FUNCTION__;
-  lua_State* L = chi::console.GetConsoleState();
+  lua_State* L = Chi::console.GetConsoleState();
   lua_getglobal(L, lua_function_name_.c_str());
 
   ChiLogicalErrorIf(not lua_isfunction(L, -1),

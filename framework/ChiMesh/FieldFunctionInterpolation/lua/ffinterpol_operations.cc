@@ -21,7 +21,8 @@ int chiFFInterpolationInitialize(lua_State* L)
   //================================================== Get handle to field function
   const size_t ffihandle = lua_tonumber(L,1);
 
-  auto p_ffi = chi::GetStackItemPtr(chi::field_func_interpolation_stack,
+  auto p_ffi =
+    Chi::GetStackItemPtr(Chi::field_func_interpolation_stack,
                                     ffihandle, fname);
 
   p_ffi->Initialize();
@@ -45,7 +46,8 @@ int chiFFInterpolationExecute(lua_State* L)
   //================================================== Get handle to field function
   const size_t ffihandle = lua_tonumber(L,1);
 
-  auto p_ffi = chi::GetStackItemPtr(chi::field_func_interpolation_stack,
+  auto p_ffi =
+    Chi::GetStackItemPtr(Chi::field_func_interpolation_stack,
                                     ffihandle, fname);
 
   p_ffi->Execute();

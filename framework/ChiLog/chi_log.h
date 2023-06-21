@@ -9,7 +9,7 @@
 #include <memory>
 
 //###################################################################
-namespace chi_objects
+namespace chi
 {
   /**Object for controlling logging.
      *
@@ -272,7 +272,7 @@ namespace chi_objects
 
 //###################################################################
 /** */
-struct chi_objects::ChiLog::EventInfo
+struct chi::ChiLog::EventInfo
 {
   std::string arb_info;
   double      arb_value = 0.0;
@@ -295,7 +295,7 @@ struct chi_objects::ChiLog::EventInfo
 
 //###################################################################
 /** Object used by repeating events.*/
-struct chi_objects::ChiLog::Event
+struct chi::ChiLog::Event
 {
   const double     ev_time = 0.0;
   const EventType  ev_type = EventType::SINGLE_OCCURRENCE;
@@ -312,7 +312,7 @@ struct chi_objects::ChiLog::Event
 
 //###################################################################
 /**Repeating event object.*/
-class chi_objects::ChiLog::RepeatingEvent
+class chi::ChiLog::RepeatingEvent
 {
 public:
   const std::string  name;

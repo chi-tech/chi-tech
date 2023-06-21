@@ -24,11 +24,11 @@ template <class MatType, class VecType, class SolverType>
 class WGSContext;
 } // namespace lbs
 
-namespace chi_objects
+namespace chi
 {
 class ChiMPICommunicatorSet;
 }
-typedef std::shared_ptr<chi_objects::ChiMPICommunicatorSet> MPILocalCommSetPtr;
+typedef std::shared_ptr<chi::ChiMPICommunicatorSet> MPILocalCommSetPtr;
 
 namespace chi_mesh
 {
@@ -109,9 +109,9 @@ protected:
   std::shared_ptr<const chi_math::TimeIntegration> time_integration_ = nullptr;
 
 public:
-  static chi_objects::InputParameters GetInputParameters();
+  static chi::InputParameters GetInputParameters();
   explicit LBSSolver(const std::string& text_name);
-  explicit LBSSolver(const chi_objects::InputParameters& params);
+  explicit LBSSolver(const chi::InputParameters& params);
 
   LBSSolver(const LBSSolver&) = delete;
   LBSSolver& operator=(const LBSSolver&) = delete;
@@ -126,10 +126,10 @@ public:
   lbs::Options& Options();
   const lbs::Options& Options() const;
 
-  static chi_objects::InputParameters OptionsBlock();
-  static chi_objects::InputParameters BoundaryOptionsBlock();
-  void SetOptions(const chi_objects::InputParameters& params);
-  void SetBoundaryOptions(const chi_objects::InputParameters& params);
+  static chi::InputParameters OptionsBlock();
+  static chi::InputParameters BoundaryOptionsBlock();
+  void SetOptions(const chi::InputParameters& params);
+  void SetBoundaryOptions(const chi::InputParameters& params);
 
   size_t NumMoments() const;
   size_t NumGroups() const;

@@ -9,9 +9,9 @@ namespace chi_math
 
 RegisterChiObject(chi_math, CrankNicolsonTimeIntegration);
 
-chi_objects::InputParameters CrankNicolsonTimeIntegration::GetInputParameters()
+chi::InputParameters CrankNicolsonTimeIntegration::GetInputParameters()
 {
-  chi_objects::InputParameters params =
+  chi::InputParameters params =
     ThetaSchemeTimeIntegration::GetInputParameters();
 
   // clang-format off
@@ -29,7 +29,7 @@ chi_objects::InputParameters CrankNicolsonTimeIntegration::GetInputParameters()
 }
 
 CrankNicolsonTimeIntegration::CrankNicolsonTimeIntegration(
-  const chi_objects::InputParameters& params)
+  const chi::InputParameters& params)
   : ThetaSchemeTimeIntegration(params)
 {
 }

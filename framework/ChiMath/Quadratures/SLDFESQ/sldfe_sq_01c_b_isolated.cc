@@ -29,7 +29,7 @@ void chi_math::SimplifiedLDFESQ::Quadrature::
   auto weights = ComputeWeights(rho);
 
   //============================================= Apply algorithm
-  chi::log.Log() << "=================================================== ";
+  Chi::log.Log() << "=================================================== ";
   for (int k=0; k<150; ++k) //iteration
   {
 //    constexpr int N = 4;
@@ -68,23 +68,23 @@ void chi_math::SimplifiedLDFESQ::Quadrature::
     for (int i=0; i<4; ++i)
       change = std::fabs((weights[i] - SA_i[i])/weights[i]);
 
-    chi::log.Log() << "Weights: "
+    Chi::log.Log() << "Weights: "
                        << weights[0] << " "
                        << weights[1] << " "
                        << weights[2] << " "
                        << weights[3] << " ";
-    chi::log.Log() << "Areas: "
+    Chi::log.Log() << "Areas: "
                        << SA_i[0] << " "
                        << SA_i[1] << " "
                        << SA_i[2] << " "
                        << SA_i[3] << "\n";
-    chi::log.Log() << "rhos: "
+    Chi::log.Log() << "rhos: "
                        << rho[0] << " "
                        << rho[1] << " "
                        << rho[2] << " "
                        << rho[3] << "\n";
-    chi::log.Log() << k<<" "<<std::fabs(change);
-    chi::log.Log() << "  ";
+    Chi::log.Log() << k<<" "<<std::fabs(change);
+    Chi::log.Log() << "  ";
 
 
     if (rho_change_total < 1.0e-2) break;

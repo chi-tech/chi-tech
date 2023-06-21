@@ -31,9 +31,9 @@ int chi_mesh::sweep_management::SPDS::MapLocJToPrelocI(int locJ) const
     }
   }
 
-  chi::log.LogAllError()
+  Chi::log.LogAllError()
     << "SPDS Invalid mapping encountered in MapLocJToPrelocI.";
-  chi::Exit(EXIT_FAILURE);
+  Chi::Exit(EXIT_FAILURE);
   return 0;
 }
 
@@ -49,9 +49,9 @@ int chi_mesh::sweep_management::SPDS::MapLocJToDeplocI(int locJ) const
     }
   }
 
-  chi::log.LogAllError()
+  Chi::log.LogAllError()
     << "SPDS Invalid mapping encountered in MapLocJToDeplocI.";
-  chi::Exit(EXIT_FAILURE);
+  Chi::Exit(EXIT_FAILURE);
   return 0;
 }
 
@@ -66,26 +66,26 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
   chi_graph::DirectedGraph TDG;
 
   //============================================= Build graph on home location
-  if (chi::mpi.location_id == 0)
+  if (Chi::mpi.location_id == 0)
   {
-    chi::log.Log0Verbose1()
-      << chi::program_timer.GetTimeString()
+    Chi::log.Log0Verbose1()
+      << Chi::program_timer.GetTimeString()
       << " Building Task Dependency Graphs.";
 
     //====================================== Add vertices to the graph
-    for (int loc=0; loc<chi::mpi.process_count; loc++)
+    for (int loc=0; loc< Chi::mpi.process_count; loc++)
       TDG.AddVertex();
 
     //====================================== Add dependencies
-    for (int loc=0; loc<chi::mpi.process_count; loc++)
+    for (int loc=0; loc< Chi::mpi.process_count; loc++)
       for (int dep=0; dep<global_dependencies[loc].size(); dep++)
         TDG.AddEdge(global_dependencies[loc][dep], loc);
 
     //====================================== Remove cyclic dependencies
     if (cycle_allowance_flag)
     {
-      chi::log.Log0Verbose1()
-        << chi::program_timer.GetTimeString()
+      Chi::log.Log0Verbose1()
+        << Chi::program_timer.GetTimeString()
         << " Removing intra-cellset cycles.";
       auto edges_to_remove_temp = TDG.RemoveCyclicDependencies();
       for (const auto& [v0,v1] : edges_to_remove_temp)
@@ -106,7 +106,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
   //============================================= Broadcast edge buffer size
   int edge_buffer_size = 0;
 
-  if (chi::mpi.location_id == 0)
+  if (Chi::mpi.location_id == 0)
     edge_buffer_size = static_cast<int>(raw_edges_to_remove.size());
 
   MPI_Bcast(&edge_buffer_size,      //Buffer
@@ -115,7 +115,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
             MPI_COMM_WORLD);        //Communicator
 
   //============================================= Broadcast edges
-  if (chi::mpi.location_id != 0)
+  if (Chi::mpi.location_id != 0)
     raw_edges_to_remove.resize(edge_buffer_size,-1);
 
   MPI_Bcast(raw_edges_to_remove.data(),      //Buffer
@@ -124,7 +124,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
             MPI_COMM_WORLD);           //Communicator
 
   //============================================= De-serialize edges
-  if (chi::mpi.location_id != 0)
+  if (Chi::mpi.location_id != 0)
   {
     edges_to_remove.resize(edge_buffer_size/2,std::pair<int,int>(0,0));
     int i = 0;
@@ -141,10 +141,10 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
     int rlocI  = edge_to_remove.first;
     int locI = edge_to_remove.second;
 
-    if (chi::mpi.location_id == 0)
+    if (Chi::mpi.location_id == 0)
       TDG.RemoveEdge(rlocI, locI);
 
-    if (locI == chi::mpi.location_id)
+    if (locI == Chi::mpi.location_id)
     {
       auto dependent_location =
         std::find(location_dependencies.begin(),
@@ -154,16 +154,16 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
       delayed_location_dependencies.push_back(rlocI);
     }
 
-    if (rlocI == chi::mpi.location_id)
+    if (rlocI == Chi::mpi.location_id)
       delayed_location_successors.push_back(locI);
   }
 
   //============================================= Generate topological sort
   std::vector<int> glob_linear_sweep_order;
-  if (chi::mpi.location_id == 0)
+  if (Chi::mpi.location_id == 0)
   {
-    chi::log.LogAllVerbose2()
-      << chi::program_timer.GetTimeString()
+    Chi::log.LogAllVerbose2()
+      << Chi::program_timer.GetTimeString()
       << "   - Generating topological sort.";
     auto so_temp = TDG.GenerateTopologicalSort();
     for (auto v : so_temp)
@@ -171,18 +171,18 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
 
     if (glob_linear_sweep_order.empty())
     {
-      chi::log.LogAllError()
+      Chi::log.LogAllError()
         << "Topological sorting for global sweep-ordering failed. "
         << "Cyclic dependencies detected. Cycles need to be allowed"
         << " by calling application.";
-      chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
   }
 
   //============================================= Broadcasting topsort size
   int topsort_buffer_size = 0;
 
-  if (chi::mpi.location_id == 0)
+  if (Chi::mpi.location_id == 0)
     topsort_buffer_size = glob_linear_sweep_order.size();
 
   MPI_Bcast(&topsort_buffer_size,   //Buffer
@@ -191,7 +191,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
             MPI_COMM_WORLD);        //Communicator
 
   //============================================= Broadcast topological sort
-  if (chi::mpi.location_id != 0)
+  if (Chi::mpi.location_id != 0)
     glob_linear_sweep_order.resize(topsort_buffer_size,-1);
 
   MPI_Bcast(glob_linear_sweep_order.data(),//Buffer
@@ -203,23 +203,23 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
   // This mapping allows us to punch in
   // the location id and find what its
   // id is in the TDG
-  std::vector<int> glob_order_mapping(chi::mpi.process_count,-1);
+  std::vector<int> glob_order_mapping(Chi::mpi.process_count,-1);
 
-  for (int k=0; k<chi::mpi.process_count; k++)
+  for (int k=0; k< Chi::mpi.process_count; k++)
   {
     int loc = glob_linear_sweep_order[k];
     glob_order_mapping[loc] = k;
   }
 
   //============================================= Determine sweep order ranks
-  chi::log.Log0Verbose1()
-    << chi::program_timer.GetTimeString()
+  Chi::log.Log0Verbose1()
+    << Chi::program_timer.GetTimeString()
     << " Determining sweep order ranks.";
 
-  std::vector<int> glob_sweep_order_rank(chi::mpi.process_count,-1);
+  std::vector<int> glob_sweep_order_rank(Chi::mpi.process_count,-1);
 
   int abs_max_rank = 0;
-  for (int k=0; k<chi::mpi.process_count; k++)
+  for (int k=0; k< Chi::mpi.process_count; k++)
   {
     int loc = glob_linear_sweep_order[k];
     if (global_dependencies[loc].empty())
@@ -242,14 +242,14 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
   }
 
   //============================================= Generate TDG structure
-  chi::log.Log0Verbose1()
-    << chi::program_timer.GetTimeString()
+  Chi::log.Log0Verbose1()
+    << Chi::program_timer.GetTimeString()
     << " Generating TDG structure.";
   for (int r=0; r<=abs_max_rank; r++)
   {
     chi_mesh::sweep_management::STDG new_stdg;
 
-    for (int k=0; k<chi::mpi.process_count; k++)
+    for (int k=0; k< Chi::mpi.process_count; k++)
     {
       if (glob_sweep_order_rank[k] == r)
         new_stdg.item_id.push_back(glob_linear_sweep_order[k]);

@@ -31,7 +31,8 @@ int chiLBSAddPointSource(lua_State *L)
 
   //============================================= Get pointer to solver
   const int solver_handle = lua_tonumber(L,1);
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
+  auto& lbs_solver =
+    Chi::GetStackItem<lbs::LBSSolver>(Chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
@@ -49,7 +50,7 @@ int chiLBSAddPointSource(lua_State *L)
 
   lbs_solver.AddPointSource(lbs::PointSource(location, groupwise_strength));
 
-  chi::log.Log() << "LBS: Added point source at "
+  Chi::log.Log() << "LBS: Added point source at "
                 << location.PrintStr();
 
   return 0;
@@ -73,13 +74,14 @@ int chiLBSClearPointSources(lua_State *L)
 
   //============================================= Get pointer to solver
   const int solver_handle = lua_tonumber(L,1);
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
+  auto& lbs_solver =
+    Chi::GetStackItem<lbs::LBSSolver>(Chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
   lbs_solver.ClearPointSources();
 
-  chi::log.Log() << "LBS: Cleared all point sources";
+  Chi::log.Log() << "LBS: Cleared all point sources";
 
   return 0;
 }
@@ -102,13 +104,14 @@ int chiLBSInitializePointSources(lua_State *L)
 
   //============================================= Get pointer to solver
   const int solver_handle = lua_tonumber(L,1);
-  auto& lbs_solver = chi::GetStackItem<lbs::LBSSolver>(chi::object_stack,
+  auto& lbs_solver =
+    Chi::GetStackItem<lbs::LBSSolver>(Chi::object_stack,
                                                        solver_handle,
                                                        fname);
 
   lbs_solver.InitializePointSources();
 
-  chi::log.Log() << "LBS: Initializing point sources.";
+  Chi::log.Log() << "LBS: Initializing point sources.";
 
   return 0;
 }

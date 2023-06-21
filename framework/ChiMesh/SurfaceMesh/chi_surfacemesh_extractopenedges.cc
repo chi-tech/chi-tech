@@ -27,10 +27,10 @@ void chi_mesh::SurfaceMesh::ExtractOpenEdgesToObj(const char *fileName)
 
   if (!outfile.is_open())
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "In call to chi_mesh::SurfaceMesh::ExtractOpenEdgesToObj. Failed"
       << " to open file: " << std::string(fileName);
-   chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   outfile << "# ChiTech open edges file\n";

@@ -27,9 +27,9 @@ void lbs::acceleration::DiffusionMIPSolver::
     throw std::logic_error(fname + ": Some or all PETSc elements are null. "
                                    "Check that Initialize has been called.");
   if (options.verbose)
-    chi::log.Log() << chi::program_timer.GetTimeString() << " Starting assembly";
+    Chi::log.Log() << Chi::program_timer.GetTimeString() << " Starting assembly";
 
-  lua_State* L = chi::console.GetConsoleState();
+  lua_State* L = Chi::console.GetConsoleState();
   const auto& source_function = options.source_lua_function;
   const auto& solution_function = options.ref_solution_lua_function;
 
@@ -218,7 +218,7 @@ void lbs::acceleration::DiffusionMIPSolver::
   KSPSetOperators(ksp_, A_, A_);
 
   if (options.verbose)
-    chi::log.Log() << chi::program_timer.GetTimeString() << " Assembly completed";
+    Chi::log.Log() << Chi::program_timer.GetTimeString() << " Assembly completed";
 
   PC pc;
   KSPGetPC(ksp_, &pc);

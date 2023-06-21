@@ -34,7 +34,7 @@ void MIPWGSContext2<Mat, Vec, KSP>::PreSetupCallback()
         method_name = "KRYLOV_BICGSTAB"; break;
       default: method_name = "KRYLOV_GMRES";
     }
-    chi::log.Log()
+    Chi::log.Log()
       << "\n\n"
       << "********** Solving groupset " << groupset_.id_
       << " with " << method_name << ".\n\n";

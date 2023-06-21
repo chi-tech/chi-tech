@@ -9,7 +9,7 @@ void mg_diffusion::Solver::Assemble_RHS(const unsigned int g,
                                         const int64_t verbose)
 {
   if (verbose > 2)
-    chi::log.Log() << "\nAssemblying RHS for group " + std::to_string(g);
+    Chi::log.Log() << "\nAssemblying RHS for group " + std::to_string(g);
 
   // copy the external source vector for group g into b
   VecSet(b_, 0.0);

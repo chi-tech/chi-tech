@@ -19,14 +19,14 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
   file.open(options.file_name);
   if (!file.is_open())
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "Failed to open file: " << options.file_name << " in call "
       << "to ImportFromOBJFile \n";
-    chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
-  chi::log.Log() << "Making Unpartitioned mesh from wavefront file "
+  Chi::log.Log() << "Making Unpartitioned mesh from wavefront file "
                  << options.file_name;
 
   typedef std::pair<uint64_t, uint64_t> Edge;
@@ -64,7 +64,7 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
 
     if (first_word == "usemtl")
     {
-      chi::log.Log0Verbose1() << "New material at cell count: "
+      Chi::log.Log0Verbose1() << "New material at cell count: "
                               << block_data.back().cells.size();
       ++material_id;
     }
@@ -93,7 +93,7 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
         //================================== Catch conversion error
         catch(const std::invalid_argument& ia)
         {
-          chi::log.Log0Warning()
+          Chi::log.Log0Warning()
           << "Failed to convert vertex in line " << file_line << std::endl;
         }
 
@@ -141,7 +141,7 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
         }
         catch(const std::invalid_argument& ia)
         {
-          chi::log.Log0Warning()
+          Chi::log.Log0Warning()
           << "Failed converting work to number in line "
           << file_line << std::endl;
         }
@@ -194,7 +194,7 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
         //================================== Catch conversion error
         catch(const std::invalid_argument& ia)
         {
-          chi::log.Log0Warning()
+          Chi::log.Log0Warning()
             << "Failed to text to integer in line " << file_line << std::endl;
         }
       }//for k
@@ -208,7 +208,7 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
     }//if (first_word == "l")
   }
   file.close();
-  chi::log.Log0Verbose0() << "Max material id: " << material_id;
+  Chi::log.Log0Verbose0() << "Max material id: " << material_id;
 
   //======================================================= Filter blocks
   std::vector<size_t> bndry_block_ids;
@@ -357,7 +357,7 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
         }//for face
       }//for edge
 
-      chi::log.Log()
+      Chi::log.Log()
         << "UnpartitionedMesh: assigned " << num_faces_boundarified
         << " faces to boundary id " << bndry_id
         << " with name " << block_data[bid].name;

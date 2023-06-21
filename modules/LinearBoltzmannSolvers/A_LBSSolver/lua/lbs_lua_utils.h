@@ -15,9 +15,9 @@ namespace lbs::common_lua_utils
 //void SetBoundaryOptions(LBSSolver& lbs_solver,
 //                        const chi_objects::InputParameters& params);
 
-chi_objects::InputParameters GetSyntax_SetOptions();
-chi_objects::ParameterBlock
-SetOptions(const chi_objects::InputParameters& params);
+chi::InputParameters GetSyntax_SetOptions();
+chi::ParameterBlock
+SetOptions(const chi::InputParameters& params);
 
 int chiLBSSetOptions(lua_State* L);
 int chiLBSSetPhiFromFieldFunction(lua_State* L);

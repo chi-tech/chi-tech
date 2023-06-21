@@ -18,9 +18,9 @@ void chi_mesh::sweep_management::SweepScheduler::
 /**Get average sweep time from logging system.*/
 double chi_mesh::sweep_management::SweepScheduler::GetAverageSweepTime() const
 {
-  return chi::log.ProcessEvent(
+  return Chi::log.ProcessEvent(
     sweep_event_tag,
-    chi_objects::ChiLog::EventOperation::AVERAGE_DURATION);
+                               chi::ChiLog::EventOperation::AVERAGE_DURATION);
 }
 
 //###################################################################
@@ -35,13 +35,10 @@ std::vector<double>
 {
   std::vector<double> info;
 
-  double total_sweep_time =
-    chi::log.ProcessEvent(sweep_event_tag,
-                         chi_objects::ChiLog::EventOperation::TOTAL_DURATION);
+  double total_sweep_time = Chi::log.ProcessEvent(sweep_event_tag, chi::ChiLog::EventOperation::TOTAL_DURATION);
 
   double total_chunk_time =
-    chi::log.ProcessEvent(sweep_timing_events_tag[0],
-                         chi_objects::ChiLog::EventOperation::TOTAL_DURATION);
+    Chi::log.ProcessEvent(sweep_timing_events_tag[0], chi::ChiLog::EventOperation::TOTAL_DURATION);
 
   double ratio_sweep_to_chunk = total_chunk_time/total_sweep_time;
 

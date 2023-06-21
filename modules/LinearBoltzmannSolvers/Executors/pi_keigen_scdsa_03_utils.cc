@@ -112,12 +112,12 @@ XXPowerIterationKEigenSCDSA::MakePWLDVecGhostCommInfo(
   const chi_math::SpatialDiscretization& sdm,
   const chi_math::UnknownManager& uk_man)
 {
-  chi::log.Log() << "Making PWLD ghost communicator";
+  Chi::log.Log() << "Making PWLD ghost communicator";
 
   const size_t num_local_dofs = sdm.GetNumLocalDOFs(uk_man);
   const size_t num_globl_dofs = sdm.GetNumGlobalDOFs(uk_man);
 
-  chi::log.Log() << "Number of global dofs" << num_globl_dofs;
+  Chi::log.Log() << "Number of global dofs" << num_globl_dofs;
 
   const size_t num_unknowns = uk_man.unknowns_.size();
 
@@ -165,7 +165,7 @@ XXPowerIterationKEigenSCDSA::MakePWLDVecGhostCommInfo(
     }
   }
 
-  chi::log.Log() << "Done making PWLD ghost communicator";
+  Chi::log.Log() << "Done making PWLD ghost communicator";
   return {vgc, ghost_global_id_2_local_map};
 }
 

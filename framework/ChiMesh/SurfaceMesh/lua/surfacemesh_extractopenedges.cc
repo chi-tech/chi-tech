@@ -27,8 +27,8 @@ int chiSurfaceMeshExtractOpenEdgesToObj(lua_State *L)
   int         surf_handle = lua_tonumber(L,1);
   const char* file_name   = lua_tostring(L,2);
 
-  auto& surface_mesh = chi::GetStackItem<chi_mesh::SurfaceMesh>(
-    chi::surface_mesh_stack, surf_handle, __FUNCTION__);
+  auto& surface_mesh = Chi::GetStackItem<chi_mesh::SurfaceMesh>(
+    Chi::surface_mesh_stack, surf_handle, __FUNCTION__);
 
   surface_mesh.ExtractOpenEdgesToObj(file_name);
   return 0;

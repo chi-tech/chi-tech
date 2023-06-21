@@ -20,14 +20,14 @@
 /**Execution... nough said.*/
 void chi_mesh::VolumeMesherExtruder::Execute()
 {
-  chi::log.Log()
-    << chi::program_timer.GetTimeString()
+  Chi::log.Log()
+    << Chi::program_timer.GetTimeString()
     << " VolumeMesherExtruder executed. Memory in use = "
-    << chi_objects::ChiConsole::GetMemoryUsageInMB() << " MB"
+    << chi::ChiConsole::GetMemoryUsageInMB() << " MB"
     << std::endl;
 
   //================================================== Loop over all regions
-  chi::log.Log0Verbose1()
+  Chi::log.Log0Verbose1()
     << "VolumeMesherExtruder: Processing Region"
     << std::endl;
 
@@ -40,14 +40,14 @@ void chi_mesh::VolumeMesherExtruder::Execute()
 
   //================================== Setup layers
   // populates vertex-layers
-  chi::log.Log0Verbose1()
+  Chi::log.Log0Verbose1()
     << "VolumeMesherExtruder: Setting up layers" << std::endl;
   SetupLayers();
 
   //================================== Process templates
   if (template_type_ == TemplateType::UNPARTITIONED_MESH)
   {
-    chi::log.Log0Verbose1()
+    Chi::log.Log0Verbose1()
       << "VolumeMesherExtruder: Processing unpartitioned mesh"
       << std::endl;
 
@@ -56,7 +56,7 @@ void chi_mesh::VolumeMesherExtruder::Execute()
 
     //================================== Create baseline polygons in template
     //                                   continuum
-    chi::log.Log0Verbose1()
+    Chi::log.Log0Verbose1()
       << "VolumeMesherExtruder: Creating template cells" << std::endl;
     CreatePolygonCells(*template_unpartitioned_mesh_, temp_grid);
 
@@ -66,11 +66,11 @@ void chi_mesh::VolumeMesherExtruder::Execute()
       template_unpartitioned_mesh_->GetMeshOptions().boundary_id_map;
   }
 
-  chi::log.Log0Verbose1()
+  Chi::log.Log0Verbose1()
     << "VolumeMesherExtruder: Creating local nodes" << std::endl;
   CreateLocalNodes(*temp_grid, *grid);
 
-  chi::log.Log0Verbose1()
+  Chi::log.Log0Verbose1()
     << "VolumeMesherExtruder: Done creating local nodes" << std::endl;
 
   //================================== Insert top and bottom boundary
@@ -83,7 +83,7 @@ void chi_mesh::VolumeMesherExtruder::Execute()
 
 
   //================================== Create extruded item_id
-  chi::log.Log()
+  Chi::log.Log()
     << "VolumeMesherExtruder: Extruding cells" << std::endl;
   MPI_Barrier(MPI_COMM_WORLD);
   ExtrudeCells(*temp_grid, *grid);
@@ -98,7 +98,7 @@ void chi_mesh::VolumeMesherExtruder::Execute()
                 MPI_SUM,
                 MPI_COMM_WORLD);
 
-  chi::log.Log()
+  Chi::log.Log()
     << "VolumeMesherExtruder: Cells extruded = "
     << total_global_cells
     << std::endl;
@@ -106,37 +106,36 @@ void chi_mesh::VolumeMesherExtruder::Execute()
   //================================== Checking partitioning parameters
   if (options.partition_type != KBA_STYLE_XYZ)
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "Any partitioning scheme other than KBA_STYLE_XYZ is currently not"
          " supported by VolumeMesherExtruder. No worries. There are plans"
          " to develop this support.";
-   chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
   if (!options.mesh_global)
   {
     int p_tot = options.partition_x*options.partition_y*options.partition_z;
 
-    if (chi::mpi.process_count != p_tot)
+    if (Chi::mpi.process_count != p_tot)
     {
-      chi::log.LogAllError()
+      Chi::log.LogAllError()
         << "ERROR: Number of processors available ("
-        << chi::mpi.process_count << ") does not match amount of processors "
+        << Chi::mpi.process_count << ") does not match amount of processors "
         << "required by surface mesher partitioning parameters ("
         << p_tot << ").";
-     chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
   }//if mesh-global
 
-  chi::log.LogAllVerbose1() << "Building local cell indices";
+  Chi::log.LogAllVerbose1() << "Building local cell indices";
 
   //================================== Print info
-  chi::log.LogAllVerbose1()
-    << "### LOCATION[" << chi::mpi.location_id
+  Chi::log.LogAllVerbose1()
+    << "### LOCATION[" << Chi::mpi.location_id
     << "] amount of local cells="
     << grid->local_cells.size();
 
-
-  chi::log.Log()
+  Chi::log.Log()
     << "VolumeMesherExtruder: Number of cells in region = "
     << total_global_cells
     << std::endl;

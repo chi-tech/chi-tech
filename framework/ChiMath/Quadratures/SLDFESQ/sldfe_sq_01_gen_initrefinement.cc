@@ -11,7 +11,7 @@
  * subdivision of an inscribed cube.*/
 void chi_math::SimplifiedLDFESQ::Quadrature::GenerateInitialRefinement(int level)
 {
-  chi_objects::ChiTimer timer;
+  chi::ChiTimer timer;
   timer.Reset();
   initial_level_ = level;
 
@@ -71,21 +71,21 @@ void chi_math::SimplifiedLDFESQ::Quadrature::GenerateInitialRefinement(int level
   double area_avg = total_area / initial_octant_SQs_.size();
 
   if (negative_weights_found)
-    chi::log.Log0Warning()
+    Chi::log.Log0Warning()
       << "SLDFESQ Quadrature detected negative weights.";
 
   //======================================== Print Statistics
   double time = timer.GetTime()/1000.0;
-  chi::log.Log0Verbose1() << "Number of dirs/octant: " << initial_octant_SQs_.size();
-  chi::log.Log0Verbose1() << "Total weight         : " << total_area;
-  chi::log.Log0Verbose1() << "Total weight/(pi/2)  : " << total_area/M_PI_2;
-  chi::log.Log0Verbose1() << "Area Max/Min         : " << area_max/area_min;
-  chi::log.Log0Verbose1() << "Area Max/Avg         : " << area_max/area_avg;
+  Chi::log.Log0Verbose1() << "Number of dirs/octant: " << initial_octant_SQs_.size();
+  Chi::log.Log0Verbose1() << "Total weight         : " << total_area;
+  Chi::log.Log0Verbose1() << "Total weight/(pi/2)  : " << total_area/M_PI_2;
+  Chi::log.Log0Verbose1() << "Area Max/Min         : " << area_max/area_min;
+  Chi::log.Log0Verbose1() << "Area Max/Avg         : " << area_max/area_avg;
 
   CopyToAllOctants();
 
   //======================================== Populate quadriture points
   PopulateQuadratureAbscissae();
 
-  chi::log.Log0Verbose1() << "Time taken           : " << time;
+  Chi::log.Log0Verbose1() << "Time taken           : " << time;
 }

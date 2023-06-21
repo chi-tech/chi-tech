@@ -45,8 +45,8 @@ int chiUnpartitionedMeshUploadVertex(lua_State* L)
   const double y = lua_tonumber(L, 3);
   const double z = lua_tonumber(L, 4);
 
-  auto& mesh = chi::GetStackItem<chi_mesh::UnpartitionedMesh>(
-    chi::unpartitionedmesh_stack,
+  auto& mesh = Chi::GetStackItem<chi_mesh::UnpartitionedMesh>(
+    Chi::unpartitionedmesh_stack,
     handle, fname);
 
   mesh.GetVertices().emplace_back(x, y, z);
@@ -127,8 +127,8 @@ int chiUnpartitionedMeshUploadCell(lua_State* L)
   bool verbose = false;
   if (num_args == 3) verbose = lua_toboolean(L, 3);
 
-  auto& mesh = chi::GetStackItem<chi_mesh::UnpartitionedMesh>(
-    chi::unpartitionedmesh_stack,
+  auto& mesh = Chi::GetStackItem<chi_mesh::UnpartitionedMesh>(
+    Chi::unpartitionedmesh_stack,
     handle, fname);
 
   LuaCheckTableValue(fname, L, 2);
@@ -165,10 +165,10 @@ int chiUnpartitionedMeshUploadCell(lua_State* L)
 
   if (verbose)
   {
-    chi::log.Log() << "Cell type       : " << cell_type_str;
-    chi::log.Log() << "Cell sub-type   : " << cell_sub_type_str;
-    chi::log.Log() << "Cell num_faces  : " << cell_num_faces;
-    chi::log.Log() << "Cell material_id: " << cell_material_id;
+    Chi::log.Log() << "Cell type       : " << cell_type_str;
+    Chi::log.Log() << "Cell sub-type   : " << cell_sub_type_str;
+    Chi::log.Log() << "Cell num_faces  : " << cell_num_faces;
+    Chi::log.Log() << "Cell material_id: " << cell_material_id;
   }
 
   std::vector<std::vector<uint64_t>> proxy_faces(cell_num_faces);
@@ -188,7 +188,7 @@ int chiUnpartitionedMeshUploadCell(lua_State* L)
       std::stringstream outstr;
       outstr << "face" << f << " ";
       for (auto val : vals) outstr << val << " ";
-      chi::log.Log() << outstr.str();
+      Chi::log.Log() << outstr.str();
     }
 
     std::vector<uint64_t> proxy_face;
@@ -261,8 +261,8 @@ int chiUnpartitionedMeshFinalizeEmpty(lua_State* L)
 
   const int handle = lua_tointeger(L,1);
 
-  auto& mesh = chi::GetStackItem<chi_mesh::UnpartitionedMesh>(
-    chi::unpartitionedmesh_stack,
+  auto& mesh = Chi::GetStackItem<chi_mesh::UnpartitionedMesh>(
+    Chi::unpartitionedmesh_stack,
     handle, fname);
 
   mesh.ComputeCentroidsAndCheckQuality();

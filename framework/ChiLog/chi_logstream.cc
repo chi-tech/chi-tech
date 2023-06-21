@@ -2,7 +2,7 @@
 
 #include "stringstream_color.h"
 
-chi_objects::LogStream::~LogStream()
+chi::LogStream::~LogStream()
 {
   if (dummy_) return;
 

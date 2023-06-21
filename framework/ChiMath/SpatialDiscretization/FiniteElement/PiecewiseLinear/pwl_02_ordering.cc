@@ -16,7 +16,7 @@
 void chi_math::SpatialDiscretization_PWLD::OrderNodes()
 {
   const std::string fname = __FUNCTION__;
-  chi_objects::ChiTimer t_stage[6];
+  chi::ChiTimer t_stage[6];
 
   t_stage[0].Reset();
   //================================================== Check cell views avail
@@ -37,7 +37,7 @@ void chi_math::SpatialDiscretization_PWLD::OrderNodes()
   }
 
   //================================================== Allgather node_counts
-  locJ_block_size_.assign(chi::mpi.process_count, 0);
+  locJ_block_size_.assign(Chi::mpi.process_count, 0);
   MPI_Allgather(&local_node_count,           //sendbuf
                 1, MPI_UNSIGNED_LONG_LONG,   //sendcount, sendtype
                 locJ_block_size_.data(),      //recvbuf
@@ -46,9 +46,9 @@ void chi_math::SpatialDiscretization_PWLD::OrderNodes()
 
   //================================================== Assign local_block_address
   uint64_t running_block_address = 0;
-  for (int locI=0; locI<chi::mpi.process_count; ++locI)
+  for (int locI=0; locI< Chi::mpi.process_count; ++locI)
   {
-    if (locI == chi::mpi.location_id)
+    if (locI == Chi::mpi.location_id)
       local_block_address_ = static_cast<int64_t>(running_block_address);
 
     running_block_address += locJ_block_size_[locI];
@@ -115,7 +115,7 @@ void chi_math::SpatialDiscretization_PWLD::OrderNodes()
 
 
   //================================================== Print info
-  chi::log.LogAllVerbose2()
+  Chi::log.LogAllVerbose2()
       << "Local dof count, start, total "
       << local_node_count << " "
       << local_block_address_ << " "

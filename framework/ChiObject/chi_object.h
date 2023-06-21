@@ -7,18 +7,18 @@
 class ChiObject
 {
 private:
-  size_t stack_id_ = chi::SIZE_T_INVALID;
+  size_t stack_id_ = Chi::SIZE_T_INVALID;
 
 public:
   /**Returns the input parameters. For the base ChiObject, there
   * are now parameters loaded.*/
-  static chi_objects::InputParameters GetInputParameters();
+  static chi::InputParameters GetInputParameters();
 
   /**Default constructor. This will be removed in future.*/
   ChiObject();
 
   /**Constructor with input parameters.*/
-  explicit ChiObject(const chi_objects::InputParameters& params);
+  explicit ChiObject(const chi::InputParameters& params);
 
   // Setters
   /**Sets the stack id of the object. This allows this

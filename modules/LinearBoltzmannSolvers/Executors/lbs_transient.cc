@@ -9,9 +9,9 @@ namespace lbs
 
 RegisterChiObject(lbs, TransientSolver);
 
-chi_objects::InputParameters TransientSolver::GetInputParameters()
+chi::InputParameters TransientSolver::GetInputParameters()
 {
-  chi_objects::InputParameters params =
+  chi::InputParameters params =
     chi_physics::Solver::GetInputParameters();
 
   params.SetGeneralDescription(
@@ -31,13 +31,12 @@ chi_objects::InputParameters TransientSolver::GetInputParameters()
   return params;
 }
 
-TransientSolver::TransientSolver(const chi_objects::InputParameters& params)
+TransientSolver::TransientSolver(const chi::InputParameters& params)
   : chi_physics::Solver(params),
-    lbs_solver_(chi::GetStackItem<LBSSolver>(
-      chi::object_stack, params.GetParamValue<size_t>("lbs_solver_handle"))),
-    time_integration_(
-      chi::GetStackItemPtrAsType<chi_math::TimeIntegration>(
-        chi::object_stack, params.GetParamValue<size_t>("time_integration")))
+    lbs_solver_(Chi::GetStackItem<LBSSolver>(
+      Chi::object_stack, params.GetParamValue<size_t>("lbs_solver_handle"))),
+    time_integration_(Chi::GetStackItemPtrAsType<chi_math::TimeIntegration>(
+      Chi::object_stack, params.GetParamValue<size_t>("time_integration")))
 {
 }
 

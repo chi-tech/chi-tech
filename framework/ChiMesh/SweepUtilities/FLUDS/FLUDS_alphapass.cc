@@ -67,7 +67,7 @@ InitializeAlphaElements(const SPDS& spds,
 
   }//for csoi
 
-  chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Done with Slot Dynamics.";
+  Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Done with Slot Dynamics.";
   MPI_Barrier(MPI_COMM_WORLD);
 
 
@@ -103,7 +103,7 @@ InitializeAlphaElements(const SPDS& spds,
   delayed_local_psi_Gn_block_stride  = largest_face*delayed_lock_box.size();
   delayed_local_psi_Gn_block_strideG = delayed_local_psi_Gn_block_stride*G;
 
-  chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Done with Local Incidence mapping.";
+  Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Done with Local Incidence mapping.";
   MPI_Barrier(MPI_COMM_WORLD);
 
   //================================================== Clean up

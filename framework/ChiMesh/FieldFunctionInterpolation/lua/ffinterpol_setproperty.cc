@@ -113,7 +113,7 @@ int chiFFInterpolationSetProperty(lua_State* L)
   const size_t ffihandle = lua_tonumber(L, 1);
 
   auto p_ffi =
-    chi::GetStackItemPtr(chi::field_func_interpolation_stack, ffihandle, fname);
+    Chi::GetStackItemPtr(Chi::field_func_interpolation_stack, ffihandle, fname);
 
   //================================================== Process properties
   using namespace chi_mesh::ff_interpolation;
@@ -145,7 +145,7 @@ int chiFFInterpolationSetProperty(lua_State* L)
   {
     int ffhandle = lua_tonumber(L, 3);
     auto cur_ff_base =
-      chi::GetStackItemPtr(chi::field_function_stack, ffhandle, fname);
+      Chi::GetStackItemPtr(Chi::field_function_stack, ffhandle, fname);
     typedef chi_physics::FieldFunctionGridBased FFGridBased;
     auto cur_ff = std::dynamic_pointer_cast<FFGridBased>(cur_ff_base);
 
@@ -161,7 +161,7 @@ int chiFFInterpolationSetProperty(lua_State* L)
     {
       const auto ffhandle = static_cast<int>(handle_d);
       auto cur_ff_base =
-        chi::GetStackItemPtr(chi::field_function_stack, ffhandle, fname);
+        Chi::GetStackItemPtr(Chi::field_function_stack, ffhandle, fname);
       typedef chi_physics::FieldFunctionGridBased FFGridBased;
       auto cur_ff = std::dynamic_pointer_cast<FFGridBased>(cur_ff_base);
 
@@ -251,11 +251,11 @@ int chiFFInterpolationSetProperty(lua_State* L)
 
     if (num_points < 2)
     {
-      chi::log.LogAllError()
+      Chi::log.LogAllError()
         << "Line property FFI_LINE_NUMBEROFPOINTS"
         << " used in chiFFInterpolationSetProperty. Number of points must"
         << " be greater than or equal to 2.";
-      chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
     cur_ffi_line.GetNumberOfPoints() = num_points;
   }
@@ -268,11 +268,11 @@ int chiFFInterpolationSetProperty(lua_State* L)
 
     if (not lua_istable(L, 3))
     {
-      chi::log.LogAllError()
+      Chi::log.LogAllError()
         << "Line property FFI_LINE_CUSTOM_ARRAY"
         << " used in chiFFInterpolationSetProperty. Argument 3 is expected "
            "to be an array.";
-      chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
 
     const size_t table_len = lua_rawlen(L, 3);
@@ -309,11 +309,11 @@ int chiFFInterpolationSetProperty(lua_State* L)
 
     if (!((op_type >= OP_SUM) && (op_type <= OP_MAX_LUA)))
     {
-      chi::log.LogAllError()
+      Chi::log.LogAllError()
         << "Volume property FFI_PROP_OPERATION"
         << " used in chiFFInterpolationSetProperty. Unsupported OPERATON."
         << " Supported types are OP_AVG and OP_SUM. " << op_type;
-      chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
 
     if ((op_type >= OP_SUM_LUA) and (op_type <= OP_MAX_LUA))
@@ -336,7 +336,7 @@ int chiFFInterpolationSetProperty(lua_State* L)
 
     auto p_logical_volume =
       std::dynamic_pointer_cast<chi_mesh::LogicalVolume>(
-      chi::GetStackItemPtr(chi::object_stack, logvol_hndle, fname));
+      Chi::GetStackItemPtr(Chi::object_stack, logvol_hndle, fname));
 
     if (p_ffi->Type() != chi_mesh::ff_interpolation::Type::VOLUME)
       throw std::logic_error(
@@ -350,9 +350,9 @@ int chiFFInterpolationSetProperty(lua_State* L)
   }
   else // Fall back
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "Invalid PropertyIndex used in chiFFInterpolationSetProperty.";
-    chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   return 0;

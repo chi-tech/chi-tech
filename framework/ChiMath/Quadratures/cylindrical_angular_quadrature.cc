@@ -200,17 +200,17 @@ chi_math::CylindricalAngularQuadrature::
   //  --------------------------------------------------------------------------
   if (verbose)
   {
-    chi::log.Log() << "map_directions" << std::endl;
+    Chi::log.Log() << "map_directions" << std::endl;
     for (const auto& dir : map_directions_)
     {
-      chi::log.Log() << "polar level " << dir.first << " : ";
+      Chi::log.Log() << "polar level " << dir.first << " : ";
       for (const auto& q : dir.second)
-        chi::log.Log() << q << ", ";
-      chi::log.Log() << std::endl;
+        Chi::log.Log() << q << ", ";
+      Chi::log.Log() << std::endl;
     }
-    chi::log.Log() << "curvilinear product quadrature : cylindrical" << std::endl;
+    Chi::log.Log() << "curvilinear product quadrature : cylindrical" << std::endl;
     for (size_t k = 0; k < weights_.size(); ++k)
-      chi::log.Log()
+      Chi::log.Log()
           << "angle index " << k << ": weight = " << weights_[k]
           << ", (phi, theta) = (" << abscissae_[k].phi << ", " << abscissae_[k].theta << ")"
           << ", omega = " << omegas_[k].PrintStr()
@@ -219,7 +219,7 @@ chi_math::CylindricalAngularQuadrature::
           << std::endl;
     const auto sum_weights =
       std::accumulate(weights_.begin(), weights_.end(), 0.0);
-    chi::log.Log() << "sum(weights) = " << sum_weights << std::endl;
+    Chi::log.Log() << "sum(weights) = " << sum_weights << std::endl;
   }
 }
 

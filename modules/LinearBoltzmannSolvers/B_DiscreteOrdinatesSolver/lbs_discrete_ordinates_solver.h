@@ -31,9 +31,9 @@ protected:
   std::map<AngQuadPtr, FLUDSTemplatePtrs> quadrature_fluds_templates_map_;
 
 public:
-  static chi_objects::InputParameters GetInputParameters();
+  static chi::InputParameters GetInputParameters();
   explicit DiscreteOrdinatesSolver(
-    const chi_objects::InputParameters& params);
+    const chi::InputParameters& params);
 protected:
   explicit DiscreteOrdinatesSolver(const std::string& text_name);
 

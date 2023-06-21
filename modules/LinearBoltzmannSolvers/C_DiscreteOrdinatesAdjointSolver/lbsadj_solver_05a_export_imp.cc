@@ -117,12 +117,11 @@ void lbs::DiscreteOrdinatesAdjointSolver::
     }//for cell
   }
 
-
-  chi::log.Log() << "Exporting importance map to binary file " << file_name;
+  Chi::log.Log() << "Exporting importance map to binary file " << file_name;
 
   const auto locJ_io_flags = std::ofstream::binary | std::ofstream::out;
   const auto loc0_io_flags = locJ_io_flags | std::ofstream::trunc;
-  const bool is_home = (chi::mpi.location_id == 0);
+  const bool is_home = (Chi::mpi.location_id == 0);
 
   //======================================== Build header
   std::string header_info =
@@ -151,13 +150,13 @@ void lbs::DiscreteOrdinatesAdjointSolver::
 
   //================================================== Process each location
   uint64_t num_global_cells = grid_ptr_->GetGlobalNumberOfCells();
-  for (int locationJ=0; locationJ<chi::mpi.process_count; ++locationJ)
+  for (int locationJ=0; locationJ< Chi::mpi.process_count; ++locationJ)
   {
-    chi::log.LogAll() << "  Barrier at " << locationJ;
+    Chi::log.LogAll() << "  Barrier at " << locationJ;
     MPI_Barrier(MPI_COMM_WORLD);
-    if (chi::mpi.location_id != locationJ) continue;
+    if (Chi::mpi.location_id != locationJ) continue;
 
-    chi::log.LogAll() << "  Location " << locationJ << " appending data.";
+    Chi::log.LogAll() << "  Location " << locationJ << " appending data.";
 
     std::ofstream file(file_name, is_home? loc0_io_flags : locJ_io_flags);
 
@@ -165,7 +164,7 @@ void lbs::DiscreteOrdinatesAdjointSolver::
     {
       std::stringstream outstr;
 
-      outstr << fname << ": Location " << chi::mpi.location_id
+      outstr << fname << ": Location " << Chi::mpi.location_id
              << ", failed to open file " << file_name;
       throw std::logic_error(outstr.str());
     }
@@ -204,6 +203,6 @@ void lbs::DiscreteOrdinatesAdjointSolver::
     file.close();
   }//for location
 
-  chi::log.LogAll() << "Done exporting importance map to binary file " << file_name;
+  Chi::log.LogAll() << "Done exporting importance map to binary file " << file_name;
   MPI_Barrier(MPI_COMM_WORLD);
 }

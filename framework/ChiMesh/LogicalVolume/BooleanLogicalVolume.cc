@@ -5,16 +5,16 @@
 namespace chi_mesh
 {
 
-chi_objects::InputParameters BooleanLogicalVolumeArgumentPair();
+chi::InputParameters BooleanLogicalVolumeArgumentPair();
 
 RegisterChiObject(chi_mesh, BooleanLogicalVolume);
 RegisterSyntaxBlock(chi_mesh,
                     BooleanLogicalVolumeArgumentPair,
                     BooleanLogicalVolumeArgumentPair);
 
-chi_objects::InputParameters BooleanLogicalVolume::GetInputParameters()
+chi::InputParameters BooleanLogicalVolume::GetInputParameters()
 {
-  chi_objects::InputParameters params = LogicalVolume::GetInputParameters();
+  chi::InputParameters params = LogicalVolume::GetInputParameters();
 
   // clang-format off
   params.SetGeneralDescription(
@@ -32,32 +32,32 @@ chi_objects::InputParameters BooleanLogicalVolume::GetInputParameters()
 }
 
 BooleanLogicalVolume::BooleanLogicalVolume(
-  const chi_objects::InputParameters& params)
+  const chi::InputParameters& params)
   : LogicalVolume(params)
 {
   const auto& input_parts = params.GetParam("parts");
-  input_parts.RequireBlockTypeIs(chi_objects::ParameterBlockType::ARRAY);
+  input_parts.RequireBlockTypeIs(chi::ParameterBlockType::ARRAY);
 
   for (size_t p = 0; p < input_parts.NumParameters(); ++p)
   {
     const auto& part = input_parts.GetParam(p);
-    part.RequireBlockTypeIs(chi_objects::ParameterBlockType::BLOCK);
+    part.RequireBlockTypeIs(chi::ParameterBlockType::BLOCK);
 
     auto part_params = BooleanLogicalVolumeArgumentPair();
 
     part_params.AssignParameters(part);
 
     const size_t lv_handle = part_params.GetParamValue<size_t>("lv");
-    auto lv_ptr = chi::GetStackItemPtrAsType<LogicalVolume>(
-      chi::object_stack, lv_handle, __FUNCTION__);
+    auto lv_ptr = Chi::GetStackItemPtrAsType<LogicalVolume>(
+      Chi::object_stack, lv_handle, __FUNCTION__);
 
     parts.emplace_back(part_params.GetParamValue<bool>("op"), lv_ptr);
   }
 }
 
-chi_objects::InputParameters BooleanLogicalVolumeArgumentPair()
+chi::InputParameters BooleanLogicalVolumeArgumentPair()
 {
-  chi_objects::InputParameters params;
+  chi::InputParameters params;
 
   // clang-format off
   params.SetGeneralDescription(

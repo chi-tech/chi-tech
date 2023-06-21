@@ -167,30 +167,30 @@ void PowerIterationKEigen2(LBSSolver& lbs_solver,
     {
       std::stringstream k_iter_info;
       k_iter_info
-        << chi::program_timer.GetTimeString() << " "
+        << Chi::program_timer.GetTimeString() << " "
         << "  Iteration " << std::setw(5) << nit
         << "  k_eff " << std::setw(11) << std::setprecision(7) << k_eff
         << "  k_eff change " << std::setw(12) << k_eff_change
         << "  reactivity " << std::setw(10) << reactivity * 1e5;
       if (converged) k_iter_info << " CONVERGED\n";
 
-      chi::log.Log() << k_iter_info.str();
+      Chi::log.Log() << k_iter_info.str();
     }
 
     if (converged) break;
   }//for k iterations
 
   //================================================== Print summary
-  chi::log.Log() << "\n";
-  chi::log.Log()
+  Chi::log.Log() << "\n";
+  Chi::log.Log()
     << "        Final k-eigenvalue    :        "
     << std::setprecision(7) << k_eff;
-  chi::log.Log()
+  Chi::log.Log()
     << "        Final change          :        "
     << std::setprecision(6) << k_eff_change
     << " (num_TrOps:" << frons_wgs_context->counter_applications_of_inv_op_ << ")"
     << "\n";
-  chi::log.Log() << "\n";
+  Chi::log.Log() << "\n";
 }
 
 }//namespace lbs

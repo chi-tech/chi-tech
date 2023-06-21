@@ -12,10 +12,9 @@ chi_mesh::sweep_management::SweepScheduler::SweepScheduler(
   scheduler_type(in_scheduler_type),
   angle_agg(in_angle_agg),
   m_sweep_chunk(in_sweep_chunk),
-  sweep_timing_events_tag({
-    chi::log.GetRepeatingEventTag("Sweep Chunk Only Timing")
+  sweep_timing_events_tag({Chi::log.GetRepeatingEventTag("Sweep Chunk Only Timing")
   }),
-  sweep_event_tag(chi::log.GetRepeatingEventTag("Sweep Timing"))
+  sweep_event_tag(Chi::log.GetRepeatingEventTag("Sweep Timing"))
 {
   angle_agg.InitializeReflectingBCs();
 

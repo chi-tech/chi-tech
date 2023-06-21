@@ -29,14 +29,14 @@ protected:
   std::vector<std::shared_ptr<FieldFunctionGridBased>> field_functions_;
 
 public:
-  static chi_objects::InputParameters GetInputParameters();
+  static chi::InputParameters GetInputParameters();
   explicit
   Solver(std::string  in_text_name) : text_name_(std::move(in_text_name)) {}
   Solver(std::string  in_text_name,
          std::initializer_list<BasicOption> in_options) :
     text_name_(std::move(in_text_name)),
     basic_options_(in_options) {}
-  explicit Solver(const chi_objects::InputParameters& params);
+  explicit Solver(const chi::InputParameters& params);
   virtual ~Solver() = default;
 
   BasicOptions& GetBasicOptions() {return basic_options_;}

@@ -30,8 +30,8 @@ int chiSurfaceMeshExportToObj(lua_State* L)
   size_t length = 0;
   const char* temp = lua_tolstring(L, 2, &length);
 
-  auto& surface_mesh = chi::GetStackItem<chi_mesh::SurfaceMesh>(
-    chi::surface_mesh_stack, handle, __FUNCTION__);
+  auto& surface_mesh = Chi::GetStackItem<chi_mesh::SurfaceMesh>(
+    Chi::surface_mesh_stack, handle, __FUNCTION__);
 
   surface_mesh.ExportToOBJFile(temp);
   
@@ -60,8 +60,8 @@ int chiSurfaceMeshExportPolyFile(lua_State* L)
   size_t length = 0;
   const char* temp = lua_tolstring(L, 2, &length);
 
-  auto& surface_mesh = chi::GetStackItem<chi_mesh::SurfaceMesh>(
-    chi::surface_mesh_stack, handle, __FUNCTION__);
+  auto& surface_mesh = Chi::GetStackItem<chi_mesh::SurfaceMesh>(
+    Chi::surface_mesh_stack, handle, __FUNCTION__);
 
   surface_mesh.ExportToPolyFile(temp);
   return 0;

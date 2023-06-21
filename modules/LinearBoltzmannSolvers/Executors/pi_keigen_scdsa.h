@@ -42,9 +42,9 @@ protected:
   std::string diff_accel_diffusion_petsc_options_;
 
 public:
-  static chi_objects::InputParameters GetInputParameters();
+  static chi::InputParameters GetInputParameters();
   explicit XXPowerIterationKEigenSCDSA(
-    const chi_objects::InputParameters& params);
+    const chi::InputParameters& params);
 
   void Initialize() override;
   void Execute() override;

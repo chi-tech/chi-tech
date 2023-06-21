@@ -16,8 +16,8 @@
 namespace chi_unit_sim_tests
 {
 
-chi_objects::ParameterBlock
-chiSimTest04_PWLC(const chi_objects::InputParameters& params);
+chi::ParameterBlock
+chiSimTest04_PWLC(const chi::InputParameters& params);
 
 RegisterWrapperFunction(/*namespace_name=*/chi_unit_tests,
                         /*name_in_lua=*/chiSimTest04_PWLC,
@@ -26,16 +26,16 @@ RegisterWrapperFunction(/*namespace_name=*/chi_unit_tests,
 
 /**This is a simple test of the Finite Volume spatial discretization applied
  * to Laplace's problem but with a manufactured solution. */
-chi_objects::ParameterBlock
-chiSimTest04_PWLC(const chi_objects::InputParameters& params)
+chi::ParameterBlock
+chiSimTest04_PWLC(const chi::InputParameters& params)
 {
-  chi::log.Log() << "Coding Tutorial 4";
+  Chi::log.Log() << "Coding Tutorial 4";
 
   //============================================= Get grid
   auto grid_ptr = chi_mesh::GetCurrentHandler().GetGrid();
   const auto& grid = *grid_ptr;
 
-  chi::log.Log() << "Global num cells: " << grid.GetGlobalNumberOfCells();
+  Chi::log.Log() << "Global num cells: " << grid.GetGlobalNumberOfCells();
 
   //============================================= Make SDM
   typedef std::shared_ptr<chi_math::SpatialDiscretization> SDMPtr;
@@ -47,8 +47,8 @@ chiSimTest04_PWLC(const chi_objects::InputParameters& params)
   const size_t num_local_dofs = sdm.GetNumLocalDOFs(OneDofPerNode);
   const size_t num_globl_dofs = sdm.GetNumGlobalDOFs(OneDofPerNode);
 
-  chi::log.Log() << "Num local DOFs: " << num_local_dofs;
-  chi::log.Log() << "Num globl DOFs: " << num_globl_dofs;
+  Chi::log.Log() << "Num local DOFs: " << num_local_dofs;
+  Chi::log.Log() << "Num globl DOFs: " << num_globl_dofs;
 
   //============================================= Initializes Mats and Vecs
   const auto n = static_cast<int64_t>(num_local_dofs);
@@ -69,7 +69,7 @@ chiSimTest04_PWLC(const chi_objects::InputParameters& params)
     A, nodal_nnz_in_diag, nodal_nnz_off_diag);
 
   //============================================= Source lambda
-  lua_State* L = chi_objects::ChiConsole::GetInstance().GetConsoleState();
+  lua_State* L = chi::ChiConsole::GetInstance().GetConsoleState();
   auto CallLuaXYZFunction =
     [&L](const std::string& lua_func_name, const chi_mesh::Vector3& xyz)
   {
@@ -108,7 +108,7 @@ chiSimTest04_PWLC(const chi_objects::InputParameters& params)
   };
 
   //============================================= Assemble the system
-  chi::log.Log() << "Assembling system: ";
+  Chi::log.Log() << "Assembling system: ";
   for (const auto& cell : grid.local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
@@ -183,17 +183,17 @@ chiSimTest04_PWLC(const chi_objects::InputParameters& params)
     } // for i
   }   // for cell
 
-  chi::log.Log() << "Global assembly";
+  Chi::log.Log() << "Global assembly";
 
   MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY);
   VecAssemblyBegin(b);
   VecAssemblyEnd(b);
 
-  chi::log.Log() << "Done global assembly";
+  Chi::log.Log() << "Done global assembly";
 
   //============================================= Create Krylov Solver
-  chi::log.Log() << "Solving: ";
+  Chi::log.Log() << "Solving: ";
   auto petsc_solver = chi_math::PETScUtils::CreateCommonKrylovSolverSetup(
     A,                // Matrix
     "PWLCDiffSolver", // Solver name
@@ -205,7 +205,7 @@ chiSimTest04_PWLC(const chi_objects::InputParameters& params)
   //============================================= Solve
   KSPSolve(petsc_solver.ksp, b, x);
 
-  chi::log.Log() << "Done solving";
+  Chi::log.Log() << "Done solving";
 
   //============================================= Extract PETSc vector
   std::vector<double> field;
@@ -218,7 +218,7 @@ chiSimTest04_PWLC(const chi_objects::InputParameters& params)
   VecDestroy(&b);
   MatDestroy(&A);
 
-  chi::log.Log() << "Done cleanup";
+  Chi::log.Log() << "Done cleanup";
 
   //============================================= Create Field Function
   auto ff = std::make_shared<chi_physics::FieldFunctionGridBased>(
@@ -274,10 +274,10 @@ chiSimTest04_PWLC(const chi_objects::InputParameters& params)
 
   global_error = std::sqrt(global_error);
 
-  chi::log.Log() << "Error: " << std::scientific << global_error
+  Chi::log.Log() << "Error: " << std::scientific << global_error
                  << " Num-cells: " << grid.GetGlobalNumberOfCells();
 
-  return chi_objects::ParameterBlock();
+  return chi::ParameterBlock();
 }
 
 } // namespace chi_unit_sim_tests

@@ -11,13 +11,12 @@ void chi_mesh::sweep_management::SweepScheduler::
 {
   typedef AngleSetStatus Status;
 
-  chi::log.LogEvent(sweep_event_tag, chi_objects::ChiLog::EventType::EVENT_BEGIN);
+  Chi::log.LogEvent(sweep_event_tag, chi::ChiLog::EventType::EVENT_BEGIN);
 
   auto ev_info_i =
-    std::make_shared<chi_objects::ChiLog::EventInfo>(std::string("Sweep initiated"));
+    std::make_shared<chi::ChiLog::EventInfo>(std::string("Sweep initiated"));
 
-  chi::log.LogEvent(sweep_event_tag,
-                   chi_objects::ChiLog::EventType::SINGLE_OCCURRENCE, ev_info_i);
+  Chi::log.LogEvent(sweep_event_tag, chi::ChiLog::EventType::SINGLE_OCCURRENCE, ev_info_i);
 
   //================================================== Loop over AngleSetGroups
   AngleSetStatus completion_status = AngleSetStatus::NOT_FINISHED;
@@ -71,6 +70,6 @@ void chi_mesh::sweep_management::SweepScheduler::
 //    angleset->ReceiveDelayedData(sorted_angleset.set_index);
 //  }
 
-  chi::log.LogEvent(sweep_event_tag, chi_objects::ChiLog::EventType::EVENT_END);
+  Chi::log.LogEvent(sweep_event_tag, chi::ChiLog::EventType::EVENT_END);
 
 }

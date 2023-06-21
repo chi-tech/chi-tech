@@ -17,8 +17,8 @@ protected:
   std::shared_ptr<chi_math::TimeIntegration> time_integration_;
 
 public:
-  static chi_objects::InputParameters GetInputParameters();
-  explicit TransientSolver(const chi_objects::InputParameters& params);
+  static chi::InputParameters GetInputParameters();
+  explicit TransientSolver(const chi::InputParameters& params);
 
   void Initialize() override;
   void Execute() override;

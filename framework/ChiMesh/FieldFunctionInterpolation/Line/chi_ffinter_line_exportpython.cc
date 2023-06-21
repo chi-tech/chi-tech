@@ -16,7 +16,7 @@ ExportPython(std::string base_name)
   std::ofstream ofile;
 
   std::string fileName = base_name;
-  fileName = fileName + std::to_string(chi::mpi.location_id);
+  fileName = fileName + std::to_string(Chi::mpi.location_id);
   fileName = fileName + std::string(".py");
   ofile.open(fileName);
 
@@ -27,12 +27,12 @@ ExportPython(std::string base_name)
 
   std::string offset;
   std::string submod_name;
-  if (chi::mpi.location_id == 0)
+  if (Chi::mpi.location_id == 0)
   {
     submod_name = base_name;
-    submod_name = submod_name + std::to_string(chi::mpi.location_id+1);
+    submod_name = submod_name + std::to_string(Chi::mpi.location_id+1);
 
-    if (chi::mpi.process_count>1)
+    if (Chi::mpi.process_count>1)
     {
       ofile << "import " << submod_name << "\n\n";
     }
@@ -53,13 +53,13 @@ ExportPython(std::string base_name)
 
     offset = std::string("");
   }
-  else if (chi::mpi.process_count>1)
+  else if (Chi::mpi.process_count>1)
   {
 
-    if (chi::mpi.location_id != (chi::mpi.process_count-1))
+    if (Chi::mpi.location_id != (Chi::mpi.process_count-1))
     {
       submod_name = base_name;
-      submod_name = submod_name + std::to_string(chi::mpi.location_id+1);
+      submod_name = submod_name + std::to_string(Chi::mpi.location_id+1);
 
       ofile << "import " << submod_name << "\n\n";
     }
@@ -71,7 +71,7 @@ ExportPython(std::string base_name)
   {
     const auto& ff_ctx = ff_contexts_[ff];
 
-    if (chi::mpi.process_count>1 and chi::mpi.location_id!=0)
+    if (Chi::mpi.process_count>1 and Chi::mpi.location_id!=0)
     {
       ofile
         << "def AddData" << ff << "(data" << ff << "):\n";
@@ -81,7 +81,7 @@ ExportPython(std::string base_name)
     for (int p=0; p < interpolation_points_.size(); p++)
     {
       if ((not ff_ctx.interpolation_points_has_ass_cell[p])  &&
-          (chi::mpi.location_id != 0))
+          (Chi::mpi.location_id != 0))
       {
         continue;
       }
@@ -105,8 +105,8 @@ ExportPython(std::string base_name)
 
     ofile << offset << "done=True\n";
     ofile << "\n\n";
-    if ((chi::mpi.process_count>1) &&
-        (chi::mpi.location_id != (chi::mpi.process_count-1)))
+    if ((Chi::mpi.process_count>1) &&
+        (Chi::mpi.location_id != (Chi::mpi.process_count-1)))
     {
       ofile << offset << submod_name
       << ".AddData" << ff << "(data" << ff << ")\n";
@@ -119,7 +119,7 @@ ExportPython(std::string base_name)
   {
     int ff = ca + field_functions_.size();
 
-    if (chi::mpi.process_count>1 and chi::mpi.location_id!=0)
+    if (Chi::mpi.process_count>1 and Chi::mpi.location_id!=0)
     {
       ofile
         << "def AddData" << ff << "(data" << ff << "):\n";
@@ -128,7 +128,7 @@ ExportPython(std::string base_name)
     }
 
     std::string op("= ");
-    if (chi::mpi.location_id != 0) op = std::string("+= ");
+    if (Chi::mpi.location_id != 0) op = std::string("+= ");
 
     for (int p=0; p < interpolation_points_.size(); p++)
     {
@@ -152,8 +152,8 @@ ExportPython(std::string base_name)
     }
     ofile << offset << "done=True\n";
     ofile << "\n\n";
-    if ((chi::mpi.process_count>1) &&
-        (chi::mpi.location_id != (chi::mpi.process_count-1)))
+    if ((Chi::mpi.process_count>1) &&
+        (Chi::mpi.location_id != (Chi::mpi.process_count-1)))
     {
       ofile << offset << submod_name
             << ".AddData" << ff << "(data" << ff << ")\n";
@@ -161,7 +161,7 @@ ExportPython(std::string base_name)
   }
 
 
-  if (chi::mpi.location_id == 0)
+  if (Chi::mpi.location_id == 0)
   {
     ofile << "plt.figure(1)\n";
     for (int ff=0; ff < field_functions_.size(); ff++)
@@ -187,7 +187,7 @@ ExportPython(std::string base_name)
 
   ofile.close();
 
-  chi::log.Log()
+  Chi::log.Log()
     << "Exported Python files for field func \""
     << field_functions_[0]->TextName()
     << "\" to base name \""

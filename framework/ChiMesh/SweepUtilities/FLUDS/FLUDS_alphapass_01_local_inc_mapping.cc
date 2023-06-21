@@ -62,11 +62,11 @@ LocalIncidentMapping(const chi_mesh::Cell& cell,
         }
         if (ass_f_counter<0)
         {
-          chi::log.LogAllError()
+          Chi::log.LogAllError()
             << "Associated face counter not found"
             << ass_face << " " << face.neighbor_id_;
           face.GetNeighborAssociatedFace(*grid);
-          chi::Exit(EXIT_FAILURE);
+          Chi::Exit(EXIT_FAILURE);
         }
 
         dof_mapping.first = /*local_psi_stride*G**/

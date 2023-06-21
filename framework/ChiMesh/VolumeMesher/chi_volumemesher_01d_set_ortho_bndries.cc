@@ -13,8 +13,8 @@
  * as "XMAX", "XMIN", "YMAX", "YMIN", "ZMAX", "ZMIN".*/
 void chi_mesh::VolumeMesher::SetupOrthogonalBoundaries()
 {
-  chi::log.Log()
-    << chi::program_timer.GetTimeString()
+  Chi::log.Log()
+    << Chi::program_timer.GetTimeString()
     << " Setting orthogonal boundaries.";
 
   //============================================= Get current mesh handler
@@ -49,7 +49,7 @@ void chi_mesh::VolumeMesher::SetupOrthogonalBoundaries()
       }//if bndry
 
   MPI_Barrier(MPI_COMM_WORLD);
-  chi::log.Log()
-    << chi::program_timer.GetTimeString()
+  Chi::log.Log()
+    << Chi::program_timer.GetTimeString()
     << " Done setting orthogonal boundaries.";
 }

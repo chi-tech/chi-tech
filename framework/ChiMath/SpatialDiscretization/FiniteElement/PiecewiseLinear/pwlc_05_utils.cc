@@ -43,7 +43,7 @@ std::vector<int64_t> chi_math::SpatialDiscretization_PWLC::GetGhostDOFIndices(
         int64_t address = -1;
         if (storage == chi_math::UnknownStorageType::BLOCK)
         {
-          for (int locJ = 0; locJ < chi::mpi.process_count; ++locJ)
+          for (int locJ = 0; locJ < Chi::mpi.process_count; ++locJ)
           {
             const int64_t local_id =
               global_id - sc_int64(locJ_block_address_[locJ]);

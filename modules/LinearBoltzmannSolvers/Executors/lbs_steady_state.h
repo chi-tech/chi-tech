@@ -12,9 +12,9 @@ protected:
   LBSSolver& lbs_solver_;
 
 public:
-  static chi_objects::InputParameters GetInputParameters();
+  static chi::InputParameters GetInputParameters();
 
-  explicit SteadyStateSolver(const chi_objects::InputParameters& params);
+  explicit SteadyStateSolver(const chi::InputParameters& params);
 
   void Initialize() override;
   void Execute() override;

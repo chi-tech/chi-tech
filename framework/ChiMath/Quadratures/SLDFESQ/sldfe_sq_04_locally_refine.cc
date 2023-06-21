@@ -122,5 +122,5 @@ void chi_math::SimplifiedLDFESQ::Quadrature::
 
   PopulateQuadratureAbscissae();
 
-  chi::log.Log() << "SLDFESQ refined " << num_refined << " SQs.";
+  Chi::log.Log() << "SLDFESQ refined " << num_refined << " SQs.";
 }

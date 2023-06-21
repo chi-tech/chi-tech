@@ -1,6 +1,6 @@
 #include "mpi_info.h"
 
-namespace chi_objects
+namespace chi
 {
 
 //###################################################################

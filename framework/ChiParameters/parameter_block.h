@@ -7,7 +7,7 @@
 #include <vector>
 #include <string>
 
-namespace chi_objects
+namespace chi
 {
 
 enum class ParameterBlockType

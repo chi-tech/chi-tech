@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace chi_objects
+namespace chi
 {
 enum StringSteamColorCode
 {

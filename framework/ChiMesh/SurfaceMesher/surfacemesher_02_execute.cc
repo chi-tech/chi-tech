@@ -7,5 +7,5 @@
 /**Virtual execute function. Meant to be overwritten.*/
 void chi_mesh::SurfaceMesher::Execute()
 {
-  chi::log.Log0Verbose1() << "This is an empty mesher. Nothing to execute.";
+  Chi::log.Log0Verbose1() << "This is an empty mesher. Nothing to execute.";
 }

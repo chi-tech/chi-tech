@@ -55,7 +55,7 @@ void lbs::DiscreteOrdinatesAdjointSolver::Initialize()
                   MPI_SUM,                   //operation
                   MPI_COMM_WORLD );          //communicator
 
-    chi::log.Log() << "LBAdjointSolver: Number of cells subscribed to "
+    Chi::log.Log() << "LBAdjointSolver: Number of cells subscribed to "
                   << qoi_designation.name << " = "
                   << num_globl_subs;
   }

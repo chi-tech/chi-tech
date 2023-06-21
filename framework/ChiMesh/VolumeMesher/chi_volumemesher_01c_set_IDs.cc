@@ -18,8 +18,8 @@ void chi_mesh::VolumeMesher::
   SetMatIDFromLogical(const chi_mesh::LogicalVolume& log_vol,
                       bool sense, int mat_id)
 {
-  chi::log.Log0Verbose1()
-    << chi::program_timer.GetTimeString()
+  Chi::log.Log0Verbose1()
+    << Chi::program_timer.GetTimeString()
     << " Setting material id from logical volume.";
   //============================================= Get current mesh handler
   auto& handler = chi_mesh::GetCurrentHandler();
@@ -51,8 +51,8 @@ void chi_mesh::VolumeMesher::
                 MPI_SUM,                    //operation
                 MPI_COMM_WORLD);            //comm
 
-  chi::log.Log0Verbose1()
-    << chi::program_timer.GetTimeString()
+  Chi::log.Log0Verbose1()
+    << Chi::program_timer.GetTimeString()
     << " Done setting material id from logical volume. "
     << "Number of cells modified = " << global_num_cells_modified << ".";
 }
@@ -64,8 +64,8 @@ void chi_mesh::VolumeMesher::
                         bool sense,
                         const std::string& bndry_name)
 {
-  chi::log.Log()
-    << chi::program_timer.GetTimeString()
+  Chi::log.Log()
+    << Chi::program_timer.GetTimeString()
     << " Setting boundary id from logical volume.";
   //============================================= Get current mesh handler
   auto& handler = chi_mesh::GetCurrentHandler();
@@ -103,8 +103,8 @@ void chi_mesh::VolumeMesher::
       grid_bndry_id_map.count(bndry_id) == 0)
       grid_bndry_id_map[bndry_id] = bndry_name;
 
-  chi::log.Log()
-    << chi::program_timer.GetTimeString()
+  Chi::log.Log()
+    << Chi::program_timer.GetTimeString()
     << " Done setting boundary id from logical volume. "
     << "Number of faces modified = " << global_num_faces_modified << ".";
 }
@@ -113,8 +113,8 @@ void chi_mesh::VolumeMesher::
 /**Sets material id's for all cells to the specified material id.*/
 void chi_mesh::VolumeMesher::SetMatIDToAll(int mat_id)
 {
-  chi::log.Log()
-    << chi::program_timer.GetTimeString()
+  Chi::log.Log()
+    << Chi::program_timer.GetTimeString()
     << " Setting material id " << mat_id << " to all cells.";
 
   //============================================= Get current mesh handler
@@ -131,8 +131,8 @@ void chi_mesh::VolumeMesher::SetMatIDToAll(int mat_id)
     vol_cont->cells[ghost_id].material_id_ = mat_id;
 
   MPI_Barrier(MPI_COMM_WORLD);
-  chi::log.Log()
-    << chi::program_timer.GetTimeString()
+  Chi::log.Log()
+    << Chi::program_timer.GetTimeString()
     << " Done setting material id " << mat_id << " to all cells";
 }
 
@@ -154,12 +154,12 @@ void chi_mesh::VolumeMesher::
 {
   const std::string fname = "chi_mesh::VolumeMesher::SetMatIDFromLuaFunction";
 
-  chi::log.Log0Verbose1()
-    << chi::program_timer.GetTimeString()
+  Chi::log.Log0Verbose1()
+    << Chi::program_timer.GetTimeString()
     << " Setting material id from lua function.";
 
   //============================================= Define console call
-  auto L = chi::console.GetConsoleState();
+  auto L = Chi::console.GetConsoleState();
   auto CallLuaXYZFunction = [&L,&lua_fname,&fname](const chi_mesh::Cell& cell)
   {
     //============= Load lua function
@@ -234,8 +234,8 @@ void chi_mesh::VolumeMesher::
                 MPI_SUM,                   //operation
                 MPI_COMM_WORLD);           //comm
 
-  chi::log.Log0Verbose1()
-    << chi::program_timer.GetTimeString()
+  Chi::log.Log0Verbose1()
+    << Chi::program_timer.GetTimeString()
     << " Done setting material id from lua function. "
     << "Number of cells modified = " << globl_num_cells_modified << ".";
 }
@@ -259,15 +259,15 @@ void chi_mesh::VolumeMesher::
 {
   const std::string fname = "chi_mesh::VolumeMesher::SetBndryIDFromLuaFunction";
 
-  if (chi::mpi.process_count != 1)
+  if (Chi::mpi.process_count != 1)
     throw std::logic_error(fname + ": Can for now only be used in serial.");
 
-  chi::log.Log0Verbose1()
-    << chi::program_timer.GetTimeString()
+  Chi::log.Log0Verbose1()
+    << Chi::program_timer.GetTimeString()
     << " Setting boundary id from lua function.";
 
   //============================================= Define console call
-  auto L = chi::console.GetConsoleState();
+  auto L = Chi::console.GetConsoleState();
   auto CallLuaXYZFunction = [&L,&lua_fname,&fname]
     (const chi_mesh::CellFace& face)
   {
@@ -365,8 +365,8 @@ void chi_mesh::VolumeMesher::
                 MPI_SUM,                   //operation
                 MPI_COMM_WORLD);           //comm
 
-  chi::log.Log0Verbose1()
-    << chi::program_timer.GetTimeString()
+  Chi::log.Log0Verbose1()
+    << Chi::program_timer.GetTimeString()
     << " Done setting boundary id from lua function. "
     << "Number of cells modified = " << globl_num_faces_modified << ".";
 }

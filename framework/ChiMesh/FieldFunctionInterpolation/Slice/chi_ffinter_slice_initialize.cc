@@ -22,7 +22,7 @@
 void chi_mesh::FieldFunctionInterpolationSlice::
   Initialize()
 {
-  chi::log.Log0Verbose1() << "Initializing slice interpolator.";
+  Chi::log.Log0Verbose1() << "Initializing slice interpolator.";
   //================================================== Check grid available
   if (field_functions_.empty())
     throw std::logic_error("Unassigned field function in slice "
@@ -196,7 +196,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
       }
       else
       {
-        chi::log.LogAllWarning() << "No face intersections encountered "
+        Chi::log.LogAllWarning() << "No face intersections encountered "
                                        "for a cell that is indicated as being "
                                        "intersected. Slice FF interp.";
       }

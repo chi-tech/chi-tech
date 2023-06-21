@@ -23,7 +23,7 @@ void chi_mesh::sweep_management::
     int locI = edge_to_remove.second;
     TDG.RemoveEdge(rlocI, locI);
 
-    if (locI == chi::mpi.location_id)
+    if (locI == Chi::mpi.location_id)
     {
       auto dependent_location =
         std::find(sweep_order->location_dependencies.begin(),
@@ -33,7 +33,7 @@ void chi_mesh::sweep_management::
       sweep_order->delayed_location_dependencies.push_back(rlocI);
     }
 
-    if (rlocI == chi::mpi.location_id)
+    if (rlocI == Chi::mpi.location_id)
     {
       sweep_order->delayed_location_successors.push_back(locI);
     }

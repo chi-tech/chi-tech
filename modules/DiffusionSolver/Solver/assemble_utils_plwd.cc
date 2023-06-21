@@ -89,9 +89,9 @@ double chi_diffusion::Solver::
   }//Polyhedron
   else
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "Unsupported cell type in call to HPerpendicular";
-    chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
 

@@ -7,9 +7,9 @@
 namespace chi_math
 {
 
-chi_objects::InputParameters TimeIntegration::GetInputParameters()
+chi::InputParameters TimeIntegration::GetInputParameters()
 {
-  chi_objects::InputParameters params = ChiObject::GetInputParameters();
+  chi::InputParameters params = ChiObject::GetInputParameters();
 
   params.AddRequiredParameter<int>("method",
                                    "Integer representing time stepping scheme");
@@ -17,7 +17,7 @@ chi_objects::InputParameters TimeIntegration::GetInputParameters()
   return params;
 }
 
-TimeIntegration::TimeIntegration(const chi_objects::InputParameters& params)
+TimeIntegration::TimeIntegration(const chi::InputParameters& params)
   : ChiObject(params)
 {
   const int method_option = params.GetParamValue<int>("method");

@@ -3,12 +3,12 @@
 namespace chi_mesh
 {
 
-chi_objects::InputParameters LogicalVolume::GetInputParameters()
+chi::InputParameters LogicalVolume::GetInputParameters()
 {
   return ChiObject::GetInputParameters();
 }
 
-LogicalVolume::LogicalVolume(const chi_objects::InputParameters& params)
+LogicalVolume::LogicalVolume(const chi::InputParameters& params)
   : ChiObject(params)
 {
 }

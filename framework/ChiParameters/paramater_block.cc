@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-namespace chi_objects
+namespace chi
 {
 // #################################################################
 std::string ParameterBlockTypeName(ParameterBlockType type)

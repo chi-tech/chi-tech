@@ -113,21 +113,21 @@ int chiVolumeMesherSetProperty(lua_State *L)
   {
     int pz = lua_tonumber(L,2);
     volume_mesher.options.partition_z = pz;
-    chi::log.LogAllVerbose1()
+    Chi::log.LogAllVerbose1()
       << "Partition z set to " << pz;
   }
   else if (property_index == VMP::PARTITION_Y)
   {
     int p = lua_tonumber(L,2);
     volume_mesher.options.partition_y = p;
-    chi::log.LogAllVerbose1()
+    Chi::log.LogAllVerbose1()
       << "Partition y set to " << p;
   }
   else if (property_index == VMP::PARTITION_X)
   {
     int p = lua_tonumber(L,2);
     volume_mesher.options.partition_x = p;
-    chi::log.LogAllVerbose1()
+    Chi::log.LogAllVerbose1()
       << "Partition x set to " << p;
   }
   else if (property_index == VMP::CUTS_Z)
@@ -156,10 +156,10 @@ int chiVolumeMesherSetProperty(lua_State *L)
         (chi_mesh::VolumeMesher::PartitionType)p;
     else
     {
-      chi::log.LogAllError()
+      Chi::log.LogAllError()
         << "Unsupported partition type used in call to "
         << fname << ".";
-     chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
   }
 
@@ -198,18 +198,18 @@ int chiVolumeMesherSetProperty(lua_State *L)
   {
     if (!((num_args == 3) || (num_args == 4)))
     {
-      chi::log.LogAllError() << "Invalid amount of arguments used for "
+      Chi::log.LogAllError() << "Invalid amount of arguments used for "
                                  "chiVolumeMesherSetProperty("
                                  "MATID_FROMLOGICAL...";
-     chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
     int volume_hndl = lua_tonumber(L,2);
     int mat_id = lua_tonumber(L,3);
     int sense = true;
     if (num_args==4) sense = lua_toboolean(L,4);
 
-    const auto& log_vol = chi::GetStackItem<chi_mesh::LogicalVolume>(
-      chi::object_stack, volume_hndl, fname);
+    const auto& log_vol = Chi::GetStackItem<chi_mesh::LogicalVolume>(
+      Chi::object_stack, volume_hndl, fname);
 
     chi_mesh::VolumeMesher::SetMatIDFromLogical(log_vol,sense,mat_id);
   }
@@ -218,10 +218,10 @@ int chiVolumeMesherSetProperty(lua_State *L)
   {
     if (!((num_args == 3) || (num_args == 4)))
     {
-      chi::log.LogAllError() << "Invalid amount of arguments used for "
+      Chi::log.LogAllError() << "Invalid amount of arguments used for "
                                  "chiVolumeMesherSetProperty("
                                  "BNDRYID_FROMLOGICAL...";
-     chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
     LuaCheckNilValue(fname, L, 2);
     LuaCheckStringValue(fname, L, 3);
@@ -234,8 +234,8 @@ int chiVolumeMesherSetProperty(lua_State *L)
       throw std::invalid_argument(fname + ": argument 3 must not be"
                                           "an empty string.");
 
-    const auto& log_vol = chi::GetStackItem<chi_mesh::LogicalVolume>(
-      chi::object_stack, volume_hndl, fname);
+    const auto& log_vol = Chi::GetStackItem<chi_mesh::LogicalVolume>(
+      Chi::object_stack, volume_hndl, fname);
 
     chi_mesh::VolumeMesher::SetBndryIDFromLogical(log_vol,sense,bndry_name);
   }
@@ -257,9 +257,9 @@ int chiVolumeMesherSetProperty(lua_State *L)
   }
   else
   {
-    chi::log.LogAllError() << "Invalid property specified " << property_index
+    Chi::log.LogAllError() << "Invalid property specified " << property_index
                               << " in call to chiVolumeMesherSetProperty().";
-   chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   return 0;

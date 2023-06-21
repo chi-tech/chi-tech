@@ -18,7 +18,7 @@ GetCellXYPartitionID(chi_mesh::Cell *cell)
 {
   std::pair<int,int> ij_id(0,0);
 
-  if (chi::mpi.process_count == 1){return ij_id;}
+  if (Chi::mpi.process_count == 1){return ij_id;}
 
   //================================================== Get the current handler
   auto& mesh_handler = chi_mesh::GetCurrentHandler();
@@ -33,18 +33,18 @@ GetCellXYPartitionID(chi_mesh::Cell *cell)
 
   if (x_remainder != 0)
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "When specifying x-partitioning, the number of grp_subsets in x "
          "needs to be divisible by the number of partitions in x.";
-   chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   if (y_remainder != 0)
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "When specifying y-partitioning, the number of grp_subsets in y "
          "needs to be divisible by the number of partitions in y.";
-   chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   size_t subsets_per_partitionx = num_x_subsets/vol_mesher.options.partition_x;
@@ -105,7 +105,7 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
   std::tuple<int,int,int> ijk_id(0,0,0);
   bool found_partition = false;
 
-  if (chi::mpi.process_count == 1){return ijk_id;}
+  if (Chi::mpi.process_count == 1){return ijk_id;}
 
   //================================================== Get ij indices
   std::pair<int,int> ij_id = GetCellXYPartitionID(cell);
@@ -132,10 +132,10 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
 
       if ((num_sub_layers%vol_mesher.options.partition_z) != 0)
       {
-        chi::log.LogAllError()
+        Chi::log.LogAllError()
           << "Number of sub-layers in extruded mesh is not divisible "
           << "by the requested number of z-partitions.";
-       chi::Exit(EXIT_FAILURE);
+        Chi::Exit(EXIT_FAILURE);
       }
 
       int delta_zk = num_sub_layers/
@@ -152,7 +152,7 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
         {
           vol_mesher.options.zcuts.push_back(vertex_layers[layer_index]);
 
-          if (chi::log.GetVerbosity() == chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2)
+          if (Chi::log.GetVerbosity() == chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2)
           {
             printf("Z-Cut %lu, %g\n",vol_mesher.options.zcuts.size(),
                    vertex_layers[layer_index]);
@@ -170,7 +170,7 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
 
       double z = cell->centroid_.z;
 
-      if (chi::log.GetVerbosity() == chi_objects::ChiLog::LOG_0VERBOSE_2)
+      if (Chi::log.GetVerbosity() == chi::ChiLog::LOG_0VERBOSE_2)
       {
         printf("zmax = %g, zmin = %g, cell_z = %g\n",zmax,zmin,z);
       }
@@ -208,7 +208,7 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
 
       double z = cell->centroid_.z;
 
-      if (chi::log.GetVerbosity() == chi_objects::ChiLog::LOG_0VERBOSE_2)
+      if (Chi::log.GetVerbosity() == chi::ChiLog::LOG_0VERBOSE_2)
       {
         printf("zmax = %g, zmin = %g, cell_z = %g\n",zmax,zmin,z);
       }
@@ -230,10 +230,10 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
   //================================================== Report unallocated item_id
   if (!found_partition)
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "A cell was encountered for which "
          "no zpartition id was found";
-    chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   return ijk_id;

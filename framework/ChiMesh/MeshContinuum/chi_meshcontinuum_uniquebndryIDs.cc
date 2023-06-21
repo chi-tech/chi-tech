@@ -12,7 +12,7 @@
 std::vector<uint64_t> chi_mesh::MeshContinuum::GetDomainUniqueBoundaryIDs() const
 {
   MPI_Barrier(MPI_COMM_WORLD);
-  chi::log.Log() << "Identifying unique boundary-ids.";
+  Chi::log.Log() << "Identifying unique boundary-ids.";
 
   //====================================== Develop local bndry-id set
   std::set<uint64_t> local_bndry_ids_set;
@@ -28,7 +28,7 @@ std::vector<uint64_t> chi_mesh::MeshContinuum::GetDomainUniqueBoundaryIDs() cons
 
   //====================================== Everyone now tells everyone
   //                                       how many bndry-ids they have
-  std::vector<int> locI_bndry_count(chi::mpi.process_count,0);
+  std::vector<int> locI_bndry_count(Chi::mpi.process_count,0);
 
   MPI_Allgather(&local_num_bndry_ids,             //sendbuf
                 1,                                //sendcount
@@ -40,9 +40,9 @@ std::vector<uint64_t> chi_mesh::MeshContinuum::GetDomainUniqueBoundaryIDs() cons
 
   //====================================== Build a displacement list, in prep
   //                                       for gathering all bndry-ids
-  std::vector<int> locI_bndry_ids_displs(chi::mpi.process_count,0);
+  std::vector<int> locI_bndry_ids_displs(Chi::mpi.process_count,0);
   size_t total_num_global_bndry_ids=locI_bndry_count[0];
-  for (int locI=1; locI<chi::mpi.process_count; ++locI)
+  for (int locI=1; locI< Chi::mpi.process_count; ++locI)
   {
     locI_bndry_ids_displs[locI] = locI_bndry_ids_displs[locI-1] +
                                   locI_bndry_count[locI-1];

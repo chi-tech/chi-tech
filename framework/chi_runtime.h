@@ -52,7 +52,7 @@ typedef std::shared_ptr<SpatialDiscretization> SpatialDiscretizationPtr;
 class UnknownManager;
 } // namespace chi_math
 
-namespace chi_objects
+namespace chi
 {
 
 class MPI_Info;
@@ -66,13 +66,13 @@ typedef std::shared_ptr<ChiObject> ChiObjectPtr;
 
 // ###################################################################
 /**General utilities in ChiTech*/
-class chi
+class Chi
 {
 public:
-  static chi_objects::MPI_Info& mpi;
-  static chi_objects::ChiTimer program_timer;
-  static chi_objects::ChiConsole& console;
-  static chi_objects::ChiLog& log;
+  static chi::MPI_Info& mpi;
+  static chi::ChiTimer program_timer;
+  static chi::ChiConsole& console;
+  static chi::ChiLog& log;
 
   static std::vector<chi_mesh::MeshHandlerPtr> meshhandler_stack;
   static int current_mesh_handler;
@@ -109,7 +109,7 @@ public:
     static const std::string command_line_help_string_;
 
   private:
-    friend class chi;
+    friend class Chi;
     static void ParseArguments(int argc, char** argv);
     static int InitPetSc(int argc, char** argv);
 
@@ -143,9 +143,9 @@ public:
   };
 
 public:
-  chi() = delete;                     // Deleted constructor
-  chi(const chi&) = delete;           // Deleted copy constructor
-  chi operator=(const chi&) = delete; // Deleted assigment operator
+  Chi() = delete;                     // Deleted constructor
+  Chi(const Chi&) = delete;           // Deleted copy constructor
+  Chi operator=(const Chi&) = delete; // Deleted assigment operator
 
 public:
   static int RunInteractive(int argc, char** argv);

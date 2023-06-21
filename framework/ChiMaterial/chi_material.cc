@@ -2,7 +2,7 @@
 
 #include "ChiObject/object_maker.h"
 
-namespace chi_objects
+namespace chi
 {
 
 RegisterChiObject(chi_objects, Material);
@@ -21,7 +21,7 @@ InputParameters Material::GetInputParameters()
   return params;
 }
 
-Material::Material(const chi_objects::InputParameters& params)
+Material::Material(const chi::InputParameters& params)
   : name_(params.GetParamValue<std::string>("name"))
 {
 }
