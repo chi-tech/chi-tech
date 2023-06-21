@@ -1,3 +1,4 @@
+/**
 \addtogroup chi_mesh__BooleanLogicalVolume
 ## Additional Example A
 The code below defines a logical volume that is within logical volume 1 but
@@ -41,3 +42,4 @@ chiMeshHandlerExportMeshToVTK("lv_boolean_test1")
 \endcode
 
 \image html framework/chi_mesh/LogicalVolume/lv_boolean_test1.png width=500px
+*/

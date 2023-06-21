@@ -1,3 +1,4 @@
+/**
 \addtogroup chi_mesh__RCCLogicalVolume
 
 ## Additional Example
@@ -28,3 +29,4 @@ chiMeshHandlerExportMeshToVTK("lv_rcc_test1")
 \endcode
 
 \image html framework/chi_mesh/LogicalVolume/lv_rcc_test1.png width=500px
+*/
