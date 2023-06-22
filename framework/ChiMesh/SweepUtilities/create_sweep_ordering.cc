@@ -41,11 +41,12 @@ chi_mesh::sweep_management::
   std::set<int> location_successors;
   std::set<int> location_dependencies;
 
-  PopulateCellRelationships(grid,
+  PopulateCellRelationships(*grid,
                             omega,
                             location_dependencies,
                             location_successors,
-                            cell_successors);
+                            cell_successors,
+                            sweep_order->cell_face_orientations_);
 
   sweep_order->location_successors.reserve(location_successors.size());
   sweep_order->location_dependencies.reserve(location_dependencies.size());

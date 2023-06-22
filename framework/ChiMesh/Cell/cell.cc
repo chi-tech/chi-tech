@@ -129,18 +129,17 @@ int chi_mesh::CellFace::
 {
   const auto& cur_face = *this; //just for readability
   //======================================== Check index validity
-  if ((not cur_face.has_neighbor_) || (not cur_face.IsNeighborLocal(grid)))
+  if (not cur_face.has_neighbor_)
   {
     std::stringstream outstr;
     outstr
       << "Invalid cell index encountered in call to "
       << "CellFace::GetNeighborAssociatedFace. Index points "
-      << "to either a boundary"
-      << "or a non-local cell.";
+      << "to a boundary";
     throw std::logic_error(outstr.str());
   }
 
-  const auto& adj_cell = grid.local_cells[cur_face.GetNeighborLocalID(grid)];
+  const auto& adj_cell = grid.cells[cur_face.neighbor_id_];
 
   int associated_face = -1;
   std::set<uint64_t> cfvids(cur_face.vertex_ids_.begin(),

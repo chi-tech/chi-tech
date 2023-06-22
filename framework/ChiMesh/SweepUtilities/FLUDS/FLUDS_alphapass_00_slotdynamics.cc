@@ -2,7 +2,7 @@
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 #include "ChiMesh/MeshContinuum/chi_grid_face_histogram.h"
 
-#include <ChiMesh/Cell/cell.h>
+#include "ChiMesh/Cell/cell.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -33,12 +33,11 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
   for (int f=0; f < cell.faces_.size(); f++)
   {
     const CellFace& face = cell.faces_[f];
-    double     mu        = spds.omega.Dot(face.normal_);
+    const auto& orientation = spds.cell_face_orientations_[cell.local_id_][f];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face
-    if (mu<(0.0-1.0e-16))
+    if (orientation == FaceOrientation::INCOMING)
     {
-//      int neighbor = face.neighbor_id;
 
       //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ LOCAL CELL DEPENDENCE
       if (face.IsNeighborLocal(*grid))
@@ -46,7 +45,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
         size_t num_face_dofs = face.vertex_ids_.size();
         size_t face_categ = grid_face_histogram.MapFaceHistogramBins(num_face_dofs);
 
-        inco_face_face_category.push_back(face_categ);
+        inco_face_face_category.push_back(static_cast<short>(face_categ));
 
         LockBox& lock_box = lock_boxes[face_categ];
 
@@ -149,17 +148,16 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
   for (int f=0; f < cell.faces_.size(); f++)
   {
     const CellFace&  face   = cell.faces_[f];
-    double     mu           = spds.omega.Dot(face.normal_);
-//    int        neighbor     = face.neighbor_id;
     int        cell_g_index = cell.global_id_;
+    const auto& orientation = spds.cell_face_orientations_[cell.local_id_][f];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Outgoing face
-    if (mu>=(0.0+1.0e-16))
+    if (orientation == FaceOrientation::OUTGOING)
     {
       size_t num_face_dofs = face.vertex_ids_.size();
       size_t face_categ = grid_face_histogram.MapFaceHistogramBins(num_face_dofs);
 
-      outb_face_face_category.push_back(face_categ);
+      outb_face_face_category.push_back(static_cast<short>(face_categ));
 
       LockBox* temp_lock_box = &lock_boxes[face_categ];
 
@@ -195,7 +193,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
       //========================================== Check if this face is
       //                                           the max size
       if (num_face_dofs>largest_face)
-        largest_face = num_face_dofs;
+        largest_face = static_cast<int>(num_face_dofs);
 
       //========================================== Find a open slot
       bool slot_found = false;
@@ -205,7 +203,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
         {
           outb_face_slot_indices.push_back(k);
           lock_box[k].first = cell_g_index;
-          lock_box[k].second= f;
+          lock_box[k].second= static_cast<short>(f);
           slot_found = true;
           break;
         }

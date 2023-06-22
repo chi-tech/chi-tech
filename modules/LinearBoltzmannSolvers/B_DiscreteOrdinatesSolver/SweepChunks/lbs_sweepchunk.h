@@ -88,7 +88,6 @@ protected:
   /**Callbacks at phase 1 : cell data established*/
   std::vector<CallbackFunction> cell_data_callbacks_;
 
-  std::vector<bool> face_incident_flags_;
   std::vector<double> face_mu_values_;
   size_t direction_num_ = 0;
   chi_mesh::Vector3 omega_;

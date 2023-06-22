@@ -19,13 +19,11 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
   for (short f=0; f < cell.faces_.size(); f++)
   {
     const CellFace&  face = cell.faces_[f];
-    double     mu         = face.normal_.Dot(spds.omega);
+    const auto& orientation = spds.cell_face_orientations_[cell.local_id_][f];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face
-    if (mu<(0.0-1.0e-16))
+    if (orientation == FaceOrientation::INCOMING)
     {
-//      int neighbor = face.neighbor_id;
-
       if ((face.has_neighbor_) and (!face.IsNeighborLocal(*grid)) )
       {
         //============================== Find prelocI

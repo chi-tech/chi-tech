@@ -16,7 +16,15 @@ namespace chi_mesh
 {
 namespace sweep_management
 {
-  struct STDG;           ///< Global Sweep Plane Ordering
+
+enum class FaceOrientation : short
+{
+  PARALLEL = -1,
+  INCOMING = 0,
+  OUTGOING = 1
+};
+
+struct STDG;           ///< Global Sweep Plane Ordering
   struct SPLS;           ///< Sweep Plane Local Subgrid
   class  PRIMARY_FLUDS;  ///< Primary Flux Data Structure
   class  AUX_FLUDS;      ///< Auxiliary Flux Data Structure
@@ -32,11 +40,12 @@ namespace sweep_management
   class SweepScheduler;
 
   void PopulateCellRelationships(
-    chi_mesh::MeshContinuumPtr grid,
+    const chi_mesh::MeshContinuum& grid,
     const chi_mesh::Vector3& omega,
     std::set<int>& location_dependencies,
     std::set<int>& location_successors,
-    std::vector<std::set<std::pair<int,double>>>& cell_successors);
+    std::vector<std::set<std::pair<int,double>>>& cell_successors,
+    std::vector<std::vector<FaceOrientation>>& cell_face_orientations);
 
   void CommunicateLocationDependencies(
     const std::vector<int>& location_dependencies,
