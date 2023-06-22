@@ -12,7 +12,7 @@ print("ChiTech root: ", chi_tech_root)
 cwd = os.getcwd()
 
 parser = argparse.ArgumentParser()
-parser.add_argument("module_name", type=str,
+parser.add_argument("module_name", type=str, required=True,
                     help="The name of the module")
 
 args = parser.parse_args()
@@ -56,18 +56,32 @@ os.chmod(mod_path+"/configure.sh", st.st_mode | stat.S_IEXEC)
 test_dot_lua = open(mod_path+"/tests/test.lua", "w")
 test_dot_lua.write("chiLog(LOG_0, \"Hello World!\")\n")
 test_dot_lua.close()
+
 # main.cc
 main_dot_cc = open(mod_path+"/main.cc", "w")
 main_dot_cc.write('''\
 #include "chi_runtime.h"
-#include "chi_log.h"
 
+//######################################################### Program entry point
+/** Program entry point.
+
+\\param argc int    Number of arguments supplied.
+\\param argv char** Array of strings representing each argument.
+
+*/
 int main(int argc, char* argv[])
 {
-  chi::Initialize(argc,argv);
-  chi::RunBatch(argc, argv);
-  chi::Finalize();
-  return 0;
+  Chi::Initialize(argc,argv);
+  
+  int error_code;
+  if (Chi::run_time::sim_option_interactive_)
+    error_code = Chi::RunInteractive(argc, argv);
+  else
+    error_code = Chi::RunBatch(argc, argv);
+
+  Chi::Finalize();
+
+  return error_code;
 }
 ''')
 main_dot_cc.close()
