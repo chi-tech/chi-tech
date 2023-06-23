@@ -274,6 +274,8 @@ def EchoTests(tests: list):
 def RunTests(tests: list, argv):
     """Actually runs the tests. This routine dynamically checks the system
        load in order to use the system maximally"""
+    start_time = time.perf_counter()
+
     capacity = max(4, argv.jobs)
     system_load = 0
 
@@ -324,7 +326,11 @@ def RunTests(tests: list, argv):
         if not slot.passed:
             num_tests_failed += 1
 
+    end_time = time.perf_counter()
+    elapsed_time = end_time - start_time
+
     print()
+    print("Elapsed time           : {:.2f} seconds".format(elapsed_time))
     print(f"Number of tests run    : {len(test_slots)}")
     print(f"Number of failed tests : {num_tests_failed}")
     print()
