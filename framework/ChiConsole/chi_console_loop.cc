@@ -20,7 +20,7 @@ void chi::ChiConsole::RunConsoleLoop(char*) const
     MPI_Bcast(int_being_bcast,    //buffer
               1, MPI_INT,         //count + type
               0,                  //root
-              MPI_COMM_WORLD);    //communicator
+              Chi::mpi.comm);    //communicator
   };
 
   /** Wrapper to an MPI_Bcast call for an array of characters
@@ -31,7 +31,7 @@ void chi::ChiConsole::RunConsoleLoop(char*) const
     MPI_Bcast(raw_string_to_bcast,           //buffer
               length, MPI_CHAR,              //count + type
               0,                             //root
-              MPI_COMM_WORLD);               //communicator
+              Chi::mpi.comm);               //communicator
   };
 
   /** Wrapper to an MPI_Bcast call for an array of characters
@@ -42,7 +42,7 @@ void chi::ChiConsole::RunConsoleLoop(char*) const
     MPI_Bcast(raw_chars.data(),              //buffer
               length, MPI_CHAR,              //count + type
               0,                             //root
-              MPI_COMM_WORLD);               //communicator
+              Chi::mpi.comm);               //communicator
 
     string_to_bcast = std::string(raw_chars.data());
   };

@@ -153,7 +153,7 @@ void lbs::DiscreteOrdinatesAdjointSolver::
   for (int locationJ=0; locationJ< Chi::mpi.process_count; ++locationJ)
   {
     Chi::log.LogAll() << "  Barrier at " << locationJ;
-    MPI_Barrier(MPI_COMM_WORLD);
+    Chi::mpi.Barrier();
     if (Chi::mpi.location_id != locationJ) continue;
 
     Chi::log.LogAll() << "  Location " << locationJ << " appending data.";
@@ -204,5 +204,5 @@ void lbs::DiscreteOrdinatesAdjointSolver::
   }//for location
 
   Chi::log.LogAll() << "Done exporting importance map to binary file " << file_name;
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
 }

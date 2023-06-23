@@ -22,7 +22,7 @@ void chi_math::SpatialDiscretization_FV::
                 1, MPI_UINT64_T,        // sendcount, sendtype
                 locJ_block_size_.data(), // recvbuf
                 1, MPI_UINT64_T,        // recvcount, recvtype
-                MPI_COMM_WORLD);        // comm
+                Chi::mpi.comm);        // comm
 
   //============================================= Build block addresses
   locJ_block_address_.assign(Chi::mpi.process_count, 0);
@@ -52,7 +52,7 @@ void chi_math::SpatialDiscretization_FV::
   const auto query_nb_gids = chi_mpi_utils::
     MapAllToAll(sorted_nb_gids,  //map
                 MPI_UINT64_T,    //datatype
-                MPI_COMM_WORLD); //comm
+                Chi::mpi.comm); //comm
 
   //============================================= Map the ids
   std::map<uint64_t, std::vector<uint64_t>> mapped_query_nb_gids;
@@ -78,7 +78,7 @@ void chi_math::SpatialDiscretization_FV::
   const auto mapped_nb_gids = chi_mpi_utils::
     MapAllToAll(mapped_query_nb_gids,  //map
                 MPI_UINT64_T,    //datatype
-                MPI_COMM_WORLD); //comm
+                Chi::mpi.comm); //comm
 
   //============================================= Create the neighbor cell
   //                                              mapping

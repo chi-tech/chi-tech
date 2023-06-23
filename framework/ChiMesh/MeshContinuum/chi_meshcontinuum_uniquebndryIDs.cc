@@ -11,7 +11,7 @@
  * the mesh.*/
 std::vector<uint64_t> chi_mesh::MeshContinuum::GetDomainUniqueBoundaryIDs() const
 {
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
   Chi::log.Log() << "Identifying unique boundary-ids.";
 
   //====================================== Develop local bndry-id set
@@ -36,7 +36,7 @@ std::vector<uint64_t> chi_mesh::MeshContinuum::GetDomainUniqueBoundaryIDs() cons
                 locI_bndry_count.data(),          //recvbuf
                 1,                                //recvcount
                 MPI_INT,                          //recvtype
-                MPI_COMM_WORLD);                  //communicator
+                Chi::mpi.comm);                  //communicator
 
   //====================================== Build a displacement list, in prep
   //                                       for gathering all bndry-ids
@@ -60,7 +60,7 @@ std::vector<uint64_t> chi_mesh::MeshContinuum::GetDomainUniqueBoundaryIDs() cons
                  locI_bndry_count.data(),          //recvcounts
                  locI_bndry_ids_displs.data(),     //displs
                  MPI_UNSIGNED_LONG_LONG,           //recvtype
-                 MPI_COMM_WORLD);                  //communicator
+                 Chi::mpi.comm);                  //communicator
 
   std::set<uint64_t> globl_bndry_ids_set(globl_bndry_ids.begin(),
                                          globl_bndry_ids.end());

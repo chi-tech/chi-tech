@@ -191,7 +191,7 @@ void chi_mesh::sweep_management::SweepScheduler::
   }//while not finished
 
   //================================================== Receive delayed data
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
   bool received_delayed_data = false;
   while (not received_delayed_data)
   {

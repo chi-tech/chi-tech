@@ -281,7 +281,7 @@ size_t chi_mesh::MeshContinuum::CountCellsInLogicalVolume(
                 1,                      // count
                 MPI_UNSIGNED_LONG_LONG, // datatype
                 MPI_SUM,                // op
-                MPI_COMM_WORLD);        // communicator
+                Chi::mpi.comm);        // communicator
 
   return global_count;
 }

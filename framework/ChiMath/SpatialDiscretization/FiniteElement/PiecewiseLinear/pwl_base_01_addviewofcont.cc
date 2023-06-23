@@ -37,7 +37,7 @@ void chi_math::SpatialDiscretization_PWLBase::PreComputeCellSDValues()
       }
     }//if compute unit intgrls
   }
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
 
   //============================================= Quadrature data
   {

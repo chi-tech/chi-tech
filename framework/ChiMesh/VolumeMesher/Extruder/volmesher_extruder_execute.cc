@@ -85,7 +85,7 @@ void chi_mesh::VolumeMesherExtruder::Execute()
   //================================== Create extruded item_id
   Chi::log.Log()
     << "VolumeMesherExtruder: Extruding cells" << std::endl;
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
   ExtrudeCells(*temp_grid, *grid);
 
   size_t total_local_cells = grid->local_cells.size();
@@ -96,7 +96,7 @@ void chi_mesh::VolumeMesherExtruder::Execute()
                 1,
                 MPI_UNSIGNED_LONG_LONG,
                 MPI_SUM,
-                MPI_COMM_WORLD);
+                Chi::mpi.comm);
 
   Chi::log.Log()
     << "VolumeMesherExtruder: Cells extruded = "
@@ -140,5 +140,5 @@ void chi_mesh::VolumeMesherExtruder::Execute()
     << total_global_cells
     << std::endl;
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
 }

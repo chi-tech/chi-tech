@@ -152,7 +152,7 @@ XXPowerIterationKEigenSCDSA::MakePWLDVecGhostCommInfo(
 
   // Create the vector ghost communicator
   auto vgc = std::make_shared<chi_math::VectorGhostCommunicator>(
-    num_local_dofs, num_globl_dofs, global_indices, MPI_COMM_WORLD);
+    num_local_dofs, num_globl_dofs, global_indices, Chi::mpi.comm);
 
   // Create the map
   std::map<int64_t, int64_t> ghost_global_id_2_local_map;

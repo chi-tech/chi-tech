@@ -112,7 +112,7 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
   Chi::log.Log()
     << "Materials Initialized:\n" << materials_list.str() << "\n";
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Compute last fast group
   // initialize last fast group

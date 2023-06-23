@@ -42,7 +42,7 @@ void chi_math::SpatialDiscretization_PWLD::OrderNodes()
                 1, MPI_UNSIGNED_LONG_LONG,   //sendcount, sendtype
                 locJ_block_size_.data(),      //recvbuf
                 1, MPI_UNSIGNED_LONG_LONG,   //recvcount, recvtype
-                MPI_COMM_WORLD );            //comm
+                Chi::mpi.comm);            //comm
 
   //================================================== Assign local_block_address
   uint64_t running_block_address = 0;

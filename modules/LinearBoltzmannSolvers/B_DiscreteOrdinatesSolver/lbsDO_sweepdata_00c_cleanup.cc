@@ -20,7 +20,7 @@ void lbs::DiscreteOrdinatesSolver::ResetSweepOrderings(LBSGroupset& groupset)
 
   groupset.angle_agg_->angle_set_groups.clear();
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
 
   Chi::log.Log()
     << "SPDS and FLUDS reset complete.            Process memory = "
@@ -32,10 +32,10 @@ void lbs::DiscreteOrdinatesSolver::ResetSweepOrderings(LBSGroupset& groupset)
                           chi::ChiLog::EventOperation::MAX_VALUE);
   double total_app_memory=0.0;
   MPI_Allreduce(&local_app_memory,&total_app_memory,
-                1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+                1,MPI_DOUBLE,MPI_SUM,Chi::mpi.comm);
   double max_proc_memory=0.0;
   MPI_Allreduce(&local_app_memory,&max_proc_memory,
-                1,MPI_DOUBLE,MPI_MAX,MPI_COMM_WORLD);
+                1,MPI_DOUBLE,MPI_MAX,Chi::mpi.comm);
 
   Chi::log.Log()
     << "\n" << std::setprecision(3)

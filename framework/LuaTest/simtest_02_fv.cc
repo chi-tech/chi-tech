@@ -157,7 +157,7 @@ int chiSimTest02_FV(lua_State*)
   chi_math::VectorGhostCommunicator vgc(num_local_dofs,
                                         num_globl_dofs,
                                         ghost_ids,
-                                        MPI_COMM_WORLD);
+                                        Chi::mpi.comm);
   std::vector<double> field_wg = vgc.MakeGhostedVector(field);
 
   vgc.CommunicateGhostEntries(field_wg);

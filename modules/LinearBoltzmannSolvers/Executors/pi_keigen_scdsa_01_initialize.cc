@@ -76,7 +76,7 @@ void XXPowerIterationKEigenSCDSA::Initialize()
 
   Chi::log.Log() << "Initializing diffusion solver";
   diffusion_solver_->Initialize();
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
   Chi::log.Log() << "Done Initializing diffusion solver";
 
   Chi::log.Log() << "Assembling A and b";

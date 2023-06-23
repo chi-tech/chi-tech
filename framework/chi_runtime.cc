@@ -156,7 +156,6 @@ void Chi::run_time::ParseArguments(int argc, char** argv)
     ChiObjectMaker::GetInstance().DumpRegister();
     Chi::console.DumpRegister();
   }
-
 }
 
 // ############################################### Initialize ChiTech
@@ -164,19 +163,22 @@ void Chi::run_time::ParseArguments(int argc, char** argv)
 \param argc int    Number of arguments supplied.
 \param argv char** Array of strings representing each argument.
  */
-int Chi::Initialize(int argc, char** argv)
+int Chi::Initialize(int argc,
+                    char** argv,
+                    MPI_Comm communicator)
 {
   int location_id = 0, number_processes = 1;
 
   MPI_Init(&argc, &argv);                           /* starts MPI */
-  MPI_Comm_rank(MPI_COMM_WORLD, &location_id);      /* get cur process id */
-  MPI_Comm_size(MPI_COMM_WORLD, &number_processes); /* get num of processes */
+  MPI_Comm_rank(communicator, &location_id);      /* get cur process id */
+  MPI_Comm_size(communicator, &number_processes); /* get num of processes */
 
+  mpi.SetCommunicator(communicator);
   mpi.SetLocationID(location_id);
   mpi.SetProcessCount(number_processes);
 
   Chi::console.LoadRegisteredLuaItems();
-  Chi::console.PostMPIInfo(location_id,       number_processes);
+  Chi::console.PostMPIInfo(location_id, number_processes);
 
   run_time::ParseArguments(argc, argv);
 
@@ -188,18 +190,12 @@ int Chi::Initialize(int argc, char** argv)
 /**Initializes PetSc for use by all entities.*/
 int Chi::run_time::InitPetSc(int argc, char** argv)
 {
-  PetscErrorCode ierr;
-  PetscMPIInt size;
-
+  PETSC_COMM_WORLD = mpi.comm;
   PetscOptionsInsertString(nullptr, "-error_output_stderr");
   if (not Chi::run_time::allow_petsc_error_handler_)
     PetscOptionsInsertString(nullptr, "-no_signal_handler");
 
-  ierr = PetscInitialize(&argc, &argv, nullptr, nullptr);
-  if (ierr) return ierr;
-
-  ierr = MPI_Comm_size(PETSC_COMM_WORLD, &size);
-  CHKERRQ(ierr);
+  PetscCall(PetscInitialize(&argc, &argv, nullptr, nullptr));
 
   return 0;
 }
@@ -297,7 +293,7 @@ int Chi::RunBatch(int argc, char** argv)
       Chi::log.Log() << k;
     }
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  mpi.Barrier();
 #endif
 
   const auto& input_fname = Chi::run_time::input_file_name_;
@@ -329,7 +325,7 @@ int Chi::RunBatch(int argc, char** argv)
 
 // ###################################################################
 /** Exits the program appropriately.*/
-void Chi::Exit(int error_code) { MPI_Abort(MPI_COMM_WORLD, error_code); }
+void Chi::Exit(int error_code) { MPI_Abort(mpi.comm, error_code); }
 
 // ###################################################################
 /** Gets the ChiTech-version string.*/

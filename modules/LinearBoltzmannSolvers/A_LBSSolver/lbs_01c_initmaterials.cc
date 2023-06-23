@@ -181,5 +181,5 @@ void lbs::LBSSolver::InitMaterials()
   Chi::log.Log0Verbose1()
     << "Materials Initialized:\n" << materials_list.str() << "\n";
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(Chi::mpi.comm);
 }

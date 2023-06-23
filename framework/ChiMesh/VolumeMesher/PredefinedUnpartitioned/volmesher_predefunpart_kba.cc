@@ -57,7 +57,7 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
             static_cast<int>(num_raw_cells),  //count
             MPI_LONG_LONG_INT,                //data type
             0,                                //root
-            MPI_COMM_WORLD);                  //communicator
+            Chi::mpi.comm);                  //communicator
   Chi::log.Log() << "Done partitioning mesh.";
 
   return cell_pids;

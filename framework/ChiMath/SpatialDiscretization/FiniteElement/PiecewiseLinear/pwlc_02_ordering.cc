@@ -72,7 +72,7 @@ void chi_math::SpatialDiscretization_PWLC::OrderNodes()
                 locJ_block_size_.data(), // recvbuf
                 1,
                 MPI_UINT64_T,    // recvcount, recvtype
-                MPI_COMM_WORLD); // comm
+                Chi::mpi.comm); // comm
 
   //============================================= Build block addresses
   locJ_block_address_.assign(Chi::mpi.process_count, 0);

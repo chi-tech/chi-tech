@@ -49,7 +49,7 @@ void chi_mesh::VolumeMesher::
                 &global_num_cells_modified, //recvbuf
                 1, MPI_INT,                 //count + datatype
                 MPI_SUM,                    //operation
-                MPI_COMM_WORLD);            //comm
+                Chi::mpi.comm);            //comm
 
   Chi::log.Log0Verbose1()
     << Chi::program_timer.GetTimeString()
@@ -96,7 +96,7 @@ void chi_mesh::VolumeMesher::
                 &global_num_faces_modified, //recvbuf
                 1, MPI_INT,                 //count + datatype
                 MPI_SUM,                    //operation
-                MPI_COMM_WORLD);            //comm
+                Chi::mpi.comm);            //comm
 
 
   if (global_num_faces_modified > 0 and
@@ -130,7 +130,7 @@ void chi_mesh::VolumeMesher::SetMatIDToAll(int mat_id)
   for (uint64_t ghost_id : ghost_ids)
     vol_cont->cells[ghost_id].material_id_ = mat_id;
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
   Chi::log.Log()
     << Chi::program_timer.GetTimeString()
     << " Done setting material id " << mat_id << " to all cells";
@@ -232,7 +232,7 @@ void chi_mesh::VolumeMesher::
                 &globl_num_cells_modified, //recvbuf
                 1, MPI_INT,                //count+datatype
                 MPI_SUM,                   //operation
-                MPI_COMM_WORLD);           //comm
+                Chi::mpi.comm);           //comm
 
   Chi::log.Log0Verbose1()
     << Chi::program_timer.GetTimeString()
@@ -363,7 +363,7 @@ void chi_mesh::VolumeMesher::
                 &globl_num_faces_modified, //recvbuf
                 1, MPI_INT,                //count+datatype
                 MPI_SUM,                   //operation
-                MPI_COMM_WORLD);           //comm
+                Chi::mpi.comm);           //comm
 
   Chi::log.Log0Verbose1()
     << Chi::program_timer.GetTimeString()

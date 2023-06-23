@@ -27,7 +27,7 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
 
   Chi::log.Log() << "Making Unpartitioned mesh from msh format file "
                 << options.file_name;
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
 
   //===================================================== Declarations
   std::string file_line;

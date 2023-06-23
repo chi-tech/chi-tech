@@ -49,7 +49,7 @@ void lbs::LBSSolver::InitializeBoundaries()
                   1, MPI_INT,                  //sendcount+type
                   recvcounts.data(),           //recvbuf
                   1, MPI_INT,              //recvcount+type
-                  MPI_COMM_WORLD);             //comm
+                  Chi::mpi.comm);             //comm
 
     std::vector<int> recvdispls(Chi::mpi.process_count, 0);
 
@@ -69,7 +69,7 @@ void lbs::LBSSolver::InitializeBoundaries()
                    recvcounts.data(),        //recvcounts
                    recvdispls.data(),        //recvdispls
                    MPI_UINT64_T,             //recvtype
-                   MPI_COMM_WORLD);          //comm
+                   Chi::mpi.comm);          //comm
 
     globl_unique_bids_set = local_unique_bids_set; //give it a head start
 
@@ -133,13 +133,13 @@ void lbs::LBSSolver::InitializeBoundaries()
                       1, MPI_INT,           //sendcount + datatype
                       locJ_has_bid.data(),  //recvbuf
                       1, MPI_INT,           //recvcount + datatype
-                      MPI_COMM_WORLD);      //communicator
+                      Chi::mpi.comm);      //communicator
 
         MPI_Allgather(&local_normal,     //sendbuf
                       3, MPI_DOUBLE,     //sendcount + datatype
                       locJ_n_val.data(), //recvbuf
                       3, MPI_DOUBLE,     //recvcount + datatype
-                      MPI_COMM_WORLD);   //communicator
+                      Chi::mpi.comm);   //communicator
 
         Vec3 global_normal;
         for (int j=0; j< Chi::mpi.process_count; ++j)

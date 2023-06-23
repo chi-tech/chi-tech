@@ -30,7 +30,7 @@ void chi_mesh::FieldFunctionInterpolationPoint::Initialize()
                 1, MPI_INT,        //sendcount + sendtype
                 locI_count.data(), //recvbuf + recvtype
                 1, MPI_INT,        //recvcount + recvtype
-                MPI_COMM_WORLD);   //communicator
+                Chi::mpi.comm);   //communicator
 
   std::vector<int> recvdispls(Chi::mpi.process_count,0);
 
@@ -49,7 +49,7 @@ void chi_mesh::FieldFunctionInterpolationPoint::Initialize()
                  locI_count.data(),         //recvcount
                  recvdispls.data(),         //recvdispl
                  MPI_UINT64_T,              //recvtype
-                 MPI_COMM_WORLD);           //communicator
+                 Chi::mpi.comm);           //communicator
 
  if (recvbuf.empty())
    throw std::logic_error(fname + ": No cell identified containing the point.");
@@ -113,7 +113,7 @@ double chi_mesh::FieldFunctionInterpolationPoint::GetPointValue() const
                 &global_point_value, //recvbuf
                 1, MPI_DOUBLE,       //count + datatype
                 MPI_SUM,             //operation
-                MPI_COMM_WORLD);     //communicator
+                Chi::mpi.comm);     //communicator
 
   return global_point_value;
 }

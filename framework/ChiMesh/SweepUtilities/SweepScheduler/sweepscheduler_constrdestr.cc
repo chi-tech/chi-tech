@@ -39,7 +39,7 @@ chi_mesh::sweep_management::SweepScheduler::SweepScheduler(
   MPI_Allreduce(&local_max_num_messages,
                 &global_max_num_messages,
                 1, MPI_INT,
-                MPI_MAX, MPI_COMM_WORLD);
+                MPI_MAX, Chi::mpi.comm);
 
   //=================================== Propogate items back to sweep buffers
   for (auto& angsetgrp : in_angle_agg.angle_set_groups)

@@ -48,7 +48,7 @@ void chi_mesh::VolumeMesher::SetupOrthogonalBoundaries()
         vol_cont->GetBoundaryIDMap()[bndry_id] = boundary_name;
       }//if bndry
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
   Chi::log.Log()
     << Chi::program_timer.GetTimeString()
     << " Done setting orthogonal boundaries.";

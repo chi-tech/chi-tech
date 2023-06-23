@@ -94,7 +94,7 @@ void chi_mesh::WritePVTUFiles(vtkNew<vtkUnstructuredGrid> &ugrid,
 
     pgrid_writer->Write();
   }
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
 
   //============================================= Serial output each piece
   auto grid_writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();

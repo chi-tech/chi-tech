@@ -54,7 +54,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
         sdm_string + ", specified.");
   }
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(Chi::mpi.comm);
   auto& sdm = discretization_;
 
   //============================================= Get DOF counts

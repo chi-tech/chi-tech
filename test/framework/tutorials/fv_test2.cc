@@ -160,7 +160,7 @@ chiSimTest02_FV(const chi::InputParameters&)
   std::vector<int64_t> ghost_ids = sdm.GetGhostDOFIndices(OneDofPerNode);
 
   chi_math::VectorGhostCommunicator vgc(
-    num_local_dofs, num_globl_dofs, ghost_ids, MPI_COMM_WORLD);
+    num_local_dofs, num_globl_dofs, ghost_ids, Chi::mpi.comm);
   std::vector<double> field_wg = vgc.MakeGhostedVector(field);
 
   vgc.CommunicateGhostEntries(field_wg);

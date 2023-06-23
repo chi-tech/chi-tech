@@ -20,7 +20,7 @@ void lbs::DiscreteOrdinatesSolver::ZeroOutflowBalanceVars(LBSGroupset& groupset)
 /**Compute balance.*/
 void lbs::DiscreteOrdinatesSolver::ComputeBalance()
 {
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
   Chi::log.Log() << "\n********** Computing balance\n";
 
   //======================================== Get material source
@@ -134,7 +134,7 @@ void lbs::DiscreteOrdinatesSolver::ComputeBalance()
                 globl_balance_table.data(),      //recvbuf
                 table_size,MPI_DOUBLE,           //count + datatype
                 MPI_SUM,                         //operation
-                MPI_COMM_WORLD);                 //communicator
+                Chi::mpi.comm);                 //communicator
 
   double globl_absorption = globl_balance_table.at(0);
   double globl_production = globl_balance_table.at(1);
@@ -155,5 +155,5 @@ void lbs::DiscreteOrdinatesSolver::ComputeBalance()
 
   Chi::log.Log() << "\n********** Done computing balance\n";
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
 }

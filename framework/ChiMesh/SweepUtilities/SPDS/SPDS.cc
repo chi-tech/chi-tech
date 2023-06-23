@@ -112,7 +112,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
   MPI_Bcast(&edge_buffer_size,      //Buffer
             1, MPI_INT,             //Count and datatype
             0,                      //Root location
-            MPI_COMM_WORLD);        //Communicator
+            Chi::mpi.comm);        //Communicator
 
   //============================================= Broadcast edges
   if (Chi::mpi.location_id != 0)
@@ -121,7 +121,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
   MPI_Bcast(raw_edges_to_remove.data(),      //Buffer
             edge_buffer_size, MPI_INT, //Count and datatype
             0,                         //Root location
-            MPI_COMM_WORLD);           //Communicator
+            Chi::mpi.comm);           //Communicator
 
   //============================================= De-serialize edges
   if (Chi::mpi.location_id != 0)
@@ -188,7 +188,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
   MPI_Bcast(&topsort_buffer_size,   //Buffer
             1, MPI_INT,             //Count and datatype
             0,                      //Root location
-            MPI_COMM_WORLD);        //Communicator
+            Chi::mpi.comm);        //Communicator
 
   //============================================= Broadcast topological sort
   if (Chi::mpi.location_id != 0)
@@ -197,7 +197,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
   MPI_Bcast(glob_linear_sweep_order.data(),//Buffer
             topsort_buffer_size, MPI_INT,  //Count and datatype
             0,                             //Root location
-            MPI_COMM_WORLD);               //Communicator
+            Chi::mpi.comm);               //Communicator
 
   //============================================= Compute reorder mapping
   // This mapping allows us to punch in

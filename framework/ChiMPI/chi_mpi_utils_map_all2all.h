@@ -24,7 +24,7 @@ namespace chi_mpi_utils
 template<typename K, class T> std::map<K, std::vector<T>>
   MapAllToAll(const std::map<K, std::vector<T>>& pid_data_pairs,
               const MPI_Datatype data_mpi_type,
-              const MPI_Comm communicator=MPI_COMM_WORLD)
+              const MPI_Comm communicator=Chi::mpi.comm)
 {
   static_assert(std::is_integral<K>::value, "Integral datatype required.");
 

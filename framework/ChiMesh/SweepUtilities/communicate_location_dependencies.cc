@@ -20,7 +20,7 @@ void chi_mesh::sweep_management::
                 1, MPI_INT,                           //Send count and type
                 depcount_per_loc.data(),              //Recv Buffer
                 1, MPI_INT,                           //Recv count and type
-                MPI_COMM_WORLD);                      //Communicator
+                Chi::mpi.comm);                      //Communicator
 
   //============================================= Broadcast dependencies
   std::vector<int> raw_depvec_displs(P, 0);
@@ -40,7 +40,7 @@ void chi_mesh::sweep_management::
                  depcount_per_loc.data(),                    //Recv counts array
                  raw_depvec_displs.data(),                   //Recv displs
                  MPI_INT,                                    //Recv type
-                 MPI_COMM_WORLD);                            //Communicator
+                 Chi::mpi.comm);                            //Communicator
 
   for (int locI=0; locI<P; ++locI)
   {

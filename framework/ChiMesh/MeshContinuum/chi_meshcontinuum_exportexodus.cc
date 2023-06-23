@@ -356,5 +356,5 @@ void chi_mesh::MeshContinuum::
   writer->PrintSelf(std::cout, vtkIndent());
 
   Chi::log.Log() << "Done exporting mesh to VTK.";
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
 }

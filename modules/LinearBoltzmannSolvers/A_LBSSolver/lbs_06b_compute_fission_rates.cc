@@ -56,7 +56,7 @@ double LBSSolver::ComputeFissionProduction(const std::vector<double>& phi)
                 &global_production, //recvbuf
                 1, MPI_DOUBLE,      //count+datatype
                 MPI_SUM,            //operation
-                MPI_COMM_WORLD);    //communicator
+                Chi::mpi.comm);    //communicator
 
   return global_production;
 }
@@ -102,7 +102,7 @@ double LBSSolver::ComputeFissionRate(const std::vector<double>& phi)
                 &global_fission_rate, //recvbuf
                 1, MPI_DOUBLE,        //count+datatype
                 MPI_SUM,              //operation
-                MPI_COMM_WORLD);      //communicator
+                Chi::mpi.comm);      //communicator
 
   return global_fission_rate;
 }

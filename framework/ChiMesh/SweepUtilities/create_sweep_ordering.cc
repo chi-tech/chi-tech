@@ -116,7 +116,7 @@ chi_mesh::sweep_management::
   //                                                        dependency graph
   sweep_order->BuildTaskDependencyGraph(cycle_allowance_flag);
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
 
   Chi::log.Log0Verbose1()
     << Chi::program_timer.GetTimeString()

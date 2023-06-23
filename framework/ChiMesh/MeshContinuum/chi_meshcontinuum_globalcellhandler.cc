@@ -92,7 +92,7 @@ size_t chi_mesh::MeshContinuum::GetGlobalNumberOfCells() const
                 1,
                 MPI_UNSIGNED_LONG_LONG,
                 MPI_SUM,
-                MPI_COMM_WORLD);
+                Chi::mpi.comm);
 
   return num_globl_cells;
 }

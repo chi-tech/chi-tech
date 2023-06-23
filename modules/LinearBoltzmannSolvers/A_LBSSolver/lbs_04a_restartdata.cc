@@ -29,7 +29,7 @@ void lbs::LBSSolver::WriteRestartData(const std::string& folder_name,
       }
   }
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
 
   //======================================== Create files
   //This step might fail for specific locations and
@@ -65,14 +65,14 @@ void lbs::LBSSolver::WriteRestartData(const std::string& folder_name,
 
   //======================================== Wait for all processes
   //                                         then check success status
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
   bool global_succeeded = true;
   MPI_Allreduce(&location_succeeded,   //Send buffer
                 &global_succeeded,     //Recv buffer
                 1,                     //count
                 MPI_CXX_BOOL,          //Data type
                 MPI_LAND,              //Operation - Logical and
-                MPI_COMM_WORLD);       //Communicator
+                Chi::mpi.comm);       //Communicator
 
   //======================================== Write status message
   if (global_succeeded)
@@ -92,7 +92,7 @@ void lbs::LBSSolver::WriteRestartData(const std::string& folder_name,
 void lbs::LBSSolver::ReadRestartData(const std::string& folder_name,
                                      const std::string& file_base)
 {
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
 
   //======================================== Open files
   //This step might fail for specific locations and
@@ -149,14 +149,14 @@ void lbs::LBSSolver::ReadRestartData(const std::string& folder_name,
 
   //======================================== Wait for all processes
   //                                         then check success status
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
   bool global_succeeded = true;
   MPI_Allreduce(&location_succeeded,   //Send buffer
                 &global_succeeded,     //Recv buffer
                 1,                     //count
                 MPI_CXX_BOOL,          //Data type
                 MPI_LAND,              //Operation - Logical and
-                MPI_COMM_WORLD);       //Communicator
+                Chi::mpi.comm);       //Communicator
 
   //======================================== Write status message
   if (global_succeeded) Chi::log.Log() << "Successfully read restart data";

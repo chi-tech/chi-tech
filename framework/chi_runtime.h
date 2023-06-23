@@ -7,6 +7,8 @@
 #include <stdexcept>
 #include <memory>
 
+#include "chi_mpi.h"
+
 namespace chi_mesh
 {
 class MeshHandler;
@@ -55,11 +57,10 @@ class UnknownManager;
 namespace chi
 {
 
-class MPI_Info;
 class ChiTimer;
 class ChiConsole;
 class ChiLog;
-} // namespace chi_objects
+} // namespace chi
 
 class ChiObject;
 typedef std::shared_ptr<ChiObject> ChiObjectPtr;
@@ -150,7 +151,7 @@ public:
 public:
   static int RunInteractive(int argc, char** argv);
   static int RunBatch(int argc, char** argv);
-  static int Initialize(int argc, char** argv);
+  static int Initialize(int argc, char** argv, MPI_Comm communicator);
   static void Finalize();
   static void Exit(int error_code);
 
@@ -206,8 +207,8 @@ public:
   template <class T, class P>
   static std::shared_ptr<T>
   GetStackItemPtrAsType(std::vector<std::shared_ptr<P>>& stack,
-                  const size_t handle,
-                  const std::string& calling_function_name = "Unknown")
+                        const size_t handle,
+                        const std::string& calling_function_name = "Unknown")
   {
     std::shared_ptr<P> item_type_P;
     try

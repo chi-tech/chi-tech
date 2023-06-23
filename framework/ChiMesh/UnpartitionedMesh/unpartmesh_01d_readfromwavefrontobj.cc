@@ -25,7 +25,7 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
     Chi::Exit(EXIT_FAILURE);
   }
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
   Chi::log.Log() << "Making Unpartitioned mesh from wavefront file "
                  << options.file_name;
 

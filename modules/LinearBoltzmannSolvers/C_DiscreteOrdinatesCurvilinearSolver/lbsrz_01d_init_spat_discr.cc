@@ -141,7 +141,7 @@ void DiscreteOrdinatesCurvilinearSolver::ComputeSecondaryUnitIntegrals()
     secondary_unit_cell_matrices_[cell.local_id_] =
       ComputeCellUnitIntegrals(cell, *swf_ptr);
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
   Chi::log.Log()
     << "Secondary Cell matrices computed.         Process memory = "
     << std::setprecision(3) << chi::ChiConsole::GetMemoryUsageInMB()

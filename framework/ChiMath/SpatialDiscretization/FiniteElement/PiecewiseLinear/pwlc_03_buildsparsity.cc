@@ -212,7 +212,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
 
   MPI_Alltoall(sendcount.data(), 1, MPI_INT,
                recvcount.data(), 1, MPI_INT,
-               MPI_COMM_WORLD);
+               Chi::mpi.comm);
 
   //=================================== Step 3
   // We now establish send displacements and
@@ -259,7 +259,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
                 recvcount.data(),
                 recv_displs.data(),
                 MPI_INT64_T,
-                MPI_COMM_WORLD);
+                Chi::mpi.comm);
 
   //======================================== Deserialze data
   Chi::log.Log0Verbose1() << "Deserialize data.";
@@ -302,7 +302,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
     }
   }
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
 
   //======================================== Spacing according to unknown
   //                                         manager

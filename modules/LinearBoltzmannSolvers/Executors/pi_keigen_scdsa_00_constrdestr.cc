@@ -153,7 +153,7 @@ XXPowerIterationKEigenSCDSA::XXPowerIterationKEigenSCDSA(
   //
   // chi::log.Log() << "Initializing diffusion solver";
   // diffusion_solver_->Initialize();
-  // MPI_Barrier(MPI_COMM_WORLD);
+  // Chi::mpi.Barrier();
   // chi::log.Log() << "Done Initializing diffusion solver";
   //
   // chi::log.Log() << "Assembling A and b";

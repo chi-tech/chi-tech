@@ -118,7 +118,7 @@ chi_physics::FieldFunctionGridBased::MakeGhostCommunicator()
   const std::vector<int64_t> ghost_ids = sdm_->GetGhostDOFIndices(UnkManager());
 
   return std::make_shared<chi_math::VectorGhostCommunicator>(
-    num_local_dofs, num_globl_dofs, ghost_ids, MPI_COMM_WORLD);
+    num_local_dofs, num_globl_dofs, ghost_ids, Chi::mpi.comm);
 }
 
 } // namespace chi_physics

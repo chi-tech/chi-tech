@@ -87,7 +87,7 @@ namespace chi_unit_sim_tests
                   &global_error,    //recvbuf
                   1, MPI_DOUBLE,    //count+datatype
                   MPI_SUM,          //operation
-                  MPI_COMM_WORLD);  //communicator
+                  Chi::mpi.comm);  //communicator
 
     global_error = std::sqrt(global_error);
 

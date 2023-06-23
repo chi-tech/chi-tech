@@ -170,11 +170,11 @@ void lbs::LBSSolver::ComputeUnitIntegrals()
                 num_globl_ucms.data(), //recvbuf
                 2, MPIU_SIZE_T,        //count+datatype
                 MPI_SUM,               //operation
-                MPI_COMM_WORLD);       //comm
+                Chi::mpi.comm);       //comm
 
 
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
   Chi::log.Log()
   << "Ghost cell unit cell-matrix ratio: "
   << (double)num_globl_ucms[1]*100/(double)num_globl_ucms[0]

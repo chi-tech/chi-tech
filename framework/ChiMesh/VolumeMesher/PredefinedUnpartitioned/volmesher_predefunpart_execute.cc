@@ -49,7 +49,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
                   "nullptr encountered for unparitioned mesh");
 
   Chi::log.Log() << "Computed centroids";
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
 
 
   //======================================== Apply partitioning scheme
@@ -85,7 +85,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   grid->SetGlobalVertexCount(umesh_ptr_->GetVertices().size());
 
   Chi::log.Log() << "Cells loaded.";
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
 
   SetContinuum(grid);
   SetGridAttributes(umesh_ptr_->GetMeshAttributes(),
@@ -107,7 +107,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
                 1,
                 MPI_UNSIGNED_LONG_LONG,
                 MPI_SUM,
-                MPI_COMM_WORLD);
+                Chi::mpi.comm);
 
   Chi::log.Log()
     << "VolumeMesherPredefinedUnpartitioned: Cells created = "

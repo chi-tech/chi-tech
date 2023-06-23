@@ -31,7 +31,7 @@ void chi_mesh::sweep_management::SweepScheduler::
   }
 
   //================================================== Receive delayed data
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
   bool received_delayed_data = false;
   while (not received_delayed_data)
   {
@@ -63,7 +63,7 @@ void chi_mesh::sweep_management::SweepScheduler::
   }
 
 //  //================================================== Receive delayed data
-//  MPI_Barrier(MPI_COMM_WORLD);
+//  Chi::mpi.Barrier();
 //  for (auto& sorted_angleset : rule_values)
 //  {
 //    auto angleset = sorted_angleset.angle_set;

@@ -58,7 +58,7 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
   if (!suppress_assembly)
     Chi::log.Log() << Chi::program_timer.GetTimeString() << " "
                        << TextName() << ": Done Assembling A locally";
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(Chi::mpi.comm);
 
   //=================================== Call matrix assembly
   if (verbose_info_ ||

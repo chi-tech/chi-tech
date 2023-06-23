@@ -37,7 +37,7 @@ void lbs::DiscOrdTransientSolver::Step()
     solver.Setup();
     solver.Solve();
 
-    MPI_Barrier(MPI_COMM_WORLD);
+    Chi::mpi.Barrier();
   }
 
   //======================================== Compute t^{n+1} value

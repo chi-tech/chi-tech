@@ -290,7 +290,7 @@ std::pair<size_t,size_t> chi_mesh::sweep_management::AngleAggregation::
                 1,
                 MPI_UNSIGNED_LONG_LONG,
                 MPI_SUM,
-                MPI_COMM_WORLD);
+                Chi::mpi.comm);
 
   number_angular_unknowns = {local_ang_unknowns,global_ang_unknowns};
 

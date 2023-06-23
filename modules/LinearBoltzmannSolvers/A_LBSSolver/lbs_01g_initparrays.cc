@@ -66,7 +66,7 @@ void lbs::LBSSolver::InitializeParrays()
   if (options_.read_restart_data)
     ReadRestartData(options_.read_restart_folder_name,
                     options_.read_restart_file_base);
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
 
   //================================================== Initialize transport views
   // Transport views act as a data structure to store information
@@ -179,7 +179,7 @@ void lbs::LBSSolver::InitializeParrays()
   //                                                   Field Functions
   InitializeFieldFunctions();
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
   Chi::log.Log()
     << "Done with parallel arrays.                Process memory = "
     << std::setprecision(3)

@@ -2,7 +2,7 @@
 
 int main(int argc, char** argv)
 {
-  Chi::Initialize(argc, argv);
+  Chi::Initialize(argc, argv, Chi::mpi.comm);
 
   int error_code;
   if (Chi::run_time::sim_option_interactive_)

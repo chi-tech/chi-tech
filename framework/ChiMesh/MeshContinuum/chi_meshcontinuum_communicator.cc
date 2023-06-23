@@ -47,7 +47,7 @@ std::shared_ptr<chi::ChiMPICommunicatorSet>
     //If chi::mpi.location_id == locI then this call will
     //act like a send instead of receive. Otherwise
     //It receives the count.
-    MPI_Bcast(&locI_num_connections,1,MPI_INT,locI,MPI_COMM_WORLD);
+    MPI_Bcast(&locI_num_connections,1,MPI_INT,locI,Chi::mpi.comm);
 
     if (Chi::mpi.location_id != locI)
     {global_graph[locI].resize(locI_num_connections,-1);}
@@ -69,7 +69,7 @@ std::shared_ptr<chi::ChiMPICommunicatorSet>
     //It receives the count.
     MPI_Bcast(global_graph[locI].data(),
               static_cast<int>(global_graph[locI].size()),
-              MPI_INT,locI,MPI_COMM_WORLD);
+              MPI_INT,locI,Chi::mpi.comm);
   }
 
   Chi::log.Log0Verbose1()
@@ -78,7 +78,7 @@ std::shared_ptr<chi::ChiMPICommunicatorSet>
 
   //============================================= Build groups
   MPI_Group world_group;
-  MPI_Comm_group(MPI_COMM_WORLD,&world_group);
+  MPI_Comm_group(Chi::mpi.comm,&world_group);
 
   std::vector<MPI_Group> location_groups;
   location_groups.resize(Chi::mpi.process_count, MPI_Group());
@@ -99,7 +99,7 @@ std::shared_ptr<chi::ChiMPICommunicatorSet>
 
   for (int locI=0;locI< Chi::mpi.process_count; locI++)
   {
-    int err = MPI_Comm_create_group(MPI_COMM_WORLD,
+    int err = MPI_Comm_create_group(Chi::mpi.comm,
                                     location_groups[locI],
                                     0, //tag
                                     &communicators[locI]);

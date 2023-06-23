@@ -112,5 +112,5 @@ void lbs::DiscreteOrdinatesSolver::
       << " MB.";
 
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
 }
