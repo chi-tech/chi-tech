@@ -126,6 +126,7 @@ EXCLUDE_PATTERNS       = "*.py"
 EXCLUDE_PATTERNS      += */lua/*
 EXCLUDE_SYMBOLS        =
 EXAMPLE_PATH           = "doc/PAGES" "doc/generated_files/input_docs"
+EXAMPLE_PATH          += "test/example"
 EXAMPLE_PATTERNS       =
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             = "doc/HTMLimages"

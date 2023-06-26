@@ -490,7 +490,7 @@ run_test(
     search_strings_vals_tols=[["[0]  Max-value=", 1.000244, 1.0e-10]])
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-#                             CFEM Diffusion Tests
+#                             DFEM Diffusion Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 # Tests 24 - 28
 
@@ -813,7 +813,6 @@ run_test(
     comment="1D KSolver LinearBSolver Test - PWLD",
     num_procs=4,
     search_strings_vals_tols=[
-        # ["[0]          Final k-eigenvalue    :", 0.99954, 1.0e-5],
         ["NumCompare", "Final k-eigenvalue", 3, "float", 0.9995301, 1.0e-5]])
 
 run_test(
