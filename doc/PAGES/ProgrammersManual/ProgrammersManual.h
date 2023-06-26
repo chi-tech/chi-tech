@@ -7,6 +7,7 @@
 -# \subpage DevManGlobalVars \n
 -# \subpage DevManAddingLua \n
 -# \subpage DevManStaticRegistration \n
+-# \subpage DevManTestSystem \n
 
 ##--
 

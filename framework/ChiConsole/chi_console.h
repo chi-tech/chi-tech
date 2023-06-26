@@ -154,6 +154,9 @@ public:
                                            const std::string& function_name,
                                            bool self_callable = false);
 
+  /**\brief A default function for returning empty input parameters. */
+  static InputParameters DefaultGetInParamsFunc();
+
   /**\brief Adds a function wrapper to the lua registry.*/
   static char AddWrapperToRegistryInNamespaceWithName(
     const std::string& namespace_name,

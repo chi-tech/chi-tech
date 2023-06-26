@@ -46,6 +46,8 @@ resources/\.DS_Store
 ._.DS_Store
 *.pyc
 *.pmesh
+__pycache__
+**/__pycache__
 
 *-private.sh
 
@@ -60,6 +62,8 @@ doc/generated_files
 
 #Unit test outputs
 ChiTech/UnitTests/Output
+
+test/**/out/
 
 #Scratch directory
 scratch/

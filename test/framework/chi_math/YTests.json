@@ -1,0 +1,18 @@
+[
+  {
+    "file" : "chi_math_test_00.lua", "num_procs" : 1, "checks" :
+    [
+      {
+        "type" : "GoldFile"
+      }
+    ]
+  },
+  {
+    "file" : "chi_math_test_01_wdd_ijk_sweep.lua", "num_procs" : 1, "checks" :
+    [
+      {
+        "type" : "GoldFile"
+      }
+    ]
+  }
+]

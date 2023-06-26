@@ -127,14 +127,20 @@ char chi_objects::ChiConsole::AddFunctionToRegistryInNamespaceWithName(
 }
 
 // ###################################################################
+chi_objects::InputParameters chi_objects::ChiConsole::DefaultGetInParamsFunc()
+{
+  return InputParameters();
+}
+
+// ###################################################################
 /**Wrapper functions operate with input and output parameters, essentially
-* hiding the lua interface.*/
+ * hiding the lua interface.*/
 char chi_objects::ChiConsole::AddWrapperToRegistryInNamespaceWithName(
   const std::string& namespace_name,
   const std::string& name_in_lua,
   WrapperGetInParamsFunc syntax_function,
   WrapperCallFunc actual_function,
-  bool ignore_null_call_func/*=false*/)
+  bool ignore_null_call_func /*=false*/)
 {
   const std::string name = (namespace_name.empty())
                              ? name_in_lua
@@ -148,7 +154,8 @@ char chi_objects::ChiConsole::AddWrapperToRegistryInNamespaceWithName(
     std::string("Attempted to register lua-function wrapper \"") + name +
       "\" but a wrapper with the same name already exists");
 
-  ChiLogicalErrorIf(not syntax_function, "Problem with get_in_params_func");
+  if (not syntax_function)
+    syntax_function = DefaultGetInParamsFunc;
 
   if (not ignore_null_call_func)
     ChiLogicalErrorIf(not actual_function, "Problem with get_in_params_func");
@@ -350,7 +357,7 @@ void chi_objects::ChiConsole::SetObjectMethodsToTable(
 
 // ##################################################################
 /**Makes a formatted output, readible by the documentation scripts,
-* of all the lua wrapper functions.*/
+ * of all the lua wrapper functions.*/
 void chi_objects::ChiConsole::DumpRegister() const
 {
   chi::log.Log() << "\n\n";
@@ -364,8 +371,7 @@ void chi_objects::ChiConsole::DumpRegister() const
 
     chi::log.Log() << "LUA_FUNCWRAPPER_BEGIN " << key;
 
-    if (not entry.call_func)
-      chi::log.Log() << "SYNTAX_BLOCK";
+    if (not entry.call_func) chi::log.Log() << "SYNTAX_BLOCK";
 
     const auto in_params = entry.get_in_params_func();
     in_params.DumpParameters();
