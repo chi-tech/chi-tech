@@ -14,10 +14,8 @@ chi::InputParameters ThetaSchemeTimeIntegration::GetInputParameters()
   chi::InputParameters params = TimeIntegration::GetInputParameters();
 
   // clang-format off
-  params.SetGeneralDescription(
-  "\\defgroup chi_math__ThetaSchemeTimeIntegration "
-  " chi_math.ThetaSchemeTimeIntegration\n"
-  "\\ingroup DocTimeIntegrations");
+  params.SetGeneralDescription("Generalized theta-scheme");
+  params.SetDocGroup("DocTimeIntegrations");
   // clang-format on
 
   params.ChangeExistingParamToOptional("method",

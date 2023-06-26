@@ -17,9 +17,6 @@ typedef std::shared_ptr<MeshHandler> MeshHandlerPtr;
 class SurfaceMesh;
 typedef std::shared_ptr<SurfaceMesh> SurfaceMeshPtr;
 
-class LogicalVolume;
-typedef std::shared_ptr<LogicalVolume> LogicalVolumePtr;
-
 class FieldFunctionInterpolation;
 typedef FieldFunctionInterpolation FFInterp;
 typedef std::shared_ptr<FFInterp> FFInterpPtr;
@@ -43,11 +40,9 @@ typedef std::shared_ptr<FieldFunction> FieldFunctionPtr;
 
 namespace chi_math
 {
-class Quadrature;
 class AngularQuadrature;
 class SpatialDiscretization;
 
-typedef std::shared_ptr<Quadrature> QuadraturePtr;
 typedef std::shared_ptr<AngularQuadrature> AngularQuadraturePtr;
 typedef std::shared_ptr<SpatialDiscretization> SpatialDiscretizationPtr;
 
@@ -86,7 +81,6 @@ public:
   static std::vector<chi_physics::MultiGroupXSPtr> multigroup_xs_stack;
   static std::vector<chi_physics::FieldFunctionPtr> field_function_stack;
 
-  static std::vector<chi_math::QuadraturePtr> quadrature_stack;
   static std::vector<chi_math::AngularQuadraturePtr> angular_quadrature_stack;
 
   static std::vector<ChiObjectPtr> object_stack;

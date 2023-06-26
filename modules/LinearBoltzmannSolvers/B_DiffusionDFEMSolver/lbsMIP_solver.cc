@@ -17,9 +17,8 @@ chi::InputParameters DiffusionDFEMSolver::GetInputParameters()
 {
   chi::InputParameters params = LBSSolver::GetInputParameters();
 
-  params.SetGeneralDescription(
-    "\\defgroup lbs__DiffusionDFEMSolver DiffusionDFEMSolver\n"
-    "\\ingroup lbs__LBSSolver");
+  params.SetClassName("DiffusionDFEMSolver");
+  params.SetDocGroup("lbs__LBSSolver");
 
   params.ChangeExistingParamToOptional("name", "LBSDiffusionDFEMSolver");
 

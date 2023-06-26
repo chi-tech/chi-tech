@@ -14,10 +14,8 @@ chi::InputParameters LBSSolver::OptionsBlock()
 {
   chi::InputParameters params;
 
-  params.SetGeneralDescription(
-    "\\defgroup lbs__OptionsBlock lbs.OptionsBlock \n"
-    "\\ingroup LBSUtilities\n"
-    "Set options from a large list of parameters");
+  params.SetGeneralDescription("Set options from a large list of parameters");
+  params.SetDocGroup("LBSUtilities");
 
   // clang-format off
   params.AddOptionalParameter("spatial_discretization", "pwld",
@@ -95,8 +93,9 @@ chi::InputParameters LBSSolver::OptionsBlock()
   "added automatically.");
   params.AddOptionalParameterArray("boundary_conditions",
   {},
-  "A table contain sub-tables for each boundary specification. "
-  "$(lbs::BoundaryOptionsBlock$)");
+  "A table contain sub-tables for each boundary specification.");
+  params.LinkParameterToBlock("boundary_conditions",
+                              "lbs::BoundaryOptionsBlock");
 
   using namespace chi_data_types;
   params.ConstrainParameterRange("spatial_discretization",
@@ -120,9 +119,8 @@ chi::InputParameters LBSSolver::BoundaryOptionsBlock()
 
   // clang-format off
   params.SetGeneralDescription(
-    "\\defgroup lbs__BoundaryOptionsBlock lbs.BoundaryOptionsBlock \n"
-    "\\ingroup LBSUtilities\n"
     "Set options for boundary conditions. See \\ref LBSBCs");
+  params.SetDocGroup("LBSUtilities");
 
   params.AddRequiredParameter<std::string>("name",
   "Boundary name that identifies the specific boundary");

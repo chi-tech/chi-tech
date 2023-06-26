@@ -11,11 +11,7 @@ chi::InputParameters RPPLogicalVolume::GetInputParameters()
 {
   chi::InputParameters params = LogicalVolume::GetInputParameters();
 
-  // clang-format off
-  params.SetGeneralDescription(
-  "\\defgroup chi_mesh__RPPLogicalVolume RPPLogicalVolume\n"
-  "\\ingroup LuaLogicVolumes");
-  // clang-format on
+  params.SetDocGroup("LuaLogicVolumes");
 
   params.AddOptionalParameter("xmin", 0.0, "X-min of the volume");
   params.AddOptionalParameter("xmax", 1.0, "X-max of the volume");

@@ -34,6 +34,26 @@ void InputParameters::SetObjectType(const std::string& obj_type)
 std::string InputParameters::ObjectType() const { return class_name_; }
 
 // #################################################################
+/**Sets a link to the documentation of a different object.*/
+void InputParameters::LinkParameterToBlock(const std::string& param_name,
+                                           const std::string& block_name)
+{
+  ChiInvalidArgumentIf(not this->Has(param_name),
+                       "Parameter \"" + param_name + "\" not present in block");
+  parameter_link_[param_name] = block_name;
+}
+
+// #################################################################
+/**Gets any linkage information of a parameter.*/
+std::string InputParameters::GetParameterDocumentationLink(
+  const std::string& param_name) const
+{
+  if (parameter_link_.count(param_name) > 0)
+    return parameter_link_.at(param_name);
+  return {};
+}
+
+// #################################################################
 /**Returns the parameter's doc string.*/
 std::string
 InputParameters::GetParameterDocString(const std::string& param_name)
@@ -324,14 +344,18 @@ void InputParameters::SetParameterTypeMismatchAllowed(
 /**Dumps the input parameters to stdout.*/
 void InputParameters::DumpParameters() const
 {
+  Chi::log.Log() << "CLASS_NAME " << class_name_;
 
   Chi::log.Log() << "DESCRIPTION_BEGIN";
   std::cout << GetGeneralDescription() << "\n";
   Chi::log.Log() << "DESCRIPTION_END\n";
 
+  Chi::log.Log() << "DOC_GROUP " << doc_group_;
+
   const std::string sp2 = "  ";
   const std::string sp4 = "    ";
-  for (const auto& param : Parameters())
+  const auto params = Parameters();
+  for (const auto& param : params)
   {
     const auto& param_name = param.Name();
     Chi::log.Log() << sp2 << "PARAM_BEGIN " << param_name;
@@ -367,13 +391,19 @@ void InputParameters::DumpParameters() const
 
     if (parameter_doc_string_.count(param_name) != 0)
     {
-      Chi::log.Log() << "DOC_STRING_BEGIN";
+      Chi::log.Log() << sp4 << "DOC_STRING_BEGIN";
       std::cout << parameter_doc_string_.at(param_name) << "\n";
-      Chi::log.Log() << "DOC_STRING_END";
+      Chi::log.Log() << sp4 << "DOC_STRING_END";
+    }
+
+    const auto& linkage = GetParameterDocumentationLink(param_name);
+    if (not linkage.empty())
+    {
+      Chi::log.Log() << sp4 << "LINKS " << linkage;
     }
 
     Chi::log.Log() << sp2 << "PARAM_END";
   }
 }
 
-} // namespace chi_objects
+} // namespace chi

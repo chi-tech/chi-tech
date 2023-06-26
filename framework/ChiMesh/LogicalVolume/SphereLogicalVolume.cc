@@ -11,11 +11,7 @@ chi::InputParameters SphereLogicalVolume::GetInputParameters()
 {
   chi::InputParameters params = ChiObject::GetInputParameters();
 
-  // clang-format off
-  params.SetGeneralDescription(
-  "\\defgroup chi_mesh__SphereLogicalVolume SphereLogicalVolume\n"
-  "\\ingroup LuaLogicVolumes");
-  // clang-format on
+  params.SetDocGroup("LuaLogicVolumes");
 
   params.AddOptionalParameter("r", 1.0, "Radius of the sphere.");
   params.AddOptionalParameter("x", 0.0, "X-location of the volume.");

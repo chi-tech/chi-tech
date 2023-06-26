@@ -15,10 +15,10 @@ DiscreteOrdinatesAdjointSolver::GetInputParameters()
   chi::InputParameters params =
     DiscreteOrdinatesSolver::GetInputParameters();
 
-  params.SetGeneralDescription("\\defgroup lbs__DiscreteOrdinatesAdjointSolver "
-                               "DiscreteOrdinatesAdjointSolver\n"
-                               "\\ingroup lbs__LBSSolver\n"
-                               "Adjoint capability");
+  params.SetGeneralDescription("Adjoint capability");
+
+  params.SetClassName("DiscreteOrdinatesAdjointSolver");
+  params.SetDocGroup("lbs__LBSSolver");
 
   params.ChangeExistingParamToOptional("name",
                                        "DiscreteOrdinatesAdjointSolver");

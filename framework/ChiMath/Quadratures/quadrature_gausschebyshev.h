@@ -1,28 +1,27 @@
-#ifndef QUADRATURE_GAUSS_CHEBYSHEV_H
-#define QUADRATURE_GAUSS_CHEBYSHEV_H
+#ifndef CHI_MATH_QUADRATURE_GAUSS_CHEBYSHEV_H
+#define CHI_MATH_QUADRATURE_GAUSS_CHEBYSHEV_H
 
 #include "quadrature.h"
 
 namespace chi_math
 {
-  class QuadratureGaussChebyshev;
-}
+
 
 //######################################################### Class Def
 /**Gauss-Chebyshev quadrature.*/
-class chi_math::QuadratureGaussChebyshev : public chi_math::Quadrature
+class QuadratureGaussChebyshev : public chi_math::Quadrature
 {
 public:
-  explicit
-  QuadratureGaussChebyshev(QuadratureOrder in_order,
-                           bool verbose=false);
+  static chi::InputParameters GetInputParameters();
+  explicit QuadratureGaussChebyshev(const chi::InputParameters& params);
 
   explicit
   QuadratureGaussChebyshev(unsigned int N,
                            bool verbose=false);
 
 private:
-  void Initialize(unsigned int N, bool verbose);
+  void Initialize(unsigned int N);
 };
 
-#endif
+}
+#endif // CHI_MATH_QUADRATURE_GAUSS_CHEBYSHEV_H

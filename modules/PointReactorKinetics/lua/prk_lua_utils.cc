@@ -99,10 +99,9 @@ chi::InputParameters GetSyntax_SetParam()
   chi::InputParameters params;
 
   params.SetGeneralDescription(
-    "\\defgroup prk__SetParam prk.SetParam \n"
-    "\\ingroup prk\n"
     "Lua wrapper function for setting parameters in the PointReactorKinetics"
     " module.");
+  params.SetDocGroup("prk");
 
   params.AddRequiredParameter<size_t>(
     "arg0", "Handle to a <TT>prk::TransientSolver</TT> object.");
@@ -153,10 +152,9 @@ chi::InputParameters GetParamSyntax()
   chi::InputParameters params;
 
   params.SetGeneralDescription(
-    "\\defgroup prk__GetParam prk.GetParam \n"
-    "\\ingroup prk\n"
     "Lua wrapper function for getting parameters from the PointReactorKinetics"
     " module.");
+  params.SetDocGroup("prk");
 
   params.AddRequiredParameter<size_t>(
     "arg0", "Handle to a <TT>prk::TransientSolver</TT> object.");

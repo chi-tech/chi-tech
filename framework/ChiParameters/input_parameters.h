@@ -22,7 +22,11 @@ enum class InputParameterTag
 class InputParameters : public ParameterBlock
 {
 private:
+  /**String to represent class name. If not provided a default will be
+   * generated.*/
   std::string class_name_;
+  /**Space separated list of group names.*/
+  std::string doc_group_;
   std::map<std::string, InputParameterTag> parameter_class_tags_;
   std::map<std::string, std::string> parameter_doc_string_;
 
@@ -30,6 +34,7 @@ private:
   std::map<std::string, std::string> deprecation_error_tags_;
   std::map<std::string, std::string> renamed_error_tags_;
   std::map<std::string, bool> type_mismatch_allowed_tags_;
+  std::map<std::string, std::string> parameter_link_;
 
   typedef std::unique_ptr<chi_data_types::AllowableRange> AllowableRangePtr;
   std::map<std::string, AllowableRangePtr> constraint_tags_;
@@ -57,11 +62,28 @@ public:
   void SetObjectType(const std::string& obj_type);
   std::string ObjectType() const;
 
+  /**Sets the class name to be applied to this object. If not used a
+   * default will be generated.*/
+  void SetClassName(const std::string& class_name) { class_name_ = class_name; }
+
+  /**Sets a general description of the object that should be included with
+   * the object's documentation.*/
   void SetGeneralDescription(const std::string& description)
   {
     general_description_ = description;
   }
   std::string GetGeneralDescription() const { return general_description_; }
+
+  /**Space separated list of doxygen group names to which this documentation
+   * should belong.*/
+  void SetDocGroup(const std::string& doc_group) { doc_group_ = doc_group; }
+
+  /**Sets a link to the documentation of a different object.*/
+  void LinkParameterToBlock(const std::string& param_name,
+                            const std::string& block_name);
+  /**Gets any linkage information of a parameter.*/
+  std::string
+  GetParameterDocumentationLink(const std::string& param_name) const;
 
   std::string GetParameterDocString(const std::string& param_name);
 
@@ -164,6 +186,6 @@ public:
   void DumpParameters() const;
 };
 
-} // namespace chi_objects
+} // namespace chi
 
 #endif // CHITECH_INPUT_PARAMETERS_H

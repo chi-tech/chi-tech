@@ -38,7 +38,6 @@ std::vector<chi_physics::MaterialPtr> Chi::material_stack;
 std::vector<chi_physics::MultiGroupXSPtr> Chi::multigroup_xs_stack;
 std::vector<chi_physics::FieldFunctionPtr> Chi::field_function_stack;
 
-std::vector<chi_math::QuadraturePtr> Chi::quadrature_stack;
 std::vector<chi_math::AngularQuadraturePtr> Chi::angular_quadrature_stack;
 
 std::vector<ChiObjectPtr> Chi::object_stack;

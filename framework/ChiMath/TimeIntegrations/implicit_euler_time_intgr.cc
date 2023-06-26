@@ -15,10 +15,8 @@ chi::InputParameters ImplicitEulerTimeIntegration::GetInputParameters()
     ThetaSchemeTimeIntegration::GetInputParameters();
 
   // clang-format off
-  params.SetGeneralDescription(
-  "\\defgroup chi_math__ImplicitEulerTimeIntegration "
-  " chi_math.ImplicitEulerTimeIntegration\n"
-  "\\ingroup DocTimeIntegrations");
+  params.SetGeneralDescription("General implicit Euler Time Integration");
+  params.SetDocGroup("DocTimeIntegrations");
   // clang-format on
 
   params.ChangeExistingParamToOptional("method",

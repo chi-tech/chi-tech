@@ -15,10 +15,8 @@ chi::InputParameters CrankNicolsonTimeIntegration::GetInputParameters()
     ThetaSchemeTimeIntegration::GetInputParameters();
 
   // clang-format off
-  params.SetGeneralDescription(
-  "\\defgroup chi_math__CrankNicolsonTimeIntegration "
-  " chi_math.CrankNicolsonTimeIntegration\n"
-  "\\ingroup DocTimeIntegrations");
+  params.SetGeneralDescription("General Crank-Nicolson Time Integration");
+  params.SetDocGroup("DocTimeIntegrations");
   // clang-format on
 
   params.ChangeExistingParamToOptional("method",

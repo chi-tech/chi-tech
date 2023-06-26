@@ -15,14 +15,9 @@ RegisterChiObject(prk, TransientSolver);
 /**Sets input parameters.*/
 chi::InputParameters TransientSolver::GetInputParameters()
 {
-  chi::InputParameters params =
-    chi_physics::Solver::GetInputParameters();
+  chi::InputParameters params = chi_physics::Solver::GetInputParameters();
 
-  // clang-format off
-  params.SetGeneralDescription(
-  "\\defgroup prk__TransientSolver prk.TransientSolver\n"
-  "\\ingorup prk");
-  // clang-format on
+  params.SetDocGroup("prk");
 
   params.ChangeExistingParamToOptional("name", "prk_TransientSolver");
 

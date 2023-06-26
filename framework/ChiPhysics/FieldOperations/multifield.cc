@@ -16,12 +16,7 @@ chi::InputParameters MultiFieldOperation::GetInputParameters()
 {
   chi::InputParameters params = FieldOperation::GetInputParameters();
 
-  // clang-format off
-  params.SetGeneralDescription(
-  "\\defgroup chi_physics__field_operations__MultiFieldOperation "
-  " chi_physics.field_operations.MultiFieldOperation\n"
-  "\\ingroup DocFieldOperation");
-  // clang-format on
+  params.SetDocGroup("DocFieldOperation");
 
   params.AddRequiredParameter<size_t>(
     "result_field_handle",

@@ -19,9 +19,8 @@ chi::InputParameters MeshModifiersApply_Syntax()
   chi::InputParameters params;
 
   params.SetGeneralDescription(
-    "\\defgroup chi_mesh__MeshModifiersApply chi_mesh.MeshModifiersApply \n"
-    "\\ingroup DocMeshModifiers\n"
     "Lua wrapper function for applying mesh modifiers");
+  params.SetDocGroup("DocMeshModifiers");
 
   params.AddRequiredParameterArray(
     "arg0", "A list of handles to the modifiers to apply.");

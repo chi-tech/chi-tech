@@ -13,6 +13,8 @@ namespace chi_math
 class chi_math::QuadratureGaussLegendre : public chi_math::Quadrature
 {
 public:
+  static chi::InputParameters GetInputParameters();
+  explicit QuadratureGaussLegendre(const chi::InputParameters& params);
   explicit
   QuadratureGaussLegendre(QuadratureOrder in_order,
                           bool verbose=false,

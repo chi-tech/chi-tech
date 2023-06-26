@@ -13,16 +13,13 @@ RegisterChiObject(chi_math::functions, LuaDimAToDimB);
 
 chi::InputParameters LuaDimAToDimB::GetInputParameters()
 {
-  chi::InputParameters params =
-    FunctionDimAToDimB::GetInputParameters();
+  chi::InputParameters params = FunctionDimAToDimB::GetInputParameters();
 
   // Inherits input_dimension and output_dimension
 
   // clang-format off
-  params.SetGeneralDescription(
-  "\\defgroup chi_math__functions__LuaDimAToDimB "
-  " chi_math.functions.LuaDimAToDimB\n"
-  "\\ingroup DocMathFunctions");
+  params.SetGeneralDescription("Lua based parsed function");
+  params.SetDocGroup("DocMathFunctions");
   // clang-format on
 
   params.AddRequiredParameter<std::string>("lua_function_name",

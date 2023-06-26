@@ -1,12 +1,14 @@
-#ifndef QUADRATURE_H
-#define QUADRATURE_H
+#ifndef CHI_MATH_QUADRATURE_H
+#define CHI_MATH_QUADRATURE_H
 
+#include "ChiObject/chi_object.h"
 #include "ChiMesh/chi_mesh.h"
 
 #include <vector>
 
 namespace chi_math
 {
+// clang-format off
   enum class QuadratureOrder : int {
     CONSTANT = 0, FIRST = 1, SECOND = 2, THIRD = 3,
     FOURTH = 4, FIFTH = 5, SIXTH = 6, SEVENTH = 7,
@@ -21,32 +23,39 @@ namespace chi_math
     FORTIETH = 40, FORTYFIRST = 41, FORTYSECOND = 42, FORTYTHIRD = 43,
     INVALID_ORDER
   };
-  typedef chi_mesh::Vector3 QuadraturePointXYZ;
-  class Quadrature;
-}
+// clang-format on
+typedef chi_mesh::Vector3 QuadraturePointXYZ;
+class Quadrature;
+} // namespace chi_math
 
-//######################################################### Class def
+// ######################################################### Class def
 /**Parent class for quadratures.*/
-class chi_math::Quadrature
+class chi_math::Quadrature : public ChiObject
 {
 public:
-  const QuadratureOrder order_;
+  QuadratureOrder order_;
   std::vector<chi_math::QuadraturePointXYZ> qpoints_;
   std::vector<double> weights_;
+
+  static chi::InputParameters GetInputParameters();
+
 protected:
   /**Interval on which the quadrature is defined
    * (relevant for one-dimensional quadratures only).*/
   std::pair<double, double> range_;
+  bool verbose_ = false;
 
 protected:
-  explicit
-  Quadrature(QuadratureOrder in_order) : order_(in_order), range_({0, 0}) {}
+  explicit Quadrature(const chi::InputParameters& params);
+  explicit Quadrature(QuadratureOrder in_order)
+    : order_(in_order), range_({0, 0})
+  {
+  }
 
 public:
   /**Get the range on which the quadrature is defined
    * (relevant for one-dimensional quadratures only).*/
-  const std::pair<double, double>& GetRange() const
-  { return range_; }
+  const std::pair<double, double>& GetRange() const { return range_; }
   /**Set the range on which the quadrature is defined.
    * (relevant for one-dimensional quadratures only).
    * Note that calling this method results in translation
@@ -54,4 +63,4 @@ public:
   void SetRange(const std::pair<double, double>& in_range);
 };
 
-#endif
+#endif // CHI_MATH_QUADRATURE_H

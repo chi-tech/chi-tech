@@ -23,10 +23,8 @@ chi::InputParameters lbs::LBSGroupset::GetInputParameters()
   chi::InputParameters params = ChiObject::GetInputParameters();
 
   // clang-format off
-  params.SetGeneralDescription(
-    "\\defgroup lbs__LBSGroupset Groupset Input Parameters\n"
-    "\\ingroup LuaLBSGroupsets\n"
-    "Input Parameters for groupsets.");
+  params.SetGeneralDescription("Input Parameters for groupsets.");
+  params.SetDocGroup("LuaLBSGroupsets");
 
   params.AddRequiredParameterArray(
     "groups_from_to", "The first and last group id this groupset operates on."

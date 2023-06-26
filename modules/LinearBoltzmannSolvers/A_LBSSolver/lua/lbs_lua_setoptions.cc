@@ -20,14 +20,14 @@ chi::InputParameters GetSyntax_SetOptions()
   chi::InputParameters params;
 
   // clang-format off
-  params.SetGeneralDescription("\\defgroup lbs__SetOptions lbs.SetOptions \n"
-                               "\\ingroup LBSLuaFunctions\n"
-                               "Set options from a large list of parameters");
+  params.SetGeneralDescription("Set options from a large list of parameters");
+  params.SetDocGroup("LBSLuaFunctions");
 
   params.AddRequiredParameter<size_t>(
     "arg0", "Handle to a <TT>lbs::LBSSolver</TT> object.");
   params.AddRequiredParameterBlock(
-    "arg1", "Block of parameters $(lbs::OptionsBlock$)");
+    "arg1", "Block of parameters for <TT>lbs::OptionsBlock</TT>");
+  params.LinkParameterToBlock("arg1", "lbs::OptionsBlock");
 
   // clang-format on
 

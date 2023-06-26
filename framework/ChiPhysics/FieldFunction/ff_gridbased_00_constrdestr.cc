@@ -16,12 +16,7 @@ chi::InputParameters FieldFunctionGridBased::GetInputParameters()
 {
   chi::InputParameters params = FieldFunction::GetInputParameters();
 
-  // clang-format off
-  params.SetGeneralDescription(
-  "\\defgroup chi_physics__FieldFunctionGridBased "
-  " chi_physics.FieldFunctionGridBased\n"
-  "\\ingroup DocFieldFunction");
-  // clang-format on
+  params.SetDocGroup("DocFieldFunction");
 
   params.AddRequiredParameter<std::string>(
     "sdm_type", "The spatial discretization type to be used");

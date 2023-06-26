@@ -11,11 +11,7 @@ chi::InputParameters RCCLogicalVolume::GetInputParameters()
 {
   chi::InputParameters params = LogicalVolume::GetInputParameters();
 
-  // clang-format off
-  params.SetGeneralDescription(
-  "\\defgroup chi_mesh__RCCLogicalVolume RCCLogicalVolume\n"
-  "\\ingroup LuaLogicVolumes");
-  // clang-format on
+  params.SetDocGroup("LuaLogicVolumes");
 
   params.AddOptionalParameter("r", 1.0, "Radius of the sphere.");
   params.AddOptionalParameter("x0", 0.0, "X-coordinate of the volume base");

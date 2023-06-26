@@ -9,14 +9,11 @@ RegisterChiObject(chi_math::functions, PiecewiseLinear1D);
 
 chi::InputParameters PiecewiseLinear1D::GetInputParameters()
 {
-  chi::InputParameters params =
-    FunctionDimAToDimB::GetInputParameters();
+  chi::InputParameters params = FunctionDimAToDimB::GetInputParameters();
 
   // clang-format off
-  params.SetGeneralDescription(
-  "\\defgroup chi_math__functions__PiecewiseLinear1D "
-  " chi_math.functions.PiecewiseLinear1D\n"
-  "\\ingroup DocMathFunctions");
+  params.SetGeneralDescription("Piecewise linear function");
+  params.SetDocGroup("DocMathFunctions");
   // clang-format on
 
   params.AddRequiredParameterArray(

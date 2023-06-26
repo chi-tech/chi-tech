@@ -15,10 +15,9 @@ chi::InputParameters SteadyStateSolver::GetInputParameters()
     chi_physics::Solver::GetInputParameters();
 
   params.SetGeneralDescription(
-    "\\defgroup lbs__SteadyStateSolver lbs.SteadyStateSolver \n"
-    "\\ingroup LBSExecutors\n"
     "Generalized implementation of a steady state solver. This solver calls"
     " the Across-Groupset (AGS) solver for the lbs-data block.");
+  params.SetDocGroup("LBSExecutors");
 
   params.ChangeExistingParamToOptional("name", "SteadyStateSolver");
 

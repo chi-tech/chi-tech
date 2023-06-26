@@ -19,12 +19,10 @@ chi::InputParameters SnapToPlaneMeshModifier::GetInputParameters()
   chi::InputParameters params = ChiObject::GetInputParameters();
 
   params.SetGeneralDescription(
-    "\\defgroup chi_mesh__SnapToPlaneMeshModifier "
-    "chi_mesh.SnapToPlaneMeshModifier\n"
-    "\\ingroup DocMeshModifiers\n"
     "Modifier that will snap nodes, that are within a tolerated distance of a "
     "plane, to the plane. This modifier is useful for straitening a boundary "
     "edge or aligning vertices that misaligned during meshing.");
+  params.SetDocGroup("DocMeshModifiers");
 
   params.AddRequiredParameterArray(
     "normal", "The normal of the plane to which the nodes are to be snapped.");

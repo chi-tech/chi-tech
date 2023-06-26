@@ -17,16 +17,16 @@ chi::InputParameters BooleanLogicalVolume::GetInputParameters()
   chi::InputParameters params = LogicalVolume::GetInputParameters();
 
   // clang-format off
-  params.SetGeneralDescription(
-  "\\defgroup chi_mesh__BooleanLogicalVolume BooleanLogicalVolume\n"
-  "\\ingroup LuaLogicVolumes\n");
+  params.SetDocGroup("LuaLogicVolumes\n");
   // clang-format on
 
   params.AddRequiredParameterArray(
     "parts",
     "Array of combinatorial logic each entry has the following required params "
-    "<TT>chi_mesh::BooleanLogicalVolumeArgumentPair</TT>"
-    "$(chi_mesh::BooleanLogicalVolumeArgumentPair$)");
+    "<TT>chi_mesh::BooleanLogicalVolumeArgumentPair</TT>");
+
+  params.LinkParameterToBlock("parts",
+                              "chi_mesh::BooleanLogicalVolumeArgumentPair");
 
   return params;
 }
@@ -59,11 +59,7 @@ chi::InputParameters BooleanLogicalVolumeArgumentPair()
 {
   chi::InputParameters params;
 
-  // clang-format off
-  params.SetGeneralDescription(
-  "\\defgroup chi_mesh__BooleanLogicalVolumeArgumentPair chi_mesh.BooleanLogicalVolumeArgumentPair\n"
-  "\\ingroup chi_mesh__BooleanLogicalVolume");
-  // clang-format on
+  params.SetDocGroup("chi_mesh__BooleanLogicalVolume");
 
   params.AddRequiredParameter<bool>(
     "op",

@@ -30,11 +30,12 @@ chi::InputParameters LBSSolver::GetInputParameters()
   params.AddRequiredParameterArray(
     "groupsets",
     "An array of blocks each specifying the input parameters for a "
-    "<TT>lbs::LBSGroupset</TT>."
-    "$(lbs::LBSGroupset$)");
+    "<TT>lbs::LBSGroupset</TT>.");
+  params.LinkParameterToBlock("groupsets", "lbs::LBSGroupset");
 
   params.AddOptionalParameterBlock("options", chi::ParameterBlock(),
-    "Block of options. See <TT>lbs::OptionsBlock</TT>. $(lbs::OptionsBlock$)");
+    "Block of options. See <TT>lbs::OptionsBlock</TT>.");
+  params.LinkParameterToBlock("options", "lbs::OptionsBlock");
   // clang-format on
 
   return params;

@@ -1,14 +1,12 @@
 #include "ChiLua/chi_lua.h"
 
 #include "chi_runtime.h"
-
-#include "ChiMath/chi_math.h"
-#include "../quadrature_gausslegendre.h"
-#include "../quadrature_gausschebyshev.h"
-
 #include "chi_log.h"
 
-//########################################################## Create empty system
+#include "ChiObject/object_maker.h"
+
+// ########################################################## Create empty
+// system
 /** Creates a quadrature.
  *
 \param QuadratureType int Quadrature identifier.
@@ -25,40 +23,47 @@
 
 \ingroup LuaQuadrature
 \author Jan*/
-int chiCreateLineQuadrature(lua_State *L)
+int chiCreateLineQuadrature(lua_State* L)
 {
   const std::string fname = __FUNCTION__;
   const int num_args = lua_gettop(L);
 
-  if (not ((num_args == 2) or (num_args == 3)))
-    LuaPostArgAmountError(fname,2,num_args);
+  if (not((num_args == 2) or (num_args == 3)))
+    LuaPostArgAmountError(fname, 2, num_args);
 
-  LuaCheckNilValue(fname,L,1);
-  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname, L, 1);
+  LuaCheckNilValue(fname, L, 2);
 
   //============================================= Parse argument
-  int ident = lua_tonumber(L,1);
-  int N = lua_tonumber(L,2);
+  int ident = lua_tonumber(L, 1);
+  int N = lua_tonumber(L, 2);
   bool verbose = false;
-  if (num_args == 3)
-    verbose = lua_toboolean(L,3);
+  if (num_args == 3) verbose = lua_toboolean(L, 3);
 
-  if (ident == 1) //GAUSS_LEGENDRE
+  chi::ParameterBlock params;
+  params.AddParameter("verbose", verbose);
+  params.AddParameter("N", N);
+
+  auto& obj_factory = ChiObjectMaker::GetInstance();
+
+  if (ident == 1) // GAUSS_LEGENDRE
   {
     Chi::log.Log() << "Creating Gauss-Legendre Quadrature\n";
-    auto new_quad = std::make_shared<chi_math::QuadratureGaussLegendre>(N, verbose);
-    Chi::quadrature_stack.push_back(new_quad);
-    int index = (int)Chi::quadrature_stack.size()-1;
-    lua_pushnumber(L,index);
+
+    const size_t handle = obj_factory.MakeRegisteredObjectOfType(
+      "chi_math::QuadratureGaussLegendre", params);
+
+    lua_pushinteger(L, static_cast<lua_Integer>(handle));
     return 1;
   }
-  else if (ident == 2) //GAUSS_CHEBYSHEV
+  else if (ident == 2) // GAUSS_CHEBYSHEV
   {
     Chi::log.Log() << "Creating Gauss-Chebyshev Quadrature\n";
-    auto new_quad = std::make_shared<chi_math::QuadratureGaussChebyshev>(N, verbose);
-    Chi::quadrature_stack.push_back(new_quad);
-    int index = (int)Chi::quadrature_stack.size()-1;
-    lua_pushnumber(L,index);
+
+    const size_t handle = obj_factory.MakeRegisteredObjectOfType(
+      "chi_math::QuadratureGaussChebyshev", params);
+
+    lua_pushinteger(L, static_cast<lua_Integer>(handle));
     return 1;
   }
   return 0;

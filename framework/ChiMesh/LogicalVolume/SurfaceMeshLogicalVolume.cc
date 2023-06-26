@@ -17,11 +17,7 @@ chi::InputParameters SurfaceMeshLogicalVolume::GetInputParameters()
 {
   chi::InputParameters params = LogicalVolume::GetInputParameters();
 
-  // clang-format off
-  params.SetGeneralDescription(
-  "\\defgroup chi_mesh__SurfaceMeshLogicalVolume SurfaceMeshLogicalVolume\n"
-  "\\ingroup LuaLogicVolumes");
-  // clang-format on
+  params.SetDocGroup("LuaLogicVolumes");
 
   params.AddRequiredParameter<size_t>(
     "surface_mesh_handle",

@@ -17,9 +17,8 @@ chi::InputParameters lbs::DiscreteOrdinatesSolver::GetInputParameters()
 {
   chi::InputParameters params = LBSSolver::GetInputParameters();
 
-  params.SetGeneralDescription(
-    "\\defgroup lbs__DiscreteOrdinatesSolver DiscreteOrdinatesSolver\n"
-    "\\ingroup lbs__LBSSolver");
+  params.SetClassName("DiscreteOrdinatesSolver");
+  params.SetDocGroup("lbs__LBSSolver");
 
   params.ChangeExistingParamToOptional("name", "LBSDiscreteOrdinatesSolver");
 
