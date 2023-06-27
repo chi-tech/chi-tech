@@ -36,7 +36,7 @@ namespace chi_unit_sim_tests
     const auto& field = solver.field_;
 
     double local_error = 0.0;
-    for (const auto& cell : sdm.ref_grid_.local_cells)
+    for (const auto& cell : sdm.Grid().local_cells)
     {
       const int mat_id = cell.material_id_;
       const auto& cell_mapping = sdm.GetCellMapping(cell);
@@ -92,7 +92,7 @@ namespace chi_unit_sim_tests
     global_error = std::sqrt(global_error);
 
     Chi::log.Log() << "Error: " << std::scientific << global_error
-                   << " Num-cells: " << sdm.ref_grid_.GetGlobalNumberOfCells();
+                   << " Num-cells: " << sdm.Grid().GetGlobalNumberOfCells();
 
     auto stl_vector = new std::vector<double>();
     sdm.LocalizePETScVector(solver.x_, *stl_vector, OneDofPerNode);

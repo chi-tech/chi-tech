@@ -9,7 +9,7 @@ const chi_math::CellMapping& chi_math::SpatialDiscretization::GetCellMapping(
                                      "GetCellMapping";
   try
   {
-    if (ref_grid_.IsCellLocal(cell.global_id_))
+    if (Grid().IsCellLocal(cell.global_id_))
     {
       return *cell_mappings_.at(cell.local_id_);
     }

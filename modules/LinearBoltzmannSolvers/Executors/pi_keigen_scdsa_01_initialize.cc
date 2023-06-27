@@ -47,7 +47,7 @@ void XXPowerIterationKEigenSCDSA::Initialize()
   else
   {
     continuous_sdm_ptr_ =
-      chi_math::SpatialDiscretization_PWLC::New(sdm.ref_grid_);
+      chi_math::SpatialDiscretization_PWLC::New(sdm.Grid());
     diffusion_solver_ = std::make_shared<acceleration::DiffusionPWLCSolver>(
       std::string(TextName() + "_WGDSA"),
       *continuous_sdm_ptr_,

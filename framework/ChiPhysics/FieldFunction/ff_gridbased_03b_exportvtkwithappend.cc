@@ -33,12 +33,12 @@ void chi_physics::FieldFunctionGridBased::
 
   for (const auto& ff_ptr : ff_list)
     if (ff_ptr != master_ff_ptr)
-      if (&ff_ptr->sdm_->ref_grid_ != &master_ff_ptr->sdm_->ref_grid_)
+      if (&ff_ptr->sdm_->Grid() != &master_ff_ptr->sdm_->Grid())
         throw std::logic_error(fname +
         ": Cannot be used with field functions based on different grids.");
 
   //============================================= Get grid
-  const auto& grid = master_ff.sdm_->ref_grid_;
+  const auto& grid = master_ff.sdm_->Grid();
 
   auto ugrid = chi_mesh::PrepareVtkUnstructuredGrid(grid);
 

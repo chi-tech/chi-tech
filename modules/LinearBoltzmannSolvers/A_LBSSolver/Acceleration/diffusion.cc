@@ -21,7 +21,7 @@ DiffusionSolver::DiffusionSolver(
   const bool verbose,
   const bool requires_ghosts)
   : text_name_(std::move(text_name)),
-    grid_(sdm.ref_grid_),
+    grid_(sdm.Grid()),
     sdm_(sdm),
     uk_man_(uk_man),
     bcs_(std::move(bcs)),
