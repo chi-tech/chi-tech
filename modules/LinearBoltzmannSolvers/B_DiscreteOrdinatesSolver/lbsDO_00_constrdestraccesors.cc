@@ -1,6 +1,6 @@
 #include "lbs_discrete_ordinates_solver.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 
 namespace lbs
 {

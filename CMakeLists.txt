@@ -167,14 +167,16 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MPI_CXX_LINK_FLAGS}")
 add_subdirectory("${CHI_TECH_DIR}/external")
 
 #================================================ Define source directories
-set(SOURCES "${CHI_TECH_DIR}/framework/chi_runtime.cc")
+set(SOURCES "${CHI_TECH_DIR}/framework/chi_runtime.cc"
+            "${CHI_TECH_DIR}/framework/ChiObject.cc"
+            "${CHI_TECH_DIR}/framework/ChiObjectFactory.cc")
+add_subdirectory("${CHI_TECH_DIR}/framework/lua")
 add_subdirectory("${CHI_TECH_DIR}/framework/ChiConsole")
 add_subdirectory("${CHI_TECH_DIR}/framework/ChiLua")
 add_subdirectory("${CHI_TECH_DIR}/framework/ChiMath")
 add_subdirectory("${CHI_TECH_DIR}/framework/ChiPhysics")
 add_subdirectory("${CHI_TECH_DIR}/framework/ChiGraph")
 add_subdirectory("${CHI_TECH_DIR}/framework/ChiMaterial")
-add_subdirectory("${CHI_TECH_DIR}/framework/ChiObject")
 add_subdirectory("${CHI_TECH_DIR}/framework/ChiParameters")
 add_subdirectory("${CHI_TECH_DIR}/framework/ChiTimer")
 add_subdirectory("${CHI_TECH_DIR}/framework/ChiMesh")
@@ -183,13 +185,14 @@ add_subdirectory("${CHI_TECH_DIR}/framework/ChiLog")
 add_subdirectory("${CHI_TECH_DIR}/framework/ChiDataTypes")
 add_subdirectory("${CHI_TECH_DIR}/framework/ChiMiscUtils")
 add_subdirectory("${CHI_TECH_DIR}/framework/LuaTest")
+add_subdirectory("${CHI_TECH_DIR}/framework/interfaces")
 
 add_subdirectory("${CHI_TECH_MOD}")
 
 add_subdirectory("${CHI_TECH_DIR}/test")
 
 #================================================ Define targets
-add_library(ChiLib STATIC ${SOURCES})
+add_library(ChiLib SHARED ${SOURCES})
 target_link_libraries(ChiLib ${CHI_LIBS} external)
 target_compile_options(ChiLib PUBLIC ${CHI_CXX_FLAGS})
 

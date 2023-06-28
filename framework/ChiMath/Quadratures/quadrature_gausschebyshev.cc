@@ -1,6 +1,6 @@
 #include "quadrature_gausschebyshev.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 #include <cmath>
 
 #include "chi_runtime.h"

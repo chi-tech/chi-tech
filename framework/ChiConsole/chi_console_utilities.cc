@@ -5,6 +5,8 @@
 
 #include "chi_misc_utils.h"
 
+#include "ChiObjectFactory.h"
+
 namespace chi::lua_utils
 {
 int chiMakeObject(lua_State* L);
@@ -15,8 +17,8 @@ int chiMakeObject(lua_State* L);
 /** Executes the given file in the Lua engine.
 \author Jan*/
 int chi::ChiConsole::ExecuteFile(const std::string& fileName,
-                                         int argc,
-                                         char** argv) const
+                                 int argc,
+                                 char** argv) const
 {
   lua_State* L = this->console_state_;
   if (not fileName.empty())
@@ -47,7 +49,7 @@ int chi::ChiConsole::ExecuteFile(const std::string& fileName,
 // ###################################################################
 /**Pushes location id and number of processes to lua state.*/
 void chi::ChiConsole::PostMPIInfo(int location_id,
-                                          int number_of_processes) const
+                                  int number_of_processes) const
 {
   lua_State* L = this->console_state_;
 
@@ -61,8 +63,8 @@ void chi::ChiConsole::PostMPIInfo(int location_id,
 // ###################################################################
 /**Basic addition to registry. Used by the other public methods
  * to registry a text-key to a lua function.*/
-void chi::ChiConsole::AddFunctionToRegistry(
-  const std::string& name_in_lua, lua_CFunction function_ptr)
+void chi::ChiConsole::AddFunctionToRegistry(const std::string& name_in_lua,
+                                            lua_CFunction function_ptr)
 {
   auto& console = GetInstance();
 
@@ -154,8 +156,7 @@ char chi::ChiConsole::AddWrapperToRegistryInNamespaceWithName(
     std::string("Attempted to register lua-function wrapper \"") + name +
       "\" but a wrapper with the same name already exists");
 
-  if (not syntax_function)
-    syntax_function = DefaultGetInParamsFunc;
+  if (not syntax_function) syntax_function = DefaultGetInParamsFunc;
 
   if (not ignore_null_call_func)
     ChiLogicalErrorIf(not actual_function, "Problem with get_in_params_func");
@@ -321,8 +322,8 @@ void chi::ChiConsole::FleshOutLuaTableStructure(
 /**Assumes a table is on top of the stack, then loads the table
  * with chunks that call registered methods of the class with the first
  * argument being the object's handle.*/
-void chi::ChiConsole::SetObjectMethodsToTable(
-  const std::string& class_name, size_t handle)
+void chi::ChiConsole::SetObjectMethodsToTable(const std::string& class_name,
+                                              size_t handle)
 {
   auto& console = GetInstance();
   auto L = console.console_state_;
@@ -379,4 +380,29 @@ void chi::ChiConsole::DumpRegister() const
     Chi::log.Log() << "LUA_FUNCWRAPPER_END\n\n";
   }
   Chi::log.Log() << "\n\n";
+}
+
+// ##################################################################
+/**Given an old status, will update the bindings for only newly registered
+ * items.*/
+void chi::ChiConsole::UpdateConsoleBindings(
+  const chi::RegistryStatuses& old_statuses)
+{
+  auto ListHasValue =
+    [](const std::vector<std::string>& list, const std::string& value)
+  { return std::find(list.begin(), list.end(), value) != list.end(); };
+
+  const auto& object_factory = ChiObjectFactory::GetInstance();
+  for (const auto& [key, _] : object_factory.Registry())
+    if (not ListHasValue(old_statuses.objfactory_keys_, key))
+      SetObjectNamespaceTableStructure(key);
+
+  for (const auto& [key, entry] : lua_function_registry_)
+    if (not ListHasValue(old_statuses.objfactory_keys_, key))
+      SetLuaFuncNamespaceTableStructure(key, entry.function_ptr);
+
+  for (const auto& [key, entry] : function_wrapper_registry_)
+    if (not ListHasValue(old_statuses.objfactory_keys_, key))
+      if (entry.call_func)
+        SetLuaFuncWrapperNamespaceTableStructure(key);
 }

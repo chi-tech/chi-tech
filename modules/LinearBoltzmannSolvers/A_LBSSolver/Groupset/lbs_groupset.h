@@ -1,7 +1,7 @@
 #ifndef LBS_GROUPSET_H
 #define LBS_GROUPSET_H
 
-#include "ChiObject/chi_object.h"
+#include "ChiObject.h"
 
 #include "lbs_group.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/IterativeMethods/lbs_iterativemethods.h"

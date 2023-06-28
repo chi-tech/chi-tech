@@ -1,6 +1,6 @@
 #include "chi_lua.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 #include "ChiConsole/chi_console.h"
 
 namespace chi::lua_utils
@@ -28,7 +28,7 @@ RegisterLuaFunctionAsIs(chiMakeObjectType);
 
   const auto params = chi_lua::TableParserAsParameterBlock::ParseTable(L, 1);
 
-  const auto& object_maker = ChiObjectMaker::GetInstance();
+  const auto& object_maker = ChiObjectFactory::GetInstance();
   const size_t handle = object_maker.MakeRegisteredObject(params);
 
   const std::string type = params.GetParamValue<std::string>("chi_obj_type");
@@ -59,7 +59,7 @@ int chiMakeObjectType(lua_State* L)
   const std::string type = lua_tostring(L, 1);
   const auto params = chi_lua::TableParserAsParameterBlock::ParseTable(L, 2);
 
-  const auto& object_maker = ChiObjectMaker::GetInstance();
+  const auto& object_maker = ChiObjectFactory::GetInstance();
   const size_t handle = object_maker.MakeRegisteredObjectOfType(type, params);
 
   lua_pushinteger(L, static_cast<lua_Integer>(handle));

@@ -1,7 +1,7 @@
 #ifndef CHI_MATH_QUADRATURE_H
 #define CHI_MATH_QUADRATURE_H
 
-#include "ChiObject/chi_object.h"
+#include "ChiObject.h"
 #include "ChiMesh/chi_mesh.h"
 
 #include <vector>

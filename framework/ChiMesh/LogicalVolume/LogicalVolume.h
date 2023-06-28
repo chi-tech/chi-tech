@@ -1,7 +1,7 @@
 #ifndef CHI_MESH_LOGICALVOLUME_H
 #define CHI_MESH_LOGICALVOLUME_H
 
-#include "ChiObject/chi_object.h"
+#include "ChiObject.h"
 
 #include "../chi_mesh.h"
 #include <chi_log.h>

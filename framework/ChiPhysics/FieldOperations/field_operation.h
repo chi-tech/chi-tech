@@ -1,7 +1,7 @@
 #ifndef CHITECH_FIELD_OPERATION_H
 #define CHITECH_FIELD_OPERATION_H
 
-#include "ChiObject/chi_object.h"
+#include "ChiObject.h"
 
 namespace chi_physics::field_operations
 {

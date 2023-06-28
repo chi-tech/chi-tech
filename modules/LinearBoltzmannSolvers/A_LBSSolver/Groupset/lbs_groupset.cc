@@ -9,7 +9,7 @@
 
 #include <fstream>
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 
 namespace lbs
 {

@@ -4,7 +4,7 @@
 #include "ChiMesh/SurfaceMesh/chi_surfacemesh.h"
 #include "ChiMesh/Raytrace/raytracing.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 
 #include <utility>
 

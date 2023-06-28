@@ -1,7 +1,7 @@
 #ifndef CHITECH_CHI_MATERIAL_H
 #define CHITECH_CHI_MATERIAL_H
 
-#include "ChiObject/chi_object.h"
+#include "ChiObject.h"
 
 namespace chi
 {

@@ -1,4 +1,4 @@
-/** \defgroup LuaModules F Code modules
+/** \defgroup LuaModules X Code modules
 
 Modules are intended to be code segments that perform unique operations and
 functions. In general, the ChiMath, ChiMesh and other utilities should serve

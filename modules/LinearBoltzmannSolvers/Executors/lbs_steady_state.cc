@@ -1,6 +1,6 @@
 #include "lbs_steady_state.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 
 #include "A_LBSSolver/IterativeMethods/ags_linear_solver.h"
 

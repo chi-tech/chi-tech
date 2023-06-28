@@ -55,6 +55,13 @@ namespace chi
 class ChiTimer;
 class ChiConsole;
 class ChiLog;
+/**Stores all the keys currently in the registries.*/
+struct RegistryStatuses
+{
+  std::vector<std::string> objfactory_keys_;
+  std::vector<std::string> console_lua_func_keys_;
+  std::vector<std::string> console_lua_wrapper_keys_;
+};
 } // namespace chi
 
 class ChiObject;
@@ -148,6 +155,9 @@ public:
   static int Initialize(int argc, char** argv, MPI_Comm communicator);
   static void Finalize();
   static void Exit(int error_code);
+
+  /**Builds a `RegistryStatuses` structure*/
+  static chi::RegistryStatuses GetStatusOfRegistries();
 
   static std::string GetVersionStr();
 

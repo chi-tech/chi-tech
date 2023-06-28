@@ -3,7 +3,7 @@
 #include "ChiPhysics/SolverBase/chi_solver.h"
 #include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -44,7 +44,7 @@ int chiSolverCreate(lua_State* L)
 
   const auto params = chi_lua::TableParserAsParameterBlock::ParseTable(L, 1);
 
-  const auto& object_maker = ChiObjectMaker::GetInstance();
+  const auto& object_maker = ChiObjectFactory::GetInstance();
   const size_t handle = object_maker.MakeRegisteredObject(params);
 
   lua_pushinteger(L, static_cast<lua_Integer>(handle));

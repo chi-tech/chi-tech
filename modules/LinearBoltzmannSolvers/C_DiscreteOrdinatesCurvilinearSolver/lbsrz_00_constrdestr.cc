@@ -1,6 +1,6 @@
 #include "lbs_curvilinear_solver.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 
 namespace lbs
 {

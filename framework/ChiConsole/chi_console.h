@@ -77,6 +77,10 @@ namespace chi_physics
 {
 class Solver;
 }
+namespace chi
+{
+struct RegistryStatuses;
+}
 
 // #############################################################################
 // CLASS DEF
@@ -126,6 +130,12 @@ public:
 
   lua_State*& GetConsoleState() { return console_state_; }
   std::vector<std::string>& GetCommandBuffer() { return command_buffer_; }
+
+  const std::map<std::string, LuaFunctionRegistryEntry>&
+  GetLuaFunctionRegistry() const {return lua_function_registry_;}
+
+  const std::map<std::string, LuaFunctionRegistryEntry>&
+  GetFunctionWrapperRegistry() const {return lua_function_registry_;}
 
   // 01 Loop
   void RunConsoleLoop(char* fileName = nullptr) const;
@@ -202,6 +212,10 @@ public:
 
   /**\brief Dumps the object registry to stdout.*/
   void DumpRegister() const;
+
+  /**Given an old status, will update the bindings for only newly registered
+  * items.*/
+  void UpdateConsoleBindings(const chi::RegistryStatuses& old_statuses);
 };
 } // namespace chi_objects
 

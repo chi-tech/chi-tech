@@ -1,7 +1,7 @@
 #ifndef CHITECH_FIELDFUNCTION_H
 #define CHITECH_FIELDFUNCTION_H
 
-#include "ChiObject/chi_object.h"
+#include "ChiObject.h"
 #include "ChiMath/UnknownManager/unknown_manager.h"
 #include "ChiMesh/chi_mesh.h"
 

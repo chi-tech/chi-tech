@@ -3,7 +3,7 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 
 // ########################################################## Create empty
 // system
@@ -44,7 +44,7 @@ int chiCreateLineQuadrature(lua_State* L)
   params.AddParameter("verbose", verbose);
   params.AddParameter("N", N);
 
-  auto& obj_factory = ChiObjectMaker::GetInstance();
+  auto& obj_factory = ChiObjectFactory::GetInstance();
 
   if (ident == 1) // GAUSS_LEGENDRE
   {

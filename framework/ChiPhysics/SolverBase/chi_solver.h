@@ -1,7 +1,7 @@
 #ifndef CHI_PHYSICS_SOLVER_H
 #define CHI_PHYSICS_SOLVER_H
 
-#include "ChiObject/chi_object.h"
+#include "ChiObject.h"
 #include "ChiPhysics/chi_physics_namespace.h"
 
 #include "ChiPhysics/BasicOptions/basic_options.h"

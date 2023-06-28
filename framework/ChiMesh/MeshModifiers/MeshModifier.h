@@ -1,7 +1,7 @@
 #ifndef CHITECH_MESHMODIFIER_H
 #define CHITECH_MESHMODIFIER_H
 
-#include "ChiObject/chi_object.h"
+#include "ChiObject.h"
 
 namespace chi_mesh
 {

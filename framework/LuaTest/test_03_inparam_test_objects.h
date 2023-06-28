@@ -1,7 +1,7 @@
 #ifndef CHITECH_TEST_03_INPARAM_TEST_OBJECTS_H
 #define CHITECH_TEST_03_INPARAM_TEST_OBJECTS_H
 
-#include "ChiObject/chi_object.h"
+#include "ChiObject.h"
 #include "ChiParameters/input_parameters.h"
 
 namespace chi_unit_tests

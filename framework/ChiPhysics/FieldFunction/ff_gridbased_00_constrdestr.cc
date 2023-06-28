@@ -5,7 +5,7 @@
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 
 namespace chi_physics
 {

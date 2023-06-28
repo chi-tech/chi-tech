@@ -1,27 +1,27 @@
-#include "object_maker.h"
+#include "ChiObjectFactory.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
 
 // ###################################################################
 /**Access to the singleton*/
-ChiObjectMaker& ChiObjectMaker::GetInstance() noexcept
+ChiObjectFactory& ChiObjectFactory::GetInstance() noexcept
 {
-  static ChiObjectMaker singleton;
+  static ChiObjectFactory singleton;
   return singleton;
 }
 
 // ###################################################################
 /**Returns a constant reference to the object registry.*/
-const std::map<std::string, ChiObjectMaker::ObjectRegistryEntry>&
-ChiObjectMaker::Registry() const
+const std::map<std::string, ChiObjectFactory::ObjectRegistryEntry>&
+ChiObjectFactory::Registry() const
 {
   return object_registry_;
 }
 
 // ###################################################################
 /**Checks if the object registry has a specific text key.*/
-bool ChiObjectMaker::RegistryHasKey(const std::string& key) const
+bool ChiObjectFactory::RegistryHasKey(const std::string& key) const
 {
   return object_registry_.count(key) > 0;
 }
@@ -30,7 +30,8 @@ bool ChiObjectMaker::RegistryHasKey(const std::string& key) const
 /**Makes an object with the given parameters and places on the global
  * object stack. Returns a handle to the object. The object type is
  * obtained from a string parameter name `chi_obj_type`.*/
-size_t ChiObjectMaker::MakeRegisteredObject(
+size_t
+ChiObjectFactory::MakeRegisteredObject(
   const chi::ParameterBlock& params) const
 {
   if (Chi::log.GetVerbosity() >= 2)
@@ -52,7 +53,7 @@ size_t ChiObjectMaker::MakeRegisteredObject(
 // ###################################################################
 /**Makes an object with the given parameters and places on the global
  * object stack. Returns a handle to the object.*/
-size_t ChiObjectMaker::MakeRegisteredObjectOfType(
+size_t ChiObjectFactory::MakeRegisteredObjectOfType(
   const std::string& type, const chi::ParameterBlock& params) const
 {
   if (Chi::log.GetVerbosity() >= 2)
@@ -98,7 +99,7 @@ size_t ChiObjectMaker::MakeRegisteredObjectOfType(
 
 // ##################################################################
 /**Dumps the registry to stdout.*/
-void ChiObjectMaker::DumpRegister() const
+void ChiObjectFactory::DumpRegister() const
 {
   Chi::log.Log() << "\n\n";
   for (const auto& [key, entry] : object_registry_)
@@ -125,7 +126,7 @@ void ChiObjectMaker::DumpRegister() const
 // ##################################################################
 /**Checks that the registry key is available and throws a
  * `std::logical_error` if it is not.*/
-void ChiObjectMaker::AssertRegistryKeyAvailable(
+void ChiObjectFactory::AssertRegistryKeyAvailable(
   const std::string& key, const std::string& calling_function) const
 {
   if (RegistryHasKey(key))

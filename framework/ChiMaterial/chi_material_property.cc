@@ -1,6 +1,6 @@
 #include "chi_material_property.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 
 namespace chi
 {

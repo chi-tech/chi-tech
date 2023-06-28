@@ -1,6 +1,6 @@
 #include "lbs_transient.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 
 #include "ChiMath/TimeIntegrations/time_integration.h"
 

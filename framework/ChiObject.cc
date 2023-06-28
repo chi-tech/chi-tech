@@ -1,4 +1,4 @@
-#include "chi_object.h"
+#include "ChiObject.h"
 
 /**Returns the input parameters.*/
 chi::InputParameters ChiObject::GetInputParameters()

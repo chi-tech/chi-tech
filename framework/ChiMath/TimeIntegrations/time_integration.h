@@ -1,7 +1,7 @@
 #ifndef CHITECH_TIME_INTEGRATION_H
 #define CHITECH_TIME_INTEGRATION_H
 
-#include "ChiObject/chi_object.h"
+#include "ChiObject.h"
 #include "ChiMath/chi_math_time_stepping.h"
 
 namespace chi_math

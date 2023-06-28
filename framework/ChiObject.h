@@ -1,5 +1,5 @@
-#ifndef CHITECH_CHI_OBJECT_H
-#define CHITECH_CHI_OBJECT_H
+#ifndef CHITECH_CHIOBJECT_H
+#define CHITECH_CHIOBJECT_H
 
 #include "chi_runtime.h"
 #include "ChiParameters/input_parameters.h"
@@ -38,4 +38,4 @@ public:
   virtual ~ChiObject() = default;
 };
 
-#endif // CHITECH_CHI_OBJECT_H
+#endif // CHITECH_CHIOBJECT_H

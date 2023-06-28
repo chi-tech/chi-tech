@@ -8,7 +8,7 @@
 
 #include "ChiPhysics/chi_physics_namespace.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 
 #include "chi_mpi.h"
 #include "chi_log.h"
@@ -152,7 +152,7 @@ void Chi::run_time::ParseArguments(int argc, char** argv)
 
   if (Chi::run_time::dump_registry_)
   {
-    ChiObjectMaker::GetInstance().DumpRegister();
+    ChiObjectFactory::GetInstance().DumpRegister();
     Chi::console.DumpRegister();
   }
 }
@@ -329,3 +329,22 @@ void Chi::Exit(int error_code) { MPI_Abort(mpi.comm, error_code); }
 // ###################################################################
 /** Gets the ChiTech-version string.*/
 std::string Chi::GetVersionStr() { return PROJECT_VERSION; }
+
+// ###################################################################
+/**Builds a `RegistryStatuses` structure*/
+chi::RegistryStatuses Chi::GetStatusOfRegistries()
+{
+  chi::RegistryStatuses stats;
+
+  const auto& object_factory = ChiObjectFactory::GetInstance();
+  for (const auto& [key, _] : object_factory.Registry())
+    stats.objfactory_keys_.push_back(key);
+
+  for (const auto& [key, _] : console.GetLuaFunctionRegistry())
+    stats.console_lua_func_keys_.push_back(key);
+
+  for (const auto& [key, _] : console.GetFunctionWrapperRegistry())
+    stats.console_lua_wrapper_keys_.push_back(key);
+
+  return stats;
+}

@@ -1,7 +1,7 @@
 #ifndef CHITECH_CHI_MATH_FUNCTION_DIMA_TO_DIMB_H
 #define CHITECH_CHI_MATH_FUNCTION_DIMA_TO_DIMB_H
 
-#include "ChiObject/chi_object.h"
+#include "ChiObject.h"
 
 namespace chi_math
 {

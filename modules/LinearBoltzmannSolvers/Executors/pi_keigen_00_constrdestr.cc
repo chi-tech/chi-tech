@@ -1,6 +1,6 @@
 #include "pi_keigen.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 
 #include "chi_runtime.h"
 

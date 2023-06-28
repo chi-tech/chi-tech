@@ -1,6 +1,6 @@
 #include "test_03_inparam_test_objects.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

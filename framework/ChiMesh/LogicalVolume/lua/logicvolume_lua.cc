@@ -3,7 +3,7 @@
 #include "../LogicalVolume.h"
 #include "../SphereLogicalVolume.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "chi_runtime.h"
@@ -92,7 +92,7 @@ int chiLogicalVolumeCreate(lua_State* L)
   const int LVSURFACE = scint(LogicalVolumeType::LVSURFACE);
   const int LVBOOLEAN = scint(LogicalVolumeType::LVBOOLEAN);
 
-  auto& object_maker = ChiObjectMaker::GetInstance();
+  auto& object_maker = ChiObjectFactory::GetInstance();
 
   //================================================== Sphere at origin
   if (type_index == LVSPHERE_ORIGIN)

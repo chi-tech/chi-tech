@@ -4,7 +4,7 @@
 #include "ChiLog/chi_log_exceptions.h"
 #include "chi_lua.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 
 namespace chi_math::functions
 {

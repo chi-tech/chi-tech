@@ -1,6 +1,6 @@
 #include "multifield.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"

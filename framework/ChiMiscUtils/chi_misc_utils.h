@@ -36,6 +36,8 @@ namespace chi_misc_utils
    * encountering the search_string.*/
   std::string StringUpToFirstReverse(const std::string& input,
                                      const std::string& search_string);
+
+  void AssertReadibleFile(const std::string& file_name);
 }//namespace chi_misc_utils
 
 #endif //CHITECH_CHI_MISC_UTILS_H

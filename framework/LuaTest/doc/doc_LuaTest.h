@@ -1,2 +1,2 @@
-/**\defgroup DocUnitTests G Unit Testing
+/**\defgroup DocUnitTests Y Unit Testing
  */
