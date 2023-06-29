@@ -1,10 +1,15 @@
-#include "../../../ChiLua/chi_lua.h"
+#include "ChiLua/chi_lua.h"
 #include <iostream>
 #include "../surfacemesher.h"
 
 #include "../../MeshHandler/chi_meshhandler.h"
 #include "chi_runtime.h"
 #include "chi_log.h"
+#include "surfmesher_lua.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiSurfaceMesherSetProperty);
+RegisterLuaConstantAsIs(MAX_AREA, chi_data_types::Varying(1));
 
 //#############################################################################
 /** Sets a property of a surface mesher.

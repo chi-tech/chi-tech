@@ -6,8 +6,12 @@
 #include "../../MeshHandler/chi_meshhandler.h"
 #include "chi_runtime.h"
 
-#include <chi_log.h>
+#include "chi_log.h"
+#include "lua_surface_mesh.h"
+#include "ChiConsole/chi_console.h"
 
+RegisterLuaFunctionAsIs(chiSurfaceMeshCheckCycles);
+RegisterLuaFunctionAsIs(chiComputeLoadBalancing);
 
 //#############################################################################
 /** Builds sweep ordering for a number of angles and checks whether any

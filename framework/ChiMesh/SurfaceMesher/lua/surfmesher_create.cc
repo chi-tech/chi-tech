@@ -1,4 +1,4 @@
-#include "../../../ChiLua/chi_lua.h"
+#include "ChiLua/chi_lua.h"
 #include <iostream>
 #include "../Predefined/surfmesher_predefined.h"
 
@@ -6,6 +6,11 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
+#include "surfmesher_lua.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiSurfaceMesherCreate);
+RegisterLuaConstantAsIs(SURFACEMESHER_PREDEFINED, chi_data_types::Varying(1));
 
 //#############################################################################
 /** Creates a surface preprocessor.

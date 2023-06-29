@@ -1,13 +1,27 @@
 #include "ChiLua/chi_lua.h"
 #include<iostream>
 
-#include "chi_runtime.h"
-
 #include "ChiPhysics/chi_physics_namespace.h"
 #include "ChiPhysics/PhysicsMaterial/MultiGroupXS/single_state_mgxs.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
+#include "multigroup_xs_lua_utils.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiPhysicsTransportXSCreate);
+RegisterLuaFunctionAsIs(chiPhysicsTransportXSSet);
+RegisterLuaFunctionAsIs(chiPhysicsTransportXSMakeCombined);
+RegisterLuaFunctionAsIs(chiPhysicsTransportXSSetCombined);
+RegisterLuaFunctionAsIs(chiPhysicsTransportXSGet);
+RegisterLuaFunctionAsIs(chiPhysicsTransportXSExportToChiTechFormat);
+
+RegisterLuaConstantAsIs(SINGLE_VALUE, chi_data_types::Varying( 0));
+RegisterLuaConstantAsIs(FROM_ARRAY,   chi_data_types::Varying( 1));
+RegisterLuaConstantAsIs(SIMPLEXS0,    chi_data_types::Varying(20));
+RegisterLuaConstantAsIs(SIMPLEXS1,    chi_data_types::Varying(21));
+RegisterLuaConstantAsIs(EXISTING,     chi_data_types::Varying(22));
+RegisterLuaConstantAsIs(CHI_XSFILE,   chi_data_types::Varying(23));
 
 //###################################################################
 /**Creates a stand-alone transport cross section.

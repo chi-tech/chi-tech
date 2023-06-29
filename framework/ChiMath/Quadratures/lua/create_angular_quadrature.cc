@@ -6,6 +6,11 @@
 
 #include "chi_log.h"
 
+#include "quadratures_lua.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiCreateCustomAngularQuadrature);
+
 //########################################################## Create empty system
 /** Creates an angular quadrature.
  *

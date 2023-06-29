@@ -23,7 +23,6 @@ namespace chi_mesh::unpartition_mesh_lua_utils
   int chiUnpartitionedMeshUploadCell(lua_State* L);
   int chiUnpartitionedMeshFinalizeEmpty(lua_State* L);
 
-  void RegisterLuaEntities(lua_State* L);
 }//namespace chi_mesh::unpartition_mesh_lua_utils
 
 

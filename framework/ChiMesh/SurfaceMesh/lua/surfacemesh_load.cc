@@ -5,6 +5,11 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
+#include "lua_surface_mesh.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiSurfaceMeshImportFromOBJFile);
+RegisterLuaFunctionAsIs(chiSurfaceMeshImportFromTriangleFiles);
 
 //############################################################################# Create Window
 /** Loads mesh data from a wavefront object.

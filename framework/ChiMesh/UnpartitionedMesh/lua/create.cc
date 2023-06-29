@@ -4,10 +4,23 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
+#include "unpartition_mesh_lua_utils.h"
 #include "ChiConsole/chi_console.h"
+
+
 
 namespace chi_mesh::unpartition_mesh_lua_utils
 {
+
+RegisterLuaFunctionAsIs(chiCreateEmptyUnpartitionedMesh);
+RegisterLuaFunctionAsIs(chiDestroyUnpartitionedMesh);
+
+RegisterLuaFunctionAsIs(chiUnpartitionedMeshFromVTU);
+RegisterLuaFunctionAsIs(chiUnpartitionedMeshFromPVTU);
+RegisterLuaFunctionAsIs(chiUnpartitionedMeshFromEnsightGold);
+RegisterLuaFunctionAsIs(chiUnpartitionedMeshFromWavefrontOBJ);
+RegisterLuaFunctionAsIs(chiUnpartitionedMeshFromMshFormat);
+RegisterLuaFunctionAsIs(chiUnpartitionedMeshFromExodusII);
 
 //###################################################################
 /**Creates an empty unpartitioned mesh. An empty unpartitioned mesh

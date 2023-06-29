@@ -5,6 +5,10 @@
 #include "../sldfe_sq.h"
 
 #include "chi_log.h"
+#include "ChiConsole/chi_console.h"
+#include "sldfe_lua.h"
+
+RegisterLuaFunctionAsIs(chiLocallyRefineSLDFESQAngularQuadrature);
 
 //###################################################################
 /** Applies a local refinement of angles.

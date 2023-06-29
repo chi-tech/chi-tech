@@ -19,6 +19,32 @@
 #define dcastVolume(x)                                                         \
   dynamic_cast<chi_mesh::FieldFunctionInterpolationVolume&>(x)
 
+#include "ffinterpol_lua.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiFFInterpolationSetProperty);
+RegisterLuaConstantAsIs(PROBEPOINT,    chi_data_types::Varying(0));
+RegisterLuaConstantAsIs(SLICE_POINT,   chi_data_types::Varying(1));
+RegisterLuaConstantAsIs(SLICE_NORMAL,  chi_data_types::Varying(2));
+RegisterLuaConstantAsIs(SLICE_TANGENT, chi_data_types::Varying(3));
+RegisterLuaConstantAsIs(SLICE_BINORM,  chi_data_types::Varying(4));
+RegisterLuaConstantAsIs(OPERATION,     chi_data_types::Varying(5));
+  RegisterLuaConstantAsIs(OP_SUM,     chi_data_types::Varying(10));
+  RegisterLuaConstantAsIs(OP_AVG,     chi_data_types::Varying(11));
+  RegisterLuaConstantAsIs(OP_MAX,     chi_data_types::Varying(12));
+  RegisterLuaConstantAsIs(OP_SUM_LUA, chi_data_types::Varying(13));
+  RegisterLuaConstantAsIs(OP_AVG_LUA, chi_data_types::Varying(14));
+  RegisterLuaConstantAsIs(OP_MAX_LUA, chi_data_types::Varying(15));
+RegisterLuaConstantAsIs(LOGICAL_VOLUME,      chi_data_types::Varying(8 ));
+
+RegisterLuaConstantAsIs(ADD_FIELDFUNCTION,   chi_data_types::Varying(9 ));
+RegisterLuaConstantAsIs(SET_FIELDFUNCTIONS,  chi_data_types::Varying(10));
+
+RegisterLuaConstantAsIs(LINE_FIRSTPOINT,     chi_data_types::Varying(11));
+RegisterLuaConstantAsIs(LINE_SECONDPOINT,    chi_data_types::Varying(12));
+RegisterLuaConstantAsIs(LINE_NUMBEROFPOINTS, chi_data_types::Varying(13));
+RegisterLuaConstantAsIs(LINE_CUSTOM_ARRAY,   chi_data_types::Varying(14));
+
 // #############################################################################
 /** Creates a new field function interpolation.
  *

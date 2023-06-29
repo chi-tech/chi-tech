@@ -5,6 +5,11 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
+#include "quadratures_lua.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiOptimizeAngularQuadratureForPolarSymmetry);
+
 //###################################################################
 /**Optimizes the indicated angular quadrature for polar symmetry.
  *

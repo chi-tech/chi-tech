@@ -4,13 +4,33 @@
 #include "chi_log.h"
 
 #include "lua/chi_log_lua.h"
+#include "ChiConsole/chi_console.h"
+
+namespace chi_log_utils::lua_utils
+{
+
+RegisterLuaFunctionAsIs(chiLogSetVerbosity);
+RegisterLuaFunctionAsIs(chiLog);
+
+RegisterLuaConstantAsIs(LOG_0, chi_data_types::Varying(1));
+RegisterLuaConstantAsIs(LOG_0WARNING, chi_data_types::Varying(2));
+RegisterLuaConstantAsIs(LOG_0ERROR, chi_data_types::Varying(3));
+RegisterLuaConstantAsIs(LOG_0VERBOSE_0, chi_data_types::Varying(4));
+RegisterLuaConstantAsIs(LOG_0VERBOSE_1, chi_data_types::Varying(5));
+RegisterLuaConstantAsIs(LOG_0VERBOSE_2, chi_data_types::Varying(6));
+RegisterLuaConstantAsIs(LOG_ALL, chi_data_types::Varying(7));
+RegisterLuaConstantAsIs(LOG_ALLWARNING, chi_data_types::Varying(8));
+RegisterLuaConstantAsIs(LOG_ALLERROR, chi_data_types::Varying(9));
+RegisterLuaConstantAsIs(LOG_ALLVERBOSE_0, chi_data_types::Varying(10));
+RegisterLuaConstantAsIs(LOG_ALLVERBOSE_1, chi_data_types::Varying(11));
+RegisterLuaConstantAsIs(LOG_ALLVERBOSE_2, chi_data_types::Varying(12));
 
 #define LUA_FMACRO1(x) lua_register(L, #x, x)
-#define LUA_CMACRO1(x,y) \
-        lua_pushnumber(L, y); \
-        lua_setglobal(L, #x)
+#define LUA_CMACRO1(x, y)                                                      \
+  lua_pushnumber(L, y);                                                        \
+  lua_setglobal(L, #x)
 
-//###################################################################
+// ###################################################################
 /** Sets the verbosity level of the Logger.
  * This lua command will overwrite the currently set value.
 
@@ -19,22 +39,20 @@
 
 \ingroup LuaLogging
 \author Jan*/
-int chiLogSetVerbosity(lua_State *L)
+int chiLogSetVerbosity(lua_State* L)
 {
   int num_args = lua_gettop(L);
 
-  if (num_args == 0) {return 0;}
+  if (num_args == 0) { return 0; }
   else
   {
-    int level = lua_tonumber(L,1);
-    if (level<=2)
-    { Chi::log.SetVerbosity(level);
-    }
+    int level = lua_tonumber(L, 1);
+    if (level <= 2) { Chi::log.SetVerbosity(level); }
   }
   return 0;
 }
 
-//###################################################################
+// ###################################################################
 /**Logs a message depending on the log type specified.
 
 \param LogType int Can be any of the log types specified below.
@@ -75,31 +93,14 @@ int chiLog(lua_State* L)
 {
   int num_args = lua_gettop(L);
 
-  if (num_args != 2)
-    LuaPostArgAmountError("chiLog",2,num_args);
+  if (num_args != 2) LuaPostArgAmountError("chiLog", 2, num_args);
 
-  int         mode    = lua_tonumber(L,1);
-  const char* message = lua_tostring(L,2);
+  int mode = lua_tonumber(L, 1);
+  const char* message = lua_tostring(L, 2);
 
   Chi::log.Log(static_cast<chi::ChiLog::LOG_LVL>(mode)) << message << std::endl;
 
   return 0;
 }
 
-void chi_log_utils::lua_utils::RegisterLuaEntities(lua_State *L)
-{
-  LUA_FMACRO1(chiLogSetVerbosity);
-  LUA_FMACRO1(chiLog);
-  LUA_CMACRO1(LOG_0,          1);
-  LUA_CMACRO1(LOG_0WARNING,   2);
-  LUA_CMACRO1(LOG_0ERROR,     3);
-  LUA_CMACRO1(LOG_0VERBOSE_0, 4);
-  LUA_CMACRO1(LOG_0VERBOSE_1, 5);
-  LUA_CMACRO1(LOG_0VERBOSE_2, 6);
-  LUA_CMACRO1(LOG_ALL,          7);
-  LUA_CMACRO1(LOG_ALLWARNING,   8);
-  LUA_CMACRO1(LOG_ALLERROR,     9);
-  LUA_CMACRO1(LOG_ALLVERBOSE_0, 10);
-  LUA_CMACRO1(LOG_ALLVERBOSE_1, 11);
-  LUA_CMACRO1(LOG_ALLVERBOSE_2, 12);
-}
+} // namespace chi_log_utils::lua_utils

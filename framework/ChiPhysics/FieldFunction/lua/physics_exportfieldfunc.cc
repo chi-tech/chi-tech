@@ -4,6 +4,11 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
+#include "fieldfunctions_lua.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiExportFieldFunctionToVTK);
+RegisterLuaFunctionAsIs(chiExportMultiFieldFunctionToVTK);
 
 // #############################################################################
 /** Exports a field function to VTK format.

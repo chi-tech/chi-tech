@@ -1,6 +1,5 @@
 #include "ChiLua/chi_lua.h"
 #include<iostream>
-#include "chi_runtime.h"
 
 #include "ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h"
 #include "ChiPhysics/PhysicsMaterial/material_property_scalarvalue.h"
@@ -9,6 +8,17 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
+
+#include "physics_lua_utils.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiPhysicsMaterialAddProperty);
+RegisterLuaFunctionAsIs(chiPhysicsMaterialSetProperty);
+RegisterLuaFunctionAsIs(chiPhysicsMaterialGetProperty);
+
+RegisterLuaConstantAsIs(SCALAR_VALUE,        chi_data_types::Varying(1 ));
+RegisterLuaConstantAsIs(TRANSPORT_XSECTIONS, chi_data_types::Varying(10));
+RegisterLuaConstantAsIs(ISOTROPIC_MG_SOURCE, chi_data_types::Varying(11));
 
 //#############################################################################
 /** Adds a material property to a material.

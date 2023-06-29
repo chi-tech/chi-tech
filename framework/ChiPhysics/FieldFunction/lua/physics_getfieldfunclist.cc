@@ -6,6 +6,10 @@
 #include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
 
 #include "chi_log.h"
+#include "fieldfunctions_lua.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiGetFieldFunctionHandleByName);
 
 //###################################################################
 /**Gets a field-function handle by name.

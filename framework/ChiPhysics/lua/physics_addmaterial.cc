@@ -1,11 +1,13 @@
-#include "../../ChiLua/chi_lua.h"
+#include "chi_lua.h"
 #include<iostream>
 #include "../PhysicsMaterial/chi_physicsmaterial.h"
 
 #include "chi_runtime.h"
-
-#include "chi_runtime.h"
 #include "chi_log.h"
+#include "physics_lua_utils.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiPhysicsAddMaterial);
 
 //#############################################################################
 /** Adds a material to the problem. Materials are added to the global

@@ -9,6 +9,15 @@
 
 #define scint(x) static_cast<int>(x)
 
+#include "ffinterpol_lua.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiFFInterpolationCreate);
+RegisterLuaConstantAsIs(SLICE , chi_data_types::Varying(1));
+RegisterLuaConstantAsIs(LINE  , chi_data_types::Varying(2));
+RegisterLuaConstantAsIs(VOLUME, chi_data_types::Varying(3));
+RegisterLuaConstantAsIs(POINT,  chi_data_types::Varying(4));
+
 //#############################################################################
 /** Creates a new field function interpolation.
  *

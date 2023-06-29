@@ -1,12 +1,17 @@
-#include"../../../ChiLua/chi_lua.h"
+#include"ChiLua/chi_lua.h"
 
 #include <iostream>
 #include "../chi_surfacemesh.h"
-#include "../../MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/MeshHandler/chi_meshhandler.h"
 
 #include "chi_runtime.h"
 
 #include "chi_log.h"
+#include "lua_surface_mesh.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiSurfaceMeshExportToObj);
+RegisterLuaFunctionAsIs(chiSurfaceMeshExportPolyFile);
 
 //############################################################################# Create
 /** Exports mesh as a .obj format.

@@ -3,9 +3,14 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
+#include "ChiConsole/chi_console.h"
 
 namespace chi_mesh::unpartition_mesh_lua_utils
 {
+
+RegisterLuaFunctionAsIs(chiUnpartitionedMeshUploadVertex);
+RegisterLuaFunctionAsIs(chiUnpartitionedMeshUploadCell);
+RegisterLuaFunctionAsIs(chiUnpartitionedMeshFinalizeEmpty);
 
 //###################################################################
 /**Uploads a vertex.

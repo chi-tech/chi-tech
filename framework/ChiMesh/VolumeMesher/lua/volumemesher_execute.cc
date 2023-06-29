@@ -6,15 +6,15 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-#include "chi_runtime.h"
 #include "ChiTimer/chi_timer.h"
 
-
+#include "volumemesher_lua.h"
 #include "ChiConsole/chi_console.h"
 
 #include <iomanip>
 #include <iostream>
-#include <unistd.h>
+
+RegisterLuaFunctionAsIs(chiVolumeMesherExecute);
 
 //#############################################################################
 /** Executes the volume meshing pipeline.

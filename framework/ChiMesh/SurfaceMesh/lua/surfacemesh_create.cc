@@ -6,6 +6,10 @@
 #include "chi_runtime.h"
 
 #include "chi_log.h"
+#include "lua_surface_mesh.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiSurfaceMeshCreate);
 
 /** \defgroup LuaSurfaceMesh Surface Meshes
  * \ingroup LuaMesh

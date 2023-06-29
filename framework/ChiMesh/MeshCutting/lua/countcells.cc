@@ -8,7 +8,10 @@
 
 #include "chi_runtime.h"
 
-#include "chi_log.h"
+#include "meshcutting_lua.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiCountMeshInLogicalVolume);
 
 //###################################################################
 /**Counts the number of cells with a logical volume.*/

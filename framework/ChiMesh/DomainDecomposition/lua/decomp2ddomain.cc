@@ -2,8 +2,10 @@
 #include "chi_runtime.h"
 
 #include "ChiMesh/SurfaceMesh/chi_surfacemesh.h"
+#include "domaindecomp_lua.h"
+#include "ChiConsole/chi_console.h"
 
-
+RegisterLuaFunctionAsIs(chiDecomposeSurfaceMeshPxPy);
 
 /** \defgroup LuaDomainDecomposition Domain decomposition
  * \ingroup LuaMesh

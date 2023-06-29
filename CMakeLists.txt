@@ -184,7 +184,6 @@ add_subdirectory("${CHI_TECH_DIR}/framework/ChiMPI")
 add_subdirectory("${CHI_TECH_DIR}/framework/ChiLog")
 add_subdirectory("${CHI_TECH_DIR}/framework/ChiDataTypes")
 add_subdirectory("${CHI_TECH_DIR}/framework/ChiMiscUtils")
-add_subdirectory("${CHI_TECH_DIR}/framework/LuaTest")
 add_subdirectory("${CHI_TECH_DIR}/framework/interfaces")
 
 add_subdirectory("${CHI_TECH_MOD}")

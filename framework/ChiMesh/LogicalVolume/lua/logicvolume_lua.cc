@@ -1,7 +1,6 @@
 #include "chi_lua.h"
 
 #include "../LogicalVolume.h"
-#include "../SphereLogicalVolume.h"
 
 #include "ChiObjectFactory.h"
 
@@ -11,6 +10,18 @@
 #include "chi_log.h"
 
 #define scint static_cast<int>
+
+#include "logicvolume_lua.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiLogicalVolumeCreate);
+RegisterLuaConstantAsIs(SPHERE       , chi_data_types::Varying(1 ));
+RegisterLuaConstantAsIs(SPHERE_ORIGIN, chi_data_types::Varying(2 ));
+RegisterLuaConstantAsIs(RPP          , chi_data_types::Varying(3 ));
+RegisterLuaConstantAsIs(RCC          , chi_data_types::Varying(4 ));
+RegisterLuaConstantAsIs(SURFACE      , chi_data_types::Varying(9 ));
+RegisterLuaConstantAsIs(BOOLEAN      , chi_data_types::Varying(10));
+RegisterLuaFunctionAsIs(chiLogicalVolumePointSense);
 
 // ###################################################################
 /** Creates a logical volume.

@@ -33,4 +33,12 @@ PrintTable(qdata.qpoints, 2)
 print("weights:")
 PrintTable(qdata.weights, 2)
 
+print("chiLegendre(0, 0.25)", chiLegendre(0, 0.25))
+print("chiLegendre(1, 0.25)", chiLegendre(1, 0.25))
+print("chiLegendreDerivative(0, 0.25)", chiLegendreDerivative(0, 0.25))
+print("chiLegendreDerivative(1, 0.25)", chiLegendreDerivative(1, 0.25))
+
+print("chiYlm(0, 0, 45*math.pi/180.0, 45*math.pi/180.0)", chiYlm(0, 0, 45*math.pi/180.0, 45*math.pi/180.0))
+print("chiYlm(1, 0, 45*math.pi/180.0, 45*math.pi/180.0)", chiYlm(1, 0, 45*math.pi/180.0, 45*math.pi/180.0))
+
 print("GOLD_END")

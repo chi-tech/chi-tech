@@ -129,6 +129,32 @@ char chi::ChiConsole::AddFunctionToRegistryInNamespaceWithName(
 }
 
 // ###################################################################
+/**\brief Adds a constant to the lua state. Prepending the constant
+ * within a namespace is optional.*/
+char chi::ChiConsole::AddLuaConstantToRegistry(
+  const std::string& namespace_name,
+  const std::string& constant_name,
+  const chi_data_types::Varying& value)
+{
+  const std::string name_in_lua = namespace_name + "::" + constant_name;
+
+  // Check if the constant name is already there
+  auto& console = ChiConsole::GetInstance();
+  if (console.lua_constants_registry_.count(name_in_lua) > 0)
+  {
+    throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
+                           ": Attempted "
+                           "to register lua const  \"" +
+                           name_in_lua +
+                           "\" but the value "
+                           "is already taken.");
+  }
+
+  console.lua_constants_registry_.insert(std::make_pair(name_in_lua, value));
+  return 0;
+}
+
+// ###################################################################
 chi::InputParameters chi::ChiConsole::DefaultGetInParamsFunc()
 {
   return InputParameters();
@@ -357,6 +383,53 @@ void chi::ChiConsole::SetObjectMethodsToTable(const std::string& class_name,
 }
 
 // ##################################################################
+/**Sets a lua constant in the lua state.*/
+void chi::ChiConsole::SetLuaConstant(const std::string& constant_name,
+                                     const chi_data_types::Varying& value)
+{
+  auto& console = GetInstance();
+  auto L = console.console_state_;
+  const auto path_names = chi_misc_utils::StringSplit(constant_name, "::");
+
+  auto PushVaryingValue = [&L](const chi_data_types::Varying& var_value)
+  {
+    if (var_value.Type() == chi_data_types::VaryingDataType::BOOL)
+      lua_pushboolean(L, var_value.BoolValue());
+    else if (var_value.Type() == chi_data_types::VaryingDataType::STRING)
+      lua_pushstring(L, var_value.StringValue().c_str());
+    else if (var_value.Type() == chi_data_types::VaryingDataType::INTEGER)
+      lua_pushinteger(L, static_cast<lua_Integer>(var_value.IntegerValue()));
+    else if (var_value.Type() == chi_data_types::VaryingDataType::FLOAT)
+      lua_pushnumber(L, var_value.FloatValue());
+    else
+      ChiInvalidArgument("Unsupported value type. Only bool, string, int and "
+                         "double is supported");
+  };
+
+  if (path_names.size() == 1)
+  {
+    PushVaryingValue(value);
+    lua_setglobal(L, path_names.front().c_str());
+  }
+  else
+  {
+    std::vector<std::string> namespace_names;
+    for (const auto& table_name : path_names)
+      if (table_name != path_names.back())
+      {
+        namespace_names.push_back(table_name);
+      }
+
+    FleshOutLuaTableStructure(namespace_names);
+    lua_pushstring(L, path_names.back().c_str());
+    PushVaryingValue(value);
+    lua_settable(L, -3);
+  }
+
+  lua_pop(L, lua_gettop(L));
+}
+
+// ##################################################################
 /**Makes a formatted output, readible by the documentation scripts,
  * of all the lua wrapper functions.*/
 void chi::ChiConsole::DumpRegister() const
@@ -403,6 +476,5 @@ void chi::ChiConsole::UpdateConsoleBindings(
 
   for (const auto& [key, entry] : function_wrapper_registry_)
     if (not ListHasValue(old_statuses.objfactory_keys_, key))
-      if (entry.call_func)
-        SetLuaFuncWrapperNamespaceTableStructure(key);
+      if (entry.call_func) SetLuaFuncWrapperNamespaceTableStructure(key);
 }

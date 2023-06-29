@@ -1,6 +1,13 @@
 #include "chi_lua.h"
 #include "../legendrepoly.h"
 
+#include "ChiConsole/chi_console.h"
+#include "legendre_lua.h"
+
+RegisterLuaFunctionAsIs(chiLegendre);
+RegisterLuaFunctionAsIs(chiLegendreDerivative);
+RegisterLuaFunctionAsIs(chiYlm);
+
 //##########################################################
 /**Provides the function evaluation of Pn at value x.
 

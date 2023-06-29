@@ -6,6 +6,14 @@
 #include "chi_log.h"
 
 #include <iostream>
+#include "meshhandler_lua.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiMeshHandlerCreate);
+RegisterLuaFunctionAsIs(chiMeshHandlerSetCurrent);
+RegisterLuaFunctionAsIs(chiMeshHandlerExportMeshToObj);
+RegisterLuaFunctionAsIs(chiMeshHandlerExportMeshToVTK);
+RegisterLuaFunctionAsIs(chiMeshHandlerExportMeshToExodus);
 
 //#############################################################################
 /** Creates a mesh handler and sets it as "current".

@@ -4,7 +4,10 @@
 #include "ChiMesh/chi_mesh.h"
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 
-#include "chi_log.h"
+#include "meshcutting_lua.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiCutMesh);
 
 //###################################################################
 /**Cuts a mesh.

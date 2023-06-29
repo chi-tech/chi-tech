@@ -8,6 +8,17 @@
 
 #include <memory>
 
+#include "quadratures_lua.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiCreateProductQuadrature);
+
+RegisterLuaConstantAsIs(GAUSS_LEGENDRE, chi_data_types::Varying(1));
+RegisterLuaConstantAsIs(GAUSS_CHEBYSHEV, chi_data_types::Varying(2));
+RegisterLuaConstantAsIs(GAUSS_LEGENDRE_LEGENDRE, chi_data_types::Varying(3));
+RegisterLuaConstantAsIs(GAUSS_LEGENDRE_CHEBYSHEV, chi_data_types::Varying(4));
+RegisterLuaConstantAsIs(CUSTOM_QUADRATURE, chi_data_types::Varying(5));
+
 //########################################################## Create empty system
 /** Creates a Product-quadrature.
  *

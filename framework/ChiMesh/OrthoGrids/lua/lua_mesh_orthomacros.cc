@@ -6,7 +6,12 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
+#include "lua_mesh_orthomacros.h"
+#include "ChiConsole/chi_console.h"
 
+RegisterLuaFunctionAsIs(chiMeshCreateUnpartitioned1DOrthoMesh);
+RegisterLuaFunctionAsIs(chiMeshCreateUnpartitioned2DOrthoMesh);
+RegisterLuaFunctionAsIs(chiMeshCreateUnpartitioned3DOrthoMesh);
 
 //###################################################################
 /** Creates a 1D Mesh from an array of 1D vertices.

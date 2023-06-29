@@ -4,7 +4,10 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
+#include "ffinterpol_lua.h"
+#include "ChiConsole/chi_console.h"
 
+RegisterLuaFunctionAsIs(chiFFInterpolationExportPython);
 
 //###################################################################
 /** Export interpolation to python line,contour plot depending on the

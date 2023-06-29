@@ -37,8 +37,8 @@ class Chi;
 #define RegisterLuaFunctionAsIs(func_name)                                     \
   static char ChiConsoleJoinWordsB(unique_var_name_luacfunc_##func_name##_,    \
                                    __COUNTER__) =                              \
-    chi::ChiConsole::AddFunctionToRegistryGlobalNamespace(#func_name,  \
-                                                                  func_name)
+    chi::ChiConsole::AddFunctionToRegistryGlobalNamespace(#func_name,          \
+                                                          func_name)
 
 /**Macro for registering a lua_CFunction within the ChiConsole
 * singleton.
@@ -50,7 +50,7 @@ class Chi;
 #define RegisterLuaFunction(function, namespace_name, func_name)               \
   static char ChiConsoleJoinWordsB(unique_var_name_luacfunc_##func_name##_,    \
                                    __COUNTER__) =                              \
-    chi::ChiConsole::AddFunctionToRegistryInNamespaceWithName(         \
+    chi::ChiConsole::AddFunctionToRegistryInNamespaceWithName(                 \
       function, #namespace_name, #func_name)
 
 /**Macro for registering a lua_CFunction within the ChiConsole
@@ -63,15 +63,27 @@ class Chi;
 #define RegisterLuaFunctionMethod(function, namespace_name, func_name)         \
   static char ChiConsoleJoinWordsB(unique_var_name_luacfunc_##func_name##_,    \
                                    __COUNTER__) =                              \
-    chi::ChiConsole::AddFunctionToRegistryInNamespaceWithName(         \
+    chi::ChiConsole::AddFunctionToRegistryInNamespaceWithName(                 \
       function, #namespace_name, #func_name, true)
 
 #define RegisterWrapperFunction(                                               \
   namespace_name, name_in_lua, syntax_function, actual_function)               \
   static char ChiConsoleJoinWordsB(unique_var_name_luacfunc_##name_in_lua##_,  \
                                    __COUNTER__) =                              \
-    chi::ChiConsole::AddWrapperToRegistryInNamespaceWithName(          \
+    chi::ChiConsole::AddWrapperToRegistryInNamespaceWithName(                  \
       #namespace_name, #name_in_lua, syntax_function, actual_function)
+
+#define RegisterLuaConstant(namespace_name, name_in_lua, value)        \
+  static char ChiConsoleJoinWordsB(                                            \
+    unique_var_name_luaconst_##namespace_name##_##name_in_lua, __COUNTER__) =  \
+    chi::ChiConsole::AddLuaConstantToRegistry(                  \
+      #namespace_name, #name_in_lua, value)
+
+#define RegisterLuaConstantAsIs(name_in_lua, value)        \
+  static char ChiConsoleJoinWordsB(                                            \
+    unique_var_name_luaconst_##name_in_lua, __COUNTER__) =  \
+    chi::ChiConsole::AddLuaConstantToRegistry(                  \
+      "", #name_in_lua, value)
 
 namespace chi_physics
 {
@@ -118,6 +130,8 @@ private:
 
   std::map<std::string, LuaFuncWrapperRegEntry> function_wrapper_registry_;
 
+  std::map<std::string, chi_data_types::Varying> lua_constants_registry_;
+
   // 00
   ChiConsole() noexcept;
 
@@ -132,10 +146,16 @@ public:
   std::vector<std::string>& GetCommandBuffer() { return command_buffer_; }
 
   const std::map<std::string, LuaFunctionRegistryEntry>&
-  GetLuaFunctionRegistry() const {return lua_function_registry_;}
+  GetLuaFunctionRegistry() const
+  {
+    return lua_function_registry_;
+  }
 
   const std::map<std::string, LuaFunctionRegistryEntry>&
-  GetFunctionWrapperRegistry() const {return lua_function_registry_;}
+  GetFunctionWrapperRegistry() const
+  {
+    return lua_function_registry_;
+  }
 
   // 01 Loop
   void RunConsoleLoop(char* fileName = nullptr) const;
@@ -163,6 +183,11 @@ public:
                                            const std::string& function_name,
                                            bool self_callable = false);
 
+  /**\brief Adds a constant to the lua state.*/
+  static char AddLuaConstantToRegistry(const std::string& namespace_name,
+                                       const std::string& constant_name,
+                                       const chi_data_types::Varying& value);
+
   /**\brief A default function for returning empty input parameters. */
   static InputParameters DefaultGetInParamsFunc();
 
@@ -172,7 +197,7 @@ public:
     const std::string& name_in_lua,
     WrapperGetInParamsFunc syntax_function,
     WrapperCallFunc actual_function,
-    bool ignore_null_call_func=false);
+    bool ignore_null_call_func = false);
 
   /**\brief Formats a namespace structure as table.*/
   static void
@@ -197,6 +222,10 @@ public:
   static void SetObjectMethodsToTable(const std::string& class_name,
                                       size_t handle);
 
+  /**Sets a lua constant in the lua state.*/
+  static void SetLuaConstant(const std::string& constant_name,
+                             const chi_data_types::Varying& value);
+
   // 03
   /**\brief Flushes any commands in the command buffer.*/
   void FlushConsole();
@@ -214,9 +243,9 @@ public:
   void DumpRegister() const;
 
   /**Given an old status, will update the bindings for only newly registered
-  * items.*/
+   * items.*/
   void UpdateConsoleBindings(const chi::RegistryStatuses& old_statuses);
 };
-} // namespace chi_objects
+} // namespace chi
 
 #endif

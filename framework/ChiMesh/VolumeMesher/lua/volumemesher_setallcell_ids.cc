@@ -1,6 +1,10 @@
 #include "ChiLua/chi_lua.h"
 
 #include "ChiMesh/VolumeMesher/chi_volumemesher.h"
+#include "volumemesher_lua.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiVolumeMesherSetMatIDToAll);
 
 //###################################################################
 /** Sets all cell-material id's to the supplied value.

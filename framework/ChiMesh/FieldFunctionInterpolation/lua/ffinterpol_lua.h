@@ -10,9 +10,4 @@ int chiFFInterpolationExecute(lua_State *L);
 int chiFFInterpolationExportPython(lua_State *L);
 int chiFFInterpolationGetValue(lua_State *L);
 
-namespace chi_mesh::ff_interpolation_lua_utils
-{
-  void RegisterLuaEntities(lua_State* L);
-}//namespace chi_mesh::ff_interpolation_lua_utils
-
 #endif //CHITECH_FFINTERPOL_LUA_H

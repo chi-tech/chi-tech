@@ -4,6 +4,10 @@
 
 #include "../sldfe_sq.h"
 
+#include "ChiConsole/chi_console.h"
+#include "sldfe_lua.h"
+
+RegisterLuaFunctionAsIs(chiCreateSLDFESQAngularQuadrature);
 
 //###################################################################
 /** Creates a Simplified Linear Discontinuous Finite Element (SLDFE)

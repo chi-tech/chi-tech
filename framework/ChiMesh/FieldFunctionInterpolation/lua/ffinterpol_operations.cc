@@ -3,6 +3,11 @@
 #include "ChiMesh/FieldFunctionInterpolation/chi_ffinterpolation.h"
 
 #include "chi_runtime.h"
+#include "ffinterpol_lua.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiFFInterpolationInitialize);
+RegisterLuaFunctionAsIs(chiFFInterpolationExecute);
 
 //###################################################################
 /** Initialize interpolator.

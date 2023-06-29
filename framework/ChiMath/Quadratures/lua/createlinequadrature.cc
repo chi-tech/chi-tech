@@ -5,6 +5,11 @@
 
 #include "ChiObjectFactory.h"
 
+#include "quadratures_lua.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiCreateLineQuadrature);
+
 // ########################################################## Create empty
 // system
 /** Creates a quadrature.

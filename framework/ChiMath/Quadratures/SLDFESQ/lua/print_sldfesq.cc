@@ -7,6 +7,10 @@
 #include "chi_log.h"
 
 #include "chi_mpi.h"
+#include "ChiConsole/chi_console.h"
+#include "sldfe_lua.h"
+
+RegisterLuaFunctionAsIs(chiPrintToPythonSLDFESQAngularQuadrature);
 
 
 //###################################################################

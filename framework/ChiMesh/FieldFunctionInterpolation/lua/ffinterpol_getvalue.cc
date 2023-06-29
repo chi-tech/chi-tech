@@ -10,6 +10,11 @@
 #define dcastLine(x) dynamic_cast<chi_mesh::FieldFunctionInterpolationLine&>(x)
 #define dcastVolume(x) dynamic_cast<chi_mesh::FieldFunctionInterpolationVolume&>(x)
 
+#include "ffinterpol_lua.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiFFInterpolationGetValue);
+
 //#############################################################################
 /** Gets the value(s) associated with an interpolation provided the
  * interpolation type has an associated value.

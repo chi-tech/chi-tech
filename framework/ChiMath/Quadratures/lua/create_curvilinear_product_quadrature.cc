@@ -9,6 +9,12 @@
 
 #include "chi_log.h"
 
+#include "quadratures_lua.h"
+#include "ChiConsole/chi_console.h"
+
+RegisterLuaFunctionAsIs(chiCreateCylindricalProductQuadrature);
+RegisterLuaFunctionAsIs(chiCreateSphericalProductQuadrature);
+
 /** Creates a curvilinear product quadrature suitable for cylindrical geometries.
 
  \param QuadratureType int Quadrature identifier.
