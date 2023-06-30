@@ -1,7 +1,7 @@
 #include "lbts_transient_solver.h"
 
 #include "chi_runtime.h"
-#include "ChiConsole/chi_console.h"
+#include "console/chi_console.h"
 
 /**Provides a callback interface to lua after each timestep. Users,
  * can setup all sorts of controls like adaptive timestepping and

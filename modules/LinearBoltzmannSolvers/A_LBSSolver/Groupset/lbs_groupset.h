@@ -6,16 +6,16 @@
 #include "lbs_group.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/IterativeMethods/lbs_iterativemethods.h"
 
-#include "ChiMath/Quadratures/LegendrePoly/legendrepoly.h"
-#include "ChiMath/Quadratures/angular_quadrature_base.h"
-#include "ChiMath/UnknownManager/unknown_manager.h"
+#include "math/Quadratures/LegendrePoly/legendrepoly.h"
+#include "math/Quadratures/angular_quadrature_base.h"
+#include "math/UnknownManager/unknown_manager.h"
 
-#include "ChiMesh/SweepUtilities/AngleAggregation/angleaggregation.h"
+#include "mesh/SweepUtilities/AngleAggregation/angleaggregation.h"
 
 #include "LinearBoltzmannSolvers/A_LBSSolver/lbs_structs.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/Tools/lbs_make_subset.h"
 
-#include "ChiPhysics/chi_physics_namespace.h"
+#include "physics/chi_physics_namespace.h"
 
 #include "A_LBSSolver/Acceleration/acceleration.h"
 

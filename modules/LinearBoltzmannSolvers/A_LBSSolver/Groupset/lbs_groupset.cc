@@ -4,8 +4,8 @@
 #include "LinearBoltzmannSolvers/A_LBSSolver/lbs_solver.h"
 
 #include "chi_runtime.h"
-#include "ChiLog/chi_log.h"
-#include "ChiMPI/chi_mpi.h"
+#include "chi_log.h"
+#include "mpi/chi_mpi.h"
 
 #include <fstream>
 

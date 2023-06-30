@@ -258,8 +258,8 @@ chi::log.Log() << "Hello World!";
 Next we include the headers for access to the `chi_mesh::MeshHandler` and the
 grid, aka `chi_mesh::MeshContinuum`
 \code
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "mesh/MeshHandler/chi_meshhandler.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 \endcode
 
 Next we add the following lines of code:
@@ -350,7 +350,7 @@ It will place only a single node at the centroid of each cell.
 To access this discretization we must first include the header for
 `chi_math::SpatialDiscretization_FV`,
 \code
-#include "ChiMath/SpatialDiscretization/FiniteVolume/fv.h"
+#include "math/SpatialDiscretization/FiniteVolume/fv.h"
 \endcode
 
 Next we add the following lines of code
@@ -426,7 +426,7 @@ ChiTech has several `macro`-type functions for handling PETSc objects. All of th
 are accessed via the `chi_math::PETScUtils` namespace for which we need to include
 the header
 \code
-#include "ChiMath/PETScUtils/petsc_utils.h"
+#include "math/PETScUtils/petsc_utils.h"
 \endcode
 
 Next we add the following code:
@@ -688,7 +688,7 @@ ChiTech uses the notion of `FieldFunctions` and the visualization toolkit, `VTK`
 to visual solutions. In order to gain access to `chi_physics::FieldFunction` we
 need to include the header
 \code
-#include "ChiPhysics/FieldFunction/fieldfunction2.h"
+#include "physics/FieldFunction/fieldfunction2.h"
 \endcode
 
 Next we create the field function using the code
@@ -741,13 +741,13 @@ And on a finer mesh, with the 3D case being 1 million cells:
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "mesh/MeshHandler/chi_meshhandler.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteVolume/fv.h"
-#include "ChiMath/PETScUtils/petsc_utils.h"
+#include "math/SpatialDiscretization/FiniteVolume/fv.h"
+#include "math/PETScUtils/petsc_utils.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction2.h"
+#include "physics/FieldFunction/fieldfunction2.h"
 
 int main(int argc, char* argv[])
 {

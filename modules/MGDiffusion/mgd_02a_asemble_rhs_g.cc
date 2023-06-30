@@ -1,8 +1,8 @@
 #include "mg_diffusion_solver.h"
 #include "chi_runtime.h"
 #include "chi_log.h"
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 //========================================================== Solve 1g problem
 void mg_diffusion::Solver::Assemble_RHS(const unsigned int g,

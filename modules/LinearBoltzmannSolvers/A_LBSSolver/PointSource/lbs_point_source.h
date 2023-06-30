@@ -3,7 +3,7 @@
 
 #include <utility>
 
-#include "ChiMesh/chi_mesh.h"
+#include "mesh/chi_mesh.h"
 
 namespace lbs
 {

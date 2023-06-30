@@ -2,7 +2,7 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-#include "ChiTimer/chi_timer.h"
+#include "utils/chi_timer.h"
 
 #include "A_LBSSolver/IterativeMethods/ags_linear_solver.h"
 

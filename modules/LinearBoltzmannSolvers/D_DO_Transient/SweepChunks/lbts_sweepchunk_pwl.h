@@ -1,11 +1,11 @@
 #ifndef LBTS_SWEEPCHUNK_PWL_H
 #define LBTS_SWEEPCHUNK_PWL_H
 
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/spatial_discretization.h"
 
-#include "ChiMesh/SweepUtilities/sweepchunk_base.h"
+#include "mesh/SweepUtilities/sweepchunk_base.h"
 
 #include "Ca_DO_SteadyState/lbs_DO_steady_state.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"

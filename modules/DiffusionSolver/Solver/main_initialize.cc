@@ -1,15 +1,15 @@
 #include "diffusion_solver.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
+#include "physics/FieldFunction/fieldfunction_gridbased.h"
 
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_runtime.h"
 
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-#include "ChiTimer/chi_timer.h"
+#include "utils/chi_timer.h"
 
 //###################################################################
 /**Initializes the diffusion solver using the PETSc library.*/

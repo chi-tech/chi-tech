@@ -2,15 +2,15 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-#include "ChiTimer/chi_timer.h"
+#include "utils/chi_timer.h"
 
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "mesh/MeshHandler/chi_meshhandler.h"
 
 #include "fv_diffusion_bndry.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
+#include "physics/FieldFunction/fieldfunction_gridbased.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteVolume/fv.h"
+#include "math/SpatialDiscretization/FiniteVolume/fv.h"
 
 //============================================= constructor
 fv_diffusion::Solver::Solver(const std::string& in_solver_name):

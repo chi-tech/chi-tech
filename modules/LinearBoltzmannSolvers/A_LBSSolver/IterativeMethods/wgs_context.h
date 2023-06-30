@@ -1,7 +1,7 @@
 #ifndef CHITECH_WGS_CONTEXT_H
 #define CHITECH_WGS_CONTEXT_H
 
-#include "ChiMath/LinearSolver/linear_solver_context.h"
+#include "math/LinearSolver/linear_solver_context.h"
 
 #include <vector>
 #include <functional>

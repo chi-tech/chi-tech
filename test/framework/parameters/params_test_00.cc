@@ -1,11 +1,11 @@
-#include "ChiParameters/parameter_block.h"
+#include"parameters/parameter_block.h"
 
 #include "chi_lua.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-#include "ChiConsole/chi_console.h"
+#include "console/chi_console.h"
 
 namespace chi_unit_tests
 {

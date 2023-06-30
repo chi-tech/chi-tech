@@ -3,8 +3,8 @@
 #include "A_LBSSolver/Acceleration/diffusion_mip.h"
 #include "A_LBSSolver/Acceleration/diffusion_PWLC.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
-#include "ChiMath/PETScUtils/petsc_utils.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+#include "math/PETScUtils/petsc_utils.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

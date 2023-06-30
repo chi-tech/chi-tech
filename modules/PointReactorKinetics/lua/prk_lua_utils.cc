@@ -1,5 +1,5 @@
 #include "chi_lua.h"
-#include "ChiConsole/chi_console.h"
+#include "console/chi_console.h"
 
 #include "../point_reactor_kinetics.h"
 #include "prk_lua_utils.h"

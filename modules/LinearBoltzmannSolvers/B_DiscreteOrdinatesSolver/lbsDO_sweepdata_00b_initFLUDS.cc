@@ -2,12 +2,12 @@
 
 #include "LinearBoltzmannSolvers/A_LBSSolver/Tools/lbs_make_subset.h"
 
-#include "ChiMesh/SweepUtilities/FLUDS/AUX_FLUDS.h"
+#include "mesh/SweepUtilities/FLUDS/AUX_FLUDS.h"
 
-#include "ChiConsole/chi_console.h"
+#include "console/chi_console.h"
 
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
-#include "ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h"
+#include "mesh/MeshHandler/chi_meshhandler.h"
+#include "mesh/VolumeMesher/Extruder/volmesher_extruder.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -15,7 +15,7 @@
 
 #include <iomanip>
 
-#include "ChiTimer/chi_timer.h"
+#include "utils/chi_timer.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
 //###################################################################

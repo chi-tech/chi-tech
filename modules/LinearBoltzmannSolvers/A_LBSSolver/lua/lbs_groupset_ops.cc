@@ -1,6 +1,6 @@
 #include "A_LBSSolver/lbs_solver.h"
 
-#include "ChiMath/Quadratures/angular_product_quadrature.h"
+#include "math/Quadratures/angular_product_quadrature.h"
 
 #include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_group.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"

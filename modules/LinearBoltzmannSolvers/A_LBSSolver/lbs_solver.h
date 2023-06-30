@@ -1,14 +1,14 @@
 #ifndef CHITECH_LBS_SOLVER_H
 #define CHITECH_LBS_SOLVER_H
 
-#include "ChiPhysics/SolverBase/chi_solver.h"
+#include "physics/SolverBase/chi_solver.h"
 
 #include "A_LBSSolver/Groupset/lbs_groupset.h"
-#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
-#include "ChiMath/LinearSolver/linear_solver.h"
+#include "math/SpatialDiscretization/spatial_discretization.h"
+#include "math/LinearSolver/linear_solver.h"
 #include "lbs_structs.h"
-#include "ChiMesh/SweepUtilities/sweep_namespace.h"
-#include "ChiMesh/SweepUtilities/SweepBoundary/sweep_boundaries.h"
+#include "mesh/SweepUtilities/sweep_namespace.h"
+#include "mesh/SweepUtilities/SweepBoundary/sweep_boundaries.h"
 
 #include "A_LBSSolver/PointSource/lbs_point_source.h"
 

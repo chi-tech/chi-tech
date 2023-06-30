@@ -954,15 +954,15 @@ the stochastic "noise" from the uncollided algorithm.
 \code
 #include "chi_lua.h"
 
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-#include "ChiMesh/Raytrace/raytracing.h"
+#include "mesh/MeshHandler/chi_meshhandler.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
+#include "mesh/Raytrace/raytracing.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
-#include "ChiMath/RandomNumberGeneration/random_number_generator.h"
-#include "ChiMath/Quadratures/LegendrePoly/legendrepoly.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "math/RandomNumberGeneration/random_number_generator.h"
+#include "math/Quadratures/LegendrePoly/legendrepoly.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction2.h"
+#include "physics/FieldFunction/fieldfunction2.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

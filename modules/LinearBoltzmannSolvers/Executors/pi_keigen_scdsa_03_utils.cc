@@ -2,9 +2,9 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-#include "ChiTimer/chi_timer.h"
+#include "utils/chi_timer.h"
 
-#include "ChiMath/VectorGhostCommunicator/vector_ghost_communicator.h"
+#include "math/VectorGhostCommunicator/vector_ghost_communicator.h"
 
 namespace lbs
 {

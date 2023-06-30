@@ -1,6 +1,6 @@
 #include "lbs_sweepchunk.h"
 
-#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/spatial_discretization.h"
 
 #define scint static_cast<int>
 

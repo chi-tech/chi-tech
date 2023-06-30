@@ -4,7 +4,7 @@
 
 #include "chi_runtime.h"
 
-#include "ChiConsole/chi_console.h"
+#include "console/chi_console.h"
 
 namespace lbs::adjoint_lua_utils
 {

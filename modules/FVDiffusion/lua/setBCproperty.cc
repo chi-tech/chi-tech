@@ -1,4 +1,4 @@
-#include "ChiLua/chi_lua.h"
+#include "chi_lua.h"
 
 #include "../fv_diffusion_solver.h"
 

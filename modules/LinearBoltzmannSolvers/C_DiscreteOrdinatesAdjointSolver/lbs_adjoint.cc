@@ -1,7 +1,7 @@
 #include "lbs_adjoint.h"
 
-#include "ChiMath/chi_math.h"
-#include "ChiMath/SerialNewtonIteration/serial_newton_iteration.h"
+#include "math/chi_math.h"
+#include "math/SerialNewtonIteration/serial_newton_iteration.h"
 
 #include "chi_runtime.h"
 #include "chi_runtime.h"

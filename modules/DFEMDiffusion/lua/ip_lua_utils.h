@@ -1,7 +1,7 @@
 #ifndef DFEM_DIFFUSION_LUA_UTILS_H
 #define DFEM_DIFFUSION_LUA_UTILS_H
 
-#include"ChiLua/chi_lua.h"
+#include "chi_lua.h"
 #include "../dfem_diffusion_solver.h"
 
 int chiDFEMDiffusionSolverCreate(lua_State *L);

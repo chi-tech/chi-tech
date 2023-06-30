@@ -4,8 +4,8 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-#include "ChiMiscUtils/chi_misc_utils.h"
-#include "ChiConsole/chi_console.h"
+#include "utils/chi_misc_utils.h"
+#include "console/chi_console.h"
 
 #include <dlfcn.h>
 

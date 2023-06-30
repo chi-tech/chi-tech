@@ -1,6 +1,6 @@
 #include "lbs_curvilinear_sweepchunk_pwl.h"
 
-#include "ChiMath/Quadratures/curvilinear_angular_quadrature.h"
+#include "math/Quadratures/curvilinear_angular_quadrature.h"
 
 #include "chi_log_exceptions.h"
 

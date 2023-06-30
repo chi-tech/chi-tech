@@ -2,7 +2,7 @@
 #define CHITECH_CHIOBJECT_H
 
 #include "chi_runtime.h"
-#include "ChiParameters/input_parameters.h"
+#include"parameters/input_parameters.h"
 
 class ChiObject
 {

@@ -1,11 +1,11 @@
 #include "lbs_discrete_ordinates_solver.h"
 
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
-#include "ChiMesh/VolumeMesher/chi_volumemesher.h"
+#include "mesh/MeshHandler/chi_meshhandler.h"
+#include "mesh/VolumeMesher/chi_volumemesher.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-#include "ChiTimer/chi_timer.h"
+#include "utils/chi_timer.h"
 
 #define ParallelParmetisNeedsCycles \
 "When using PARMETIS type partitioning then groupset iterative method" \

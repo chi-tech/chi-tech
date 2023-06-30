@@ -1,7 +1,7 @@
 #include "mg_diffusion_solver.h"
 #include "chi_runtime.h"
 #include "chi_log.h"
-#include "ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h"
+#include "physics/PhysicsMaterial/chi_physicsmaterial.h"
 
 void mg_diffusion::Solver::Compute_TwoGrid_Params()
 {

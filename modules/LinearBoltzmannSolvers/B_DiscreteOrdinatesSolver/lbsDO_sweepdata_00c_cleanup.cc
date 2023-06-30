@@ -3,7 +3,7 @@
 #include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
 #include "chi_runtime.h"
-#include "ChiConsole/chi_console.h"
+#include "console/chi_console.h"
 #include "chi_log.h"
 #include "chi_mpi.h"
 

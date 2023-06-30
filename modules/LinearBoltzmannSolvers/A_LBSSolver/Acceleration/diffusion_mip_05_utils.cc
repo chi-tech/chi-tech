@@ -1,10 +1,10 @@
 #include "diffusion_mip.h"
 
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/spatial_discretization.h"
 
-#include "ChiMesh/chi_mesh.h"
+#include "mesh/chi_mesh.h"
 
 #define scdouble static_cast<double>
 

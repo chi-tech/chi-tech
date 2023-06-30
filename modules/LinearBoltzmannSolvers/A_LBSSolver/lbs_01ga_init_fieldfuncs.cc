@@ -1,6 +1,6 @@
 #include "lbs_solver.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
+#include "physics/FieldFunction/fieldfunction_gridbased.h"
 
 #include "chi_runtime.h"
 

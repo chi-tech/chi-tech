@@ -2,7 +2,7 @@
 
 #include "B_DiscreteOrdinatesSolver/lbs_discrete_ordinates_solver.h"
 
-#include "ChiConsole/chi_console.h"
+#include "console/chi_console.h"
 
 #include "chi_runtime.h"
 

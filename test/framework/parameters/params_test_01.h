@@ -2,7 +2,7 @@
 #define CHITECH_PARAMS_TEST_H
 
 #include "ChiObject.h"
-#include "ChiParameters/input_parameters.h"
+#include"parameters/input_parameters.h"
 
 namespace chi_unit_testsB
 {

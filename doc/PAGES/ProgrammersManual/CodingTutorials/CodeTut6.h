@@ -816,18 +816,18 @@ Notice the blocky appearance, a consequence of the finite volume discretization.
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "mesh/MeshHandler/chi_meshhandler.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteVolume/fv.h"
-#include "ChiMath/Quadratures/angular_quadrature_base.h"
-#include "ChiMath/Quadratures/angular_product_quadrature.h"
-#include "ChiMath/chi_math_range.h"
+#include "math/SpatialDiscretization/FiniteVolume/fv.h"
+#include "math/Quadratures/angular_quadrature_base.h"
+#include "math/Quadratures/angular_product_quadrature.h"
+#include "math/chi_math_range.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction2.h"
-#include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
+#include "physics/FieldFunction/fieldfunction2.h"
+#include "physics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
 
-#include "ChiDataTypes/ndarray.h"
+#include "data_types/ndarray.h"
 
 int main(int argc, char* argv[])
 {

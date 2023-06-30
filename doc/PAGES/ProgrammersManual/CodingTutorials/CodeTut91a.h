@@ -9,15 +9,15 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "mesh/MeshHandler/chi_meshhandler.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
-#include "ChiMath/PETScUtils/petsc_utils.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+#include "math/PETScUtils/petsc_utils.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction2.h"
+#include "physics/FieldFunction/fieldfunction2.h"
 
-#include "ChiConsole/chi_console.h"
-#include "ChiLua/chi_lua.h"
+#include "console/chi_console.h"
+#include "chi_lua.h"
 
 int main(int argc, char* argv[])
 {

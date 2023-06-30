@@ -1,6 +1,6 @@
 #include "diffusion_PWLC.h"
 
-#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/spatial_discretization.h"
 
 namespace lbs::acceleration
 {

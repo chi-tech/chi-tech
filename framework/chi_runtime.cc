@@ -2,17 +2,17 @@
 #include "chi_runtime.h"
 #include "chi_configuration.h"
 
-#include "ChiConsole/chi_console.h"
-#include "ChiMath/chi_math.h"
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "console/chi_console.h"
+#include "math/chi_math.h"
+#include "mesh/MeshHandler/chi_meshhandler.h"
 
-#include "ChiPhysics/chi_physics_namespace.h"
+#include "physics/chi_physics_namespace.h"
 
 #include "ChiObjectFactory.h"
 
 #include "chi_mpi.h"
 #include "chi_log.h"
-#include "ChiTimer/chi_timer.h"
+#include "utils/chi_timer.h"
 
 #include <iostream>
 

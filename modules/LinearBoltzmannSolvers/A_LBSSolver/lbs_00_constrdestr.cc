@@ -3,7 +3,7 @@
 #include "chi_log.h"
 
 #include "IterativeMethods/wgs_context.h"
-#include "ChiMath/TimeIntegrations/time_integration.h"
+#include "math/TimeIntegrations/time_integration.h"
 
 namespace lbs
 {
