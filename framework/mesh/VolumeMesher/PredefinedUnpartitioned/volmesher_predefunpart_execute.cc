@@ -20,7 +20,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   Chi::log.Log()
     << Chi::program_timer.GetTimeString()
     << " VolumeMesherPredefinedUnpartitioned executing. Memory in use = "
-    << chi::ChiConsole::GetMemoryUsageInMB() << " MB"
+    << chi::Console::GetMemoryUsageInMB() << " MB"
     << std::endl;
 
   //======================================== Check partitioning params

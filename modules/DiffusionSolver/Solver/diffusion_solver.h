@@ -31,8 +31,8 @@
 class chi_diffusion::Solver : public chi_physics::Solver
 {
 private:
-  chi::ChiTimer t_assembly_;
-  chi::ChiTimer t_solve_;
+  chi::Timer t_assembly_;
+  chi::Timer t_solve_;
 
   double time_assembly_ = 0.0;
   double time_solve_    = 0.0;

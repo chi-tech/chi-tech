@@ -21,26 +21,26 @@ extern "C"
 class Chi;
 
 /**Small utility macro for joining two words.*/
-#define ChiConsoleJoinWordsA(x, y) x##y
+#define ConsoleJoinWordsA(x, y) x##y
 /**IDK why this is needed. Seems like counter doesnt work properly without it*/
-#define ChiConsoleJoinWordsB(x, y) ChiConsoleJoinWordsA(x, y)
+#define ConsoleJoinWordsB(x, y) ConsoleJoinWordsA(x, y)
 
-/**Macro for registering a lua_CFunction within the ChiConsole
+/**Macro for registering a lua_CFunction within the Console
  * singleton, with the function being in the global namespace. Example:
  * \code
- * ChiConsoleRegisterLuaFunction(chiSolverInitialize);
+ * ConsoleRegisterLuaFunction(chiSolverInitialize);
  * \endcode
  *
  * \note Remember to include the header "console/chi_console.h".
  * The name supplied to this function cannot have scope resolution operators,
  * i.e., "::".*/
 #define RegisterLuaFunctionAsIs(func_name)                                     \
-  static char ChiConsoleJoinWordsB(unique_var_name_luacfunc_##func_name##_,    \
+  static char ConsoleJoinWordsB(unique_var_name_luacfunc_##func_name##_,    \
                                    __COUNTER__) =                              \
-    chi::ChiConsole::AddFunctionToRegistryGlobalNamespace(#func_name,          \
+    chi::Console::AddFunctionToRegistryGlobalNamespace(#func_name,          \
                                                           func_name)
 
-/**Macro for registering a lua_CFunction within the ChiConsole
+/**Macro for registering a lua_CFunction within the Console
 * singleton.
 \param function LuaCFunction. The function to use.
 \param namespace_name NonQuotedString. May include scope resolution
@@ -48,12 +48,12 @@ class Chi;
                  the lua console.
 */
 #define RegisterLuaFunction(function, namespace_name, func_name)               \
-  static char ChiConsoleJoinWordsB(unique_var_name_luacfunc_##func_name##_,    \
+  static char ConsoleJoinWordsB(unique_var_name_luacfunc_##func_name##_,    \
                                    __COUNTER__) =                              \
-    chi::ChiConsole::AddFunctionToRegistryInNamespaceWithName(                 \
+    chi::Console::AddFunctionToRegistryInNamespaceWithName(                 \
       function, #namespace_name, #func_name)
 
-/**Macro for registering a lua_CFunction within the ChiConsole
+/**Macro for registering a lua_CFunction within the Console
 * singleton, functioning as a method of the class pointed to by the namespace.
 \param function LuaCFunction. The function to use.
 \param namespace_name NonQuotedString. May include scope resolution
@@ -61,28 +61,28 @@ class Chi;
                  the lua console.
 */
 #define RegisterLuaFunctionMethod(function, namespace_name, func_name)         \
-  static char ChiConsoleJoinWordsB(unique_var_name_luacfunc_##func_name##_,    \
+  static char ConsoleJoinWordsB(unique_var_name_luacfunc_##func_name##_,    \
                                    __COUNTER__) =                              \
-    chi::ChiConsole::AddFunctionToRegistryInNamespaceWithName(                 \
+    chi::Console::AddFunctionToRegistryInNamespaceWithName(                 \
       function, #namespace_name, #func_name, true)
 
 #define RegisterWrapperFunction(                                               \
   namespace_name, name_in_lua, syntax_function, actual_function)               \
-  static char ChiConsoleJoinWordsB(unique_var_name_luacfunc_##name_in_lua##_,  \
+  static char ConsoleJoinWordsB(unique_var_name_luacfunc_##name_in_lua##_,  \
                                    __COUNTER__) =                              \
-    chi::ChiConsole::AddWrapperToRegistryInNamespaceWithName(                  \
+    chi::Console::AddWrapperToRegistryInNamespaceWithName(                  \
       #namespace_name, #name_in_lua, syntax_function, actual_function)
 
 #define RegisterLuaConstant(namespace_name, name_in_lua, value)        \
-  static char ChiConsoleJoinWordsB(                                            \
+  static char ConsoleJoinWordsB(                                            \
     unique_var_name_luaconst_##namespace_name##_##name_in_lua, __COUNTER__) =  \
-    chi::ChiConsole::AddLuaConstantToRegistry(                  \
+    chi::Console::AddLuaConstantToRegistry(                  \
       #namespace_name, #name_in_lua, value)
 
 #define RegisterLuaConstantAsIs(name_in_lua, value)        \
-  static char ChiConsoleJoinWordsB(                                            \
+  static char ConsoleJoinWordsB(                                            \
     unique_var_name_luaconst_##name_in_lua, __COUNTER__) =  \
-    chi::ChiConsole::AddLuaConstantToRegistry(                  \
+    chi::Console::AddLuaConstantToRegistry(                  \
       "", #name_in_lua, value)
 
 namespace chi_physics
@@ -100,7 +100,7 @@ namespace chi
 {
 
 /** Class for handling the console and scripting.*/
-class ChiConsole
+class Console
 {
 public:
   using WrapperGetInParamsFunc = chi::InputParameters (*)();
@@ -122,7 +122,7 @@ private:
   lua_State* console_state_; ///< Pointer to lua console state
 
   std::vector<std::string> command_buffer_; ///< Buffer of commands to execute
-  static ChiConsole instance_;
+  static Console instance_;
 
   std::map<std::string, LuaFunctionRegistryEntry> lua_function_registry_;
 
@@ -133,14 +133,14 @@ private:
   std::map<std::string, chi_data_types::Varying> lua_constants_registry_;
 
   // 00
-  ChiConsole() noexcept;
+  Console() noexcept;
 
 private:
   friend class ::Chi;
   void LoadRegisteredLuaItems();
 
 public:
-  static ChiConsole& GetInstance() noexcept;
+  static Console& GetInstance() noexcept;
 
   lua_State*& GetConsoleState() { return console_state_; }
   std::vector<std::string>& GetCommandBuffer() { return command_buffer_; }

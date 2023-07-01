@@ -4,7 +4,7 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-#include "utils/chi_misc_utils.h"
+#include "utils/chi_utils.h"
 #include "console/chi_console.h"
 
 #include <dlfcn.h>
@@ -38,7 +38,7 @@ Plugin::Plugin(const InputParameters& params)
   Chi::log.Log0Verbose1() << "Loading plugin \"" << plugin_path_ << "\"";
   chi::RegistryStatuses registry_statuses = Chi::GetStatusOfRegistries();
 
-  chi_misc_utils::AssertReadibleFile(plugin_path_);
+  chi::AssertReadibleFile(plugin_path_);
   library_handle_ = dlopen(plugin_path_.c_str(), RTLD_LAZY);
 
   ChiLogicalErrorIf(not library_handle_,

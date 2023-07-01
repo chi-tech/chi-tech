@@ -183,5 +183,5 @@ void lbs::LBSSolver::InitializeParrays()
   Chi::log.Log()
     << "Done with parallel arrays.                Process memory = "
     << std::setprecision(3)
-    << chi::ChiConsole::GetMemoryUsageInMB() << " MB" << std::endl;
+    << chi::Console::GetMemoryUsageInMB() << " MB" << std::endl;
 }

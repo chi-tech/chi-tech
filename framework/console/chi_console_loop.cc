@@ -8,7 +8,7 @@
 
 //######################################################### Run Console loop
 /** Executes the loop for the console.*/
-void chi::ChiConsole::RunConsoleLoop(char*) const
+void chi::Console::RunConsoleLoop(char*) const
 {
   Chi::log.Log() << "Console loop started. "
                      << "Type \"exit\" to quit (or Ctl-C).";

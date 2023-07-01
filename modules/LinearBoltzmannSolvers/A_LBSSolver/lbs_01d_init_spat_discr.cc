@@ -182,5 +182,5 @@ void lbs::LBSSolver::ComputeUnitIntegrals()
   Chi::log.Log()
     << "Cell matrices computed.                   Process memory = "
     << std::setprecision(3)
-    << chi::ChiConsole::GetMemoryUsageInMB() << " MB";
+    << chi::Console::GetMemoryUsageInMB() << " MB";
 }

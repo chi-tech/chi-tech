@@ -1,4 +1,4 @@
-#include "chi_misc_utils.h"
+#include "chi_utils.h"
 
 #include <cmath>
 #include <iomanip>
@@ -13,7 +13,7 @@
  *
  * Specifying 10 intervals will print after each 10% is completed.
  * Specifying 4 intervals will print after each 25% is completed.*/
-std::string chi_misc_utils::
+std::string chi::
   PrintIterationProgress(const size_t current_iteration,
                          const size_t total_num_iterations,
                          const unsigned int num_intvls/*=10*/)

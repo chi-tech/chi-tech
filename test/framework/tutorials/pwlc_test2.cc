@@ -69,7 +69,7 @@ chiSimTest04_PWLC(const chi::InputParameters& params)
     A, nodal_nnz_in_diag, nodal_nnz_off_diag);
 
   //============================================= Source lambda
-  lua_State* L = chi::ChiConsole::GetInstance().GetConsoleState();
+  lua_State* L = chi::Console::GetInstance().GetConsoleState();
   auto CallLuaXYZFunction =
     [&L](const std::string& lua_func_name, const chi_mesh::Vector3& xyz)
   {

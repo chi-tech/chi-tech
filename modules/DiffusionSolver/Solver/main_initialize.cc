@@ -23,7 +23,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
   if (not common_items_initialized_)
     InitializeCommonItems(); //Mostly boundaries
 
-  chi::ChiTimer t_init; t_init.Reset();
+  chi::Timer t_init; t_init.Reset();
 
   auto sdm_string = basic_options_("discretization_method").StringValue();
   {

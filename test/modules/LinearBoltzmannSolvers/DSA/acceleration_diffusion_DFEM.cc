@@ -200,7 +200,7 @@ acceleration_Diffusion_DFEM(const chi::InputParameters&)
   const auto field_wg = ff->GetGhostedFieldVector();
 
   double local_error = 0.0;
-  lua_State* L = chi::ChiConsole::GetInstance().GetConsoleState();
+  lua_State* L = chi::Console::GetInstance().GetConsoleState();
   for (const auto& cell : grid.local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);

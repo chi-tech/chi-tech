@@ -63,7 +63,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
 
   std::vector<std::pair<int,int>> edges_to_remove;
   std::vector<int> raw_edges_to_remove;
-  chi_graph::DirectedGraph TDG;
+  chi::DirectedGraph TDG;
 
   //============================================= Build graph on home location
   if (Chi::mpi.location_id == 0)

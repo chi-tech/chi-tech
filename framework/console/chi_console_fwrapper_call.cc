@@ -6,19 +6,19 @@
 namespace chi
 {
 
-RegisterLuaFunction(ChiConsole::LuaWrapperCall, chi_console, LuaWrapperCall);
+RegisterLuaFunction(Console::LuaWrapperCall, chi_console, LuaWrapperCall);
 
 /** This function expects at least 1 parameter. The first parameter must
  * be a string indicating the registered name of the function wrapper to
  * call. All other parameters will be forwarded to the function wrapper.*/
-int ChiConsole::LuaWrapperCall(lua_State* L)
+int Console::LuaWrapperCall(lua_State* L)
 {
   const int num_args = lua_gettop(L);
   // We do not check for the required parameters here because we want
   // to make this function call as fast as possible. Besides, via the
   // static registration we should never run into an issue here.
 
-  auto& console = ChiConsole::GetInstance();
+  auto& console = Console::GetInstance();
 
   const auto& registry = console.function_wrapper_registry_;
 

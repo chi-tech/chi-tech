@@ -6,7 +6,7 @@
 
 #include <memory>
 
-namespace chi_graph
+namespace chi
 {
   class DirectedGraph;
 }
@@ -53,11 +53,11 @@ struct STDG;           ///< Global Sweep Plane Ordering
 
   void RemoveGlobalCyclicDependencies(
     chi_mesh::sweep_management::SPDS* sweep_order,
-    chi_graph::DirectedGraph& TDG);
+                                 chi::DirectedGraph& TDG);
 
   void RemoveLocalCyclicDependencies(
     std::shared_ptr<SPDS> sweep_order,
-    chi_graph::DirectedGraph& local_DG);
+                                     chi::DirectedGraph& local_DG);
 
   std::shared_ptr<SPDS> CreateSweepOrder(const chi_mesh::Vector3& omega,
                                          const chi_mesh::MeshContinuumPtr& grid,

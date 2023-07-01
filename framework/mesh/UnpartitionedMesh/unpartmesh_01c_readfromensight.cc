@@ -2,7 +2,7 @@
 
 #include "mesh/MeshContinuum/chi_grid_vtk_utils.h"
 
-#include "utils/chi_misc_utils.h"
+#include "utils/chi_utils.h"
 
 #include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
@@ -51,14 +51,14 @@ void chi_mesh::UnpartitionedMesh::
   {
     auto block_a = iter_a->GetCurrentDataObject();
 
-    const std::string block_name = chi_misc_utils::StringTrim(
+    const std::string block_name = chi::StringTrim(
       iter_a->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME()));
 
     if (block_a->GetDataObjectType() == VTK_UNSTRUCTURED_GRID)
     {
       grid_blocks.emplace_back(
         vtkUnstructuredGrid::SafeDownCast(block_a),
-        chi_misc_utils::StringTrim(
+        chi::StringTrim(
           iter_a->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME())));
 
       Chi::log.Log()

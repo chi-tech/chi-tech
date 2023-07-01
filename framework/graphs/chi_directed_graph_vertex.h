@@ -7,7 +7,7 @@
 
 //###################################################################
 /**General implementation of a directed-graph vertex.*/
-struct chi_graph::GraphVertex
+struct chi::GraphVertex
 {
   size_t id;
   void* context;

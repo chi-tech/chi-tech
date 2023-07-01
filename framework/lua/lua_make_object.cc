@@ -36,7 +36,7 @@ RegisterLuaFunctionAsIs(chiMakeObjectType);
   lua_pushinteger(L, static_cast<lua_Integer>(handle));
 
   lua_newtable(L);
-  ChiConsole::SetObjectMethodsToTable(type, handle);
+  Console::SetObjectMethodsToTable(type, handle);
 
   return 2;
 }
@@ -65,7 +65,7 @@ int chiMakeObjectType(lua_State* L)
   lua_pushinteger(L, static_cast<lua_Integer>(handle));
 
   lua_newtable(L);
-  ChiConsole::SetObjectMethodsToTable(type, handle);
+  Console::SetObjectMethodsToTable(type, handle);
 
   return 2;
 }

@@ -13,8 +13,7 @@
 //###################################################################
 /**Removes local cyclic dependencies.*/
 void chi_mesh::sweep_management::
-  RemoveLocalCyclicDependencies(std::shared_ptr<SPDS> sweep_order,
-                                chi_graph::DirectedGraph &local_DG)
+  RemoveLocalCyclicDependencies(std::shared_ptr<SPDS> sweep_order, chi::DirectedGraph &local_DG)
 {
   auto edges_to_remove = local_DG.RemoveCyclicDependencies();
 

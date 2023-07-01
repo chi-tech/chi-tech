@@ -92,7 +92,7 @@ ExportToChiXSFile(const std::string &file_name,
 
 
   ofile << "# Exported cross section from ChiTech\n";
-  ofile << "# Date: " << chi::ChiTimer::GetLocalDateTimeString() << "\n";
+  ofile << "# Date: " << chi::Timer::GetLocalDateTimeString() << "\n";
   ofile << "NUM_GROUPS " << NumGroups() << "\n";
   ofile << "NUM_MOMENTS " << ScatteringOrder() + 1 << "\n";
   if (NumPrecursors() > 0)

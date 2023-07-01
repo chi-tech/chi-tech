@@ -16,7 +16,7 @@
 void chi_math::SpatialDiscretization_PWLD::OrderNodes()
 {
   const std::string fname = __FUNCTION__;
-  chi::ChiTimer t_stage[6];
+  chi::Timer t_stage[6];
 
   t_stage[0].Reset();
   //================================================== Check cell views avail

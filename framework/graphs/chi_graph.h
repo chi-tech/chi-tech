@@ -3,7 +3,7 @@
 
 #include "mesh/chi_mesh.h"
 
-namespace chi_graph
+namespace chi
 {
   struct GraphVertex;
   class DirectedGraph;

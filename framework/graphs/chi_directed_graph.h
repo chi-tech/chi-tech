@@ -8,7 +8,7 @@
 /**Simple implementation of a directed graph. This implementation was
  * considered to serve more versatile strategies with regards to grid
  * parallel partitioning.*/
-class chi_graph::DirectedGraph
+class chi::DirectedGraph
 {
 public:
 

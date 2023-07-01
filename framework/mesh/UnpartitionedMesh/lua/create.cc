@@ -86,7 +86,7 @@ int chiDestroyUnpartitionedMesh(lua_State* L)
 
   Chi::log.Log()
   << "Unpartitioned mesh destroyed. Memory in use = "
-  << chi::ChiConsole::GetMemoryUsageInMB() << " MB";
+  << chi::Console::GetMemoryUsageInMB() << " MB";
   return 0;
 }
 

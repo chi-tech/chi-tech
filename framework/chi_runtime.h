@@ -52,8 +52,8 @@ class UnknownManager;
 namespace chi
 {
 
-class ChiTimer;
-class ChiConsole;
+class Timer;
+class Console;
 class ChiLog;
 /**Stores all the keys currently in the registries.*/
 struct RegistryStatuses
@@ -73,8 +73,8 @@ class Chi
 {
 public:
   static chi::MPI_Info& mpi;
-  static chi::ChiTimer program_timer;
-  static chi::ChiConsole& console;
+  static chi::Timer program_timer;
+  static chi::Console& console;
   static chi::ChiLog& log;
 
   static std::vector<chi_mesh::MeshHandlerPtr> meshhandler_stack;

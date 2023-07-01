@@ -9,7 +9,7 @@
 
 //###################################################################
 /** Adds a vertex to the graph with a supplied id.*/
-void chi_graph::DirectedGraph::
+void chi::DirectedGraph::
   VertexAccessor::AddVertex(size_t id, void* context)
 {
   vertices_.emplace_back(id, context);
@@ -21,7 +21,7 @@ void chi_graph::DirectedGraph::
  * For example, if there are 3 vertices on the graph (with
  * IDs 0 through 2) then the next vertex (this one) will
  * be assigned and ID of 3.*/
-void chi_graph::DirectedGraph::
+void chi::DirectedGraph::
 VertexAccessor::AddVertex(void* context)
 {
   vertices_.emplace_back(vertices_.size(), context);
@@ -31,7 +31,7 @@ VertexAccessor::AddVertex(void* context)
 
 //###################################################################
 /** Removes a vertex from the graph.*/
-void chi_graph::DirectedGraph::
+void chi::DirectedGraph::
   VertexAccessor::RemoveVertex(size_t v)
 {
   ChiLogicalErrorIf(v >= vertices_.size(), "Error removing vertex.");
@@ -62,7 +62,7 @@ void chi_graph::DirectedGraph::
 
 //###################################################################
 /** Accesses a vertex from the graph.*/
-chi_graph::GraphVertex& chi_graph::DirectedGraph::
+chi::GraphVertex& chi::DirectedGraph::
   VertexAccessor::operator[](size_t v)
 {
   if (not vertex_valid_flags_[v])
@@ -75,7 +75,7 @@ chi_graph::GraphVertex& chi_graph::DirectedGraph::
 //###################################################################
 /** Adds a vertex to the graph. By default <I>context</I> is
  * assumed to be nullptr.*/
-void chi_graph::DirectedGraph::AddVertex(size_t id,void* context/*=nullptr*/)
+void chi::DirectedGraph::AddVertex(size_t id,void* context/*=nullptr*/)
 {
   vertices.AddVertex(id, context);
 }
@@ -86,7 +86,7 @@ void chi_graph::DirectedGraph::AddVertex(size_t id,void* context/*=nullptr*/)
  * automatically. In
  * the latter case the vertex id will be the same as the order
  * in which it was added (0,1,2,3,etc ... will have id's 0,1,2,3,etc)*/
-void chi_graph::DirectedGraph::AddVertex(void* context/*=nullptr*/)
+void chi::DirectedGraph::AddVertex(void* context/*=nullptr*/)
 {
   vertices.AddVertex(context);
 }
@@ -94,7 +94,7 @@ void chi_graph::DirectedGraph::AddVertex(void* context/*=nullptr*/)
 //###################################################################
 /** Removes a vertex from the graph. This method does not
  * free any context related data.*/
-void chi_graph::DirectedGraph::
+void chi::DirectedGraph::
   RemoveVertex(size_t v)
 {
   vertices.RemoveVertex(v);
@@ -103,7 +103,7 @@ void chi_graph::DirectedGraph::
 //###################################################################
 /** Adds an edge to the graph. Range checks are supplied by the
  * vertex accessor.*/
-bool chi_graph::DirectedGraph::
+bool chi::DirectedGraph::
   AddEdge(size_t from, size_t to, double weight)
 {
   vertices[from].ds_edge.insert(to);
@@ -118,7 +118,7 @@ bool chi_graph::DirectedGraph::
 //###################################################################
 /**Remove an edge from the graph. Range checks are supplied by the
  * vertex accessor.*/
-void chi_graph::DirectedGraph::RemoveEdge(size_t from, size_t to)
+void chi::DirectedGraph::RemoveEdge(size_t from, size_t to)
 {
   vertices[from].ds_edge.erase(to);
   vertices[to].us_edge.erase(from);
@@ -128,7 +128,7 @@ void chi_graph::DirectedGraph::RemoveEdge(size_t from, size_t to)
 /** Depth-First-Search main recursive algorithm. This is the recursive
  * portion of the method below this one
  * (chi_graph::DirectedGraph::DepthFirstSearch).*/
-void chi_graph::DirectedGraph::
+void chi::DirectedGraph::
   DFSAlgorithm(std::vector<size_t> &traversal,
                std::vector<bool> &visited,
                size_t cur_vid)
@@ -146,7 +146,7 @@ void chi_graph::DirectedGraph::
 /**SCC main recursive algorithm. This is the recursive call for the
  * method defined below this one
  * (chi_graph::DirectedGraph::FindStronglyConnectedConnections).*/
-void chi_graph::DirectedGraph::SCCAlgorithm(
+void chi::DirectedGraph::SCCAlgorithm(
   size_t u, int& time,
   std::vector<int>& disc,
   std::vector<int>& low,
@@ -199,7 +199,8 @@ void chi_graph::DirectedGraph::SCCAlgorithm(
  *
  * It returns collections of vertices that form strongly connected
  * components excluding singletons.*/
-std::vector<std::vector<size_t>> chi_graph::DirectedGraph::
+std::vector<std::vector<size_t>>
+chi::DirectedGraph::
   FindStronglyConnectedComponents()
 {
   size_t V = vertices.size();
@@ -232,7 +233,7 @@ std::vector<std::vector<size_t>> chi_graph::DirectedGraph::
  * \return Returns the vertex ids sorted topologically. If this
  *         vector is empty the algorithm failed because it detected
  *         cyclic dependencies.*/
-std::vector<size_t> chi_graph::DirectedGraph::GenerateTopologicalSort()
+std::vector<size_t> chi::DirectedGraph::GenerateTopologicalSort()
 {
   bool has_cycles=false;
   std::vector<size_t> L;
@@ -296,10 +297,10 @@ std::vector<size_t> chi_graph::DirectedGraph::GenerateTopologicalSort()
  * [1] Eades P., Lin X., Smyth W.F., "Fast & Effective heuristic for
  *     the feedback arc set problem", Information Processing Letters,
  *     Volume 47. 1993.*/
-std::vector<size_t> chi_graph::DirectedGraph::
+std::vector<size_t> chi::DirectedGraph::
   FindApproxMinimumFAS()
 {
-  auto GetVertexDelta = [](chi_graph::GraphVertex& vertex)
+  auto GetVertexDelta = [](chi::GraphVertex& vertex)
   {
     double delta = 0.0;
     for (size_t ds : vertex.ds_edge)
@@ -367,7 +368,7 @@ std::vector<size_t> chi_graph::DirectedGraph::
 
 //###################################################################
 /**Prints the graph in Graphviz format.*/
-void chi_graph::DirectedGraph::PrintGraphviz(int location_mask)
+void chi::DirectedGraph::PrintGraphviz(int location_mask)
 {
   if (Chi::mpi.location_id != location_mask) return;
 
@@ -396,7 +397,7 @@ void chi_graph::DirectedGraph::PrintGraphviz(int location_mask)
 
 //###################################################################
 /**Prints a sub-graph in Graphviz format.*/
-void chi_graph::DirectedGraph::
+void chi::DirectedGraph::
   PrintSubGraphviz(const std::vector<int>& verts_to_print,
                    int location_mask)
 {
@@ -432,7 +433,7 @@ void chi_graph::DirectedGraph::
 
 //###################################################################
 std::vector<std::pair<size_t,size_t>>
-chi_graph::DirectedGraph::RemoveCyclicDependencies()
+chi::DirectedGraph::RemoveCyclicDependencies()
 {
   std::vector<std::pair<size_t,size_t>> edges_to_remove;
 
@@ -485,7 +486,7 @@ chi_graph::DirectedGraph::RemoveCyclicDependencies()
       else
       {
         //=============================== Add vertices to temporary graph
-        chi_graph::DirectedGraph TG; //Temp Graph
+        chi::DirectedGraph TG; //Temp Graph
         for (size_t k=0; k<subDG.size(); ++k)
           TG.AddVertex();
 
@@ -507,7 +508,7 @@ chi_graph::DirectedGraph::RemoveCyclicDependencies()
         }//for u
 
         //=============================== Make a copy of the graph verts
-        std::vector<chi_graph::GraphVertex> verts_copy;
+        std::vector<chi::GraphVertex> verts_copy;
         verts_copy.reserve(TG.vertices.size());
         for (auto& v : TG.vertices)
           verts_copy.push_back(v);
@@ -565,7 +566,7 @@ chi_graph::DirectedGraph::RemoveCyclicDependencies()
 
 //###################################################################
 /**Clears all the data structures associated with the graph.*/
-void chi_graph::DirectedGraph::Clear()
+void chi::DirectedGraph::Clear()
 {
   vertices.clear();
 }
@@ -573,7 +574,7 @@ void chi_graph::DirectedGraph::Clear()
 
 //###################################################################
 /**Destructor.*/
-chi_graph::DirectedGraph::~DirectedGraph()
+chi::DirectedGraph::~DirectedGraph()
 {
   Clear();
 }

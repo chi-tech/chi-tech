@@ -25,7 +25,7 @@ void lbs::DiscreteOrdinatesSolver::ResetSweepOrderings(LBSGroupset& groupset)
   Chi::log.Log()
     << "SPDS and FLUDS reset complete.            Process memory = "
     << std::setprecision(3)
-    << chi::ChiConsole::GetMemoryUsageInMB() << " MB";
+    << chi::Console::GetMemoryUsageInMB() << " MB";
 
   double local_app_memory =
     Chi::log.ProcessEvent(chi::ChiLog::StdTags::MAX_MEMORY_USAGE,

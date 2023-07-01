@@ -1,10 +1,10 @@
-#include "chi_misc_utils.h"
+#include "chi_utils.h"
 
 #include <fstream>
 
 #include "chi_log_exceptions.h"
 
-namespace chi_misc_utils
+namespace chi
 {
 // #################################################################
 std::string StringLTrim(const std::string& s)

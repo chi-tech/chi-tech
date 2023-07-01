@@ -29,7 +29,7 @@ void chi_mesh::SurfaceMesh::CheckCyclicDependencies(int num_angles)
     omega.z = 0.0;
 
     //================================= Add all polyfaces to graph
-    chi_graph::DirectedGraph G;
+    chi::DirectedGraph G;
     size_t num_loc_cells = poly_faces_.size();
     for (size_t c=0; c<num_loc_cells; c++)
       G.AddVertex();

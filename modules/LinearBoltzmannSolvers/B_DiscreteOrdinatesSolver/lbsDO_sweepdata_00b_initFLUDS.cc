@@ -108,7 +108,7 @@ void lbs::DiscreteOrdinatesSolver::
       << Chi::program_timer.GetTimeString()
       << " Initialized Angle Aggregation.   "
       << "         Process memory = "
-      << std::setprecision(3) << chi::ChiConsole::GetMemoryUsageInMB()
+      << std::setprecision(3) << chi::Console::GetMemoryUsageInMB()
       << " MB.";
 
 

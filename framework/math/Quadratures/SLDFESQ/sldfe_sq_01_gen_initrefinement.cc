@@ -10,7 +10,7 @@
  * subdivision of an inscribed cube.*/
 void chi_math::SimplifiedLDFESQ::Quadrature::GenerateInitialRefinement(int level)
 {
-  chi::ChiTimer timer;
+  chi::Timer timer;
   timer.Reset();
   initial_level_ = level;
 

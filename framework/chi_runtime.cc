@@ -21,10 +21,10 @@
 #endif
 
 //=============================================== Global variables
-chi::ChiConsole& Chi::console = chi::ChiConsole::GetInstance();
+chi::Console& Chi::console = chi::Console::GetInstance();
 chi::ChiLog& Chi::log = chi::ChiLog::GetInstance();
 chi::MPI_Info& Chi::mpi = chi::MPI_Info::GetInstance();
-chi::ChiTimer Chi::program_timer;
+chi::Timer Chi::program_timer;
 
 /** Global stack of handlers */
 std::vector<chi_mesh::MeshHandlerPtr> Chi::meshhandler_stack;
@@ -225,7 +225,7 @@ int Chi::RunInteractive(int argc, char** argv)
 {
   if (not Chi::run_time::supress_beg_end_timelog_)
   {
-    Chi::log.Log() << chi::ChiTimer::GetLocalDateTimeString()
+    Chi::log.Log() << chi::Timer::GetLocalDateTimeString()
                    << " Running ChiTech in interactive-mode with "
                    << Chi::mpi.process_count << " processes.";
 
@@ -258,7 +258,7 @@ int Chi::RunInteractive(int argc, char** argv)
   if (not Chi::run_time::supress_beg_end_timelog_)
   {
     Chi::log.Log() << "Final program time " << program_timer.GetTimeString();
-    Chi::log.Log() << chi::ChiTimer::GetLocalDateTimeString()
+    Chi::log.Log() << chi::Timer::GetLocalDateTimeString()
                    << " ChiTech finished execution.";
   }
 
@@ -271,7 +271,7 @@ int Chi::RunBatch(int argc, char** argv)
 {
   if (not Chi::run_time::supress_beg_end_timelog_)
   {
-    Chi::log.Log() << chi::ChiTimer::GetLocalDateTimeString()
+    Chi::log.Log() << chi::Timer::GetLocalDateTimeString()
                    << " Running ChiTech in batch-mode with "
                    << Chi::mpi.process_count << " processes.";
 
@@ -314,7 +314,7 @@ int Chi::RunBatch(int argc, char** argv)
   if (not Chi::run_time::supress_beg_end_timelog_)
   {
     Chi::log.Log() << "\nFinal program time " << program_timer.GetTimeString();
-    Chi::log.Log() << chi::ChiTimer::GetLocalDateTimeString()
+    Chi::log.Log() << chi::Timer::GetLocalDateTimeString()
                    << " ChiTech finished execution of "
                    << Chi::run_time::input_file_name_;
   }

@@ -24,7 +24,7 @@ chi_mesh::sweep_management::PRIMARY_FLUDS::
     << spds.omega.PrintS()
     << "         Process memory = "
     << std::setprecision(3)
-    << chi::ChiConsole::GetMemoryUsageInMB() << " MB.";
+    << chi::Console::GetMemoryUsageInMB() << " MB.";
 
   this->InitializeAlphaElements(spds, grid_face_histogram);
   this->InitializeBetaElements(spds);

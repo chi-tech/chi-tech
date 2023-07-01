@@ -9,14 +9,14 @@
 namespace chi
 {
   /** Timer object.*/
-  class ChiTimer
-  {
+  class Timer
+{
   private:
     std::chrono::steady_clock::time_point start_time_;
 
   public:
     //00
-                ChiTimer() noexcept;
+    Timer() noexcept;
     //01
     void   		  Reset();
     double 		  GetTime() const;

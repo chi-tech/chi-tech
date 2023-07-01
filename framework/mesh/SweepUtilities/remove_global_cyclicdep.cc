@@ -11,8 +11,7 @@
 /**Removes global cyclic dependencies.*/
 void chi_mesh::sweep_management::
   RemoveGlobalCyclicDependencies(
-    chi_mesh::sweep_management::SPDS* sweep_order,
-    chi_graph::DirectedGraph& TDG)
+    chi_mesh::sweep_management::SPDS* sweep_order, chi::DirectedGraph& TDG)
 {
   auto edges_to_remove = TDG.RemoveCyclicDependencies();
 

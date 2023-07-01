@@ -58,7 +58,7 @@ chi_mesh::sweep_management::
     sweep_order->location_dependencies.push_back(v);
 
   //============================================= Build graph
-  chi_graph::DirectedGraph local_DG;
+  chi::DirectedGraph local_DG;
 
   // Add vertex for each local cell
   for (int c=0; c<num_loc_cells; ++c)

@@ -46,7 +46,7 @@ void chi_mesh::sweep_management::SweepBuffer::
     }
 
     //================================================ Make a memory query
-    double memory_mb = chi::ChiConsole::GetMemoryUsageInMB();
+    double memory_mb = chi::Console::GetMemoryUsageInMB();
 
     std::shared_ptr<chi::ChiLog::EventInfo> memory_event_info =
       std::make_shared<chi::ChiLog::EventInfo>(memory_mb);
