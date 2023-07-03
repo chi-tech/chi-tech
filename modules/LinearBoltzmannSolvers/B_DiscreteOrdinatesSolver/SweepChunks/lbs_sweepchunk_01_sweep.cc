@@ -29,7 +29,7 @@ void LBSSweepChunk::Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
   // ====================================================== Loop over each
   //                                                        cell
   const auto& spds = angle_set->GetSPDS();
-  const auto& spls = spds.spls.item_id;
+  const auto& spls = spds.GetSPLS().item_id;
   const size_t num_spls = spls.size();
   for (size_t spls_index = 0; spls_index < num_spls; ++spls_index)
   {
@@ -40,7 +40,7 @@ void LBSSweepChunk::Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
 
     using namespace chi_mesh::sweep_management;
     const auto& face_orientations =
-      spds.cell_face_orientations_[cell_local_id_];
+      spds.CellFaceOrientations()[cell_local_id_];
 
     cell_num_faces_ = cell_->faces_.size();
     cell_num_nodes_ = cell_mapping_->NumNodes();

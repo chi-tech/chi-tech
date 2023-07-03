@@ -11,7 +11,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
   NonLocalIncidentMapping(const chi_mesh::Cell& cell,
                           const SPDS& spds)
 {
-  chi_mesh::MeshContinuumPtr         grid = spds.grid;
+  const chi_mesh::MeshContinuum& grid = spds.Grid();
 
   //=================================================== Loop over faces
   //           INCIDENT                                 but process
@@ -19,15 +19,15 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
   for (short f=0; f < cell.faces_.size(); f++)
   {
     const CellFace&  face = cell.faces_[f];
-    const auto& orientation = spds.cell_face_orientations_[cell.local_id_][f];
+    const auto& orientation = spds.CellFaceOrientations()[cell.local_id_][f];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face
     if (orientation == FaceOrientation::INCOMING)
     {
-      if ((face.has_neighbor_) and (!face.IsNeighborLocal(*grid)) )
+      if ((face.has_neighbor_) and (!face.IsNeighborLocal(grid)) )
       {
         //============================== Find prelocI
-        int locJ = face.GetNeighborPartitionID(*grid);
+        int locJ = face.GetNeighborPartitionID(grid);
         int prelocI = spds.MapLocJToPrelocI(locJ);
 
         //###########################################################

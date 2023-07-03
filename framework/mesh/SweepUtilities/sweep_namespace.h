@@ -28,7 +28,7 @@ struct STDG;           ///< Global Sweep Plane Ordering
   struct SPLS;           ///< Sweep Plane Local Subgrid
   class  PRIMARY_FLUDS;  ///< Primary Flux Data Structure
   class  AUX_FLUDS;      ///< Auxiliary Flux Data Structure
-  struct SPDS;           ///< Sweep Plane Data Structure
+  class SPDS;           ///< Sweep Plane Data Structure
 
   class  SweepBuffer;
   class AngleSet;
@@ -50,18 +50,6 @@ struct STDG;           ///< Global Sweep Plane Ordering
   void CommunicateLocationDependencies(
     const std::vector<int>& location_dependencies,
     std::vector<std::vector<int>>& global_dependencies);
-
-  void RemoveGlobalCyclicDependencies(
-    chi_mesh::sweep_management::SPDS* sweep_order,
-                                 chi::DirectedGraph& TDG);
-
-  void RemoveLocalCyclicDependencies(
-    std::shared_ptr<SPDS> sweep_order,
-                                     chi::DirectedGraph& local_DG);
-
-  std::shared_ptr<SPDS> CreateSweepOrder(const chi_mesh::Vector3& omega,
-                                         const chi_mesh::MeshContinuumPtr& grid,
-                                         bool cycle_allowance_flag=false);
 
   void PrintSweepOrdering(SPDS* sweep_order,
                           MeshContinuumPtr vol_continuum);

@@ -16,8 +16,8 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
 InitializeAlphaElements(const SPDS& spds,
                         const GridFaceHistogram& grid_face_histogram)
 {
-  chi_mesh::MeshContinuum& grid = *spds.grid;
-  const chi_mesh::sweep_management::SPLS& spls = spds.spls;
+  const chi_mesh::MeshContinuum& grid = spds.Grid();
+  const chi_mesh::sweep_management::SPLS& spls = spds.GetSPLS();
 
   //================================================== Initialize face
   //                                                   categorization
@@ -29,7 +29,7 @@ InitializeAlphaElements(const SPDS& spds,
 
   //================================================== Initialize dependent
   //                                                   locations
-  size_t num_of_deplocs = spds.location_successors.size();
+  size_t num_of_deplocs = spds.GetLocationSuccessors().size();
   deplocI_face_dof_count.resize(num_of_deplocs,0);
   deplocI_cell_views.resize(num_of_deplocs);
 
