@@ -44,9 +44,9 @@ std::vector<std::vector<int>> chi_math::CellMappingFE_PWL::
       }//for cell i
       if (mapping<0)
       {
-        chi::log.LogAllError() << "Unknown face mapping encountered. "
+        Chi::log.LogAllError() << "Unknown face mapping encountered. "
                                   "pwl_polyhedron.h";
-        chi::Exit(EXIT_FAILURE);
+        Chi::Exit(EXIT_FAILURE);
       }
       face_dof_mapping.push_back(mapping);
     }//for face i

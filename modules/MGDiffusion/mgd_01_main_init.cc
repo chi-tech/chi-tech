@@ -50,8 +50,8 @@ mg_diffusion::Solver::~Solver()
 //============================================= Initialize
 void mg_diffusion::Solver::Initialize()
 {
-  chi::log.Log() << "\n"
-                 << chi::program_timer.GetTimeString() << " "
+  Chi::log.Log() << "\n"
+                 << Chi::program_timer.GetTimeString() << " "
                  << TextName() << ": Initializing CFEM Multigroup Diffusion solver ";
 
   //============================================= Get grid
@@ -60,8 +60,8 @@ void mg_diffusion::Solver::Initialize()
   if (grid_ptr_ == nullptr)
     throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
                            " No grid defined.");
- 
-  chi::log.Log() << "Global num cells: " << grid.GetGlobalNumberOfCells();
+
+  Chi::log.Log() << "Global num cells: " << grid.GetGlobalNumberOfCells();
 
   //================================================== Add unique material ids
   std::set<int> unique_material_ids;
@@ -83,7 +83,7 @@ void mg_diffusion::Solver::Initialize()
 
   if (invalid_mat_cell_count>0)
   {
-    chi::log.LogAllWarning()
+    Chi::log.LogAllWarning()
       << "Number of invalid material cells: " << invalid_mat_cell_count;
   }
 
@@ -101,9 +101,9 @@ void mg_diffusion::Solver::Initialize()
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;
   num_local_dofs_ = sdm.GetNumLocalDOFs(OneDofPerNode);
   num_globl_dofs_ = sdm.GetNumGlobalDOFs(OneDofPerNode);
- 
-  chi::log.Log() << "Num local DOFs: " << num_local_dofs_;
-  chi::log.Log() << "Num globl DOFs: " << num_globl_dofs_;
+
+  Chi::log.Log() << "Num local DOFs: " << num_local_dofs_;
+  Chi::log.Log() << "Num globl DOFs: " << num_globl_dofs_;
 
   //============================================= Initializes Mats and Vecs
   const auto n = static_cast<int64_t>(num_local_dofs_);
@@ -192,7 +192,7 @@ void mg_diffusion::Solver::Initialize()
             Unknown(UnknownType::SCALAR)); //Unknown Manager
 
       field_functions_.push_back(initial_field_function);
-      chi::field_function_stack.push_back(initial_field_function);
+      Chi::field_function_stack.push_back(initial_field_function);
     }//for g
   }//if not ff set
 

@@ -6,8 +6,8 @@
 
 void chi_mesh::VolumeMesher::Execute()
 {
-  chi::log.Log() << "Empty volume mesher, nothing executed.";
-  chi::log.Log() << std::endl;
+  Chi::log.Log() << "Empty volume mesher, nothing executed.";
+  Chi::log.Log() << std::endl;
 }
 
 

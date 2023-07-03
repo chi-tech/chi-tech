@@ -77,7 +77,7 @@ std::vector<double> lbs::DiscreteOrdinatesSolver::
                 global_leakage.data(),     //recvbuf,
                 gs_num_groups, MPI_DOUBLE, //count+datatype
                 MPI_SUM,                   //operation
-                MPI_COMM_WORLD);           //comm
+                Chi::mpi.comm);           //comm
 
   return global_leakage;
 }

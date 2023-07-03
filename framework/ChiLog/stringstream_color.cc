@@ -2,8 +2,8 @@
 
 #include "chi_runtime.h"
 
-std::string chi_objects::StringStreamColor(StringSteamColorCode code)
+std::string chi::StringStreamColor(StringSteamColorCode code)
 {
-  if (chi::run_time::suppress_color_) return {};
+  if (Chi::run_time::suppress_color_) return {};
   return std::string("\033[") + std::to_string(code) + "m";
 }

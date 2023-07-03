@@ -21,8 +21,8 @@ int chiFieldOperationExecute(lua_State* L)
   const size_t handle = lua_tointeger(L, 1);
 
   auto& operation =
-    chi::GetStackItem<chi_physics::field_operations::FieldOperation>(
-      chi::object_stack, handle, fname);
+    Chi::GetStackItem<chi_physics::field_operations::FieldOperation>(
+      Chi::object_stack, handle, fname);
 
   operation.Execute();
 

@@ -32,7 +32,7 @@ void SweepWGSContext<Mat, Vec, KSP>::PreSetupCallback()
         method_name = "KRYLOV_BICGSTAB"; break;
       default: method_name = "KRYLOV_GMRES";
     }
-    chi::log.Log()
+    Chi::log.Log()
         << "\n\n"
         << "********** Solving groupset " << groupset_.id_
         << " with " << method_name << ".\n\n"
@@ -85,7 +85,7 @@ std::pair<int64_t, int64_t> SweepWGSContext<Mat, Vec, KSP>::SystemSize()
 
   if (log_info_)
   {
-    chi::log.Log()
+    Chi::log.Log()
       << "Total number of angular unknowns: "
       << num_psi_global
       << "\n"
@@ -151,9 +151,8 @@ void SweepWGSContext<Mat, Vec, KSP>::PostSolveCallback()
   {
     double sweep_time = sweep_scheduler_.GetAverageSweepTime();
     double chunk_overhead_ratio = 1.0 - sweep_scheduler_.GetAngleSetTimings()[2];
-    double source_time=
-      chi::log.ProcessEvent(lbs_solver_.GetSourceEventTag(),
-                           chi_objects::ChiLog::EventOperation::AVERAGE_DURATION);
+    double source_time= Chi::log.ProcessEvent(lbs_solver_.GetSourceEventTag(),
+                            chi::ChiLog::EventOperation::AVERAGE_DURATION);
     size_t num_angles = groupset_.quadrature_->abscissae_.size();
     size_t num_unknowns = lbs_solver_.GlobalNodeCount() *
                           num_angles *
@@ -161,29 +160,29 @@ void SweepWGSContext<Mat, Vec, KSP>::PostSolveCallback()
 
     if (log_info_)
     {
-      chi::log.Log()
+      Chi::log.Log()
         << "\n\n";
-      chi::log.Log()
+      Chi::log.Log()
         << "        Set Src Time/sweep (s):        "
         << source_time;
-      chi::log.Log()
+      Chi::log.Log()
         << "        Average sweep time (s):        "
         << sweep_time;
-      chi::log.Log()
+      Chi::log.Log()
         << "        Chunk-Overhead-Ratio  :        "
         << chunk_overhead_ratio;
-      chi::log.Log()
+      Chi::log.Log()
         << "        Sweep Time/Unknown (ns):       "
-        << sweep_time*1.0e9*chi::mpi.process_count/
+        << sweep_time*1.0e9* Chi::mpi.process_count/
            static_cast<double>(num_unknowns);
-      chi::log.Log()
+      Chi::log.Log()
         << "        Number of unknowns per sweep:  " << num_unknowns;
-      chi::log.Log()
+      Chi::log.Log()
         << "\n\n";
 
       std::string sweep_log_file_name =
         std::string("GS_") + std::to_string(groupset_.id_) +
-        std::string("_SweepLog_") + std::to_string(chi::mpi.location_id) +
+        std::string("_SweepLog_") + std::to_string(Chi::mpi.location_id) +
         std::string(".log");
       groupset_.PrintSweepInfoFile(sweep_scheduler_.sweep_event_tag,
                                   sweep_log_file_name);

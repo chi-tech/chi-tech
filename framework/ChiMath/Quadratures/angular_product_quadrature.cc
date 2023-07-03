@@ -22,11 +22,11 @@ void chi_math::ProductQuadrature::
 
   if (Nw != Na*Np)
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "Product Quadrature, InitializeWithCustom: mismatch in the amount "
          "angles and weights. Number of azimuthal angles times number "
          "polar angles must equal the amount of weights.";
-    chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   azimu_ang_ = azimuthal;
@@ -34,13 +34,13 @@ void chi_math::ProductQuadrature::
 
   if (verbose)
   {
-    chi::log.Log() << "Azimuthal angles:";
+    Chi::log.Log() << "Azimuthal angles:";
     for (const auto& ang : azimu_ang_)
-      chi::log.Log() << ang;
+      Chi::log.Log() << ang;
 
-    chi::log.Log() << "Polar angles:";
+    Chi::log.Log() << "Polar angles:";
     for (const auto& ang : polar_ang_)
-      chi::log.Log() << ang;
+      Chi::log.Log() << ang;
   }
 
   //================================================== Create angle pairs
@@ -90,13 +90,12 @@ void chi_math::ProductQuadrature::
 
     omegas_.emplace_back(new_omega);
 
-    if (verbose)
-      chi::log.Log() << "Quadrature angle=" << new_omega.PrintS();
+    if (verbose) Chi::log.Log() << "Quadrature angle=" << new_omega.PrintS();
   }
 
   if (verbose)
   {
-    chi::log.Log()
+    Chi::log.Log()
       << ostr.str() << "\n"
       << "Weight sum=" << weight_sum;
   }
@@ -249,11 +248,11 @@ chi_math::AngularQuadratureProdCustom::
 
   if (Nw != Na*Np)
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "Product Quadrature, InitializeWithCustom: mismatch in the amount "
          "angles and weights. Number of azimuthal angles times number "
          "polar angles must equal the amount of weights.";
-    chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   AssembleCosines(azimuthal, polar, weights_, verbose);

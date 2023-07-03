@@ -9,7 +9,7 @@
 
 //###################################################################
 /**Access to the singleton*/
-chi_objects::ChiLog& chi_objects::ChiLog::GetInstance() noexcept
+chi::ChiLog& chi::ChiLog::GetInstance() noexcept
 {
   static ChiLog instance;
   return instance;
@@ -17,7 +17,7 @@ chi_objects::ChiLog& chi_objects::ChiLog::GetInstance() noexcept
 
 //###################################################################
 /** Default constructor*/
-chi_objects::ChiLog::ChiLog() noexcept
+chi::ChiLog::ChiLog() noexcept
 {
   verbosity_ = 0;
   std::string memory_usage_event("Maximum Memory Usage");
@@ -25,24 +25,23 @@ chi_objects::ChiLog::ChiLog() noexcept
 
   RepeatingEvent& ref_rep_event = repeating_events.back();
 
-  ref_rep_event.events.emplace_back(
-    chi::program_timer.GetTime(),
+  ref_rep_event.events.emplace_back(Chi::program_timer.GetTime(),
     EventType::EVENT_CREATED,
     std::make_shared<EventInfo>());
 }
 
 //###################################################################
 /** Makes a log entry.*/
-chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
+chi::LogStream chi::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
 {
   switch (level)
   {
     case LOG_0VERBOSE_0:
     case LOG_0:
     {
-      if (chi::mpi.location_id == 0)
+      if (Chi::mpi.location_id == 0)
       {
-        std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
+        std::string header = "[" + std::to_string(Chi::mpi.location_id) + "]  ";
         return {&std::cout, header};
       }
       else
@@ -53,9 +52,9 @@ chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
     }
     case LOG_0WARNING:
     {
-      if (chi::mpi.location_id == 0)
+      if (Chi::mpi.location_id == 0)
       {
-        std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
+        std::string header = "[" + std::to_string(Chi::mpi.location_id) + "]  ";
         header += StringStreamColor(FG_YELLOW) + "**WARNING** ";
         return {&std::cout, header};
       }
@@ -67,9 +66,9 @@ chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
     }
     case LOG_0ERROR:
     {
-      if (chi::mpi.location_id == 0)
+      if (Chi::mpi.location_id == 0)
       {
-        std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
+        std::string header = "[" + std::to_string(Chi::mpi.location_id) + "]  ";
         header += StringStreamColor(FG_RED) + "**!**ERROR**!** ";
         return {&std::cerr, header};
       }
@@ -82,9 +81,9 @@ chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
 
     case LOG_0VERBOSE_1:
     {
-      if ((chi::mpi.location_id == 0) && (verbosity_ >= 1))
+      if ((Chi::mpi.location_id == 0) && (verbosity_ >= 1))
       {
-        std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
+        std::string header = "[" + std::to_string(Chi::mpi.location_id) + "]  ";
         header += StringStreamColor(FG_CYAN);
         return {&std::cout, header};
       }
@@ -96,9 +95,9 @@ chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
     }
     case ChiLog::LOG_LVL::LOG_0VERBOSE_2:
     {
-      if ((chi::mpi.location_id == 0) && (verbosity_ >= 2))
+      if ((Chi::mpi.location_id == 0) && (verbosity_ >= 2))
       {
-        std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
+        std::string header = "[" + std::to_string(Chi::mpi.location_id) + "]  ";
         header += StringStreamColor(FG_MAGENTA);
         return {&std::cout, header};
       }
@@ -111,18 +110,18 @@ chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
     case LOG_ALLVERBOSE_0:
     case LOG_ALL:
     {
-      std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
+      std::string header = "[" + std::to_string(Chi::mpi.location_id) + "]  ";
       return {&std::cout, header};
     }
     case LOG_ALLWARNING:
     {
-      std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
+      std::string header = "[" + std::to_string(Chi::mpi.location_id) + "]  ";
       header += StringStreamColor(FG_YELLOW) + "**WARNING** ";
       return {&std::cout, header};
     }
     case LOG_ALLERROR:
     {
-      std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
+      std::string header = "[" + std::to_string(Chi::mpi.location_id) + "]  ";
       header += StringStreamColor(FG_RED) + "**!**ERROR**!** ";
       return {&std::cerr, header};
     }
@@ -131,7 +130,7 @@ chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
     {
       if (verbosity_ >= 1)
       {
-        std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
+        std::string header = "[" + std::to_string(Chi::mpi.location_id) + "]  ";
         header += StringStreamColor(FG_CYAN);
         return {&std::cout, header};
       }
@@ -145,7 +144,7 @@ chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
     {
       if (verbosity_ >= 2)
       {
-        std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
+        std::string header = "[" + std::to_string(Chi::mpi.location_id) + "]  ";
         header += StringStreamColor(FG_MAGENTA);
         return {&std::cout, header};
       }
@@ -164,28 +163,27 @@ chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
 
 //###################################################################
 /** Sets the verbosity level.*/
-void chi_objects::ChiLog::SetVerbosity(int int_level)
+void chi::ChiLog::SetVerbosity(int int_level)
 {
   verbosity_ = std::min(int_level, 2);
 }
 
 //###################################################################
 /** Gets the current verbosity level.*/
-int chi_objects::ChiLog::GetVerbosity() const
+int chi::ChiLog::GetVerbosity() const
 {
   return verbosity_;
 }
 
 //###################################################################
 /** Returns a unique tag to a newly created repeating event.*/
-size_t chi_objects::ChiLog::GetRepeatingEventTag(std::string event_name)
+size_t chi::ChiLog::GetRepeatingEventTag(std::string event_name)
 {
   repeating_events.emplace_back(event_name);
 
   RepeatingEvent& ref_rep_event = repeating_events.back();
 
-  ref_rep_event.events.emplace_back(
-    chi::program_timer.GetTime(),
+  ref_rep_event.events.emplace_back(Chi::program_timer.GetTime(),
     EventType::EVENT_CREATED,
     std::make_shared<EventInfo>());
 
@@ -194,7 +192,7 @@ size_t chi_objects::ChiLog::GetRepeatingEventTag(std::string event_name)
 
 //###################################################################
 /**Logs an event with the supplied event information.*/
-void chi_objects::ChiLog::LogEvent(size_t ev_tag,
+void chi::ChiLog::LogEvent(size_t ev_tag,
                                    EventType ev_type,
                                    const std::shared_ptr<EventInfo>& ev_info)
 {
@@ -204,14 +202,14 @@ void chi_objects::ChiLog::LogEvent(size_t ev_tag,
   RepeatingEvent& ref_rep_event = repeating_events[ev_tag];
 
   ref_rep_event.events.emplace_back(
-    chi::program_timer.GetTime(),
+    Chi::program_timer.GetTime(),
     ev_type,
     ev_info);
 }
 
 //###################################################################
 /**Logs an event without any event information.*/
-void chi_objects::ChiLog::LogEvent(size_t ev_tag,
+void chi::ChiLog::LogEvent(size_t ev_tag,
                                    EventType ev_type)
 {
   if (ev_tag >= repeating_events.size())
@@ -220,7 +218,7 @@ void chi_objects::ChiLog::LogEvent(size_t ev_tag,
   RepeatingEvent& ref_rep_event = repeating_events[ev_tag];
 
   ref_rep_event.events.emplace_back(
-    chi::program_timer.GetTime(),
+    Chi::program_timer.GetTime(),
     ev_type,
     nullptr);
 }
@@ -231,7 +229,7 @@ void chi_objects::ChiLog::LogEvent(size_t ev_tag,
  * the program timestamp in seconds. This method uses the
  * ChiLog::EventInfo::GetString method to append information. This allows
  * derived classes to implement more sophisticated outputs.*/
-std::string chi_objects::ChiLog::PrintEventHistory(size_t ev_tag)
+std::string chi::ChiLog::PrintEventHistory(size_t ev_tag)
 {
   std::stringstream outstr;
   if (ev_tag >= repeating_events.size())
@@ -241,7 +239,7 @@ std::string chi_objects::ChiLog::PrintEventHistory(size_t ev_tag)
 
   for (auto& event : ref_rep_event.events)
   {
-    outstr << "[" << chi::mpi.location_id << "] ";
+    outstr << "[" << Chi::mpi.location_id << "] ";
 
     char buf[100];
     snprintf(buf,100,"%16.9f",event.ev_time/1000.0);
@@ -274,8 +272,8 @@ std::string chi_objects::ChiLog::PrintEventHistory(size_t ev_tag)
 //###################################################################
 /**Processes an event given an event operation. See ChiLog for further
  * reference.*/
-double chi_objects::ChiLog::ProcessEvent(size_t ev_tag,
-                                         chi_objects::ChiLog::EventOperation ev_operation)
+double chi::ChiLog::ProcessEvent(size_t ev_tag,
+                                 chi::ChiLog::EventOperation ev_operation)
 {
   if (ev_tag >= repeating_events.size())
     return 0.0;

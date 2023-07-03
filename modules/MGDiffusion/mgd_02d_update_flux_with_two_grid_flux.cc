@@ -11,8 +11,7 @@
 //============================================= assemble matrix A
 void mg_diffusion::Solver::Update_Flux_With_TwoGrid(const int64_t verbose)
 {
-  if (verbose > 2)
-    chi::log.Log() << "\nUpdating Thermal fluxes from two-grid";
+  if (verbose > 2) Chi::log.Log() << "\nUpdating Thermal fluxes from two-grid";
 
   const auto& grid = *grid_ptr_;
   const auto& sdm  = *sdm_ptr_;

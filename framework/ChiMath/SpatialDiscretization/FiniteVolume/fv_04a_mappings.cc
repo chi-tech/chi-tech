@@ -26,7 +26,7 @@ int64_t chi_math::SpatialDiscretization_FV::
 
 
   int64_t address=-1;
-  if (cell.partition_id_ == chi::mpi.location_id)
+  if (cell.partition_id_ == Chi::mpi.location_id)
   {
     if (storage == chi_math::UnknownStorageType::BLOCK)
       address = sc_int64(local_block_address_) * num_unknowns +
@@ -74,7 +74,7 @@ int64_t chi_math::SpatialDiscretization_FV::
 
 
   int64_t address=-1;
-  if (cell.partition_id_ == chi::mpi.location_id)
+  if (cell.partition_id_ == Chi::mpi.location_id)
   {
     if (storage == chi_math::UnknownStorageType::BLOCK)
       address = sc_int64(num_local_cells) * block_id + cell.local_id_;

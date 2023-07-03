@@ -15,7 +15,7 @@ void chi_mesh::VolumeMesherExtruder::SetupLayers(int default_layer_count)
   //                                                   input layers are provided
   if (input_layers_.empty())
   {
-    chi::log.Log0Warning()
+    Chi::log.Log0Warning()
       << "VolumeMesherExtruder: No extrusion layers have been specified. "
       << "A default single layer will be used with height 1.0 and a single "
       << "subdivision.";
@@ -42,7 +42,7 @@ void chi_mesh::VolumeMesherExtruder::SetupLayers(int default_layer_count)
     }
   }
 
-  chi::log.Log()
+  Chi::log.Log()
     << "VolumeMesherExtruder: Total number of cell layers is "
     << vertex_layers_.size() - 1;
 }
@@ -97,7 +97,7 @@ bool chi_mesh::VolumeMesherExtruder::
     auto& centroid = template_cell.centroid_;
     auto projected_centroid = ProjectCentroidToLevel(centroid, z_level);
     int pid = GetCellKBAPartitionIDFromCentroid(projected_centroid);
-    if (pid == chi::mpi.location_id)
+    if (pid == Chi::mpi.location_id)
       return true;
   }
 
@@ -130,7 +130,7 @@ bool chi_mesh::VolumeMesherExtruder::
       {
         auto projected_centroid = ProjectCentroidToLevel(cc_centroid, z);
         int pid = GetCellKBAPartitionIDFromCentroid(projected_centroid);
-        if (pid == chi::mpi.location_id)
+        if (pid == Chi::mpi.location_id)
           return true;
       }
     }//for cid
@@ -143,7 +143,7 @@ bool chi_mesh::VolumeMesherExtruder::
 
     auto projected_centroid = ProjectCentroidToLevel(template_cell.centroid_, z);
     int pid = GetCellKBAPartitionIDFromCentroid(projected_centroid);
-    if (pid == chi::mpi.location_id)
+    if (pid == Chi::mpi.location_id)
       return true;
   }//for z
 

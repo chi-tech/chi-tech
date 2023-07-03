@@ -20,7 +20,7 @@ void chi_physics::FieldFunctionGridBased::
     const std::vector<std::shared_ptr<const FieldFunctionGridBased>> &ff_list)
 {
   const std::string fname = "chi_physics::FieldFunction::ExportMultipleToVTK";
-  chi::log.Log() << "Exporting field functions to VTK with file base \""
+  Chi::log.Log() << "Exporting field functions to VTK with file base \""
                  << file_base_name << "\"";
 
   if (ff_list.empty())
@@ -114,5 +114,5 @@ void chi_physics::FieldFunctionGridBased::
 
   chi_mesh::WritePVTUFiles(ugrid, file_base_name);
 
-  chi::log.Log() << "Done exporting field functions to VTK.";
+  Chi::log.Log() << "Done exporting field functions to VTK.";
 }

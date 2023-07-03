@@ -20,7 +20,7 @@ void chi_physics::MultiGroupXS::
 ExportToChiXSFile(const std::string &file_name,
                   const double fission_scaling /* = 1.0 */) const
 {
-  chi::log.Log() << "Exporting transport cross section to file: " << file_name;
+  Chi::log.Log() << "Exporting transport cross section to file: " << file_name;
 
   //============================================================
   // Define utility functions
@@ -92,7 +92,7 @@ ExportToChiXSFile(const std::string &file_name,
 
 
   ofile << "# Exported cross section from ChiTech\n";
-  ofile << "# Date: " << chi_objects::ChiTimer::GetLocalDateTimeString() << "\n";
+  ofile << "# Date: " << chi::ChiTimer::GetLocalDateTimeString() << "\n";
   ofile << "NUM_GROUPS " << NumGroups() << "\n";
   ofile << "NUM_MOMENTS " << ScatteringOrder() + 1 << "\n";
   if (NumPrecursors() > 0)
@@ -202,6 +202,6 @@ ExportToChiXSFile(const std::string &file_name,
 
   ofile.close();
 
-  chi::log.Log0Verbose1() << "Done exporting transport "
+  Chi::log.Log0Verbose1() << "Done exporting transport "
                              "cross section to file: " << file_name;
 }

@@ -8,7 +8,7 @@
 
 void lbs::LBSSolver::InitializeSolverSchemes()
 {
-  chi::log.Log() << "Initializing Solver schemes";
+  Chi::log.Log() << "Initializing Solver schemes";
 
   InitializeWGSSolvers();
 

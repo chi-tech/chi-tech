@@ -50,7 +50,7 @@ void lbs::acceleration::DiffusionSolver::Solve(
 
     double rhs_norm;
     VecNorm(rhs_, NORM_2, &rhs_norm);
-    chi::log.Log() << "RHS-norm " << rhs_norm;
+    Chi::log.Log() << "RHS-norm " << rhs_norm;
   }
 
   if (use_initial_guess)
@@ -71,13 +71,13 @@ void lbs::acceleration::DiffusionSolver::Solve(
   {
     double sol_norm;
     VecNorm(x, NORM_2, &sol_norm);
-    chi::log.Log() << "Solution-norm " << sol_norm;
+    Chi::log.Log() << "Solution-norm " << sol_norm;
 
     using namespace chi_physics;
     KSPConvergedReason reason;
     KSPGetConvergedReason(ksp_, &reason);
 
-    chi::log.Log() << "Convergence Reason: "
+    Chi::log.Log() << "Convergence Reason: "
                    << GetPETScConvergedReasonstring(reason);
   }
 
@@ -137,7 +137,7 @@ void lbs::acceleration::DiffusionSolver::Solve(
 
     double rhs_norm;
     VecNorm(rhs_, NORM_2, &rhs_norm);
-    chi::log.Log() << "RHS-norm " << rhs_norm;
+    Chi::log.Log() << "RHS-norm " << rhs_norm;
   }
 
   if (use_initial_guess) { VecCopy(petsc_solution, x); }
@@ -150,13 +150,13 @@ void lbs::acceleration::DiffusionSolver::Solve(
   {
     double sol_norm;
     VecNorm(x, NORM_2, &sol_norm);
-    chi::log.Log() << "Solution-norm " << sol_norm;
+    Chi::log.Log() << "Solution-norm " << sol_norm;
 
     using namespace chi_physics;
     KSPConvergedReason reason;
     KSPGetConvergedReason(ksp_, &reason);
 
-    chi::log.Log() << "Convergence Reason: "
+    Chi::log.Log() << "Convergence Reason: "
                    << GetPETScConvergedReasonstring(reason);
   }
 

@@ -23,30 +23,31 @@ void chi_diffusion::Solver::GetMaterialProperties(
     int moment)
 {
   uint64_t cell_glob_index = cell.global_id_;
-  bool cell_is_local = (cell.partition_id_ == chi::mpi.location_id);
+  bool cell_is_local = (cell.partition_id_ == Chi::mpi.location_id);
   uint64_t cell_local_id = cell.local_id_;
   int mat_id = cell.material_id_;
 
   if (mat_id<0)
   {
-    chi::log.Log0Error()
+    Chi::log.Log0Error()
       << "Cell encountered with no material id. ";
-    chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
-  if (mat_id>=chi::material_stack.size())
+  if (mat_id>= Chi::material_stack.size())
   {
-    chi::log.Log0Error()
+    Chi::log.Log0Error()
       << "Cell encountered with material id pointing to "
          "non-existing material.";
-    chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   auto property_map_D     = basic_options_("property_map_D").IntegerValue();
   auto property_map_q     = basic_options_("property_map_q").IntegerValue();
   auto property_map_sigma = basic_options_("property_map_sigma").IntegerValue();
 
-  auto material = chi::GetStackItemPtr(chi::material_stack, mat_id, __FUNCTION__);
+  auto material =
+    Chi::GetStackItemPtr(Chi::material_stack, mat_id, __FUNCTION__);
 
   //====================================== Process material properties
   diffCoeff.resize(cell_dofs,1.0);
@@ -59,11 +60,11 @@ void chi_diffusion::Solver::GetMaterialProperties(
     //We absolutely need the diffusion coefficient so process error
     if ((property_map_D < 0) || (property_map_D >= material->properties_.size()))
     {
-      chi::log.Log0Error()
+      Chi::log.Log0Error()
         << "Solver diffusion coefficient mapped to property index "
         << property_map_D << " is not a valid index for material \""
         << material->name_ <<"\" id " << mat_id;
-      chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
 
     //For now, we can only support scalar values so lets check that
@@ -75,14 +76,14 @@ void chi_diffusion::Solver::GetMaterialProperties(
     }
     else
     {
-      chi::log.Log0Error()
+      Chi::log.Log0Error()
         << "Solver diffusion coefficient mapped to property index "
         << property_map_D << " is not a valid property type"
         << " for material \""
         << material->name_ <<"\" id " << mat_id
         << ". Currently SCALAR_VALUE and THERMAL_CONDUCTIVITY are the "
         << "only supported types.";
-      chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
 
 
@@ -97,14 +98,14 @@ void chi_diffusion::Solver::GetMaterialProperties(
       }
       else
       {
-        chi::log.Log0Error()
+        Chi::log.Log0Error()
           << "Source value mapped to property index "
           << property_map_q << " is not a valid property type"
           << " for material \""
           << material->name_ <<"\" id " << mat_id
           << ". Currently SCALAR_VALUE is the "
           << "only supported type.";
-        chi::Exit(EXIT_FAILURE);
+        Chi::Exit(EXIT_FAILURE);
       }
     }
 
@@ -139,10 +140,10 @@ void chi_diffusion::Solver::GetMaterialProperties(
 
     if (!transportxs_found)
     {
-      chi::log.LogAllError()
+      Chi::log.LogAllError()
         << "Diffusion Solver: Material encountered with no tranport xs"
            " yet material mode is DIFFUSION_MATERIALS_FROM_TRANSPORTXS.";
-      chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
 
     //====================================== Setting Q
@@ -157,22 +158,22 @@ void chi_diffusion::Solver::GetMaterialProperties(
       }
       else
       {
-        chi::log.Log0Error()
+        Chi::log.Log0Error()
           << "Source value mapped to property index "
           << property_map_q << " is not a valid property type"
           << " for material \""
           << material->name_ <<"\" id " << mat_id
           << ". Currently SCALAR_VALUE is the "
           << "only supported type.";
-        chi::Exit(EXIT_FAILURE);
+        Chi::Exit(EXIT_FAILURE);
       }
     }
   }//transport xs TTR
   else
   {
-    chi::log.Log0Error()
+    Chi::log.Log0Error()
       << "Diffusion Solver: Invalid material mode.";
-    chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
 
@@ -183,7 +184,7 @@ void chi_diffusion::Solver::GetMaterialProperties(
 /**Update the field functions with the latest data.*/
 void chi_diffusion::Solver::UpdateFieldFunctions()
 {
-  chi::log.LogAll() << "Updating field functions" << std::endl;
+  Chi::log.LogAll() << "Updating field functions" << std::endl;
   auto& ff = *field_functions_.front();
   const auto& OneDofPerNode = discretization_->UNITARY_UNKNOWN_MANAGER;
 

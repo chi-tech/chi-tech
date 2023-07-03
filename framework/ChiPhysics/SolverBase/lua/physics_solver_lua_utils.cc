@@ -69,8 +69,8 @@ int chiSolverInitialize(lua_State* L)
 
   const int solver_handle = lua_tonumber(L, 1);
 
-  auto& solver = chi::GetStackItem<chi_physics::Solver>(
-    chi::object_stack, solver_handle, fname);
+  auto& solver = Chi::GetStackItem<chi_physics::Solver>(
+    Chi::object_stack, solver_handle, fname);
 
   solver.Initialize();
 
@@ -95,8 +95,8 @@ int chiSolverExecute(lua_State* L)
 
   const int solver_handle = lua_tonumber(L, 1);
 
-  auto& solver = chi::GetStackItem<chi_physics::Solver>(
-    chi::object_stack, solver_handle, fname);
+  auto& solver = Chi::GetStackItem<chi_physics::Solver>(
+    Chi::object_stack, solver_handle, fname);
 
   solver.Execute();
 
@@ -121,8 +121,8 @@ int chiSolverStep(lua_State* L)
 
   const int solver_handle = lua_tonumber(L, 1);
 
-  auto& solver = chi::GetStackItem<chi_physics::Solver>(
-    chi::object_stack, solver_handle, fname);
+  auto& solver = Chi::GetStackItem<chi_physics::Solver>(
+    Chi::object_stack, solver_handle, fname);
 
   solver.Step();
 
@@ -147,8 +147,8 @@ int chiSolverAdvance(lua_State* L)
 
   const int solver_handle = lua_tonumber(L, 1);
 
-  auto& solver = chi::GetStackItem<chi_physics::Solver>(
-    chi::object_stack, solver_handle, fname);
+  auto& solver = Chi::GetStackItem<chi_physics::Solver>(
+    Chi::object_stack, solver_handle, fname);
 
   solver.Advance();
 
@@ -180,8 +180,8 @@ int chiSolverSetBasicOption(lua_State* L)
   const int solver_handle = lua_tointeger(L, 1);
   const std::string option_name = lua_tostring(L, 2);
 
-  auto& solver = chi::GetStackItem<chi_physics::Solver>(
-    chi::object_stack, solver_handle, fname);
+  auto& solver = Chi::GetStackItem<chi_physics::Solver>(
+    Chi::object_stack, solver_handle, fname);
 
   try
   {
@@ -198,28 +198,28 @@ int chiSolverSetBasicOption(lua_State* L)
       case chi_data_types::VaryingDataType::STRING:
         LuaCheckStringValue(fname, L, 3);
         option.SetStringValue(lua_tostring(L, 3));
-        chi::log.Log() << "Solver:" << solver.TextName()
+        Chi::log.Log() << "Solver:" << solver.TextName()
                        << " option:" << option_name << " set to "
                        << option.StringValue() << ".";
         break;
       case chi_data_types::VaryingDataType::BOOL:
         LuaCheckBoolValue(fname, L, 3);
         option.SetBoolValue(lua_toboolean(L, 3));
-        chi::log.Log() << "Solver:" << solver.TextName()
+        Chi::log.Log() << "Solver:" << solver.TextName()
                        << " option:" << option_name << " set to "
                        << ((option.BoolValue()) ? "true" : "false") << ".";
         break;
       case chi_data_types::VaryingDataType::INTEGER:
         LuaCheckIntegerValue(fname, L, 3);
         option.SetIntegerValue(lua_tointeger(L, 3));
-        chi::log.Log() << "Solver:" << solver.TextName()
+        Chi::log.Log() << "Solver:" << solver.TextName()
                        << " option:" << option_name << " set to "
                        << option.IntegerValue() << ".";
         break;
       case chi_data_types::VaryingDataType::FLOAT:
         LuaCheckNumberValue(fname, L, 3);
         option.SetFloatValue(lua_tonumber(L, 3));
-        chi::log.Log() << "Solver:" << solver.TextName()
+        Chi::log.Log() << "Solver:" << solver.TextName()
                        << " option:" << option_name << " set to "
                        << option.FloatValue() << ".";
         break;
@@ -227,7 +227,7 @@ int chiSolverSetBasicOption(lua_State* L)
   }
   catch (const std::out_of_range& oor)
   {
-    chi::log.Log0Error() << fname << ": " << oor.what();
+    Chi::log.Log0Error() << fname << ": " << oor.what();
     throw oor;
   }
 
@@ -252,8 +252,8 @@ int chiSolverGetName(lua_State* L)
 
   const int solver_handle = lua_tonumber(L, 1);
 
-  const auto& solver = chi::GetStackItem<chi_physics::Solver>(
-    chi::object_stack, solver_handle, fname);
+  const auto& solver = Chi::GetStackItem<chi_physics::Solver>(
+    Chi::object_stack, solver_handle, fname);
 
   lua_pushstring(L, solver.TextName().c_str());
 
@@ -276,8 +276,8 @@ int chiSolverGetFieldFunctionList(lua_State* L)
   //======================================================= Getting solver
   const int solver_handle = lua_tonumber(L, 1);
 
-  const auto& solver = chi::GetStackItem<chi_physics::Solver>(
-    chi::object_stack, solver_handle, fname);
+  const auto& solver = Chi::GetStackItem<chi_physics::Solver>(
+    Chi::object_stack, solver_handle, fname);
 
   //============================================= Push up new table
   lua_newtable(L);
@@ -286,7 +286,7 @@ int chiSolverGetFieldFunctionList(lua_State* L)
     lua_pushinteger(L, static_cast<lua_Integer>(ff) + 1);
     int pff_count = -1;
     bool found = false;
-    for (auto& pff : chi::field_function_stack) // pff pointer to field func
+    for (auto& pff : Chi::field_function_stack) // pff pointer to field func
     {
       //const auto& compare_ff_ptr = solver.GetFieldFunctions()[ff];
       //const auto compare_base_ptr =

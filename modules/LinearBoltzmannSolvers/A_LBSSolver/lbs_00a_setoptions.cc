@@ -10,9 +10,9 @@ RegisterSyntaxBlock(/*namespace_name=*/lbs,
                     /*block_name=*/OptionsBlock,
                     /*syntax_function=*/LBSSolver::OptionsBlock);
 
-chi_objects::InputParameters LBSSolver::OptionsBlock()
+chi::InputParameters LBSSolver::OptionsBlock()
 {
-  chi_objects::InputParameters params;
+  chi::InputParameters params;
 
   params.SetGeneralDescription(
     "\\defgroup lbs__OptionsBlock lbs.OptionsBlock \n"
@@ -114,9 +114,9 @@ RegisterSyntaxBlock(/*namespace_in_lua=*/lbs,
                     /*name_in_lua=*/BoundaryOptionsBlock,
                     /*syntax_function=*/LBSSolver::BoundaryOptionsBlock);
 
-chi_objects::InputParameters LBSSolver::BoundaryOptionsBlock()
+chi::InputParameters LBSSolver::BoundaryOptionsBlock()
 {
-  chi_objects::InputParameters params;
+  chi::InputParameters params;
 
   // clang-format off
   params.SetGeneralDescription(
@@ -150,7 +150,7 @@ chi_objects::InputParameters LBSSolver::BoundaryOptionsBlock()
 }
 
 // ##################################################################
-void LBSSolver::SetOptions(const chi_objects::InputParameters& params)
+void LBSSolver::SetOptions(const chi::InputParameters& params)
 {
   const auto& user_params = params.ParametersAtAssignment();
 
@@ -235,7 +235,7 @@ void LBSSolver::SetOptions(const chi_objects::InputParameters& params)
 
     else if (spec.Name() == "boundary_conditions")
     {
-      spec.RequireBlockTypeIs(chi_objects::ParameterBlockType::ARRAY);
+      spec.RequireBlockTypeIs(chi::ParameterBlockType::ARRAY);
 
       for (size_t b = 0; b < spec.NumParameters(); ++b)
       {
@@ -249,7 +249,7 @@ void LBSSolver::SetOptions(const chi_objects::InputParameters& params)
 }
 
 // ##################################################################
-void LBSSolver::SetBoundaryOptions(const chi_objects::InputParameters& params)
+void LBSSolver::SetBoundaryOptions(const chi::InputParameters& params)
 {
   const std::string fname = __FUNCTION__;
   const auto& user_params = params.ParametersAtAssignment();
@@ -291,7 +291,8 @@ void LBSSolver::SetBoundaryOptions(const chi_objects::InputParameters& params)
         throw std::invalid_argument(message);
       }
       user_params.RequireParameterBlockTypeIs(
-        "group_strength", chi_objects::ParameterBlockType::ARRAY);
+        "group_strength",
+                                              chi::ParameterBlockType::ARRAY);
 
       const auto group_strength =
         user_params.GetParamVectorValue<double>("group_strength");

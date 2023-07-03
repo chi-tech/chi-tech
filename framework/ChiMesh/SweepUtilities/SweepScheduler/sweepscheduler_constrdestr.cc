@@ -12,10 +12,9 @@ chi_mesh::sweep_management::SweepScheduler::SweepScheduler(
   scheduler_type(in_scheduler_type),
   angle_agg(in_angle_agg),
   m_sweep_chunk(in_sweep_chunk),
-  sweep_timing_events_tag({
-    chi::log.GetRepeatingEventTag("Sweep Chunk Only Timing")
+  sweep_timing_events_tag({Chi::log.GetRepeatingEventTag("Sweep Chunk Only Timing")
   }),
-  sweep_event_tag(chi::log.GetRepeatingEventTag("Sweep Timing"))
+  sweep_event_tag(Chi::log.GetRepeatingEventTag("Sweep Timing"))
 {
   angle_agg.InitializeReflectingBCs();
 
@@ -40,7 +39,7 @@ chi_mesh::sweep_management::SweepScheduler::SweepScheduler(
   MPI_Allreduce(&local_max_num_messages,
                 &global_max_num_messages,
                 1, MPI_INT,
-                MPI_MAX, MPI_COMM_WORLD);
+                MPI_MAX, Chi::mpi.comm);
 
   //=================================== Propogate items back to sweep buffers
   for (auto& angsetgrp : in_angle_agg.angle_set_groups)

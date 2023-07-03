@@ -15,13 +15,13 @@ namespace chi_mesh
 class LogicalVolume : public ChiObject
 {
 public:
-  static chi_objects::InputParameters GetInputParameters();
+  static chi::InputParameters GetInputParameters();
 
   virtual bool Inside(const chi_mesh::Vector3& point) const { return false; }
 
 protected:
   explicit LogicalVolume() : ChiObject() {}
-  explicit LogicalVolume(const chi_objects::InputParameters& parameters);
+  explicit LogicalVolume(const chi::InputParameters& parameters);
 };
 
 } // namespace chi_mesh

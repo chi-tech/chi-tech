@@ -14,11 +14,11 @@
 int chiSurfaceMesherExecute(lua_State *L)
 {
   auto& cur_hndlr = chi_mesh::GetCurrentHandler();
-  chi::log.LogAllVerbose2() << "Executing surface mesher\n";
+  Chi::log.LogAllVerbose2() << "Executing surface mesher\n";
 
   cur_hndlr.GetSurfaceMesher().Execute();
 
-  chi::log.LogAllVerbose2()
+  Chi::log.LogAllVerbose2()
     << "chiSurfaceMesherExecute: Surface mesher execution completed."
     << std::endl;
 

@@ -86,11 +86,11 @@ bool chi_mesh::CellFace::
   IsNeighborLocal(const chi_mesh::MeshContinuum& grid) const
 {
   if (not has_neighbor_) return false;
-  if (chi::mpi.process_count == 1) return true;
+  if (Chi::mpi.process_count == 1) return true;
 
   auto& adj_cell = grid.cells[neighbor_id_];
 
-  return (adj_cell.partition_id_ == static_cast<uint64_t>(chi::mpi.location_id));
+  return (adj_cell.partition_id_ == static_cast<uint64_t>(Chi::mpi.location_id));
 }
 
 //###################################################################
@@ -99,7 +99,7 @@ int chi_mesh::CellFace::
   GetNeighborPartitionID(const chi_mesh::MeshContinuum& grid) const
 {
   if (not has_neighbor_) return -1;
-  if (chi::mpi.process_count == 1) return 0;
+  if (Chi::mpi.process_count == 1) return 0;
 
   auto& adj_cell = grid.cells[neighbor_id_];
 
@@ -112,11 +112,11 @@ int chi_mesh::CellFace::
   GetNeighborLocalID(const chi_mesh::MeshContinuum& grid) const
 {
   if (not has_neighbor_) return -1;
-  if (chi::mpi.process_count == 1) return neighbor_id_; //cause global_ids=local_ids
+  if (Chi::mpi.process_count == 1) return neighbor_id_; //cause global_ids=local_ids
 
   auto& adj_cell = grid.cells[neighbor_id_];
 
-  if (adj_cell.partition_id_ != chi::mpi.location_id)
+  if (adj_cell.partition_id_ != Chi::mpi.location_id)
     throw std::logic_error("Cell local ID requested from a non-local cell.");
 
   return adj_cell.local_id_;
@@ -129,18 +129,17 @@ int chi_mesh::CellFace::
 {
   const auto& cur_face = *this; //just for readability
   //======================================== Check index validity
-  if ((not cur_face.has_neighbor_) || (not cur_face.IsNeighborLocal(grid)))
+  if (not cur_face.has_neighbor_)
   {
     std::stringstream outstr;
     outstr
       << "Invalid cell index encountered in call to "
       << "CellFace::GetNeighborAssociatedFace. Index points "
-      << "to either a boundary"
-      << "or a non-local cell.";
+      << "to a boundary";
     throw std::logic_error(outstr.str());
   }
 
-  const auto& adj_cell = grid.local_cells[cur_face.GetNeighborLocalID(grid)];
+  const auto& adj_cell = grid.cells[cur_face.neighbor_id_];
 
   int associated_face = -1;
   std::set<uint64_t> cfvids(cur_face.vertex_ids_.begin(),

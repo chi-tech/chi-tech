@@ -3,7 +3,7 @@
 #include "ChiObject/object_maker.h"
 #include "ChiConsole/chi_console.h"
 
-namespace chi_objects::lua_utils
+namespace chi::lua_utils
 {
 
 int chiMakeObject(lua_State* L);

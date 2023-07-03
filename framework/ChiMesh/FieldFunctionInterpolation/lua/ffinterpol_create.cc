@@ -36,9 +36,9 @@ int chiFFInterpolationCreate(lua_State *L)
   {
     auto new_ffi = new chi_mesh::FieldFunctionInterpolationPoint;
 
-    chi::field_func_interpolation_stack.emplace_back(new_ffi);
-    const size_t index = chi::field_func_interpolation_stack.size()-1;
-    chi::log.LogAllVerbose2()
+    Chi::field_func_interpolation_stack.emplace_back(new_ffi);
+    const size_t index = Chi::field_func_interpolation_stack.size()-1;
+    Chi::log.LogAllVerbose2()
       << "Created point Field Function Interpolation";
     lua_pushnumber(L,static_cast<lua_Number>(index));
     return 1;
@@ -47,9 +47,9 @@ int chiFFInterpolationCreate(lua_State *L)
   {
     auto new_ffi = new chi_mesh::FieldFunctionInterpolationSlice;
 
-    chi::field_func_interpolation_stack.emplace_back(new_ffi);
-    const size_t index = chi::field_func_interpolation_stack.size()-1;
-    chi::log.LogAllVerbose2()
+    Chi::field_func_interpolation_stack.emplace_back(new_ffi);
+    const size_t index = Chi::field_func_interpolation_stack.size()-1;
+    Chi::log.LogAllVerbose2()
     << "Created slice Field Function Interpolation";
     lua_pushnumber(L,static_cast<lua_Number>(index));
     return 1;
@@ -58,9 +58,9 @@ int chiFFInterpolationCreate(lua_State *L)
   {
     auto new_ffi = new chi_mesh::FieldFunctionInterpolationLine;
 
-    chi::field_func_interpolation_stack.emplace_back(new_ffi);
-    const size_t index = chi::field_func_interpolation_stack.size()-1;
-    chi::log.LogAllVerbose2()
+    Chi::field_func_interpolation_stack.emplace_back(new_ffi);
+    const size_t index = Chi::field_func_interpolation_stack.size()-1;
+    Chi::log.LogAllVerbose2()
       << "Created line Field Function Interpolation";
     lua_pushnumber(L,static_cast<lua_Number>(index));
     return 1;
@@ -69,18 +69,18 @@ int chiFFInterpolationCreate(lua_State *L)
   {
     auto new_ffi = new chi_mesh::FieldFunctionInterpolationVolume;
 
-    chi::field_func_interpolation_stack.emplace_back(new_ffi);
-    const size_t index = chi::field_func_interpolation_stack.size()-1;
-    chi::log.LogAllVerbose2()
+    Chi::field_func_interpolation_stack.emplace_back(new_ffi);
+    const size_t index = Chi::field_func_interpolation_stack.size()-1;
+    Chi::log.LogAllVerbose2()
       << "Created Volume Field Function Interpolation";
     lua_pushnumber(L,static_cast<lua_Number>(index));
     return 1;
   }
   else                                              //Fall back
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
     << "Invalid FFITypeIndex used in chiFFInterpolationCreate.";
-    chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
   return 0;
 }

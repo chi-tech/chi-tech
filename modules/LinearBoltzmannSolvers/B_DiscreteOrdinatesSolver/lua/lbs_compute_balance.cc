@@ -31,8 +31,8 @@ int chiLBSComputeBalance(lua_State* L)
   //============================================= Get pointer to solver
   const int solver_handle = lua_tonumber(L, 1);
 
-  auto& lbs_solver = chi::GetStackItem<lbs::DiscreteOrdinatesSolver>(
-    chi::object_stack, solver_handle, fname);
+  auto& lbs_solver = Chi::GetStackItem<lbs::DiscreteOrdinatesSolver>(
+    Chi::object_stack, solver_handle, fname);
 
   lbs_solver.ComputeBalance();
 

@@ -12,9 +12,9 @@ RegisterChiObject(chi_physics::field_operations, MultiFieldOperation);
 
 // ##################################################################
 /**Returns the input parameters.*/
-chi_objects::InputParameters MultiFieldOperation::GetInputParameters()
+chi::InputParameters MultiFieldOperation::GetInputParameters()
 {
-  chi_objects::InputParameters params = FieldOperation::GetInputParameters();
+  chi::InputParameters params = FieldOperation::GetInputParameters();
 
   // clang-format off
   params.SetGeneralDescription(
@@ -51,7 +51,7 @@ chi_objects::InputParameters MultiFieldOperation::GetInputParameters()
 // ##################################################################
 /**Constructor.*/
 MultiFieldOperation::MultiFieldOperation(
-  const chi_objects::InputParameters& params)
+  const chi::InputParameters& params)
   : FieldOperation(params),
     result_field_handle_(params.GetParamValue<size_t>("result_field_handle")),
     dependent_field_handles_(
@@ -84,8 +84,8 @@ MultiFieldOperation::MultiFieldOperation(
     result_component_references_ = {0};
 
   //============================================= Process handles
-  auto ff_base_ptr = chi::GetStackItemPtr(
-    chi::field_function_stack, result_field_handle_, __FUNCTION__);
+  auto ff_base_ptr = Chi::GetStackItemPtr(
+    Chi::field_function_stack, result_field_handle_, __FUNCTION__);
 
   primary_ff_ = std::dynamic_pointer_cast<FieldFunctionGridBased>(ff_base_ptr);
 
@@ -96,7 +96,7 @@ MultiFieldOperation::MultiFieldOperation(
   for (const size_t dep_handle : dependent_field_handles_)
   {
     auto dep_ff_base_ptr =
-      chi::GetStackItemPtr(chi::field_function_stack, dep_handle, __FUNCTION__);
+      Chi::GetStackItemPtr(Chi::field_function_stack, dep_handle, __FUNCTION__);
 
     auto dep_ff_ptr =
       std::dynamic_pointer_cast<FieldFunctionGridBased>(dep_ff_base_ptr);
@@ -109,7 +109,7 @@ MultiFieldOperation::MultiFieldOperation(
   }
 
   auto function_base_obj =
-    chi::GetStackItemPtr(chi::object_stack, function_handle_, __FUNCTION__);
+    Chi::GetStackItemPtr(Chi::object_stack, function_handle_, __FUNCTION__);
 
   function_ptr_ =
     std::dynamic_pointer_cast<chi_math::FunctionDimAToDimB>(function_base_obj);

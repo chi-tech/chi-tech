@@ -7,7 +7,7 @@
 /**Prints the quadrature to file.*/
 void chi_math::SimplifiedLDFESQ::Quadrature::PrintQuadratureToFile()
 {
-  chi::log.Log() << "Printing SLDFE-Quadrature to file.";
+  Chi::log.Log() << "Printing SLDFE-Quadrature to file.";
 
   std::ofstream vert_file,cell_file,points_file,python_file;
   vert_file.open(output_filename_prefix_ + "verts.txt");
@@ -159,5 +159,5 @@ void chi_math::SimplifiedLDFESQ::Quadrature::PrintQuadratureToFile()
    "plt.show()\n";
   python_file.close();
 
-  chi::log.Log() << "Done printing SLDFE-Quadrature to file.";
+  Chi::log.Log() << "Done printing SLDFE-Quadrature to file.";
 }

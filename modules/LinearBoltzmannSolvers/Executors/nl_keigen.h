@@ -20,8 +20,8 @@ protected:
   bool reinit_phi_1_;
 
 public:
-  static chi_objects::InputParameters GetInputParameters();
-  explicit XXNonLinearKEigen(const chi_objects::InputParameters& params);
+  static chi::InputParameters GetInputParameters();
+  explicit XXNonLinearKEigen(const chi::InputParameters& params);
 
   void Initialize() override;
   void Execute() override;

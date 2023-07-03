@@ -15,7 +15,7 @@ std::vector<double> chi_physics::FieldFunctionGridBased::GetGhostedFieldVector()
   //   sdm_->GetGhostDOFIndices(unknown_manager_);
   //
   // chi_math::VectorGhostCommunicator vgc(
-  //   num_local_dofs, num_globl_dofs, ghost_ids, MPI_COMM_WORLD);
+  //   num_local_dofs, num_globl_dofs, ghost_ids, Chi::mpi.comm);
   // std::vector<double> field_wg = vgc.MakeGhostedVector(FieldVectorRead());
 
   // vgc.CommunicateGhostEntries(field_wg);

@@ -79,7 +79,7 @@ double lbs::DiscreteOrdinatesAdjointSolver::ComputeInnerProduct()
                 &global_integral,    //recvbuf
                 1, MPI_DOUBLE,       //count, datatype
                 MPI_SUM,             //op
-                MPI_COMM_WORLD);     //comm
+                Chi::mpi.comm);     //comm
 
   return global_integral;
 }

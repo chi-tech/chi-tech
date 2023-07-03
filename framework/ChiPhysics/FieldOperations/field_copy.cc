@@ -11,9 +11,9 @@ RegisterChiObject(chi_physics::field_operations, FieldCopyOperation);
 
 // ##################################################################
 /**Returns the input parameters.*/
-chi_objects::InputParameters FieldCopyOperation::GetInputParameters()
+chi::InputParameters FieldCopyOperation::GetInputParameters()
 {
-  chi_objects::InputParameters params = FieldOperation::GetInputParameters();
+  chi::InputParameters params = FieldOperation::GetInputParameters();
 
   // clang-format off
   params.SetGeneralDescription(
@@ -56,15 +56,15 @@ chi_objects::InputParameters FieldCopyOperation::GetInputParameters()
 // ##################################################################
 /**Constructor.*/
 FieldCopyOperation::FieldCopyOperation(
-  const chi_objects::InputParameters& params)
+  const chi::InputParameters& params)
   : FieldOperation(params),
     to_field_handle_(params.GetParamValue<size_t>("to")),
     from_field_handle_(params.GetParamValue<size_t>("from"))
 {
   //============================================= Get field functions
   {
-    auto to_base_ptr = chi::GetStackItemPtr(
-      chi::field_function_stack, to_field_handle_, __FUNCTION__);
+    auto to_base_ptr = Chi::GetStackItemPtr(
+      Chi::field_function_stack, to_field_handle_, __FUNCTION__);
 
     to_ff_ = std::dynamic_pointer_cast<FieldFunctionGridBased>(to_base_ptr);
 
@@ -74,8 +74,8 @@ FieldCopyOperation::FieldCopyOperation(
   }
 
   {
-    auto from_base_ptr = chi::GetStackItemPtr(
-      chi::field_function_stack, from_field_handle_, __FUNCTION__);
+    auto from_base_ptr = Chi::GetStackItemPtr(
+      Chi::field_function_stack, from_field_handle_, __FUNCTION__);
 
     from_ff_ = std::dynamic_pointer_cast<FieldFunctionGridBased>(from_base_ptr);
 

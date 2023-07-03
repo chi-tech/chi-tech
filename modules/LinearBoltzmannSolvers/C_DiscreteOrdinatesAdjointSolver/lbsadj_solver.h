@@ -24,9 +24,9 @@ public:
   std::vector<std::vector<double>> m_moment_buffers_;
 
 public:
-  static chi_objects::InputParameters GetInputParameters();
+  static chi::InputParameters GetInputParameters();
   explicit DiscreteOrdinatesAdjointSolver(
-    const chi_objects::InputParameters& params);
+    const chi::InputParameters& params);
   explicit DiscreteOrdinatesAdjointSolver(const std::string& solver_name);
 
   DiscreteOrdinatesAdjointSolver(const DiscreteOrdinatesAdjointSolver&) =

@@ -31,9 +31,9 @@ chiMeshCreateUnpartitioned2DOrthoMesh(mesh,mesh)
 chiVolumeMesherExecute();
 
 --############################################### Set Material IDs
-vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
+vol0 = chi_mesh.RPPLogicalVolume.Create({infx=true, infy=true, infz=true})
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
-vol1 = chiLogicalVolumeCreate(RPP,-1000,0,-1000,1000,-1000,1000)
+vol1 = chi_mesh.RPPLogicalVolume.Create({xmin=-1000.0, xmax=0.0, infy=true, infz=true})
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol1,1)
 
 

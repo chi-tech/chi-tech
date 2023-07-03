@@ -7,5 +7,5 @@
 /**Executes the pass-through surface mesher.*/
 void chi_mesh::SurfaceMesherPassthrough::Execute()
 {
-  chi::log.Log0Verbose1() << "SurfaceMesherPassthrough executed";
+  Chi::log.Log0Verbose1() << "SurfaceMesherPassthrough executed";
 }

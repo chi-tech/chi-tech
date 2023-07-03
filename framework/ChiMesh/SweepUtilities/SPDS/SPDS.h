@@ -5,10 +5,10 @@
 
 #include <memory>
 
-namespace chi_mesh { namespace sweep_management
+namespace chi_mesh::sweep_management
 {
   struct SPDS;
-} }
+}
 
 //###################################################################
 /**Contains multiple levels*/
@@ -28,6 +28,8 @@ struct chi_mesh::sweep_management::SPDS
   std::vector<std::pair<int,int>> local_cyclic_dependencies;
 
   std::vector<std::vector<int>> global_dependencies;
+
+  std::vector<std::vector<FaceOrientation>> cell_face_orientations_;
 
   //======================================== Default constructor
   SPDS() = default;

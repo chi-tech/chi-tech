@@ -66,7 +66,8 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
   LuaCheckNumberValue(fname, L, 1);
   const int solver_index = lua_tonumber(L,1);
 
-  auto& solver = chi::GetStackItem<mg_diffusion::Solver>(chi::object_stack,
+  auto& solver = Chi::GetStackItem<mg_diffusion::Solver>(
+    Chi::object_stack,
                                                           solver_index,
                                                           fname);
 
@@ -79,11 +80,11 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
   {
     if (num_args < 4)
     {
-      chi::log.Log0Error()
+      Chi::log.Log0Error()
       << "Invalid amount of arguments used in"
       << " chiCFEMMGDiffusionsetBCproperty(...,\"boundary_type\".... "
       << " At least 4 arguments are expected.";
-      chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
     LuaCheckNumberValue(fname, L, 3);
     const int bound_index = lua_tonumber(L,3);
@@ -95,12 +96,12 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
     {
       if (num_args != 4)
       {
-        chi::log.Log0Error()
+        Chi::log.Log0Error()
           << "Invalid amount of arguments used in"
           << " chiCFEMMGDiffusionsetBCproperty(...,\"boundary_type\","
           << bound_index << ",\"reflecting\". "
           << " 4 arguments are expected.";
-        chi::Exit(EXIT_FAILURE);
+        Chi::Exit(EXIT_FAILURE);
       }
 
       mg_diffusion::Solver::BoundaryInfo bndry_info;
@@ -108,26 +109,26 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
 
       solver.boundary_preferences_.insert(std::make_pair(bound_index, bndry_info));
 
-      chi::log.Log() << "Boundary " << bound_index << " set as "
+      Chi::log.Log() << "Boundary " << bound_index << " set as "
                      << "Reflecting.";
     }
     else if (type_name == "dirichlet") // ------------- DIRICHLET
     {
-      chi::log.Log0Error()
+      Chi::log.Log0Error()
         << "Dirichlet BC is not supported in multigroup diffusion "
         << "(chiCFEMMGDiffusionSetBCProperty).";
-      chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
     else if (type_name == "neumann") // ------------- NEUMANN
     {
       if (num_args != 5)
       {
-        chi::log.Log0Error()
+        Chi::log.Log0Error()
           << "Invalid amount of arguments used in"
           << " chiCFEMMGDiffusionsetBCproperty(...,\"boundary_type\","
           << bound_index << ",\"neumann\". "
           << " 5 arguments are expected.";
-        chi::Exit(EXIT_FAILURE);
+        Chi::Exit(EXIT_FAILURE);
       }
       // check lua tables
       LuaCheckTableValue(fname, L, 5);
@@ -143,19 +144,19 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
       bndry_info.second = {a_values,b_values,f_values};
       solver.boundary_preferences_.insert(std::make_pair(bound_index, bndry_info));
 
-      chi::log.Log() << "Boundary " << bound_index << " set as "
+      Chi::log.Log() << "Boundary " << bound_index << " set as "
                      << "Neumann with D_g grad(u_g) dot n = f_g";
     }
     else if (type_name == "vacuum") // ------------- VACUUM
     {
       if (num_args != 4)
       {
-        chi::log.Log0Error()
+        Chi::log.Log0Error()
           << "Invalid amount of arguments used in"
           << " chiCFEMMGDiffusionsetBCproperty(...,\"boundary_type\","
           << bound_index << ",\"vacuum\". "
           << " 4 arguments are expected.";
-        chi::Exit(EXIT_FAILURE);
+        Chi::Exit(EXIT_FAILURE);
       }
       // dummy-sized values until we now num_group later, after solver init
       std::vector<double> a_values(1, 0.25);
@@ -167,19 +168,19 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
       bndry_info.second = {a_values,b_values,f_values};
       solver.boundary_preferences_.insert(std::make_pair(bound_index, bndry_info));
 
-      chi::log.Log() << "Boundary " << bound_index << " set as "
+      Chi::log.Log() << "Boundary " << bound_index << " set as "
                      << "Vacuum.";
     }
     else if (type_name == "robin") // ------------- ROBIN
     {
       if (num_args != 7)
       {
-        chi::log.Log0Error()
+        Chi::log.Log0Error()
           << "Invalid amount of arguments used in"
           << " chiCFEMMGDiffusionSetBCProperty(...,\"boundary_type\","
           << bound_index << ",\"robin\". "
           << " 7 arguments are expected.";
-        chi::Exit(EXIT_FAILURE);
+        Chi::Exit(EXIT_FAILURE);
       }
       // check lua tables
       LuaCheckTableValue(fname, L, 5);
@@ -195,21 +196,21 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
       bndry_info.second = {a_values,b_values,f_values};
       solver.boundary_preferences_.insert(std::make_pair(bound_index, bndry_info));
 
-      chi::log.Log() << "Boundary " << bound_index << " set as Robin";
+      Chi::log.Log() << "Boundary " << bound_index << " set as Robin";
     }
     else
     {
-      chi::log.LogAllError()
+      Chi::log.LogAllError()
         << "Unsupported boundary type encountered in call to "
         << "chiCFEMMGDiffusionSetBCProperty(..,\"boundary_type\",.. :"
         << type_name;
-      chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
   }
   else // wrong property_name
   {
-    chi::log.Log0Error() << "Invalid property in chiCFEMMGDiffusionSetBCProperty.";
-    chi::Exit(EXIT_FAILURE);
+    Chi::log.Log0Error() << "Invalid property in chiCFEMMGDiffusionSetBCProperty.";
+    Chi::Exit(EXIT_FAILURE);
   }
   return 0;
 }//end of chiCFEMMGDiffusionSetBCProperty

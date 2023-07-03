@@ -9,7 +9,7 @@
 void chi_mesh::GlobalCellHandler::
   push_back(std::unique_ptr<chi_mesh::Cell> new_cell)
 {
-  if (new_cell->partition_id_ == static_cast<uint64_t>(chi::mpi.location_id))
+  if (new_cell->partition_id_ == static_cast<uint64_t>(Chi::mpi.location_id))
   {
     new_cell->local_id_ = local_cells_ref_.size();
 
@@ -92,7 +92,7 @@ size_t chi_mesh::MeshContinuum::GetGlobalNumberOfCells() const
                 1,
                 MPI_UNSIGNED_LONG_LONG,
                 MPI_SUM,
-                MPI_COMM_WORLD);
+                Chi::mpi.comm);
 
   return num_globl_cells;
 }

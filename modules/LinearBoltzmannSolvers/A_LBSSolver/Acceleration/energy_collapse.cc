@@ -94,11 +94,11 @@ MakeTwoGridCollapsedInfo(const chi_physics::MultiGroupXS& xs,
   }
 
   //======================================== Verbose output the spectrum
-  chi::log.Log0Verbose1() << "Fundamental eigen-value: " << rho;
+  Chi::log.Log0Verbose1() << "Fundamental eigen-value: " << rho;
   std::stringstream outstr;
   for (auto& xi : spectrum)
     outstr << xi << '\n';
-  chi::log.Log0Verbose1() << outstr.str();
+  Chi::log.Log0Verbose1() << outstr.str();
 
   return {collapsed_D, collapsed_sig_a, spectrum};
 }

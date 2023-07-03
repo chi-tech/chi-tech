@@ -39,8 +39,8 @@ int chiCreateSLDFESQAngularQuadrature(lua_State* L)
   std::shared_ptr<chi_math::AngularQuadrature> new_ang_quad =
     std::shared_ptr<chi_math::SimplifiedLDFESQ::Quadrature>(sldfesq);
 
-  chi::angular_quadrature_stack.push_back(new_ang_quad);
-  const size_t index = chi::angular_quadrature_stack.size() - 1;
+  Chi::angular_quadrature_stack.push_back(new_ang_quad);
+  const size_t index = Chi::angular_quadrature_stack.size() - 1;
   lua_pushnumber(L,static_cast<lua_Number>(index));
 
   return 1;

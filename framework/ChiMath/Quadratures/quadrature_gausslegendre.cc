@@ -51,7 +51,7 @@ chi_math::QuadratureGaussLegendre::Initialize(unsigned int N, bool verbose,
     default:
     {
       if (verbose)
-        chi::log.Log() << "Initializing Gauss-Legendre Quadrature "
+        Chi::log.Log() << "Initializing Gauss-Legendre Quadrature "
                          "with " << N << " q-points";
 
       //========================= Compute the roots
@@ -68,7 +68,7 @@ chi_math::QuadratureGaussLegendre::Initialize(unsigned int N, bool verbose,
              Legendre(N+1, qpoints_[k][0]) * Legendre(N + 1, qpoints_[k][0]) );
 
         if (verbose)
-          chi::log.Log()
+          Chi::log.Log()
               << "root[" << k << "]=" << qpoints_[k][0]
               << ", weight=" << weights_[k];
       }//for abscissae
@@ -116,7 +116,7 @@ std::vector<double> chi_math::QuadratureGaussLegendre::FindRoots(
   if (N>2056)
   {
     num_search_intvls *= 10;
-    chi::log.Log0Warning()
+    Chi::log.Log0Warning()
       << "chi_math::QuadratureGaussLegendre::FindRoots: "
       << "The order of the polynomial for which to find the roots is "
       << "greater than 2056. Accuracy of the root finder will be diminished "

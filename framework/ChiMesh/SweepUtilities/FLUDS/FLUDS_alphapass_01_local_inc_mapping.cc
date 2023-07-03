@@ -27,10 +27,10 @@ LocalIncidentMapping(const chi_mesh::Cell& cell,
   for (short f=0; f < cell.faces_.size(); f++)
   {
     const CellFace& face = cell.faces_[f];
-    double     mu  = face.normal_.Dot(spds.omega);
+    const auto& orienation = spds.cell_face_orientations_[cell.local_id_][f];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face
-    if (mu<(0.0-1.0e-16))
+    if (orienation == FaceOrientation::INCOMING)
     {
       if (face.IsNeighborLocal(*grid))
       {
@@ -44,29 +44,21 @@ LocalIncidentMapping(const chi_mesh::Cell& cell,
 
         //======================================== Find associated face
         //                                         counter for slot lookup
-        const auto& adj_cell = grid->local_cells[face.GetNeighborLocalID(*grid)];
-        int  adj_so_index = local_so_cell_mapping[adj_cell.local_id_];
-        int  ass_f_counter=-1;
+        const auto& adj_cell = grid->cells[face.neighbor_id_];
+        const int adj_so_index = local_so_cell_mapping[adj_cell.local_id_];
+        const auto& face_oris = spds.cell_face_orientations_[adj_cell.local_id_];
+        int ass_f_counter = -1;
 
         int out_f = -1;
-        for (short af=0; af < adj_cell.faces_.size(); af++)
+        for (size_t af=0; af < adj_cell.faces_.size(); ++af)
         {
-          double mur = adj_cell.faces_[af].normal_.Dot(spds.omega);
+          if (face_oris[af] == FaceOrientation::OUTGOING) {++out_f;}
 
-          if (mur>=(0.0+1.0e-16)) {out_f++;}
           if (af == ass_face)
           {
             ass_f_counter = out_f;
             break;
           }
-        }
-        if (ass_f_counter<0)
-        {
-          chi::log.LogAllError()
-            << "Associated face counter not found"
-            << ass_face << " " << face.neighbor_id_;
-          face.GetNeighborAssociatedFace(*grid);
-          chi::Exit(EXIT_FAILURE);
         }
 
         dof_mapping.first = /*local_psi_stride*G**/

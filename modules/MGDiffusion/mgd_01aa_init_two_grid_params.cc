@@ -59,11 +59,11 @@ void mg_diffusion::Solver::Compute_TwoGrid_Params()
         collapsed_sig_a -= S[g][gp] * spectrum[gp];
     }
     // Verbose output the spectrum
-    chi::log.Log0Verbose1() << "Fundamental eigen-value: " << rho;
+    Chi::log.Log0Verbose1() << "Fundamental eigen-value: " << rho;
     std::stringstream outstr;
     for (auto &xi: spectrum)
       outstr << xi << '\n';
-    chi::log.Log0Verbose1() << outstr.str();  // jcr verbose1
+    Chi::log.Log0Verbose1() << outstr.str();  // jcr verbose1
 
 //    std::stringstream outstr2;
 //    for (auto &xi: diffusion_coeff)

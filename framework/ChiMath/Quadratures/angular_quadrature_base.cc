@@ -112,7 +112,7 @@ void chi_math::AngularQuadrature::
     outs << "\n";
   }
 
-  chi::log.Log0Verbose1() << outs.str();
+  Chi::log.Log0Verbose1() << outs.str();
 }
 
 //###################################################################
@@ -167,7 +167,7 @@ void chi_math::AngularQuadrature::
     outs << "\n";
   }
 
-  chi::log.Log0Verbose1() << outs.str();
+  Chi::log.Log0Verbose1() << outs.str();
 }
 
 //###################################################################
@@ -227,10 +227,10 @@ chi_math::AngularQuadratureCustom::
 
   if ((Na-Np != 0) or (Na-Nw != 0))
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "chi_math::AngularQuadrature::InitializeWithCustom: supplied"
          " vectors need to be of equal length.";
-    chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   //================================================== Create angle pairs
@@ -272,7 +272,7 @@ chi_math::AngularQuadratureCustom::
 
   if (verbose)
   {
-    chi::log.Log()
+    Chi::log.Log()
       << ostr.str() << "\n"
       << "Weight sum=" << weight_sum;
   }

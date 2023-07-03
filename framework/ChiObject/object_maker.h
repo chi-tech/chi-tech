@@ -60,9 +60,9 @@ class ChiObjectMaker
 public:
   using ObjectPtr = std::shared_ptr<ChiObject>;
 
-  using ObjectGetInParamsFunc = chi_objects::InputParameters (*)();
+  using ObjectGetInParamsFunc = chi::InputParameters (*)();
   using ObjectConstructorFunc =
-    ObjectPtr (*)(const chi_objects::InputParameters&);
+    ObjectPtr (*)(const chi::InputParameters&);
 
   struct ObjectRegistryEntry
   {
@@ -130,10 +130,10 @@ public:
     return 0;
   }
 
-  size_t MakeRegisteredObject(const chi_objects::ParameterBlock& params) const;
+  size_t MakeRegisteredObject(const chi::ParameterBlock& params) const;
   size_t
   MakeRegisteredObjectOfType(const std::string& type,
-                             const chi_objects::ParameterBlock& params) const;
+                             const chi::ParameterBlock& params) const;
 
   /**\brief Dumps the object registry to stdout.*/
   void DumpRegister() const;
@@ -149,7 +149,7 @@ private:
   /**Utility redirection to call an object's static `GetInputParameters`
    * function.*/
   template <typename T>
-  static chi_objects::InputParameters CallGetInputParamsFunction()
+  static chi::InputParameters CallGetInputParamsFunction()
   {
     return T::GetInputParameters();
   }
@@ -158,7 +158,7 @@ private:
    * of input parameters.*/
   template <typename T, typename base_T>
   static std::shared_ptr<base_T>
-  CallObjectConstructor(const chi_objects::InputParameters& params)
+  CallObjectConstructor(const chi::InputParameters& params)
   {
     return std::make_shared<T>(params);
   }

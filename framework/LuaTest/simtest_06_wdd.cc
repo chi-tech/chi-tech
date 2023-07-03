@@ -45,16 +45,16 @@ int chiSimTest06_WDD(lua_State* L)
 {
   const std::string fname = "chiSimTest06_WDD";
   const int num_args = lua_gettop(L);
-  chi::log.Log() << "chiSimTest06_WDD num_args = " << num_args;
+  Chi::log.Log() << "chiSimTest06_WDD num_args = " << num_args;
 
-  if (chi::mpi.process_count != 1)
+  if (Chi::mpi.process_count != 1)
     throw std::logic_error(fname + ": Is serial only.");
 
   //============================================= Get grid
   auto grid_ptr = chi_mesh::GetCurrentHandler().GetGrid();
   const auto& grid = *grid_ptr;
 
-  chi::log.Log() << "Global num cells: " << grid.GetGlobalNumberOfCells();
+  Chi::log.Log() << "Global num cells: " << grid.GetGlobalNumberOfCells();
 
   //============================================= Make Orthogonal mapping
   const auto  ijk_info         = grid.GetIJKInfo();
@@ -84,8 +84,8 @@ int chiSimTest06_WDD(lua_State* L)
   const size_t num_local_nodes = sdm.GetNumLocalDOFs(OneDofPerNode);
   const size_t num_globl_nodes = sdm.GetNumGlobalDOFs(OneDofPerNode);
 
-  chi::log.Log() << "Num local nodes: " << num_local_nodes;
-  chi::log.Log() << "Num globl nodes: " << num_globl_nodes;
+  Chi::log.Log() << "Num local nodes: " << num_local_nodes;
+  Chi::log.Log() << "Num globl nodes: " << num_globl_nodes;
 
   //============================================= Make an angular quadrature
   std::shared_ptr<chi_math::AngularQuadrature> quadrature;
@@ -101,7 +101,7 @@ int chiSimTest06_WDD(lua_State* L)
   else
     throw std::logic_error(fname + "Error with the dimensionality "
                                    "of the mesh.");
-  chi::log.Log() << "Quadrature created." << std::endl;
+  Chi::log.Log() << "Quadrature created." << std::endl;
 
   //============================================= Set/Get params
   const size_t scat_order = 1;
@@ -117,8 +117,8 @@ int chiSimTest06_WDD(lua_State* L)
   const size_t num_moments = m_ell_em_map.size();
   const size_t num_dirs = quadrature->omegas_.size();
 
-  chi::log.Log() << "End Set/Get params." << std::endl;
-  chi::log.Log() << "Num Moments: " << num_moments << std::endl;
+  Chi::log.Log() << "End Set/Get params." << std::endl;
+  Chi::log.Log() << "Num Moments: " << num_moments << std::endl;
 
   //============================================= Make Unknown Managers
   const auto VecN = chi_math::UnknownType::VECTOR_N;
@@ -133,7 +133,7 @@ int chiSimTest06_WDD(lua_State* L)
   const size_t num_local_phi_dofs = sdm.GetNumLocalDOFs(phi_uk_man);
   const size_t num_local_psi_dofs = sdm.GetNumLocalDOFs(psi_uk_man);
 
-  chi::log.Log() << "End ukmanagers." << std::endl;
+  Chi::log.Log() << "End ukmanagers." << std::endl;
 
   //============================================= Make XSs
   chi_physics::SingleStateMGXS xs;
@@ -146,7 +146,7 @@ int chiSimTest06_WDD(lua_State* L)
   auto phi_new        = phi_old;
   auto q_source       = phi_old;
 
-  chi::log.Log() << "End vectors." << std::endl;
+  Chi::log.Log() << "End vectors." << std::endl;
 
   //============================================= Make material source term
   for (const auto& cell : grid.local_cells)
@@ -277,7 +277,7 @@ int chiSimTest06_WDD(lua_State* L)
   };
 
   //============================================= Classic Richardson iteration
-  chi::log.Log() << "Starting iterations" << std::endl;
+  Chi::log.Log() << "Starting iterations" << std::endl;
   for (size_t iter=0; iter<200; ++iter)
   {
     phi_new.assign(phi_new.size(), 0.0);
@@ -297,7 +297,7 @@ int chiSimTest06_WDD(lua_State* L)
       outstr << buffer;
     }
 
-    chi::log.Log() << outstr.str();
+    Chi::log.Log() << outstr.str();
 
     phi_old = phi_new;
 

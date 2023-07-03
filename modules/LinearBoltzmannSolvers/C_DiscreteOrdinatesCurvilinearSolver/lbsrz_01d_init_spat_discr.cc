@@ -14,7 +14,7 @@ namespace lbs
 
 void DiscreteOrdinatesCurvilinearSolver::InitializeSpatialDiscretization()
 {
-  chi::log.Log() << "Initializing spatial discretization_.\n";
+  Chi::log.Log() << "Initializing spatial discretization_.\n";
 
   const auto setup_flags = chi_math::finite_element::NO_FLAGS_SET;
   auto qorder = chi_math::QuadratureOrder::INVALID_ORDER;
@@ -38,11 +38,11 @@ void DiscreteOrdinatesCurvilinearSolver::InitializeSpatialDiscretization()
     }
     default:
     {
-      chi::log.LogAllError() << "D_DO_RZ_SteadyState::SteadyStateSolver::"
+      Chi::log.LogAllError() << "D_DO_RZ_SteadyState::SteadyStateSolver::"
                                 "InitializeSpatialDiscretization : "
                              << "invalid geometry, static_cast<int>(type) = "
                              << static_cast<int>(options_.geometry_type);
-      chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
   }
 
@@ -72,11 +72,11 @@ void DiscreteOrdinatesCurvilinearSolver::InitializeSpatialDiscretization()
     }
     default:
     {
-      chi::log.LogAllError() << "D_DO_RZ_SteadyState::SteadyStateSolver::"
+      Chi::log.LogAllError() << "D_DO_RZ_SteadyState::SteadyStateSolver::"
                                 "InitializeSpatialDiscretization : "
                              << "invalid geometry, static_cast<int>(type) = "
                              << static_cast<int>(options_.geometry_type);
-      chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
   }
 
@@ -88,7 +88,7 @@ void DiscreteOrdinatesCurvilinearSolver::InitializeSpatialDiscretization()
 
 void DiscreteOrdinatesCurvilinearSolver::ComputeSecondaryUnitIntegrals()
 {
-  chi::log.Log() << "Computing RZ secondary unit integrals.\n";
+  Chi::log.Log() << "Computing RZ secondary unit integrals.\n";
   const auto& sdm = *discretization_;
 
   //======================================== Define spatial weighting functions
@@ -141,10 +141,10 @@ void DiscreteOrdinatesCurvilinearSolver::ComputeSecondaryUnitIntegrals()
     secondary_unit_cell_matrices_[cell.local_id_] =
       ComputeCellUnitIntegrals(cell, *swf_ptr);
 
-  MPI_Barrier(MPI_COMM_WORLD);
-  chi::log.Log()
+  Chi::mpi.Barrier();
+  Chi::log.Log()
     << "Secondary Cell matrices computed.         Process memory = "
-    << std::setprecision(3) << chi_objects::ChiConsole::GetMemoryUsageInMB()
+    << std::setprecision(3) << chi::ChiConsole::GetMemoryUsageInMB()
     << " MB";
 }
 

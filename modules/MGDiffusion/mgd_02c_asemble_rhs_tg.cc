@@ -10,8 +10,7 @@
 //========================================================== Solve 1g problem
 void mg_diffusion::Solver::Assemble_RHS_TwoGrid(const int64_t verbose)
 {
-  if (verbose > 2)
-    chi::log.Log() << "\nAssemblying RHS for two-grid ";
+  if (verbose > 2) Chi::log.Log() << "\nAssemblying RHS for two-grid ";
 
   VecSet(b_, 0.0);
 

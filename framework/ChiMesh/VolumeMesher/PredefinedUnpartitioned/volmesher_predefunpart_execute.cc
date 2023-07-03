@@ -17,10 +17,10 @@
 /**Executes the predefined3D mesher.*/
 void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
 {
-  chi::log.Log()
-    << chi::program_timer.GetTimeString()
+  Chi::log.Log()
+    << Chi::program_timer.GetTimeString()
     << " VolumeMesherPredefinedUnpartitioned executing. Memory in use = "
-    << chi_objects::ChiConsole::GetMemoryUsageInMB() << " MB"
+    << chi::ChiConsole::GetMemoryUsageInMB() << " MB"
     << std::endl;
 
   //======================================== Check partitioning params
@@ -32,15 +32,15 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
 
     int desired_process_count = Px*Py*Pz;
 
-    if (desired_process_count != chi::mpi.process_count)
+    if (desired_process_count != Chi::mpi.process_count)
     {
-      chi::log.LogAllError()
+      Chi::log.LogAllError()
         << "ERROR: Number of processors available ("
-        << chi::mpi.process_count <<
+        << Chi::mpi.process_count <<
         ") does not match amount of processors "
         "required by partitioning parameters ("
         << desired_process_count << ").";
-     chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
   }
 
@@ -48,8 +48,8 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   ChiLogicalErrorIf(umesh_ptr_ == nullptr,
                   "nullptr encountered for unparitioned mesh");
 
-  chi::log.Log() << "Computed centroids";
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::log.Log() << "Computed centroids";
+  Chi::mpi.Barrier();
 
 
   //======================================== Apply partitioning scheme
@@ -84,8 +84,8 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
 
   grid->SetGlobalVertexCount(umesh_ptr_->GetVertices().size());
 
-  chi::log.Log() << "Cells loaded.";
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::log.Log() << "Cells loaded.";
+  Chi::mpi.Barrier();
 
   SetContinuum(grid);
   SetGridAttributes(umesh_ptr_->GetMeshAttributes(),
@@ -94,8 +94,8 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
                      umesh_ptr_->GetMeshOptions().ortho_Nz});
 
   //======================================== Concluding messages
-  chi::log.LogAllVerbose1()
-    << "### LOCATION[" << chi::mpi.location_id
+  Chi::log.LogAllVerbose1()
+    << "### LOCATION[" << Chi::mpi.location_id
     << "] amount of local cells="
     << grid->local_cells.size();
 
@@ -107,9 +107,9 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
                 1,
                 MPI_UNSIGNED_LONG_LONG,
                 MPI_SUM,
-                MPI_COMM_WORLD);
+                Chi::mpi.comm);
 
-  chi::log.Log()
+  Chi::log.Log()
     << "VolumeMesherPredefinedUnpartitioned: Cells created = "
     << total_global_cells
     << std::endl;

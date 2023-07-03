@@ -16,7 +16,7 @@ void lbs::LBSSolver::
                              const std::string& file_base)
 {
   std::string file_name =
-    file_base + std::to_string(chi::mpi.location_id) + ".data";
+    file_base + std::to_string(Chi::mpi.location_id) + ".data";
 
   //============================================= Open file
   std::ofstream file(file_name,
@@ -27,7 +27,7 @@ void lbs::LBSSolver::
   //============================================= Check file is open
   if (not file.is_open())
   {
-    chi::log.LogAllWarning()
+    Chi::log.LogAllWarning()
       << __FUNCTION__ << "Failed to open " << file_name;
     return;
   }
@@ -108,7 +108,7 @@ void lbs::LBSSolver::
                             const std::string& file_base)
 {
   std::string file_name =
-    file_base + std::to_string(chi::mpi.location_id) + ".data";
+    file_base + std::to_string(Chi::mpi.location_id) + ".data";
 
   //============================================= Open file
   std::ifstream file(file_name,
@@ -118,7 +118,7 @@ void lbs::LBSSolver::
   //============================================= Check file is open
   if (not file.is_open())
   {
-    chi::log.LogAllWarning()
+    Chi::log.LogAllWarning()
       << __FUNCTION__ << "Failed to open " << file_name;
     return;
   }
@@ -140,7 +140,7 @@ void lbs::LBSSolver::
 
 
   //============================================= Read header
-  chi::log.Log() << "Reading angular flux file " << file_name;
+  Chi::log.Log() << "Reading angular flux file " << file_name;
   char header_bytes[320]; header_bytes[319] = '\0';
   file.read(header_bytes,319);
 
@@ -160,7 +160,7 @@ void lbs::LBSSolver::
     outstr << "num_angles     : " << file_num_angles << "\n";
     outstr << "num_groups     : " << file_num_groups << "\n";
     outstr << "num_local_dofs : " << file_num_local_dofs << "\n";
-    chi::log.LogAll()
+    Chi::log.LogAll()
       << "Incompatible DOF data found in file " << file_name << "\n"
       << outstr.str();
     file.close();
@@ -195,7 +195,7 @@ void lbs::LBSSolver::
     psi[imap] = psi_value;
   }
 
-  chi::log.LogAll() << "Number of cells read: " << cells_touched.size();
+  Chi::log.LogAll() << "Number of cells read: " << cells_touched.size();
 
   //============================================= Clean-up
   file.close();

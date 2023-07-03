@@ -114,7 +114,7 @@ TestIntegration(int test_case, double ref_solution, int RiemannN)
   snprintf(buff2, 200, "Error_RQ%05d_%06d: %2d %f %e\n", Nd,Nd*8,
            initial_level_, h, std::fabs((I_riemann - I_quadrature) / ref_solution));
 
-  chi::log.Log() << buff0;
-  chi::log.Log() << buff1;
-  chi::log.Log() << buff2;
+  Chi::log.Log() << buff0;
+  Chi::log.Log() << buff1;
+  Chi::log.Log() << buff2;
 }

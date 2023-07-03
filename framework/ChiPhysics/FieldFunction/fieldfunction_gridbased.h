@@ -41,10 +41,10 @@ private:
 
 public:
   /**Returns required input parameters.*/
-  static chi_objects::InputParameters GetInputParameters();
+  static chi::InputParameters GetInputParameters();
 
   /**ObjectMaker based constructor.*/
-  explicit FieldFunctionGridBased(const chi_objects::InputParameters& params);
+  explicit FieldFunctionGridBased(const chi::InputParameters& params);
 
   /**Creates a field function, filling it with zeros.*/
   FieldFunctionGridBased(const std::string& text_name,

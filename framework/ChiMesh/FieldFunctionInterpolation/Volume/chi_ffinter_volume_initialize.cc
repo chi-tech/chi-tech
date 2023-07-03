@@ -11,7 +11,7 @@
 /**Initializes the volume field function interpolation.*/
 void chi_mesh::FieldFunctionInterpolationVolume::Initialize()
 {
-  chi::log.Log0Verbose1() << "Initializing volume interpolator.";
+  Chi::log.Log0Verbose1() << "Initializing volume interpolator.";
   //================================================== Check grid available
   if (field_functions_.empty())
     throw std::logic_error("Unassigned field function in volume field "

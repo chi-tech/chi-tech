@@ -9,11 +9,11 @@
  * weights of the discrete angles.*/
 AnglePairs& chi_math::GolubFischer::GetDiscreteScatAngles(Tvecdbl& mell)
 {
-  chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Getting Discrete Scattering Angles" << '\n';
+  Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Getting Discrete Scattering Angles" << '\n';
 
   for (int m=0; m<mell.size(); m++)
   {
-    chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Moment " << m << " " << mell[m];
+    Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Moment " << m << " " << mell[m];
   }
 
   std::vector<double> in_mell;
@@ -32,14 +32,13 @@ AnglePairs& chi_math::GolubFischer::GetDiscreteScatAngles(Tvecdbl& mell)
   Tvecdbl b;   b.resize(2*n,0.0);
   Tvecdbl c;   c.resize(2*n,0.0);
 
-
-  chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "a,b,c:\n";
+  Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "a,b,c:\n";
   for(int j=0; j<2*n; j++)
   {
     a[j] = 0.0;
     b[j] = j/(2.0*j+1);
     c[j] = (j+1.0)/(2*j+1);
-    chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2)
+    Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2)
       << a[j] << " "
       << b[j] << " "
       << c[j] << " \n";
@@ -52,10 +51,10 @@ AnglePairs& chi_math::GolubFischer::GetDiscreteScatAngles(Tvecdbl& mell)
 
   for (int i=0; i<n; i++)
   {
-    chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "i " << xn_wn_[i].first << " " << xn_wn_[i].second << '\n';
+    Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "i " << xn_wn_[i].first << " " << xn_wn_[i].second << '\n';
   }
 
-  chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Done" << '\n';
+  Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Done" << '\n';
 
   return xn_wn_;
 }
@@ -64,13 +63,13 @@ AnglePairs& chi_math::GolubFischer::GetDiscreteScatAngles(Tvecdbl& mell)
  * recursion coefficients for the orthogonal polynomials.*/
 void chi_math::GolubFischer::MCA(Tvecdbl& in_mell, Tvecdbl& a, Tvecdbl& b, Tvecdbl& c)
 {
-  chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "MCA Start" << '\n';
+  Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "MCA Start" << '\n';
 
   int N = in_mell.size()-1;
   int n = (N+1)/2;
 
-  chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "N " << N << " n " << n << '\n';
-  chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "alpha, beta" << '\n';
+  Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "N " << N << " n " << n << '\n';
+  Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "alpha, beta" << '\n';
 
   alpha_.resize(n + 1, 0.0);
   beta_.resize(n + 1, 0.0);
@@ -86,7 +85,7 @@ void chi_math::GolubFischer::MCA(Tvecdbl& in_mell, Tvecdbl& a, Tvecdbl& b, Tvecd
   alpha_[0] = a[0] + c[0] * sigma[0][1] / sigma[0][0];
   beta_[0] = in_mell[0];
 
-  chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << 0 << " " << alpha_[0] << " " << beta_[0] << "\n";
+  Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << 0 << " " << alpha_[0] << " " << beta_[0] << "\n";
 
 
   for(int k=1; k<n+1; k++)
@@ -113,22 +112,22 @@ void chi_math::GolubFischer::MCA(Tvecdbl& in_mell, Tvecdbl& a, Tvecdbl& b, Tvecd
                 +c[k]*(sigma[k][k+1]/sigma[k][k]);
     beta_[k] = c[k - 1] * sigma[k][k] / sigma[k - 1][k - 1];
 
-    chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << k << " " << alpha_[k] << " " << beta_[k] << "\n";
+    Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << k << " " << alpha_[k] << " " << beta_[k] << "\n";
   }
 
-  chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Done" << '\n';
+  Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Done" << '\n';
 }
 
 /**Finds the roots of the orthogonal polynomial.*/
 void chi_math::GolubFischer::RootsOrtho(int& N, Tvecdbl& in_alpha, Tvecdbl& in_beta)
 {
-  chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "RootsOrtho Start" << '\n';
+  Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "RootsOrtho Start" << '\n';
 
   int maxiters = 1000;
   double tol = 1.0e-6;
   double adder = 0.999*2/std::max(N-1,1);
 
-  chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Check 1: Init guess" << '\n';
+  Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Check 1: Init guess" << '\n';
 
   Tvecdbl xn; xn.resize(N, 0.0);
   Tvecdbl wn; wn.resize(N, 0.0);
@@ -136,23 +135,23 @@ void chi_math::GolubFischer::RootsOrtho(int& N, Tvecdbl& in_alpha, Tvecdbl& in_b
   for(int i=0; i<N; i++)
   {
     xn[i] = -0.999+i*adder;
-    chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "x[" << i << "]=" << xn[i] << "\n";
+    Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "x[" << i << "]=" << xn[i] << "\n";
   }
 
 
 
   Tvecdbl norm; norm.resize(N+1, 0.0);
-  chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Check 2 " << in_beta[0] << '\n';
+  Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Check 2 " << in_beta[0] << '\n';
   norm[0] = in_beta[0];
-  chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Check 3a norms" << '\n';
-  chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << norm[0] << '\n';
+  Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Check 3a norms" << '\n';
+  Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << norm[0] << '\n';
   for (int i=1; i<(N+1); i++)
   {
     norm[i]=in_beta[i]*norm[i-1];
-    chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << norm[i] << '\n';
+    Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << norm[i] << '\n';
   }
 
-  chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Check 3" << '\n';
+  Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Check 3" << '\n';
 
   for (int k=0; k<N; k++)
   {
@@ -173,14 +172,14 @@ void chi_math::GolubFischer::RootsOrtho(int& N, Tvecdbl& in_alpha, Tvecdbl& in_b
       double xnew = xold-(a/(b-a*c));
       if (std::isnan(xnew))
       {
-        chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "xnew " << i << " " << xnew << " y=" << a << std::endl;
-       chi::Exit(EXIT_FAILURE);
+        Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "xnew " << i << " " << xnew << " y=" << a << std::endl;
+        Chi::Exit(EXIT_FAILURE);
       }
 
       double res = std::fabs(xnew-xold);
       xn[k] = xnew;
 
-      chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "xnew " << i << " " << xnew << " y=" << a << std::endl;
+      Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "xnew " << i << " " << xnew << " y=" << a << std::endl;
 
       if (res<tol)
       {
@@ -226,9 +225,7 @@ void chi_math::GolubFischer::RootsOrtho(int& N, Tvecdbl& in_alpha, Tvecdbl& in_b
     xn_wn_[i].second = wn[i];
   }
 
-
-
-  chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Done" << '\n';
+  Chi::log.Log(chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Done" << '\n';
 }
 
 /**Computes the function evaluation of the orthogonal polynomials.*/

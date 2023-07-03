@@ -14,9 +14,9 @@ RegisterWrapperFunction(/*namespace_in_lua=*/chi_mesh,
                         /*syntax_function=*/MeshModifiersApply_Syntax,
                         /*actual_function=*/MeshModifiersApply);
 
-chi_objects::InputParameters MeshModifiersApply_Syntax()
+chi::InputParameters MeshModifiersApply_Syntax()
 {
-  chi_objects::InputParameters params;
+  chi::InputParameters params;
 
   params.SetGeneralDescription(
     "\\defgroup chi_mesh__MeshModifiersApply chi_mesh.MeshModifiersApply \n"
@@ -29,8 +29,8 @@ chi_objects::InputParameters MeshModifiersApply_Syntax()
   return params;
 }
 
-chi_objects::ParameterBlock
-MeshModifiersApply(const chi_objects::InputParameters& params)
+chi::ParameterBlock
+MeshModifiersApply(const chi::InputParameters& params)
 {
   const std::string fname = __FUNCTION__;
   const std::vector<size_t> handles =
@@ -39,12 +39,12 @@ MeshModifiersApply(const chi_objects::InputParameters& params)
   for (const size_t handle : handles)
   {
     auto& modifier =
-      chi::GetStackItem<MeshModifier>(chi::object_stack, handle, fname);
+      Chi::GetStackItem<MeshModifier>(Chi::object_stack, handle, fname);
 
     modifier.Apply();
   }
 
-  return chi_objects::ParameterBlock(); // Return empty param block
+  return chi::ParameterBlock(); // Return empty param block
 }
 
 } // namespace chi_mesh::lua_utils

@@ -12,9 +12,9 @@ namespace chi_physics
 
 RegisterChiObject(chi_physics, FieldFunctionGridBased);
 
-chi_objects::InputParameters FieldFunctionGridBased::GetInputParameters()
+chi::InputParameters FieldFunctionGridBased::GetInputParameters()
 {
-  chi_objects::InputParameters params = FieldFunction::GetInputParameters();
+  chi::InputParameters params = FieldFunction::GetInputParameters();
 
   // clang-format off
   params.SetGeneralDescription(
@@ -35,7 +35,7 @@ chi_objects::InputParameters FieldFunctionGridBased::GetInputParameters()
 // ##################################################################
 /**ObjectMaker based constructor.*/
 FieldFunctionGridBased::FieldFunctionGridBased(
-  const chi_objects::InputParameters& params)
+  const chi::InputParameters& params)
   : FieldFunction(params),
     local_grid_bounding_box_(
       chi_mesh::GetCurrentHandler().GetGrid()->GetLocalBoundingBox())
@@ -118,7 +118,7 @@ chi_physics::FieldFunctionGridBased::MakeGhostCommunicator()
   const std::vector<int64_t> ghost_ids = sdm_->GetGhostDOFIndices(UnkManager());
 
   return std::make_shared<chi_math::VectorGhostCommunicator>(
-    num_local_dofs, num_globl_dofs, ghost_ids, MPI_COMM_WORLD);
+    num_local_dofs, num_globl_dofs, ghost_ids, Chi::mpi.comm);
 }
 
 } // namespace chi_physics

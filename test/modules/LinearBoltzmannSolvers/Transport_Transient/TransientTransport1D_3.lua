@@ -33,7 +33,7 @@ chiVolumeMesherExecute();
 --############################################### Set Material IDs
 chiVolumeMesherSetMatIDToAll(0)
 
-vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-L/4,L/4)
+vol0 = chi_mesh.RPPLogicalVolume.Create({infx=true, infy=true, zmin=-L/4, zmax=L/4})
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,1)
 
 --############################################### Add materials

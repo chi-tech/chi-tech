@@ -7,14 +7,14 @@ namespace chi_physics::field_operations
 
 // ##################################################################
 /**Returns the input parameters.*/
-chi_objects::InputParameters FieldOperation::GetInputParameters()
+chi::InputParameters FieldOperation::GetInputParameters()
 {
   return ChiObject::GetInputParameters();
 }
 
 // ##################################################################
 /**Constructor.*/
-FieldOperation::FieldOperation(const chi_objects::InputParameters& params)
+FieldOperation::FieldOperation(const chi::InputParameters& params)
   : ChiObject(params)
 {
 }

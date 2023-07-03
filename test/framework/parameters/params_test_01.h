@@ -12,8 +12,8 @@ class TestSubObject : public ChiObject
 private:
   const size_t num_groups_;
 public:
-  static chi_objects::InputParameters GetInputParameters();
-  explicit TestSubObject(const chi_objects::InputParameters& params);
+  static chi::InputParameters GetInputParameters();
+  explicit TestSubObject(const chi::InputParameters& params);
 };
 
 class TestObject : public ChiObject
@@ -23,8 +23,8 @@ private:
   TestSubObject sub_obj1_;
   TestSubObject sub_obj2_;
 public:
-  static chi_objects::InputParameters GetInputParameters();
-  explicit TestObject(const chi_objects::InputParameters& params);
+  static chi::InputParameters GetInputParameters();
+  explicit TestObject(const chi::InputParameters& params);
 };
 
 class ChildTestObject : public TestObject
@@ -32,8 +32,8 @@ class ChildTestObject : public TestObject
 private:
   const int num_sub_groups_;
 public:
-  static chi_objects::InputParameters GetInputParameters();
-  explicit ChildTestObject(const chi_objects::InputParameters& params);
+  static chi::InputParameters GetInputParameters();
+  explicit ChildTestObject(const chi::InputParameters& params);
 };
 
 

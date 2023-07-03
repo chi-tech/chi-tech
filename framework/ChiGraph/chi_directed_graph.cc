@@ -66,7 +66,7 @@ chi_graph::GraphVertex& chi_graph::DirectedGraph::
   VertexAccessor::operator[](size_t v)
 {
   if (not vertex_valid_flags_[v])
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "chi_graph::DirectedGraph::VertexAccessor: "
          "Invalid vertex accessed. Vertex may have been removed.";
   return vertices_[v];
@@ -369,7 +369,7 @@ std::vector<size_t> chi_graph::DirectedGraph::
 /**Prints the graph in Graphviz format.*/
 void chi_graph::DirectedGraph::PrintGraphviz(int location_mask)
 {
-  if (chi::mpi.location_id != location_mask) return;
+  if (Chi::mpi.location_id != location_mask) return;
 
   std::stringstream o;
   std::string offset("    ");
@@ -400,7 +400,7 @@ void chi_graph::DirectedGraph::
   PrintSubGraphviz(const std::vector<int>& verts_to_print,
                    int location_mask)
 {
-  if (chi::mpi.location_id != location_mask) return;
+  if (Chi::mpi.location_id != location_mask) return;
 
   std::stringstream o;
   std::string offset("    ");
@@ -449,8 +449,8 @@ chi_graph::DirectedGraph::RemoveCyclicDependencies()
   int iter=0;
   while (not SCCs.empty())
   {
-    if (chi::log.GetVerbosity() >= chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2)
-      chi::log.LogAll()
+    if (Chi::log.GetVerbosity() >= chi::ChiLog::LOG_LVL::LOG_0VERBOSE_2)
+      Chi::log.LogAll()
         << "Inter cell cyclic dependency removal. Iteration " << ++iter;
 
     //============================================= Remove bi-connected then

@@ -93,6 +93,7 @@ Parameters:
 - `"file"` : The name of the `.lua` that initiates the test.
 - `"num_procs"` : The number of mpi processes to use.
 - `"checks"` : An array of checks `[..Checks..]`
+- `"args"` : An array of arguments to pass to the executable
 
 All other keys are ignored so feel free to peruse something like `"comment"` to
 annotate the test.

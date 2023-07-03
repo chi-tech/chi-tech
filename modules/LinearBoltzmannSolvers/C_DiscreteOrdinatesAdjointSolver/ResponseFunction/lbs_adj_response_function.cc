@@ -43,7 +43,7 @@ std::vector<double> lbs::ResponseFunctionDesignation::
   }
 
   //============================================= Load lua function
-  lua_State* L = chi::console.GetConsoleState();
+  lua_State* L = Chi::console.GetConsoleState();
   lua_getglobal(L, lua_functional.c_str());
 
 

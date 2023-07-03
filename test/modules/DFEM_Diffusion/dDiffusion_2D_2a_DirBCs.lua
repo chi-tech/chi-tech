@@ -15,10 +15,11 @@ chiMeshCreateUnpartitioned2DOrthoMesh(mesh,mesh)
 chiVolumeMesherExecute();
  
 --############################################### Set Material IDs
-vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
+vol0 = chi_mesh.RPPLogicalVolume.Create({infx=true, infy=true, infz=true})
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
 
-vol1 = chiLogicalVolumeCreate(RPP,-0.5,0.5,-0.5,0.5,-1000,1000)
+vol1 = chi_mesh.RPPLogicalVolume.Create
+({ xmin=-0.5,xmax=0.5,ymin=-0.5,ymax=0.5, infz=true })
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol1,1)
 
 D = {1.0,0.01}
@@ -36,10 +37,10 @@ end
 
 -- Setboundary IDs
 -- xmin,xmax,ymin,ymax,zmin,zmax
-e_vol = chiLogicalVolumeCreate(RPP,0.99999,1000,-1000,1000,-1000,1000)
-w_vol = chiLogicalVolumeCreate(RPP,-1000,-0.9999,-1000,1000,-1000,1000)
-n_vol = chiLogicalVolumeCreate(RPP,-1000,1000,0.99999,1000,-1000,1000)
-s_vol = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,-0.99999,-1000,1000)
+e_vol = chi_mesh.RPPLogicalVolume.Create({xmin=0.99999,xmax=1000.0  , infy=true, infz=true})
+w_vol = chi_mesh.RPPLogicalVolume.Create({xmin=-1000.0,xmax=-0.99999, infy=true, infz=true})
+n_vol = chi_mesh.RPPLogicalVolume.Create({ymin=0.99999,ymax=1000.0  , infx=true, infz=true})
+s_vol = chi_mesh.RPPLogicalVolume.Create({ymin=-1000.0,ymax=-0.99999, infx=true, infz=true})
 
 e_bndry = 0
 w_bndry = 1
@@ -75,7 +76,7 @@ if (master_export == nil) then
 end
 
 --############################################### Volume integrations
-vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
+vol0 = chi_mesh.RPPLogicalVolume.Create({infx=true, infy=true, infz=true})
 
 ffvol = chiFFInterpolationCreate(VOLUME)
 chiFFInterpolationSetProperty(ffvol,OPERATION,OP_AVG)

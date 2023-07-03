@@ -29,8 +29,8 @@ int chiSurfaceMeshCheckCycles(lua_State *L)
   int surf_handle = lua_tonumber(L,1);
   int num_angles  = lua_tonumber(L,2);
 
-  auto& surf_mesh = chi::GetStackItem<chi_mesh::SurfaceMesh>(
-    chi::surface_mesh_stack, surf_handle, __FUNCTION__);
+  auto& surf_mesh = Chi::GetStackItem<chi_mesh::SurfaceMesh>(
+    Chi::surface_mesh_stack, surf_handle, __FUNCTION__);
 
   surf_mesh.CheckCyclicDependencies(num_angles);
   return 0;
@@ -55,16 +55,16 @@ int chiComputeLoadBalancing(lua_State *L)
   //======================================== Get reference surface mesh
   int surf_handle = lua_tonumber(L,1);
 
-  auto& cur_surf = chi::GetStackItem<chi_mesh::SurfaceMesh>(
-    chi::surface_mesh_stack, surf_handle, __FUNCTION__);
+  auto& cur_surf = Chi::GetStackItem<chi_mesh::SurfaceMesh>(
+    Chi::surface_mesh_stack, surf_handle, __FUNCTION__);
 
   //======================================== Extract x-cuts
   if (!lua_istable(L,2))
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "In call to chiComputeLoadBalancing: "
       << " expected table for argument 2. Incompatible value supplied.";
-   chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   int x_table_len = lua_rawlen(L,2);
@@ -81,10 +81,10 @@ int chiComputeLoadBalancing(lua_State *L)
   //======================================== Extract y-cuts
   if (!lua_istable(L,3))
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "In call to chiComputeLoadBalancing: "
       << " expected table for argument 3. Incompatible value supplied.";
-   chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   int y_table_len = lua_rawlen(L,3);

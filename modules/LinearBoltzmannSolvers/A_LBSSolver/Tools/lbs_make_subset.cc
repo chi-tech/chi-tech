@@ -45,7 +45,7 @@ std::vector<SubSetInfo> MakeSubSets(const size_t num_items,
     << ss_size << "\n";
   }
 
-  chi::log.Log0Verbose1() << outstr.str();
+  Chi::log.Log0Verbose1() << outstr.str();
 
   return ss_infos;
 }

@@ -13,9 +13,9 @@ lbs::DiscreteOrdinatesSolver::DiscreteOrdinatesSolver(
 {
 }
 
-chi_objects::InputParameters lbs::DiscreteOrdinatesSolver::GetInputParameters()
+chi::InputParameters lbs::DiscreteOrdinatesSolver::GetInputParameters()
 {
-  chi_objects::InputParameters params = LBSSolver::GetInputParameters();
+  chi::InputParameters params = LBSSolver::GetInputParameters();
 
   params.SetGeneralDescription(
     "\\defgroup lbs__DiscreteOrdinatesSolver DiscreteOrdinatesSolver\n"
@@ -28,7 +28,7 @@ chi_objects::InputParameters lbs::DiscreteOrdinatesSolver::GetInputParameters()
 
 /**Static registration based constructor.*/
 lbs::DiscreteOrdinatesSolver::DiscreteOrdinatesSolver(
-  const chi_objects::InputParameters& params)
+  const chi::InputParameters& params)
   : LBSSolver(params)
 {
 }

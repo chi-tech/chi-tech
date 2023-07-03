@@ -16,7 +16,7 @@
   throw std::logic_error(std::string(__PRETTY_FUNCTION__) + ": Parameter \"" + \
                          param_name + "\" not present in list of parameters.")
 
-namespace chi_objects
+namespace chi
 {
 
 const std::vector<std::string> InputParameters::system_ignored_param_names_ = {
@@ -121,8 +121,8 @@ void InputParameters::AssignParameters(const ParameterBlock& params)
   param_block_at_assignment_ = params;
   std::stringstream err_stream;
 
-  if (chi::log.GetVerbosity() >= 1)
-    chi::log.Log() << "Number of parameters " << params.NumParameters();
+  if (Chi::log.GetVerbosity() >= 1)
+    Chi::log.Log() << "Number of parameters " << params.NumParameters();
 
   // ================================== Check required parameters
   // Loops over all input-parameters that have been
@@ -182,7 +182,7 @@ void InputParameters::AssignParameters(const ParameterBlock& params)
       if (IsParameterIgnored(param_name)) continue;
 
       if (this->Has(param_name) and (dep_warns.count(param_name) > 0))
-        chi::log.Log0Warning()
+        Chi::log.Log0Warning()
           << "Parameter \"" << param_name << "\" has been deprecated "
           << "and will be removed soon.\n"
           << dep_warns.at(param_name);
@@ -202,10 +202,10 @@ void InputParameters::AssignParameters(const ParameterBlock& params)
 
       if (this->Has(param_name) and (dep_errs.count(param_name) > 0))
       {
-        chi::log.Log0Error()
+        Chi::log.Log0Error()
           << "Parameter \"" << param_name << "\" has been deprecated.\n"
           << dep_errs.at(param_name);
-        chi::Exit(EXIT_FAILURE);
+        Chi::Exit(EXIT_FAILURE);
       }
     }
   }
@@ -247,8 +247,8 @@ void InputParameters::AssignParameters(const ParameterBlock& params)
       }
     } // if constraint
 
-    if (chi::log.GetVerbosity() >= 1)
-      chi::log.Log() << "Setting parameter " << param_name;
+    if (Chi::log.GetVerbosity() >= 1)
+      Chi::log.Log() << "Setting parameter " << param_name;
     input_param = param;
   } // for input params
 
@@ -325,27 +325,27 @@ void InputParameters::SetParameterTypeMismatchAllowed(
 void InputParameters::DumpParameters() const
 {
 
-  chi::log.Log() << "DESCRIPTION_BEGIN";
+  Chi::log.Log() << "DESCRIPTION_BEGIN";
   std::cout << GetGeneralDescription() << "\n";
-  chi::log.Log() << "DESCRIPTION_END\n";
+  Chi::log.Log() << "DESCRIPTION_END\n";
 
   const std::string sp2 = "  ";
   const std::string sp4 = "    ";
   for (const auto& param : Parameters())
   {
     const auto& param_name = param.Name();
-    chi::log.Log() << sp2 << "PARAM_BEGIN " << param_name;
+    Chi::log.Log() << sp2 << "PARAM_BEGIN " << param_name;
 
     const auto type = param.Type();
 
-    chi::log.Log() << sp4 << "TYPE " << ParameterBlockTypeName(type);
+    Chi::log.Log() << sp4 << "TYPE " << ParameterBlockTypeName(type);
 
     if (parameter_class_tags_.at(param_name) == InputParameterTag::OPTIONAL)
     {
-      chi::log.Log() << sp4 << "TAG OPTIONAL";
+      Chi::log.Log() << sp4 << "TAG OPTIONAL";
       if (type != ParameterBlockType::BLOCK and
           type != ParameterBlockType::ARRAY)
-        chi::log.Log() << sp4 << "DEFAULT_VALUE " << param.Value().PrintStr();
+        Chi::log.Log() << sp4 << "DEFAULT_VALUE " << param.Value().PrintStr();
       else if (type == ParameterBlockType::ARRAY)
       {
         std::stringstream outstr;
@@ -355,24 +355,24 @@ void InputParameters::DumpParameters() const
           const auto& sub_param = param.GetParam(k);
           outstr << sub_param.Value().PrintStr() << ", ";
         }
-        chi::log.Log() << outstr.str();
+        Chi::log.Log() << outstr.str();
       }
     }
     else
-      chi::log.Log() << sp4 << "TAG REQUIRED";
+      Chi::log.Log() << sp4 << "TAG REQUIRED";
 
     if (constraint_tags_.count(param_name) != 0)
-      chi::log.Log() << sp4 << "CONSTRAINTS "
+      Chi::log.Log() << sp4 << "CONSTRAINTS "
                      << constraint_tags_.at(param_name)->PrintRange();
 
     if (parameter_doc_string_.count(param_name) != 0)
     {
-      chi::log.Log() << "DOC_STRING_BEGIN";
+      Chi::log.Log() << "DOC_STRING_BEGIN";
       std::cout << parameter_doc_string_.at(param_name) << "\n";
-      chi::log.Log() << "DOC_STRING_END";
+      Chi::log.Log() << "DOC_STRING_END";
     }
 
-    chi::log.Log() << sp2 << "PARAM_END";
+    Chi::log.Log() << sp2 << "PARAM_END";
   }
 }
 

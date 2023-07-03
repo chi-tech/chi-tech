@@ -60,11 +60,11 @@ int chiVolumeMesherCreate(lua_State *L)
   {
     if (num_args != 3)
     {
-      chi::log.LogAllError()
+      Chi::log.LogAllError()
         << fname + ": "
            "When specifying VOLUMEMESHER_EXTRUDER, the template type and "
            "handle must also be supplied.";
-     chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
 
     LuaCheckNilValue(fname,L,2);
@@ -78,16 +78,17 @@ int chiVolumeMesherCreate(lua_State *L)
 
     if (template_type == (int)UNPART_MESH_TEMPLATE)
     {
-      auto p_umesh = chi::GetStackItemPtr(chi::unpartitionedmesh_stack,
+      auto p_umesh = Chi::GetStackItemPtr(
+        Chi::unpartitionedmesh_stack,
                                           template_handle, fname);
 
       new_mesher = std::make_shared<chi_mesh::VolumeMesherExtruder>(p_umesh);
     }
     else
     {
-      chi::log.LogAllError()
+      Chi::log.LogAllError()
         << "In call to " << __FUNCTION__ << ". Invalid template type specified.";
-     chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
 
 
@@ -96,34 +97,35 @@ int chiVolumeMesherCreate(lua_State *L)
   {
     if (num_args != 2)
     {
-      chi::log.LogAllError()
+      Chi::log.LogAllError()
         << fname + ": "
                    "When specifying VOLUMEMESHER_UNPARTITIONED, the "
                    "handle must also be supplied.";
-     chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
 
     LuaCheckNilValue(fname,L,2);
     const int template_handle = lua_tonumber(L,2);
 
-    auto p_umesh = chi::GetStackItemPtr(chi::unpartitionedmesh_stack,
+    auto p_umesh = Chi::GetStackItemPtr(
+      Chi::unpartitionedmesh_stack,
                                         template_handle, fname);
 
     new_mesher = std::make_shared<chi_mesh::VolumeMesherPredefinedUnpartitioned>(p_umesh);
   }
   else
   {
-    chi::log.Log0Error() << "Invalid Volume mesher type in function "
+    Chi::log.Log0Error() << "Invalid Volume mesher type in function "
                                "chiVolumeMesherCreate. Allowed options are"
                                "VOLUMEMESHER_EXTRUDER or "
                                "VOLUMEMESHER_UNPARTITIONED";
-   chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   auto& cur_hndlr = chi_mesh::GetCurrentHandler();
   cur_hndlr.SetVolumeMesher(new_mesher);
 
-  chi::log.LogAllVerbose2()
+  Chi::log.LogAllVerbose2()
     << "chiVolumeMesherCreate: Volume mesher created."
     << std::endl;
 

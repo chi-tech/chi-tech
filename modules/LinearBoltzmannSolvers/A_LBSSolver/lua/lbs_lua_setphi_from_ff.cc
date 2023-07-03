@@ -61,7 +61,7 @@ int chiLBSSetPhiFromFieldFunction(lua_State* L)
   const size_t handle = lua_tointeger(L, 1);
 
   auto& lbs_solver =
-    chi::GetStackItem<lbs::LBSSolver>(chi::object_stack, handle, fname);
+    Chi::GetStackItem<lbs::LBSSolver>(Chi::object_stack, handle, fname);
 
   auto specs = chi_lua::TableParserAsParameterBlock::ParseTable(L, 2);
 

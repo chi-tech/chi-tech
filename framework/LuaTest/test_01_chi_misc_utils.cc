@@ -12,7 +12,7 @@ int Test_chi_misc_utils(lua_State* L)
 {
   bool passed = true;
 
-  chi::log.Log() << "Testing chi_misc_utils::PrintIterationProgress\n";
+  Chi::log.Log() << "Testing chi_misc_utils::PrintIterationProgress\n";
 
   const unsigned int I = 4;
   const size_t N=39;
@@ -23,7 +23,7 @@ int Test_chi_misc_utils(lua_State* L)
     progress << chi_misc_utils::PrintIterationProgress(i, N, I);
   }
 
-  chi::log.Log() << progress.str();
+  Chi::log.Log() << progress.str();
 
   return 0;
 }

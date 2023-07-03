@@ -5,7 +5,7 @@
 #include "../ChiMesh/chi_mesh.h"
 #include "chi_runtime.h"
 
-namespace chi_objects
+namespace chi
 {
 
 //################################################################### Class def

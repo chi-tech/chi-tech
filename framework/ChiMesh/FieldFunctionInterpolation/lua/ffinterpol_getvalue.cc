@@ -35,7 +35,8 @@ int chiFFInterpolationGetValue(lua_State *L)
   //================================================== Get handle to field function
   const size_t ffihandle = lua_tonumber(L,1);
 
-  auto p_ffi = chi::GetStackItemPtr(chi::field_func_interpolation_stack,
+  auto p_ffi =
+    Chi::GetStackItemPtr(Chi::field_func_interpolation_stack,
                                     ffihandle, fname);
 
   if (p_ffi->Type() == chi_mesh::ff_interpolation::Type::POINT)
@@ -81,7 +82,7 @@ int chiFFInterpolationGetValue(lua_State *L)
   }
   else
   {
-    chi::log.Log0Warning()
+    Chi::log.Log0Warning()
       << "chiFFInterpolationGetValue is currently only supported for "
       << " POINT, LINE and VOLUME interpolator types.";
   }

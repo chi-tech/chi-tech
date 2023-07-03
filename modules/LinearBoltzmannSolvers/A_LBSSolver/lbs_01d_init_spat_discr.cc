@@ -14,7 +14,7 @@
 void lbs::LBSSolver::InitializeSpatialDiscretization()
 {
   using namespace chi_math::finite_element;
-  chi::log.Log() << "Initializing spatial discretization.\n";
+  Chi::log.Log() << "Initializing spatial discretization.\n";
   discretization_ = chi_math::SpatialDiscretization_PWLD::New(*grid_ptr_);
 
   ComputeUnitIntegrals();
@@ -22,7 +22,7 @@ void lbs::LBSSolver::InitializeSpatialDiscretization()
 
 void lbs::LBSSolver::ComputeUnitIntegrals()
 {
-  chi::log.Log() << "Computing unit integrals.\n";
+  Chi::log.Log() << "Computing unit integrals.\n";
   const auto& sdm = *discretization_;
 
   //======================================== Define spatial weighting functions
@@ -170,17 +170,17 @@ void lbs::LBSSolver::ComputeUnitIntegrals()
                 num_globl_ucms.data(), //recvbuf
                 2, MPIU_SIZE_T,        //count+datatype
                 MPI_SUM,               //operation
-                MPI_COMM_WORLD);       //comm
+                Chi::mpi.comm);       //comm
 
 
 
-  MPI_Barrier(MPI_COMM_WORLD);
-  chi::log.Log()
+  Chi::mpi.Barrier();
+  Chi::log.Log()
   << "Ghost cell unit cell-matrix ratio: "
   << (double)num_globl_ucms[1]*100/(double)num_globl_ucms[0]
   << "%";
-  chi::log.Log()
+  Chi::log.Log()
     << "Cell matrices computed.                   Process memory = "
     << std::setprecision(3)
-    << chi_objects::ChiConsole::GetMemoryUsageInMB() << " MB";
+    << chi::ChiConsole::GetMemoryUsageInMB() << " MB";
 }

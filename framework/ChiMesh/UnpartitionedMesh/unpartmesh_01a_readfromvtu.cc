@@ -23,7 +23,7 @@
 void chi_mesh::UnpartitionedMesh::ReadFromVTU(
   const chi_mesh::UnpartitionedMesh::Options& options)
 {
-  chi::log.Log() << "Reading VTU file: " << options.file_name << ".";
+  Chi::log.Log() << "Reading VTU file: " << options.file_name << ".";
 
   //======================================== Attempt to open file
   std::ifstream file;
@@ -88,5 +88,5 @@ void chi_mesh::UnpartitionedMesh::ReadFromVTU(
   ComputeCentroidsAndCheckQuality();
   BuildMeshConnectivity();
 
-  chi::log.Log() << "Done reading VTU file: " << options.file_name << ".";
+  Chi::log.Log() << "Done reading VTU file: " << options.file_name << ".";
 }

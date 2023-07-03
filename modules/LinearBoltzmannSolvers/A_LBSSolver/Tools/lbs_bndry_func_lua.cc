@@ -66,7 +66,7 @@ Evaluate(size_t cell_global_id,
   };
 
   //======================================== Get lua function
-  lua_State* L = chi::console.GetConsoleState();
+  lua_State* L = Chi::console.GetConsoleState();
   lua_getglobal(L, m_lua_function_name.c_str());
 
   //======================================== Error check lua function

@@ -21,9 +21,9 @@ private:
   std::vector<double> delta_x_values_;
 
 public:
-  static chi_objects::InputParameters GetInputParameters();
+  static chi::InputParameters GetInputParameters();
 
-  explicit PiecewiseLinear1D(const chi_objects::InputParameters& params);
+  explicit PiecewiseLinear1D(const chi::InputParameters& params);
 
   std::vector<double>
   Evaluate(const std::vector<double>& values) const override;

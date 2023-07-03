@@ -35,7 +35,7 @@ void SourceFunction::operator()(LBSGroupset &groupset,
   if (source_flags & NO_FLAGS_SET) return;
 
   const size_t source_event_tag = lbs_solver_.GetSourceEventTag();
-  chi::log.LogEvent(source_event_tag, chi_objects::ChiLog::EventType::EVENT_BEGIN);
+  Chi::log.LogEvent(source_event_tag, chi::ChiLog::EventType::EVENT_BEGIN);
 
   apply_fixed_src_       = (source_flags & APPLY_FIXED_SOURCES);
   apply_wgs_scatter_src_ = (source_flags & APPLY_WGS_SCATTER_SOURCES);
@@ -164,7 +164,7 @@ void SourceFunction::operator()(LBSGroupset &groupset,
 
   AddAdditionalSources(groupset, destination_q, phi_local, source_flags);
 
-  chi::log.LogEvent(source_event_tag, chi_objects::ChiLog::EventType::EVENT_END);
+  Chi::log.LogEvent(source_event_tag, chi::ChiLog::EventType::EVENT_END);
 }
 
 double SourceFunction::AddSourceMoments() const

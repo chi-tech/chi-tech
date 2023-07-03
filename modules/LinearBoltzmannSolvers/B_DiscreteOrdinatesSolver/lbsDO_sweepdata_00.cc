@@ -11,7 +11,7 @@
 "When using PARMETIS type partitioning then groupset iterative method" \
 " must be NPT_CLASSICRICHARDSON_CYCLES or NPT_GMRES_CYCLES"
 
-#define IsParallel chi::mpi.process_count>1
+#define IsParallel Chi::mpi.process_count>1
 
 #define IsPartitionTypeParmetis \
 mesher.options.partition_type == chi_mesh::VolumeMesher::PartitionType::PARMETIS
@@ -33,7 +33,7 @@ namespace lbs
  * provides us with the angle-set-subset- and groupset-subset capability.*/
 void DiscreteOrdinatesSolver::InitializeSweepDataStructures()
 {
-  chi::log.Log() << chi::program_timer.GetTimeString()
+  Chi::log.Log() << Chi::program_timer.GetTimeString()
                  << " Initializing sweep datastructures.\n";
 
   //=================================== Perform checks
@@ -101,7 +101,7 @@ void DiscreteOrdinatesSolver::InitializeSweepDataStructures()
       );
   }//for quadrature spds-list pair
 
-  chi::log.Log() << chi::program_timer.GetTimeString()
+  Chi::log.Log() << Chi::program_timer.GetTimeString()
                  << " Done initializing sweep datastructures.\n";
 }
 

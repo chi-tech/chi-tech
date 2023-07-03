@@ -16,7 +16,8 @@ class TestConfiguration:
     def __init__(self, file_dir: str, filename: str, num_procs: int,
                  checks_params: list,
                  message_prefix: str,
-                 dependency: str):
+                 dependency: str,
+                 args: list):
         """Constructor. Load checks into the data structure"""
         self.file_dir = file_dir
         self.filename = filename
@@ -26,6 +27,7 @@ class TestConfiguration:
         self.submitted = False
         self.annotations = []
         self.dependency = dependency
+        self.args = args
 
         check_num = 0
         for check_params in checks_params:
@@ -161,6 +163,13 @@ def ParseTestConfiguration(file_path: str):
             warnings.warn(message_prefix + '"checks" field must be a list')
             continue
 
+        args = []
+        if "args" in test_block and not isinstance(test_block["args"], list):
+            warnings.warn(message_prefix + '"args" field must be a list')
+            continue
+        if "args" in test_block:
+            args = test_block["args"]
+
         dependency = ""
         if "dependency" in test_block:
             dependency = test_block["dependency"]
@@ -172,7 +181,8 @@ def ParseTestConfiguration(file_path: str):
                                          num_procs=test_block["num_procs"],
                                          checks_params=test_block["checks"],
                                          message_prefix=message_prefix,
-                                         dependency=dependency)
+                                         dependency=dependency,
+                                         args=args)
             test_objects.append(new_test)
         except ValueError:
             continue
@@ -264,6 +274,8 @@ def EchoTests(tests: list):
 def RunTests(tests: list, argv):
     """Actually runs the tests. This routine dynamically checks the system
        load in order to use the system maximally"""
+    start_time = time.perf_counter()
+
     capacity = max(4, argv.jobs)
     system_load = 0
 
@@ -314,7 +326,11 @@ def RunTests(tests: list, argv):
         if not slot.passed:
             num_tests_failed += 1
 
+    end_time = time.perf_counter()
+    elapsed_time = end_time - start_time
+
     print()
+    print("Elapsed time           : {:.2f} seconds".format(elapsed_time))
     print(f"Number of tests run    : {len(test_slots)}")
     print(f"Number of failed tests : {num_tests_failed}")
     print()

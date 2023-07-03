@@ -2,9 +2,8 @@
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-#include "chi_mpi.h"
-
 
 //###################################################################
 /**Builds the sparsity pattern for a Discontinuous Finite Element Method.*/
@@ -119,7 +118,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
     }//for j
   }
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
 }
 
 

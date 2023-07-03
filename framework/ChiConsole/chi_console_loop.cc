@@ -8,9 +8,9 @@
 
 //######################################################### Run Console loop
 /** Executes the loop for the console.*/
-void chi_objects::ChiConsole::RunConsoleLoop(char*) const
+void chi::ChiConsole::RunConsoleLoop(char*) const
 {
-  chi::log.Log() << "Console loop started. "
+  Chi::log.Log() << "Console loop started. "
                      << "Type \"exit\" to quit (or Ctl-C).";
 
   /** Wrapper to an MPI_Bcast call for a single integer
@@ -20,7 +20,7 @@ void chi_objects::ChiConsole::RunConsoleLoop(char*) const
     MPI_Bcast(int_being_bcast,    //buffer
               1, MPI_INT,         //count + type
               0,                  //root
-              MPI_COMM_WORLD);    //communicator
+              Chi::mpi.comm);    //communicator
   };
 
   /** Wrapper to an MPI_Bcast call for an array of characters
@@ -31,7 +31,7 @@ void chi_objects::ChiConsole::RunConsoleLoop(char*) const
     MPI_Bcast(raw_string_to_bcast,           //buffer
               length, MPI_CHAR,              //count + type
               0,                             //root
-              MPI_COMM_WORLD);               //communicator
+              Chi::mpi.comm);               //communicator
   };
 
   /** Wrapper to an MPI_Bcast call for an array of characters
@@ -42,7 +42,7 @@ void chi_objects::ChiConsole::RunConsoleLoop(char*) const
     MPI_Bcast(raw_chars.data(),              //buffer
               length, MPI_CHAR,              //count + type
               0,                             //root
-              MPI_COMM_WORLD);               //communicator
+              Chi::mpi.comm);               //communicator
 
     string_to_bcast = std::string(raw_chars.data());
   };
@@ -53,7 +53,7 @@ void chi_objects::ChiConsole::RunConsoleLoop(char*) const
     bool error = luaL_dostring(console_state_, the_string.c_str());
     if (error)
     {
-      chi::log.LogAll() << lua_tostring(console_state_, -1);
+      Chi::log.LogAll() << lua_tostring(console_state_, -1);
       lua_pop(console_state_, 1);
     }
   };
@@ -66,9 +66,9 @@ void chi_objects::ChiConsole::RunConsoleLoop(char*) const
     return L;
   };
 
-  const bool HOME = chi::mpi.location_id == 0;
+  const bool HOME = Chi::mpi.location_id == 0;
 
-  while (not chi::run_time::termination_posted_)
+  while (not Chi::run_time::termination_posted_)
   {
     std::string console_input;
 
@@ -84,18 +84,18 @@ void chi_objects::ChiConsole::RunConsoleLoop(char*) const
       else      NonHomeBroadcastStringAsRaw(console_input, console_input_len);
 
     try { LuaDoString(console_input); }
-    catch(const chi::RecoverableException& e)
+    catch(const Chi::RecoverableException& e)
     {
-      chi::log.LogAllError() << e.what();
+      Chi::log.LogAllError() << e.what();
     }
     catch(const std::exception& e)
     {
-      chi::log.LogAllError() << e.what();
-      chi::Exit(EXIT_FAILURE);
+      Chi::log.LogAllError() << e.what();
+      Chi::Exit(EXIT_FAILURE);
     }
   }//while not termination posted
 
-  chi::run_time::termination_posted_ = true;
+  Chi::run_time::termination_posted_ = true;
 
-  chi::log.Log() << "Console loop stopped successfully.";
+  Chi::log.Log() << "Console loop stopped successfully.";
 }

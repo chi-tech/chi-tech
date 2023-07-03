@@ -15,9 +15,9 @@ RegisterWrapperFunction(/*namespace_in_lua=*/lbs,
                         /*syntax_function=*/GetSyntax_SetOptions,
                         /*actual_function=*/SetOptions);
 
-chi_objects::InputParameters GetSyntax_SetOptions()
+chi::InputParameters GetSyntax_SetOptions()
 {
-  chi_objects::InputParameters params;
+  chi::InputParameters params;
 
   // clang-format off
   params.SetGeneralDescription("\\defgroup lbs__SetOptions lbs.SetOptions \n"
@@ -34,8 +34,8 @@ chi_objects::InputParameters GetSyntax_SetOptions()
   return params;
 }
 
-chi_objects::ParameterBlock
-SetOptions(const chi_objects::InputParameters& params)
+chi::ParameterBlock
+SetOptions(const chi::InputParameters& params)
 {
   const std::string fname = __FUNCTION__;
 
@@ -44,14 +44,14 @@ SetOptions(const chi_objects::InputParameters& params)
 
   const size_t handle = params.GetParamValue<size_t>("arg0");
   auto& lbs_solver =
-    chi::GetStackItem<lbs::LBSSolver>(chi::object_stack, handle, fname);
+    Chi::GetStackItem<lbs::LBSSolver>(Chi::object_stack, handle, fname);
 
   auto options_params = LBSSolver::OptionsBlock();
   options_params.AssignParameters(params.GetParam("arg1"));
 
   lbs_solver.SetOptions(options_params);
 
-  return chi_objects::ParameterBlock();
+  return chi::ParameterBlock();
 }
 
 } // namespace lbs::common_lua_utils

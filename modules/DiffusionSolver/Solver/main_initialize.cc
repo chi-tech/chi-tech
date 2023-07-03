@@ -15,15 +15,15 @@
 /**Initializes the diffusion solver using the PETSc library.*/
 int chi_diffusion::Solver::Initialize(bool verbose)
 {
-  chi::log.Log() << "\n"
-                     << chi::program_timer.GetTimeString() << " "
+  Chi::log.Log() << "\n"
+                     << Chi::program_timer.GetTimeString() << " "
                      << TextName() << ": Initializing Diffusion solver ";
   this->verbose_info_ = verbose;
 
   if (not common_items_initialized_)
     InitializeCommonItems(); //Mostly boundaries
 
-  chi_objects::ChiTimer t_init; t_init.Reset();
+  chi::ChiTimer t_init; t_init.Reset();
 
   auto sdm_string = basic_options_("discretization_method").StringValue();
   {
@@ -54,13 +54,13 @@ int chi_diffusion::Solver::Initialize(bool verbose)
         sdm_string + ", specified.");
   }
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(Chi::mpi.comm);
   auto& sdm = discretization_;
 
   //============================================= Get DOF counts
   local_dof_count_ = sdm->GetNumLocalDOFs(unknown_manager_);
   global_dof_count_ = sdm->GetNumGlobalDOFs(unknown_manager_);
-  chi::log.Log()
+  Chi::log.Log()
       << TextName() << ": Global number of DOFs="
       << global_dof_count_;
 
@@ -83,20 +83,20 @@ int chi_diffusion::Solver::Initialize(bool verbose)
         Unknown(UnknownType::SCALAR)); //Unknown/Variable
 
     field_functions_.push_back(initial_field_function);
-    chi::field_function_stack.push_back(initial_field_function);
+    Chi::field_function_stack.push_back(initial_field_function);
   }//if not ff set
 
 
   //================================================== Determine nodal DOF
-  chi::log.Log() << "Building sparsity pattern.";
+  Chi::log.Log() << "Building sparsity pattern.";
   std::vector<int64_t> nodal_nnz_in_diag;
   std::vector<int64_t> nodal_nnz_off_diag;
   sdm->BuildSparsityPattern(nodal_nnz_in_diag,
                             nodal_nnz_off_diag,
                             unknown_manager_);
 
-  chi::log.Log()
-    << chi::program_timer.GetTimeString() << " "
+  Chi::log.Log()
+    << Chi::program_timer.GetTimeString() << " "
     << TextName() << ": Diffusion Solver initialization time "
     << t_init.GetTime()/1000.0 << std::endl;
 
@@ -120,7 +120,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
   ierr_ = MatSetType(A_, MATMPIAIJ);CHKERRQ(ierr_);
 
   //================================================== Allocate matrix memory
-  chi::log.Log() << "Setting matrix preallocation.";
+  Chi::log.Log() << "Setting matrix preallocation.";
   MatMPIAIJSetPreallocation(A_, 0, nodal_nnz_in_diag.data(),
                             0, nodal_nnz_off_diag.data());
   MatSetOption(A_, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);

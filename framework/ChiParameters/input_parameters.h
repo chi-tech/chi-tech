@@ -6,10 +6,9 @@
 
 #include <map>
 
-#define MakeInpParamsForObj(x, y)                                              \
-  chi_objects::InputParameters::MakeForObject<x>(y)
+#define MakeInpParamsForObj(x, y) chi::InputParameters::MakeForObject<x>(y)
 
-namespace chi_objects
+namespace chi
 {
 
 enum class InputParameterTag

@@ -2,7 +2,7 @@
 
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 
-#include <chi_mpi.h>
+#include "chi_runtime.h"
 
 #include <algorithm>
 
@@ -46,7 +46,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
     MPI_Isend(multi_face_indices[deplocI].data(),
               multi_face_indices[deplocI].size(),
               MPI_INT,locJ,101+tag_index,
-              MPI_COMM_WORLD,&send_requests[deplocI]);
+              Chi::mpi.comm,&send_requests[deplocI]);
 
     //TODO: Watch eager limits on sent data
 
@@ -64,7 +64,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
     int locJ = spds.delayed_location_dependencies[prelocI];
 
     MPI_Status probe_status;
-    MPI_Probe(locJ,101+tag_index,MPI_COMM_WORLD,&probe_status);
+    MPI_Probe(locJ,101+tag_index,Chi::mpi.comm,&probe_status);
 
     int amount_to_receive=0;
     MPI_Get_count(&probe_status, MPI_INT, &amount_to_receive );
@@ -73,7 +73,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
     face_indices.resize(amount_to_receive,0);
 
     MPI_Recv(face_indices.data(),amount_to_receive,MPI_INT,
-             locJ,101+tag_index,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+             locJ,101+tag_index,Chi::mpi.comm,MPI_STATUS_IGNORE);
 
     DeSerializeCellInfo(delayed_prelocI_cell_views[prelocI], &face_indices,
                         delayed_prelocI_face_dof_count[prelocI]);
@@ -95,7 +95,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
     int locJ = spds.location_dependencies[prelocI];
 
     MPI_Status probe_status;
-    MPI_Probe(locJ,101+tag_index,MPI_COMM_WORLD,&probe_status);
+    MPI_Probe(locJ,101+tag_index,Chi::mpi.comm,&probe_status);
 
     int amount_to_receive=0;
     MPI_Get_count(&probe_status, MPI_INT, &amount_to_receive );
@@ -107,7 +107,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
              amount_to_receive,
              MPI_INT,
              locJ,101+tag_index,
-             MPI_COMM_WORLD,
+             Chi::mpi.comm,
              MPI_STATUS_IGNORE);
 
     DeSerializeCellInfo(prelocI_cell_views[prelocI], &face_indices,
@@ -134,7 +134,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
     MPI_Isend(multi_face_indices[deplocI].data(),
               multi_face_indices[deplocI].size(),
               MPI_INT,locJ,101+tag_index,
-              MPI_COMM_WORLD,&send_requests[deplocI]);
+              Chi::mpi.comm,&send_requests[deplocI]);
 
     //TODO: Watch eager limits on sent data
 

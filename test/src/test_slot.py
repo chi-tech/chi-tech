@@ -1,5 +1,6 @@
 import os
 import subprocess
+import time
 
 
 class TestSlot:
@@ -10,6 +11,9 @@ class TestSlot:
         self.test = test
         self.passed = False
         self.argv = argv
+
+        self.time_start = time.perf_counter()
+        self.time_end = self.time_start
 
         self._Run()
 
@@ -25,6 +29,8 @@ class TestSlot:
         cmd += "--suppress_color "
         cmd += "--supress_beg_end_timelog "
         cmd += "master_export=false "
+        for arg in test.args:
+            cmd += arg + " "
         # cmd += f"> out/{test.filename}.out "
         # cmd += "2>&1 "
         self.process = subprocess.Popen(cmd,
@@ -47,6 +53,8 @@ class TestSlot:
         if self.process.poll() is not None:
 
             out, err = self.process.communicate()
+
+            self.time_end = time.perf_counter()
 
             file = open(test.file_dir + f"out/{test.filename}.out", "w")
             file.write(out + "\n")
@@ -105,4 +113,6 @@ class TestSlot:
         width = 120 - len(prefix + test_path) + pad
         message = message.rjust(width, ".")
 
-        print(prefix + test_path + message)
+        time_taken_message = " {:.2f}s".format(self.time_end - self.time_start)
+
+        print(prefix + test_path + message + time_taken_message)

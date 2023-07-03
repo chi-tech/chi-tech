@@ -1,16 +1,12 @@
 <VTKFile type="PUnstructuredGrid" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
   <PUnstructuredGrid GhostLevel="0">
-    <PPointData>
-      <PDataArray type="Float64" Name="PhiUnknown_0"/>
-    </PPointData>
     <PCellData>
       <PDataArray type="Int32" Name="Material"/>
       <PDataArray type="UInt32" Name="Partition"/>
-      <PDataArray type="Float64" Name="PhiUnknown_0"/>
     </PCellData>
     <PPoints>
       <PDataArray type="Float64" Name="Points" NumberOfComponents="3"/>
     </PPoints>
-    <Piece Source="SimTest_92b_DSA_PWLC_0.vtu"/>
+    <Piece Source="lv_rcc_test1_0.vtu"/>
   </PUnstructuredGrid>
 </VTKFile>

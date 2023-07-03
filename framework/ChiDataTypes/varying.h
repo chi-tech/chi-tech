@@ -13,38 +13,12 @@ namespace chi_data_types
 class Varying
 {
 private:
-  /**Raw byte-value data*/
-  std::vector<std::byte> raw_data_;
-  /**Flag indicating whether initialized or not*/
-  bool data_initialized_ = false;
-  /**Type specification*/
-  VaryingDataType type_ = VaryingDataType::VOID;
-
-private:
-  /**Utility that converts a type to a byte vector provided that
-   * it has the sizeof() function defined for it.*/
-  template <typename T>
-  void PopulateRaw(const T& value)
-  {
-    auto src = reinterpret_cast<const std::byte*>(&value);
-
-    size_t num_bytes = sizeof(T);
-    raw_data_.resize(num_bytes);
-
-    std::copy(src, src + num_bytes, &raw_data_[0]);
-
-    data_initialized_ = true;
-  }
-
-  /**Checks if two VaryingDataType values match.
-   * Type A is matched against type B.*/
-  void CheckTypeMatch(VaryingDataType type_A,
-                      VaryingDataType type_B_required) const;
-  /**Checks whether the data has been initialized.*/
-  void CheckDataInitialized() const;
-
-public:
   // Helpers
+  template <typename T>
+  struct IsByteArray
+  {
+    static constexpr bool value = std::is_same_v<T, std::vector<std::byte>>;
+  };
   template <typename T>
   struct IsBool
   {
@@ -75,25 +49,180 @@ public:
   template <typename T>
   using IntegerType = typename std::enable_if_t<IsInteger<T>::value, T>;
 
-private:
   template <typename T>
-  BoolType<T> CastValue(const T& value)
+  using BoolStorageType = typename std::enable_if_t<IsBool<T>::value, bool>;
+  template <typename T>
+  using FloatStorageType = typename std::enable_if_t<IsFloat<T>::value, double>;
+  template <typename T>
+  using IntegerStorageType =
+    typename std::enable_if_t<IsInteger<T>::value, int64_t>;
+
+  template <typename T>
+  BoolStorageType<T> CastValue(const T& value)
   {
     return value;
   }
 
   template <typename T>
-  FloatType<T> CastValue(const T& value)
+  FloatStorageType<T> CastValue(const T& value)
   {
     return static_cast<double>(value);
   }
 
   template <typename T>
-  IntegerType<T> CastValue(const T& value)
+  IntegerStorageType<T> CastValue(const T& value)
   {
     return static_cast<int64_t>(value);
   }
 
+  /**This acts as a base class for templated child arbitrary types*/
+  class VaryingType
+  {
+  public:
+    virtual std::string StringValue() const;
+    virtual bool BoolValue() const;
+    virtual int64_t IntegerValue() const;
+    virtual double FloatValue() const;
+    virtual std::vector<std::byte> BytesValue() const;
+
+    virtual std::unique_ptr<VaryingType> Clone() const = 0;
+    virtual size_t Size() const = 0;
+
+    virtual bool operator==(const VaryingType& that) const = 0;
+    virtual bool operator!=(const VaryingType& that) const = 0;
+    virtual bool operator>(const VaryingType& that) const = 0;
+    virtual bool operator<(const VaryingType& that) const = 0;
+    virtual bool operator>=(const VaryingType& that) const = 0;
+    virtual bool operator<=(const VaryingType& that) const = 0;
+
+    VaryingDataType Type() const { return type_; }
+
+    virtual ~VaryingType() = default;
+
+  protected:
+    VaryingDataType type_;
+    explicit VaryingType(VaryingDataType type) : type_(type) {}
+  };
+
+  template <typename T>
+  class VaryingArbitraryType : public VaryingType
+  {
+  public:
+    // clang-format off
+    explicit VaryingArbitraryType(T value)
+      : VaryingType(IsByteArray<T>::value ? VaryingDataType::ARBITRARY_BYTES :
+                    IsString<T>::value ? VaryingDataType::STRING :
+                    IsBool<T>::value ? VaryingDataType::BOOL :
+                    IsInteger<T>::value ? VaryingDataType::INTEGER :
+                    IsFloat<T>::value ? VaryingDataType::FLOAT :
+                    VaryingDataType::VOID),
+      value_(value)
+    {
+    }
+    // clang-format on
+    std::string StringValue() const override;
+    bool BoolValue() const override;
+    int64_t IntegerValue() const override;
+    double FloatValue() const override;
+
+    std::unique_ptr<VaryingType> Clone() const override
+    {
+      return std::make_unique<VaryingArbitraryType<T>>(value_);
+    }
+    size_t Size() const override { return sizeof(T); }
+
+    bool operator==(const VaryingType& that) const override
+    {
+      if (type_ != that.Type()) return false;
+
+      switch (this->Type())
+      {
+        case VaryingDataType::ARBITRARY_BYTES:
+          return BytesValue() == that.BytesValue();
+        case VaryingDataType::STRING:
+          return StringValue() == that.StringValue();
+        case VaryingDataType::BOOL:
+          return BoolValue() == that.BoolValue();
+        case VaryingDataType::INTEGER:
+          return IntegerValue() == that.IntegerValue();
+        case VaryingDataType::FLOAT:
+          return FloatValue() == that.FloatValue();
+        case VaryingDataType::VOID:
+        default:
+          return false;
+      }
+    }
+
+    bool operator!=(const VaryingType& that) const override
+    {
+      return not(*this == that);
+    }
+    bool operator>(const VaryingType& that) const override
+    {
+      if (type_ != that.Type()) return false;
+
+      switch (this->Type())
+      {
+        case VaryingDataType::ARBITRARY_BYTES:
+          return BytesValue() > that.BytesValue();
+        case VaryingDataType::STRING:
+          return StringValue() > that.StringValue();
+        case VaryingDataType::BOOL:
+          return BoolValue() > that.BoolValue();
+        case VaryingDataType::INTEGER:
+          return IntegerValue() > that.IntegerValue();
+        case VaryingDataType::FLOAT:
+          return FloatValue() > that.FloatValue();
+        case VaryingDataType::VOID:
+        default:
+          return false;
+      }
+    }
+    bool operator<(const VaryingType& that) const override
+    {
+      if (type_ != that.Type()) return false;
+
+      switch (this->Type())
+      {
+        case VaryingDataType::ARBITRARY_BYTES:
+          return BytesValue() < that.BytesValue();
+        case VaryingDataType::STRING:
+          return StringValue() < that.StringValue();
+        case VaryingDataType::BOOL:
+          return BoolValue() < that.BoolValue();
+        case VaryingDataType::INTEGER:
+          return IntegerValue() < that.IntegerValue();
+        case VaryingDataType::FLOAT:
+          return FloatValue() < that.FloatValue();
+        case VaryingDataType::VOID:
+        default:
+          return false;
+      }
+    }
+    bool operator>=(const VaryingType& that) const override
+    {
+      return (*this > that) or (*this == that);
+    }
+    bool operator<=(const VaryingType& that) const override
+    {
+      return (*this < that) or (*this == that);
+    }
+
+  private:
+    T value_;
+  };
+
+  /**Type specification*/
+  VaryingDataType type_ = VaryingDataType::VOID;
+  std::unique_ptr<VaryingType> data_ = nullptr;
+
+private:
+  /**Checks if two VaryingDataType values match.
+   * Type A is matched against type B.*/
+  void CheckTypeMatch(VaryingDataType type_A,
+                      VaryingDataType type_B_required) const;
+
+private:
 public:
   // Constructors
   /**Generalized constructor for bool, integral- and float-types. This
@@ -107,14 +236,74 @@ public:
     static_assert(is_supported_type,
                   "Constructor called with unsupported type");
 
-    if (IsBool<T>::value) type_ = VaryingDataType::BOOL;
+    if (IsBool<T>::value)
+    {
+      type_ = VaryingDataType::BOOL;
+    }
     else if (IsFloat<T>::value)
+    {
       type_ = VaryingDataType::FLOAT;
+    }
     else if (IsInteger<T>::value)
+    {
       type_ = VaryingDataType::INTEGER;
+    }
 
-    PopulateRaw<T>(CastValue(value));
+    data_ = Helper(CastValue(value));
   }
+
+  static std::unique_ptr<VaryingType> Helper(const bool& value)
+  {
+    return std::make_unique<VaryingArbitraryType<bool>>(value);
+  }
+
+  static std::unique_ptr<VaryingType> Helper(const int64_t& value)
+  {
+    return std::make_unique<VaryingArbitraryType<int64_t>>(value);
+  }
+
+  static std::unique_ptr<VaryingType> Helper(const double& value)
+  {
+    return std::make_unique<VaryingArbitraryType<double>>(value);
+  }
+
+
+
+  // template <typename T>
+  // explicit Varying(const BoolType<T>& value)
+  //{
+  //   constexpr bool is_supported_type = IsBool<T>::value;
+  //   static_assert(is_supported_type,
+  //                 "Constructor called with unsupported type");
+  //
+  //   type_ = VaryingDataType::BOOL;
+  //   data_ = std::make_unique<VaryingArbitraryType<BoolStorageType<T>>>(
+  //     CastValue(value));
+  // }
+  //
+  // template <typename T>
+  // explicit Varying(const IntegerType<T>& value)
+  //{
+  //   constexpr bool is_supported_type = IsInteger<T>::value;
+  //   static_assert(is_supported_type,
+  //                 "Constructor called with unsupported type");
+  //
+  //   type_ = VaryingDataType::INTEGER;
+  //   data_ = std::make_unique<VaryingArbitraryType<IntegerStorageType<T>>>(
+  //     CastValue(value));
+  // }
+  //
+  // template <typename T>
+  // explicit Varying(const FloatType<T>& value)
+  //{
+  //   constexpr bool is_supported_type = IsFloat<T>::value;
+  //   static_assert(is_supported_type,
+  //                 "Constructor called with unsupported type");
+  //
+  //   type_ = VaryingDataType::FLOAT;
+  //   data_ = std::make_unique<VaryingArbitraryType<FloatStorageType<T>>>(
+  //     CastValue(value));
+  // }
 
   /**Constructor for an arbitrary sequence of bytes value.*/
   explicit Varying(const std::vector<std::byte>& value);
@@ -126,11 +315,11 @@ public:
     : Varying((not value) ? std::string() : std::string(value))
   {
   }
-  template <std::size_t N>
-  explicit Varying(const char (&value)[N])
-    : Varying(static_cast<const char*>(value))
-  {
-  }
+  // template <std::size_t N>
+  // explicit Varying(const char (&value)[N])
+  //   : Varying(static_cast<const char*>(value))
+  //{
+  // }
 
   /**Copy constructor.*/
   Varying(const Varying& other);
@@ -154,85 +343,9 @@ public:
   Varying& operator=(const T& value)
   {
     type_ = VaryingDataType::BOOL;
-    PopulateRaw<bool>(value);
+    data_ = std::make_unique<VaryingArbitraryType<bool>>(value);
 
     return *this;
-  }
-
-  /**Equality operator*/
-  bool operator==(const Varying& that) const
-  {
-    if (this->Type() != that.type_) return false;
-    switch (this->Type())
-    {
-      case VaryingDataType::ARBITRARY_BYTES:
-        return raw_data_ == that.raw_data_;
-      case VaryingDataType::STRING:
-        return StringValue() == that.StringValue();
-      case VaryingDataType::BOOL:
-        return BoolValue() == that.BoolValue();
-      case VaryingDataType::INTEGER:
-        return IntegerValue() == that.IntegerValue();
-      case VaryingDataType::FLOAT:
-        return FloatValue() == that.FloatValue();
-      case VaryingDataType::VOID:
-      default:
-        return false;
-    }
-  }
-
-  /**Inequality operator*/
-  bool operator!=(const Varying& that) const { return not(*this == that); }
-
-  /**Relation operators*/
-  bool operator>(const Varying& that) const
-  {
-    switch (this->Type())
-    {
-      case VaryingDataType::ARBITRARY_BYTES:
-        return raw_data_ > that.raw_data_;
-      case VaryingDataType::STRING:
-        return StringValue() > that.StringValue();
-      case VaryingDataType::BOOL:
-        return BoolValue() > that.BoolValue();
-      case VaryingDataType::INTEGER:
-        return IntegerValue() > that.IntegerValue();
-      case VaryingDataType::FLOAT:
-        return FloatValue() > that.FloatValue();
-      case VaryingDataType::VOID:
-      default:
-        return false;
-    }
-  }
-  /**Relation operators*/
-  bool operator>=(const Varying& that) const
-  {
-    return (*this > that) or (*this == that);
-  }
-  /**Relation operators*/
-  bool operator<(const Varying& that) const
-  {
-    switch (this->Type())
-    {
-      case VaryingDataType::ARBITRARY_BYTES:
-        return raw_data_ < that.raw_data_;
-      case VaryingDataType::STRING:
-        return StringValue() < that.StringValue();
-      case VaryingDataType::BOOL:
-        return BoolValue() < that.BoolValue();
-      case VaryingDataType::INTEGER:
-        return IntegerValue() < that.IntegerValue();
-      case VaryingDataType::FLOAT:
-        return FloatValue() < that.FloatValue();
-      case VaryingDataType::VOID:
-      default:
-        return false;
-    }
-  }
-  /**Relation operators*/
-  bool operator<=(const Varying& that) const
-  {
-    return (*this < that) or (*this == that);
   }
 
   /**Assigns an integer value.*/
@@ -240,7 +353,7 @@ public:
   Varying& operator=(const T& value)
   {
     type_ = VaryingDataType::INTEGER;
-    PopulateRaw<int64_t>(static_cast<int64_t>(value));
+    data_ = std::make_unique<VaryingArbitraryType<int64_t>>(value);
 
     return *this;
   }
@@ -250,9 +363,30 @@ public:
   Varying& operator=(const T& value)
   {
     type_ = VaryingDataType::FLOAT;
-    PopulateRaw<double>(static_cast<double>(value));
+    data_ = std::make_unique<VaryingArbitraryType<double>>(value);
 
     return *this;
+  }
+
+  /**Equality operator*/
+  bool operator==(const Varying& that) const { return *data_ == *that.data_; }
+
+  /**Inequality operator*/
+  bool operator!=(const Varying& that) const { return not(*this == that); }
+
+  /**Relation operators*/
+  bool operator>(const Varying& that) const { return *data_ > *that.data_; }
+  /**Relation operators*/
+  bool operator>=(const Varying& that) const
+  {
+    return (*this > that) or (*this == that);
+  }
+  /**Relation operators*/
+  bool operator<(const Varying& that) const { return *data_ < *that.data_; }
+  /**Relation operators*/
+  bool operator<=(const Varying& that) const
+  {
+    return (*this < that) or (*this == that);
   }
 
   /**Returns a default value for the type required.*/
@@ -293,9 +427,8 @@ public:
   BoolType<T> GetValue() const
   {
     CheckTypeMatch(type_, VaryingDataType::BOOL);
-    CheckDataInitialized();
 
-    return *reinterpret_cast<const bool*>(&raw_data_[0]);
+    return data_->BoolValue();
   }
 
   /**Returns floating point values if able.*/
@@ -303,9 +436,8 @@ public:
   FloatType<T> GetValue() const
   {
     CheckTypeMatch(type_, VaryingDataType::FLOAT);
-    CheckDataInitialized();
 
-    const double value = *reinterpret_cast<const double*>(&raw_data_[0]);
+    const double value = data_->FloatValue();
 
     return static_cast<T>(value);
   }
@@ -315,12 +447,8 @@ public:
   StringType<T> GetValue() const
   {
     CheckTypeMatch(type_, VaryingDataType::STRING);
-    CheckDataInitialized();
 
-    if (not raw_data_.data()) // Covers construction from null
-      return std::string();
-
-    return std::string(reinterpret_cast<const char*>(raw_data_.data()));
+    return data_->StringValue();
   }
 
   /**Returns a signed integer if able.*/
@@ -328,9 +456,8 @@ public:
   SignedIntegerType<T> GetValue() const
   {
     CheckTypeMatch(type_, VaryingDataType::INTEGER);
-    CheckDataInitialized();
 
-    const int64_t value = *reinterpret_cast<const int64_t*>(&raw_data_[0]);
+    const int64_t value = data_->IntegerValue();
 
     return static_cast<T>(value);
   }
@@ -340,9 +467,8 @@ public:
   UnsignedIntegerType<T> GetValue() const
   {
     CheckTypeMatch(type_, VaryingDataType::INTEGER);
-    CheckDataInitialized();
 
-    const int64_t value = *reinterpret_cast<const int64_t*>(&raw_data_[0]);
+    const int64_t value = data_->IntegerValue();
 
     if (value < 0)
       throw std::logic_error(std::string(__PRETTY_FUNCTION__) +

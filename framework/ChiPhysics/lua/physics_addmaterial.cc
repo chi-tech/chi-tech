@@ -39,12 +39,12 @@ int chiPhysicsAddMaterial(lua_State *L)
     new_material->name_ = std::string(temp);
   }
 
-  chi::material_stack.push_back(new_material);
+  Chi::material_stack.push_back(new_material);
 
-  const size_t index = chi::material_stack.size()-1;
+  const size_t index = Chi::material_stack.size()-1;
   lua_pushnumber(L,static_cast<lua_Number>(index));
 
-  chi::log.Log0Verbose1() << "New material added at index " << index
+  Chi::log.Log0Verbose1() << "New material added at index " << index
                             << " with name \"" << new_material->name_ << "\"";
 
   return 1;

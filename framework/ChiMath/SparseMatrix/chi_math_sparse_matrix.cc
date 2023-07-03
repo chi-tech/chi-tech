@@ -41,11 +41,11 @@ void chi_math::SparseMatrix::Insert(size_t i, size_t j, double value)
 
   if ((i<0) || (i >= row_size_) || (j < 0) || (j >= col_size_))
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
         << "SparseMatrix::Insert encountered out of bounds,"
         << " i=" << i << " j=" << j
         << " bounds(" << row_size_ << "," << col_size_ << ")";
-   chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   auto relative_location = std::find(rowI_indices_[i].begin(),
@@ -72,11 +72,11 @@ void chi_math::SparseMatrix::InsertAdd(size_t i, size_t j, double value)
 
   if ((i<0) || (i >= row_size_) || (j < 0) || (j >= col_size_))
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
         << "SparseMatrix::Insert encountered out of bounds,"
         << " i=" << i << " j=" << j
         << " bounds(" << row_size_ << "," << col_size_ << ")";
-   chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   auto relative_location = std::find(rowI_indices_[i].begin(),
@@ -105,10 +105,10 @@ void chi_math::SparseMatrix::SetDiagonal(const std::vector<double>& diag)
   //============================================= Check size
   if (diag.size() != rowI_values_.size())
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
     << "Incompatible matrix-vector size encountered "
     << "in call to SparseMatrix::SetDiagonal.";
-   chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   //============================================= Assign values
@@ -140,11 +140,11 @@ double chi_math::SparseMatrix::ValueIJ(size_t i, size_t j) const
   double retval = 0.0;
   if ((i<0) || (i >= rowI_indices_.size()))
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "Index i out of bounds"
       << " in call to SparseMatrix::ValueIJ"
       << " i=" << i;
-   chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   if (not rowI_indices_[i].empty())
@@ -251,9 +251,9 @@ void chi_math::SparseMatrix::CheckInitialized() const
 {
   if (rowI_values_.empty())
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "Illegal call to unitialized SparseMatrix matrix.";
-   chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 }
 

@@ -81,7 +81,7 @@ void lbs::LBSSolver::InitializePointSources()
         for (double val : info.shape_values) output << val << " ";
         output << "volume_weight=" << info.volume_weight/v_total;
 
-        chi::log.LogAll() << output.str();
+        Chi::log.LogAll() << output.str();
       }
     }//for info in temp list
   }//for point_source

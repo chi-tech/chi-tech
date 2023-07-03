@@ -10,7 +10,7 @@ void lbs::LBSSolver::Initialize()
   PerformInputChecks();                //a assigns num_groups and grid
   PrintSimHeader();                    //b
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(Chi::mpi.comm);
 
   InitMaterials();                     //c
   InitializeSpatialDiscretization();   //d
@@ -20,5 +20,5 @@ void lbs::LBSSolver::Initialize()
   InitializeBoundaries();              //h
   InitializePointSources();            //i
 
-  source_event_tag_ = chi::log.GetRepeatingEventTag("Set Source");
+  source_event_tag_ = Chi::log.GetRepeatingEventTag("Set Source");
 }

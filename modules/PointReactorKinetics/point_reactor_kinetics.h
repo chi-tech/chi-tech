@@ -30,8 +30,8 @@ private:
   double period_tph_ = 0.0;
 
 public:
-  static chi_objects::InputParameters GetInputParameters();
-  explicit TransientSolver(const chi_objects::InputParameters& params);
+  static chi::InputParameters GetInputParameters();
+  explicit TransientSolver(const chi::InputParameters& params);
 
   void Initialize() override;
   void Execute() override;

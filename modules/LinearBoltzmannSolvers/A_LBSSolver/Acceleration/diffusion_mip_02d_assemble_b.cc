@@ -29,7 +29,7 @@ void lbs::acceleration::DiffusionMIPSolver::
     throw std::logic_error(fname + ": Some or all PETSc elements are null. "
                                    "Check that Initialize has been called.");
   if (options.verbose)
-    chi::log.Log() << chi::program_timer.GetTimeString() << " Starting assembly";
+    Chi::log.Log() << Chi::program_timer.GetTimeString() << " Starting assembly";
 
   const size_t num_groups   = uk_man_.unknowns_.front().num_components_;
 
@@ -162,7 +162,7 @@ void lbs::acceleration::DiffusionMIPSolver::
   VecAssemblyEnd(rhs_);
 
   if (options.verbose)
-    chi::log.Log() << chi::program_timer.GetTimeString() << " Assembly completed";
+    Chi::log.Log() << Chi::program_timer.GetTimeString() << " Assembly completed";
 }
 
 //###################################################################
@@ -177,7 +177,7 @@ Assemble_b(Vec petsc_q_vector)
     throw std::logic_error(fname + ": Some or all PETSc elements are null. "
                                    "Check that Initialize has been called.");
   if (options.verbose)
-    chi::log.Log() << chi::program_timer.GetTimeString() << " Starting assembly";
+    Chi::log.Log() << Chi::program_timer.GetTimeString() << " Starting assembly";
 
   const size_t num_groups   = uk_man_.unknowns_.front().num_components_;
 
@@ -315,5 +315,5 @@ Assemble_b(Vec petsc_q_vector)
   VecAssemblyEnd(rhs_);
 
   if (options.verbose)
-    chi::log.Log() << chi::program_timer.GetTimeString() << " Assembly completed";
+    Chi::log.Log() << Chi::program_timer.GetTimeString() << " Assembly completed";
 }

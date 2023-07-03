@@ -23,7 +23,7 @@ std::runtime_error("Failed to open file: " + options.file_name + \
 void chi_mesh::UnpartitionedMesh::
   ReadFromEnsightGold(const chi_mesh::UnpartitionedMesh::Options &options)
 {
-  chi::log.Log() << "Reading Ensight-Gold file: " << options.file_name << ".";
+  Chi::log.Log() << "Reading Ensight-Gold file: " << options.file_name << ".";
 
   //======================================== Attempt to open file
   std::ifstream file;
@@ -61,7 +61,7 @@ void chi_mesh::UnpartitionedMesh::
         chi_misc_utils::StringTrim(
           iter_a->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME())));
 
-      chi::log.Log()
+      Chi::log.Log()
         << "Reading block " << block_name
         << " Number of cells: " << grid_blocks.back().first->GetNumberOfCells()
         << " Number of points: " << grid_blocks.back().first->GetNumberOfPoints();
@@ -105,6 +105,6 @@ void chi_mesh::UnpartitionedMesh::
   //======================================== Set boundary ids
   SetBoundaryIDsFromBlocks(bndry_grid_blocks);
 
-  chi::log.Log() << "Done reading Ensight-Gold file: "
+  Chi::log.Log() << "Done reading Ensight-Gold file: "
                  << options.file_name << ".";
 }

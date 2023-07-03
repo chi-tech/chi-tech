@@ -4,7 +4,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace chi_objects
+namespace chi
 {
 //###################################################################
 /** Log stream for adding header information to a string stream.*/

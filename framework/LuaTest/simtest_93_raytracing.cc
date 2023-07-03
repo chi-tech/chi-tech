@@ -19,13 +19,13 @@ namespace chi_unit_sim_tests
 int chiSimTest93_RayTracing(lua_State* Lstate)
 {
   const std::string fname = "chiSimTest93_RayTracing";
-  chi::log.Log() << "chiSimTest93_RayTracing";
+  Chi::log.Log() << "chiSimTest93_RayTracing";
 
   //============================================= Get grid
   auto grid_ptr = chi_mesh::GetCurrentHandler().GetGrid();
   const auto& grid = *grid_ptr;
 
-  chi::log.Log() << "Global num cells: " << grid.GetGlobalNumberOfCells();
+  Chi::log.Log() << "Global num cells: " << grid.GetGlobalNumberOfCells();
 
   const int dimension = (grid.Attributes() & chi_mesh::DIMENSION_1)? 1 :
                         (grid.Attributes() & chi_mesh::DIMENSION_2)? 2 :
@@ -67,8 +67,8 @@ int chiSimTest93_RayTracing(lua_State* Lstate)
   const size_t num_fem_local_dofs = sdm.GetNumLocalDOFs(phi_uk_man);
   const size_t num_fem_globl_dofs = sdm.GetNumGlobalDOFs(phi_uk_man);
 
-  chi::log.Log() << "Num local FEM DOFs: " << num_fem_local_dofs;
-  chi::log.Log() << "Num globl FEM DOFs: " << num_fem_globl_dofs;
+  Chi::log.Log() << "Num local FEM DOFs: " << num_fem_local_dofs;
+  Chi::log.Log() << "Num globl FEM DOFs: " << num_fem_globl_dofs;
 
   //============================================= Define tallies
   std::vector<double> phi_tally(num_fem_local_dofs, 0.0);

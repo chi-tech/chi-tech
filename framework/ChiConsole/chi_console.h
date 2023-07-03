@@ -18,7 +18,7 @@ extern "C"
 #include <map>
 #include <stack>
 
-class chi;
+class Chi;
 
 /**Small utility macro for joining two words.*/
 #define ChiConsoleJoinWordsA(x, y) x##y
@@ -37,7 +37,7 @@ class chi;
 #define RegisterLuaFunctionAsIs(func_name)                                     \
   static char ChiConsoleJoinWordsB(unique_var_name_luacfunc_##func_name##_,    \
                                    __COUNTER__) =                              \
-    chi_objects::ChiConsole::AddFunctionToRegistryGlobalNamespace(#func_name,  \
+    chi::ChiConsole::AddFunctionToRegistryGlobalNamespace(#func_name,  \
                                                                   func_name)
 
 /**Macro for registering a lua_CFunction within the ChiConsole
@@ -50,7 +50,7 @@ class chi;
 #define RegisterLuaFunction(function, namespace_name, func_name)               \
   static char ChiConsoleJoinWordsB(unique_var_name_luacfunc_##func_name##_,    \
                                    __COUNTER__) =                              \
-    chi_objects::ChiConsole::AddFunctionToRegistryInNamespaceWithName(         \
+    chi::ChiConsole::AddFunctionToRegistryInNamespaceWithName(         \
       function, #namespace_name, #func_name)
 
 /**Macro for registering a lua_CFunction within the ChiConsole
@@ -63,14 +63,14 @@ class chi;
 #define RegisterLuaFunctionMethod(function, namespace_name, func_name)         \
   static char ChiConsoleJoinWordsB(unique_var_name_luacfunc_##func_name##_,    \
                                    __COUNTER__) =                              \
-    chi_objects::ChiConsole::AddFunctionToRegistryInNamespaceWithName(         \
+    chi::ChiConsole::AddFunctionToRegistryInNamespaceWithName(         \
       function, #namespace_name, #func_name, true)
 
 #define RegisterWrapperFunction(                                               \
   namespace_name, name_in_lua, syntax_function, actual_function)               \
   static char ChiConsoleJoinWordsB(unique_var_name_luacfunc_##name_in_lua##_,  \
                                    __COUNTER__) =                              \
-    chi_objects::ChiConsole::AddWrapperToRegistryInNamespaceWithName(          \
+    chi::ChiConsole::AddWrapperToRegistryInNamespaceWithName(          \
       #namespace_name, #name_in_lua, syntax_function, actual_function)
 
 namespace chi_physics
@@ -80,16 +80,15 @@ class Solver;
 
 // #############################################################################
 // CLASS DEF
-namespace chi_objects
+namespace chi
 {
 
 /** Class for handling the console and scripting.*/
 class ChiConsole
 {
 public:
-  using WrapperGetInParamsFunc = chi_objects::InputParameters (*)();
-  using WrapperCallFunc =
-    chi_objects::ParameterBlock (*)(const chi_objects::InputParameters&);
+  using WrapperGetInParamsFunc = chi::InputParameters (*)();
+  using WrapperCallFunc = chi::ParameterBlock (*)(const chi::InputParameters&);
 
 private:
   struct LuaFunctionRegistryEntry
@@ -119,7 +118,7 @@ private:
   ChiConsole() noexcept;
 
 private:
-  friend class ::chi;
+  friend class ::Chi;
   void LoadRegisteredLuaItems();
 
 public:

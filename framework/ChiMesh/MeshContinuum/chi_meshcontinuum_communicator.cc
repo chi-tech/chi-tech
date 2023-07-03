@@ -8,16 +8,16 @@
 //###################################################################
 /**Gets the communicator-set for interprocess communication,
  * associated with this mesh. If not created yet, it will create it.*/
-std::shared_ptr<chi_objects::ChiMPICommunicatorSet>
+std::shared_ptr<chi::ChiMPICommunicatorSet>
   chi_mesh::MeshContinuum::MakeMPILocalCommunicatorSet() const
 {
   //================================================== Build the communicator
-  chi::log.Log0Verbose1() << "Building communicator.";
+  Chi::log.Log0Verbose1() << "Building communicator.";
   std::set<int>    local_graph_edges;
 
   //================================================== Loop over local cells
   //Populate local_graph_edges
-  local_graph_edges.insert(chi::mpi.location_id); //add current location
+  local_graph_edges.insert(Chi::mpi.location_id); //add current location
   for (auto& cell : local_cells)
   {
     for (auto& face : cell.faces_)
@@ -35,21 +35,21 @@ std::shared_ptr<chi_objects::ChiMPICommunicatorSet>
                                      local_graph_edges.end());
 
   //============================================= Broadcast local connection size
-  chi::log.Log0Verbose1()
+  Chi::log.Log0Verbose1()
     << "Communicating local connections.";
 
-  std::vector<std::vector<int>> global_graph(chi::mpi.process_count,
+  std::vector<std::vector<int>> global_graph(Chi::mpi.process_count,
                                              std::vector<int>());
-  for (int locI=0;locI<chi::mpi.process_count; locI++)
+  for (int locI=0;locI< Chi::mpi.process_count; locI++)
   {
     int locI_num_connections = static_cast<int>(local_connections.size());
 
     //If chi::mpi.location_id == locI then this call will
     //act like a send instead of receive. Otherwise
     //It receives the count.
-    MPI_Bcast(&locI_num_connections,1,MPI_INT,locI,MPI_COMM_WORLD);
+    MPI_Bcast(&locI_num_connections,1,MPI_INT,locI,Chi::mpi.comm);
 
-    if (chi::mpi.location_id != locI)
+    if (Chi::mpi.location_id != locI)
     {global_graph[locI].resize(locI_num_connections,-1);}
     else
     {
@@ -62,28 +62,28 @@ std::shared_ptr<chi_objects::ChiMPICommunicatorSet>
 
 
   //============================================= Broadcast local connections
-  for (int locI=0;locI<chi::mpi.process_count; locI++)
+  for (int locI=0;locI< Chi::mpi.process_count; locI++)
   {
     //If chi::mpi.location_id == locI then this call will
     //act like a send instead of receive. Otherwise
     //It receives the count.
     MPI_Bcast(global_graph[locI].data(),
               static_cast<int>(global_graph[locI].size()),
-              MPI_INT,locI,MPI_COMM_WORLD);
+              MPI_INT,locI,Chi::mpi.comm);
   }
 
-  chi::log.Log0Verbose1()
+  Chi::log.Log0Verbose1()
     << "Done communicating local connections.";
 
 
   //============================================= Build groups
   MPI_Group world_group;
-  MPI_Comm_group(MPI_COMM_WORLD,&world_group);
+  MPI_Comm_group(Chi::mpi.comm,&world_group);
 
   std::vector<MPI_Group> location_groups;
-  location_groups.resize(chi::mpi.process_count, MPI_Group());
+  location_groups.resize(Chi::mpi.process_count, MPI_Group());
 
-  for (int locI=0;locI<chi::mpi.process_count; locI++)
+  for (int locI=0;locI< Chi::mpi.process_count; locI++)
   {
     MPI_Group_incl(world_group,
                    static_cast<int>(global_graph[locI].size()),
@@ -93,28 +93,28 @@ std::shared_ptr<chi_objects::ChiMPICommunicatorSet>
 
   //============================================= Build communicators
   std::vector<MPI_Comm>  communicators;
-  chi::log.Log0Verbose1()
+  Chi::log.Log0Verbose1()
     << "Building communicators.";
-  communicators.resize(chi::mpi.process_count, MPI_Comm());
+  communicators.resize(Chi::mpi.process_count, MPI_Comm());
 
-  for (int locI=0;locI<chi::mpi.process_count; locI++)
+  for (int locI=0;locI< Chi::mpi.process_count; locI++)
   {
-    int err = MPI_Comm_create_group(MPI_COMM_WORLD,
+    int err = MPI_Comm_create_group(Chi::mpi.comm,
                                     location_groups[locI],
                                     0, //tag
                                     &communicators[locI]);
 
     if (err != MPI_SUCCESS)
     {
-      chi::log.Log0Verbose1()
+      Chi::log.Log0Verbose1()
         << "Communicator creation failed.";
     }
   }
 
-  chi::log.Log0Verbose1()
+  Chi::log.Log0Verbose1()
     << "Done building communicators.";
 
-  return std::make_shared<chi_objects::ChiMPICommunicatorSet>(
+  return std::make_shared<chi::ChiMPICommunicatorSet>(
     communicators, location_groups, world_group);
 }
 

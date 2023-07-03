@@ -11,9 +11,9 @@ class LuaDimAToDimB : public FunctionDimAToDimB
 private:
   const std::string lua_function_name_;
 public:
-  static chi_objects::InputParameters GetInputParameters();
+  static chi::InputParameters GetInputParameters();
 
-  explicit LuaDimAToDimB(const chi_objects::InputParameters& params);
+  explicit LuaDimAToDimB(const chi::InputParameters& params);
 
   std::vector<double>
   Evaluate(const std::vector<double>& vals) const override;

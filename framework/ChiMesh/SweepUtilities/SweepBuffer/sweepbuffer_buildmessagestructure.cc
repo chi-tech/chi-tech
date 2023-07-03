@@ -23,10 +23,10 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
 //============================================= Check angleset is complete
   if (angleset->angles.empty())
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "A call to SweepBuffer::BuildMessageStructure() has been made without"
          " an initialized angleset.";
-    chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   const auto& spds =  angleset->GetSPDS();

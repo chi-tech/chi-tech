@@ -153,7 +153,7 @@ MPI_Allreduce(&local_error,     //sendbuf
               &global_error,    //recvbuf
               1, MPI_DOUBLE,    //count+datatype
               MPI_SUM,          //operation
-              MPI_COMM_WORLD);  //communicator
+              Chi::mpi.comm);  //communicator
 
 global_error = std::sqrt(global_error);
 
@@ -182,7 +182,7 @@ MPI_Allreduce(&local_error,     //sendbuf
               &global_error,    //recvbuf
               1, MPI_DOUBLE,    //count+datatype
               MPI_SUM,          //operation
-              MPI_COMM_WORLD);  //communicator
+              Chi::mpi.comm);  //communicator
 
 global_error = std::sqrt(global_error);
 \endcode
@@ -450,7 +450,7 @@ int main(int argc, char* argv[])
                 &global_error,    //recvbuf
                 1, MPI_DOUBLE,    //count+datatype
                 MPI_SUM,          //operation
-                MPI_COMM_WORLD);  //communicator
+                Chi::mpi.comm);  //communicator
 
   global_error = std::sqrt(global_error);
 

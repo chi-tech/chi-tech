@@ -65,10 +65,10 @@ int chiSurfaceMeshImportFromOBJFile(lua_State *L)
   if (num_args>=3) as_poly = lua_toboolean(L,3);
 
 
-  auto& surface_mesh = chi::GetStackItem<chi_mesh::SurfaceMesh>(
-    chi::surface_mesh_stack, handle, __FUNCTION__);
+  auto& surface_mesh = Chi::GetStackItem<chi_mesh::SurfaceMesh>(
+    Chi::surface_mesh_stack, handle, __FUNCTION__);
 
-  chi::log.Log0Verbose2()
+  Chi::log.Log0Verbose2()
     << fname  << ": Loading Wavefront .obj file: " << std::endl;
 
   //Transform if necessary
@@ -80,7 +80,7 @@ int chiSurfaceMeshImportFromOBJFile(lua_State *L)
     if (T.size() != 3)
       throw std::invalid_argument(fname + ": Argument 4. Table length not 3.");
     Tvec = chi_mesh::Vector3(T[0],T[1],T[2]);
-    chi::log.Log0Verbose2() << "Transform vector: " << Tvec.PrintStr();
+    Chi::log.Log0Verbose2() << "Transform vector: " << Tvec.PrintStr();
   }
 
   surface_mesh.ImportFromOBJFile(file_name, as_poly, Tvec);
@@ -117,8 +117,8 @@ int chiSurfaceMeshImportFromTriangleFiles(lua_State *L)
     as_poly = lua_toboolean(L,3);
   }
 
-  auto& surface_mesh = chi::GetStackItem<chi_mesh::SurfaceMesh>(
-    chi::surface_mesh_stack, handle, __FUNCTION__);
+  auto& surface_mesh = Chi::GetStackItem<chi_mesh::SurfaceMesh>(
+    Chi::surface_mesh_stack, handle, __FUNCTION__);
 
   surface_mesh.ImportFromTriangleFiles(temp,as_poly);
 
@@ -142,14 +142,14 @@ int chiSurfaceMeshImportFromMshFiles(lua_State *L)
     as_poly = lua_toboolean(L,3);
   }
 
-  auto& surface_mesh = chi::GetStackItem<chi_mesh::SurfaceMesh>(
-    chi::surface_mesh_stack, handle, __FUNCTION__);
+  auto& surface_mesh = Chi::GetStackItem<chi_mesh::SurfaceMesh>(
+    Chi::surface_mesh_stack, handle, __FUNCTION__);
 
   std::stringstream outtext;
   outtext << "chiSurfaceMeshImportFromMshFiles: "
              "Loading a gmsh ascii file: ";
   outtext << temp << std::endl;
-  chi::log.LogAllVerbose2() << outtext.str();
+  Chi::log.LogAllVerbose2() << outtext.str();
   surface_mesh.ImportFromMshFiles(temp, as_poly);
 
   return 1;

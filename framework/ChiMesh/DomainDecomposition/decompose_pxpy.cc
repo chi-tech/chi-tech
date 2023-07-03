@@ -140,7 +140,7 @@ void chi_mesh::DecomposeSurfaceMeshPxPy(const chi_mesh::SurfaceMesh& smesh,
 
     x_cuts[x] = (b+a)/2.0;
 
-    chi::log.Log()
+    Chi::log.Log()
      << "X-cut" << x << " " << x_cuts[x];
   }
 
@@ -178,13 +178,13 @@ void chi_mesh::DecomposeSurfaceMeshPxPy(const chi_mesh::SurfaceMesh& smesh,
       min_lbf = lbf;
       min_bin = x;
     }
-    chi::log.Log() << "Load balance factor: " << lbf;
+    Chi::log.Log() << "Load balance factor: " << lbf;
   }//for x
 
   //================================================== Write y-cuts
   for (int y=0; y<(py-1); y++)
   {
-    chi::log.Log()
+    Chi::log.Log()
       << "Y-cut" << y << " " << y_cuts_per_x_bin[min_bin][y];
   }
 
