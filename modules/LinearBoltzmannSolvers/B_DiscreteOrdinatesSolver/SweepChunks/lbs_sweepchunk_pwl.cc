@@ -111,10 +111,10 @@ Sweep(chi_mesh::sweep_management::AngleSet *angle_set)
   typedef const int64_t cint64_t;
 
   // ========================================================== Loop over each cell
-  size_t num_loc_cells = spds.spls.item_id.size();
+  size_t num_loc_cells = spds.GetSPLS().item_id.size();
   for (size_t spls_index = 0; spls_index < num_loc_cells; ++spls_index)
   {
-    const int cell_local_id = spds.spls.item_id[spls_index];
+    const int cell_local_id = spds.GetSPLS().item_id[spls_index];
     const auto& cell = grid_view_->local_cells[cell_local_id];
     const auto num_faces = cell.faces_.size();
     const auto& cell_mapping = grid_fe_view_.GetCellMapping(cell);

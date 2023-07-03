@@ -9,32 +9,34 @@
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-//###################################################################
+// ###################################################################
 /** Receives delayed data from successor locations. */
-bool chi_mesh::sweep_management::SweepBuffer::
-  ReceiveDelayedData(int angle_set_num)
+bool chi_mesh::sweep_management::SweepBuffer::ReceiveDelayedData(
+  int angle_set_num)
 {
   const auto& spds = angleset->GetSPDS();
 
-  const size_t num_delayed_loc_deps = spds.delayed_location_dependencies.size();
+  const auto& delayed_location_dependencies =
+    spds.GetDelayedLocationDependencies();
+  const size_t num_delayed_loc_deps = delayed_location_dependencies.size();
 
   //======================================== Receive delayed data
   bool all_messages_received = true;
-  for (size_t prelocI=0; prelocI<num_delayed_loc_deps; prelocI++)
+  for (size_t prelocI = 0; prelocI < num_delayed_loc_deps; prelocI++)
   {
-    int locJ = spds.delayed_location_dependencies[prelocI];
-
+    int locJ = delayed_location_dependencies[prelocI];
 
     int num_mess = delayed_prelocI_message_count[prelocI];
-    for (int m=0; m<num_mess; m++)
+    for (int m = 0; m < num_mess; m++)
     {
       if (not delayed_prelocI_message_received[prelocI][m])
       {
         int message_available = 0;
         MPI_Iprobe(comm_set.MapIonJ(locJ, Chi::mpi.location_id),
-                   max_num_mess*angle_set_num + m, //tag
+                   max_num_mess * angle_set_num + m, // tag
                    comm_set.LocICommunicator(Chi::mpi.location_id),
-                   &message_available, MPI_STATUS_IGNORE);
+                   &message_available,
+                   MPI_STATUS_IGNORE);
 
         if (not message_available)
         {
@@ -45,7 +47,7 @@ bool chi_mesh::sweep_management::SweepBuffer::
         //============================ Receive upstream data
         auto& upstream_psi = angleset->delayed_prelocI_outgoing_psi[prelocI];
 
-        u_ll_int block_addr   = delayed_prelocI_message_blockpos[prelocI][m];
+        u_ll_int block_addr = delayed_prelocI_message_blockpos[prelocI][m];
         u_ll_int message_size = delayed_prelocI_message_size[prelocI][m];
 
         int error_code =
@@ -53,7 +55,7 @@ bool chi_mesh::sweep_management::SweepBuffer::
                    static_cast<int>(message_size),
                    MPI_DOUBLE,
                    comm_set.MapIonJ(locJ, Chi::mpi.location_id),
-                   max_num_mess*angle_set_num + m, //tag
+                   max_num_mess * angle_set_num + m, // tag
                    comm_set.LocICommunicator(Chi::mpi.location_id),
                    MPI_STATUS_IGNORE);
 
@@ -64,11 +66,10 @@ bool chi_mesh::sweep_management::SweepBuffer::
           std::stringstream err_stream;
           err_stream << "################# Delayed receive error."
                      << " message size=" << message_size
-                     << " as_num=" << angle_set_num
-                     << " num_mess=" << num_mess
-                     << " m=" << m
-                     << " error="
-                     << " size=" << "\n";
+                     << " as_num=" << angle_set_num << " num_mess=" << num_mess
+                     << " m=" << m << " error="
+                     << " size="
+                     << "\n";
           char error_string[BUFSIZ];
           int length_of_error_string, error_class;
           MPI_Error_class(error_code, &error_class);
@@ -78,12 +79,11 @@ bool chi_mesh::sweep_management::SweepBuffer::
           err_stream << error_string << "\n";
           Chi::log.LogAllWarning() << err_stream.str();
         }
-      }//if not message already received
-    }//for message
-  }//for delayed predecessor
+      } // if not message already received
+    }   // for message
+  }     // for delayed predecessor
 
-  if (not all_messages_received)
-    return false;
+  if (not all_messages_received) return false;
 
   return true;
 }

@@ -15,7 +15,7 @@ LocalIncidentMapping(const chi_mesh::Cell& cell,
                      const SPDS& spds,
                      std::vector<int>&  local_so_cell_mapping)
 {
-  chi_mesh::MeshContinuumPtr grid = spds.grid;
+  const chi_mesh::MeshContinuum& grid = spds.Grid();
   auto& cell_nodal_mapping = grid_nodal_mappings[cell.local_id_];
   std::vector<std::pair<int,std::vector<short>>> inco_face_dof_mapping;
 
@@ -27,12 +27,12 @@ LocalIncidentMapping(const chi_mesh::Cell& cell,
   for (short f=0; f < cell.faces_.size(); f++)
   {
     const CellFace& face = cell.faces_[f];
-    const auto& orienation = spds.cell_face_orientations_[cell.local_id_][f];
+    const auto& orienation = spds.CellFaceOrientations()[cell.local_id_][f];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face
     if (orienation == FaceOrientation::INCOMING)
     {
-      if (face.IsNeighborLocal(*grid))
+      if (face.IsNeighborLocal(grid))
       {
         incoming_face_count++;
         //======================================== Find associated face for
@@ -44,9 +44,9 @@ LocalIncidentMapping(const chi_mesh::Cell& cell,
 
         //======================================== Find associated face
         //                                         counter for slot lookup
-        const auto& adj_cell = grid->cells[face.neighbor_id_];
+        const auto& adj_cell = grid.cells[face.neighbor_id_];
         const int adj_so_index = local_so_cell_mapping[adj_cell.local_id_];
-        const auto& face_oris = spds.cell_face_orientations_[adj_cell.local_id_];
+        const auto& face_oris = spds.CellFaceOrientations()[adj_cell.local_id_];
         int ass_f_counter = -1;
 
         int out_f = -1;

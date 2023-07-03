@@ -21,7 +21,7 @@ chi_mesh::sweep_management::PRIMARY_FLUDS::
 {
   Chi::log.Log0Verbose1()
     << "Initializing FLUDS for omega="
-    << spds.omega.PrintS()
+    << spds.Omega().PrintS()
     << "         Process memory = "
     << std::setprecision(3)
     << chi::Console::GetMemoryUsageInMB() << " MB.";

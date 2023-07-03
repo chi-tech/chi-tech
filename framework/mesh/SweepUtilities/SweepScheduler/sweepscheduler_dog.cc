@@ -25,7 +25,7 @@ void chi_mesh::sweep_management::SweepScheduler::InitializeAlgoDOG()
     {
       auto angleset                 = angleset_group.angle_sets[as];
       const auto& spds              = angleset->GetSPDS();
-      const TLEVELED_GRAPH& leveled_graph = spds.global_sweep_planes;
+      const TLEVELED_GRAPH& leveled_graph = spds.GetGlobalSweepPlanes();
 
       //========================== Find location depth
       int loc_depth = -1;
@@ -48,9 +48,10 @@ void chi_mesh::sweep_management::SweepScheduler::InitializeAlgoDOG()
         new_rule_vals.depth_of_graph = loc_depth;
         new_rule_vals.set_index      = as + q * num_anglesets;
 
-        new_rule_vals.sign_of_omegax = (spds.omega.x >= 0)?2:1;
-        new_rule_vals.sign_of_omegay = (spds.omega.y >= 0)?2:1;
-        new_rule_vals.sign_of_omegaz = (spds.omega.z >= 0)?2:1;
+        const auto& omega = spds.Omega();
+        new_rule_vals.sign_of_omegax = (omega.x >= 0)?2:1;
+        new_rule_vals.sign_of_omegay = (omega.y >= 0)?2:1;
+        new_rule_vals.sign_of_omegaz = (omega.z >= 0)?2:1;
 
         rule_values.push_back(new_rule_vals);
       }

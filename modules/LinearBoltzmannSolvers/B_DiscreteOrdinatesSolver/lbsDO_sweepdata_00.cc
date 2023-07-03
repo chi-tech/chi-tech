@@ -7,14 +7,17 @@
 #include "chi_log.h"
 #include "utils/chi_timer.h"
 
-#define ParallelParmetisNeedsCycles \
-"When using PARMETIS type partitioning then groupset iterative method" \
-" must be NPT_CLASSICRICHARDSON_CYCLES or NPT_GMRES_CYCLES"
+#include "mesh/SweepUtilities/SPDS/SPDS_AdamsAdamsHawkins.h"
 
-#define IsParallel Chi::mpi.process_count>1
+#define ParallelParmetisNeedsCycles                                            \
+  "When using PARMETIS type partitioning then groupset iterative method"       \
+  " must be NPT_CLASSICRICHARDSON_CYCLES or NPT_GMRES_CYCLES"
 
-#define IsPartitionTypeParmetis \
-mesher.options.partition_type == chi_mesh::VolumeMesher::PartitionType::PARMETIS
+#define IsParallel Chi::mpi.process_count > 1
+
+#define IsPartitionTypeParmetis                                                \
+  mesher.options.partition_type ==                                             \
+    chi_mesh::VolumeMesher::PartitionType::PARMETIS
 
 namespace lbs
 {
@@ -50,7 +53,7 @@ void DiscreteOrdinatesSolver::InitializeSweepDataStructures()
 
       if (no_cycles_parmetis_partitioning and not is_1D_geometry and IsParallel)
         throw std::logic_error(ParallelParmetisNeedsCycles);
-    }//for groupset
+    } // for groupset
   }
 
   //=================================== Define sweep ordering groups
@@ -66,7 +69,8 @@ void DiscreteOrdinatesSolver::InitializeSweepDataStructures()
                                   options_.geometry_type);
 
     if (quadrature_allow_cycles_map_.count(groupset.quadrature_) == 0)
-      quadrature_allow_cycles_map_[groupset.quadrature_] = groupset.allow_cycles_;
+      quadrature_allow_cycles_map_[groupset.quadrature_] =
+        groupset.allow_cycles_;
   }
 
   //=================================== Build sweep orderings
@@ -81,14 +85,13 @@ void DiscreteOrdinatesSolver::InitializeSweepDataStructures()
 
       const size_t master_dir_id = so_grouping.front();
       const auto& omega = quadrature->omegas_[master_dir_id];
-      const auto new_swp_order =
-        chi_mesh::sweep_management::
-        CreateSweepOrder(omega,
-                         this->grid_ptr_,
-                         quadrature_allow_cycles_map_[quadrature]);
+
+      using namespace chi_mesh::sweep_management;
+      const auto new_swp_order = std::make_shared<SPDS_AdamsAdamsHawkins>(
+        omega, *this->grid_ptr_, quadrature_allow_cycles_map_[quadrature]);
       quadrature_spds_map_[quadrature].push_back(new_swp_order);
     }
-  }//quadrature info-pack
+  } // quadrature info-pack
 
   //=================================== Build FLUDS templates
   quadrature_fluds_templates_map_.clear();
@@ -96,13 +99,12 @@ void DiscreteOrdinatesSolver::InitializeSweepDataStructures()
   {
     for (const auto& spds : spds_list)
       quadrature_fluds_templates_map_[quadrature].push_back(
-        std::make_shared<FLUDSTemplate>(1, grid_nodal_mappings_, *spds,
-                                        *grid_face_histogram_)
-      );
-  }//for quadrature spds-list pair
+        std::make_shared<FLUDSTemplate>(
+          1, grid_nodal_mappings_, *spds, *grid_face_histogram_));
+  } // for quadrature spds-list pair
 
   Chi::log.Log() << Chi::program_timer.GetTimeString()
                  << " Done initializing sweep datastructures.\n";
 }
 
-}//namespace lbs
+} // namespace lbs
