@@ -3,7 +3,7 @@
 
 #include "ChiObject/chi_object.h"
 
-namespace chi_objects
+namespace chi
 {
 
 /**Base class for a material property.*/
@@ -13,8 +13,8 @@ private:
   const std::string name_;
 
 public:
-  static chi_objects::InputParameters GetInputParameters();
-  explicit MaterialProperty(const chi_objects::InputParameters& params);
+  static chi::InputParameters GetInputParameters();
+  explicit MaterialProperty(const chi::InputParameters& params);
 
   const std::string& TextName() const;
 };

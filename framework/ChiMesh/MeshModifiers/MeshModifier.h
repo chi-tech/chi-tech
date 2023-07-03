@@ -10,7 +10,7 @@ namespace chi_mesh
 class MeshModifier : public ChiObject
 {
 public:
-  explicit MeshModifier(const chi_objects::InputParameters& params);
+  explicit MeshModifier(const chi::InputParameters& params);
 
   virtual void Apply() = 0;
   virtual ~MeshModifier() = default;

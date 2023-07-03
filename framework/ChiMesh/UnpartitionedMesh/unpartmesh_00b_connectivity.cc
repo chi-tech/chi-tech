@@ -20,11 +20,11 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
     for (auto& face : cell->faces)
       if (not face.has_neighbor) ++num_bndry_faces;
 
-  chi::log.Log0Verbose1() << chi::program_timer.GetTimeString()
+  Chi::log.Log0Verbose1() << Chi::program_timer.GetTimeString()
                               << " Number of unconnected faces "
                                  "before connectivity: " << num_bndry_faces;
 
-  chi::log.Log() << chi::program_timer.GetTimeString()
+  Chi::log.Log() << Chi::program_timer.GetTimeString()
                 << " Establishing cell connectivity.";
 
   //======================================== Establish internal connectivity
@@ -40,7 +40,7 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
     }
   }
 
-  chi::log.Log() << chi::program_timer.GetTimeString()
+  Chi::log.Log() << Chi::program_timer.GetTimeString()
                 << " Vertex cell subscriptions complete.";
 
   // Process raw cells
@@ -91,7 +91,7 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
                                        static_cast<double>(num_raw_cells);
       if (fraction_complete >= static_cast<double>(aux_counter+1)*0.1)
       {
-        chi::log.Log() << chi::program_timer.GetTimeString()
+        Chi::log.Log() << Chi::program_timer.GetTimeString()
                       << " Surpassing cell " << cur_cell_id
                       << " of " << num_raw_cells
                       << " (" << (aux_counter+1)*10 << "%)";
@@ -100,7 +100,7 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
     }//for cell
   }
 
-  chi::log.Log() << chi::program_timer.GetTimeString()
+  Chi::log.Log() << Chi::program_timer.GetTimeString()
                 << " Establishing cell boundary connectivity.";
 
   //======================================== Establish boundary connectivity
@@ -161,12 +161,12 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
     for (auto& face : cell->faces)
       if (not face.has_neighbor) ++num_bndry_faces;
 
-  chi::log.Log0Verbose1() << chi::program_timer.GetTimeString()
+  Chi::log.Log0Verbose1() << Chi::program_timer.GetTimeString()
                               << " Number of boundary faces "
                                  "after connectivity: " << num_bndry_faces;
 
-  MPI_Barrier(MPI_COMM_WORLD);
-  chi::log.Log() << chi::program_timer.GetTimeString()
+  Chi::mpi.Barrier();
+  Chi::log.Log() << Chi::program_timer.GetTimeString()
                 << " Done establishing cell connectivity.";
 
 }

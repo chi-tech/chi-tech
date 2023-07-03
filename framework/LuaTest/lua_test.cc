@@ -18,8 +18,8 @@
 int chiLuaTest(lua_State* L)
 {
   const int num_args = lua_gettop(L);
-  chi::log.Log() << "Hello from chiLuaTest()";
-  chi::log.Log() << "num_args = " << num_args;
+  Chi::log.Log() << "Hello from chiLuaTest()";
+  Chi::log.Log() << "num_args = " << num_args;
   return 0;
 }
 
@@ -53,7 +53,7 @@ int chiThrowRecoverableException(lua_State* L)
     message = lua_tostring(L,1);
   }
 
-  throw chi::RecoverableException(message);
+  throw Chi::RecoverableException(message);
 }
 
 /**Registers the lua function calls for unit tests.*/

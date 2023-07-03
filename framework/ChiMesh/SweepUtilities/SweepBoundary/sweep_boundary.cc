@@ -14,10 +14,10 @@ HeterogeneousPsiIncoming(uint64_t cell_local_id,
                          int group_num,
                          int gs_ss_begin)
 {
-  chi::log.LogAllError()
+  Chi::log.LogAllError()
     << "HeterogeneousPsiIncoming call made to boundary "
        "that has no such information.";
-  chi::Exit(EXIT_FAILURE);
+  Chi::Exit(EXIT_FAILURE);
   return nullptr;
 }
 
@@ -30,9 +30,9 @@ HeterogeneousPsiOutgoing(uint64_t cell_local_id,
                          int angle_num,
                          int gs_ss_begin)
 {
-  chi::log.LogAllError()
+  Chi::log.LogAllError()
     << "HeterogeneousPsiOutgoing call made to boundary "
        "that has no such information.";
-  chi::Exit(EXIT_FAILURE);
+  Chi::Exit(EXIT_FAILURE);
   return nullptr;
 }

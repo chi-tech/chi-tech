@@ -17,25 +17,25 @@
 namespace chi_unit_sim_tests
 {
 
-chi_objects::ParameterBlock
-acceleration_Diffusion_DFEM(const chi_objects::InputParameters& params);
+chi::ParameterBlock
+acceleration_Diffusion_DFEM(const chi::InputParameters& params);
 
 RegisterWrapperFunction(/*namespace_name=*/chi_unit_tests,
                         /*name_in_lua=*/acceleration_Diffusion_DFEM,
                         /*syntax_function=*/nullptr,
                         /*actual_function=*/acceleration_Diffusion_DFEM);
 
-chi_objects::ParameterBlock
-acceleration_Diffusion_DFEM(const chi_objects::InputParameters&)
+chi::ParameterBlock
+acceleration_Diffusion_DFEM(const chi::InputParameters&)
 {
   typedef std::map<int, lbs::acceleration::Multigroup_D_and_sigR> MatID2XSMap;
-  chi::log.Log() << "chiSimTest92_DSA";
+  Chi::log.Log() << "chiSimTest92_DSA";
 
   //============================================= Get grid
   auto grid_ptr = chi_mesh::GetCurrentHandler().GetGrid();
   const auto& grid = *grid_ptr;
 
-  chi::log.Log() << "Global num cells: " << grid.GetGlobalNumberOfCells();
+  Chi::log.Log() << "Global num cells: " << grid.GetGlobalNumberOfCells();
 
   //============================================= Make SDM
   typedef std::shared_ptr<chi_math::SpatialDiscretization> SDMPtr;
@@ -47,8 +47,8 @@ acceleration_Diffusion_DFEM(const chi_objects::InputParameters&)
   const size_t num_local_dofs = sdm.GetNumLocalDOFs(OneDofPerNode);
   const size_t num_globl_dofs = sdm.GetNumGlobalDOFs(OneDofPerNode);
 
-  chi::log.Log() << "Num local DOFs: " << num_local_dofs;
-  chi::log.Log() << "Num globl DOFs: " << num_globl_dofs;
+  Chi::log.Log() << "Num local DOFs: " << num_local_dofs;
+  Chi::log.Log() << "Num globl DOFs: " << num_globl_dofs;
 
   //============================================= Make Boundary conditions
   typedef lbs::acceleration::BoundaryCondition BC;
@@ -171,7 +171,7 @@ acceleration_Diffusion_DFEM(const chi_objects::InputParameters&)
 
   solver.Initialize();
 
-  chi::log.Log() << "Done constructing solver" << std::endl;
+  Chi::log.Log() << "Done constructing solver" << std::endl;
 
   //============================================= Assemble and solve
   std::vector<double> q_vector(num_local_dofs,1.0);
@@ -200,7 +200,7 @@ acceleration_Diffusion_DFEM(const chi_objects::InputParameters&)
   const auto field_wg = ff->GetGhostedFieldVector();
 
   double local_error = 0.0;
-  lua_State* L = chi_objects::ChiConsole::GetInstance().GetConsoleState();
+  lua_State* L = chi::ChiConsole::GetInstance().GetConsoleState();
   for (const auto& cell : grid.local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
@@ -234,14 +234,14 @@ acceleration_Diffusion_DFEM(const chi_objects::InputParameters&)
                 &global_error,    //recvbuf
                 1, MPI_DOUBLE,    //count+datatype
                 MPI_SUM,          //operation
-                MPI_COMM_WORLD);  //communicator
+                Chi::mpi.comm);  //communicator
 
   global_error = std::sqrt(global_error);
 
-  chi::log.Log() << "Error: " << std::scientific << global_error
+  Chi::log.Log() << "Error: " << std::scientific << global_error
                  << " Num-cells: " << grid.GetGlobalNumberOfCells();
 
-  return chi_objects::ParameterBlock();
+  return chi::ParameterBlock();
 }
 
 }//namespace chi_unit_sim_tests

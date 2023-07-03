@@ -45,19 +45,19 @@ int chiCreateLineQuadrature(lua_State *L)
 
   if (ident == 1) //GAUSS_LEGENDRE
   {
-    chi::log.Log() << "Creating Gauss-Legendre Quadrature\n";
+    Chi::log.Log() << "Creating Gauss-Legendre Quadrature\n";
     auto new_quad = std::make_shared<chi_math::QuadratureGaussLegendre>(N, verbose);
-    chi::quadrature_stack.push_back(new_quad);
-    int index = (int)chi::quadrature_stack.size()-1;
+    Chi::quadrature_stack.push_back(new_quad);
+    int index = (int)Chi::quadrature_stack.size()-1;
     lua_pushnumber(L,index);
     return 1;
   }
   else if (ident == 2) //GAUSS_CHEBYSHEV
   {
-    chi::log.Log() << "Creating Gauss-Chebyshev Quadrature\n";
+    Chi::log.Log() << "Creating Gauss-Chebyshev Quadrature\n";
     auto new_quad = std::make_shared<chi_math::QuadratureGaussChebyshev>(N, verbose);
-    chi::quadrature_stack.push_back(new_quad);
-    int index = (int)chi::quadrature_stack.size()-1;
+    Chi::quadrature_stack.push_back(new_quad);
+    int index = (int)Chi::quadrature_stack.size()-1;
     lua_pushnumber(L,index);
     return 1;
   }

@@ -16,23 +16,23 @@
 namespace chi_unit_tests
 {
 
-chi_objects::ParameterBlock
-chi_data_types_Test00(const chi_objects::InputParameters& params);
+chi::ParameterBlock
+chi_data_types_Test00(const chi::InputParameters& params);
 
 RegisterWrapperFunction(/*namespace_name=*/chi_unit_tests,
                         /*name_in_lua=*/chi_data_types_Test00,
                         /*syntax_function=*/nullptr,
                         /*actual_function=*/chi_data_types_Test00);
 
-chi_objects::ParameterBlock
-chi_data_types_Test00(const chi_objects::InputParameters&)
+chi::ParameterBlock
+chi_data_types_Test00(const chi::InputParameters&)
 {
   bool passed = true;
 
   //======================================================= Byte array
   //write/read
-  chi::log.Log() << "GOLD_BEGIN";
-  chi::log.Log() << "Testing chi_data_types::ByteArray Write and Read\n";
+  Chi::log.Log() << "GOLD_BEGIN";
+  Chi::log.Log() << "Testing chi_data_types::ByteArray Write and Read\n";
   chi_data_types::ByteArray barr;
 
   barr.Write<double>(1.01234567890123456789);
@@ -53,11 +53,11 @@ chi_data_types_Test00(const chi_objects::InputParameters&)
   seeker.Write<bool>(false);
   seeker.Write<double>(1.01234567890123456789);
 
-  chi::log.Log() << "EndOfBuffer " << seeker.EndOfBuffer();
-  chi::log.Log() << "Offset " << seeker.Offset();
+  Chi::log.Log() << "EndOfBuffer " << seeker.EndOfBuffer();
+  Chi::log.Log() << "Offset " << seeker.Offset();
   seeker.Seek(seeker.Size() - sizeof(double));
-  chi::log.Log() << "OffsetAfterSeek " << seeker.Offset();
-  chi::log.Log() << "Value check " << seeker.Read<double>();
+  Chi::log.Log() << "OffsetAfterSeek " << seeker.Offset();
+  Chi::log.Log() << "Value check " << seeker.Read<double>();
 
   if (dbl_value != 1.01234567890123456789 or int_value != -15600700 or
       dbl_value2 != 2.0987654321 or bl_value1 or !bl_value2 or
@@ -67,18 +67,18 @@ chi_data_types_Test00(const chi_objects::InputParameters&)
 
   {
     passed = false;
-    chi::log.Log() << std::string("chi_data_types::ByteArray"
+    Chi::log.Log() << std::string("chi_data_types::ByteArray"
                                   " Write/Read ... Failed\n");
   }
   else
-    chi::log.Log() << std::string("chi_data_types::ByteArray "
+    Chi::log.Log() << std::string("chi_data_types::ByteArray "
                                   "Write/Read ... Passed\n");
 
   //======================================================= Testing Byte array
   //serialization
-  chi::log.Log() << "Testing chi_data_types::ByteArray "
+  Chi::log.Log() << "Testing chi_data_types::ByteArray "
                     "Serialization/DeSerialization\n";
-  if (chi::mpi.process_count == 2)
+  if (Chi::mpi.process_count == 2)
   {
 
     std::map<int /*pid*/, chi_data_types::ByteArray> send_data;
@@ -156,7 +156,7 @@ chi_data_types_Test00(const chi_objects::InputParameters&)
       }
     }
 
-    if (chi::mpi.location_id == 0)
+    if (Chi::mpi.location_id == 0)
     {
       send_data[1].Append(poster_child_cell.Serialize());
       send_data[1].Append(poster_child_cell.Serialize().Data());
@@ -189,50 +189,50 @@ chi_data_types_Test00(const chi_objects::InputParameters&)
         if (rcell.Type() != pcell.Type())
         {
           passed = false;
-          chi::log.Log0Error() << "Line: " << __LINE__ << "\n";
+          Chi::log.Log0Error() << "Line: " << __LINE__ << "\n";
           break;
         }
         if (rcell.SubType() != pcell.SubType())
         {
           passed = false;
-          chi::log.Log0Error() << "Line: " << __LINE__ << "\n";
+          Chi::log.Log0Error() << "Line: " << __LINE__ << "\n";
           break;
         }
         if (rcell.global_id_ != pcell.global_id_)
         {
           passed = false;
-          chi::log.Log0Error() << "Line: " << __LINE__ << "\n";
+          Chi::log.Log0Error() << "Line: " << __LINE__ << "\n";
           break;
         }
         if (rcell.local_id_ != pcell.local_id_)
         {
           passed = false;
-          chi::log.Log0Error() << "Line: " << __LINE__ << "\n";
+          Chi::log.Log0Error() << "Line: " << __LINE__ << "\n";
           break;
         }
         if (rcell.partition_id_ != pcell.partition_id_)
         {
           passed = false;
-          chi::log.Log0Error() << "Line: " << __LINE__ << "\n";
+          Chi::log.Log0Error() << "Line: " << __LINE__ << "\n";
           break;
         }
         if (rcell.material_id_ != pcell.material_id_)
         {
           passed = false;
-          chi::log.Log0Error() << "Line: " << __LINE__ << "\n";
+          Chi::log.Log0Error() << "Line: " << __LINE__ << "\n";
           break;
         }
         if (rcell.vertex_ids_ != pcell.vertex_ids_)
         {
           passed = false;
-          chi::log.Log0Error() << "Line: " << __LINE__ << "\n";
+          Chi::log.Log0Error() << "Line: " << __LINE__ << "\n";
           break;
         }
 
         if (rcell.faces_.size() != pcell.faces_.size())
         {
           passed = false;
-          chi::log.Log0Error() << "Line: " << __LINE__ << "\n";
+          Chi::log.Log0Error() << "Line: " << __LINE__ << "\n";
           break;
         }
 
@@ -244,19 +244,19 @@ chi_data_types_Test00(const chi_objects::InputParameters&)
           if (rface.vertex_ids_ != pface.vertex_ids_)
           {
             passed = false;
-            chi::log.Log0Error() << "Line: " << __LINE__ << "\n";
+            Chi::log.Log0Error() << "Line: " << __LINE__ << "\n";
             break;
           }
           if (rface.has_neighbor_ != pface.has_neighbor_)
           {
             passed = false;
-            chi::log.Log0Error() << "Line: " << __LINE__ << "\n";
+            Chi::log.Log0Error() << "Line: " << __LINE__ << "\n";
             break;
           }
           if (rface.neighbor_id_ != pface.neighbor_id_)
           {
             passed = false;
-            chi::log.Log0Error() << "Line: " << __LINE__ << "\n";
+            Chi::log.Log0Error() << "Line: " << __LINE__ << "\n";
             break;
           }
           ++f;
@@ -270,16 +270,16 @@ chi_data_types_Test00(const chi_objects::InputParameters&)
 
   if (not passed)
   {
-    chi::log.Log() << "chi_data_types::ByteArray "
+    Chi::log.Log() << "chi_data_types::ByteArray "
                       "Serialization/DeSerialization ... Failed\n";
   }
   else
-    chi::log.Log() << "chi_data_types::ByteArray"
+    Chi::log.Log() << "chi_data_types::ByteArray"
                       "Serialization/DeSerialization ... Passed\n";
 
   //======================================================= Testing NDArray
   //
-  chi::log.Log() << "Testing chi_data_types::NDArray\n";
+  Chi::log.Log() << "Testing chi_data_types::NDArray\n";
   std::stringstream dummy;
   // Constructor vector
   // rank()
@@ -398,11 +398,11 @@ chi_data_types_Test00(const chi_objects::InputParameters&)
     dummy << "Done10\n";
   }
 
-  chi::log.Log() << dummy.str();
+  Chi::log.Log() << dummy.str();
 
-  chi::log.Log() << "GOLD_END";
+  Chi::log.Log() << "GOLD_END";
 
-  return chi_objects::ParameterBlock();
+  return chi::ParameterBlock();
 }
 
 } // namespace chi_unit_tests

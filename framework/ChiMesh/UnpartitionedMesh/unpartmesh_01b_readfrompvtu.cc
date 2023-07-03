@@ -23,7 +23,7 @@ std::runtime_error("Failed to open file: " + options.file_name + \
 void chi_mesh::UnpartitionedMesh::
   ReadFromPVTU(const chi_mesh::UnpartitionedMesh::Options &options)
 {
-  chi::log.Log() << "Reading PVTU file: " << options.file_name << ".";
+  Chi::log.Log() << "Reading PVTU file: " << options.file_name << ".";
 
   //======================================== Attempt to open file
   std::ifstream file;
@@ -80,6 +80,6 @@ void chi_mesh::UnpartitionedMesh::
   ComputeCentroidsAndCheckQuality();
   BuildMeshConnectivity();
 
-  chi::log.Log() << "Done reading PVTU file: " << options.file_name << ".";
+  Chi::log.Log() << "Done reading PVTU file: " << options.file_name << ".";
 }
 

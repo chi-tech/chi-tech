@@ -23,7 +23,7 @@ std::runtime_error("Failed to open file: " + options.file_name + \
 void chi_mesh::UnpartitionedMesh::
   ReadFromExodus(const chi_mesh::UnpartitionedMesh::Options &options)
 {
-  chi::log.Log() << "Reading Exodus file: " << options.file_name << ".";
+  Chi::log.Log() << "Reading Exodus file: " << options.file_name << ".";
 
   //======================================== Attempt to open file
   std::ifstream file;
@@ -86,7 +86,7 @@ void chi_mesh::UnpartitionedMesh::
       grid_blocks.emplace_back(
         vtkUnstructuredGrid::SafeDownCast(block_a),block_name);
 
-      chi::log.Log()
+      Chi::log.Log()
       << "Reading block " << block_name
       << " Number of cells: " << grid_blocks.back().first->GetNumberOfCells()
       << " Number of points: " << grid_blocks.back().first->GetNumberOfPoints();
@@ -128,6 +128,6 @@ void chi_mesh::UnpartitionedMesh::
   //======================================== Set boundary ids
   SetBoundaryIDsFromBlocks(bndry_grid_blocks);
 
-  chi::log.Log() << "Done reading Exodus file: "
+  Chi::log.Log() << "Done reading Exodus file: "
                  << options.file_name << ".";
 }

@@ -138,7 +138,7 @@ PetscErrorCode chi_math::PETScUtils::KSPMonitorRelativeToRHS(
     << std::scientific << std::setprecision(7) << rnorm / rhs_norm
     << std::endl;
 
-  chi::log.Log() << buff.str();
+  Chi::log.Log() << buff.str();
 
   return 0;
 }
@@ -169,7 +169,7 @@ PetscErrorCode chi_math::PETScUtils::KSPMonitorStraight(
     << std::scientific << std::setprecision(7) << rnorm
     << std::endl;
 
-  chi::log.Log() << buff.str();
+  Chi::log.Log() << buff.str();
 
   return 0;
 }

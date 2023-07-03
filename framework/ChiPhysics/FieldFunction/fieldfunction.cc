@@ -7,9 +7,9 @@ namespace chi_physics
 
 // ##################################################################
 /**Returns required input parameters.*/
-chi_objects::InputParameters FieldFunction::GetInputParameters()
+chi::InputParameters FieldFunction::GetInputParameters()
 {
-  chi_objects::InputParameters params = ChiObject::GetInputParameters();
+  chi::InputParameters params = ChiObject::GetInputParameters();
 
   params.AddRequiredParameter<std::string>(
     "name", "Named to be associated with this field function");
@@ -39,7 +39,7 @@ chi_objects::InputParameters FieldFunction::GetInputParameters()
 
 // ##################################################################
 /**ObjectMaker based constructor.*/
-FieldFunction::FieldFunction(const chi_objects::InputParameters& params)
+FieldFunction::FieldFunction(const chi::InputParameters& params)
   : ChiObject(params),
     text_name_(params.GetParamValue<std::string>("name")),
     unknown_((params.GetParamValue<std::string>("unknown_type") == "Scalar")
@@ -76,8 +76,8 @@ void FieldFunction::PushOntoStack(std::shared_ptr<ChiObject>& new_object)
   ChiLogicalErrorIf(not ff_ptr,
                     "Bad trouble when casting object to field function");
 
-  chi::field_function_stack.push_back(ff_ptr);
-  new_object->SetStackID(chi::field_function_stack.size() - 1);
+  Chi::field_function_stack.push_back(ff_ptr);
+  new_object->SetStackID(Chi::field_function_stack.size() - 1);
 }
 
 } // namespace chi_physics

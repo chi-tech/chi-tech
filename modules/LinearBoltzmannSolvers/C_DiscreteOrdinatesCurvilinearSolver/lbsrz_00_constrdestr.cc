@@ -7,10 +7,10 @@ namespace lbs
 
 RegisterChiObject(lbs, DiscreteOrdinatesCurvilinearSolver);
 
-chi_objects::InputParameters
+chi::InputParameters
 DiscreteOrdinatesCurvilinearSolver::GetInputParameters()
 {
-  chi_objects::InputParameters params =
+  chi::InputParameters params =
     DiscreteOrdinatesSolver::GetInputParameters();
 
   params.SetGeneralDescription(
@@ -33,7 +33,7 @@ DiscreteOrdinatesCurvilinearSolver::GetInputParameters()
 }
 
 DiscreteOrdinatesCurvilinearSolver::DiscreteOrdinatesCurvilinearSolver(
-  const chi_objects::InputParameters& params)
+  const chi::InputParameters& params)
   : DiscreteOrdinatesSolver(params),
     coord_system_type_(static_cast<chi_math::CoordinateSystemType>(
       params.GetParamValue<int>("coord_system")))

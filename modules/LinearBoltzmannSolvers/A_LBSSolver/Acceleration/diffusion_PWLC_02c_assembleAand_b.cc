@@ -34,7 +34,7 @@ void DiffusionPWLCSolver::AssembleAand_b(const std::vector<double>& q_vector)
     throw std::logic_error(fname + ": Some or all PETSc elements are null. "
                                    "Check that Initialize has been called.");
   if (options.verbose)
-    chi::log.Log() << chi::program_timer.GetTimeString()
+    Chi::log.Log() << Chi::program_timer.GetTimeString()
                    << " Starting assembly";
 
   const size_t num_groups = uk_man_.unknowns_.front().num_components_;
@@ -191,7 +191,7 @@ void DiffusionPWLCSolver::AssembleAand_b(const std::vector<double>& q_vector)
     MatInfo info;
     MatGetInfo(A_, MAT_GLOBAL_SUM, &info);
 
-    chi::log.Log() << "Number of mallocs used = " << info.mallocs
+    Chi::log.Log() << "Number of mallocs used = " << info.mallocs
                    << "\nNumber of non-zeros allocated = " << info.nz_allocated
                    << "\nNumber of non-zeros used = " << info.nz_used
                    << "\nNumber of unneeded non-zeros = " << info.nz_unneeded;
@@ -208,7 +208,7 @@ void DiffusionPWLCSolver::AssembleAand_b(const std::vector<double>& q_vector)
   KSPSetOperators(ksp_, A_, A_);
 
   if (options.verbose)
-    chi::log.Log() << chi::program_timer.GetTimeString()
+    Chi::log.Log() << Chi::program_timer.GetTimeString()
                    << " Assembly completed";
 
   PC pc;

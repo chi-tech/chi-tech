@@ -6,18 +6,18 @@
 namespace chi_unit_tests
 {
 
-chi_objects::ParameterBlock ExampleTest(const chi_objects::InputParameters&);
+chi::ParameterBlock ExampleTest(const chi::InputParameters&);
 
 RegisterWrapperFunction(/*namespace_name=*/chi_unit_tests,
                         /*name_in_lua=*/ExampleTest,
                         /*syntax_function=*/nullptr,
                         /*actual_function=*/ExampleTest);
 
-chi_objects::ParameterBlock ExampleTest(const chi_objects::InputParameters&)
+chi::ParameterBlock ExampleTest(const chi::InputParameters&)
 {
-  chi::log.Log() << "This is an example test";
+  Chi::log.Log() << "This is an example test";
 
-  return chi_objects::ParameterBlock();
+  return chi::ParameterBlock();
 }
 
 } // namespace chi_unit_tests

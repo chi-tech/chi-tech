@@ -121,7 +121,7 @@ template<> void WGSLinearSolver<Mat, Vec, KSP>::SetInitialGuess()
   {
     KSPSetInitialGuessNonzero(solver_, PETSC_TRUE);
     if (gs_context_ptr->log_info_)
-      chi::log.Log() << "Using phi_old as initial guess.";
+      Chi::log.Log() << "Using phi_old as initial guess.";
   }
 }
 
@@ -134,7 +134,7 @@ void WGSLinearSolver<Mat, Vec, KSP>::SetRHS()
   auto& lbs_solver = gs_context_ptr->lbs_solver_;
 
   if (gs_context_ptr->log_info_)
-    chi::log.Log() << chi::program_timer.GetTimeString() << " Computing b";
+    Chi::log.Log() << Chi::program_timer.GetTimeString() << " Computing b";
 
   //SetSource for RHS
   saved_q_moments_local_ = lbs_solver.QMomentsLocal();
@@ -172,7 +172,7 @@ template<> void WGSLinearSolver<Mat, Vec, KSP>::PostSolveCallback()
   KSPConvergedReason reason;
   KSPGetConvergedReason(solver_,&reason);
   if (reason != KSP_CONVERGED_RTOL and reason != KSP_DIVERGED_ITS)
-    chi::log.Log0Warning()
+    Chi::log.Log0Warning()
       << "Krylov solver failed. "
       << "Reason: " << chi_physics::GetPETScConvergedReasonstring(reason);
 

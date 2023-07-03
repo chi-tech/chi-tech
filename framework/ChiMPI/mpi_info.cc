@@ -1,6 +1,6 @@
 #include "mpi_info.h"
 
-namespace chi_objects
+namespace chi
 {
 
 //###################################################################
@@ -9,6 +9,12 @@ MPI_Info& MPI_Info::GetInstance() noexcept
 {
   static MPI_Info singleton;
   return singleton;
+}
+
+/**Sets the active communicator*/
+void MPI_Info::SetCommunicator(MPI_Comm new_communicator)
+{
+  communicator_ = new_communicator;
 }
 
 /**Sets the rank.*/
@@ -25,6 +31,11 @@ void MPI_Info::SetProcessCount(int in_process_count)
   if (not process_count_set_)
     process_count_ = in_process_count;
   process_count_set_ = true;
+}
+
+void MPI_Info::Barrier() const
+{
+  MPI_Barrier(this->communicator_);
 }
 
 }//namespace chi_objects

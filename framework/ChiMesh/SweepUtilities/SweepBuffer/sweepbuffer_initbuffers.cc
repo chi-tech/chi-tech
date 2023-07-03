@@ -46,13 +46,13 @@ void chi_mesh::sweep_management::SweepBuffer::
     }
 
     //================================================ Make a memory query
-    double memory_mb = chi_objects::ChiConsole::GetMemoryUsageInMB();
+    double memory_mb = chi::ChiConsole::GetMemoryUsageInMB();
 
-    std::shared_ptr<chi_objects::ChiLog::EventInfo> memory_event_info =
-      std::make_shared<chi_objects::ChiLog::EventInfo>(memory_mb);
+    std::shared_ptr<chi::ChiLog::EventInfo> memory_event_info =
+      std::make_shared<chi::ChiLog::EventInfo>(memory_mb);
 
-    chi::log.LogEvent(chi_objects::ChiLog::StdTags::MAX_MEMORY_USAGE,
-                     chi_objects::ChiLog::EventType::SINGLE_OCCURRENCE,
+    Chi::log.LogEvent(chi::ChiLog::StdTags::MAX_MEMORY_USAGE,
+                      chi::ChiLog::EventType::SINGLE_OCCURRENCE,
                      memory_event_info);
 
     data_initialized = true;

@@ -12,7 +12,7 @@ chi_mesh::UnpartitionedMesh::~UnpartitionedMesh()
 {
   for (auto& cell : raw_cells_)          delete cell;
   for (auto& cell : raw_boundary_cells_) delete cell;
-  chi::log.Log0Verbose2() << "~UnpartitionedMesh";
+  Chi::log.Log0Verbose2() << "~UnpartitionedMesh";
 }
 
 /**Compute centroids for all cells.*/
@@ -20,7 +20,7 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
 {
   const chi_mesh::Vector3 khat(0.0,0.0,1.0);
 
-  chi::log.Log() << "Computing cell-centroids.";
+  Chi::log.Log() << "Computing cell-centroids.";
   for (auto cell : raw_cells_)
   {
     cell->centroid = chi_mesh::Vertex(0.0,0.0,0.0);
@@ -29,9 +29,9 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
 
     cell->centroid = cell->centroid/static_cast<double>(cell->vertex_ids.size());
   }
-  chi::log.Log() << "Done computing cell-centroids.";
+  Chi::log.Log() << "Done computing cell-centroids.";
 
-  chi::log.Log() << "Checking cell-center-to-face orientations";
+  Chi::log.Log() << "Checking cell-center-to-face orientations";
   size_t num_negative_volume_elements=0;
   for (auto cell : raw_cells_)
   {
@@ -90,10 +90,10 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
   }//for cell in raw_cells
 
   if (num_negative_volume_elements > 0)
-    chi::log.LogAllWarning()
+    Chi::log.LogAllWarning()
       << "Cell quality checks detected " << num_negative_volume_elements
       << " negative volume sub-elements (sub-triangle or sub-tetrahedron)."
       << " This issue could result in incorrect quantities"
       << " under some circumstances.";
-  chi::log.Log() << "Done checking cell-center-to-face orientations";
+  Chi::log.Log() << "Done checking cell-center-to-face orientations";
 }

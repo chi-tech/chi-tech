@@ -16,7 +16,7 @@
 std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
   KBA(const chi_mesh::UnpartitionedMesh& umesh)
 {
-  chi::log.Log() << "Partitioning mesh KBA-style.";
+  Chi::log.Log() << "Partitioning mesh KBA-style.";
 
   const size_t num_raw_cells = umesh.GetNumberOfCells();
 
@@ -44,7 +44,7 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
   //======================================== Determine cell partition-IDs
   //                                         only on home location
   std::vector<int64_t> cell_pids(num_raw_cells, 0);
-  if (chi::mpi.location_id == 0)
+  if (Chi::mpi.location_id == 0)
   {
     uint64_t cell_id = 0;
     for (auto& raw_cell : umesh.GetRawCells())
@@ -57,8 +57,8 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
             static_cast<int>(num_raw_cells),  //count
             MPI_LONG_LONG_INT,                //data type
             0,                                //root
-            MPI_COMM_WORLD);                  //communicator
-  chi::log.Log() << "Done partitioning mesh.";
+            Chi::mpi.comm);                  //communicator
+  Chi::log.Log() << "Done partitioning mesh.";
 
   return cell_pids;
 }

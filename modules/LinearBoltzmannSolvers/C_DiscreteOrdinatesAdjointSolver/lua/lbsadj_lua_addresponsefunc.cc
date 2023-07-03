@@ -39,12 +39,11 @@ int chiAdjointSolverAddResponseFunction(lua_State* L)
     lua_function = lua_tostring(L,4);
   }
 
-  auto& solver = chi::GetStackItem<lbs::DiscreteOrdinatesAdjointSolver>(
-    chi::object_stack, solver_handle, fname);
+  auto& solver = Chi::GetStackItem<lbs::DiscreteOrdinatesAdjointSolver>(
+    Chi::object_stack, solver_handle, fname);
 
   auto p_logical_volume = std::dynamic_pointer_cast<chi_mesh::LogicalVolume>(
-    chi::GetStackItemPtr(
-    chi::object_stack, logvol_handle, fname));
+    Chi::GetStackItemPtr(Chi::object_stack, logvol_handle, fname));
 
   size_t qoi_index = solver.AddResponseFunction(qoi_name,
                                                  p_logical_volume,

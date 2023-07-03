@@ -37,10 +37,10 @@ void lbs::LBSSolver::
                    const std::vector<double>& flux_moments)
 {
   std::string file_name =
-    file_base + std::to_string(chi::mpi.location_id) + ".data";
+    file_base + std::to_string(Chi::mpi.location_id) + ".data";
 
   //============================================= Open file
-  chi::log.Log() << "Writing flux-moments to files with base-name " << file_base
+  Chi::log.Log() << "Writing flux-moments to files with base-name " << file_base
                 << " and extension .data";
   std::ofstream file(file_name,
                      std::ofstream::binary | //binary file
@@ -50,7 +50,7 @@ void lbs::LBSSolver::
   //============================================= Check file is open
   if (not file.is_open())
   {
-    chi::log.LogAllWarning()
+    Chi::log.LogAllWarning()
       << __FUNCTION__ << "Failed to open " << file_name;
     return;
   }
@@ -155,12 +155,12 @@ void lbs::LBSSolver::ReadFluxMoments(
   bool single_file/*=false*/)
 {
   std::string file_name =
-    file_base + std::to_string(chi::mpi.location_id) + ".data";
+    file_base + std::to_string(Chi::mpi.location_id) + ".data";
   if (single_file)
     file_name = file_base + ".data";
 
   //============================================= Open file
-  chi::log.Log() << "Reading flux-moments file " << file_name;
+  Chi::log.Log() << "Reading flux-moments file " << file_name;
   std::ifstream file(file_name,
                      std::ofstream::binary | //binary file
                      std::ofstream::in);     //no accidental writing
@@ -168,7 +168,7 @@ void lbs::LBSSolver::ReadFluxMoments(
   //============================================= Check file is open
   if (not file.is_open())
   {
-    chi::log.LogAllWarning()
+    Chi::log.LogAllWarning()
       << __FUNCTION__ << "Failed to open " << file_name;
     return;
   }
@@ -219,7 +219,7 @@ void lbs::LBSSolver::ReadFluxMoments(
                                     << num_local_dofs << "\n";
       outstr << "num_local_cells: " << file_num_local_cells << " vs "
                                     << num_local_cells << "\n";
-      chi::log.LogAll()
+      Chi::log.LogAll()
         << "Incompatible DOF data found in file " << file_name << "\n"
         << "File data vs system:\n" << outstr.str();
       file.close();

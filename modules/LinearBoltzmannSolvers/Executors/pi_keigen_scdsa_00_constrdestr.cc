@@ -10,9 +10,9 @@ namespace lbs
 
 RegisterChiObject(lbs, XXPowerIterationKEigenSCDSA);
 
-chi_objects::InputParameters XXPowerIterationKEigenSCDSA::GetInputParameters()
+chi::InputParameters XXPowerIterationKEigenSCDSA::GetInputParameters()
 {
-  chi_objects::InputParameters params =
+  chi::InputParameters params =
     XXPowerIterationKEigen::GetInputParameters();
 
   params.SetGeneralDescription(
@@ -70,7 +70,7 @@ chi_objects::InputParameters XXPowerIterationKEigenSCDSA::GetInputParameters()
 }
 
 XXPowerIterationKEigenSCDSA::XXPowerIterationKEigenSCDSA(
-  const chi_objects::InputParameters& params)
+  const chi::InputParameters& params)
   : XXPowerIterationKEigen(params),
     accel_pi_max_its_(params.GetParamValue<int>("accel_pi_max_its")),
     accel_pi_k_tol_(params.GetParamValue<double>("accel_pi_k_tol")),
@@ -153,7 +153,7 @@ XXPowerIterationKEigenSCDSA::XXPowerIterationKEigenSCDSA(
   //
   // chi::log.Log() << "Initializing diffusion solver";
   // diffusion_solver_->Initialize();
-  // MPI_Barrier(MPI_COMM_WORLD);
+  // Chi::mpi.Barrier();
   // chi::log.Log() << "Done Initializing diffusion solver";
   //
   // chi::log.Log() << "Assembling A and b";

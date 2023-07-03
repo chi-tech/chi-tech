@@ -19,12 +19,12 @@ chi_mesh::sweep_management::PRIMARY_FLUDS::
   G(in_G),
   grid_nodal_mappings(in_grid_nodal_mappings)
 {
-  chi::log.Log0Verbose1()
+  Chi::log.Log0Verbose1()
     << "Initializing FLUDS for omega="
     << spds.omega.PrintS()
     << "         Process memory = "
     << std::setprecision(3)
-    <<chi_objects::ChiConsole::GetMemoryUsageInMB() << " MB.";
+    << chi::ChiConsole::GetMemoryUsageInMB() << " MB.";
 
   this->InitializeAlphaElements(spds, grid_face_histogram);
   this->InitializeBetaElements(spds);
@@ -73,10 +73,10 @@ NLOutgoingPsi(int outb_face_counter,
 {
   if (outb_face_counter>nonlocal_outb_face_deplocI_slot.size())
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "Invalid number of outb_face_counter " << outb_face_counter
       << " max allowed " << nonlocal_outb_face_deplocI_slot.size();
-    chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   int depLocI = nonlocal_outb_face_deplocI_slot[outb_face_counter].first;
@@ -90,11 +90,11 @@ NLOutgoingPsi(int outb_face_counter,
   if ((index<0) ||
       (index>ref_deplocI_outgoing_psi->operator[](depLocI).size()))
   {
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "Invalid index " << index
       << " encountered in non-local outgoing Psi"
       << " max allowed " << ref_deplocI_outgoing_psi->operator[](depLocI).size();
-    chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   return &ref_deplocI_outgoing_psi->operator[](depLocI)[index];

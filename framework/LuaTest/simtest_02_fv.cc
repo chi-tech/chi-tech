@@ -19,13 +19,13 @@ namespace chi_unit_sim_tests
  * to Laplace's problem. */
 int chiSimTest02_FV(lua_State*)
 {
-  chi::log.Log() << "Coding Tutorial 2";
+  Chi::log.Log() << "Coding Tutorial 2";
 
   //============================================= Get grid
   auto grid_ptr = chi_mesh::GetCurrentHandler().GetGrid();
   const auto& grid = *grid_ptr;
 
-  chi::log.Log() << "Global num cells: " << grid.GetGlobalNumberOfCells();
+  Chi::log.Log() << "Global num cells: " << grid.GetGlobalNumberOfCells();
 
   //============================================= Make SDM
   typedef std::shared_ptr<chi_math::SpatialDiscretization> SDMPtr;
@@ -37,8 +37,8 @@ int chiSimTest02_FV(lua_State*)
   const size_t num_local_dofs = sdm.GetNumLocalDOFs(OneDofPerNode);
   const size_t num_globl_dofs = sdm.GetNumGlobalDOFs(OneDofPerNode);
 
-  chi::log.Log() << "Num local DOFs: " << num_local_dofs;
-  chi::log.Log() << "Num globl DOFs: " << num_globl_dofs;
+  Chi::log.Log() << "Num local DOFs: " << num_local_dofs;
+  Chi::log.Log() << "Num globl DOFs: " << num_globl_dofs;
 
   //============================================= Initializes Mats and Vecs
   const auto n = static_cast<int64_t>(num_local_dofs);
@@ -59,7 +59,7 @@ int chiSimTest02_FV(lua_State*)
                                            nodal_nnz_off_diag);
 
   //============================================= Assemble the system
-  chi::log.Log() << "Assembling system: ";
+  Chi::log.Log() << "Assembling system: ";
   for (const auto& cell : grid.local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
@@ -102,17 +102,17 @@ int chiSimTest02_FV(lua_State*)
     VecSetValue(b, imap, 1.0*V, ADD_VALUES);
   }//for cell i
 
-  chi::log.Log() << "Global assembly";
+  Chi::log.Log() << "Global assembly";
 
   MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY);
   VecAssemblyBegin(b);
   VecAssemblyEnd(b);
 
-  chi::log.Log() << "Done global assembly";
+  Chi::log.Log() << "Done global assembly";
 
   //============================================= Create Krylov Solver
-  chi::log.Log() << "Solving: ";
+  Chi::log.Log() << "Solving: ";
   auto petsc_solver =
     chi_math::PETScUtils::CreateCommonKrylovSolverSetup(
       A,               //Matrix
@@ -125,7 +125,7 @@ int chiSimTest02_FV(lua_State*)
   //============================================= Solve
   KSPSolve(petsc_solver.ksp,b,x);
 
-  chi::log.Log() << "Done solving";
+  Chi::log.Log() << "Done solving";
 
   //============================================= Extract PETSc vector
   std::vector<double> field(num_local_dofs, 0.0);
@@ -138,7 +138,7 @@ int chiSimTest02_FV(lua_State*)
   VecDestroy(&b);
   MatDestroy(&A);
 
-  chi::log.Log() << "Done cleanup";
+  Chi::log.Log() << "Done cleanup";
 
   //============================================= Create Field Function
   auto ff = std::make_shared<chi_physics::FieldFunctionGridBased>(
@@ -157,7 +157,7 @@ int chiSimTest02_FV(lua_State*)
   chi_math::VectorGhostCommunicator vgc(num_local_dofs,
                                         num_globl_dofs,
                                         ghost_ids,
-                                        MPI_COMM_WORLD);
+                                        Chi::mpi.comm);
   std::vector<double> field_wg = vgc.MakeGhostedVector(field);
 
   vgc.CommunicateGhostEntries(field_wg);

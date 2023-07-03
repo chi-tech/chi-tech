@@ -20,7 +20,7 @@ AngleSet(size_t in_numgrps,
          std::vector<size_t>& angle_indices,
          std::map<uint64_t, std::shared_ptr<SweepBndry>>& sim_boundaries,
          int sweep_eager_limit,
-         const chi_objects::ChiMPICommunicatorSet& in_comm_set):
+         const chi::ChiMPICommunicatorSet& in_comm_set):
   num_grps(in_numgrps),
   spds(in_spds),
   sweep_buffer(this,sweep_eager_limit,in_comm_set),
@@ -73,9 +73,9 @@ chi_mesh::sweep_management::AngleSet::
   {
     sweep_buffer.InitializeLocalAndDownstreamBuffers();
 
-    chi::log.LogEvent(timing_tags[0], chi_objects::ChiLog::EventType::EVENT_BEGIN);
+    Chi::log.LogEvent(timing_tags[0], chi::ChiLog::EventType::EVENT_BEGIN);
     sweep_chunk.Sweep(this); //Execute chunk
-    chi::log.LogEvent(timing_tags[0], chi_objects::ChiLog::EventType::EVENT_END);
+    Chi::log.LogEvent(timing_tags[0], chi::ChiLog::EventType::EVENT_END);
 
     //Send outgoing psi and clear local and receive buffers
     sweep_buffer.SendDownstreamPsi(angle_set_num);

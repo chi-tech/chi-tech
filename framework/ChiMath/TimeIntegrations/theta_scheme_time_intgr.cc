@@ -9,9 +9,9 @@ namespace chi_math
 
 RegisterChiObject(chi_math, ThetaSchemeTimeIntegration);
 
-chi_objects::InputParameters ThetaSchemeTimeIntegration::GetInputParameters()
+chi::InputParameters ThetaSchemeTimeIntegration::GetInputParameters()
 {
-  chi_objects::InputParameters params = TimeIntegration::GetInputParameters();
+  chi::InputParameters params = TimeIntegration::GetInputParameters();
 
   // clang-format off
   params.SetGeneralDescription(
@@ -30,7 +30,7 @@ chi_objects::InputParameters ThetaSchemeTimeIntegration::GetInputParameters()
 }
 
 ThetaSchemeTimeIntegration::ThetaSchemeTimeIntegration(
-  const chi_objects::InputParameters& params)
+  const chi::InputParameters& params)
   : TimeIntegration(params), theta_(params.GetParamValue<double>("theta"))
 {
 }

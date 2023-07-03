@@ -7,6 +7,8 @@
 #include <stdexcept>
 #include <memory>
 
+#include "chi_mpi.h"
+
 namespace chi_mesh
 {
 class MeshHandler;
@@ -52,27 +54,26 @@ typedef std::shared_ptr<SpatialDiscretization> SpatialDiscretizationPtr;
 class UnknownManager;
 } // namespace chi_math
 
-namespace chi_objects
+namespace chi
 {
 
-class MPI_Info;
 class ChiTimer;
 class ChiConsole;
 class ChiLog;
-} // namespace chi_objects
+} // namespace chi
 
 class ChiObject;
 typedef std::shared_ptr<ChiObject> ChiObjectPtr;
 
 // ###################################################################
 /**General utilities in ChiTech*/
-class chi
+class Chi
 {
 public:
-  static chi_objects::MPI_Info& mpi;
-  static chi_objects::ChiTimer program_timer;
-  static chi_objects::ChiConsole& console;
-  static chi_objects::ChiLog& log;
+  static chi::MPI_Info& mpi;
+  static chi::ChiTimer program_timer;
+  static chi::ChiConsole& console;
+  static chi::ChiLog& log;
 
   static std::vector<chi_mesh::MeshHandlerPtr> meshhandler_stack;
   static int current_mesh_handler;
@@ -109,7 +110,7 @@ public:
     static const std::string command_line_help_string_;
 
   private:
-    friend class chi;
+    friend class Chi;
     static void ParseArguments(int argc, char** argv);
     static int InitPetSc(int argc, char** argv);
 
@@ -143,14 +144,14 @@ public:
   };
 
 public:
-  chi() = delete;                     // Deleted constructor
-  chi(const chi&) = delete;           // Deleted copy constructor
-  chi operator=(const chi&) = delete; // Deleted assigment operator
+  Chi() = delete;                     // Deleted constructor
+  Chi(const Chi&) = delete;           // Deleted copy constructor
+  Chi operator=(const Chi&) = delete; // Deleted assigment operator
 
 public:
   static int RunInteractive(int argc, char** argv);
   static int RunBatch(int argc, char** argv);
-  static int Initialize(int argc, char** argv);
+  static int Initialize(int argc, char** argv, MPI_Comm communicator);
   static void Finalize();
   static void Exit(int error_code);
 
@@ -206,8 +207,8 @@ public:
   template <class T, class P>
   static std::shared_ptr<T>
   GetStackItemPtrAsType(std::vector<std::shared_ptr<P>>& stack,
-                  const size_t handle,
-                  const std::string& calling_function_name = "Unknown")
+                        const size_t handle,
+                        const std::string& calling_function_name = "Unknown")
   {
     std::shared_ptr<P> item_type_P;
     try

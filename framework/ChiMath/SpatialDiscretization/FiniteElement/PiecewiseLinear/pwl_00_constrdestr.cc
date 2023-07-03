@@ -47,25 +47,25 @@ chi_math::SpatialDiscretization_PWLD::SpatialDiscretization_PWLD(
     }
 
     if (static_cast<int>(line_quad_order_arbitrary_.order_) < qorder_min)
-      chi::log.LogAllWarning()
+      Chi::log.LogAllWarning()
         << "SpatialDiscretization_PWLD::SpatialDiscretization_PWLD : "
         << "static_cast<int>(line_quad_order_arbitrary.order) < " << qorder_min
         << ".";
 
     if (static_cast<int>(tri_quad_order_arbitrary_.order_) < qorder_min)
-      chi::log.LogAllWarning()
+      Chi::log.LogAllWarning()
         << "SpatialDiscretization_PWLD::SpatialDiscretization_PWLD : "
         << "static_cast<int>(tri_quad_order_arbitrary.order) < " << qorder_min
         << ".";
 
     if (static_cast<int>(quad_quad_order_arbitrary_.order_) < qorder_min)
-      chi::log.LogAllWarning()
+      Chi::log.LogAllWarning()
         << "SpatialDiscretization_PWLD::SpatialDiscretization_PWLD : "
         << "static_cast<int>(quad_quad_order_arbitrary.order) < " << qorder_min
         << ".";
 
     if (static_cast<int>(tet_quad_order_arbitrary_.order_) < qorder_min)
-      chi::log.LogAllWarning()
+      Chi::log.LogAllWarning()
         << "SpatialDiscretization_PWLD::SpatialDiscretization_PWLD : "
         << "static_cast<int>(tet_quad_order_arbitrary.order) < " << qorder_min
         << ".";
@@ -93,7 +93,7 @@ chi_math::SpatialDiscretization_PWLD::New(
   const auto PWLD = SpatialDiscretizationType::PIECEWISE_LINEAR_DISCONTINUOUS;
   // First try to find an existing spatial discretization that matches the
   // one requested.
-  for (auto& sdm : chi::sdm_stack)
+  for (auto& sdm : Chi::sdm_stack)
     if (sdm->Type() == PWLD and
         std::addressof(sdm->Grid()) == std::addressof(in_grid) and
         sdm->GetCoordinateSystemType() == in_cs_type)
@@ -116,7 +116,7 @@ chi_math::SpatialDiscretization_PWLD::New(
   auto new_sdm = std::shared_ptr<SpatialDiscretization_PWLD>(
     new SpatialDiscretization_PWLD(in_grid, setup_flags, qorder, in_cs_type));
 
-  chi::sdm_stack.push_back(new_sdm);
+  Chi::sdm_stack.push_back(new_sdm);
 
   return new_sdm;
 }

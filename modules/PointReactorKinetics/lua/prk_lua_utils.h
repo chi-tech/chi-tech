@@ -8,13 +8,13 @@ namespace prk::lua_utils
 int chiPRKGetParam(lua_State* L);
 int chiPRKSetParam(lua_State* L);
 
-chi_objects::InputParameters GetSyntax_SetParam();
-chi_objects::ParameterBlock
-SetParam(const chi_objects::InputParameters& params);
+chi::InputParameters GetSyntax_SetParam();
+chi::ParameterBlock
+SetParam(const chi::InputParameters& params);
 
-chi_objects::InputParameters GetParamSyntax();
-chi_objects::ParameterBlock
-GetParam(const chi_objects::InputParameters& params);
+chi::InputParameters GetParamSyntax();
+chi::ParameterBlock
+GetParam(const chi::InputParameters& params);
 } // namespace prk::lua_utils
 
 #endif

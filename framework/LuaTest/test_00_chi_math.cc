@@ -14,18 +14,18 @@ int Test_chi_math(lua_State* L)
 {
   //======================================================= Dynamic Vector
   {
-    chi::log.Log() << "Testing chi_math::DynamicVector\n";
+    Chi::log.Log() << "Testing chi_math::DynamicVector\n";
 
     chi_math::DynamicVector<double> vec(5, 1.0);
 
-    chi::log.Log() << vec.PrintStr();
+    Chi::log.Log() << vec.PrintStr();
   }
   //======================================================= Dynamic Matrix
   {
-    chi::log.Log() << "Testing chi_math::DynamicMatrix\n";
+    Chi::log.Log() << "Testing chi_math::DynamicMatrix\n";
     chi_math::DynamicMatrix<double> mat(5, 7, 1.0);
 
-    chi::log.Log() << mat.PrintStr();
+    Chi::log.Log() << mat.PrintStr();
   }
 
   //======================================================= SparseMatrix
@@ -39,35 +39,35 @@ int Test_chi_math(lua_State* L)
 
     {
       auto &m = mat;
-      chi::log.Log() << "----- SparseMatrix::PrintS() -----"
+      Chi::log.Log() << "----- SparseMatrix::PrintS() -----"
                      << "\n" << m.PrintStr() << "\n";
 
-      chi::log.Log() <<"----- for (const auto& entry : m.Row(2)) -----";
+      Chi::log.Log() <<"----- for (const auto& entry : m.Row(2)) -----";
       for (const auto &entry: m.Row(2))
-        chi::log.Log() << entry.row_index << " "
+        Chi::log.Log() << entry.row_index << " "
                        << entry.column_index << " "
                        << entry.value;
 
-      chi::log.Log() << "----- after value*2 -----";
+      Chi::log.Log() << "----- after value*2 -----";
       for (const auto&[row_index, column_index, value]: m.Row(2))
         value *= 2;
 
       for (const auto &entry: m.Row(2))
-        chi::log.Log() << entry.row_index << " "
+        Chi::log.Log() << entry.row_index << " "
                        << entry.column_index << " "
                        << entry.value;
     }
 
-    chi::log.Log() << "----- for (auto entry : matrix) -----";
+    Chi::log.Log() << "----- for (auto entry : matrix) -----";
     for (const auto& entry : matrix)
-      chi::log.Log() << entry.row_index << " "
+      Chi::log.Log() << entry.row_index << " "
                      << entry.column_index << " "
                      << entry.value;
 
     matrix.Compress();
-    chi::log.Log() << "----- after compress -----";
+    Chi::log.Log() << "----- after compress -----";
     for (const auto& entry : matrix)
-      chi::log.Log() << entry.row_index << " "
+      Chi::log.Log() << entry.row_index << " "
                      << entry.column_index << " "
                      << entry.value;
   }

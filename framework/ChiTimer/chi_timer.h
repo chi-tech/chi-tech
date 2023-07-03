@@ -6,7 +6,7 @@
 
 
 //################################################################### CLASS DEF
-namespace chi_objects
+namespace chi
 {
   /** Timer object.*/
   class ChiTimer

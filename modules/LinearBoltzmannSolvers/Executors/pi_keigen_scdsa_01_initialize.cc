@@ -74,12 +74,12 @@ void XXPowerIterationKEigenSCDSA::Initialize()
     ds->options.additional_options_string = diff_accel_diffusion_petsc_options_;
   }
 
-  chi::log.Log() << "Initializing diffusion solver";
+  Chi::log.Log() << "Initializing diffusion solver";
   diffusion_solver_->Initialize();
-  MPI_Barrier(MPI_COMM_WORLD);
-  chi::log.Log() << "Done Initializing diffusion solver";
+  Chi::mpi.Barrier();
+  Chi::log.Log() << "Done Initializing diffusion solver";
 
-  chi::log.Log() << "Assembling A and b";
+  Chi::log.Log() << "Assembling A and b";
   std::vector<double> dummy_rhs;
   if (diffusion_solver_sdm_ == "pwld")
     dummy_rhs.assign(sdm.GetNumLocalDOFs(uk_man), 0.0);
@@ -87,7 +87,7 @@ void XXPowerIterationKEigenSCDSA::Initialize()
     dummy_rhs.assign(continuous_sdm_ptr_->GetNumLocalAndGhostDOFs(uk_man), 0.0);
 
   diffusion_solver_->AssembleAand_b(dummy_rhs);
-  chi::log.Log() << "Done Assembling A and b";
+  Chi::log.Log() << "Done Assembling A and b";
 }
 
 } // namespace lbs

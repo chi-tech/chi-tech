@@ -2,7 +2,7 @@
 #define CHI_CONSOLE_STRUCTS_H
 
 //=============================================================================
-namespace chi_objects
+namespace chi
 {
   /**Simple structure for memory usage.*/
   struct CSTMemory

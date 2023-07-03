@@ -26,21 +26,21 @@ int chiGetProductQuadrature(lua_State *L)
 
   std::shared_ptr<chi_math::ProductQuadrature> quad;
   try{
-    auto ang_quad = chi::angular_quadrature_stack.at(handle);
+    auto ang_quad = Chi::angular_quadrature_stack.at(handle);
     if (ang_quad->type_ == chi_math::AngularQuadratureType::ProductQuadrature)
       quad = std::static_pointer_cast<chi_math::ProductQuadrature>(ang_quad);
     else
     {
-      chi::log.LogAllError()
+      Chi::log.LogAllError()
         << "chiGetProductQuadrature: Provided quadrature handle points to "
            "a quadrature that is not a product quadrature.";
-     chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
   }
   catch (const std::out_of_range& o){
-    chi::log.LogAllError()
+    Chi::log.LogAllError()
       << "chiGetProductQuadrature: Invalid quadrature handle.";
-   chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   lua_newtable(L);

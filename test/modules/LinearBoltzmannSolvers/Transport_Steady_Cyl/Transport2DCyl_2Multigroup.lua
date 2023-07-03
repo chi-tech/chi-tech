@@ -19,7 +19,7 @@ end
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 dim = 2
-length = {1, 2, }
+length = {1.0, 2.0, }
 ncells = {50, 100, }
 nodes = {}
 for d = 1, dim do
@@ -34,7 +34,8 @@ chiVolumeMesherSetProperty(PARTITION_TYPE, PARMETIS)
 chiVolumeMesherExecute()
 
 --############################################### Set Material IDs
-vol0 = chiLogicalVolumeCreate(RPP, 0, length[1], 0, length[2], 0, 0)
+vol0 = chi_mesh.RPPLogicalVolume.Create
+({ xmin=0.0,xmax=length[1],ymin=0.0,ymax=length[2], infz=true })
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
 
 --############################################### Add materials

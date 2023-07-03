@@ -13,9 +13,9 @@ namespace lbs
 RegisterChiObject(lbs, DiffusionDFEMSolver);
 
 // ##################################################################
-chi_objects::InputParameters DiffusionDFEMSolver::GetInputParameters()
+chi::InputParameters DiffusionDFEMSolver::GetInputParameters()
 {
-  chi_objects::InputParameters params = LBSSolver::GetInputParameters();
+  chi::InputParameters params = LBSSolver::GetInputParameters();
 
   params.SetGeneralDescription(
     "\\defgroup lbs__DiffusionDFEMSolver DiffusionDFEMSolver\n"
@@ -28,7 +28,7 @@ chi_objects::InputParameters DiffusionDFEMSolver::GetInputParameters()
 
 // ##################################################################
 DiffusionDFEMSolver::DiffusionDFEMSolver(
-  const chi_objects::InputParameters& params)
+  const chi::InputParameters& params)
   : LBSSolver(params)
 {
 }

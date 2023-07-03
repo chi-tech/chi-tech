@@ -69,7 +69,7 @@ chiFFInterpolationInitialize(curffi)
 chiFFInterpolationExecute(curffi)
 
 --############################################### Volume integrations
-vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
+vol0 = chi_mesh.RPPLogicalVolume.Create({infx=true, infy=true, infz=true})
 ffi1 = chiFFInterpolationCreate(VOLUME)
 curffi = ffi1
 chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)

@@ -30,7 +30,7 @@ int chiPRKGetParam(lua_State* L)
   const int handle = lua_tointeger(L, 1);
 
   auto solver =
-    chi::GetStackItem<TransientSolver>(chi::object_stack, handle, fname);
+    Chi::GetStackItem<TransientSolver>(Chi::object_stack, handle, fname);
 
   const std::string param_name = lua_tostring(L, 2);
 
@@ -70,7 +70,7 @@ int chiPRKSetParam(lua_State* L)
   const int handle = lua_tointeger(L, 1);
 
   auto& solver =
-    chi::GetStackItem<TransientSolver>(chi::object_stack, handle, fname);
+    Chi::GetStackItem<TransientSolver>(Chi::object_stack, handle, fname);
 
   const std::string param_name = lua_tostring(L, 2);
 
@@ -94,9 +94,9 @@ RegisterWrapperFunction(/*namespace_in_lua=*/prk,
                         /*syntax_function=*/GetSyntax_SetParam,
                         /*actual_function=*/SetParam);
 
-chi_objects::InputParameters GetSyntax_SetParam()
+chi::InputParameters GetSyntax_SetParam()
 {
-  chi_objects::InputParameters params;
+  chi::InputParameters params;
 
   params.SetGeneralDescription(
     "\\defgroup prk__SetParam prk.SetParam \n"
@@ -118,18 +118,18 @@ chi_objects::InputParameters GetSyntax_SetParam()
   return params;
 }
 
-chi_objects::ParameterBlock SetParam(const chi_objects::InputParameters& params)
+chi::ParameterBlock SetParam(const chi::InputParameters& params)
 {
   const std::string fname = __FUNCTION__;
   const size_t handle = params.GetParamValue<size_t>("arg0");
 
   auto& solver =
-    chi::GetStackItem<TransientSolver>(chi::object_stack, handle, fname);
+    Chi::GetStackItem<TransientSolver>(Chi::object_stack, handle, fname);
 
   const auto param_name = params.GetParamValue<std::string>("arg1");
   const auto& value_param = params.GetParam("arg2");
 
-  using namespace chi_objects;
+  using namespace chi;
   if (param_name == "rho")
   {
     ChiInvalidArgumentIf(value_param.Type() != ParameterBlockType::FLOAT,
@@ -139,7 +139,7 @@ chi_objects::ParameterBlock SetParam(const chi_objects::InputParameters& params)
   else
     ChiInvalidArgument("Invalid property name \"" + param_name);
 
-  return chi_objects::ParameterBlock(); // Return empty param block
+  return chi::ParameterBlock(); // Return empty param block
 }
 
 // ##################################################################
@@ -148,9 +148,9 @@ RegisterWrapperFunction(/*namespace_in_lua=*/prk,
                         /*syntax_function=*/GetParamSyntax,
                         /*actual_function=*/GetParam);
 
-chi_objects::InputParameters GetParamSyntax()
+chi::InputParameters GetParamSyntax()
 {
-  chi_objects::InputParameters params;
+  chi::InputParameters params;
 
   params.SetGeneralDescription(
     "\\defgroup prk__GetParam prk.GetParam \n"
@@ -171,16 +171,16 @@ chi_objects::InputParameters GetParamSyntax()
   return params;
 }
 
-chi_objects::ParameterBlock GetParam(const chi_objects::InputParameters& params)
+chi::ParameterBlock GetParam(const chi::InputParameters& params)
 {
   const std::string fname = __FUNCTION__;
   const size_t handle = params.GetParamValue<size_t>("arg0");
 
   auto& solver =
-    chi::GetStackItem<TransientSolver>(chi::object_stack, handle, fname);
+    Chi::GetStackItem<TransientSolver>(Chi::object_stack, handle, fname);
 
   const auto param_name = params.GetParamValue<std::string>("arg1");
-  chi_objects::ParameterBlock outputs;
+  chi::ParameterBlock outputs;
 
   if (param_name == "population_prev")
     outputs.AddParameter("", solver.PopulationPrev());

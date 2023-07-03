@@ -30,7 +30,7 @@ int chiLBSGetScalarFieldFunctionList(lua_State* L)
   //============================================= Get pointer to solver
   const int solver_handle = lua_tonumber(L, 1);
   const auto& lbs_solver =
-    chi::GetStackItem<lbs::LBSSolver>(chi::object_stack, solver_handle, fname);
+    Chi::GetStackItem<lbs::LBSSolver>(Chi::object_stack, solver_handle, fname);
 
   /**Lambda for matching a field function smart pointer to one on
   * the runtime stack.*/
@@ -38,7 +38,7 @@ int chiLBSGetScalarFieldFunctionList(lua_State* L)
     [](std::shared_ptr<chi_physics::FieldFunctionGridBased>& local_ff)
   {
     size_t stack_ff_counter = 0;
-    for (auto& stack_ff : chi::field_function_stack)
+    for (auto& stack_ff : Chi::field_function_stack)
     {
       if (stack_ff == local_ff)
         return stack_ff_counter;

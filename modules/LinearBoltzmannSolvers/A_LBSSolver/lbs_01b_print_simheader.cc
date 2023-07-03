@@ -8,7 +8,7 @@
 /**Prints header information of simulation.*/
 void lbs::LBSSolver::PrintSimHeader()
 {
-  if (chi::mpi.location_id == 0)
+  if (Chi::mpi.location_id == 0)
   {
     std::stringstream outstr;
     outstr << "\nInitializing LBS SteadyStateSolver with name: "
@@ -39,7 +39,7 @@ void lbs::LBSSolver::PrintSimHeader()
         }
 
       }//for g
-      chi::log.Log() << outstr.str() << "\n" << std::endl;
+      Chi::log.Log() << outstr.str() << "\n" << std::endl;
     }//for gs
   }
 }

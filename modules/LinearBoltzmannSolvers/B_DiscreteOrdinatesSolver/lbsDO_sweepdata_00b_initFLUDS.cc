@@ -104,13 +104,13 @@ void lbs::DiscreteOrdinatesSolver::
   groupset.angle_agg_->angle_set_groups.push_back(std::move(angle_set_group));
 
   if (options_.verbose_inner_iterations)
-    chi::log.Log()
-      << chi::program_timer.GetTimeString()
+    Chi::log.Log()
+      << Chi::program_timer.GetTimeString()
       << " Initialized Angle Aggregation.   "
       << "         Process memory = "
-      << std::setprecision(3) << chi_objects::ChiConsole::GetMemoryUsageInMB()
+      << std::setprecision(3) << chi::ChiConsole::GetMemoryUsageInMB()
       << " MB.";
 
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
 }

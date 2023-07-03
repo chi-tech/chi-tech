@@ -20,7 +20,7 @@ PetscErrorCode KEigenSNESMonitor(SNES, PetscInt iter,
 
   std::stringstream iter_info;
   iter_info
-    << chi::program_timer.GetTimeString() << " "
+    << Chi::program_timer.GetTimeString() << " "
     << residual_context.solver_name
     << "_NonLinearK_Outer"
     << " Iteration " << std::setw(5) << iter
@@ -30,7 +30,7 @@ PetscErrorCode KEigenSNESMonitor(SNES, PetscInt iter,
     << std::setprecision(2)
     << "  reactivity " << std::setw(10) << reactivity * 1e5;
 
-  chi::log.Log() << iter_info.str();
+  Chi::log.Log() << iter_info.str();
 
   return 0;
 }
@@ -42,13 +42,13 @@ PetscErrorCode KEigenKSPMonitor(KSP ksp, PetscInt iter, PetscReal rnorm,
 
   std::stringstream iter_info;
   iter_info
-    << "      " << chi::program_timer.GetTimeString() << " "
+    << "      " << Chi::program_timer.GetTimeString() << " "
     << residual_context.solver_name
     << "_NonLinearK_Inner"
     << " Iteration " << std::setw(5) << iter
     << " Residual " << std::setw(11) << rnorm;
 
-  chi::log.Log() << iter_info.str();
+  Chi::log.Log() << iter_info.str();
 
   return 0;
 }

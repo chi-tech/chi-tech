@@ -13,8 +13,8 @@ private:
   const size_t output_dimension_;
 
 public:
-  static chi_objects::InputParameters GetInputParameters();
-  explicit FunctionDimAToDimB(const chi_objects::InputParameters& params);
+  static chi::InputParameters GetInputParameters();
+  explicit FunctionDimAToDimB(const chi::InputParameters& params);
 
   size_t InputDimension() const {return input_dimension_;}
   size_t OutputDimension() const {return output_dimension_;}

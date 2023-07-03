@@ -3,7 +3,7 @@
 namespace chi_mesh
 {
 
-MeshModifier::MeshModifier(const chi_objects::InputParameters& params)
+MeshModifier::MeshModifier(const chi::InputParameters& params)
   : ChiObject(params)
 {
 }

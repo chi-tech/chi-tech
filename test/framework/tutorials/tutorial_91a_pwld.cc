@@ -19,8 +19,8 @@
 namespace chi_unit_sim_tests
 {
 
-chi_objects::ParameterBlock
-chiSimTest91_PWLD(const chi_objects::InputParameters&);
+chi::ParameterBlock
+chiSimTest91_PWLD(const chi::InputParameters&);
 
 RegisterWrapperFunction(/*namespace_name=*/chi_unit_tests,
                         /*name_in_lua=*/chiSimTest91_PWLD,
@@ -28,21 +28,21 @@ RegisterWrapperFunction(/*namespace_name=*/chi_unit_tests,
                         /*actual_function=*/chiSimTest91_PWLD);
 
 /**PWLD Sweep. */
-chi_objects::ParameterBlock
-chiSimTest91_PWLD(const chi_objects::InputParameters&)
+chi::ParameterBlock
+chiSimTest91_PWLD(const chi::InputParameters&)
 {
   const std::string fname = "chiSimTest91_PWLD";
 
-  chi::log.Log() << "chiSimTest91_PWLD num_args = " << 0;
+  Chi::log.Log() << "chiSimTest91_PWLD num_args = " << 0;
 
-  if (chi::mpi.process_count != 1)
+  if (Chi::mpi.process_count != 1)
     throw std::logic_error(fname + ": Is serial only.");
 
   //============================================= Get grid
   auto grid_ptr = chi_mesh::GetCurrentHandler().GetGrid();
   const auto& grid = *grid_ptr;
 
-  chi::log.Log() << "Global num cells: " << grid.GetGlobalNumberOfCells();
+  Chi::log.Log() << "Global num cells: " << grid.GetGlobalNumberOfCells();
 
   //============================================= Make Orthogonal mapping
   const auto ijk_info = grid.GetIJKInfo();
@@ -71,8 +71,8 @@ chiSimTest91_PWLD(const chi_objects::InputParameters&)
   const size_t num_local_nodes = sdm.GetNumLocalDOFs(OneDofPerNode);
   const size_t num_globl_nodes = sdm.GetNumGlobalDOFs(OneDofPerNode);
 
-  chi::log.Log() << "Num local nodes: " << num_local_nodes;
-  chi::log.Log() << "Num globl nodes: " << num_globl_nodes;
+  Chi::log.Log() << "Num local nodes: " << num_local_nodes;
+  Chi::log.Log() << "Num globl nodes: " << num_globl_nodes;
 
   //============================================= Make an angular quadrature
   std::shared_ptr<chi_math::AngularQuadrature> quadrature;
@@ -88,7 +88,7 @@ chiSimTest91_PWLD(const chi_objects::InputParameters&)
   else
     throw std::logic_error(fname + "Error with the dimensionality "
                                    "of the mesh.");
-  chi::log.Log() << "Quadrature created." << std::endl;
+  Chi::log.Log() << "Quadrature created." << std::endl;
 
   //============================================= Set/Get params
   const size_t scat_order = 1;
@@ -104,8 +104,8 @@ chiSimTest91_PWLD(const chi_objects::InputParameters&)
   const size_t num_moments = m_ell_em_map.size();
   const size_t num_dirs = quadrature->omegas_.size();
 
-  chi::log.Log() << "End Set/Get params." << std::endl;
-  chi::log.Log() << "Num Moments: " << num_moments << std::endl;
+  Chi::log.Log() << "End Set/Get params." << std::endl;
+  Chi::log.Log() << "Num Moments: " << num_moments << std::endl;
 
   //============================================= Make Unknown Managers
   const auto VecN = chi_math::UnknownType::VECTOR_N;
@@ -120,7 +120,7 @@ chiSimTest91_PWLD(const chi_objects::InputParameters&)
   const size_t num_local_phi_dofs = sdm.GetNumLocalDOFs(phi_uk_man);
   const size_t num_local_psi_dofs = sdm.GetNumLocalDOFs(psi_uk_man);
 
-  chi::log.Log() << "End ukmanagers." << std::endl;
+  Chi::log.Log() << "End ukmanagers." << std::endl;
 
   //============================================= Make XSs
   chi_physics::SingleStateMGXS xs;
@@ -133,7 +133,7 @@ chiSimTest91_PWLD(const chi_objects::InputParameters&)
   auto phi_new = phi_old;
   auto q_source = phi_old;
 
-  chi::log.Log() << "End vectors." << std::endl;
+  Chi::log.Log() << "End vectors." << std::endl;
 
   //============================================= Make material source term
   for (const auto& cell : grid.local_cells)
@@ -212,7 +212,7 @@ chiSimTest91_PWLD(const chi_objects::InputParameters&)
 
   } // for cell
 
-  chi::log.Log() << "End cell matrices." << std::endl;
+  Chi::log.Log() << "End cell matrices." << std::endl;
 
   //============================================= Make Grid internal face
   //mapping
@@ -471,7 +471,7 @@ chiSimTest91_PWLD(const chi_objects::InputParameters&)
   };
 
   //============================================= Classic Richardson iteration
-  chi::log.Log() << "Starting iterations" << std::endl;
+  Chi::log.Log() << "Starting iterations" << std::endl;
   for (size_t iter = 0; iter < 200; ++iter)
   {
     phi_new.assign(phi_new.size(), 0.0);
@@ -489,7 +489,7 @@ chiSimTest91_PWLD(const chi_objects::InputParameters&)
       outstr << buffer;
     }
 
-    chi::log.Log() << outstr.str();
+    Chi::log.Log() << outstr.str();
 
     phi_old = phi_new;
 
@@ -557,7 +557,7 @@ chiSimTest91_PWLD(const chi_objects::InputParameters&)
   chi_physics::FieldFunctionGridBased::ExportMultipleToVTK("SimTest_91a_PWLD",
                                                            const_ff_list);
 
-  return chi_objects::ParameterBlock();
+  return chi::ParameterBlock();
 }
 
 } // namespace chi_unit_sim_tests

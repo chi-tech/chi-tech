@@ -28,8 +28,7 @@ int chiLogSetVerbosity(lua_State *L)
   {
     int level = lua_tonumber(L,1);
     if (level<=2)
-    {
-      chi::log.SetVerbosity(level);
+    { Chi::log.SetVerbosity(level);
     }
   }
   return 0;
@@ -82,7 +81,7 @@ int chiLog(lua_State* L)
   int         mode    = lua_tonumber(L,1);
   const char* message = lua_tostring(L,2);
 
-  chi::log.Log(static_cast<chi_objects::ChiLog::LOG_LVL>(mode)) << message << std::endl;
+  Chi::log.Log(static_cast<chi::ChiLog::LOG_LVL>(mode)) << message << std::endl;
 
   return 0;
 }

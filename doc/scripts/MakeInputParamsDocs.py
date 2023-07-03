@@ -102,7 +102,7 @@ if not os.path.exists("doc/generated_files"):
 if not os.path.exists("doc/generated_files/input_docs"):
     os.mkdir("doc/generated_files/input_docs")
 
-input_file_folders = ["tests", "doc/examples"]
+input_file_folders = ["test", "doc/examples"]
 """
 The following function finds all lua input files in the 
 input file folders.

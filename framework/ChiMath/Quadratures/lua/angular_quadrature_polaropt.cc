@@ -37,11 +37,11 @@ int chiOptimizeAngularQuadratureForPolarSymmetry(lua_State* L)
   if (num_args == 2)
     normalization = lua_tonumber(L, 2);
 
-  auto& quadrature = chi::GetStackItem<chi_math::AngularQuadrature>(
-    chi::angular_quadrature_stack, handle, fname);
+  auto& quadrature = Chi::GetStackItem<chi_math::AngularQuadrature>(
+    Chi::angular_quadrature_stack, handle, fname);
 
   if (normalization > 0.0)
-    chi::log.Log() << "Optimizing angular quadrature for polar symmetry. using "
+    Chi::log.Log() << "Optimizing angular quadrature for polar symmetry. using "
                    << "normalization factor " << normalization << ".";
 
   quadrature.OptimizeForPolarSymmetry(normalization);

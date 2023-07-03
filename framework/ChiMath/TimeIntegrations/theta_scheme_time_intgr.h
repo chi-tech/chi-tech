@@ -12,9 +12,9 @@ private:
   const double theta_;
 
 public:
-  static chi_objects::InputParameters GetInputParameters();
+  static chi::InputParameters GetInputParameters();
   explicit ThetaSchemeTimeIntegration(
-    const chi_objects::InputParameters& params);
+    const chi::InputParameters& params);
 
   double ThetaFactor() const;
 };

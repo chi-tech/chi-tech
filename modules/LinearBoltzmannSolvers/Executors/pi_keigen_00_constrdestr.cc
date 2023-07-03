@@ -9,9 +9,9 @@ namespace lbs
 
 RegisterChiObject(lbs, XXPowerIterationKEigen);
 
-chi_objects::InputParameters XXPowerIterationKEigen::GetInputParameters()
+chi::InputParameters XXPowerIterationKEigen::GetInputParameters()
 {
-  chi_objects::InputParameters params =
+  chi::InputParameters params =
     chi_physics::Solver::GetInputParameters();
 
   params.SetGeneralDescription(
@@ -41,10 +41,10 @@ chi_objects::InputParameters XXPowerIterationKEigen::GetInputParameters()
 }
 
 XXPowerIterationKEigen::XXPowerIterationKEigen(
-  const chi_objects::InputParameters& params)
+  const chi::InputParameters& params)
   : chi_physics::Solver(params),
-    lbs_solver_(chi::GetStackItem<LBSSolver>(
-      chi::object_stack, params.GetParamValue<size_t>("lbs_solver_handle"))),
+    lbs_solver_(Chi::GetStackItem<LBSSolver>(
+      Chi::object_stack, params.GetParamValue<size_t>("lbs_solver_handle"))),
     max_iters_(params.GetParamValue<size_t>("max_iters")),
     k_tolerance_(params.GetParamValue<double>("k_tol")),
     reinit_phi_1_(params.GetParamValue<bool>("reinit_phi_1")),

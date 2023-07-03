@@ -21,7 +21,7 @@ for search_folder in folders_to_walk:
                 if extension == ".cc":
                     wrapper_sources.append(dir_path + "/" + file_name)
 
-input_file_folders = ["tests", "doc/examples"]
+input_file_folders = ["test", "doc/examples"]
 """
 The following function finds all lua input files in the 
 input file folders. It then creates proxies for these files.

@@ -20,7 +20,7 @@ void chi_math::SpatialDiscretization_PWLBase::PreComputeCellSDValues()
     {
       if (not integral_data_initialized_)
       {
-        chi::log.Log() << chi::program_timer.GetTimeString()
+        Chi::log.Log() << Chi::program_timer.GetTimeString()
                        << " Computing unit integrals.";
         fe_unit_integrals_.reserve(num_local_cells);
         for (const auto& cell : ref_grid_.local_cells)
@@ -37,7 +37,7 @@ void chi_math::SpatialDiscretization_PWLBase::PreComputeCellSDValues()
       }
     }//if compute unit intgrls
   }
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
 
   //============================================= Quadrature data
   {
@@ -46,7 +46,7 @@ void chi_math::SpatialDiscretization_PWLBase::PreComputeCellSDValues()
     {
       if (not qp_data_initialized_)
       {
-        chi::log.Log() << chi::program_timer.GetTimeString()
+        Chi::log.Log() << Chi::program_timer.GetTimeString()
                        << " Computing quadrature data.";
         fe_vol_qp_data_.reserve(num_local_cells);
         fe_srf_qp_data_.reserve(num_local_cells);
@@ -79,7 +79,7 @@ void chi_math::SpatialDiscretization_PWLBase::PreComputeNeighborCellSDValues()
     {
       if (not nb_integral_data_initialized_)
       {
-        chi::log.Log() << chi::program_timer.GetTimeString()
+        Chi::log.Log() << Chi::program_timer.GetTimeString()
                        << " Computing neighbor unit integrals.";
         const auto ghost_ids = ref_grid_.cells.GetGhostGlobalIDs();
         for (uint64_t cell_gid : ghost_ids)
@@ -106,7 +106,7 @@ void chi_math::SpatialDiscretization_PWLBase::PreComputeNeighborCellSDValues()
     {
       if (not nb_qp_data_initialized_)
       {
-        chi::log.Log() << chi::program_timer.GetTimeString()
+        Chi::log.Log() << Chi::program_timer.GetTimeString()
                        << " Computing neighbor quadrature data.";
         const auto ghost_ids = ref_grid_.cells.GetGhostGlobalIDs();
         for (uint64_t cell_gid : ghost_ids)

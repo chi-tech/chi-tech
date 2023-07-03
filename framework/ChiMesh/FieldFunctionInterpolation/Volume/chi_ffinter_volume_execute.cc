@@ -72,7 +72,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::Execute()
   if (op_type_ == Operation::OP_SUM or op_type_ == Operation::OP_SUM_LUA)
   {
     double global_sum;
-    MPI_Allreduce(&local_sum,&global_sum,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+    MPI_Allreduce(&local_sum,&global_sum,1,MPI_DOUBLE,MPI_SUM,Chi::mpi.comm);
     op_value_ = global_sum;
   }
   if (op_type_ == Operation::OP_AVG or op_type_ == Operation::OP_AVG_LUA)
@@ -80,7 +80,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::Execute()
     double local_data[] = {local_volume, local_sum};
     double global_data[] = {0.0,0.0};
 
-    MPI_Allreduce(&local_data,&global_data,2,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+    MPI_Allreduce(&local_data,&global_data,2,MPI_DOUBLE,MPI_SUM,Chi::mpi.comm);
     double global_volume = global_data[0];
     double global_sum = global_data[1];
     op_value_ = global_sum / global_volume;
@@ -88,7 +88,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::Execute()
   if (op_type_ == Operation::OP_MAX or op_type_ == Operation::OP_MAX_LUA)
   {
     double global_value;
-    MPI_Allreduce(&local_max,&global_value,1,MPI_DOUBLE,MPI_MAX,MPI_COMM_WORLD);
+    MPI_Allreduce(&local_max,&global_value,1,MPI_DOUBLE,MPI_MAX,Chi::mpi.comm);
     op_value_ = global_value;
   }
 }

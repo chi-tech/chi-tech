@@ -43,7 +43,7 @@ PetscErrorCode mg_diffusion::MGKSPMonitor(
       << std::scientific << std::setprecision(7) << rnorm / rhs_norm
       << std::endl;
 
-    chi::log.Log() << buff.str();
+    Chi::log.Log() << buff.str();
   }
 
   return 0;

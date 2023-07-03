@@ -13,7 +13,7 @@
 /**Executes the interpolation.*/
 void chi_mesh::FieldFunctionInterpolationLine::Execute()
 {
-  chi::log.Log0Verbose1() << "Executing line interpolator.";
+  Chi::log.Log0Verbose1() << "Executing line interpolator.";
   for (int ff=0; ff < field_functions_.size(); ff++)
   {
           auto& ff_ctx = ff_contexts_[ff];

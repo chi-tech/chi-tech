@@ -16,7 +16,7 @@ void chi_physics::SingleStateMGXS::ComputeAbsorption()
     // estimate from a transfer matrix
   else
   {
-    chi::log.Log0Warning()
+    Chi::log.Log0Warning()
         << "Estimating absorption from the transfer matrices.";
 
     const auto& S0 = transfer_matrices_[0];
@@ -40,7 +40,7 @@ void chi_physics::SingleStateMGXS::ComputeAbsorption()
 
       // TODO: Should negative absorption be allowed?
       if (sigma_a_[g] < 0.0)
-        chi::log.Log0Warning()
+        Chi::log.Log0Warning()
             << "Negative absorption cross section encountered "
             << "in group " << g << " when estimating from the "
             << "transfer matrices";
@@ -91,7 +91,7 @@ void chi_physics::SingleStateMGXS::ComputeDiffusionParameters()
     if (sig_1 >= sigma_t_[g])
     {
       sig_1 = 0.0;
-      chi::log.Log0Warning()
+      Chi::log.Log0Warning()
           << "Transport corrected diffusion coefficient failed for group "
           << g << " in call to " << __FUNCTION__ << ". "
           << "sigma_t=" << sigma_t_[g] << " sigs_g_(m=1)=" << sig_1

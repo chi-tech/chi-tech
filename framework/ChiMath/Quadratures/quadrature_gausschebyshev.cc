@@ -39,7 +39,7 @@ void
 chi_math::QuadratureGaussChebyshev::Initialize(unsigned int N, bool verbose)
 {
   if (verbose)
-    chi::log.Log() << "Initializing Gauss-Chebyshev Quadrature "
+    Chi::log.Log() << "Initializing Gauss-Chebyshev Quadrature "
                      "with " << N << " q-points";
 
   const double pi_N = M_PI/N;
@@ -52,7 +52,7 @@ chi_math::QuadratureGaussChebyshev::Initialize(unsigned int N, bool verbose)
     weights_.emplace_back(wn);
 
     if (verbose)
-      chi::log.Log()
+      Chi::log.Log()
           << "root[" << n << "]=" << qpoints_[n][0]
           << ", weight=" << weights_[n];
   }

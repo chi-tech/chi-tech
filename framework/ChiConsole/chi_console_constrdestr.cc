@@ -15,7 +15,7 @@
 
 //###################################################################
 /**Access to the singleton*/
-chi_objects::ChiConsole& chi_objects::ChiConsole::GetInstance() noexcept
+chi::ChiConsole& chi::ChiConsole::GetInstance() noexcept
 {
   static ChiConsole singleton;
   return singleton;
@@ -23,7 +23,7 @@ chi_objects::ChiConsole& chi_objects::ChiConsole::GetInstance() noexcept
 
 //###################################################################
 /** Default constructor for the console*/
-chi_objects::ChiConsole::ChiConsole() noexcept :
+chi::ChiConsole::ChiConsole() noexcept :
   console_state_(luaL_newstate())
 {
 
@@ -31,7 +31,7 @@ chi_objects::ChiConsole::ChiConsole() noexcept :
 
 //###################################################################
 /**Registers all lua items so that they are available in the console.*/
-void chi_objects::ChiConsole::LoadRegisteredLuaItems()
+void chi::ChiConsole::LoadRegisteredLuaItems()
 {
   //=================================== Initializing console
   auto& L = GetConsoleState();

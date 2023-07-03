@@ -8,7 +8,7 @@
 chi_mesh::sweep_management::SweepBuffer::
   SweepBuffer(chi_mesh::sweep_management::AngleSet* ref_angleset,
               int sweep_eager_limit,
-              const chi_objects::ChiMPICommunicatorSet& in_comm_set) :
+              const chi::ChiMPICommunicatorSet& in_comm_set) :
   angleset(ref_angleset),
   comm_set(in_comm_set)
 {

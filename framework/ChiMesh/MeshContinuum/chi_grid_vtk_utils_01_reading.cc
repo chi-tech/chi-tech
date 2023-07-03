@@ -54,7 +54,7 @@ chi_mesh::vtkUGridPtr chi_mesh::ConsolidateGridBlocks(
   } // for grid_name pairs
 
   if (has_global_ids)
-    chi::log.Log() << fname << ": blocks have global-id arrays";
+    Chi::log.Log() << fname << ": blocks have global-id arrays";
 
   //======================================== Consolidate the blocks
   auto append = vtkSmartPointer<vtkAppendFilter>::New();
@@ -67,7 +67,7 @@ chi_mesh::vtkUGridPtr chi_mesh::ConsolidateGridBlocks(
   auto consolidated_ugrid = vtkSmartPointer<vtkUnstructuredGrid>(
     vtkUnstructuredGrid::SafeDownCast(append->GetOutput()));
 
-  chi::log.Log0Verbose1() << "Consolidated grid num cells and points: "
+  Chi::log.Log0Verbose1() << "Consolidated grid num cells and points: "
                           << consolidated_ugrid->GetNumberOfCells() << " "
                           << consolidated_ugrid->GetNumberOfPoints();
 
@@ -86,7 +86,7 @@ chi_mesh::vtkUGridPtr chi_mesh::ConsolidateGridBlocks(
       max_id = std::max(max_id, point_gid);
     }
 
-    chi::log.Log() << "Minimum and Maximum node-ids " << min_id << " "
+    Chi::log.Log() << "Minimum and Maximum node-ids " << min_id << " "
                    << max_id;
   }
 
@@ -178,7 +178,7 @@ chi_mesh::BuildCellMaterialIDsFromField(vtkUGridPtr& ugrid,
   vtkDataArray* cell_id_array_ptr;
   if (field_name.empty())
   {
-    chi::log.Log0Warning()
+    Chi::log.Log0Warning()
       << "A user-supplied field name from which to recover material "
          "identifiers "
       << "has not been found. Material-ids will be left unassigned.";
@@ -192,7 +192,7 @@ chi_mesh::BuildCellMaterialIDsFromField(vtkUGridPtr& ugrid,
 
     if (!vtk_abstract_array_ptr)
     {
-      chi::log.Log0Warning()
+      Chi::log.Log0Warning()
         << "The VTU file : \"" << file_name << "\" "
         << "does not contain a vtkCellData field of name : \"" << field_name
         << "\". Material-ids will be left unassigned.";
@@ -202,7 +202,7 @@ chi_mesh::BuildCellMaterialIDsFromField(vtkUGridPtr& ugrid,
     cell_id_array_ptr = vtkArrayDownCast<vtkDataArray>(vtk_abstract_array_ptr);
     if (!cell_id_array_ptr)
     {
-      chi::log.Log0Warning()
+      Chi::log.Log0Warning()
         << "The VTU file : \"" << file_name << "\" "
         << "with vtkCellData field of name : \"" << field_name << "\" "
         << "cannot be downcast to vtkDataArray. Material-ids will be left "
@@ -213,7 +213,7 @@ chi_mesh::BuildCellMaterialIDsFromField(vtkUGridPtr& ugrid,
     const auto cell_id_n_tup = cell_id_array_ptr->GetNumberOfTuples();
     if (cell_id_n_tup != total_cell_count)
     {
-      chi::log.Log0Warning()
+      Chi::log.Log0Warning()
         << "The VTU file : \"" << file_name << "\" "
         << "with vtkCellData field of name : \"" << field_name
         << "\" has n. tuples : " << cell_id_n_tup
@@ -225,7 +225,7 @@ chi_mesh::BuildCellMaterialIDsFromField(vtkUGridPtr& ugrid,
     const auto cell_id_n_val = cell_id_array_ptr->GetNumberOfValues();
     if (cell_id_n_val != total_cell_count)
     {
-      chi::log.Log0Warning()
+      Chi::log.Log0Warning()
         << "The VTU file : \"" << file_name << "\" "
         << "with vtkCellData field of name : \"" << field_name
         << "\" has n. values : " << cell_id_n_val

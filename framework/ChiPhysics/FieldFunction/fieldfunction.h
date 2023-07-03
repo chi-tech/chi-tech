@@ -22,10 +22,10 @@ private:
 
 public:
   /**Returns required input parameters.*/
-  static chi_objects::InputParameters GetInputParameters();
+  static chi::InputParameters GetInputParameters();
 
   /**ObjectMaker based constructor.*/
-  explicit FieldFunction(const chi_objects::InputParameters& params);
+  explicit FieldFunction(const chi::InputParameters& params);
 
   /**Conventional constructor.*/
   FieldFunction(const std::string& text_name, chi_math::Unknown unknown);

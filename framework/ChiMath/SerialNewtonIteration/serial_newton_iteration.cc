@@ -29,7 +29,7 @@ VecDbl chi_math::
              << value << " ";
     output << "L2_norm_F_x_i=" << L2_norm_F_x_i;
 
-    chi::log.Log() << output.str();
+    Chi::log.Log() << output.str();
   };
 
   //=================================== Declare and init variables

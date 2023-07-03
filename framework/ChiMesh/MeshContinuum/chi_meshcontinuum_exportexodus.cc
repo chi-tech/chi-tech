@@ -28,9 +28,9 @@ void chi_mesh::MeshContinuum::
                       bool suppress_side_sets/*= false*/) const
 {
   const std::string fname = "chi_mesh::MeshContinuum::ExportCellsToExodus";
-  chi::log.Log() << "Exporting mesh to Exodus file with base " << file_base_name;
+  Chi::log.Log() << "Exporting mesh to Exodus file with base " << file_base_name;
 
-  if (chi::mpi.process_count != 1)
+  if (Chi::mpi.process_count != 1)
     throw std::logic_error(fname + ": Currently this routine is only allowed "
                                    "in serial.");
 
@@ -115,7 +115,7 @@ void chi_mesh::MeshContinuum::
     //============================ Set block
     grid_blocks->SetBlock(0, ugrid);
 
-    chi::log.Log()
+    Chi::log.Log()
       << "Writing grid block "
       << " Number of cells: " << ugrid->GetNumberOfCells()
       << " Number of points: " << ugrid->GetNumberOfPoints();
@@ -179,7 +179,7 @@ void chi_mesh::MeshContinuum::
   for (const auto& [bndry_id, face_list] : boundary_id_faces_map)
   {
     const std::string block_name = grid.GetBoundaryIDMap().at(bndry_id);
-    chi::log.Log0Verbose1() << "bid: " + std::to_string(bndry_id) +
+    Chi::log.Log0Verbose1() << "bid: " + std::to_string(bndry_id) +
                                " name=\"" + block_name + "\"";
 
     //====================================== NodeSet
@@ -235,7 +235,7 @@ void chi_mesh::MeshContinuum::
       nodesets_blocks->GetMetaData(bndry_id)->
         Set(vtkCompositeDataSet::NAME(), block_name);
 
-      chi::log.Log()
+      Chi::log.Log()
       << "Writing nodeset block " << block_name
       << " Number of cells: " << ugrid->GetNumberOfCells()
       << " Number of points: " << ugrid->GetNumberOfPoints();
@@ -290,7 +290,7 @@ void chi_mesh::MeshContinuum::
       sidesets_blocks->GetMetaData(bndry_id)->
         Set(vtkCompositeDataSet::NAME(), block_name);
 
-      chi::log.Log()
+      Chi::log.Log()
         << "Writing sideset block " << block_name
         << " Number of cells: " << ugrid->GetNumberOfCells()
         << " Number of points: " << ugrid->GetNumberOfPoints();
@@ -303,13 +303,13 @@ void chi_mesh::MeshContinuum::
   main_block->SetBlock(next_block++, grid_blocks);
   if (not suppress_node_sets)
   {
-    chi::log.Log0Verbose1() << "Exporting nodeset";
+    Chi::log.Log0Verbose1() << "Exporting nodeset";
     main_block->SetBlock(next_block, nodesets_blocks);
     main_block->GetMetaData(next_block++)->Set(vtkCompositeDataSet::NAME(), "Node Sets");
   }
   if (not suppress_side_sets)
   {
-    chi::log.Log0Verbose1() << "Exporting sideset";
+    Chi::log.Log0Verbose1() << "Exporting sideset";
     main_block->SetBlock(next_block, sidesets_blocks);
     main_block->GetMetaData(next_block++)->Set(vtkCompositeDataSet::NAME(), "Side Sets");
   }
@@ -348,13 +348,13 @@ void chi_mesh::MeshContinuum::
 
   auto em = writer->GetModelMetadata();
 
-  chi::log.Log() << "Num Blocks   :  " << em->GetNumberOfBlocks();
-  chi::log.Log() << "Num Node Sets:  " << em->GetNumberOfNodeSets();
-  chi::log.Log() << "Num Side Sets:  " << em->GetNumberOfSideSets();
-  chi::log.Log() << "Dimension    :  " << em->GetDimension();
+  Chi::log.Log() << "Num Blocks   :  " << em->GetNumberOfBlocks();
+  Chi::log.Log() << "Num Node Sets:  " << em->GetNumberOfNodeSets();
+  Chi::log.Log() << "Num Side Sets:  " << em->GetNumberOfSideSets();
+  Chi::log.Log() << "Dimension    :  " << em->GetDimension();
 
   writer->PrintSelf(std::cout, vtkIndent());
 
-  chi::log.Log() << "Done exporting mesh to VTK.";
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::log.Log() << "Done exporting mesh to VTK.";
+  Chi::mpi.Barrier();
 }

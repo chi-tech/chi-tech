@@ -9,9 +9,9 @@ namespace chi_math
 
 RegisterChiObject(chi_math, ImplicitEulerTimeIntegration);
 
-chi_objects::InputParameters ImplicitEulerTimeIntegration::GetInputParameters()
+chi::InputParameters ImplicitEulerTimeIntegration::GetInputParameters()
 {
-  chi_objects::InputParameters params =
+  chi::InputParameters params =
     ThetaSchemeTimeIntegration::GetInputParameters();
 
   // clang-format off
@@ -29,7 +29,7 @@ chi_objects::InputParameters ImplicitEulerTimeIntegration::GetInputParameters()
 }
 
 ImplicitEulerTimeIntegration::ImplicitEulerTimeIntegration(
-  const chi_objects::InputParameters& params)
+  const chi::InputParameters& params)
   : ThetaSchemeTimeIntegration(params)
 {
 }

@@ -82,8 +82,8 @@ public:
   chi_math::UnknownManager psi_uk_man_;
 
   //lbs_groupset.cc
-  static chi_objects::InputParameters GetInputParameters();
-  explicit LBSGroupset(const chi_objects::InputParameters& params,
+  static chi::InputParameters GetInputParameters();
+  explicit LBSGroupset(const chi::InputParameters& params,
                        int id,
                        const LBSSolver& lbs_solver);
   LBSGroupset() : LBSGroupset(-1) {};

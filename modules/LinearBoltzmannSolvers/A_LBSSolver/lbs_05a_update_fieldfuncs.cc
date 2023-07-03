@@ -115,7 +115,7 @@ void LBSSolver::UpdateFieldFunctions()
                     1,
                     MPI_DOUBLE,      // count + datatype
                     MPI_SUM,         // operation
-                    MPI_COMM_WORLD); // communicator
+                    Chi::mpi.comm); // communicator
 
       chi_math::Scale(data_vector_local,
                       options_.power_normalization / globl_total_power);

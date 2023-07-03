@@ -13,9 +13,9 @@ namespace chi_mesh
 
 RegisterChiObject(chi_mesh, SurfaceMeshLogicalVolume);
 
-chi_objects::InputParameters SurfaceMeshLogicalVolume::GetInputParameters()
+chi::InputParameters SurfaceMeshLogicalVolume::GetInputParameters()
 {
-  chi_objects::InputParameters params = LogicalVolume::GetInputParameters();
+  chi::InputParameters params = LogicalVolume::GetInputParameters();
 
   // clang-format off
   params.SetGeneralDescription(
@@ -31,10 +31,10 @@ chi_objects::InputParameters SurfaceMeshLogicalVolume::GetInputParameters()
 }
 
 SurfaceMeshLogicalVolume::SurfaceMeshLogicalVolume(
-  const chi_objects::InputParameters& params)
+  const chi::InputParameters& params)
   : LogicalVolume(params),
-    surf_mesh(chi::GetStackItemPtrAsType<chi_mesh::SurfaceMesh>(
-      chi::object_stack,
+    surf_mesh(Chi::GetStackItemPtrAsType<chi_mesh::SurfaceMesh>(
+      Chi::object_stack,
       params.GetParamValue<size_t>("surface_mesh_handle"),
       __FUNCTION__)),
     xbounds_({1.0e6, -1.0e6}),

@@ -79,9 +79,9 @@ void chi_mesh::SurfaceMesh::CheckCyclicDependencies(int num_angles)
     auto topological_order = G.GenerateTopologicalSort();
     if (topological_order.empty())
     {
-      chi::log.LogAllError()
+      Chi::log.LogAllError()
         << "Function CheckCyclicDependencies. Detected cyclic depency.";
-     chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
 
     //================================= Cleanup
@@ -90,7 +90,7 @@ void chi_mesh::SurfaceMesh::CheckCyclicDependencies(int num_angles)
 
   GetMeshStats();
 
-  chi::log.Log()
+  Chi::log.Log()
     << "Cyclic dependency check complete. No cycles or "
     << "bad mesh elements were detected";
 }
@@ -175,7 +175,7 @@ void chi_mesh::SurfaceMesh::GetMeshStats()
   }
   output << "Number of negative or zero faces = " << num_negative_areas;
 
-  chi::log.Log() << output.str();
+  Chi::log.Log() << output.str();
 
 }
 
@@ -187,11 +187,11 @@ void chi_mesh::SurfaceMesh::ComputeLoadBalancing(
   std::vector<double> &x_cuts,
   std::vector<double> &y_cuts)
 {
-  chi::log.Log() << "X-cuts to be logged: " << x_cuts.size();
+  Chi::log.Log() << "X-cuts to be logged: " << x_cuts.size();
 //  for (auto& val : x_cuts)
 //    chi::log.Log() << val;
 //
-  chi::log.Log() << "Y-cuts to be logged: " << y_cuts.size();
+  Chi::log.Log() << "Y-cuts to be logged: " << y_cuts.size();
 //  for (auto& val : y_cuts)
 //    chi::log.Log() << val;
 
@@ -240,30 +240,28 @@ void chi_mesh::SurfaceMesh::ComputeLoadBalancing(
 
   double average = tot_bin_size/((double)(I+1)*(J+1));
 
-  chi::log.Log() << "Average faces per set: " << average;
-  chi::log.Log()
+  Chi::log.Log() << "Average faces per set: " << average;
+  Chi::log.Log()
     << "Maximum faces per set: " << max_bin_size
     << " at (i,j)= ( " << i_max << " , " << j_max << " )";
 
-  if      (i_max == I)
-    chi::log.Log()  << "X greater than " << x_cuts[i_max-1];
+  if      (i_max == I) Chi::log.Log()  << "X greater than " << x_cuts[i_max-1];
   else if (i_max == 0)
-    chi::log.Log()  << "X less than " << x_cuts[0];
+    Chi::log.Log()  << "X less than " << x_cuts[0];
   else
-    chi::log.Log()
+    Chi::log.Log()
       << "X greater than " << x_cuts[i_max-1]
       << " and less than " << x_cuts[i_max];
 
-  if      (j_max == J)
-    chi::log.Log()  << "Y greater than " << y_cuts[j_max-1];
+  if      (j_max == J) Chi::log.Log()  << "Y greater than " << y_cuts[j_max-1];
   else if (j_max == 0)
-    chi::log.Log()  << "Y less than " << y_cuts[0];
+    Chi::log.Log()  << "Y less than " << y_cuts[0];
   else
-    chi::log.Log()
+    Chi::log.Log()
       << "Y greater than " << y_cuts[j_max-1]
       << " and less than " << y_cuts[j_max];
 
-                        chi::log.Log()
+  Chi::log.Log()
     << "Max-to-average ratio: " << max_bin_size/average;
 
 

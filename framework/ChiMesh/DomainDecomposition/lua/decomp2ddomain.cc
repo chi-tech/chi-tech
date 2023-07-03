@@ -31,8 +31,8 @@ int chiDecomposeSurfaceMeshPxPy(lua_State *L)
   int px           = lua_tonumber(L,2);
   int py           = lua_tonumber(L,3);
 
-  auto& surf_mesh = chi::GetStackItem<chi_mesh::SurfaceMesh>(
-    chi::surface_mesh_stack, surface_hndl);
+  auto& surf_mesh = Chi::GetStackItem<chi_mesh::SurfaceMesh>(
+    Chi::surface_mesh_stack, surface_hndl);
 
   chi_mesh::DecomposeSurfaceMeshPxPy(surf_mesh,px,py);
 

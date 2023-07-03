@@ -26,12 +26,12 @@ int chiVolumeMesherExecute(lua_State *L)
   auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //Get memory before
-  chi_objects::CSTMemory mem_before = chi_objects::ChiConsole::GetMemoryUsage();
+  chi::CSTMemory mem_before = chi::ChiConsole::GetMemoryUsage();
 
   cur_hndlr.GetVolumeMesher().Execute();
 
   //Get memory usage
-  chi_objects::CSTMemory mem_after = chi_objects::ChiConsole::GetMemoryUsage();
+  chi::CSTMemory mem_after = chi::ChiConsole::GetMemoryUsage();
 
   std::stringstream mem_string;
   mem_string
@@ -42,8 +42,8 @@ int chiVolumeMesherExecute(lua_State *L)
   << mem_after.memory_mbytes
   << " MB";
 
-  chi::log.Log()
-    << chi::program_timer.GetTimeString()
+  Chi::log.Log()
+    << Chi::program_timer.GetTimeString()
     << " chiVolumeMesherExecute: Volume meshing completed."
     << mem_string.str()
     << std::endl;

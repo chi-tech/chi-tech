@@ -5,5 +5,5 @@
 
 void chi_mesh::SurfaceMesherPredefined::Execute()
 {
-  chi::log.Log0Verbose1() << "SurfaceMesherPredefined executed";
+  Chi::log.Log0Verbose1() << "SurfaceMesherPredefined executed";
 }

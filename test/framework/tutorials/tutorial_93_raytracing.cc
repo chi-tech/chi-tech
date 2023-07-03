@@ -16,25 +16,25 @@
 namespace chi_unit_sim_tests
 {
 
-chi_objects::ParameterBlock
-chiSimTest93_RayTracing(const chi_objects::InputParameters& params);
+chi::ParameterBlock
+chiSimTest93_RayTracing(const chi::InputParameters& params);
 
 RegisterWrapperFunction(/*namespace_name=*/chi_unit_tests,
                         /*name_in_lua=*/chiSimTest93_RayTracing,
                         /*syntax_function=*/nullptr,
                         /*actual_function=*/chiSimTest93_RayTracing);
 
-chi_objects::ParameterBlock
-chiSimTest93_RayTracing(const chi_objects::InputParameters&)
+chi::ParameterBlock
+chiSimTest93_RayTracing(const chi::InputParameters&)
 {
   const std::string fname = "chiSimTest93_RayTracing";
-  chi::log.Log() << "chiSimTest93_RayTracing";
+  Chi::log.Log() << "chiSimTest93_RayTracing";
 
   //============================================= Get grid
   auto grid_ptr = chi_mesh::GetCurrentHandler().GetGrid();
   const auto& grid = *grid_ptr;
 
-  chi::log.Log() << "Global num cells: " << grid.GetGlobalNumberOfCells();
+  Chi::log.Log() << "Global num cells: " << grid.GetGlobalNumberOfCells();
 
   const int dimension = (grid.Attributes() & chi_mesh::DIMENSION_1)   ? 1
                         : (grid.Attributes() & chi_mesh::DIMENSION_2) ? 2
@@ -77,8 +77,8 @@ chiSimTest93_RayTracing(const chi_objects::InputParameters&)
   const size_t num_fem_local_dofs = sdm.GetNumLocalDOFs(phi_uk_man);
   const size_t num_fem_globl_dofs = sdm.GetNumGlobalDOFs(phi_uk_man);
 
-  chi::log.Log() << "Num local FEM DOFs: " << num_fem_local_dofs;
-  chi::log.Log() << "Num globl FEM DOFs: " << num_fem_globl_dofs;
+  Chi::log.Log() << "Num local FEM DOFs: " << num_fem_local_dofs;
+  Chi::log.Log() << "Num globl FEM DOFs: " << num_fem_globl_dofs;
 
   //============================================= Define tallies
   std::vector<double> phi_tally(num_fem_local_dofs, 0.0);
@@ -379,7 +379,7 @@ chiSimTest93_RayTracing(const chi_objects::InputParameters&)
   chi_physics::FieldFunctionGridBased::ExportMultipleToVTK("SimTest_93",
                                                            const_ff_list);
 
-  return chi_objects::ParameterBlock();
+  return chi::ParameterBlock();
 }
 
 } // namespace chi_unit_sim_tests

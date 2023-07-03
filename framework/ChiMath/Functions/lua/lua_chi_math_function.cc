@@ -28,17 +28,15 @@ int chiFunctionDimAToDimBEvaluate(lua_State* L)
   LuaCheckNilValue(fname, L, 1);
   const size_t handle = lua_tointeger(L, 1);
 
-  const auto& function =
-    chi::GetStackItem<chi_math::FunctionDimAToDimB>(
-      chi::object_stack, handle, fname);
+  const auto& function = Chi::GetStackItem<chi_math::FunctionDimAToDimB>(
+    Chi::object_stack, handle, fname);
 
   // ================================== Getting params
   std::vector<double> params;
   if (lua_istable(L, 2))
   {
     auto table_block = chi_lua::TableParserAsParameterBlock::ParseTable(L, 2);
-    ChiInvalidArgumentIf(table_block.Type() !=
-                           chi_objects::ParameterBlockType::ARRAY,
+    ChiInvalidArgumentIf(table_block.Type() != chi::ParameterBlockType::ARRAY,
                          fname + ": Only an array type is allowed. Table can "
                                  "not have string keys.");
     params = table_block.GetVectorValue<double>();

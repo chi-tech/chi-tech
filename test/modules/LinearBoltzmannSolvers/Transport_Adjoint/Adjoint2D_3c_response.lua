@@ -30,19 +30,18 @@ mesh,region0 = chiMeshCreateUnpartitioned2DOrthoMesh(nodes,nodes)
 chiVolumeMesherExecute();
 
 ----############################################### Set Material IDs
-vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
+NewRPP = chi_mesh.RPPLogicalVolume.Create
+vol0 = NewRPP({infx=true, infy=true, infz=true})
+vol1 = NewRPP({ymin=0.0,ymax=0.8*L,infx=true,infz=true})
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
-
-vol1 = chiLogicalVolumeCreate(RPP,-1000,1000,0.0,0.8*L,-1000,1000)
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol1,1)
 
 
 
 ----############################################### Set Material IDs
-vol0b = chiLogicalVolumeCreate(RPP,-0.166666+2.5,0.166666+2.5,-1000,1000,-1000,1000)
+vol0b = NewRPP({xmin=-0.166666+2.5,xmax=0.166666+2.5,infy=true,infz=true})
+vol1b = NewRPP({xmin=-1+2.5,xmax=1+2.5,ymin=0.9*L,ymax=L,infz=true})
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0b,0)
-
-vol1b = chiLogicalVolumeCreate(RPP,-1+2.5,1+2.5,0.9*L,L,-1000,1000)
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol1b,1)
 
 

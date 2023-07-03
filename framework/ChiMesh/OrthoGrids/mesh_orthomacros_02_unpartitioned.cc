@@ -68,7 +68,7 @@ size_t chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
   umesh->ComputeCentroidsAndCheckQuality();
   umesh->BuildMeshConnectivity();
 
-  chi::unpartitionedmesh_stack.push_back(umesh);
+  Chi::unpartitionedmesh_stack.push_back(umesh);
 
   //======================================== Create meshers
   handler.SetSurfaceMesher(std::make_shared<chi_mesh::SurfaceMesherPredefined>());
@@ -77,7 +77,7 @@ size_t chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
 
 //  handler.GetVolumeMesher().Execute();
 
-  return chi::unpartitionedmesh_stack.size()-1;
+  return Chi::unpartitionedmesh_stack.size()-1;
 }
 
 //###################################################################
@@ -181,7 +181,7 @@ size_t chi_mesh::CreateUnpartitioned2DOrthoMesh(
   umesh->ComputeCentroidsAndCheckQuality();
   umesh->BuildMeshConnectivity();
 
-  chi::unpartitionedmesh_stack.push_back(umesh);
+  Chi::unpartitionedmesh_stack.push_back(umesh);
 
   //======================================== Create meshers
   handler.SetSurfaceMesher(std::make_shared<chi_mesh::SurfaceMesherPredefined>());
@@ -190,7 +190,7 @@ size_t chi_mesh::CreateUnpartitioned2DOrthoMesh(
 
   handler.GetSurfaceMesher().Execute();
 
-  return chi::unpartitionedmesh_stack.size()-1;
+  return Chi::unpartitionedmesh_stack.size()-1;
 }
 
 //###################################################################
@@ -370,7 +370,7 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
   umesh->ComputeCentroidsAndCheckQuality();
   umesh->BuildMeshConnectivity();
 
-  chi::unpartitionedmesh_stack.push_back(umesh);
+  Chi::unpartitionedmesh_stack.push_back(umesh);
 
   //======================================== Create meshers
   handler.SetSurfaceMesher(std::make_shared<chi_mesh::SurfaceMesherPredefined>());
@@ -379,5 +379,5 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
 
   handler.GetSurfaceMesher().Execute();
 
-  return chi::unpartitionedmesh_stack.size()-1;
+  return Chi::unpartitionedmesh_stack.size()-1;
 }

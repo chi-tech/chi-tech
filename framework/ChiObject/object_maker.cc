@@ -31,10 +31,10 @@ bool ChiObjectMaker::RegistryHasKey(const std::string& key) const
  * object stack. Returns a handle to the object. The object type is
  * obtained from a string parameter name `chi_obj_type`.*/
 size_t ChiObjectMaker::MakeRegisteredObject(
-  const chi_objects::ParameterBlock& params) const
+  const chi::ParameterBlock& params) const
 {
-  if (chi::log.GetVerbosity() >= 2)
-    chi::log.Log() << "Making object with type from parameters";
+  if (Chi::log.GetVerbosity() >= 2)
+    Chi::log.Log() << "Making object with type from parameters";
 
   const std::string fname = __PRETTY_FUNCTION__;
 
@@ -53,10 +53,10 @@ size_t ChiObjectMaker::MakeRegisteredObject(
 /**Makes an object with the given parameters and places on the global
  * object stack. Returns a handle to the object.*/
 size_t ChiObjectMaker::MakeRegisteredObjectOfType(
-  const std::string& type, const chi_objects::ParameterBlock& params) const
+  const std::string& type, const chi::ParameterBlock& params) const
 {
-  if (chi::log.GetVerbosity() >= 2)
-    chi::log.Log() << "Making object with specified type";
+  if (Chi::log.GetVerbosity() >= 2)
+    Chi::log.Log() << "Making object with specified type";
 
   const std::string fname = __PRETTY_FUNCTION__;
 
@@ -64,8 +64,8 @@ size_t ChiObjectMaker::MakeRegisteredObjectOfType(
     throw std::logic_error(fname + ": No registered type \"" + type +
                            "\" found.");
 
-  if (chi::log.GetVerbosity() >= 2)
-    chi::log.Log() << "Making object type " << type;
+  if (Chi::log.GetVerbosity() >= 2)
+    Chi::log.Log() << "Making object type " << type;
 
   auto object_entry = object_registry_.at(type);
 
@@ -77,20 +77,20 @@ size_t ChiObjectMaker::MakeRegisteredObjectOfType(
 
   input_params.SetObjectType(type);
 
-  if (chi::log.GetVerbosity() >= 2)
-    chi::log.Log() << "Assigning parameters for object " << type;
+  if (Chi::log.GetVerbosity() >= 2)
+    Chi::log.Log() << "Assigning parameters for object " << type;
 
   input_params.AssignParameters(params);
 
-  if (chi::log.GetVerbosity() >= 2)
-    chi::log.Log() << "Constructing object " << type;
+  if (Chi::log.GetVerbosity() >= 2)
+    Chi::log.Log() << "Constructing object " << type;
 
   auto new_object = object_entry.constructor_func(input_params);
 
   new_object->PushOntoStack(new_object);
 
-  if (chi::log.GetVerbosity() >= 2)
-    chi::log.Log() << "Done making object type " << type << " with handle "
+  if (Chi::log.GetVerbosity() >= 2)
+    Chi::log.Log() << "Done making object type " << type << " with handle "
                    << new_object->StackID();
 
   return new_object->StackID();
@@ -100,26 +100,26 @@ size_t ChiObjectMaker::MakeRegisteredObjectOfType(
 /**Dumps the registry to stdout.*/
 void ChiObjectMaker::DumpRegister() const
 {
-  chi::log.Log() << "\n\n";
+  Chi::log.Log() << "\n\n";
   for (const auto& [key, entry] : object_registry_)
   {
-    if (chi::log.GetVerbosity() == 0)
+    if (Chi::log.GetVerbosity() == 0)
     {
-      chi::log.Log() << key;
+      Chi::log.Log() << key;
       continue;
     }
 
-    chi::log.Log() << "OBJECT_BEGIN " << key;
+    Chi::log.Log() << "OBJECT_BEGIN " << key;
 
     if (entry.constructor_func == nullptr)
-      chi::log.Log() << "NOT_CONSTRUCTIBLE";
+      Chi::log.Log() << "NOT_CONSTRUCTIBLE";
 
     const auto in_params = entry.get_in_params_func();
     in_params.DumpParameters();
 
-    chi::log.Log() << "OBJECT_END\n\n";
+    Chi::log.Log() << "OBJECT_END\n\n";
   }
-  chi::log.Log() << "\n\n";
+  Chi::log.Log() << "\n\n";
 }
 
 // ##################################################################

@@ -9,10 +9,10 @@ RegisterChiObject(lbs, DiscreteOrdinatesAdjointSolver);
 
 // ##################################################################
 /**Returns the input parameters.*/
-chi_objects::InputParameters
+chi::InputParameters
 DiscreteOrdinatesAdjointSolver::GetInputParameters()
 {
-  chi_objects::InputParameters params =
+  chi::InputParameters params =
     DiscreteOrdinatesSolver::GetInputParameters();
 
   params.SetGeneralDescription("\\defgroup lbs__DiscreteOrdinatesAdjointSolver "
@@ -29,7 +29,7 @@ DiscreteOrdinatesAdjointSolver::GetInputParameters()
 // ###################################################################
 /**Constructor.*/
 DiscreteOrdinatesAdjointSolver::DiscreteOrdinatesAdjointSolver(
-  const chi_objects::InputParameters& params)
+  const chi::InputParameters& params)
   : lbs::DiscreteOrdinatesSolver(params)
 {
   basic_options_.AddOption<std::string>("REFERENCE_RF", std::string());

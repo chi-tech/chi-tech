@@ -9,9 +9,9 @@ namespace lbs
 
 RegisterChiObject(lbs, SteadyStateSolver);
 
-chi_objects::InputParameters SteadyStateSolver::GetInputParameters()
+chi::InputParameters SteadyStateSolver::GetInputParameters()
 {
-  chi_objects::InputParameters params =
+  chi::InputParameters params =
     chi_physics::Solver::GetInputParameters();
 
   params.SetGeneralDescription(
@@ -28,10 +28,10 @@ chi_objects::InputParameters SteadyStateSolver::GetInputParameters()
   return params;
 }
 
-SteadyStateSolver::SteadyStateSolver(const chi_objects::InputParameters& params)
+SteadyStateSolver::SteadyStateSolver(const chi::InputParameters& params)
   : chi_physics::Solver(params),
-    lbs_solver_(chi::GetStackItem<LBSSolver>(
-      chi::object_stack, params.GetParamValue<size_t>("lbs_solver_handle")))
+    lbs_solver_(Chi::GetStackItem<LBSSolver>(
+      Chi::object_stack, params.GetParamValue<size_t>("lbs_solver_handle")))
 {
 
 }

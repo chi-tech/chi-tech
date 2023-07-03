@@ -24,7 +24,7 @@
 namespace chi_lua
 {
 
-typedef chi_objects::ParameterBlock ParamBlock;
+typedef chi::ParameterBlock ParamBlock;
 
 // ###################################################################
 //  NOLINTBEGIN(misc-no-recursion)
@@ -69,7 +69,7 @@ void TableParserAsParameterBlock::RecursivelyParseTableValues(
     }
     case LUA_TTABLE:
     {
-      chi_objects::ParameterBlock new_block(key_str_name);
+      chi::ParameterBlock new_block(key_str_name);
       RecursivelyParseTableKeys(L, lua_gettop(L), new_block);
       block.AddParameter(new_block);
       break;
@@ -85,7 +85,7 @@ void TableParserAsParameterBlock::RecursivelyParseTableValues(
 /**This function operates on table keys recursively. It has a specific
  * behavior if it detects an array.*/
 void TableParserAsParameterBlock::RecursivelyParseTableKeys(
-  lua_State* L, int t, chi_objects::ParameterBlock& block)
+  lua_State* L, int t, chi::ParameterBlock& block)
 {
   bool number_key_encountered = false;
   bool string_key_encountered = false;
@@ -111,7 +111,7 @@ void TableParserAsParameterBlock::RecursivelyParseTableKeys(
     {
       if (string_key_encountered) ExceptionMixStringNumberKeys;
 
-      if (block.Type() != chi_objects::ParameterBlockType::ARRAY)
+      if (block.Type() != chi::ParameterBlockType::ARRAY)
         block.ChangeToArray();
 
       number_key_encountered = true;
@@ -151,7 +151,7 @@ block =
 
 chiUnitTests_Test_paramblock(--[[verbose=]]true, block)
 \endcode*/
-chi_objects::ParameterBlock
+chi::ParameterBlock
 TableParserAsParameterBlock::ParseTable(lua_State* L, int table_stack_index)
 {
   ParamBlock param_block;
@@ -167,10 +167,10 @@ TableParserAsParameterBlock::ParseTable(lua_State* L, int table_stack_index)
  * the parameter block will have its individual parameters exported as single
  * values, otherwise the block is exported as a table.*/
 void PushParameterBlock(lua_State* L,
-                        const chi_objects::ParameterBlock& block,
+                        const chi::ParameterBlock& block,
                         int level /*=0*/)
 {
-  using namespace chi_objects;
+  using namespace chi;
 
   switch (block.Type())
   {

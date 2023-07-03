@@ -3,7 +3,7 @@
 
 #include "ChiObject/chi_object.h"
 
-namespace chi_objects
+namespace chi
 {
 
 /**A generic material object used to group together multiple properties.*/
@@ -13,7 +13,7 @@ private:
   std::string name_;
 public:
   static InputParameters GetInputParameters();
-  explicit Material(const chi_objects::InputParameters& params);
+  explicit Material(const chi::InputParameters& params);
 
 
 };

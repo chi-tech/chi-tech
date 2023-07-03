@@ -13,7 +13,7 @@
 /**Exports just the mesh to VTK format.*/
 void chi_mesh::MeshContinuum::ExportCellsToVTK(const std::string& file_base_name) const
 {
-  chi::log.Log() << "Exporting mesh to VTK files with base " << file_base_name;
+  Chi::log.Log() << "Exporting mesh to VTK files with base " << file_base_name;
 
   const auto& grid = *this;
 
@@ -21,5 +21,5 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const std::string& file_base_name
 
   chi_mesh::WritePVTUFiles(ugrid, file_base_name);
 
-  chi::log.Log() << "Done exporting mesh to VTK.";
+  Chi::log.Log() << "Done exporting mesh to VTK.";
 }

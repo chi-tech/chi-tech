@@ -7,9 +7,9 @@ namespace chi_math::functions
 
 RegisterChiObject(chi_math::functions, PiecewiseLinear1D);
 
-chi_objects::InputParameters PiecewiseLinear1D::GetInputParameters()
+chi::InputParameters PiecewiseLinear1D::GetInputParameters()
 {
-  chi_objects::InputParameters params =
+  chi::InputParameters params =
     FunctionDimAToDimB::GetInputParameters();
 
   // clang-format off
@@ -30,7 +30,7 @@ chi_objects::InputParameters PiecewiseLinear1D::GetInputParameters()
   return params;
 }
 
-PiecewiseLinear1D::PiecewiseLinear1D(const chi_objects::InputParameters& params)
+PiecewiseLinear1D::PiecewiseLinear1D(const chi::InputParameters& params)
   : FunctionDimAToDimB(params),
     x_values_(params.GetParamVectorValue<double>("x_values")),
     y_values_(params.GetParamVectorValue<double>("y_values")),

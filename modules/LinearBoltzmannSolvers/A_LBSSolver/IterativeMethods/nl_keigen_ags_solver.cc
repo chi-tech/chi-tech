@@ -122,7 +122,7 @@ void NLKEigenvalueAGSSolver<SNESTypes>::PostSolveCallback()
   SNESGetNumberFunctionEvals(nl_solver_, &number_of_func_evals);
 
   //================================================== Print summary
-  chi::log.Log() << "\n"
+  Chi::log.Log() << "\n"
                  << "        Final k-eigenvalue    :        "
                  << std::fixed << std::setw(10) << std::setprecision(7)
                  << k_eff

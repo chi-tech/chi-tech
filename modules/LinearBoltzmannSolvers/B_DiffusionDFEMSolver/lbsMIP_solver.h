@@ -16,8 +16,8 @@ public:
 
 public:
   // 00
-  static chi_objects::InputParameters GetInputParameters();
-  explicit DiffusionDFEMSolver(const chi_objects::InputParameters& params);
+  static chi::InputParameters GetInputParameters();
+  explicit DiffusionDFEMSolver(const chi::InputParameters& params);
   ~DiffusionDFEMSolver() override;
   // 01
   void Initialize() override;

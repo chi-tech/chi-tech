@@ -14,7 +14,7 @@ namespace chi_unit_sim_tests
 
   int chiSimTest_IP_MMS_L2error(lua_State* L)
   {
-    chi::log.Log() << "chiSimTest_IP_MMS_L2error";
+    Chi::log.Log() << "chiSimTest_IP_MMS_L2error";
 
     //============================================= Make solver
     dfem_diffusion::Solver solver("SimTest_IP_MMS_L2err");
@@ -25,9 +25,9 @@ namespace chi_unit_sim_tests
     const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;
     const size_t num_local_dofs = sdm.GetNumLocalDOFs(OneDofPerNode);
     const size_t num_globl_dofs = sdm.GetNumGlobalDOFs(OneDofPerNode);
-    chi::log.Log() << "Num local DOFs: " << num_local_dofs;
-    chi::log.Log() << "Num globl DOFs: " << num_globl_dofs;
-    chi::log.Log() << "Done constructing solver" << std::endl;
+    Chi::log.Log() << "Num local DOFs: " << num_local_dofs;
+    Chi::log.Log() << "Num globl DOFs: " << num_globl_dofs;
+    Chi::log.Log() << "Done constructing solver" << std::endl;
 
     solver.Execute();
 
@@ -74,10 +74,10 @@ namespace chi_unit_sim_tests
         solver.sdm_ptr_,            //Spatial Discretization
         unk_man.unknowns_.front()); //Unknown Manager
 
-    chi::field_function_stack.push_back(ff);
+    Chi::field_function_stack.push_back(ff);
 
     // pops the handle, sets the global variable (handles are numbered from 0, hence -1)
-    auto handle = static_cast<lua_Integer>(chi::field_function_stack.size() - 1);
+    auto handle = static_cast<lua_Integer>(Chi::field_function_stack.size() - 1);
     lua_pushinteger(L, handle);
     lua_setglobal(L, "simtest_IP_MMS_L2_handle");
 
@@ -87,11 +87,11 @@ namespace chi_unit_sim_tests
                   &global_error,    //recvbuf
                   1, MPI_DOUBLE,    //count+datatype
                   MPI_SUM,          //operation
-                  MPI_COMM_WORLD);  //communicator
+                  Chi::mpi.comm);  //communicator
 
     global_error = std::sqrt(global_error);
 
-    chi::log.Log() << "Error: " << std::scientific << global_error
+    Chi::log.Log() << "Error: " << std::scientific << global_error
                    << " Num-cells: " << sdm.ref_grid_.GetGlobalNumberOfCells();
 
     auto stl_vector = new std::vector<double>();

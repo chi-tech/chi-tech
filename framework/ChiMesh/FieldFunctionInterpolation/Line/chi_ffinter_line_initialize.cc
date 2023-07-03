@@ -15,7 +15,7 @@
 void chi_mesh::FieldFunctionInterpolationLine::
   Initialize()
 {
-  chi::log.Log0Verbose1() << "Initializing line interpolator.";
+  Chi::log.Log0Verbose1() << "Initializing line interpolator.";
   //================================================== Check for empty FF-list
   if (field_functions_.empty())
     throw std::logic_error("Unassigned field function in line "
@@ -61,5 +61,5 @@ void chi_mesh::FieldFunctionInterpolationLine::
     }//for cell
   }//for ff
 
-  chi::log.Log0Verbose1() << "Finished initializing interpolator.";
+  Chi::log.Log0Verbose1() << "Finished initializing interpolator.";
 }

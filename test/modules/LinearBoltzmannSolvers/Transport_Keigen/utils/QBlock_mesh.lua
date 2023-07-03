@@ -17,6 +17,7 @@ chiVolumeMesherExecute();
 
 chiVolumeMesherSetMatIDToAll(0)
 
-vol1 = chiLogicalVolumeCreate(RPP,-1000,10.0,-1000,10.0,-1000,1000)
+vol1 = chi_mesh.RPPLogicalVolume.Create
+({ xmin=-1000.0,xmax=10.0,ymin=-1000.0,ymax=10.0, infz=true })
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol1,1)
 

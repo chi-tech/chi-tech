@@ -17,23 +17,23 @@ void chi_math::SpatialDiscretization_FV::
 {
   //============================================= Communicate node counts
   const uint64_t local_num_nodes = ref_grid_.local_cells.size();
-  locJ_block_size_.assign(chi::mpi.process_count, 0);
+  locJ_block_size_.assign(Chi::mpi.process_count, 0);
   MPI_Allgather(&local_num_nodes,       // sendbuf
                 1, MPI_UINT64_T,        // sendcount, sendtype
                 locJ_block_size_.data(), // recvbuf
                 1, MPI_UINT64_T,        // recvcount, recvtype
-                MPI_COMM_WORLD);        // comm
+                Chi::mpi.comm);        // comm
 
   //============================================= Build block addresses
-  locJ_block_address_.assign(chi::mpi.process_count, 0);
+  locJ_block_address_.assign(Chi::mpi.process_count, 0);
   uint64_t global_num_nodes = 0;
-  for (int j=0; j<chi::mpi.process_count; ++j)
+  for (int j=0; j< Chi::mpi.process_count; ++j)
   {
     locJ_block_address_[j] = global_num_nodes;
     global_num_nodes += locJ_block_size_[j];
   }
 
-  local_block_address_ = locJ_block_address_[chi::mpi.location_id];
+  local_block_address_ = locJ_block_address_[Chi::mpi.location_id];
 
   local_base_block_size_ = local_num_nodes;
   globl_base_block_size_ = global_num_nodes;
@@ -52,7 +52,7 @@ void chi_math::SpatialDiscretization_FV::
   const auto query_nb_gids = chi_mpi_utils::
     MapAllToAll(sorted_nb_gids,  //map
                 MPI_UINT64_T,    //datatype
-                MPI_COMM_WORLD); //comm
+                Chi::mpi.comm); //comm
 
   //============================================= Map the ids
   std::map<uint64_t, std::vector<uint64_t>> mapped_query_nb_gids;
@@ -78,7 +78,7 @@ void chi_math::SpatialDiscretization_FV::
   const auto mapped_nb_gids = chi_mpi_utils::
     MapAllToAll(mapped_query_nb_gids,  //map
                 MPI_UINT64_T,    //datatype
-                MPI_COMM_WORLD); //comm
+                Chi::mpi.comm); //comm
 
   //============================================= Create the neighbor cell
   //                                              mapping

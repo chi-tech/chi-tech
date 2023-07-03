@@ -182,7 +182,7 @@ void chi_mesh::UnpartitionedMesh::CopyUGridCellsAndPoints(
     bound_box_->zmax = std::max(bound_box_->zmax, vertex.z);
   }
 
-  chi::log.Log() << fname + ": Done";
+  Chi::log.Log() << fname + ": Done";
 }
 
 // ###################################################################
@@ -208,7 +208,7 @@ void chi_mesh::UnpartitionedMesh::SetBoundaryIDsFromBlocks(
     for (auto& face : cell_ptr->faces)
       if (not face.has_neighbor) bndry_faces.push_back(&face);
 
-  chi::log.Log() << "Number of boundary faces: " << bndry_faces.size();
+  Chi::log.Log() << "Number of boundary faces: " << bndry_faces.size();
 
   //======================================== Build boundary vertex ids
   std::set<uint64_t> bndry_vids_set;
@@ -243,7 +243,7 @@ void chi_mesh::UnpartitionedMesh::SetBoundaryIDsFromBlocks(
 
       if (not map_found)
       {
-        chi::log.Log0Warning()
+        Chi::log.Log0Warning()
           << "chi_mesh::UnpartitionedMesh::"
              "SetBoundaryIDsFromBlocks: Failed to map a vertex. " +
                point.PrintStr() + " for boundary " + ugrid_name.second +
@@ -296,7 +296,7 @@ void chi_mesh::UnpartitionedMesh::SetBoundaryIDsFromBlocks(
       } // for face_id
     }   // for boundary cell bc
 
-    chi::log.Log() << "UnpartitionedMesh: assigned " << num_faces_boundarified
+    Chi::log.Log() << "UnpartitionedMesh: assigned " << num_faces_boundarified
                    << " to boundary id " << bndry_id << " with name "
                    << ugrid_name.second;
 

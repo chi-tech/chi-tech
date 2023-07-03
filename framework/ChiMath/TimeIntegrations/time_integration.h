@@ -13,8 +13,8 @@ private:
   SteppingMethod method_;
 
 public:
-  static chi_objects::InputParameters GetInputParameters();
-  explicit TimeIntegration(const chi_objects::InputParameters& params);
+  static chi::InputParameters GetInputParameters();
+  explicit TimeIntegration(const chi::InputParameters& params);
 
   SteppingMethod Method() const;
 

@@ -13,9 +13,9 @@ namespace chi_mesh
 class SnapToPlaneMeshModifier : public MeshModifier
 {
 public:
-  static chi_objects::InputParameters GetInputParameters();
+  static chi::InputParameters GetInputParameters();
   explicit SnapToPlaneMeshModifier(
-    const chi_objects::InputParameters& params);
+    const chi::InputParameters& params);
 
   void Apply() override;
 

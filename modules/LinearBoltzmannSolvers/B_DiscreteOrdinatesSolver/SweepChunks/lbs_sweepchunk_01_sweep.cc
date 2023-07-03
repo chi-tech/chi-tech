@@ -28,7 +28,8 @@ void LBSSweepChunk::Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
 
   // ====================================================== Loop over each
   //                                                        cell
-  const auto& spls = angle_set->GetSPDS().spls.item_id;
+  const auto& spds = angle_set->GetSPDS();
+  const auto& spls = spds.spls.item_id;
   const size_t num_spls = spls.size();
   for (size_t spls_index = 0; spls_index < num_spls; ++spls_index)
   {
@@ -36,6 +37,10 @@ void LBSSweepChunk::Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
     cell_ = &grid_.local_cells[cell_local_id_];
     cell_mapping_ = &grid_fe_view_.GetCellMapping(*cell_);
     cell_transport_view_ = &grid_transport_view_[cell_->local_id_];
+
+    using namespace chi_mesh::sweep_management;
+    const auto& face_orientations =
+      spds.cell_face_orientations_[cell_local_id_];
 
     cell_num_faces_ = cell_->faces_.size();
     cell_num_nodes_ = cell_mapping_->NumNodes();
@@ -84,12 +89,10 @@ void LBSSweepChunk::Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
       sweep_surface_status_info_.deploc_face_counter = 0;
 
       // ======================================== Update face orientations
-      face_incident_flags_.assign(cell_num_faces_, false);
       face_mu_values_.assign(cell_num_faces_, 0.0);
       for (int f = 0; f < cell_num_faces_; ++f)
       {
         const double mu = omega_.Dot(cell_->faces_[f].normal_);
-        face_incident_flags_[f] = mu < 0.0;
         face_mu_values_[f] = mu;
       }
 
@@ -99,9 +102,8 @@ void LBSSweepChunk::Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
       {
         const auto& face = cell_->faces_[f];
 
-        if (face_mu_values_[f] >= 0.0) continue;
+        if (face_orientations[f] != FaceOrientation::INCOMING) continue;
 
-        face_incident_flags_[f] = true;
         const bool local = cell_transport_view_->IsFaceLocal(f);
         const bool boundary = not face.has_neighbor_;
         const uint64_t bndry_id = face.neighbor_id_;
@@ -143,7 +145,7 @@ void LBSSweepChunk::Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
       int out_face_counter = -1;
       for (int f = 0; f < cell_num_faces_; ++f)
       {
-        if (face_incident_flags_[f]) continue;
+        if (face_orientations[f] == FaceOrientation::INCOMING) continue;
 
         // ================================= Set flags and counters
         out_face_counter++;
@@ -171,8 +173,8 @@ void LBSSweepChunk::Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
       } // for face
 
       ExecuteKernels(post_cell_dir_sweep_callbacks_);
-    }   // for n
-  }     // for cell
+    } // for n
+  }   // for cell
 }
 
 } // namespace lbs

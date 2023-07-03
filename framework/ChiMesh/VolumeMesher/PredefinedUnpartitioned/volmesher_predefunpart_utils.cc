@@ -20,7 +20,7 @@ bool chi_mesh::VolumeMesherPredefinedUnpartitioned::
 {
   //First determine if the cell is a local cell
   int cell_pid = static_cast<int>(cell_partition_ids[cell_global_id]);
-  if (cell_pid == chi::mpi.location_id)
+  if (cell_pid == Chi::mpi.location_id)
     return true;
 
   //Now determine if the cell is a ghost cell
@@ -29,7 +29,7 @@ bool chi_mesh::VolumeMesherPredefinedUnpartitioned::
     {
       if (cid == cell_global_id) continue;
       int adj_pid = static_cast<int>(cell_partition_ids[cid]);
-      if (adj_pid == chi::mpi.location_id)
+      if (adj_pid == Chi::mpi.location_id)
         return true;
     }
 

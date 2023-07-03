@@ -37,7 +37,7 @@ void chi_diffusion::Solver::InitializeCommonItems()
           boundaries_.insert(
             std::make_pair(bndry_id, new
                            chi_diffusion::BoundaryReflecting()));
-          chi::log.Log() << "Boundary \"" << bndry_name << "\" set to reflecting.";
+          Chi::log.Log() << "Boundary \"" << bndry_name << "\" set to reflecting.";
           break;
         }
         case BoundaryType::Dirichlet:
@@ -46,7 +46,7 @@ void chi_diffusion::Solver::InitializeCommonItems()
           boundaries_.insert(
             std::make_pair(bndry_id, new
             chi_diffusion::BoundaryDirichlet(bndry_vals[0])));
-          chi::log.Log() << "Boundary \"" << bndry_name << "\" set to dirichlet.";
+          Chi::log.Log() << "Boundary \"" << bndry_name << "\" set to dirichlet.";
           break;
         }
         case BoundaryType::Robin:
@@ -57,7 +57,7 @@ void chi_diffusion::Solver::InitializeCommonItems()
                            chi_diffusion::BoundaryRobin(bndry_vals[0],
                                                         bndry_vals[1],
                                                         bndry_vals[2])));
-          chi::log.Log() << "Boundary \"" << bndry_name << "\" set to robin.";
+          Chi::log.Log() << "Boundary \"" << bndry_name << "\" set to robin.";
           break;
         }
         case BoundaryType::Vacuum:
@@ -65,7 +65,7 @@ void chi_diffusion::Solver::InitializeCommonItems()
           boundaries_.insert(
             std::make_pair(bndry_id, new
                            chi_diffusion::BoundaryRobin(0.25, 0.5, 0.0)));
-          chi::log.Log() << "Boundary \"" << bndry_name << "\" set to vacuum.";
+          Chi::log.Log() << "Boundary \"" << bndry_name << "\" set to vacuum.";
           break;
         }
         case BoundaryType::Neumann:
@@ -76,7 +76,7 @@ void chi_diffusion::Solver::InitializeCommonItems()
             chi_diffusion::BoundaryRobin(bndry_vals[0],
                                          bndry_vals[1],
                                          bndry_vals[2])));
-          chi::log.Log() << "Boundary \"" << bndry_name << "\" set to neumann.";
+          Chi::log.Log() << "Boundary \"" << bndry_name << "\" set to neumann.";
           break;
         }
       }//switch boundary type
@@ -86,7 +86,7 @@ void chi_diffusion::Solver::InitializeCommonItems()
       boundaries_.insert(
         std::make_pair(bndry_id, new
                        chi_diffusion::BoundaryDirichlet()));
-      chi::log.Log0Verbose1()
+      Chi::log.Log0Verbose1()
         << "No boundary preference found for boundary \"" << bndry_name
         << "\" Dirichlet boundary added with zero boundary value.";
     }

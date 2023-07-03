@@ -18,7 +18,7 @@ namespace chi_data_types
   class NDArray;
 }//namespace chi_data_types
 
-namespace chi_objects
+namespace chi
 {
   class ChiMPICommunicatorSet;
 }
@@ -34,7 +34,7 @@ namespace chi_mesh
 class chi_mesh::MeshContinuum
 {
 private:
-  typedef std::shared_ptr<chi_objects::ChiMPICommunicatorSet> MPILocalCommSetPtr;
+  typedef std::shared_ptr<chi::ChiMPICommunicatorSet> MPILocalCommSetPtr;
 private:
   std::vector<std::unique_ptr<chi_mesh::Cell>> local_cells_;  ///< Actual local cells
   std::vector<std::unique_ptr<chi_mesh::Cell>> ghost_cells_; ///< Locally stored ghosts

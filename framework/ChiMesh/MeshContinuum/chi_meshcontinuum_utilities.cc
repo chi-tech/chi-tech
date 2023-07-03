@@ -62,13 +62,13 @@ chi_mesh::MeshContinuum::MakeGridFaceHistogram(double master_tolerance,
   outstr << "\nAverage dofs/face = " << average_dofs_per_face;
   outstr << "\nMax to avg ratio = "
          << (double)largest_face / average_dofs_per_face;
-  chi::log.LogAllVerbose2() << outstr.str();
+  Chi::log.LogAllVerbose2() << outstr.str();
 
   //================================================== Determine number of bins
   size_t last_bin_num_faces = total_num_faces;
   if (((double)largest_face / average_dofs_per_face) > master_tolerance)
   {
-    chi::log.LogAllVerbose2()
+    Chi::log.LogAllVerbose2()
       << "The ratio of max face dofs to average face dofs "
       << "is larger than " << master_tolerance
       << ", therefore a binned histogram "
@@ -113,7 +113,7 @@ chi_mesh::MeshContinuum::MakeGridFaceHistogram(double master_tolerance,
            << " faces with max face dofs " << bins.first << "\n";
   }
 
-  chi::log.LogAllVerbose2() << outstr.str();
+  Chi::log.LogAllVerbose2() << outstr.str();
 
   return std::make_shared<GridFaceHistogram>(face_categories_list);
 }
@@ -168,11 +168,11 @@ void chi_mesh::MeshContinuum::FindAssociatedVertices(
   //======================================== Check index validity
   if ((not cur_face.has_neighbor_) || (not cur_face.IsNeighborLocal(*this)))
   {
-    chi::log.LogAllError() << "Invalid cell index encountered in call to "
+    Chi::log.LogAllError() << "Invalid cell index encountered in call to "
                            << "MeshContinuum::FindAssociatedVertices. Index "
                               "points to either a boundary"
                            << "or a non-local cell.";
-    chi::Exit(EXIT_FAILURE);
+    Chi::Exit(EXIT_FAILURE);
   }
 
   auto& adj_cell = local_cells[cur_face.GetNeighborLocalID(*this)];
@@ -198,12 +198,12 @@ void chi_mesh::MeshContinuum::FindAssociatedVertices(
 
     if (!found)
     {
-      chi::log.LogAllError()
+      Chi::log.LogAllError()
         << "Face DOF mapping failed in call to "
         << "MeshContinuum::FindAssociatedVertices. Could not find a matching"
            "node."
         << cur_face.neighbor_id_ << " " << cur_face.centroid_.PrintS();
-      chi::Exit(EXIT_FAILURE);
+      Chi::Exit(EXIT_FAILURE);
     }
   }
 }
@@ -254,8 +254,8 @@ chi_mesh::Vector3 chi_mesh::MeshContinuum::ComputeCentroidFromListOfNodes(
 {
   if (list.empty())
   {
-    chi::log.LogAllError() << "ComputeCentroidFromListOfNodes, empty list";
-    chi::Exit(EXIT_FAILURE);
+    Chi::log.LogAllError() << "ComputeCentroidFromListOfNodes, empty list";
+    Chi::Exit(EXIT_FAILURE);
   }
   chi_mesh::Vector3 centroid;
   for (auto node_id : list)
@@ -281,7 +281,7 @@ size_t chi_mesh::MeshContinuum::CountCellsInLogicalVolume(
                 1,                      // count
                 MPI_UNSIGNED_LONG_LONG, // datatype
                 MPI_SUM,                // op
-                MPI_COMM_WORLD);        // communicator
+                Chi::mpi.comm);        // communicator
 
   return global_count;
 }

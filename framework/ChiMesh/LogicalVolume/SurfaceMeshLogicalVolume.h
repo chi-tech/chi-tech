@@ -11,8 +11,8 @@ namespace chi_mesh
 class SurfaceMeshLogicalVolume : public LogicalVolume
 {
 public:
-  static chi_objects::InputParameters GetInputParameters();
-  explicit SurfaceMeshLogicalVolume(const chi_objects::InputParameters& params);
+  static chi::InputParameters GetInputParameters();
+  explicit SurfaceMeshLogicalVolume(const chi::InputParameters& params);
 
   bool Inside(const chi_mesh::Vector3& point) const override;
 

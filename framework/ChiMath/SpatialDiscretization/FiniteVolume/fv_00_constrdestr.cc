@@ -24,7 +24,7 @@ chi_math::SpatialDiscretization_FV::New(const chi_mesh::MeshContinuum& in_grid,
 {
   // First try to find an existing spatial discretization that matches the
   // one requested.
-  for (auto& sdm : chi::sdm_stack)
+  for (auto& sdm : Chi::sdm_stack)
     if (sdm->Type() == SpatialDiscretizationType::FINITE_VOLUME and
         std::addressof(sdm->Grid()) == std::addressof(in_grid) and
         sdm->GetCoordinateSystemType() == in_cs_type)
@@ -41,7 +41,7 @@ chi_math::SpatialDiscretization_FV::New(const chi_mesh::MeshContinuum& in_grid,
   auto new_sdm = std::shared_ptr<chi_math::SpatialDiscretization_FV>(
     new SpatialDiscretization_FV(in_grid, in_cs_type));
 
-  chi::sdm_stack.push_back(new_sdm);
+  Chi::sdm_stack.push_back(new_sdm);
 
   return new_sdm;
 }

@@ -13,9 +13,9 @@ namespace prk
 RegisterChiObject(prk, TransientSolver);
 
 /**Sets input parameters.*/
-chi_objects::InputParameters TransientSolver::GetInputParameters()
+chi::InputParameters TransientSolver::GetInputParameters()
 {
-  chi_objects::InputParameters params =
+  chi::InputParameters params =
     chi_physics::Solver::GetInputParameters();
 
   // clang-format off
@@ -70,7 +70,7 @@ chi_objects::InputParameters TransientSolver::GetInputParameters()
 }
 
 /**Constructor.*/
-TransientSolver::TransientSolver(const chi_objects::InputParameters& params)
+TransientSolver::TransientSolver(const chi::InputParameters& params)
   : chi_physics::Solver(params.GetParamValue<std::string>("name")),
     lambdas_(params.GetParamVectorValue<double>("precursor_lambdas")),
     betas_(params.GetParamVectorValue<double>("precursor_betas")),
@@ -81,20 +81,20 @@ TransientSolver::TransientSolver(const chi_objects::InputParameters& params)
     time_integration_(params.GetParamValue<std::string>("time_integration")),
     num_precursors_(lambdas_.size())
 {
-  chi::log.Log() << "Created solver " << TextName();
+  Chi::log.Log() << "Created solver " << TextName();
   {
     std::stringstream outstr;
     outstr << "lambdas = ";
     for (double val : lambdas_)
       outstr << val << " ";
-    chi::log.Log() << outstr.str();
+    Chi::log.Log() << outstr.str();
   }
   {
     std::stringstream outstr;
     outstr << "betas = ";
     for (double val : betas_)
       outstr << val << " ";
-    chi::log.Log() << outstr.str();
+    Chi::log.Log() << outstr.str();
   }
 }
 
@@ -154,7 +154,7 @@ void TransientSolver::Initialize()
     x_t_ = A_temp.Inverse() * b_temp;
   }
 
-  chi::log.Log() << "Final: " << x_t_.PrintStr();
+  Chi::log.Log() << "Final: " << x_t_.PrintStr();
 }
 
 /**Execution function.*/

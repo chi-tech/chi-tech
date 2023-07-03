@@ -39,8 +39,6 @@ chiVolumeMesherExecute();
 --############################################### Set Material IDs
 chiVolumeMesherSetMatIDToAll(0)
 
---vol1 = chiLogicalVolumeCreate(RPP,-10.0,10.0,-10.0,10.0,-10.0,10.0)
---chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol1,1)
 
 --############################################### Add materials
 materials = {}

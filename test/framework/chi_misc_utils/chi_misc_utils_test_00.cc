@@ -8,18 +8,18 @@
 namespace chi_unit_tests
 {
 
-chi_objects::ParameterBlock
-chi_misc_utils_Test00(const chi_objects::InputParameters& params);
+chi::ParameterBlock
+chi_misc_utils_Test00(const chi::InputParameters& params);
 
 RegisterWrapperFunction(/*namespace_name=*/chi_unit_tests,
                         /*name_in_lua=*/chi_misc_utils_Test00,
                         /*syntax_function=*/nullptr,
                         /*actual_function=*/chi_misc_utils_Test00);
 
-chi_objects::ParameterBlock
-chi_misc_utils_Test00(const chi_objects::InputParameters&)
+chi::ParameterBlock
+chi_misc_utils_Test00(const chi::InputParameters&)
 {
-  chi::log.Log() << "Testing chi_misc_utils::PrintIterationProgress\n";
+  Chi::log.Log() << "Testing chi_misc_utils::PrintIterationProgress\n";
 
   const unsigned int I = 4;
   const size_t N = 39;
@@ -30,9 +30,9 @@ chi_misc_utils_Test00(const chi_objects::InputParameters&)
     progress << chi_misc_utils::PrintIterationProgress(i, N, I);
   }
 
-  chi::log.Log() << progress.str();
+  Chi::log.Log() << progress.str();
 
-  return chi_objects::ParameterBlock();
+  return chi::ParameterBlock();
 }
 
 } // namespace chi_unit_tests

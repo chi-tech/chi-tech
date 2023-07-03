@@ -4,7 +4,7 @@
 #include "chi_material_property.h"
 #include "ChiMath/Functions/function_dimA_to_dimB.h"
 
-namespace chi_objects
+namespace chi
 {
 
 /**General material base class for a scalar material property that

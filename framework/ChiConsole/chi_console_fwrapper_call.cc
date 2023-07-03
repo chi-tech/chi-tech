@@ -3,7 +3,7 @@
 #include "chi_log_exceptions.h"
 #include "chi_lua.h"
 
-namespace chi_objects
+namespace chi
 {
 
 RegisterLuaFunction(ChiConsole::LuaWrapperCall, chi_console, LuaWrapperCall);

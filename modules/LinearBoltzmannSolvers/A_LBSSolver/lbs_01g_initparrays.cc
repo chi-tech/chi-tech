@@ -12,7 +12,7 @@
 /**Initializes parallel arrays.*/
 void lbs::LBSSolver::InitializeParrays()
 {
-  chi::log.Log() << "Initializing parallel arrays."
+  Chi::log.Log() << "Initializing parallel arrays."
                  << " G=" << num_groups_
                  << " M=" << num_moments_ << std::endl;
 
@@ -33,7 +33,7 @@ void lbs::LBSSolver::InitializeParrays()
   size_t num_grps = groups_.size();
   size_t local_unknown_count = local_node_count_ * num_grps * num_moments_;
 
-  chi::log.LogAllVerbose1() << "LBS Number of phi unknowns: "
+  Chi::log.LogAllVerbose1() << "LBS Number of phi unknowns: "
                                 << local_unknown_count;
 
   //================================================== Size local vectors
@@ -66,7 +66,7 @@ void lbs::LBSSolver::InitializeParrays()
   if (options_.read_restart_data)
     ReadRestartData(options_.read_restart_folder_name,
                     options_.read_restart_file_base);
-  MPI_Barrier(MPI_COMM_WORLD);
+  Chi::mpi.Barrier();
 
   //================================================== Initialize transport views
   // Transport views act as a data structure to store information
@@ -179,9 +179,9 @@ void lbs::LBSSolver::InitializeParrays()
   //                                                   Field Functions
   InitializeFieldFunctions();
 
-  MPI_Barrier(MPI_COMM_WORLD);
-  chi::log.Log()
+  Chi::mpi.Barrier();
+  Chi::log.Log()
     << "Done with parallel arrays.                Process memory = "
     << std::setprecision(3)
-    << chi_objects::ChiConsole::GetMemoryUsageInMB() << " MB" << std::endl;
+    << chi::ChiConsole::GetMemoryUsageInMB() << " MB" << std::endl;
 }
