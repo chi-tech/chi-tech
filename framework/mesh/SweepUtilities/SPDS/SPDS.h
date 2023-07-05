@@ -14,7 +14,9 @@ class SPDS
 {
 public:
   SPDS(const chi_mesh::Vector3& in_omega,
-       const chi_mesh::MeshContinuum& in_grid) : omega_(in_omega), grid_(in_grid)
+       const chi_mesh::MeshContinuum& in_grid,
+       bool verbose)
+    : omega_(in_omega), grid_(in_grid), verbose_(verbose)
   {
   }
 
@@ -67,9 +69,20 @@ protected:
 
   std::vector<std::vector<FaceOrientation>> cell_face_orientations_;
 
+  bool verbose_ = false;
+
+  /**Populates cell relationships and cell_face_orientations.*/
+  void PopulateCellRelationships(
+    const chi_mesh::Vector3& omega,
+    std::set<int>& location_dependencies,
+    std::set<int>& location_successors,
+    std::vector<std::set<std::pair<int, double>>>& cell_successors);
+
   void BuildTaskDependencyGraph(
     const std::vector<std::vector<int>>& global_dependencies,
     bool cycle_allowance_flag);
+
+  void PrintedGhostedGraph() const;
 };
 
 } // namespace chi_mesh::sweep_management

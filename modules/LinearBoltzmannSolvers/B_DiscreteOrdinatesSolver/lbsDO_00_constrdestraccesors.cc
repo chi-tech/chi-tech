@@ -22,13 +22,20 @@ chi::InputParameters lbs::DiscreteOrdinatesSolver::GetInputParameters()
 
   params.ChangeExistingParamToOptional("name", "LBSDiscreteOrdinatesSolver");
 
+  params.AddOptionalParameterArray(
+    "directions_sweep_order_to_print",
+    std::vector<size_t>(),
+    "List of direction id's for which sweep ordering info is to be printed.");
+
   return params;
 }
 
 /**Static registration based constructor.*/
 lbs::DiscreteOrdinatesSolver::DiscreteOrdinatesSolver(
   const chi::InputParameters& params)
-  : LBSSolver(params)
+  : LBSSolver(params),
+    verbose_sweep_angles_(
+      params.GetParamVectorValue<size_t>("directions_sweep_order_to_print"))
 {
 }
 
