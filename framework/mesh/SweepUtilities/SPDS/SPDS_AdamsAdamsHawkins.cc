@@ -12,8 +12,9 @@ namespace chi_mesh::sweep_management
 SPDS_AdamsAdamsHawkins::SPDS_AdamsAdamsHawkins(
   const chi_mesh::Vector3& omega,
   const chi_mesh::MeshContinuum& grid,
-  bool cycle_allowance_flag)
-  : SPDS(omega, grid)
+  bool cycle_allowance_flag,
+  bool verbose)
+  : SPDS(omega, grid, verbose)
 {
   Chi::log.Log0Verbose1() << Chi::program_timer.GetTimeString()
                           << " Building sweep ordering for Omega = "
@@ -27,12 +28,10 @@ SPDS_AdamsAdamsHawkins::SPDS_AdamsAdamsHawkins(
   std::set<int> location_successors;
   std::set<int> location_dependencies;
 
-  PopulateCellRelationships(grid,
-                            omega,
+  PopulateCellRelationships(omega,
                             location_dependencies,
                             location_successors,
-                            cell_successors,
-                            cell_face_orientations_);
+                            cell_successors);
 
   location_successors_.reserve(location_successors.size());
   location_dependencies_.reserve(location_dependencies.size());
@@ -56,11 +55,14 @@ SPDS_AdamsAdamsHawkins::SPDS_AdamsAdamsHawkins(
       local_DG.AddEdge(c, successor.first, successor.second);
 
   //============================================= Remove local cycles if allowed
+  if (verbose_)
+    PrintedGhostedGraph();
+
   if (cycle_allowance_flag)
   {
     Chi::log.Log0Verbose1()
       << Chi::program_timer.GetTimeString() << " Removing inter-cell cycles.";
-    // RemoveLocalCyclicDependencies(sweep_order, local_DG);
+
     auto edges_to_remove = local_DG.RemoveCyclicDependencies();
 
     for (auto& edge_to_remove : edges_to_remove)

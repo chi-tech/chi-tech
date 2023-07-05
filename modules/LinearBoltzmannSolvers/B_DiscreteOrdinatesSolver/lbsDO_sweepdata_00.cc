@@ -6,6 +6,7 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 #include "utils/chi_timer.h"
+#include "utils/chi_utils.h"
 
 #include "mesh/SweepUtilities/SPDS/SPDS_AdamsAdamsHawkins.h"
 
@@ -86,9 +87,21 @@ void DiscreteOrdinatesSolver::InitializeSweepDataStructures()
       const size_t master_dir_id = so_grouping.front();
       const auto& omega = quadrature->omegas_[master_dir_id];
 
+      bool verbose = false;
+      if (not verbose_sweep_angles_.empty())
+        for (const size_t dir_id : verbose_sweep_angles_)
+          if (chi::VectorListHas(so_grouping, dir_id))
+          {
+            verbose = true;
+            break;
+          }
+
       using namespace chi_mesh::sweep_management;
       const auto new_swp_order = std::make_shared<SPDS_AdamsAdamsHawkins>(
-        omega, *this->grid_ptr_, quadrature_allow_cycles_map_[quadrature]);
+        omega,
+        *this->grid_ptr_,
+        quadrature_allow_cycles_map_[quadrature],
+        verbose);
       quadrature_spds_map_[quadrature].push_back(new_swp_order);
     }
   } // quadrature info-pack

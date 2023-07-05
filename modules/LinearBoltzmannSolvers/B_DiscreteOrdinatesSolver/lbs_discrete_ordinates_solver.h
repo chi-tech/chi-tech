@@ -30,6 +30,8 @@ protected:
   std::map<AngQuadPtr, SPDS_ptrs> quadrature_spds_map_;
   std::map<AngQuadPtr, FLUDSTemplatePtrs> quadrature_fluds_templates_map_;
 
+  std::vector<size_t> verbose_sweep_angles_;
+
 public:
   static chi::InputParameters GetInputParameters();
   explicit DiscreteOrdinatesSolver(
