@@ -7,6 +7,7 @@
 
 #include "math/chi_math_vectorNX.h"
 #include "math/SpatialDiscretization/FiniteElement/spatial_discretization_FE.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "lbs_adjoint.h"
 

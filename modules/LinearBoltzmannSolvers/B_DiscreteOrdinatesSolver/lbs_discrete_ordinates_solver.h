@@ -21,14 +21,19 @@ protected:
   typedef std::shared_ptr<chi_mesh::sweep_management::SPDS> SPDS_ptr;
   typedef std::vector<SPDS_ptr> SPDS_ptrs;
 
-  typedef chi_mesh::sweep_management::PRIMARY_FLUDS FLUDSTemplate;
-  typedef std::shared_ptr<FLUDSTemplate> FLUDSTemplatePtr;
-  typedef std::vector<FLUDSTemplatePtr> FLUDSTemplatePtrs;
+  //typedef chi_mesh::sweep_management::PRIMARY_FLUDS FLUDSTemplate;
+  //typedef std::shared_ptr<FLUDSTemplate> FLUDSTemplatePtr;
+  //typedef std::vector<FLUDSTemplatePtr> FLUDSTemplatePtrs;
+
+  typedef chi_mesh::sweep_management::FLUDSCommonData FLUDSCommonData;
+  typedef std::unique_ptr<FLUDSCommonData> FLUDSCommonDataPtr;
+  typedef std::vector<FLUDSCommonDataPtr> FLUDSCommonDataPtrs;
 
 protected:
   std::map<AngQuadPtr, SwpOrderGroupingInfo> quadrature_unq_so_grouping_map_;
   std::map<AngQuadPtr, SPDS_ptrs> quadrature_spds_map_;
-  std::map<AngQuadPtr, FLUDSTemplatePtrs> quadrature_fluds_templates_map_;
+  //std::map<AngQuadPtr, FLUDSTemplatePtrs> quadrature_fluds_templates_map_;
+  std::map<AngQuadPtr, FLUDSCommonDataPtrs> quadrature_fluds_commondata_map_;
 
   std::vector<size_t> verbose_sweep_angles_;
 

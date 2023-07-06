@@ -1,15 +1,16 @@
-#include "FLUDS.h"
+#include "AAH_FLUDSCommonData.h"
 
 #include "mesh/SweepUtilities/SPDS/SPDS.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-//###################################################################
-/**Performs non-local incident mapping for polyhedron cells.*/
-void chi_mesh::sweep_management::PRIMARY_FLUDS::
-  NonLocalIncidentMapping(const chi_mesh::Cell& cell,
-                          const SPDS& spds)
+namespace chi_mesh::sweep_management
+{
+
+void AAH_FLUDSCommonData::NonLocalIncidentMapping(const chi_mesh::Cell& cell,
+                                                  const SPDS& spds)
 {
   const chi_mesh::MeshContinuum& grid = spds.Grid();
 
@@ -46,10 +47,10 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           if (ass_cell<0)
           {
             Chi::log.LogAll()
-                << "Required predecessor cell not located in call to"
-                << " InitializeBetaElements. locJ=" << locJ
-                << " prelocI=" << prelocI
-                << " cell=" << face.neighbor_id_;
+              << "Required predecessor cell not located in call to"
+              << " InitializeBetaElements. locJ=" << locJ
+              << " prelocI=" << prelocI
+              << " cell=" << face.neighbor_id_;
             Chi::Exit(EXIT_FAILURE);
           }
 
@@ -57,7 +58,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           std::set<int> cfvids(face.vertex_ids_.begin(),
                                face.vertex_ids_.end());
           CompactCellView* adj_cell_view =
-              &prelocI_cell_views[prelocI][ass_cell];
+            &prelocI_cell_views[prelocI][ass_cell];
           int ass_face = -1, af = -1;
           for (auto& adj_face : adj_cell_view->second)
           {
@@ -74,7 +75,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           if (ass_face<0)
           {
             Chi::log.LogAll()
-                << "Associated face not found in call to InitializeBetaElements";
+              << "Associated face not found in call to InitializeBetaElements";
             Chi::Exit(EXIT_FAILURE);
           }
 
@@ -82,7 +83,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           std::pair<int,std::vector<int>> dof_mapping;
           dof_mapping.first = adj_cell_view->second[ass_face].first;
           std::vector<uint64_t>* ass_face_verts =
-              &adj_cell_view->second[ass_face].second;
+            &adj_cell_view->second[ass_face].second;
           for (int fv=0; fv < face.vertex_ids_.size(); fv++)
           {
             bool match_found = false;
@@ -100,7 +101,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
             if (!match_found)
             {
               Chi::log.LogAll()
-                  << "Associated vertex not found in call to InitializeBetaElements";
+                << "Associated vertex not found in call to InitializeBetaElements";
               Chi::Exit(EXIT_FAILURE);
             }
           }
@@ -109,7 +110,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           std::pair<int,std::pair<int,std::vector<int>>> inc_face_prelocI_info;
           inc_face_prelocI_info.first = prelocI;
           inc_face_prelocI_info.second =
-              std::pair<int,std::vector<int>>(dof_mapping);
+            std::pair<int,std::vector<int>>(dof_mapping);
 
           std::pair<int,std::pair<int,std::vector<int>>> empty_delayed_info;
           empty_delayed_info.first = prelocI;
@@ -134,16 +135,16 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           if (ass_cell<0)
           {
             Chi::log.LogAll()
-                << "Required predecessor cell not located in call to"
-                << " InitializeBetaElements. locJ=" << locJ
-                << " delayed prelocI=" << delayed_preLocI
-                << " cell=" << face.neighbor_id_;
+              << "Required predecessor cell not located in call to"
+              << " InitializeBetaElements. locJ=" << locJ
+              << " delayed prelocI=" << delayed_preLocI
+              << " cell=" << face.neighbor_id_;
             Chi::Exit(EXIT_FAILURE);
           }
 
           //============================== Find associated face
           CompactCellView* adj_cell_view =
-              &delayed_prelocI_cell_views[delayed_preLocI][ass_cell];
+            &delayed_prelocI_cell_views[delayed_preLocI][ass_cell];
           int ass_face = -1;
           for (int af=0; af<adj_cell_view->second.size(); af++)
           {
@@ -169,7 +170,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           if (ass_face<0)
           {
             Chi::log.LogAll()
-                << "Associated face not found in call to InitializeBetaElements";
+              << "Associated face not found in call to InitializeBetaElements";
             Chi::Exit(EXIT_FAILURE);
           }
 
@@ -177,7 +178,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           std::pair<int,std::vector<int>> dof_mapping;
           dof_mapping.first = adj_cell_view->second[ass_face].first;
           std::vector<uint64_t>* ass_face_verts =
-              &adj_cell_view->second[ass_face].second;
+            &adj_cell_view->second[ass_face].second;
           for (int fv=0; fv < face.vertex_ids_.size(); fv++)
           {
             bool match_found = false;
@@ -195,7 +196,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
             if (!match_found)
             {
               Chi::log.LogAll()
-                  << "Associated vertex not found in call to InitializeBetaElements";
+                << "Associated vertex not found in call to InitializeBetaElements";
               Chi::Exit(EXIT_FAILURE);
             }
           }
@@ -204,7 +205,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           std::pair<int,std::pair<int,std::vector<int>>> inc_face_prelocI_info;
           inc_face_prelocI_info.first = delayed_preLocI;
           inc_face_prelocI_info.second =
-              std::pair<int,std::vector<int>>(dof_mapping);
+            std::pair<int,std::vector<int>>(dof_mapping);
 
           std::pair<int,std::pair<int,std::vector<int>>> delayed_info;
           delayed_info.first = -(delayed_preLocI + 1);
@@ -213,12 +214,9 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           nonlocal_inc_face_prelocI_slot_dof.push_back(delayed_info);
         }//If delayed predecessor
 
-
-
-
       }//if not local and not boundary
     }//if incident
   }//for incindent f
-
-
 }
+
+} // namespace chi_mesh::sweep_management

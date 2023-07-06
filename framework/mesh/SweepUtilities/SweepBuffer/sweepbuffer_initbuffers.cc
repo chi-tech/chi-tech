@@ -2,7 +2,7 @@
 
 #include "mesh/SweepUtilities/AngleSet/angleset.h"
 #include "mesh/SweepUtilities/SPDS/SPDS.h"
-#include "mesh/SweepUtilities/FLUDS/FLUDS.h"
+#include "mesh/SweepUtilities/FLUDS/AAH_FLUDS.h"
 
 #include "chi_runtime.h"
 #include "console/chi_console.h"
@@ -21,29 +21,17 @@ void chi_mesh::sweep_management::SweepBuffer::
   if (!data_initialized)
   {
     const auto& spds = angleset->GetSPDS();
-    auto fluds=  angleset->fluds;
+    auto fluds=  std::dynamic_pointer_cast<AAH_FLUDS>(angleset->fluds);
 
     const auto num_grps   = angleset->GetNumGrps();
     const auto num_angles = angleset->angles.size();
 
     //============================ Resize FLUDS local outgoing Data
-    angleset->local_psi.resize(fluds->num_face_categories);
-    // fc = face category
-    for (size_t fc = 0; fc<fluds->num_face_categories; fc++)
-    {
-      angleset->local_psi[fc].resize(fluds->local_psi_stride[fc]*
-                                     fluds->local_psi_max_elements[fc]*
-                                     num_grps*num_angles,0.0);
-    }
+    angleset->fluds->AllocateInternalLocalPsi(num_grps, num_angles);
 
     //============================ Resize FLUDS non-local outgoing Data
-    angleset->deplocI_outgoing_psi.resize(
-      spds.GetLocationSuccessors().size(),std::vector<double>());
-    for (size_t deplocI=0; deplocI<spds.GetLocationSuccessors().size(); deplocI++)
-    {
-      angleset->deplocI_outgoing_psi[deplocI].resize(
-        fluds->deplocI_face_dof_count[deplocI]*num_grps*num_angles,0.0);
-    }
+    const size_t num_loc_sucs = spds.GetLocationSuccessors().size();
+    angleset->fluds->AllocateOutgoingPsi(num_grps, num_angles, num_loc_sucs);
 
     //================================================ Make a memory query
     double memory_mb = chi::Console::GetMemoryUsageInMB();

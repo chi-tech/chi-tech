@@ -2,6 +2,7 @@
 #define CHI_SPDS_H
 
 #include "mesh/SweepUtilities/SPLS/SPLS.h"
+#include "mesh/chi_mesh.h"
 
 #include <memory>
 

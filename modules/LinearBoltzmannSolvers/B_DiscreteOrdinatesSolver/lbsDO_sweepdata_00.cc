@@ -9,6 +9,7 @@
 #include "utils/chi_utils.h"
 
 #include "mesh/SweepUtilities/SPDS/SPDS_AdamsAdamsHawkins.h"
+#include "mesh/SweepUtilities/FLUDS/AAH_FLUDS.h"
 
 #define ParallelParmetisNeedsCycles                                            \
   "When using PARMETIS type partitioning then groupset iterative method"       \
@@ -107,13 +108,14 @@ void DiscreteOrdinatesSolver::InitializeSweepDataStructures()
   } // quadrature info-pack
 
   //=================================== Build FLUDS templates
-  quadrature_fluds_templates_map_.clear();
+  quadrature_fluds_commondata_map_.clear();
   for (const auto& [quadrature, spds_list] : quadrature_spds_map_)
   {
+    using namespace chi_mesh::sweep_management;
     for (const auto& spds : spds_list)
-      quadrature_fluds_templates_map_[quadrature].push_back(
-        std::make_shared<FLUDSTemplate>(
-          1, grid_nodal_mappings_, *spds, *grid_face_histogram_));
+      quadrature_fluds_commondata_map_[quadrature].push_back(
+        std::make_unique<AAH_FLUDSCommonData>(
+          grid_nodal_mappings_, *spds, *grid_face_histogram_));
   } // for quadrature spds-list pair
 
   Chi::log.Log() << Chi::program_timer.GetTimeString()

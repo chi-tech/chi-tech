@@ -1,23 +1,23 @@
-#include "FLUDS.h"
+#include "AAH_FLUDSCommonData.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 #include "mesh/SweepUtilities/SPDS/SPDS.h"
 #include "mesh/MeshContinuum/chi_grid_face_histogram.h"
-
-#include "mesh/Cell/cell.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
 
 typedef std::vector<std::pair<int,short>> LockBox;
 
-//###################################################################
-/**Performs slot dynamics for Polyhedron cell.*/
-void chi_mesh::sweep_management::PRIMARY_FLUDS::
-  SlotDynamics(const chi_mesh::Cell& cell,
-               const SPDS& spds,
-               const GridFaceHistogram& grid_face_histogram,
-               std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
-               std::vector<std::pair<int,short>>& delayed_lock_box,
-               std::set<int>& location_boundary_dependency_set)
+namespace chi_mesh::sweep_management
+{
+
+void AAH_FLUDSCommonData::SlotDynamics(
+  const chi_mesh::Cell& cell,
+  const SPDS& spds,
+  const GridFaceHistogram& grid_face_histogram,
+  std::vector<std::vector<std::pair<int, short>>>& lock_boxes,
+  std::vector<std::pair<int, short>>& delayed_lock_box,
+  std::set<int>& location_boundary_dependency_set)
 {
   const chi_mesh::MeshContinuum& grid = spds.Grid();
 
@@ -258,9 +258,9 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
 /**Given a sweep ordering index, the outgoing face counter,
  * the outgoing face dof, this function computes the location
  * of this position's upwind psi in the local upwind psi vector.*/
-void  chi_mesh::sweep_management::PRIMARY_FLUDS::
-AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
-                     const chi_mesh::CellFace& face)
+void AAH_FLUDSCommonData::
+  AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
+                       const chi_mesh::CellFace& face)
 {
   //======================================== Check if cell is already there
   bool cell_already_there = false;
@@ -287,3 +287,5 @@ AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
 
 
 }
+
+} // namespace chi_mesh::sweep_management

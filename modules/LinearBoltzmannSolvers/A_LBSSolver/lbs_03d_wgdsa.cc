@@ -1,6 +1,7 @@
 #include "A_LBSSolver/lbs_solver.h"
 
 #include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "A_LBSSolver/Acceleration/diffusion_mip.h"
 

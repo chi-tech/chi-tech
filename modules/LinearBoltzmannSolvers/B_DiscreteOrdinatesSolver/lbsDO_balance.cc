@@ -4,6 +4,8 @@
 #include "chi_log.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
+
 #include <iomanip>
 
 //###################################################################

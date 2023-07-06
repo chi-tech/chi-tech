@@ -1,6 +1,7 @@
 #include "SPDS.h"
 
 #include "graphs/chi_directed_graph.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

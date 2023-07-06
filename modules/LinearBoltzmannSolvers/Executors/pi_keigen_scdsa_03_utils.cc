@@ -5,6 +5,7 @@
 #include "utils/chi_timer.h"
 
 #include "math/VectorGhostCommunicator/vector_ghost_communicator.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 namespace lbs
 {

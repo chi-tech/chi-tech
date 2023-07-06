@@ -1,6 +1,7 @@
 #include "adjoint_src_function.h"
 
 #include "C_DiscreteOrdinatesAdjointSolver/lbsadj_solver.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 namespace lbs
 {

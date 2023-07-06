@@ -2,7 +2,7 @@
 
 #include "mesh/SweepUtilities/AngleSet/angleset.h"
 #include "mesh/SweepUtilities/SPDS/SPDS.h"
-#include "mesh/SweepUtilities/FLUDS/FLUDS.h"
+#include "mesh/SweepUtilities/FLUDS/AAH_FLUDS.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -30,7 +30,7 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
   }
 
   const auto& spds =  angleset->GetSPDS();
-  auto fluds=  angleset->fluds;
+  auto fluds=  std::dynamic_pointer_cast<AAH_FLUDS>(angleset->fluds);
 
   const auto num_grps   = angleset->GetNumGrps();
   const auto num_angles = angleset->angles.size();
@@ -43,10 +43,10 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
   prelocI_message_blockpos.resize(num_dependencies);
   prelocI_message_received.clear();
 
-  for (size_t prelocI=0; prelocI<num_dependencies; prelocI++)
+  for (int prelocI=0; prelocI<num_dependencies; prelocI++)
   {
     u_ll_int num_unknowns =
-      fluds->prelocI_face_dof_count[prelocI]*num_grps*num_angles;
+      fluds->GetPrelocIFaceDOFCount(prelocI)*num_grps*num_angles;
 
     u_ll_int message_size;
     int      message_count;
@@ -88,10 +88,10 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
   delayed_prelocI_message_blockpos.resize(num_delayed_dependencies);
   delayed_prelocI_message_received.clear();
 
-  for (size_t prelocI=0; prelocI<num_delayed_dependencies; prelocI++)
+  for (int prelocI=0; prelocI<num_delayed_dependencies; prelocI++)
   {
     u_ll_int num_unknowns =
-      fluds->delayed_prelocI_face_dof_count[prelocI]*num_grps*num_angles;
+      fluds->GetDelayedPrelocIFaceDOFCount(prelocI)*num_grps*num_angles;
 
     u_ll_int message_size;
     int      message_count;
@@ -138,7 +138,7 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
   for (size_t deplocI=0; deplocI<num_successors; deplocI++)
   {
     u_ll_int num_unknowns =
-      fluds->deplocI_face_dof_count[deplocI]*num_grps*num_angles;
+      fluds->GetDeplocIFaceDOFCount(deplocI)*num_grps*num_angles;
 
     u_ll_int message_size;
     int      message_count;
@@ -171,15 +171,6 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
 
     deplocI_message_request.emplace_back(message_count,MPI_Request());
   }
-
-  angleset->fluds->SetReferencePsi(&angleset->local_psi,
-                                   &angleset->delayed_local_psi,
-                                   &angleset->delayed_local_psi_old,
-                                   &angleset->deplocI_outgoing_psi,
-                                   &angleset->prelocI_outgoing_psi,
-                                   &angleset->boundryI_incoming_psi,
-                                   &angleset->delayed_prelocI_outgoing_psi,
-                                   &angleset->delayed_prelocI_outgoing_psi_old);
 
   //================================================== All reduce to get
   //                                                   maximum message count

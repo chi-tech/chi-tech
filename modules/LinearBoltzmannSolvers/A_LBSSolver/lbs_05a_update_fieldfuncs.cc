@@ -1,6 +1,7 @@
 #include "lbs_solver.h"
 
 #include "physics/FieldFunction/fieldfunction_gridbased.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_log.h"
 
