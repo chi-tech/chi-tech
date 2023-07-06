@@ -4,6 +4,8 @@
 #include "physics/PhysicsMaterial/MultiGroupXS/adjoint_mgxs.h"
 #include "A_LBSSolver/SourceFunctions/adjoint_src_function.h"
 
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
+
 #include "chi_runtime.h"
 #include "chi_log.h"
 

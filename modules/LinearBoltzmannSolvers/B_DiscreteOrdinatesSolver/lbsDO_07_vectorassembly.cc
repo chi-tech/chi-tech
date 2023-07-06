@@ -1,6 +1,8 @@
 #include "lbs_discrete_ordinates_solver.h"
 #include "A_LBSSolver/Groupset/lbs_groupset.h"
 
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
+
 //###################################################################
 /**Scales a flux moment vector. For sweep methods the delayed angular
  * fluxes will also be scaled.*/

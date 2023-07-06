@@ -45,7 +45,8 @@ bool chi_mesh::sweep_management::SweepBuffer::ReceiveDelayedData(
         }
 
         //============================ Receive upstream data
-        auto& upstream_psi = angleset->delayed_prelocI_outgoing_psi[prelocI];
+        auto& upstream_psi =
+          angleset->fluds->DelayedPrelocIOutgoingPsi()[prelocI];
 
         u_ll_int block_addr = delayed_prelocI_message_blockpos[prelocI][m];
         u_ll_int message_size = delayed_prelocI_message_size[prelocI][m];

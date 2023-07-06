@@ -1,6 +1,7 @@
 #include "lbs_curvilinear_sweepchunk_pwl.h"
 
 #include "math/Quadratures/curvilinear_angular_quadrature.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_log_exceptions.h"
 

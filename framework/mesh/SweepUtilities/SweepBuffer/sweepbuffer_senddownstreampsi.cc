@@ -26,7 +26,7 @@ SendDownstreamPsi(int angle_set_num)
       u_ll_int block_addr   = deplocI_message_blockpos[deplocI][m];
       u_ll_int message_size = deplocI_message_size[deplocI][m];
 
-      const auto& outgoing_psi = angleset->deplocI_outgoing_psi[deplocI];
+      const auto& outgoing_psi = angleset->fluds->DeplocIOutgoingPsi()[deplocI];
 
       MPI_Isend(&outgoing_psi[block_addr],
                 static_cast<int>(message_size),

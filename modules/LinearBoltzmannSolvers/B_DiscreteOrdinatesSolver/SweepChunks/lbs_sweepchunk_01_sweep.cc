@@ -1,6 +1,7 @@
 #include "lbs_sweepchunk.h"
 
 #include "math/SpatialDiscretization/spatial_discretization.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #define scint static_cast<int>
 

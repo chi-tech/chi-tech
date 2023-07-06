@@ -27,7 +27,7 @@ enum class FaceOrientation : short
 struct STDG;           ///< Global Sweep Plane Ordering
   struct SPLS;           ///< Sweep Plane Local Subgrid
   class  PRIMARY_FLUDS;  ///< Primary Flux Data Structure
-  class  AUX_FLUDS;      ///< Auxiliary Flux Data Structure
+  class AAH_FLUDS;      ///< Auxiliary Flux Data Structure
   class SPDS;           ///< Sweep Plane Data Structure
 
   class  SweepBuffer;
@@ -38,14 +38,6 @@ struct STDG;           ///< Global Sweep Plane Ordering
   class SweepChunk;
 
   class SweepScheduler;
-
-  void PopulateCellRelationships(
-    const chi_mesh::MeshContinuum& grid,
-    const chi_mesh::Vector3& omega,
-    std::set<int>& location_dependencies,
-    std::set<int>& location_successors,
-    std::vector<std::set<std::pair<int,double>>>& cell_successors,
-    std::vector<std::vector<FaceOrientation>>& cell_face_orientations);
 
   void CommunicateLocationDependencies(
     const std::vector<int>& location_dependencies,

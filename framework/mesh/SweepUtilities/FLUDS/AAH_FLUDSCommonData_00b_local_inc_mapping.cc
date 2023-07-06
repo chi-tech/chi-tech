@@ -1,22 +1,18 @@
-#include "FLUDS.h"
+#include "AAH_FLUDSCommonData.h"
+
 #include "mesh/SweepUtilities/SPDS/SPDS.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "mesh/Cell/cell.h"
+namespace chi_mesh::sweep_management
+{
 
-#include "chi_runtime.h"
-#include "chi_log.h"
-
-typedef std::vector<std::pair<int,short>> LockBox;
-
-//###################################################################
-/**Performs Incident mapping for Polyhedron cell.*/
-void chi_mesh::sweep_management::PRIMARY_FLUDS::
-LocalIncidentMapping(const chi_mesh::Cell& cell,
-                     const SPDS& spds,
-                     std::vector<int>&  local_so_cell_mapping)
+void AAH_FLUDSCommonData::LocalIncidentMapping(
+  const chi_mesh::Cell& cell,
+  const SPDS& spds,
+  std::vector<int>& local_so_cell_mapping)
 {
   const chi_mesh::MeshContinuum& grid = spds.Grid();
-  auto& cell_nodal_mapping = grid_nodal_mappings[cell.local_id_];
+  auto& cell_nodal_mapping = grid_nodal_mappings_[cell.local_id_];
   std::vector<std::pair<int,std::vector<short>>> inco_face_dof_mapping;
 
   short        incoming_face_count=-1;
@@ -75,6 +71,6 @@ LocalIncidentMapping(const chi_mesh::Cell& cell,
     inco_face_info_array[i].Setup(inco_face_dof_mapping[i]);
 
   so_cell_inco_face_dof_indices.push_back(inco_face_info_array);
-
-
 }
+
+} // namespace chi_mesh::sweep_management

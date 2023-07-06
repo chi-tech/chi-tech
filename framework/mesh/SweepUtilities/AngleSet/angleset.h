@@ -31,17 +31,7 @@ public:
   std::map<uint64_t, SweepBndryPtr>& ref_boundaries;
   size_t                             ref_subset;
 
-  //FLUDS
-  std::vector<std::vector<double>>  local_psi;
-  std::vector<double>               delayed_local_psi;
-  std::vector<double>               delayed_local_psi_old;
-  std::vector<std::vector<double>>  deplocI_outgoing_psi;
-  std::vector<std::vector<double>>  prelocI_outgoing_psi;
-  std::vector<std::vector<double>>  boundryI_incoming_psi;
-
-  std::vector<std::vector<double>>  delayed_prelocI_outgoing_psi;
-  std::vector<std::vector<double>>  delayed_prelocI_outgoing_psi_old;
-
+public:
   AngleSet(size_t in_numgrps,
            size_t in_ref_subset,
            const SPDS& in_spds,
