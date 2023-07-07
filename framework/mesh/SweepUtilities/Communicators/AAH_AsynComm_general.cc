@@ -1,11 +1,12 @@
-#include "sweepbuffer.h"
+#include "AAH_AsynComm.h"
 
-#include "mesh/SweepUtilities/AngleSet/angleset.h"
+#include "mesh/SweepUtilities/AngleSet/AngleSet.h"
 #include "mesh/SweepUtilities/SPDS/SPDS.h"
 
 // ###################################################################
 /**Constructor.*/
-chi_mesh::sweep_management::SweepBuffer::SweepBuffer(
+chi_mesh::sweep_management::AAH_ASynchronousCommunicator::
+  AAH_ASynchronousCommunicator(
   FLUDS& fluds,
   size_t num_groups,
   size_t num_angles,
@@ -28,7 +29,7 @@ chi_mesh::sweep_management::SweepBuffer::SweepBuffer(
 
 // ###################################################################
 /**Returns the private flag done_sending.*/
-bool chi_mesh::sweep_management::SweepBuffer::DoneSending() const
+bool chi_mesh::sweep_management::AAH_ASynchronousCommunicator::DoneSending() const
 {
   return done_sending;
 }
@@ -36,14 +37,14 @@ bool chi_mesh::sweep_management::SweepBuffer::DoneSending() const
 // ###################################################################
 /**Receive all upstream Psi. This method is called from within
  * an advancement of an angleset, right after execution.*/
-void chi_mesh::sweep_management::SweepBuffer::ClearLocalAndReceiveBuffers()
+void chi_mesh::sweep_management::AAH_ASynchronousCommunicator::ClearLocalAndReceiveBuffers()
 {
   fluds_.ClearLocalAndReceivePsi();
 }
 
 // ###################################################################
 /**Sends downstream psi.*/
-void chi_mesh::sweep_management::SweepBuffer::ClearDownstreamBuffers()
+void chi_mesh::sweep_management::AAH_ASynchronousCommunicator::ClearDownstreamBuffers()
 {
   if (done_sending) return;
 
@@ -65,7 +66,7 @@ void chi_mesh::sweep_management::SweepBuffer::ClearDownstreamBuffers()
 
 // ###################################################################
 /**Clear flags in preperation for another sweep.*/
-void chi_mesh::sweep_management::SweepBuffer::Reset()
+void chi_mesh::sweep_management::AAH_ASynchronousCommunicator::Reset()
 {
   done_sending = false;
   data_initialized = false;

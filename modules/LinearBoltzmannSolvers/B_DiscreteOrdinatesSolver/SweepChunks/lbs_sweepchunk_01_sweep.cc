@@ -11,7 +11,7 @@ namespace lbs
 void LBSSweepChunk::Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
 {
   const SubSetInfo& grp_ss_info =
-    groupset_.grp_subset_infos_[angle_set->ref_subset];
+    groupset_.grp_subset_infos_[angle_set->GetRefGroupSubset()];
 
   gs_ss_size_ = grp_ss_info.ss_size;
   gs_ss_begin_ = grp_ss_info.ss_begin;
@@ -21,7 +21,7 @@ void LBSSweepChunk::Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
   int preloc_face_counter = -1;
 
   sweep_surface_status_info_.angle_set = angle_set;
-  sweep_surface_status_info_.fluds = &(*angle_set->fluds);
+  sweep_surface_status_info_.fluds = &(angle_set->GetFLUDS());
   sweep_surface_status_info_.surface_source_active = IsSurfaceSourceActive();
   sweep_surface_status_info_.gs_ss_size_ = gs_ss_size_;
   sweep_surface_status_info_.gs_ss_begin_ = gs_ss_begin_;
@@ -63,11 +63,12 @@ void LBSSweepChunk::Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
     // =============================================== Loop over angles in set
     const int ni_deploc_face_counter = deploc_face_counter;
     const int ni_preloc_face_counter = preloc_face_counter;
-    const size_t as_num_angles = angle_set->angles.size();
+    const std::vector<size_t>& angle_indices = angle_set->GetAngleIndices();
+    const size_t as_num_angles = angle_indices.size();
     for (size_t angle_set_index = 0; angle_set_index < as_num_angles;
          ++angle_set_index)
     {
-      direction_num_ = angle_set->angles[angle_set_index];
+      direction_num_ = angle_indices[angle_set_index];
       omega_ = groupset_.quadrature_->omegas_[direction_num_];
       direction_qweight_ = groupset_.quadrature_->weights_[direction_num_];
 
@@ -157,7 +158,7 @@ void LBSSweepChunk::Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
 
         bool reflecting_bndry = false;
         if (boundary)
-          if (angle_set->ref_boundaries[bndry_id]->IsReflecting())
+          if (angle_set->GetBoundaries()[bndry_id]->IsReflecting())
             reflecting_bndry = true;
 
         if (not boundary and not local) ++deploc_face_counter;

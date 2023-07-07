@@ -1,6 +1,6 @@
-#include "sweepbuffer.h"
+#include "AAH_AsynComm.h"
 
-#include "mesh/SweepUtilities/AngleSet/angleset.h"
+#include "mesh/SweepUtilities/AngleSet/AngleSet.h"
 #include "mesh/SweepUtilities/SPDS/SPDS.h"
 #include "mesh/SweepUtilities/FLUDS/AAH_FLUDS.h"
 
@@ -15,7 +15,7 @@
  * method. It is also fairly important in terms of memory to only allocate
  * these chunks of memory when actually ready to use them since they form the
  * majority of memory usage.*/
-void chi_mesh::sweep_management::SweepBuffer::
+void chi_mesh::sweep_management::AAH_ASynchronousCommunicator::
   InitializeLocalAndDownstreamBuffers()
 {
   if (!data_initialized)

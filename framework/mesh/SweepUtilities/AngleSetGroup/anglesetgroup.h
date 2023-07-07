@@ -1,9 +1,7 @@
 #ifndef CHI_ANGLESET_GROUP_H
 #define CHI_ANGLESET_GROUP_H
 
-#include "mesh/SweepUtilities/AngleSet/angleset.h"
-
-
+#include "mesh/SweepUtilities/AngleSet/AngleSet.h"
 
 //###################################################################
 /**Manages the workstages of a single angleset group.*/

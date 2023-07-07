@@ -1,13 +1,13 @@
-#include "sweepbuffer.h"
+#include "AAH_AsynComm.h"
 
-#include "mesh/SweepUtilities/AngleSet/angleset.h"
+#include "mesh/SweepUtilities/AngleSet/AngleSet.h"
 #include "mesh/SweepUtilities/SPDS/SPDS.h"
 #include "mesh/SweepUtilities/FLUDS/AAH_FLUDS.h"
 
 // ###################################################################
 /**Initializes delayed upstream data. This method gets called
  * when a sweep scheduler is constructed.*/
-void chi_mesh::sweep_management::SweepBuffer::InitializeDelayedUpstreamData()
+void chi_mesh::sweep_management::AAH_ASynchronousCommunicator::InitializeDelayedUpstreamData()
 {
   const auto& spds = fluds_.GetSPDS();
 
