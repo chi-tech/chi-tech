@@ -303,7 +303,7 @@ void lbs::LBSGroupset::PrintSweepInfoFile(size_t ev_tag,
 
       ofile << "  Angle-set " << ang_set_num << " angles [# varphi theta]:\n";
 
-      for (auto& ang_num : ang_set->angles)
+      for (auto& ang_num : ang_set->GetAngleIndices())
       {
         const auto& angle = quadrature_->abscissae_[ang_num];
 

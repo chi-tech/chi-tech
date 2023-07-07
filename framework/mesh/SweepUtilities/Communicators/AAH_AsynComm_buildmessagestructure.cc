@@ -1,6 +1,6 @@
-#include "sweepbuffer.h"
+#include "AAH_AsynComm.h"
 
-#include "mesh/SweepUtilities/AngleSet/angleset.h"
+#include "mesh/SweepUtilities/AngleSet/AngleSet.h"
 #include "mesh/SweepUtilities/SPDS/SPDS.h"
 #include "mesh/SweepUtilities/FLUDS/AAH_FLUDS.h"
 
@@ -13,7 +13,7 @@
  *
  * This method gets called by an angleset that subscribes to this
  * sweepbuffer.*/
-void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
+void chi_mesh::sweep_management::AAH_ASynchronousCommunicator::BuildMessageStructure()
 {
   const auto& spds =  fluds_.GetSPDS();
   auto& aah_fluds = dynamic_cast<AAH_FLUDS&>(fluds_);

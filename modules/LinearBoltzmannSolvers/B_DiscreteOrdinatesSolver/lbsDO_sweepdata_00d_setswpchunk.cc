@@ -1,6 +1,5 @@
 #include "lbs_discrete_ordinates_solver.h"
 
-#include "SweepChunks/lbs_sweepchunk_pwl.h"
 #include "SweepChunks/lbs_sweepchunk.h"
 
 typedef chi_mesh::sweep_management::SweepChunk SweepChunk;

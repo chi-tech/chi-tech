@@ -1,6 +1,6 @@
-#include "sweepbuffer.h"
+#include "AAH_AsynComm.h"
 
-#include "mesh/SweepUtilities/AngleSet/angleset.h"
+#include "mesh/SweepUtilities/AngleSet/AngleSet.h"
 #include "mesh/SweepUtilities/SPDS/SPDS.h"
 
 #include "mpi/chi_mpi_commset.h"
@@ -12,7 +12,7 @@
 /**Check if all upstream dependencies have been met and receives
  * it as it becomes available.*/
 chi_mesh::sweep_management::AngleSetStatus
-chi_mesh::sweep_management::SweepBuffer::ReceiveUpstreamPsi(int angle_set_num)
+chi_mesh::sweep_management::AAH_ASynchronousCommunicator::ReceiveUpstreamPsi(int angle_set_num)
 {
   const auto& spds = fluds_.GetSPDS();
 

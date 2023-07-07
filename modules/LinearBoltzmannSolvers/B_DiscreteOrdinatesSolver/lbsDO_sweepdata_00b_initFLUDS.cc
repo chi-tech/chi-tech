@@ -3,6 +3,7 @@
 #include "LinearBoltzmannSolvers/A_LBSSolver/Tools/lbs_make_subset.h"
 
 #include "mesh/SweepUtilities/FLUDS/AAH_FLUDS.h"
+#include "mesh/SweepUtilities/AngleSet/AAH_AngleSet.h"
 
 #include "console/chi_console.h"
 
@@ -25,7 +26,7 @@ void lbs::DiscreteOrdinatesSolver::InitFluxDataStructures(LBSGroupset& groupset)
 {
   namespace sweep_namespace = chi_mesh::sweep_management;
   typedef sweep_namespace::AngleSetGroup TAngleSetGroup;
-  typedef sweep_namespace::AngleSet TAngleSet;
+  typedef sweep_namespace::AAH_AngleSet TAAH_AngleSet;
 
   const auto& quadrature_sweep_info =
     quadrature_unq_so_grouping_map_[groupset.quadrature_];
@@ -87,14 +88,15 @@ void lbs::DiscreteOrdinatesSolver::InitFluxDataStructures(LBSGroupset& groupset)
           throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +
                                    ": Casting failure.");
 
-        auto angleSet = std::make_shared<TAngleSet>(gs_ss_size,
-                                                    gs_ss,
-                                                    *sweep_ordering,
-                                                    fluds,
-                                                    angle_indices,
-                                                    sweep_boundaries_,
-                                                    options_.sweep_eager_limit,
-                                                    *grid_local_comm_set_);
+        auto angleSet =
+          std::make_shared<TAAH_AngleSet>(gs_ss_size,
+                                          gs_ss,
+                                          *sweep_ordering,
+                                          fluds,
+                                          angle_indices,
+                                          sweep_boundaries_,
+                                          options_.sweep_eager_limit,
+                                          *grid_local_comm_set_);
 
         angle_set_group.angle_sets.push_back(angleSet);
       } // for an_ss

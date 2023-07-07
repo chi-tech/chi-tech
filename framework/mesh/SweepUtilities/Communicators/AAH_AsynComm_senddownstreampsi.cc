@@ -1,6 +1,6 @@
-#include "sweepbuffer.h"
+#include "AAH_AsynComm.h"
 
-#include "mesh/SweepUtilities/AngleSet/angleset.h"
+#include "mesh/SweepUtilities/AngleSet/AngleSet.h"
 #include "mesh/SweepUtilities/SPDS/SPDS.h"
 
 #include "mpi/chi_mpi_commset.h"
@@ -8,7 +8,7 @@
 //###################################################################
 /**Sends downstream psi. This method gets called after a sweep chunk has
  * executed */
-void chi_mesh::sweep_management::SweepBuffer::
+void chi_mesh::sweep_management::AAH_ASynchronousCommunicator::
 SendDownstreamPsi(int angle_set_num)
 {
   const auto& spds = fluds_.GetSPDS();

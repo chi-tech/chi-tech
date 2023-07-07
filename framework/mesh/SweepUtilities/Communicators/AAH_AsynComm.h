@@ -1,5 +1,5 @@
-#ifndef CHI_SWEEPBUFFER_H
-#define CHI_SWEEPBUFFER_H
+#ifndef CHI_AAH_ASYNCOMM_H
+#define CHI_AAH_ASYNCOMM_H
 
 #include "mesh/SweepUtilities/sweep_namespace.h"
 #include "chi_mpi.h"
@@ -8,7 +8,7 @@ typedef unsigned long long int u_ll_int;
 
 namespace chi
 {
-  class ChiMPICommunicatorSet;
+class ChiMPICommunicatorSet;
 }
 
 namespace chi_mesh::sweep_management
@@ -16,16 +16,16 @@ namespace chi_mesh::sweep_management
 
 class FLUDS;
 
-//###################################################################
+// ###################################################################
 /**Handles the swift communication of interprocess communication
  * related to sweeping.*/
-class SweepBuffer
+class AAH_ASynchronousCommunicator
 {
 private:
   FLUDS& fluds_;
   const size_t num_groups_;
   const size_t num_angles_;
-  const chi::ChiMPICommunicatorSet&   comm_set;
+  const chi::ChiMPICommunicatorSet& comm_set;
 
   bool done_sending;
   bool data_initialized;
@@ -53,7 +53,7 @@ private:
 public:
   int max_num_mess;
 
-  SweepBuffer(FLUDS& fluds,
+  AAH_ASynchronousCommunicator(FLUDS& fluds,
               size_t num_groups,
               size_t num_angles,
               int sweep_eager_limit,
@@ -70,7 +70,6 @@ public:
 
 protected:
   void BuildMessageStructure();
-
 };
-}
-#endif //CHI_SWEEPBUFFER_H
+} // namespace chi_mesh::sweep_management
+#endif // CHI_AAH_ASYNCOMM_H

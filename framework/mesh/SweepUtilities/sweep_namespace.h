@@ -30,7 +30,7 @@ struct STDG;           ///< Global Sweep Plane Ordering
   class AAH_FLUDS;      ///< Auxiliary Flux Data Structure
   class SPDS;           ///< Sweep Plane Data Structure
 
-  class  SweepBuffer;
+  class AAH_ASynchronousCommunicator;
   class AngleSet;
   class AngleSetGroup;
   class  AngleAggregation;
