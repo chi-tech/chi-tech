@@ -14,7 +14,7 @@
 bool chi_mesh::sweep_management::SweepBuffer::ReceiveDelayedData(
   int angle_set_num)
 {
-  const auto& spds = angleset->GetSPDS();
+  const auto& spds = fluds_.GetSPDS();
 
   const auto& delayed_location_dependencies =
     spds.GetDelayedLocationDependencies();
@@ -46,7 +46,7 @@ bool chi_mesh::sweep_management::SweepBuffer::ReceiveDelayedData(
 
         //============================ Receive upstream data
         auto& upstream_psi =
-          angleset->fluds->DelayedPrelocIOutgoingPsi()[prelocI];
+          fluds_.DelayedPrelocIOutgoingPsi()[prelocI];
 
         u_ll_int block_addr = delayed_prelocI_message_blockpos[prelocI][m];
         u_ll_int message_size = delayed_prelocI_message_size[prelocI][m];

@@ -6,10 +6,15 @@
 // ###################################################################
 /**Constructor.*/
 chi_mesh::sweep_management::SweepBuffer::SweepBuffer(
-  chi_mesh::sweep_management::AngleSet* ref_angleset,
+  FLUDS& fluds,
+  size_t num_groups,
+  size_t num_angles,
   int sweep_eager_limit,
   const chi::ChiMPICommunicatorSet& in_comm_set)
-  : angleset(ref_angleset), comm_set(in_comm_set)
+  : fluds_(fluds),
+    num_groups_(num_groups),
+    num_angles_(num_angles),
+    comm_set(in_comm_set)
 {
   done_sending = false;
   data_initialized = false;
@@ -17,6 +22,8 @@ chi_mesh::sweep_management::SweepBuffer::SweepBuffer(
   EAGER_LIMIT = sweep_eager_limit;
 
   max_num_mess = 0;
+
+  this->BuildMessageStructure();
 }
 
 // ###################################################################
@@ -31,7 +38,7 @@ bool chi_mesh::sweep_management::SweepBuffer::DoneSending() const
  * an advancement of an angleset, right after execution.*/
 void chi_mesh::sweep_management::SweepBuffer::ClearLocalAndReceiveBuffers()
 {
-  angleset->fluds->ClearLocalAndReceivePsi();
+  fluds_.ClearLocalAndReceivePsi();
 }
 
 // ###################################################################
@@ -53,7 +60,7 @@ void chi_mesh::sweep_management::SweepBuffer::ClearDownstreamBuffers()
       }
     }
 
-  if (done_sending) angleset->fluds->ClearSendPsi();
+  if (done_sending) fluds_.ClearSendPsi();
 }
 
 // ###################################################################

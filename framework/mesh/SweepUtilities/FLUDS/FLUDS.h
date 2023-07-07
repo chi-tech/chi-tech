@@ -17,10 +17,16 @@ class GridFaceHistogram;
 namespace chi_mesh::sweep_management
 {
 
+class SPDS;
 
 class FLUDS
 {
 public:
+  explicit FLUDS(size_t num_groups, size_t num_angles, const SPDS& spds)
+    : num_groups_(num_groups), num_angles_(num_angles), spds_(spds){};
+
+  const SPDS& GetSPDS() const { return spds_; }
+
   virtual double* OutgoingPsi(int cell_so_index,
                               int outb_face_counter,
                               int face_dof,
@@ -78,6 +84,11 @@ public:
   DelayedPrelocIOutgoingPsiOld() const = 0;
 
   virtual ~FLUDS() = default;
+
+protected:
+  const size_t num_groups_;
+  const size_t num_angles_;
+  const SPDS& spds_;
 };
 
 } // namespace chi_mesh::sweep_management

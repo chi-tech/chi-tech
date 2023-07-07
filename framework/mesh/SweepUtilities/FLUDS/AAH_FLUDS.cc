@@ -12,15 +12,18 @@ namespace chi_mesh::sweep_management
  * on a primary FLUDS. The restriction here is that the
  * auxiliary FLUDS has the exact same sweep ordering as the
  * primary FLUDS.*/
-AAH_FLUDS::AAH_FLUDS(size_t in_G, const AAH_FLUDSCommonData& common_data)
-  : common_data_(common_data), G(in_G)
+AAH_FLUDS::AAH_FLUDS(size_t num_groups,
+                     size_t num_angles,
+                     const AAH_FLUDSCommonData& common_data)
+  : FLUDS(num_groups, num_angles, common_data.GetSPDS()),
+    common_data_(common_data)
 {
   //============================== Adjusting for different group aggregate
   for (auto& val : common_data_.local_psi_n_block_stride)
-    local_psi_Gn_block_strideG.push_back(val * G);
+    local_psi_Gn_block_strideG.push_back(val * num_groups_);
 
   delayed_local_psi_Gn_block_strideG =
-    common_data_.delayed_local_psi_Gn_block_stride * G;
+    common_data_.delayed_local_psi_Gn_block_stride * num_groups_;
 }
 
 // ###################################################################
@@ -43,8 +46,8 @@ double* AAH_FLUDS::OutgoingPsi(int cell_so_index,
       local_psi_Gn_block_strideG[fc] * n +
       common_data_
           .so_cell_outb_face_slot_indices[cell_so_index][outb_face_counter] *
-        common_data_.local_psi_stride[fc] * G +
-      face_dof * G;
+        common_data_.local_psi_stride[fc] * num_groups_ +
+      face_dof * num_groups_;
 
     return &local_psi_[fc][index];
   }
@@ -54,8 +57,8 @@ double* AAH_FLUDS::OutgoingPsi(int cell_so_index,
       delayed_local_psi_Gn_block_strideG * n +
       common_data_
           .so_cell_outb_face_slot_indices[cell_so_index][outb_face_counter] *
-        common_data_.delayed_local_psi_stride * G +
-      face_dof * G;
+        common_data_.delayed_local_psi_stride * num_groups_ +
+      face_dof * num_groups_;
 
     return &delayed_local_psi_[index];
   }
@@ -81,7 +84,8 @@ double* AAH_FLUDS::NLOutgoingPsi(int outb_face_counter, int face_dof, int n)
   int nonlocal_psi_Gn_blockstride =
     common_data_.deplocI_face_dof_count[depLocI];
 
-  int index = nonlocal_psi_Gn_blockstride * G * n + slot * G + face_dof * G;
+  int index = nonlocal_psi_Gn_blockstride * num_groups_ * n +
+              slot * num_groups_ + face_dof * num_groups_;
 
   if ((index < 0) || (index > deplocI_outgoing_psi_[depLocI].size()))
   {
@@ -114,11 +118,11 @@ double* AAH_FLUDS::UpwindPsi(
       common_data_
           .so_cell_inco_face_dof_indices[cell_so_index][inc_face_counter]
           .slot_address *
-        common_data_.local_psi_stride[fc] * G +
+        common_data_.local_psi_stride[fc] * num_groups_ +
       common_data_
           .so_cell_inco_face_dof_indices[cell_so_index][inc_face_counter]
           .upwind_dof_mapping[face_dof] *
-        G +
+        num_groups_ +
       g;
 
     return &local_psi_[fc][index];
@@ -130,11 +134,11 @@ double* AAH_FLUDS::UpwindPsi(
       common_data_
           .so_cell_inco_face_dof_indices[cell_so_index][inc_face_counter]
           .slot_address *
-        common_data_.delayed_local_psi_stride * G +
+        common_data_.delayed_local_psi_stride * num_groups_ +
       common_data_
           .so_cell_inco_face_dof_indices[cell_so_index][inc_face_counter]
           .upwind_dof_mapping[face_dof] *
-        G +
+        num_groups_ +
       g;
 
     return &delayed_local_psi_old_[index];
@@ -164,8 +168,8 @@ AAH_FLUDS::NLUpwindPsi(int nonl_inc_face_counter, int face_dof, int g, int n)
       common_data_.nonlocal_inc_face_prelocI_slot_dof[nonl_inc_face_counter]
         .second.second[face_dof];
 
-    int index =
-      nonlocal_psi_Gn_blockstride * G * n + slot * G + mapped_dof * G + g;
+    int index = nonlocal_psi_Gn_blockstride * num_groups_ * n +
+                slot * num_groups_ + mapped_dof * num_groups_ + g;
 
     return &prelocI_outgoing_psi_[prelocI][index];
   }
@@ -188,8 +192,8 @@ AAH_FLUDS::NLUpwindPsi(int nonl_inc_face_counter, int face_dof, int g, int n)
         .delayed_nonlocal_inc_face_prelocI_slot_dof[nonl_inc_face_counter]
         .second.second[face_dof];
 
-    int index =
-      nonlocal_psi_Gn_blockstride * G * n + slot * G + mapped_dof * G + g;
+    int index = nonlocal_psi_Gn_blockstride * num_groups_ * n +
+                slot * num_groups_ + mapped_dof * num_groups_ + g;
 
     return &delayed_prelocI_outgoing_psi_old_[prelocI][index];
   }

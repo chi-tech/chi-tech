@@ -2,7 +2,6 @@
 
 #include "mesh/SweepUtilities/AngleSet/angleset.h"
 #include "mesh/SweepUtilities/SPDS/SPDS.h"
-#include "mesh/SweepUtilities/FLUDS/AAH_FLUDS.h"
 
 #include "mpi/chi_mpi_commset.h"
 
@@ -15,25 +14,14 @@
 chi_mesh::sweep_management::AngleSetStatus
 chi_mesh::sweep_management::SweepBuffer::ReceiveUpstreamPsi(int angle_set_num)
 {
-  const auto& spds = angleset->GetSPDS();
-  auto fluds = std::dynamic_pointer_cast<AAH_FLUDS>(angleset->fluds);
-
-  const auto num_grps = angleset->GetNumGrps();
-  const auto num_angles = angleset->angles.size();
+  const auto& spds = fluds_.GetSPDS();
 
   //============================== Resize FLUDS non-local incoming Data
   const size_t num_loc_deps = spds.GetLocationDependencies().size();
   if (!upstream_data_initialized)
   {
-    // angleset->prelocI_outgoing_psi.resize(num_loc_deps,
-    // std::vector<double>()); for (size_t prelocI=0; prelocI<num_loc_deps;
-    // prelocI++)
-    //{
-    //   angleset->prelocI_outgoing_psi[prelocI].resize(
-    //     fluds->prelocI_face_dof_count[prelocI]*num_grps*num_angles,0.0);
-    // }
-    angleset->fluds->AllocatePrelocIOutgoingPsi(
-      num_grps, num_angles, num_loc_deps);
+    fluds_.AllocatePrelocIOutgoingPsi(
+      num_groups_, num_angles_, num_loc_deps);
 
     upstream_data_initialized = true;
   }
@@ -64,7 +52,7 @@ chi_mesh::sweep_management::SweepBuffer::ReceiveUpstreamPsi(int angle_set_num)
         } // if message is not available
 
         //============================ Receive upstream data
-        auto& upstream_psi = angleset->fluds->PrelocIOutgoingPsi()[prelocI];
+        auto& upstream_psi = fluds_.PrelocIOutgoingPsi()[prelocI];
 
         u_ll_int block_addr = prelocI_message_blockpos[prelocI][m];
         u_ll_int message_size = prelocI_message_size[prelocI][m];

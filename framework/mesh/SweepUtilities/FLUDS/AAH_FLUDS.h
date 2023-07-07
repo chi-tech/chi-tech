@@ -12,11 +12,12 @@ namespace chi_mesh::sweep_management
 class AAH_FLUDS : public FLUDS
 {
 public:
-  AAH_FLUDS(size_t in_G, const AAH_FLUDSCommonData& common_data);
+  AAH_FLUDS(size_t num_groups,
+            size_t num_angles,
+            const AAH_FLUDSCommonData& common_data);
 
 private:
   const AAH_FLUDSCommonData& common_data_;
-  const size_t G;
 
   // local_psi_n_block_stride[fc]. Given face category fc, the value is
   // total number of faces that store information in this category's buffer
@@ -26,15 +27,15 @@ private:
   // const size_t delayed_local_psi_Gn_block_stride;
   size_t delayed_local_psi_Gn_block_strideG; // Custom G
 
-  std::vector<std::vector<double>>  local_psi_;
-  std::vector<double>               delayed_local_psi_;
-  std::vector<double>               delayed_local_psi_old_;
-  std::vector<std::vector<double>>  deplocI_outgoing_psi_;
-  std::vector<std::vector<double>>  prelocI_outgoing_psi_;
-  std::vector<std::vector<double>>  boundryI_incoming_psi_;
+  std::vector<std::vector<double>> local_psi_;
+  std::vector<double> delayed_local_psi_;
+  std::vector<double> delayed_local_psi_old_;
+  std::vector<std::vector<double>> deplocI_outgoing_psi_;
+  std::vector<std::vector<double>> prelocI_outgoing_psi_;
+  std::vector<std::vector<double>> boundryI_incoming_psi_;
 
-  std::vector<std::vector<double>>  delayed_prelocI_outgoing_psi_;
-  std::vector<std::vector<double>>  delayed_prelocI_outgoing_psi_old_;
+  std::vector<std::vector<double>> delayed_prelocI_outgoing_psi_;
+  std::vector<std::vector<double>> delayed_prelocI_outgoing_psi_old_;
 
 public:
   double* OutgoingPsi(int cell_so_index,

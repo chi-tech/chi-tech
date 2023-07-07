@@ -14,13 +14,17 @@ namespace chi
 namespace chi_mesh::sweep_management
 {
 
+class FLUDS;
+
 //###################################################################
 /**Handles the swift communication of interprocess communication
  * related to sweeping.*/
 class SweepBuffer
 {
 private:
-  chi_mesh::sweep_management::AngleSet* const angleset;
+  FLUDS& fluds_;
+  const size_t num_groups_;
+  const size_t num_angles_;
   const chi::ChiMPICommunicatorSet&   comm_set;
 
   bool done_sending;
@@ -46,16 +50,15 @@ private:
 
   std::vector<std::vector<MPI_Request>> deplocI_message_request;
 
-
-
 public:
   int max_num_mess;
 
-  SweepBuffer(chi_mesh::sweep_management::AngleSet* ref_angleset,
+  SweepBuffer(FLUDS& fluds,
+              size_t num_groups,
+              size_t num_angles,
               int sweep_eager_limit,
               const chi::ChiMPICommunicatorSet& in_comm_set);
   bool DoneSending() const;
-  void BuildMessageStructure();
   void InitializeDelayedUpstreamData();
   void InitializeLocalAndDownstreamBuffers();
   void SendDownstreamPsi(int angle_set_num);
@@ -64,6 +67,9 @@ public:
   AngleSetStatus ReceiveUpstreamPsi(int angle_set_num);
   void ClearLocalAndReceiveBuffers();
   void Reset();
+
+protected:
+  void BuildMessageStructure();
 
 };
 }
