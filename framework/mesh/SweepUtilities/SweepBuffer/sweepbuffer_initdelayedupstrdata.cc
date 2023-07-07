@@ -9,16 +9,12 @@
  * when a sweep scheduler is constructed.*/
 void chi_mesh::sweep_management::SweepBuffer::InitializeDelayedUpstreamData()
 {
-  const auto& spds = angleset->GetSPDS();
-  auto fluds = std::dynamic_pointer_cast<AAH_FLUDS>(angleset->fluds);
-
-  const auto num_grps = angleset->GetNumGrps();
-  const auto num_angles = angleset->angles.size();
+  const auto& spds = fluds_.GetSPDS();
 
   const auto num_loc_deps = spds.GetDelayedLocationDependencies().size();
 
-  angleset->fluds->AllocateDelayedPrelocIOutgoingPsi(
-    num_grps, num_angles, num_loc_deps);
+  fluds_.AllocateDelayedPrelocIOutgoingPsi(
+    num_groups_, num_angles_, num_loc_deps);
 
-  angleset->fluds->AllocateDelayedLocalPsi(num_grps, num_angles);
+  fluds_.AllocateDelayedLocalPsi(num_groups_, num_angles_);
 }

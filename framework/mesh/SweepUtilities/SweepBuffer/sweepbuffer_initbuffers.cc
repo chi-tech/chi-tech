@@ -20,18 +20,14 @@ void chi_mesh::sweep_management::SweepBuffer::
 {
   if (!data_initialized)
   {
-    const auto& spds = angleset->GetSPDS();
-    auto fluds=  std::dynamic_pointer_cast<AAH_FLUDS>(angleset->fluds);
-
-    const auto num_grps   = angleset->GetNumGrps();
-    const auto num_angles = angleset->angles.size();
+    const auto& spds = fluds_.GetSPDS();
 
     //============================ Resize FLUDS local outgoing Data
-    angleset->fluds->AllocateInternalLocalPsi(num_grps, num_angles);
+    fluds_.AllocateInternalLocalPsi(num_groups_, num_angles_);
 
     //============================ Resize FLUDS non-local outgoing Data
     const size_t num_loc_sucs = spds.GetLocationSuccessors().size();
-    angleset->fluds->AllocateOutgoingPsi(num_grps, num_angles, num_loc_sucs);
+    fluds_.AllocateOutgoingPsi(num_groups_, num_angles_, num_loc_sucs);
 
     //================================================ Make a memory query
     double memory_mb = chi::Console::GetMemoryUsageInMB();

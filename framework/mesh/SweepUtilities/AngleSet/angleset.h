@@ -35,7 +35,7 @@ public:
   AngleSet(size_t in_numgrps,
            size_t in_ref_subset,
            const SPDS& in_spds,
-           std::shared_ptr<FLUDS> in_fluds,
+           std::shared_ptr<FLUDS>& in_fluds,
            std::vector<size_t>& angle_indices,
            std::map<uint64_t, std::shared_ptr<SweepBndry>>& sim_boundaries,
            int sweep_eager_limit,

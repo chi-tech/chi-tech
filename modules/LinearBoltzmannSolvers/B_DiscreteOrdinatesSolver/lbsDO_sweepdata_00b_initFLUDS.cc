@@ -78,6 +78,7 @@ void lbs::DiscreteOrdinatesSolver::InitFluxDataStructures(LBSGroupset& groupset)
         using namespace chi_mesh::sweep_management;
         auto aux_fluds = std::make_shared<AAH_FLUDS>(
           gs_ss_size,
+          angle_indices.size(),
           dynamic_cast<const AAH_FLUDSCommonData&>(fluds_common_data));
 
         auto fluds = std::dynamic_pointer_cast<FLUDS>(aux_fluds);

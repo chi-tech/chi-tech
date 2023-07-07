@@ -4,11 +4,6 @@
 #include "mesh/SweepUtilities/SPDS/SPDS.h"
 #include "mesh/SweepUtilities/FLUDS/AAH_FLUDS.h"
 
-#include "chi_runtime.h"
-#include "chi_log.h"
-#include "chi_mpi.h"
-#include "console/chi_console.h"
-
 //###################################################################
 /**Builds message structure.
  *
@@ -20,20 +15,8 @@
  * sweepbuffer.*/
 void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
 {
-//============================================= Check angleset is complete
-  if (angleset->angles.empty())
-  {
-    Chi::log.LogAllError()
-      << "A call to SweepBuffer::BuildMessageStructure() has been made without"
-         " an initialized angleset.";
-    Chi::Exit(EXIT_FAILURE);
-  }
-
-  const auto& spds =  angleset->GetSPDS();
-  auto fluds=  std::dynamic_pointer_cast<AAH_FLUDS>(angleset->fluds);
-
-  const auto num_grps   = angleset->GetNumGrps();
-  const auto num_angles = angleset->angles.size();
+  const auto& spds =  fluds_.GetSPDS();
+  auto& aah_fluds = dynamic_cast<AAH_FLUDS&>(fluds_);
 
   //============================================= Predecessor locations
   size_t num_dependencies = spds.GetLocationDependencies().size();
@@ -46,13 +29,13 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
   for (int prelocI=0; prelocI<num_dependencies; prelocI++)
   {
     u_ll_int num_unknowns =
-      fluds->GetPrelocIFaceDOFCount(prelocI)*num_grps*num_angles;
+      aah_fluds.GetPrelocIFaceDOFCount(prelocI)*num_groups_*num_angles_;
 
     u_ll_int message_size;
     int      message_count;
     if ((num_unknowns*8)<=EAGER_LIMIT)
     {
-      message_count = static_cast<int>(num_angles);
+      message_count = static_cast<int>(num_angles_);
       message_size  = ceil((double)num_unknowns/(double)message_count);
     }
     else
@@ -91,13 +74,13 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
   for (int prelocI=0; prelocI<num_delayed_dependencies; prelocI++)
   {
     u_ll_int num_unknowns =
-      fluds->GetDelayedPrelocIFaceDOFCount(prelocI)*num_grps*num_angles;
+      aah_fluds.GetDelayedPrelocIFaceDOFCount(prelocI)*num_groups_*num_angles_;
 
     u_ll_int message_size;
     int      message_count;
     if ((num_unknowns*8)<=EAGER_LIMIT)
     {
-      message_count = static_cast<int>(num_angles);
+      message_count = static_cast<int>(num_angles_);
       message_size  = ceil((double)num_unknowns/(double)message_count);
     }
     else
@@ -135,16 +118,16 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
 
   deplocI_message_request.clear();
 
-  for (size_t deplocI=0; deplocI<num_successors; deplocI++)
+  for (int deplocI=0; deplocI<num_successors; deplocI++)
   {
     u_ll_int num_unknowns =
-      fluds->GetDeplocIFaceDOFCount(deplocI)*num_grps*num_angles;
+      aah_fluds.GetDeplocIFaceDOFCount(deplocI)*num_groups_*num_angles_;
 
     u_ll_int message_size;
     int      message_count;
     if ((num_unknowns*8)<=EAGER_LIMIT)
     {
-      message_count = static_cast<int>(num_angles);
+      message_count = static_cast<int>(num_angles_);
       message_size  = ceil((double)num_unknowns/(double)message_count);
     }
     else

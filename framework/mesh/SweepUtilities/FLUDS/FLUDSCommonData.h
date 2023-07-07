@@ -5,6 +5,7 @@
 
 namespace chi_mesh::sweep_management
 {
+class SPDS;
 struct FaceNodalMapping
 {
   const int associated_face;
@@ -21,11 +22,15 @@ class FLUDSCommonData
 {
 public:
   explicit FLUDSCommonData(
+    const SPDS& spds,
     const std::vector<CellFaceNodalMapping>& grid_nodal_mappings);
 
   virtual ~FLUDSCommonData() = default;
 
+  const SPDS& GetSPDS() const;
+
 protected:
+  const SPDS& spds_;
   const std::vector<CellFaceNodalMapping>& grid_nodal_mappings_;
 };
 
