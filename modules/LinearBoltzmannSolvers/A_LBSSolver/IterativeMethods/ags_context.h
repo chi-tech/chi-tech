@@ -1,8 +1,8 @@
 #ifndef CHITECH_AGS_CONTEXT_H
 #define CHITECH_AGS_CONTEXT_H
 
-#include "ChiMath/LinearSolver/linear_solver_context.h"
-#include "ChiMath/LinearSolver/linear_solver.h"
+#include "math/LinearSolver/linear_solver_context.h"
+#include "math/LinearSolver/linear_solver.h"
 
 #include <vector>
 #include <memory>

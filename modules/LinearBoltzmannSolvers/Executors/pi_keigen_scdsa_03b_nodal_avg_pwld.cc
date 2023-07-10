@@ -1,6 +1,6 @@
 #include "pi_keigen_scdsa.h"
 
-#include "ChiMath/VectorGhostCommunicator/vector_ghost_communicator.h"
+#include "math/VectorGhostCommunicator/vector_ghost_communicator.h"
 
 #include "chi_log.h"
 

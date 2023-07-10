@@ -1,10 +1,10 @@
 #ifndef CHITECH_POINT_REACTOR_KINETICS_H
 #define CHITECH_POINT_REACTOR_KINETICS_H
 
-#include "ChiPhysics/SolverBase/chi_solver.h"
-#include "ChiMath/chi_math.h"
-#include "ChiMath/dynamic_matrix.h"
-#include "ChiMath/dynamic_vector.h"
+#include "physics/SolverBase/chi_solver.h"
+#include "math/chi_math.h"
+#include "math/dynamic_matrix.h"
+#include "math/dynamic_vector.h"
 
 namespace prk
 {

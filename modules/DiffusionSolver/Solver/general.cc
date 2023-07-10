@@ -1,9 +1,9 @@
 #include "diffusion_solver.h"
 
-#include "ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h"
-#include "ChiPhysics/PhysicsMaterial/material_property_scalarvalue.h"
-#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
-#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
+#include "physics/PhysicsMaterial/chi_physicsmaterial.h"
+#include "physics/PhysicsMaterial/material_property_scalarvalue.h"
+#include "physics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
+#include "physics/FieldFunction/fieldfunction_gridbased.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

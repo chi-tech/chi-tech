@@ -2,7 +2,7 @@
 
 #include "lbsadj_solver.h"
 
-#include "ChiMesh/LogicalVolume/LogicalVolume.h"
+#include "mesh/LogicalVolume/LogicalVolume.h"
 
 //###################################################################
 /**Subscribes cells to QOIs.*/

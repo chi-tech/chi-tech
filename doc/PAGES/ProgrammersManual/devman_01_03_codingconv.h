@@ -26,7 +26,7 @@
  - Classes and Categorical functions should be contained in their own folder
    unless they are simple.
  - Folder depth shall be kept to a minimum and not exceed a depth of 3
-   sub-levels unless very well justified, i.e. `ChiMath/Discretization/PWL`
+   sub-levels unless very well justified, i.e. `math/Discretization/PWL`
  - Within a class folder the class declaration must be contained in its own
    header file. Exceptions to this are allowed for templates and in-line
    functions
@@ -153,8 +153,6 @@ Class declerations must always happen within header files and should aim to
 provide the maximum amount of scope <B>within the minimum amount of vertical
 space.</B> Member variables/structures should be on the top portion of the
 class decleration and methods should be on the bottom.
-
-\include "../../CHI_TECH/ChiMesh/SurfaceMesh/chi_surfacemesh.h"
 
  \section devman1_sec1 Header files
 

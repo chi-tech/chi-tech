@@ -1,11 +1,11 @@
-#include "ChiMath/dynamic_vector.h"
-#include "ChiMath/dynamic_matrix.h"
-#include "ChiMath/SparseMatrix/chi_math_sparse_matrix.h"
+#include "math/dynamic_vector.h"
+#include "math/dynamic_matrix.h"
+#include "math/SparseMatrix/chi_math_sparse_matrix.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-#include "ChiConsole/chi_console.h"
+#include "console/chi_console.h"
 
 namespace chi_unit_tests
 {

@@ -1,17 +1,17 @@
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-#include "ChiMesh/Raytrace/raytracing.h"
+#include "mesh/MeshHandler/chi_meshhandler.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
+#include "mesh/Raytrace/raytracing.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
-#include "ChiMath/RandomNumberGeneration/random_number_generator.h"
-#include "ChiMath/Quadratures/LegendrePoly/legendrepoly.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "math/RandomNumberGeneration/random_number_generator.h"
+#include "math/Quadratures/LegendrePoly/legendrepoly.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
+#include "physics/FieldFunction/fieldfunction_gridbased.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-#include "ChiConsole/chi_console.h"
+#include "console/chi_console.h"
 
 namespace chi_unit_sim_tests
 {

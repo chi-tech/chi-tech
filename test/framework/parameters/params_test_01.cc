@@ -1,6 +1,6 @@
 #include "params_test_01.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

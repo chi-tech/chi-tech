@@ -1,11 +1,11 @@
-#include "ChiDataTypes/byte_array.h"
-#include "ChiDataTypes/ndarray.h"
-#include "ChiMesh/Cell/cell.h"
+#include "data_types/byte_array.h"
+#include "data_types/ndarray.h"
+#include "mesh/Cell/cell.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-#include "ChiConsole/chi_console.h"
+#include "console/chi_console.h"
 
 #include "chi_mpi.h"
 

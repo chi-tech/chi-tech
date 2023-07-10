@@ -1,6 +1,6 @@
 #include "diffusion_PWLC.h"
 
-#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/spatial_discretization.h"
 
 namespace lbs::acceleration
 {
@@ -25,7 +25,7 @@ DiffusionPWLCSolver::DiffusionPWLCSolver(
   using SDM_TYPE = chi_math::SpatialDiscretizationType;
   const auto& PWLC = SDM_TYPE ::PIECEWISE_LINEAR_CONTINUOUS;
 
-  if (sdm_.type_ != PWLC)
+  if (sdm_.Type() != PWLC)
     throw std::logic_error("lbs::acceleration::DiffusionPWLCSolver: can only be"
                            " used with PWLC.");
 }

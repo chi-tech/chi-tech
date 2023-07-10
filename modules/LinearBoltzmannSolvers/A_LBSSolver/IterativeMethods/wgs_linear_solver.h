@@ -1,7 +1,7 @@
 #ifndef CHITECH_WGSLINSOLVEBASE_H
 #define CHITECH_WGSLINSOLVEBASE_H
 
-#include "ChiMath/LinearSolver/linear_solver.h"
+#include "math/LinearSolver/linear_solver.h"
 
 #include "wgs_context.h"
 

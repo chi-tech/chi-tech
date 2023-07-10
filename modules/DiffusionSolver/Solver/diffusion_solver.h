@@ -1,20 +1,19 @@
 #ifndef CHI_DIFFUSION_SOLVER_H
 #define CHI_DIFFUSION_SOLVER_H
 
-#include "ChiMesh/Cell/cell.h"
+#include "mesh/Cell/cell.h"
 
 #include "DiffusionSolver/Boundaries/chi_diffusion_bndry.h"
 
 #include "DiffusionSolver/chi_diffusion.h"
-#include "ChiPhysics/SolverBase/chi_solver.h"
-#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+#include "physics/SolverBase/chi_solver.h"
+#include "math/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 
-#include "ChiMesh/VolumeMesher/chi_volumemesher.h"
+#include "mesh/VolumeMesher/chi_volumemesher.h"
 
-#include "ChiTimer/chi_timer.h"
-
+#include "utils/chi_timer.h"
 
 #include <petscksp.h>
 
@@ -32,8 +31,8 @@
 class chi_diffusion::Solver : public chi_physics::Solver
 {
 private:
-  chi::ChiTimer t_assembly_;
-  chi::ChiTimer t_solve_;
+  chi::Timer t_assembly_;
+  chi::Timer t_solve_;
 
   double time_assembly_ = 0.0;
   double time_solve_    = 0.0;

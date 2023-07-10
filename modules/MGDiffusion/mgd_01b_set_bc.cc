@@ -2,15 +2,15 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-#include "ChiTimer/chi_timer.h"
+#include "utils/chi_timer.h"
 
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "mesh/MeshHandler/chi_meshhandler.h"
 
 #include "mg_diffusion_bndry.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 
-#include "ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h"
+#include "physics/PhysicsMaterial/chi_physicsmaterial.h"
 
 //============================================= assemble matrix A
 void mg_diffusion::Solver::Set_BCs(const std::vector<uint64_t>& globl_unique_bndry_ids)

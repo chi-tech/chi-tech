@@ -1,6 +1,6 @@
 #include "diffusion_solver.h"
 
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 //###################################################################
 /**Assembles PWLC matrix for general cells.*/

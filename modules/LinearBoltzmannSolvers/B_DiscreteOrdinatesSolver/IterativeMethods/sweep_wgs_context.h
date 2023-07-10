@@ -3,7 +3,7 @@
 
 #include "A_LBSSolver/IterativeMethods/wgs_context.h"
 
-#include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
+#include "mesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
 namespace lbs

@@ -1,7 +1,7 @@
 #ifndef CHITECH_LBS_BNDRY_FUNC_LUA_H
 #define CHITECH_LBS_BNDRY_FUNC_LUA_H
 
-#include "ChiMesh/SweepUtilities/SweepBoundary/sweep_boundaries.h"
+#include "mesh/SweepUtilities/SweepBoundary/sweep_boundaries.h"
 
 #include <string>
 #include <utility>

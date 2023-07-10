@@ -1,7 +1,7 @@
 #ifndef CHITECH_NL_KEIGEN_H
 #define CHITECH_NL_KEIGEN_H
 
-#include "ChiPhysics/SolverBase/chi_solver.h"
+#include "physics/SolverBase/chi_solver.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/lbs_solver.h"
 #include "A_LBSSolver/IterativeMethods/nl_keigen_ags_solver.h"
 

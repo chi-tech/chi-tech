@@ -2,7 +2,7 @@
 #define CHITECH_LBS_ACCEL_DIFFUSION_H
 
 #include "acceleration.h"
-#include "ChiMath/UnknownManager/unknown_manager.h"
+#include "math/UnknownManager/unknown_manager.h"
 #include "petscksp.h"
 
 // ############################################### Forward declarations

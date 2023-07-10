@@ -1,9 +1,9 @@
 #ifndef CHITECH_LBS_SWEEPCHUNK_H
 #define CHITECH_LBS_SWEEPCHUNK_H
 
-#include "ChiMesh/SweepUtilities/sweepchunk_base.h"
+#include "mesh/SweepUtilities/sweepchunk_base.h"
 
-#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/spatial_discretization.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
 namespace lbs

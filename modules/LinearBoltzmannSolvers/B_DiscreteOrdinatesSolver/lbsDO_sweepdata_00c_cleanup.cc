@@ -3,7 +3,7 @@
 #include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
 #include "chi_runtime.h"
-#include "ChiConsole/chi_console.h"
+#include "console/chi_console.h"
 #include "chi_log.h"
 #include "chi_mpi.h"
 
@@ -25,7 +25,7 @@ void lbs::DiscreteOrdinatesSolver::ResetSweepOrderings(LBSGroupset& groupset)
   Chi::log.Log()
     << "SPDS and FLUDS reset complete.            Process memory = "
     << std::setprecision(3)
-    << chi::ChiConsole::GetMemoryUsageInMB() << " MB";
+    << chi::Console::GetMemoryUsageInMB() << " MB";
 
   double local_app_memory =
     Chi::log.ProcessEvent(chi::ChiLog::StdTags::MAX_MEMORY_USAGE,

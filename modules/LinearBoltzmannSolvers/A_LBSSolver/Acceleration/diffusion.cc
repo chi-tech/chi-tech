@@ -1,7 +1,7 @@
 #include "diffusion.h"
 
-#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "math/SpatialDiscretization/spatial_discretization.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -21,7 +21,7 @@ DiffusionSolver::DiffusionSolver(
   const bool verbose,
   const bool requires_ghosts)
   : text_name_(std::move(text_name)),
-    grid_(sdm.ref_grid_),
+    grid_(sdm.Grid()),
     sdm_(sdm),
     uk_man_(uk_man),
     bcs_(std::move(bcs)),

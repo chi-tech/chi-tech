@@ -1,7 +1,7 @@
 #include "acceleration.h"
 
-#include "ChiMesh/SweepUtilities/SweepBoundary/sweep_boundaries.h"
-#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
+#include "mesh/SweepUtilities/SweepBoundary/sweep_boundaries.h"
+#include "physics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
 
 #include "chi_runtime.h"
 #include "chi_log_exceptions.h"

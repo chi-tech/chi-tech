@@ -1,15 +1,15 @@
 #include "diffusion_solver.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
+#include "physics/FieldFunction/fieldfunction_gridbased.h"
 
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_runtime.h"
 
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-#include "ChiTimer/chi_timer.h"
+#include "utils/chi_timer.h"
 
 //###################################################################
 /**Initializes the diffusion solver using the PETSc library.*/
@@ -23,7 +23,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
   if (not common_items_initialized_)
     InitializeCommonItems(); //Mostly boundaries
 
-  chi::ChiTimer t_init; t_init.Reset();
+  chi::Timer t_init; t_init.Reset();
 
   auto sdm_string = basic_options_("discretization_method").StringValue();
   {

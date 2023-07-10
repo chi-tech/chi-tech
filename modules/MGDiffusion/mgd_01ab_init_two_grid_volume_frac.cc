@@ -1,8 +1,8 @@
 #include "mg_diffusion_solver.h"
-#include "ChiTimer/chi_timer.h"
-#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
-#include "ChiMath/SpatialDiscretization/FiniteElement/finite_element.h"
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "utils/chi_timer.h"
+#include "math/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/FiniteElement/finite_element.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 //============================================= assemble matrix A
 void mg_diffusion::Solver::Compute_TwoGrid_VolumeFractions()

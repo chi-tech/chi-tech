@@ -1,16 +1,16 @@
 #ifndef MG_DIFFUSION_SOLVER_H
 #define MG_DIFFUSION_SOLVER_H
 
-#include "ChiPhysics/SolverBase/chi_solver.h"
-#include "ChiMath/PETScUtils/petsc_utils.h"
+#include "physics/SolverBase/chi_solver.h"
+#include "math/PETScUtils/petsc_utils.h"
 
 #include "mg_diffusion_bndry.h"
-#include "ChiTimer/chi_timer.h"
+#include "utils/chi_timer.h"
 
-#include "ChiConsole/chi_console.h"
+#include "console/chi_console.h"
 
-#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
-#include "ChiPhysics/PhysicsMaterial/material_property_isotropic_mg_src.h"
+#include "physics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
+#include "physics/PhysicsMaterial/material_property_isotropic_mg_src.h"
 
 #include <map>
 

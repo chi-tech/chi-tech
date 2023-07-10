@@ -3,7 +3,7 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 #include "chi_mpi.h"
-#include "ChiConsole/chi_console.h"
+#include "console/chi_console.h"
 
 #include <iomanip>
 
@@ -183,5 +183,5 @@ void lbs::LBSSolver::InitializeParrays()
   Chi::log.Log()
     << "Done with parallel arrays.                Process memory = "
     << std::setprecision(3)
-    << chi::ChiConsole::GetMemoryUsageInMB() << " MB" << std::endl;
+    << chi::Console::GetMemoryUsageInMB() << " MB" << std::endl;
 }

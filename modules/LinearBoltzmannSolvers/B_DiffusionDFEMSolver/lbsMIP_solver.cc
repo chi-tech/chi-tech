@@ -1,6 +1,6 @@
 #include "lbsMIP_solver.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 
 #include "A_LBSSolver/SourceFunctions/source_function.h"
 #include "A_LBSSolver/Acceleration/diffusion_mip.h"
@@ -17,9 +17,8 @@ chi::InputParameters DiffusionDFEMSolver::GetInputParameters()
 {
   chi::InputParameters params = LBSSolver::GetInputParameters();
 
-  params.SetGeneralDescription(
-    "\\defgroup lbs__DiffusionDFEMSolver DiffusionDFEMSolver\n"
-    "\\ingroup lbs__LBSSolver");
+  params.SetClassName("DiffusionDFEMSolver");
+  params.SetDocGroup("lbs__LBSSolver");
 
   params.ChangeExistingParamToOptional("name", "LBSDiffusionDFEMSolver");
 

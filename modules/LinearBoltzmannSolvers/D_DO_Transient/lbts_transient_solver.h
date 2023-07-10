@@ -2,7 +2,7 @@
 #define CHITECH_LBTS_TRANSIENT_SOLVER_H
 
 #include "Cc_DO_KEigenvalue/lbkes_k_eigenvalue_solver.h"
-#include "ChiMath/chi_math_time_stepping.h"
+#include "math/chi_math_time_stepping.h"
 
 typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
 

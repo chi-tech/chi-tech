@@ -1,9 +1,9 @@
 #include "lbs_adj_response_function.h"
 
-#include "ChiLua/chi_lua.h"
+#include "chi_lua.h"
 
 #include "chi_runtime.h"
-#include "ChiConsole/chi_console.h"
+#include "console/chi_console.h"
 #include "chi_log.h"
 
 //###################################################################

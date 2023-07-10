@@ -1,16 +1,16 @@
 #ifndef DFEM_DIFFUSION_SOLVER_H
 #define DFEM_DIFFUSION_SOLVER_H
 
-#include "ChiPhysics/SolverBase/chi_solver.h"
-#include "ChiMath/PETScUtils/petsc_utils.h"
+#include "physics/SolverBase/chi_solver.h"
+#include "math/PETScUtils/petsc_utils.h"
 
 #include "dfem_diffusion_bndry.h"
-#include "ChiTimer/chi_timer.h"
+#include "utils/chi_timer.h"
 
-#include "ChiConsole/chi_console.h"
-#include "ChiMath/UnknownManager/unknown_manager.h"
+#include "console/chi_console.h"
+#include "math/UnknownManager/unknown_manager.h"
 
-#include "ChiMesh/chi_mesh.h"
+#include "mesh/chi_mesh.h"
 
 #include <map>
 

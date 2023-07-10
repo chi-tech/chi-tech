@@ -1,8 +1,8 @@
-#include "ChiConsole/chi_console.h"
-#include "ChiLua/chi_lua.h"
+#include "console/chi_console.h"
+#include "chi_lua.h"
 #include "cfem_diffusion_solver.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
+#include "physics/FieldFunction/fieldfunction_gridbased.h"
 
 //###################################################################
 /**Calls a lua function with xyz coordinates.

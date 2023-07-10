@@ -32,7 +32,7 @@ The stack items stored within `chi` can be accessed either by reference or as a
 
 \code
 #include "chi_runtime.h"
-#include "ChiMesh/SurfaceMesh/chi_surfacemesh.h" //Just an example
+#include "mesh/SurfaceMesh/chi_surfacemesh.h" //Just an example
 
 void SomeFunction()
 {

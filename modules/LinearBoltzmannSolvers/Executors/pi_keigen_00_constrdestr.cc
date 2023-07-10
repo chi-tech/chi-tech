@@ -1,6 +1,6 @@
 #include "pi_keigen.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 
 #include "chi_runtime.h"
 
@@ -15,10 +15,9 @@ chi::InputParameters XXPowerIterationKEigen::GetInputParameters()
     chi_physics::Solver::GetInputParameters();
 
   params.SetGeneralDescription(
-    "\\defgroup lbs__XXPowerIterationKEigen lbs.XXPowerIterationKEigen \n"
-    "\\ingroup LBSExecutors\n"
     "Generalized implementation of a k-Eigenvalue solver using Power "
     "Iteration.");
+  params.SetDocGroup("LBSExecutors");
 
   params.ChangeExistingParamToOptional("name", "XXPowerIterationKEigen");
 

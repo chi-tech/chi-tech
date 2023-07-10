@@ -1,8 +1,8 @@
 #include "lbs_transient.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 
-#include "ChiMath/TimeIntegrations/time_integration.h"
+#include "math/TimeIntegrations/time_integration.h"
 
 namespace lbs
 {
@@ -15,10 +15,9 @@ chi::InputParameters TransientSolver::GetInputParameters()
     chi_physics::Solver::GetInputParameters();
 
   params.SetGeneralDescription(
-    "\\defgroup lbs__TransientSolver lbs.TransientSolver \n"
-    "\\ingroup LBSExecutors\n"
     "Generalized implementation of a transient solver. This solver calls"
     " the Across-Groupset (AGS) solver for the lbs-data block.");
+  params.SetDocGroup("LBSExecutors");
 
   params.ChangeExistingParamToOptional("name", "TransientSolver");
 
