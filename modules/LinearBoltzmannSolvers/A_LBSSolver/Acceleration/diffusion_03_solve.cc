@@ -1,9 +1,9 @@
 #include "diffusion.h"
 
-#include "ChiMath/PETScUtils/petsc_utils.h"
-#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "math/PETScUtils/petsc_utils.h"
+#include "math/SpatialDiscretization/spatial_discretization.h"
 
-#include "ChiPhysics/chi_physics_namespace.h"
+#include "physics/chi_physics_namespace.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

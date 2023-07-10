@@ -205,7 +205,7 @@ int main(int argc, char* argv[])
 To gain access to the `chi_math::SpatialDiscretization_PWLC` class we need to
 include the header
 \code
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 \endcode
 
 Next we add the following code
@@ -483,12 +483,12 @@ ff->ExportToVTK("CodeTut3_PWLC");
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "mesh/MeshHandler/chi_meshhandler.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
-#include "ChiMath/PETScUtils/petsc_utils.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+#include "math/PETScUtils/petsc_utils.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction2.h"
+#include "physics/FieldFunction/fieldfunction2.h"
 
 int main(int argc, char* argv[])
 {

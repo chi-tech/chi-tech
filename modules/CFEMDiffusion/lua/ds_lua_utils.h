@@ -1,7 +1,7 @@
 #ifndef CFEM_DIFFUSION_LUA_UTILS_H
 #define CFEM_DIFFUSION_LUA_UTILS_H
 
-#include"ChiLua/chi_lua.h"
+#include "chi_lua.h"
 #include "../cfem_diffusion_solver.h"
 
 namespace cfem_diffusion::cfem_diffusion_lua_utils

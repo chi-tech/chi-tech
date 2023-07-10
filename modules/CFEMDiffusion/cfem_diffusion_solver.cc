@@ -2,16 +2,16 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-#include "ChiTimer/chi_timer.h"
+#include "utils/chi_timer.h"
 
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "mesh/MeshHandler/chi_meshhandler.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "cfem_diffusion_bndry.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
+#include "physics/FieldFunction/fieldfunction_gridbased.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 
 //============================================= constructor
 cfem_diffusion::Solver::Solver(const std::string& in_solver_name):

@@ -1,6 +1,6 @@
 #include "diffusion_mip.h"
 
-#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/spatial_discretization.h"
 
 #include <utility>
 
@@ -26,7 +26,7 @@ lbs::acceleration::DiffusionMIPSolver::DiffusionMIPSolver(
   using SDM_TYPE = chi_math::SpatialDiscretizationType;
   const auto& PWLD = SDM_TYPE ::PIECEWISE_LINEAR_DISCONTINUOUS;
 
-  if (sdm_.type_ != PWLD)
+  if (sdm_.Type() != PWLD)
     throw std::logic_error("lbs::acceleration::DiffusionMIPSolver: can only be"
                            " used with PWLD.");
 }

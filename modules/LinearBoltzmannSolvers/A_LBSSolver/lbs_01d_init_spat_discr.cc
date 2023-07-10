@@ -1,11 +1,11 @@
 #include "lbs_solver.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-#include "ChiConsole/chi_console.h"
+#include "console/chi_console.h"
 
 
 
@@ -182,5 +182,5 @@ void lbs::LBSSolver::ComputeUnitIntegrals()
   Chi::log.Log()
     << "Cell matrices computed.                   Process memory = "
     << std::setprecision(3)
-    << chi::ChiConsole::GetMemoryUsageInMB() << " MB";
+    << chi::Console::GetMemoryUsageInMB() << " MB";
 }

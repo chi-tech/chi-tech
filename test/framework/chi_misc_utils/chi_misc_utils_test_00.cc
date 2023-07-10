@@ -1,9 +1,9 @@
-#include "chi_misc_utils.h"
+#include "chi_utils.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-#include "ChiConsole/chi_console.h"
+#include "console/chi_console.h"
 
 namespace chi_unit_tests
 {
@@ -27,7 +27,7 @@ chi_misc_utils_Test00(const chi::InputParameters&)
   std::stringstream progress;
   for (size_t i = 0; i < N; ++i)
   {
-    progress << chi_misc_utils::PrintIterationProgress(i, N, I);
+    progress << chi::PrintIterationProgress(i, N, I);
   }
 
   Chi::log.Log() << progress.str();

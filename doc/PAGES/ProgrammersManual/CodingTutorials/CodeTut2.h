@@ -86,7 +86,7 @@ share the intended structure of the ghost-communicator).
 In order to gain access to `chi_math::VectorGhostCommunicator` we first include
 the header
 \code
-#include "ChiMath/VectorGhostCommunicator/vector_ghost_communicator.h"
+#include "math/VectorGhostCommunicator/vector_ghost_communicator.h"
 \endcode
 
 Next we add the following code:
@@ -292,15 +292,15 @@ visualization as shown below
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "mesh/MeshHandler/chi_meshhandler.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteVolume/fv.h"
-#include "ChiMath/PETScUtils/petsc_utils.h"
+#include "math/SpatialDiscretization/FiniteVolume/fv.h"
+#include "math/PETScUtils/petsc_utils.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction2.h"
+#include "physics/FieldFunction/fieldfunction2.h"
 
-#include "ChiMath/VectorGhostCommunicator/vector_ghost_communicator.h"
+#include "math/VectorGhostCommunicator/vector_ghost_communicator.h"
 
 int main(int argc, char* argv[])
 {

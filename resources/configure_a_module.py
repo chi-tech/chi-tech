@@ -12,7 +12,7 @@ print("ChiTech root: ", chi_tech_root)
 cwd = os.getcwd()
 
 parser = argparse.ArgumentParser()
-parser.add_argument("module_name", type=str, required=True,
+parser.add_argument("module_name", type=str,
                     help="The name of the module")
 
 args = parser.parse_args()
@@ -71,7 +71,7 @@ main_dot_cc.write('''\
 */
 int main(int argc, char* argv[])
 {
-  Chi::Initialize(argc,argv);
+  Chi::Initialize(argc,argv, MPI_COMM_WORLD);
   
   int error_code;
   if (Chi::run_time::sim_option_interactive_)

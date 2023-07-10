@@ -2,16 +2,16 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-#include "ChiTimer/chi_timer.h"
+#include "utils/chi_timer.h"
 
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "mesh/MeshHandler/chi_meshhandler.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "dfem_diffusion_bndry.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction_gridbased.h"
+#include "physics/FieldFunction/fieldfunction_gridbased.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
 #define DefaultBCDirichlet BoundaryCondition{BCType::DIRICHLET,{0,0,0}}
 

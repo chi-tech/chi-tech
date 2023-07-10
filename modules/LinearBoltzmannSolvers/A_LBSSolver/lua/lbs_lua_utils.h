@@ -2,7 +2,7 @@
 #define CHITECH_LBS_LUA_UTILS_H
 
 #include "chi_lua.h"
-#include "ChiParameters/input_parameters.h"
+#include"parameters/input_parameters.h"
 
 namespace lbs
 {

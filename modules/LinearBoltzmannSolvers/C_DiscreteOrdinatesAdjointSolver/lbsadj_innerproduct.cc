@@ -1,6 +1,6 @@
 #include "lbsadj_solver.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/spatial_discretization_FE.h"
+#include "math/SpatialDiscretization/FiniteElement/spatial_discretization_FE.h"
 
 //###################################################################
 /**Computes the inner product of the flux and the material source.*/

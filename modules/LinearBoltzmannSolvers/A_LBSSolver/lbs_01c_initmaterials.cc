@@ -1,6 +1,6 @@
 #include "lbs_solver.h"
 
-#include "ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h"
+#include "physics/PhysicsMaterial/chi_physicsmaterial.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

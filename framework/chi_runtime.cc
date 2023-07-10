@@ -2,17 +2,17 @@
 #include "chi_runtime.h"
 #include "chi_configuration.h"
 
-#include "ChiConsole/chi_console.h"
-#include "ChiMath/chi_math.h"
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "console/chi_console.h"
+#include "math/chi_math.h"
+#include "mesh/MeshHandler/chi_meshhandler.h"
 
-#include "ChiPhysics/chi_physics_namespace.h"
+#include "physics/chi_physics_namespace.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 
 #include "chi_mpi.h"
 #include "chi_log.h"
-#include "ChiTimer/chi_timer.h"
+#include "utils/chi_timer.h"
 
 #include <iostream>
 
@@ -21,10 +21,10 @@
 #endif
 
 //=============================================== Global variables
-chi::ChiConsole& Chi::console = chi::ChiConsole::GetInstance();
+chi::Console& Chi::console = chi::Console::GetInstance();
 chi::ChiLog& Chi::log = chi::ChiLog::GetInstance();
 chi::MPI_Info& Chi::mpi = chi::MPI_Info::GetInstance();
-chi::ChiTimer Chi::program_timer;
+chi::Timer Chi::program_timer;
 
 /** Global stack of handlers */
 std::vector<chi_mesh::MeshHandlerPtr> Chi::meshhandler_stack;
@@ -38,7 +38,6 @@ std::vector<chi_physics::MaterialPtr> Chi::material_stack;
 std::vector<chi_physics::MultiGroupXSPtr> Chi::multigroup_xs_stack;
 std::vector<chi_physics::FieldFunctionPtr> Chi::field_function_stack;
 
-std::vector<chi_math::QuadraturePtr> Chi::quadrature_stack;
 std::vector<chi_math::AngularQuadraturePtr> Chi::angular_quadrature_stack;
 
 std::vector<ChiObjectPtr> Chi::object_stack;
@@ -153,7 +152,7 @@ void Chi::run_time::ParseArguments(int argc, char** argv)
 
   if (Chi::run_time::dump_registry_)
   {
-    ChiObjectMaker::GetInstance().DumpRegister();
+    ChiObjectFactory::GetInstance().DumpRegister();
     Chi::console.DumpRegister();
   }
 }
@@ -226,7 +225,7 @@ int Chi::RunInteractive(int argc, char** argv)
 {
   if (not Chi::run_time::supress_beg_end_timelog_)
   {
-    Chi::log.Log() << chi::ChiTimer::GetLocalDateTimeString()
+    Chi::log.Log() << chi::Timer::GetLocalDateTimeString()
                    << " Running ChiTech in interactive-mode with "
                    << Chi::mpi.process_count << " processes.";
 
@@ -259,7 +258,7 @@ int Chi::RunInteractive(int argc, char** argv)
   if (not Chi::run_time::supress_beg_end_timelog_)
   {
     Chi::log.Log() << "Final program time " << program_timer.GetTimeString();
-    Chi::log.Log() << chi::ChiTimer::GetLocalDateTimeString()
+    Chi::log.Log() << chi::Timer::GetLocalDateTimeString()
                    << " ChiTech finished execution.";
   }
 
@@ -272,7 +271,7 @@ int Chi::RunBatch(int argc, char** argv)
 {
   if (not Chi::run_time::supress_beg_end_timelog_)
   {
-    Chi::log.Log() << chi::ChiTimer::GetLocalDateTimeString()
+    Chi::log.Log() << chi::Timer::GetLocalDateTimeString()
                    << " Running ChiTech in batch-mode with "
                    << Chi::mpi.process_count << " processes.";
 
@@ -315,7 +314,7 @@ int Chi::RunBatch(int argc, char** argv)
   if (not Chi::run_time::supress_beg_end_timelog_)
   {
     Chi::log.Log() << "\nFinal program time " << program_timer.GetTimeString();
-    Chi::log.Log() << chi::ChiTimer::GetLocalDateTimeString()
+    Chi::log.Log() << chi::Timer::GetLocalDateTimeString()
                    << " ChiTech finished execution of "
                    << Chi::run_time::input_file_name_;
   }
@@ -330,3 +329,22 @@ void Chi::Exit(int error_code) { MPI_Abort(mpi.comm, error_code); }
 // ###################################################################
 /** Gets the ChiTech-version string.*/
 std::string Chi::GetVersionStr() { return PROJECT_VERSION; }
+
+// ###################################################################
+/**Builds a `RegistryStatuses` structure*/
+chi::RegistryStatuses Chi::GetStatusOfRegistries()
+{
+  chi::RegistryStatuses stats;
+
+  const auto& object_factory = ChiObjectFactory::GetInstance();
+  for (const auto& [key, _] : object_factory.Registry())
+    stats.objfactory_keys_.push_back(key);
+
+  for (const auto& [key, _] : console.GetLuaFunctionRegistry())
+    stats.console_lua_func_keys_.push_back(key);
+
+  for (const auto& [key, _] : console.GetFunctionWrapperRegistry())
+    stats.console_lua_wrapper_keys_.push_back(key);
+
+  return stats;
+}

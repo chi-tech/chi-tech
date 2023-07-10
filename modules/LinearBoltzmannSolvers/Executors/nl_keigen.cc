@@ -1,6 +1,6 @@
 #include "nl_keigen.h"
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 #include "chi_log.h"
 
 namespace lbs
@@ -14,9 +14,8 @@ chi::InputParameters XXNonLinearKEigen::GetInputParameters()
     chi_physics::Solver::GetInputParameters();
 
   params.SetGeneralDescription(
-    "\\defgroup lbs__XXNonLinearKEigen lbs.XXNonLinearKEigen \n"
-    "\\ingroup LBSExecutors\n"
     "Generalized implementation of a non-linear k-Eigenvalue solver");
+  params.SetDocGroup("LBSExecutors");
 
   params.ChangeExistingParamToOptional("name", "XXPowerIterationKEigen");
 

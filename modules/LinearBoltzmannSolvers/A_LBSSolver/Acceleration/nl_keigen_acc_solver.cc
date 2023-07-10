@@ -4,7 +4,7 @@
 
 #include "A_LBSSolver/IterativeMethods/snes_k_monitor.h"
 
-#include "ChiMath/PETScUtils/petsc_utils.h"
+#include "math/PETScUtils/petsc_utils.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

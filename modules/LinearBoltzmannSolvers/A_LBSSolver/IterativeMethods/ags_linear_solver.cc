@@ -2,8 +2,8 @@
 
 #include "A_LBSSolver/lbs_solver.h"
 
-#include "ChiMath/PETScUtils/petsc_utils.h"
-#include "ChiMath/LinearSolver/linear_matrix_action_Ax.h"
+#include "math/PETScUtils/petsc_utils.h"
+#include "math/LinearSolver/linear_matrix_action_Ax.h"
 
 #include <petscksp.h>
 

@@ -4,7 +4,7 @@
 
 #include "LinearBoltzmannSolvers/A_LBSSolver/lbs_solver.h"
 
-#include "ChiConsole/chi_console.h"
+#include "console/chi_console.h"
 #include "chi_runtime.h"
 #include "chi_log.h"
 

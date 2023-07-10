@@ -1,9 +1,9 @@
 #include "diffusion.h"
 
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
-#include "ChiMath/PETScUtils/petsc_utils.h"
+#include "math/SpatialDiscretization/spatial_discretization.h"
+#include "math/PETScUtils/petsc_utils.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

@@ -2,7 +2,7 @@
 #define CHITECH_LBS_DIFFUSION_MIP_H
 
 #include "diffusion.h"
-#include "ChiLua/chi_lua.h"
+#include "chi_lua.h"
 
 //############################################### Forward declarations
 namespace chi_mesh

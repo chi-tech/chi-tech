@@ -1,13 +1,13 @@
 #include "diffusion_PWLC.h"
 
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
+#include "math/SpatialDiscretization/spatial_discretization.h"
 
 #include "A_LBSSolver/lbs_structs.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-#include "ChiTimer/chi_timer.h"
+#include "utils/chi_timer.h"
 
 #define DefaultBCDirichlet                                                     \
   BoundaryCondition                                                            \

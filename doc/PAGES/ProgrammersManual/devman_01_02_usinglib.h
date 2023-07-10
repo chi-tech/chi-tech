@@ -162,7 +162,7 @@ make -j4
  * with the following contents:
  *
  * \code
- * #include"ChiLua/chi_lua.h"
+ * #include "chi_lua.h"
  * #include "chi::log.h"
  *
  * int chiPrintStatus(lua_State *L)
@@ -224,7 +224,7 @@ the project. The line
  * Modify your ```test.cc``` source file to be
 \code
 #include "chi_runtime.h"
-#include "ChiConsole/chi_console.h"
+#include "console/chi_console.h"
 
 int main(int argc, char* argv[])
 {

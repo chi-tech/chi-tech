@@ -1,19 +1,19 @@
 #include "diffusion_PWLC.h"
 #include "acceleration.h"
 
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
-#include "ChiMath/SpatialDiscretization/FiniteElement/finite_element.h"
+#include "math/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/FiniteElement/finite_element.h"
 
-#include "ChiPhysics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
+#include "physics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
 
 #include "LinearBoltzmannSolvers/A_LBSSolver/lbs_structs.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-#include "ChiTimer/chi_timer.h"
-#include "ChiConsole/chi_console.h"
+#include "utils/chi_timer.h"
+#include "console/chi_console.h"
 
 #define DefaultBCDirichlet                                                     \
   BoundaryCondition                                                            \

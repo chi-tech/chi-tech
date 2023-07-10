@@ -3,7 +3,7 @@
 
 #include "source_function.h"
 
-#include "ChiMath/chi_math_time_stepping.h"
+#include "math/chi_math_time_stepping.h"
 
 namespace lbs
 {

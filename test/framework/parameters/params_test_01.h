@@ -1,8 +1,8 @@
 #ifndef CHITECH_PARAMS_TEST_H
 #define CHITECH_PARAMS_TEST_H
 
-#include "ChiObject/chi_object.h"
-#include "ChiParameters/input_parameters.h"
+#include "ChiObject.h"
+#include"parameters/input_parameters.h"
 
 namespace chi_unit_testsB
 {

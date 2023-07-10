@@ -4,12 +4,12 @@
 #include "LinearBoltzmannSolvers/A_LBSSolver/lbs_solver.h"
 
 #include "chi_runtime.h"
-#include "ChiLog/chi_log.h"
-#include "ChiMPI/chi_mpi.h"
+#include "chi_log.h"
+#include "mpi/chi_mpi.h"
 
 #include <fstream>
 
-#include "ChiObject/object_maker.h"
+#include "ChiObjectFactory.h"
 
 namespace lbs
 {
@@ -23,10 +23,8 @@ chi::InputParameters lbs::LBSGroupset::GetInputParameters()
   chi::InputParameters params = ChiObject::GetInputParameters();
 
   // clang-format off
-  params.SetGeneralDescription(
-    "\\defgroup lbs__LBSGroupset Groupset Input Parameters\n"
-    "\\ingroup LuaLBSGroupsets\n"
-    "Input Parameters for groupsets.");
+  params.SetGeneralDescription("Input Parameters for groupsets.");
+  params.SetDocGroup("LuaLBSGroupsets");
 
   params.AddRequiredParameterArray(
     "groups_from_to", "The first and last group id this groupset operates on."

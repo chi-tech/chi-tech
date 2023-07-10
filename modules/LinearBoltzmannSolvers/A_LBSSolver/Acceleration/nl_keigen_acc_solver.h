@@ -1,7 +1,7 @@
 #ifndef CHITECH_LBS_NL_KEIGEN_ACC_SOLVER_H
 #define CHITECH_LBS_NL_KEIGEN_ACC_SOLVER_H
 
-#include "ChiMath/NonLinearSolver/non_linear_solver.h"
+#include "math/NonLinearSolver/non_linear_solver.h"
 
 #include "nl_keigen_acc_context.h"
 

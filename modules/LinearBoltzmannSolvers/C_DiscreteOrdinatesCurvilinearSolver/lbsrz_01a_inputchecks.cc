@@ -1,7 +1,7 @@
 #include "lbs_curvilinear_solver.h"
 
-#include "ChiMath/Quadratures/cylindrical_angular_quadrature.h"
-#include "ChiMath/Quadratures/spherical_angular_quadrature.h"
+#include "math/Quadratures/cylindrical_angular_quadrature.h"
+#include "math/Quadratures/spherical_angular_quadrature.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

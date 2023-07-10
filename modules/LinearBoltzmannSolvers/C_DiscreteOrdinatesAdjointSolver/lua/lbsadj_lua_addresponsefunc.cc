@@ -3,9 +3,9 @@
 #include "C_DiscreteOrdinatesAdjointSolver/lbsadj_solver.h"
 
 #include "chi_runtime.h"
-#include "ChiMesh/LogicalVolume/LogicalVolume.h"
+#include "mesh/LogicalVolume/LogicalVolume.h"
 
-#include "ChiConsole/chi_console.h"
+#include "console/chi_console.h"
 
 namespace lbs::adjoint_lua_utils
 {

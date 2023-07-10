@@ -17,9 +17,6 @@ typedef std::shared_ptr<MeshHandler> MeshHandlerPtr;
 class SurfaceMesh;
 typedef std::shared_ptr<SurfaceMesh> SurfaceMeshPtr;
 
-class LogicalVolume;
-typedef std::shared_ptr<LogicalVolume> LogicalVolumePtr;
-
 class FieldFunctionInterpolation;
 typedef FieldFunctionInterpolation FFInterp;
 typedef std::shared_ptr<FFInterp> FFInterpPtr;
@@ -43,11 +40,9 @@ typedef std::shared_ptr<FieldFunction> FieldFunctionPtr;
 
 namespace chi_math
 {
-class Quadrature;
 class AngularQuadrature;
 class SpatialDiscretization;
 
-typedef std::shared_ptr<Quadrature> QuadraturePtr;
 typedef std::shared_ptr<AngularQuadrature> AngularQuadraturePtr;
 typedef std::shared_ptr<SpatialDiscretization> SpatialDiscretizationPtr;
 
@@ -57,9 +52,16 @@ class UnknownManager;
 namespace chi
 {
 
-class ChiTimer;
-class ChiConsole;
+class Timer;
+class Console;
 class ChiLog;
+/**Stores all the keys currently in the registries.*/
+struct RegistryStatuses
+{
+  std::vector<std::string> objfactory_keys_;
+  std::vector<std::string> console_lua_func_keys_;
+  std::vector<std::string> console_lua_wrapper_keys_;
+};
 } // namespace chi
 
 class ChiObject;
@@ -71,8 +73,8 @@ class Chi
 {
 public:
   static chi::MPI_Info& mpi;
-  static chi::ChiTimer program_timer;
-  static chi::ChiConsole& console;
+  static chi::Timer program_timer;
+  static chi::Console& console;
   static chi::ChiLog& log;
 
   static std::vector<chi_mesh::MeshHandlerPtr> meshhandler_stack;
@@ -86,7 +88,6 @@ public:
   static std::vector<chi_physics::MultiGroupXSPtr> multigroup_xs_stack;
   static std::vector<chi_physics::FieldFunctionPtr> field_function_stack;
 
-  static std::vector<chi_math::QuadraturePtr> quadrature_stack;
   static std::vector<chi_math::AngularQuadraturePtr> angular_quadrature_stack;
 
   static std::vector<ChiObjectPtr> object_stack;
@@ -154,6 +155,9 @@ public:
   static int Initialize(int argc, char** argv, MPI_Comm communicator);
   static void Finalize();
   static void Exit(int error_code);
+
+  /**Builds a `RegistryStatuses` structure*/
+  static chi::RegistryStatuses GetStatusOfRegistries();
 
   static std::string GetVersionStr();
 

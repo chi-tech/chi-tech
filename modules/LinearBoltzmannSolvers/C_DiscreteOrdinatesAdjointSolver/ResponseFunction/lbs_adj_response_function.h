@@ -3,7 +3,7 @@
 
 #include <utility>
 
-#include "ChiMesh/Cell/cell.h"
+#include "mesh/Cell/cell.h"
 
 namespace lbs
 {

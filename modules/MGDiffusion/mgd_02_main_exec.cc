@@ -6,8 +6,8 @@
 
 #include <iomanip>
 
-//#include "ChiMesh/MeshHandler/chi_meshhandler.h"
-//#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+//#include "mesh/MeshHandler/chi_meshhandler.h"
+//#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 
 //========================================================== Execute
 void mg_diffusion::Solver::Execute()

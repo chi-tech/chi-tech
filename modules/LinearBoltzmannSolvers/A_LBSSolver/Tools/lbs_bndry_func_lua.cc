@@ -1,10 +1,10 @@
 #include "lbs_bndry_func_lua.h"
 
-#include "ChiLua/chi_lua.h"
+#include "chi_lua.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-#include "ChiConsole/chi_console.h"
+#include "console/chi_console.h"
 
 //###################################################################
 /**Customized boundary function by calling a lua routine.*/

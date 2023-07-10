@@ -28,6 +28,17 @@ for ell in range(0, len(lines)):
         object_dict["name"] = words[2]
         object_dict["constructible"] = True
 
+    if words[1] == "CLASS_NAME":
+        if len(words) >= 3:
+            end_of_word = line.find("CLASS_NAME") + len("CLASS_NAME")
+            object_dict["class_name"] = line[end_of_word:]
+
+    if words[1] == "DOC_GROUP":
+        num_doc_groups = len(words) - 2
+        object_dict["doc_groups"] = []
+        for w in range(0, num_doc_groups):
+            object_dict["doc_groups"].append(words[2 + w])
+
     if words[1] == "LUA_FUNCWRAPPER_BEGIN":
         object_dict["name"] = words[2]
         object_dict["function_wrapper"] = True
@@ -91,6 +102,10 @@ for ell in range(0, len(lines)):
 
     if words[1] == "CONSTRAINTS":
         param_dict[words[1]] = EverythingAfter(line, words[1]).strip()
+
+    if words[1] == "LINKS":
+        if len(words) > 2:
+            param_dict[words[1]] = words[2:]
 
     ell += 1
 
@@ -198,14 +213,16 @@ padding-top: 4px;
 padding-bottom: 0px;
 "
 '''
+
+
 # <span class="arrow" style="padding-left: 0px;">▼
 # <span class="arrow" style="padding-left: 16px;">►</span>
 
 
-def WriteHTMLParameters(file, params, padding=0):
+def WriteHTMLParameters(file, obj_name, params, padding=0):
     """ This function writes HTML formatted parameters with
     dropdown boxes."""
-    # file.write('\htmlonly\n\n')
+
     file.write('<div style="display: block;">\n')
     droppy = "droppy2"
     for param in params:
@@ -222,13 +239,20 @@ def WriteHTMLParameters(file, params, padding=0):
         sub_doc_end = doc_string.find("$)")
 
         sub_doc_name = ""
+        # if sub_doc_begin >= 0 and sub_doc_end >= 0:
+        #     sub_string = doc_string[sub_doc_begin:(sub_doc_end + 2)]
+        #     doc_string = doc_string.replace(sub_string, "")
+        #
+        #     sub_doc_name = sub_string[2:-2]
         if sub_doc_begin >= 0 and sub_doc_end >= 0:
-            sub_string = doc_string[sub_doc_begin:(sub_doc_end+2)]
-            doc_string = doc_string.replace(sub_string, "")
+            print(f'WARNING[{obj_name}]: Deprecated use of "$(" or ")$" in '
+                  f'parameter \"{param["name"]}\"')
 
-            sub_doc_name = sub_string[2:-2]
+        if "LINKS" in param:
+            if len(param["LINKS"]) > 0:
+                sub_doc_name = param["LINKS"][0]
 
-        file.write('<button type="button" class="'+droppy+'" ' +
+        file.write('<button type="button" class="' + droppy + '" ' +
                    'style=' + button_style + '>' +
                    '<span class="arrow" style="padding-left: 0px;">►' +
                    '</span><TT><B>' +
@@ -260,7 +284,7 @@ def WriteHTMLParameters(file, params, padding=0):
             file.write(f'<div class="content" style="padding-left: {pad}px;">\n')
             file.write('<HR>')
             if len(sub_obj["required_params"]) > 0:
-                file.write('<button type="button" class="'+droppy+'" ' +
+                file.write('<button type="button" class="' + droppy + '" ' +
                            'style=' + sub_doc_button_style + '>' +
                            '<span class="arrow" style="padding-left: 0px;">►' +
                            '</span><B>' +
@@ -268,10 +292,10 @@ def WriteHTMLParameters(file, params, padding=0):
                            '</B></button>\n')
                 file.write('<div class="content" style="display: none;'
                            'padding-left: 20px;">\n')
-                WriteHTMLParameters(file, sub_obj["required_params"], pad)
+                WriteHTMLParameters(file, sub_doc_name, sub_obj["required_params"], pad)
                 file.write('</div>\n')
             if len(sub_obj["optional_params"]) > 0:
-                file.write('<button type="button" class="'+droppy+'" ' +
+                file.write('<button type="button" class="' + droppy + '" ' +
                            'style=' + sub_doc_button_style + '>' +
                            '<span class="arrow" style="padding-left: 0px;">►' +
                            '</span><B>' +
@@ -279,28 +303,43 @@ def WriteHTMLParameters(file, params, padding=0):
                            '</B></button>\n')
                 file.write('<div class="content" style="display: none;'
                            'padding-left: 20px;">\n')
-                WriteHTMLParameters(file, sub_obj["optional_params"], pad)
+                WriteHTMLParameters(file, sub_doc_name, sub_obj["optional_params"], pad)
                 file.write('</div>\n')
             file.write('</div>\n')
 
         file.write('</div>\n\n')
 
     file.write('</div>\n')
-    # file.write('\\endhtmlonly\n\n')
 
 
 for obj in obj_list:
     num_args = len(obj["required_params"]) + len(obj["optional_params"])
     reduced_name = obj["name"].replace(":", "_")
-    file = open("doc/generated_files/input_docs/" + reduced_name+".h", "w")
+    file = open("doc/generated_files/input_docs/" + reduced_name + ".h", "w")
+    dotted_name = reduced_name.replace("__", ".")
 
-    file.write("/** \\addtogroup " + reduced_name + "\n\n\n")
+    class_name = dotted_name
+    if "class_name" in obj:
+        class_name = obj["class_name"]
+
+    file.write("/** \\defgroup " + reduced_name + " " + class_name + "\n\n\n")
+
+    if "doc_groups" in obj:
+        doc_groups = obj["doc_groups"]
+        if len(doc_groups) == 0:
+            file.write("\\ingroup DocExperimental\n")
+        else:
+            for g in range(0, len(doc_groups)):
+                file.write("\\ingroup " + doc_groups[g] + "\n")
 
     if "description" in obj:
         file.write(obj["description"] + "\n")
-        if obj["description"].find("\ingroup") < 0 and \
-            obj["description"].find("\\ingroup") < 0:
-            file.write("\\ingroup DocExperimental\n")
+        if obj["description"].find("\ingroup") >= 0:
+            print(f'WARNING[{reduced_name}]: instead of using \"\\ingroup in '
+                  f'description use the SetDocGroup method')
+        if obj["description"].find("\defgroup") >= 0:
+            print(f'WARNING[{reduced_name}]: do not use \"\\defgroup in '
+                  f'description. Rather use the method SetClassName')
 
     if "constructible" in obj:
         if obj["constructible"]:
@@ -314,7 +353,7 @@ for obj in obj_list:
                 param_name2 = value2,
                 --etc.
             }\n'''))
-            file.write(obj["name"].replace("::", ".")+".Create(params)\n")
+            file.write(obj["name"].replace("::", ".") + ".Create(params)\n")
             file.write("\\endcode\n")
         else:
             file.write("<B>Note:</B> This object is not constructable\n")
@@ -338,7 +377,7 @@ for obj in obj_list:
                         break
 
                 file.write(f"{type_str} arg{p}")
-                if p < num_args-1:
+                if p < num_args - 1:
                     file.write(", ")
             file.write(")\n")
             file.write("\\endcode\n")
@@ -346,13 +385,13 @@ for obj in obj_list:
     if len(obj["required_params"]) > 0:
         file.write("## Required Input parameters\n")
         file.write('\\htmlonly\n\n')
-        WriteHTMLParameters(file, obj["required_params"])
+        WriteHTMLParameters(file, dotted_name, obj["required_params"])
         file.write('\\endhtmlonly\n\n')
 
     if len(obj["optional_params"]) > 0:
         file.write("## Optional Input parameters\n")
         file.write('\\htmlonly\n\n')
-        WriteHTMLParameters(file, obj["optional_params"])
+        WriteHTMLParameters(file, dotted_name, obj["optional_params"])
         file.write('\\endhtmlonly\n\n')
 
     file.write('\\htmlonly\n\n')
@@ -371,6 +410,5 @@ for obj in obj_list:
 
     file.write("*/")
     file.close()
-
 
 print("Done creating InputParamsDocs")

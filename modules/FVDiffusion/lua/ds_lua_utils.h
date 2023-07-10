@@ -1,7 +1,7 @@
 #ifndef FV_DIFFUSION_LUA_UTILS_H
 #define FV_DIFFUSION_LUA_UTILS_H
 
-#include"ChiLua/chi_lua.h"
+#include "chi_lua.h"
 #include "../fv_diffusion_solver.h"
 
 namespace fv_diffusion::fv_diffusion_lua_utils

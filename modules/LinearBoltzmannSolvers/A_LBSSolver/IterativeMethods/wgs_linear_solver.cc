@@ -3,13 +3,13 @@
 #include "wgs_convergence_test.h"
 #include "A_LBSSolver/lbs_solver.h"
 
-#include "ChiMath/PETScUtils/petsc_utils.h"
-#include "ChiMath/LinearSolver/linear_matrix_action_Ax.h"
+#include "math/PETScUtils/petsc_utils.h"
+#include "math/LinearSolver/linear_matrix_action_Ax.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-#include "ChiTimer/chi_timer.h"
+#include "utils/chi_timer.h"
 
 #include <petscksp.h>
 #include <memory>

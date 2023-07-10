@@ -5,8 +5,8 @@
 #include "chi_mpi.h"
 
 
-#include "ChiMath/chi_math_vectorNX.h"
-#include "ChiMath/SpatialDiscretization/FiniteElement/spatial_discretization_FE.h"
+#include "math/chi_math_vectorNX.h"
+#include "math/SpatialDiscretization/FiniteElement/spatial_discretization_FE.h"
 
 #include "lbs_adjoint.h"
 
