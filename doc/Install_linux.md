@@ -24,8 +24,8 @@ gcc --version
 This should display something like this:
 
     $ gcc --version
-    gcc (Ubuntu 7.3.0-30ubuntu1~18.04.york0) 7.3.0
-    Copyright (C) 2017 Free Software Foundation, Inc.
+    gcc (Ubuntu 11.3.0-1ubuntu1~22.04.1) 11.3.0
+    Copyright (C) 2021 Free Software Foundation, Inc.
     This is free software; see the source for copying conditions.  There is NO
     warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
@@ -43,14 +43,7 @@ Now, install the remaining packages needed to build Chi-Tech and its dependencie
 
 ```bash
 sudo apt-get install cmake python git zlib1g-dev libx11-dev unzip
-sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev
 ```
-
-<u>NOTE</u>: *The recommended version of PETSc requires Python 2.6+; Python 3.x, typically
-pre-installed on modern Linux systems, will not work (Step 4 below provides more
-details if you need to use `python3`) .*
-
-<u>NOTE</u>: *The second line is to install OpenGL for VTK.*
 
 ### Step 2 - An MPI flavor
 
@@ -71,32 +64,39 @@ mpicc --version
 Which should display the same message the gcc call did, i.e.
 
     $ mpicc --version
-    gcc (Ubuntu 7.3.0-30ubuntu1~18.04.york0) 7.3.0
-    Copyright (C) 2017 Free Software Foundation, Inc.
+    gcc (Ubuntu 11.3.0-1ubuntu1~22.04.1) 11.3.0
+    Copyright (C) 2021 Free Software Foundation, Inc.
     This is free software; see the source for copying conditions.  There is NO
     warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+In order to ensure that all installations downstream of this install with the 
+required mpi wrappers, do the following:
+```shell
+export CC=mpicc
+export CXX=mpicxx
+export FC=mpifort
+```
 
 ### Step 3 - PETSc
 
 The current supported version is
-[petsc version 3.12.5](http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.12.5.tar.gz).
+[petsc version 3.17.0](https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.17.0.tar.gz).
 
-
-Return to your *projects* folder (or whatever you chose to place stuff). Run
-the following
+Return to your *projects* folder (or whatever you chose to place stuff). Do
+the following. Download and extract the archive file to a folder of your choice
+then navigate into the directory containing the "configure" script.
 
 ```bash
-wget http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.12.5.tar.gz
-tar -zxf petsc-3.12.5.tar.gz
-cd petsc-3.12.5
+wget https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.17.0.tar.gz
+tar -zxf petsc-3.17.0.tar.gz
+cd petsc-3.17.0
 ```
 
-Download and extract the archive file to a folder of your choice then navigate
-into the directory containing the "configure" script and execute the following:
+and execute the following:
 
 ```bash
 ./configure  \
---prefix=</path/to/install>  \
+--prefix=$PWD/../petsc-3.17.0-install  \
 --download-hypre=1  \
 --with-ssl=0  \
 --with-debugging=0  \
@@ -121,15 +121,7 @@ FOPTFLAGS='-O3 -march=native -mtune=native'  \
 PETSC_DIR=$PWD
 ```
 
-The installation prefix ```</path/to/install>``` must be replaced with
-the desired installation directory for this script to execute properly.
-
 If the configuration fails then consult PETSc's user documentation.
-
-<u>NOTE:</u> *The recommended version of PETSc requires Python 2.6+ for its configuration.
-If you need to use Python 3.4+ (which is typically pre-installed on modern Linux systems as
-`python3`), you will need to download PETSc 3.11 (current most recent version is 3.11.3)
-and run the above configure script as `python3 ./configure ...`*
 
 Upon completion of the configure step, PETSc will provide the make command
 that you should use. Execute this command.
@@ -159,9 +151,9 @@ In your projects folder install VTK using the following commands:
 ```bash
 mkdir VTK
 cd VTK
-wget https://www.vtk.org/files/release/8.2/VTK-8.2.0.tar.gz
-tar -zxf VTK-8.2.0.tar.gz
-cd VTK-8.2.0
+wget https://www.vtk.org/files/release/9.1/VTK-9.1.0.tar.gz
+tar -zxf VTK-9.1.0.tar.gz
+cd VTK-9.1.0
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=$PWD/../install  + \
@@ -194,15 +186,56 @@ Again, this is also something you'd like to add to your bash profile.
 
 ### Step 5 - Install Lua
 
-Download and extract **Lua** from https://www.lua.org.  v5.3.5+ is recommended.
+#### Step 5a - Install ncurses
+Navigate to a folder to install `ncurses`
+```shell
+wget https://invisible-mirror.net/archives/ncurses/ncurses-6.1.tar.gz
+tar -zxf ncurses-6.1.tar.gz
+cd ncurses-6.1
+./configure --prefix=$PWD/chi_build
+```
+
+After the configure completes then
+```shell
+make -j4
+```
+and then
+```shell
+make install
+```
+
+#### Step 5b - Install readline
+Navigate to a folder to install `readline`
+```shell
+wget ftp://ftp.gnu.org/gnu/readline/readline-8.0.tar.gz
+tar -zxf readline-8.0.tar.gz
+cd readline-8.0
+./configure --prefix=$PWD/chi_build
+```
+
+After the configure completes then
+```shell
+make -j4
+```
+and then
+```shell
+make install
+```
+
+#### Step 5c - The actual lua installation
+
+Download and extract **Lua** version 5.3.5 from https://www.lua.org. 
 Before installing **Lua** edit the Makefile and set INSTALL_TOP to your desired
 install location.  Install **Lua** as follows:
 ```bash
-    $ make linux
-    $ make install
+$ export CPATH=<path-to-readline-include>:$CPATH
+$ export LIBRARY_PATH=<path-to-readline-lib>:<path-to-ncurses-lib>:$LIBRARY_PATH
+$ make linux
+$ make local
 ```
 If the install complains about missing **readline** includes or libraries, it may
-be necessary to install **readline** first.
+be necessary to install **readline** first, that would probably require 
+**ncurses** in turn.
 
 Set the LUA_ROOT environment variable to the **Lua** install location:
 ```bash
@@ -238,7 +271,7 @@ will use threading where possible.
 To check if the code compiled correctly, execute the test scripts:
 
 ```bash
-    $ python3 tests/Z_Run_all.py
+    $ test/run_tests -d test/ -j8
 ```
 
 

@@ -5,14 +5,14 @@ import errno
 
 print("########## Chi-Tech Dependency installer ##########")
 
-verbose : bool = False
+verbose: bool = False
 
 for arg in sys.argv:
-    if arg=="verbose":
+    if arg == "verbose":
         verbose = True
 
 
-####################################### Setting install dir
+# ###################################### Setting install dir
 cwd = os.getcwd()
 install_dir = f"{cwd}/chi-dependencies"
 log_str = f">>{install_dir}/log.txt"
@@ -34,8 +34,7 @@ else:
 if not os.path.exists(install_dir):
     os.mkdir(install_dir)
 
-
-####################################### Parsing versions
+# ###################################### Parsing versions
 versions = {"readline": "8.0", "ncurses": "6.1", "lua": "5.3.5",
             "petsc": "3.17.0", "VTK": "9.1.0"}
 packages = list(versions.keys())
@@ -96,6 +95,7 @@ print(vtk_install)
 
 log_file = open(f"{install_dir}/log.txt", "w+")
 roots_file = open(f"{install_dir}/configure_deproots.sh", "w+")
+
 
 #######################################
 # Prints a value to cout using system
@@ -214,7 +214,6 @@ def DownloadPackage(url, pkg, ver, upper=False):
 
 ####################################### Get package
 def ExtractPackage(pkg, ver):
-    ##success, err = ExecSub(f"tar -zxf {pkg}-{ver}.tar.gz --one-top-level={pkg}-{ver}/ --strip-components=1", log_file)
     print(f"Extracting package with command tar -zxf {pkg}-{ver}.tar.gz")
 
     success, err = ExecSub(f"tar -zxf {pkg}-{ver}.tar.gz", log_file)
