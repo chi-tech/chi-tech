@@ -104,7 +104,7 @@ Before building the dependencies, you need to export a few variables for the PET
 Go to the chi-tech folder you have just cloned and type:
 ```bash
     $ cd chi-tech
-    $ python3 resources/configure_dependencies.py ../dependencies
+    $ python3 resources/configure_dependencies.py -d ../dependencies
 ```
 The configure script will attempt to download and install all the necessary 
 dependencies **and may take a long time**
@@ -115,7 +115,7 @@ The next step in this process is to setup the environment variables for compilin
 Chi-Tech.
 
 ```bash
-    $source ./dependencies/configure_deproots.sh
+    $source ../dependencies/configure_deproots.sh
 ```
 **Note:** You can replace ```$source ``` in the above with ```$. ```
 
@@ -148,25 +148,21 @@ you can run
 To check if the code compiled correctly, execute the test scripts:
 
 ```bash
-    $ python3 tests/Z_Run_all.py
+    $ test/run_tests -d test/ -j8
 ```
 
-### Step 7 - Chi-Tech documentation
+### Step 8 - Chi-Tech documentation
 
 You can either access the documentation online [here](https://chi-tech.github.io), or generate it locally.
 
 To generate the documentation from your local working copy, first make sure
-Doxygen, Lua, and LaTeX (texlive) are installed (otherwise, get them from ```brew```).
+Doxygen and LaTeX are installed:
 
-*Note:* Given that Lua was installed already as a Chi-Tech dependencies, you may elect not to 
-intall Lua again, but rather add its location to your PATH. I have chosen to add a symbolic link in
-```/Users/USERNAME/local/bin/``` as follows:
 ```bash
-ln -s /Users/USERNAME/repo/dependencies/LUA/lua-5.3.5/install/bin/lua lua
+sudo apt-get install doxygen texlive
 ```
 
-
-The documentation is contained in the `doc` folder and can be generated
+The documentation is contained in the *doc* folder and can be generated
 using a script provided in that folder:
 
 ```bash

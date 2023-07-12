@@ -19,6 +19,7 @@ RegisterWrapperFunction(/*namespace_name=*/chi_unit_tests,
 chi::ParameterBlock
 chi_misc_utils_Test00(const chi::InputParameters&)
 {
+  Chi::log.Log() << "GOLD_BEGIN";
   Chi::log.Log() << "Testing chi_misc_utils::PrintIterationProgress\n";
 
   const unsigned int I = 4;
@@ -32,6 +33,7 @@ chi_misc_utils_Test00(const chi::InputParameters&)
 
   Chi::log.Log() << progress.str();
 
+  Chi::log.Log() << "GOLD_END";
   return chi::ParameterBlock();
 }
 

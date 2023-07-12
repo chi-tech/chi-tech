@@ -3,6 +3,7 @@
 [0m[0]  Parsing argument 3 --supress_beg_end_timelog
 [0]  Parsing argument 4 master_export=false
 [0]  ChiTech number of arguments supplied: 4
+[0]  GOLD_BEGIN
 [0]  Azimuthal angles:
 [0]  0
 [0]  Polar angles:
@@ -27,5 +28,6 @@ order:
 0.0367928
 0.0259291
 0.018273
+[0]  GOLD_END
 
 

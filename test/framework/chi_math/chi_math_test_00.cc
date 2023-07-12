@@ -21,6 +21,7 @@ RegisterWrapperFunction(/*namespace_name=*/chi_unit_tests,
 chi::ParameterBlock
 chi_math_Test00(const chi::InputParameters& params)
 {
+  Chi::log.Log() << "GOLD_BEGIN";
   //======================================================= Dynamic Vector
   {
     Chi::log.Log() << "Testing chi_math::DynamicVector\n";
@@ -86,6 +87,7 @@ chi_math_Test00(const chi::InputParameters& params)
                      << entry.value;
   }
 
+  Chi::log.Log() << "GOLD_END";
   return chi::ParameterBlock();
 }
 
