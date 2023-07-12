@@ -145,29 +145,30 @@ def CheckExecutableExists(thingname: str, thing: str):
 
 # ###################################### Get package
 # Downloads a package using either wget or curl
-def DownloadPackage(downloader, url, pkg, ver, upper=False):
-    pkg_ = pkg.upper() if upper else pkg
+def DownloadPackage(downloader, url, pkg, ver):
     pkgdir = f"{install_dir}/downloads"
-    log_file.write(f"Downloading {pkg_.upper()} {ver} to \"{pkgdir}\" " +
+    log_file.write(f"Downloading {pkg.upper()} {ver} to \"{pkgdir}\" " +
                    f"with command: {downloader} {url}")
     download_cmd = f"{downloader}" if downloader == "wget" else f"{downloader}"
-    output_cmd = "" if downloader == "wget" else f"--output {pkg_}-{ver}.tar.gz"
+    output_cmd = "" if downloader == "wget" else f"--output {pkg}-{ver}.tar.gz"
 
-    print(f"Downloading {pkg_.upper()} {ver} to \"{pkgdir}\" " +
-          f"with command: {download_cmd} {url} {output_cmd}", end="",
+    pkgdir_relative = os.path.relpath(pkgdir)
+
+    print(f"Downloading {pkg.upper()} {ver} to \"{pkgdir_relative}\" " +
+          f"with command:\n{download_cmd} {url} {output_cmd}", end="",
           flush=True)
 
     already_there = False
-    if not os.path.exists(f"{install_dir}/downloads/{pkg_}-{ver}.tar.gz"):
+    if not os.path.exists(f"{install_dir}/downloads/{pkg}-{ver}.tar.gz"):
         ExecSub(f"{download_cmd} {url} {output_cmd}", out_log=log_file)
 
-        if upper:
-            item = f"{pkg_}-{ver}.tar.gz"
-            shutil.move(f"mv {item}", f"{item.lower()}")
+        if os.path.exists(f"{install_dir}/downloads/{pkg.upper()}-{ver}.tar.gz"):
+            item = f"{pkg.upper()}-{ver}.tar.gz"
+            shutil.move(f"{item}", f"{item.lower()}")
     else:
         already_there = True
 
-    if os.path.exists(f"{install_dir}/downloads/{pkg_}-{ver}.tar.gz"):
+    if os.path.exists(f"{install_dir}/downloads/{pkg}-{ver}.tar.gz"):
         there = f"Already downloaded" if already_there else ""
         print(f" {TextColors.OKGREEN}Success{TextColors.ENDC} {TextColors.OKCYAN}{there}{TextColors.ENDC}")
         log_file.write(f" Success {there}\n")
@@ -266,6 +267,7 @@ if len(dl_errors) > 0:
 if argv.download_only:
     exit(0)
 
+print()
 
 # ========================================== Install command for ncurses and
 # readline
@@ -376,7 +378,7 @@ def InstallLuaPackage(pkg: str, ver: str, gold_file: str,
         if "Darwin" in os.uname():
             os_tag = "macosx"
 
-        command = f"make {os_tag} MYLIBS=-lncurses -j{argv.jobs}"
+        command = f"make {os_tag} MYCFLAGS=-fPIC MYLIBS=-lncurses -j{argv.jobs}"
         success, err = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
         if not success:
             print(command, err)
