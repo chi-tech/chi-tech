@@ -17,6 +17,7 @@ RegisterLuaFunction(/*function_ptr=*/chi_ParameterBlock_Test00,
 
 int chi_ParameterBlock_Test00(lua_State* L)
 {
+  Chi::log.Log() << "GOLD_BEGIN";
   const int num_args = lua_gettop(L);
   bool verbose = false;
   if (num_args >= 1)
@@ -118,6 +119,7 @@ int chi_ParameterBlock_Test00(lua_State* L)
     Chi::log.Log() << "hello" << v.StringValue();
     Chi::log.Log() << "hello" << v.GetValue<std::string>();
   }
+  Chi::log.Log() << "GOLD_END";
   return 0;
 }
 
