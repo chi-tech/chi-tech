@@ -6,9 +6,6 @@
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_runtime.h"
-#include "chi_log.h"
-
-#include <unistd.h>
 
 namespace lbs
 {
@@ -45,18 +42,21 @@ chi_mesh::sweep_management::AngleSetStatus CBC_AngleSet::AngleSetAdvance(
   const std::vector<size_t>& timing_tags,
   chi_mesh::sweep_management::ExecutionPermission permission)
 {
-  //usleep(100'000);
   const auto& grid = spds_.Grid();
   if (executed_) return chi_mesh::sweep_management::AngleSetStatus::FINISHED;
+
+  const auto& cbc_spds = dynamic_cast<const CBC_SPDS&>(spds_);
+  if (current_task_list_.empty()) current_task_list_ = cbc_spds.TaskList();
+
+  auto tasks_who_received_data = async_comm_.ReceiveData();
+
+  for (const uint64_t task_number : tasks_who_received_data)
+    --current_task_list_[task_number].num_dependencies_;
 
   // Check if boundaries allow for execution
   for (auto& [bid, bndry] : ref_boundaries_)
     if (not bndry->CheckAnglesReadyStatus(angles_, ref_group_subset_))
-      return chi_mesh::sweep_management::AngleSetStatus::RECEIVING;
-
-  const auto& cbc_spds = dynamic_cast<const CBC_SPDS&>(spds_);
-
-  if (current_task_list_.empty()) current_task_list_ = cbc_spds.TaskList();
+      return chi_mesh::sweep_management::AngleSetStatus::NOT_FINISHED;
 
   bool all_tasks_completed = true;
   for (auto& cell_task : current_task_list_)
@@ -64,7 +64,7 @@ chi_mesh::sweep_management::AngleSetStatus CBC_AngleSet::AngleSetAdvance(
     if (not cell_task.completed_) all_tasks_completed = false;
     if (cell_task.num_dependencies_ == 0 and not cell_task.completed_)
     {
-      sweep_chunk.SetCell(&grid.local_cells[cell_task.reference_id_]);
+      sweep_chunk.SetCell(&grid.local_cells[cell_task.reference_id_], *this);
       sweep_chunk.Sweep(*this);
       for (uint64_t local_task_num : cell_task.successors_)
         --current_task_list_[local_task_num].num_dependencies_;
@@ -74,13 +74,12 @@ chi_mesh::sweep_management::AngleSetStatus CBC_AngleSet::AngleSetAdvance(
   } // for cell_task
 
   bool all_messages_sent = async_comm_.SendData();
-  auto tasks_who_received_data = async_comm_.ReceiveData();
-
-  for (const uint64_t task_number : tasks_who_received_data)
-    --current_task_list_[task_number].num_dependencies_;
 
   if (all_tasks_completed and all_messages_sent)
   {
+    // Update boundary readiness
+    for (auto& [bid, bndry] : ref_boundaries_)
+      bndry->UpdateAnglesReadyStatus(angles_, ref_group_subset_);
     executed_ = true;
     return chi_mesh::sweep_management::AngleSetStatus::FINISHED;
   }

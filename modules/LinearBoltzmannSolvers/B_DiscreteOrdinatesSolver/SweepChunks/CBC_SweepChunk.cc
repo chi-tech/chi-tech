@@ -7,8 +7,6 @@
 #include "math/SpatialDiscretization/spatial_discretization.h"
 #include "B_DiscreteOrdinatesSolver/Sweepers/CBC_FLUDS.h"
 
-#include "chi_log_exceptions.h"
-
 #define scint static_cast<int>
 
 namespace lbs
@@ -65,14 +63,12 @@ CBC_SweepChunk::CBC_SweepChunk(
   post_cell_dir_sweep_callbacks_ = {};
 }
 
-void CBC_SweepChunk::SetCell(const chi_mesh::Cell* cell_ptr)
+void CBC_SweepChunk::SetCell(const chi_mesh::Cell* cell_ptr,
+                             chi_mesh::sweep_management::AngleSet& angle_set)
 {
   cell_ptr_ = cell_ptr;
   cell_local_id_ = cell_ptr_->local_id_;
-}
 
-void CBC_SweepChunk::Sweep(chi_mesh::sweep_management::AngleSet& angle_set)
-{
   const SubSetInfo& grp_ss_info =
     groupset_.grp_subset_infos_[angle_set.GetRefGroupSubset()];
 
@@ -89,19 +85,18 @@ void CBC_SweepChunk::Sweep(chi_mesh::sweep_management::AngleSet& angle_set)
     dynamic_cast<CBC_SweepDependencyInterface&>(sweep_dependency_interface_);
   cbc_sweep_depinterf.fluds_ = &dynamic_cast<CBC_FLUDS&>(angle_set.GetFLUDS());
 
-  const auto& spds = angle_set.GetSPDS();
+  cbc_sweep_depinterf.group_stride_ = angle_set.GetNumGroups();
+  cbc_sweep_depinterf.group_angle_stride_ =
+    angle_set.GetNumGroups() * angle_set.GetNumAngles();
+
   cell_ = &grid_.local_cells[cell_local_id_];
   sweep_dependency_interface_.cell_ptr_ = cell_;
   sweep_dependency_interface_.cell_local_id_ = cell_local_id_;
   cell_mapping_ = &grid_fe_view_.GetCellMapping(*cell_);
   cell_transport_view_ = &grid_transport_view_[cell_->local_id_];
 
-  using namespace chi_mesh::sweep_management;
-  const auto& face_orientations = spds.CellFaceOrientations()[cell_local_id_];
-
   cell_num_faces_ = cell_->faces_.size();
   cell_num_nodes_ = cell_mapping_->NumNodes();
-  const auto& sigma_t = xs_.at(cell_->material_id_)->SigmaTotal();
 
   // =============================================== Get Cell matrices
   const auto& fe_intgrl_values = unit_cell_matrices_[cell_local_id_];
@@ -112,6 +107,14 @@ void CBC_SweepChunk::Sweep(chi_mesh::sweep_management::AngleSet& angle_set)
 
   for (auto& callback : cell_data_callbacks_)
     callback();
+}
+
+void CBC_SweepChunk::Sweep(chi_mesh::sweep_management::AngleSet& angle_set)
+{
+  using FaceOrientation = chi_mesh::sweep_management::FaceOrientation;
+  const auto& face_orientations =
+    angle_set.GetSPDS().CellFaceOrientations()[cell_local_id_];
+  const auto& sigma_t = xs_.at(cell_->material_id_)->SigmaTotal();
 
   // as = angle set
   // ss = subset
@@ -213,6 +216,17 @@ void CBC_SweepDependencyInterface::SetupIncomingFace(int face_id,
 
   face_nodal_mapping_ = &fluds_->CommonData().GetFaceNodalMapping(
     cell_local_id_, current_face_idx_);
+
+  if (on_local_face_)
+  {
+    neighbor_cell_ptr_ = &fluds_->GetSPDS().Grid().cells[neighbor_id_];
+    psi_upwnd_data_ = &fluds_->GetLocalUpwindData();
+  }
+  else if (not on_boundary_)
+  {
+    psi_upwnd_data_ =
+      &fluds_->GetNonLocalUpwindData(cell_ptr_->global_id_, current_face_idx_);
+  }
 }
 
 void CBC_SweepDependencyInterface::SetupOutgoingFace(int face_id,
@@ -235,6 +249,20 @@ void CBC_SweepDependencyInterface::SetupOutgoingFace(int face_id,
   is_reflecting_bndry_ =
     (on_boundary_ and
      angle_set_->GetBoundaries()[neighbor_id_]->IsReflecting());
+
+  if (not on_local_face_ and not on_boundary_)
+  {
+    auto& async_comm = *angle_set_->GetCommunicator();
+
+    size_t data_size = num_face_nodes_ * group_angle_stride_;
+
+    psi_dnwnd_data_ = &async_comm.InitGetDownwindMessageData(
+      face_locality_,
+      neighbor_id_,
+      face_nodal_mapping_->associated_face_,
+      angle_set_->GetID(),
+      data_size);
+  }
 }
 
 const double*
@@ -243,28 +271,22 @@ CBC_SweepDependencyInterface::GetUpwindPsi(int face_node_local_idx) const
   const double* psi;
   if (on_local_face_)
   {
-    const uint64_t adj_cell_global_id = neighbor_id_;
-
     const unsigned int adj_cell_node =
       face_nodal_mapping_->cell_node_mapping_[face_node_local_idx];
 
-    return fluds_->GetUpwindPsi(
-      adj_cell_global_id, adj_cell_node, angle_num_, gs_ss_begin_);
+    return fluds_->GetLocalUpwindPsi(*psi_upwnd_data_,
+                                     *neighbor_cell_ptr_,
+                                     adj_cell_node,
+                                     angle_num_,
+                                     gs_ss_begin_);
   }
   else if (not on_boundary_)
   {
     const unsigned int adj_face_node =
       face_nodal_mapping_->face_node_mapping_[face_node_local_idx];
 
-    const size_t group_stride = angle_set_->GetNumGroups();
-    const size_t group_angle_stride = group_stride * angle_set_->GetNumAngles();
-
-    psi = fluds_->GetNLUpwindPsi(cell_ptr_->global_id_,
-                                 current_face_idx_,
-                                 adj_face_node,
-                                 angle_set_index_,
-                                 group_angle_stride,
-                                 group_stride);
+    psi = fluds_->GetNonLocalUpwindPsi(
+      *psi_upwnd_data_, adj_face_node, angle_set_index_);
   }
   else
     psi = angle_set_->PsiBndry(neighbor_id_,
@@ -284,25 +306,13 @@ CBC_SweepDependencyInterface::GetDownwindPsi(int face_node_local_idx) const
 {
   double* psi = nullptr;
 
-  if (on_local_face_) psi = nullptr;
+  if (on_local_face_) psi = nullptr; // We don't write local face outputs
   else if (not on_boundary_)
   {
-    const size_t group_stride = angle_set_->GetNumGroups();
-    const size_t group_angle_stride = group_stride * angle_set_->GetNumAngles();
+    const size_t addr_offset = face_node_local_idx * group_angle_stride_ +
+                               angle_set_index_ * group_stride_;
 
-    const size_t data_size = num_face_nodes_ * group_angle_stride;
-
-    auto& async_comm = *angle_set_->GetCommunicator();
-    std::vector<double>& data =
-      async_comm.GetDownwindMessageData(face_locality_,
-                                        neighbor_id_,
-                                        face_nodal_mapping_->associated_face_,
-                                        angle_set_->GetID(),
-                                        data_size);
-    const size_t addr_offset = face_node_local_idx * group_angle_stride +
-                               angle_set_index_ * group_stride;
-
-    psi = &data.at(addr_offset);
+    psi = &(*psi_dnwnd_data_).at(addr_offset);
   }
   else if (is_reflecting_bndry_)
     psi = angle_set_->ReflectingPsiOutBoundBndry(neighbor_id_,

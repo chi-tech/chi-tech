@@ -24,7 +24,8 @@ public:
 
   /**Obtains a data vector holding a spot into which outgoing data can be
    * written.*/
-  virtual std::vector<double>& GetDownwindMessageData(int location_id,
+  virtual std::vector<double>&
+  InitGetDownwindMessageData(int location_id,
                                                       uint64_t cell_global_id,
                                                       unsigned int face_id,
                                                       size_t angle_set_id,

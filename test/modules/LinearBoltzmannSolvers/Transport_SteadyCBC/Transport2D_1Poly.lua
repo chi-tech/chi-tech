@@ -1,7 +1,7 @@
--- 1D Transport test with Vacuum and Incident-isotropic BC.
+-- 2D Transport test with Vacuum and Incident-isotropic BC.
 -- SDM: PWLD
--- Test: Max-value=0.49903 and 7.18243e-4
-num_procs = 1
+-- Test: Max-value=0.50758 and 2.52527e-04
+num_procs = 4
 
 
 
@@ -18,23 +18,25 @@ end
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
-mesh={}
-N=40
-L=5.0
-xmin = 0.0
-dx = L/N
-for i=1,(N+1) do
-  k=i-1
-  mesh[i] = xmin + k*dx
-end
-chiMeshCreateUnpartitioned2DOrthoMesh(mesh, mesh)
+umesh = chiUnpartitionedMeshFromWavefrontOBJ(
+  "../../../../resources/TestMeshes/SquareMesh2x2QuadsBlock.obj")
+
+chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
+chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED, umesh);
+
+chiVolumeMesherSetKBAPartitioningPxPyPz(2,2,1)
+chiVolumeMesherSetKBACutsX({0.0})
+chiVolumeMesherSetKBACutsY({0.0})
+
+chiVolumeMesherSetProperty(PARTITION_TYPE,KBA_STYLE_XYZ)
+
+chiSurfaceMesherExecute();
 chiVolumeMesherExecute();
 
 --############################################### Set Material IDs
-chiVolumeMesherSetMatIDToAll(0)
-RPP = chi_mesh.RPPLogicalVolume
-lv0 = RPP.Create({infz=true, infy=true, xmin = -1.0, xmax=L/2})
-chiVolumeMesherSetProperty(MATID_FROMLOGICAL, lv0, 1)
+vol0 = chi_mesh.RPPLogicalVolume.Create({infx=true, infy=true, infz=true})
+chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
+
 
 --############################################### Add materials
 materials = {}
@@ -63,11 +65,12 @@ for g=1,num_groups do
 end
 --src[1] = 1.0
 chiPhysicsMaterialSetProperty(materials[1],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
-src[1] = 1.0
 chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 
 --############################################### Setup Physics
-pquad0 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2,2)
+pquad0 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 1)
+chiOptimizeAngularQuadratureForPolarSymmetry(pqaud, 4.0*math.pi)
+
 lbs_block =
 {
   num_groups = num_groups,
@@ -77,7 +80,7 @@ lbs_block =
       groups_from_to = {0, 62},
       angular_quadrature_handle = pquad0,
       angle_aggregation_num_subsets = 1,
-      groupset_num_subsets = 1,
+      groupset_num_subsets = 2,
       inner_linear_method = "gmres",
       l_abs_tol = 1.0e-6,
       l_max_its = 300,
@@ -87,31 +90,37 @@ lbs_block =
       groups_from_to = {63, num_groups-1},
       angular_quadrature_handle = pquad0,
       angle_aggregation_num_subsets = 1,
-      groupset_num_subsets = 1,
+      groupset_num_subsets = 2,
       inner_linear_method = "gmres",
       l_abs_tol = 1.0e-6,
       l_max_its = 300,
       gmres_restart_interval = 100,
     },
   },
-  options =
-  {
-    scattering_order = 5,
-    save_angular_flux = true
-  },
   sweep_type = "CBC"
-  --sweep_type = "AAH"
+}
+bsrc={}
+for g=1,num_groups do
+  bsrc[g] = 0.0
+end
+bsrc[1] = 1.0/4.0/math.pi
+
+lbs_options =
+{
+  boundary_conditions =
+  {
+    {
+      name = "xmin",
+      type = "incident_isotropic",
+      group_strength = bsrc
+    }
+  },
+  scattering_order = 1,
+  save_angular_flux = true
 }
 
---[0]  00:00:00 Computing b
---[0]  00:00:00 WGS groups [0-62] Iteration     0 Residual         1
---[0]  00:00:00 WGS groups [0-62] Iteration     1 Residual  0.117557
---[0]  00:00:00 WGS groups [0-62] Iteration     2 Residual 0.0181943
---[0]  00:00:00 WGS groups [0-62] Iteration     3 Residual 0.00599125
---[0]  00:00:00 WGS groups [0-62] Iteration     4 Residual 0.00238215
-
-
 phys1 = lbs.DiscreteOrdinatesSolver.Create(lbs_block)
+lbs.SetOptions(phys1, lbs_options)
 
 --############################################### Initialize and Execute Solver
 ss_solver = lbs.SteadyStateSolver.Create({lbs_solver_handle = phys1})
@@ -121,11 +130,16 @@ chiSolverExecute(ss_solver)
 
 --############################################### Get field functions
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
-chiExportMultiFieldFunctionToVTK(fflist, "Transport2D_1")
 
+--############################################### Slice plot
+slice2 = chiFFInterpolationCreate(SLICE)
+chiFFInterpolationSetProperty(slice2,SLICE_POINT,0.0,0.0,0.025)
+chiFFInterpolationSetProperty(slice2,ADD_FIELDFUNCTION,fflist[1])
+
+chiFFInterpolationInitialize(slice2)
+chiFFInterpolationExecute(slice2)
 
 --############################################### Volume integrations
-vol0 = chi_mesh.RPPLogicalVolume.Create({infx=true, infy=true, infz=true})
 ffi1 = chiFFInterpolationCreate(VOLUME)
 curffi = ffi1
 chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)
@@ -138,8 +152,9 @@ maxval = chiFFInterpolationGetValue(curffi)
 
 chiLog(LOG_0,string.format("Max-value1=%.5f", maxval))
 
-ffi2 = chiFFInterpolationCreate(VOLUME)
-curffi = ffi2
+--############################################### Volume integrations
+ffi1 = chiFFInterpolationCreate(VOLUME)
+curffi = ffi1
 chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)
 chiFFInterpolationSetProperty(curffi,LOGICAL_VOLUME,vol0)
 chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fflist[160])
@@ -151,11 +166,11 @@ maxval = chiFFInterpolationGetValue(curffi)
 chiLog(LOG_0,string.format("Max-value2=%.5e", maxval))
 
 --############################################### Exports
-if (master_export == nil) then
-  --chiFFInterpolationExportPython(cline)
+if master_export == nil then
+  chiFFInterpolationExportPython(slice2)
 end
 
 --############################################### Plots
 if (chi_location_id == 0 and master_export == nil) then
-  --local handle = io.popen("python3 ZLFFI00.py")
+  local handle = io.popen("python ZPFFI00.py")
 end

@@ -5,7 +5,7 @@
 
 #include <functional>
 
-//###################################################################
+// ###################################################################
 /**Sweep work function*/
 class chi_mesh::sweep_management::SweepChunk
 {
@@ -16,9 +16,9 @@ public:
    *  chi_mesh::sweep_management::SweepChunk *
    *  chi_mesh::sweep_management::AngleSet *
    */
-  typedef std::function<void(chi_mesh::sweep_management::SweepChunk * sweeper,
+  typedef std::function<void(chi_mesh::sweep_management::SweepChunk* sweeper,
                              chi_mesh::sweep_management::AngleSet* angle_set)>
-                             MomentCallbackF;
+    MomentCallbackF;
 
   /**
    * Functions of type MomentCallbackF can be added to the moment_callbacks
@@ -30,17 +30,19 @@ public:
 
   SweepChunk(std::vector<double>& in_destination_phi,
              std::vector<double>& in_destination_psi)
-    : destination_phi(&in_destination_phi),
-      destination_psi(&in_destination_psi)
-  {}
+    : destination_phi(&in_destination_phi), destination_psi(&in_destination_psi)
+  {
+  }
 
   /**Sweep chunks should override this.*/
-  virtual void Sweep(AngleSet& angle_set)
-  {}
+  virtual void Sweep(AngleSet& angle_set) {}
 
   /**For cell-by-cell methods or computing the residual on a
-  * single cell.*/
-  virtual void SetCell(chi_mesh::Cell const* cell_ptr) {}
+   * single cell.*/
+  virtual void SetCell(chi_mesh::Cell const* cell_ptr,
+                       chi_mesh::sweep_management::AngleSet& angle_set)
+  {
+  }
 
   virtual ~SweepChunk() = default;
 
@@ -59,10 +61,7 @@ protected:
   }
 
   /**Returns a reference to the output flux moments vector.*/
-  std::vector<double>& GetDestinationPhi()
-  {
-    return *destination_phi;
-  }
+  std::vector<double>& GetDestinationPhi() { return *destination_phi; }
 
   /**Sets the location where angular fluxes are to be written.*/
   void SetDestinationPsi(std::vector<double>& in_destination_psi)
@@ -77,27 +76,22 @@ protected:
   }
 
   /**Returns a reference to the output angular flux vector.*/
-  std::vector<double>& GetDestinationPsi()
-  {
-    return *destination_psi;
-  }
+  std::vector<double>& GetDestinationPsi() { return *destination_psi; }
 
   /**Activates or deactives the surface src flag.*/
-  void SetBoundarySourceActiveFlag(bool flag_value) //Done
+  void SetBoundarySourceActiveFlag(bool flag_value) // Done
   {
     surface_source_active = flag_value;
   }
 
 protected:
   /**Returns the surface src-active flag.*/
-  bool IsSurfaceSourceActive() const
-  {return surface_source_active;}
+  bool IsSurfaceSourceActive() const { return surface_source_active; }
 
 private:
   std::vector<double>* destination_phi;
   std::vector<double>* destination_psi;
   bool surface_source_active = false;
-
 };
 
-#endif //CHI_SWEEPCHUNK_BASE_H
+#endif // CHI_SWEEPCHUNK_BASE_H

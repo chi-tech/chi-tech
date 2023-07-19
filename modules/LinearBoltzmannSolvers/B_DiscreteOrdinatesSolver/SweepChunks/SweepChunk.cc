@@ -34,14 +34,14 @@ SweepChunk::SweepChunk(
     groupset_(groupset),
     xs_(xs),
     num_moments_(num_moments),
-    num_groups_(groupset.groups_.size()),
     save_angular_flux_(!destination_psi.empty()),
     sweep_dependency_interface_ptr_(std::move(sweep_dependency_interface_ptr)),
     sweep_dependency_interface_(*sweep_dependency_interface_ptr_)
 {
   Amat_.resize(max_num_cell_dofs, std::vector<double>(max_num_cell_dofs));
   Atemp_.resize(max_num_cell_dofs, std::vector<double>(max_num_cell_dofs));
-  b_.resize(num_groups_, std::vector<double>(max_num_cell_dofs, 0.0));
+  b_.resize(groupset.groups_.size(),
+            std::vector<double>(max_num_cell_dofs, 0.0));
   source_.resize(max_num_cell_dofs, 0.0);
 }
 
@@ -106,14 +106,6 @@ void SweepChunk::OutgoingSurfaceOperations()
         cell_transport_view_->AddOutflow(gs_gi_ + gsg,
                                          wt * mu * b_[gsg][i] * IntF_shapeI[i]);
 
-    //if (omega_.z > 0.0)
-    //{
-    //  std::stringstream outstr;
-    //  for (int gsg = 0; gsg < gs_ss_size_; ++gsg)
-    //    outstr << " vals " << b_[gsg][i];
-    //  Chi::log.LogAll() << "dn >0 " << cell_->global_id_ << outstr.str()
-    //                    << std::endl;
-    //}
   } // for fi
 }
 
@@ -152,15 +144,6 @@ void SweepChunk::KernelFEMUpwindSurfaceIntegrals()
 
       for (int gsg = 0; gsg < gs_ss_size_; ++gsg)
         b_[gsg][i] += psi[gsg] * mu_Nij;
-
-      //if (omega_.z > 0.0)
-      //{
-      //  std::stringstream outstr;
-      //  for (int gsg = 0; gsg < gs_ss_size_; ++gsg)
-      //    outstr << " vals " << psi[gsg];
-      //  Chi::log.LogAll() << "up >0 " << cell_->global_id_ << outstr.str()
-      //                    << std::endl;
-      //}
     } // for face node j
   }   // for face node i
 }
@@ -237,9 +220,6 @@ void SweepChunk::KernelPsiUpdate()
       *cell_, i, groupset_.psi_uk_man_, direction_num_, gs_ss_begin_);
     for (int gsg = 0; gsg < gs_ss_size_; ++gsg)
       output_psi[imap + gsg] = b_[gsg][i];
-
-    //if (cell_->global_id_ == 10)
-    //  std::cout << b_[0][i] << std::endl;
   } // for i
 }
 

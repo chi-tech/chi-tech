@@ -23,14 +23,14 @@ CBC_ASynchronousCommunicator::CBC_ASynchronousCommunicator(
 {
 }
 
-std::vector<double>&
-CBC_ASynchronousCommunicator::GetDownwindMessageData(int location_id,
-                                                     uint64_t cell_global_id,
-                                                     unsigned int face_id,
-                                                     size_t angle_set_id,
-                                                     size_t data_size)
+std::vector<double>& CBC_ASynchronousCommunicator::InitGetDownwindMessageData(
+  int location_id,
+  uint64_t cell_global_id,
+  unsigned int face_id,
+  size_t angle_set_id,
+  size_t data_size)
 {
-  MessageKey key{location_id, cell_global_id, face_id, angle_set_id};
+  MessageKey key{location_id, cell_global_id, face_id};
   if (outgoing_message_queue_.count(key) == 0)
   {
     std::vector<double>& data = outgoing_message_queue_[key];
@@ -53,22 +53,12 @@ bool CBC_ASynchronousCommunicator::SendData()
 
     buffer_array.Write(std::get<1>(msg_key)); // cell_global_id
     buffer_array.Write(std::get<2>(msg_key)); // face_id
-    buffer_array.Write(std::get<3>(msg_key)); // angle_set_id
     buffer_array.Write(data.size());          // data_size
 
     for (const double value : data) // actual psi_data
       buffer_array.Write(value);
 
     send_buffer_.push_back(std::move(buffer_item));
-
-
-    //std::stringstream outstr;
-    //for (const double value : data)
-    //  outstr << " vals " << value;
-    //Chi::log.LogAll() << "packet"
-    //                  << " " << std::get<0>(msg_key) << " "
-    //                  << std::get<1>(msg_key) << " " << std::get<2>(msg_key)
-    //                  << " " << std::get<3>(msg_key) << outstr.str() << std::endl;
   } // for item in queue
   outgoing_message_queue_.clear();
 
@@ -84,7 +74,7 @@ bool CBC_ASynchronousCommunicator::SendData()
                   static_cast<int>(buffer_item.data_array_.Size()), // count
                   MPI_BYTE,                                         // datatype
                   comm_set_.MapIonJ(locJ, locJ),    // destination
-                  static_cast<int>(angle_set_id_),                    // tag
+                  static_cast<int>(angle_set_id_),  // tag
                   comm_set_.LocICommunicator(locJ), // comm
                   &buffer_item.mpi_request_));      // request
       buffer_item.send_initiated_ = true;
@@ -92,16 +82,10 @@ bool CBC_ASynchronousCommunicator::SendData()
 
     if (not buffer_item.completed_)
     {
-
-      //Chi::log.LogAll() << "Testing" << std::endl;
       int sent;
       chi::MPI_Info::Call(
         MPI_Test(&buffer_item.mpi_request_, &sent, MPI_STATUS_IGNORE));
-      if (sent)
-      {
-        buffer_item.completed_ = true;
-        //Chi::log.LogAll() << "Sent" << std::endl;
-      }
+      if (sent) buffer_item.completed_ = true;
       else
         all_messages_sent = false;
     }
@@ -126,15 +110,14 @@ std::vector<uint64_t> CBC_ASynchronousCommunicator::ReceiveData()
     int message_available = 0;
     MPI_Status status;
     chi::MPI_Info::Call(
-      MPI_Iprobe(comm_set_.MapIonJ(locJ, Chi::mpi.location_id),
-                 static_cast<int>(angle_set_id_),
-                 comm_set_.LocICommunicator(Chi::mpi.location_id),
-                 &message_available,
-                 &status));
+      MPI_Iprobe(comm_set_.MapIonJ(locJ, Chi::mpi.location_id),    // source
+                 static_cast<int>(angle_set_id_),                  // tag
+                 comm_set_.LocICommunicator(Chi::mpi.location_id), // comm
+                 &message_available,                               // flag
+                 &status));                                        // status
 
     if (message_available)
     {
-      //Chi::log.LogAll() << "Receiving" << std::endl;
       int num_items;
       MPI_Get_count(&status, MPI_BYTE, &num_items);
       std::vector<std::byte> recv_buffer(num_items);
@@ -150,22 +133,12 @@ std::vector<uint64_t> CBC_ASynchronousCommunicator::ReceiveData()
       chi_data_types::ByteArray data_array(recv_buffer);
       const uint64_t cell_global_id = data_array.Read<uint64_t>();
       const unsigned int face_id = data_array.Read<unsigned int>();
-      const size_t angle_set_id = data_array.Read<size_t>();
       const size_t data_size = data_array.Read<size_t>();
 
       std::vector<double> psi_data;
       psi_data.reserve(data_size);
       for (size_t k = 0; k < data_size; ++k)
         psi_data.push_back(data_array.Read<double>());
-
-      //std::stringstream outstr;
-      //for (const double value : psi_data)
-      //  outstr << " vals " << value;
-      //
-      //Chi::log.LogAll() << "recvd"
-      //                  << " " << cell_global_id << " " << face_id << " "
-      //                  << angle_set_id << " " << data_size << " from "
-      //                  << status.MPI_SOURCE << outstr.str() << std::endl;
 
       received_messages[{cell_global_id, face_id}] = std::move(psi_data);
       cells_who_received_data.push_back(grid.cells[cell_global_id].local_id_);

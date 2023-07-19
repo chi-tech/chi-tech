@@ -23,10 +23,12 @@ class FLUDS
 {
 public:
   FLUDS(size_t num_groups, size_t num_angles, const SPDS& spds)
-    : num_groups_(num_groups), num_angles_(num_angles), spds_(spds){};
+    : num_groups_(num_groups),
+      num_angles_(num_angles),
+      num_groups_and_angles_(num_groups_ * num_angles_),
+      spds_(spds){};
 
   const SPDS& GetSPDS() const { return spds_; }
-
 
   virtual void ClearLocalAndReceivePsi() {}
   virtual void ClearSendPsi() {}
@@ -64,6 +66,7 @@ public:
 protected:
   const size_t num_groups_;
   const size_t num_angles_;
+  const size_t num_groups_and_angles_;
   const SPDS& spds_;
 };
 
