@@ -111,8 +111,14 @@ public:
   bool IsCellLocal(uint64_t cell_global_index) const;
   static int GetCellDimension(const chi_mesh::Cell& cell);
 
+  /**Creates a mapping of the current face local-ids to the
+  * adjacent face's local ids.*/
   void FindAssociatedVertices(const chi_mesh::CellFace& cur_face,
                               std::vector<short>& dof_mapping) const;
+  /**Creates a mapping of the current face local-ids to the
+  * adjacent cell's local ids.*/
+  void FindAssociatedCellVertices(const chi_mesh::CellFace& cur_face,
+                                  std::vector<short>& dof_mapping) const;
   static size_t MapCellFace(const chi_mesh::Cell& cur_cell,
                      const chi_mesh::Cell& adj_cell,
                      unsigned int f) ;

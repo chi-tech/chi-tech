@@ -9,11 +9,6 @@
 /**Sweep work function*/
 class chi_mesh::sweep_management::SweepChunk
 {
-private:
-  std::vector<double>* destination_phi;
-  std::vector<double>* destination_psi;
-  bool surface_source_active = false;
-
 public:
   /**
    * Convenient typdef for the moment call back function. See moment_callbacks.
@@ -38,6 +33,16 @@ public:
     : destination_phi(&in_destination_phi),
       destination_psi(&in_destination_psi)
   {}
+
+  /**Sweep chunks should override this.*/
+  virtual void Sweep(AngleSet& angle_set)
+  {}
+
+  /**For cell-by-cell methods or computing the residual on a
+  * single cell.*/
+  virtual void SetCell(chi_mesh::Cell const* cell_ptr) {}
+
+  virtual ~SweepChunk() = default;
 
 protected:
   friend class SweepScheduler;
@@ -83,17 +88,15 @@ protected:
     surface_source_active = flag_value;
   }
 
-public:
-  /**Sweep chunks should override this.*/
-  virtual void Sweep(AngleSet* angle_set)
-  {}
-
 protected:
   /**Returns the surface src-active flag.*/
   bool IsSurfaceSourceActive() const
   {return surface_source_active;}
-public:
-  virtual ~SweepChunk() = default;
+
+private:
+  std::vector<double>* destination_phi;
+  std::vector<double>* destination_psi;
+  bool surface_source_active = false;
 
 };
 

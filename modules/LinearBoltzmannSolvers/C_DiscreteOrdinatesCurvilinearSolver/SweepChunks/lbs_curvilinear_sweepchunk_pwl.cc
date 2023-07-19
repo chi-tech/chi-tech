@@ -23,7 +23,7 @@ SweepChunkPWLRZ::SweepChunkPWLRZ(
   const std::map<int, lbs::XSPtr>& xs,
   int num_moments,
   int max_num_cell_dofs)
-  : LBSSweepChunk(grid,
+  : AAH_SweepChunk(grid,
                   discretization_primary,
                   unit_cell_matrices,
                   cell_transport_views,
@@ -160,8 +160,8 @@ void SweepChunkPWLRZ::KernelFEMRZVolumetricGradientTerm()
 /**Performs the integral over the surface of a face.*/
 void SweepChunkPWLRZ::KernelFEMRZUpwindSurfaceIntegrals()
 {
-  const size_t f = sweep_surface_status_info_.f;
-  if (sweep_surface_status_info_.on_boundary)
+  const size_t f = sweep_dependency_interface_.current_face_idx_;
+  if (sweep_dependency_interface_.on_boundary_)
   {
     const auto& face_normal = cell_->faces_[f].normal_;
     //------------------------------------------------------------------
@@ -189,7 +189,7 @@ void SweepChunkPWLRZ::KernelFEMRZUpwindSurfaceIntegrals()
     {
       const int j = cell_mapping_->MapFaceNode(f, fj);
 
-      const double* psi = sweep_surface_status_info_.GetUpwindPsi(fj);
+      const double* psi = sweep_dependency_interface_.GetUpwindPsi(fj);
 
       const double mu_Nij = -mu * M_surf_f[i][j];
       Amat_[i][j] += mu_Nij;

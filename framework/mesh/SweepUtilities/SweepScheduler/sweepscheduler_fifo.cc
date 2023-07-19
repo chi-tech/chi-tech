@@ -3,31 +3,36 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-//###################################################################
+// ###################################################################
 /**Applies a First-In-First-Out sweep scheduling.*/
-void chi_mesh::sweep_management::SweepScheduler::
-  ScheduleAlgoFIFO(SweepChunk& sweep_chunk)
+void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoFIFO(
+  SweepChunk& sweep_chunk)
 {
   typedef AngleSetStatus Status;
 
-  Chi::log.LogEvent(sweep_event_tag, chi::ChiLog::EventType::EVENT_BEGIN);
+  Chi::log.LogEvent(sweep_event_tag_, chi::ChiLog::EventType::EVENT_BEGIN);
 
   auto ev_info_i =
     std::make_shared<chi::ChiLog::EventInfo>(std::string("Sweep initiated"));
 
-  Chi::log.LogEvent(sweep_event_tag, chi::ChiLog::EventType::SINGLE_OCCURRENCE, ev_info_i);
+  Chi::log.LogEvent(
+    sweep_event_tag_, chi::ChiLog::EventType::SINGLE_OCCURRENCE, ev_info_i);
 
   //================================================== Loop over AngleSetGroups
   AngleSetStatus completion_status = AngleSetStatus::NOT_FINISHED;
   while (completion_status == AngleSetStatus::NOT_FINISHED)
   {
     completion_status = AngleSetStatus::FINISHED;
-    for (int q=0; q<angle_agg.angle_set_groups.size(); q++)
-    {
-      completion_status = angle_agg.angle_set_groups[q].
-        AngleSetGroupAdvance(sweep_chunk, q, sweep_timing_events_tag);
-    }
-  }
+
+    for (auto& angle_set_group : angle_agg_.angle_set_groups)
+      for (auto& angle_set : angle_set_group.AngleSets())
+      {
+        auto angle_set_status = angle_set->AngleSetAdvance(
+          sweep_chunk, sweep_timing_events_tag_, ExecutionPermission::EXECUTE);
+        if (angle_set_status == AngleSetStatus::NOT_FINISHED)
+          completion_status = AngleSetStatus::NOT_FINISHED;
+      }// for angleset
+  }// while not finished
 
   //================================================== Receive delayed data
   Chi::mpi.Barrier();
@@ -35,23 +40,24 @@ void chi_mesh::sweep_management::SweepScheduler::
   while (not received_delayed_data)
   {
     received_delayed_data = true;
-    for (auto& sorted_angleset : rule_values)
-    {
-      auto& as = sorted_angleset.angle_set;
 
-      if (as->FlushSendBuffers() == Status::MESSAGES_PENDING)
-        received_delayed_data = false;
+    for (auto& angle_set_group : angle_agg_.angle_set_groups)
+      for (auto& angle_set : angle_set_group.AngleSets())
+      {
+        if (angle_set->FlushSendBuffers() == Status::MESSAGES_PENDING)
+          received_delayed_data = false;
 
-      if (not as->ReceiveDelayedData(sorted_angleset.set_index))
-        received_delayed_data = false;
-    }
+        if (not angle_set->ReceiveDelayedData())
+          received_delayed_data = false;
+      }
   }
 
   //================================================== Reset all
-  for (auto& angsetgroup : angle_agg.angle_set_groups)
-    angsetgroup.ResetSweep();
+  for (auto& angle_set_group : angle_agg_.angle_set_groups)
+    for (auto& angle_set : angle_set_group.AngleSets())
+      angle_set->ResetSweepBuffers();
 
-  for (auto& [bid, bndry] : angle_agg.sim_boundaries)
+  for (auto& [bid, bndry] : angle_agg_.sim_boundaries)
   {
     if (bndry->Type() == chi_mesh::sweep_management::BoundaryType::REFLECTING)
     {
@@ -61,14 +67,5 @@ void chi_mesh::sweep_management::SweepScheduler::
     }
   }
 
-//  //================================================== Receive delayed data
-//  Chi::mpi.Barrier();
-//  for (auto& sorted_angleset : rule_values)
-//  {
-//    auto angleset = sorted_angleset.angle_set;
-//    angleset->ReceiveDelayedData(sorted_angleset.set_index);
-//  }
-
-  Chi::log.LogEvent(sweep_event_tag, chi::ChiLog::EventType::EVENT_END);
-
+  Chi::log.LogEvent(sweep_event_tag_, chi::ChiLog::EventType::EVENT_END);
 }

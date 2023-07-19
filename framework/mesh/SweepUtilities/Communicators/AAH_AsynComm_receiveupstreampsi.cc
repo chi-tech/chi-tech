@@ -39,9 +39,9 @@ chi_mesh::sweep_management::AAH_ASynchronousCommunicator::ReceiveUpstreamPsi(int
       if (!prelocI_message_received[prelocI][m])
       {
         int message_available = 0;
-        MPI_Iprobe(comm_set.MapIonJ(locJ, Chi::mpi.location_id),
+        MPI_Iprobe(comm_set_.MapIonJ(locJ, Chi::mpi.location_id),
                    max_num_mess * angle_set_num + m, // tag
-                   comm_set.LocICommunicator(Chi::mpi.location_id),
+                   comm_set_.LocICommunicator(Chi::mpi.location_id),
                    &message_available,
                    MPI_STATUS_IGNORE);
 
@@ -61,9 +61,9 @@ chi_mesh::sweep_management::AAH_ASynchronousCommunicator::ReceiveUpstreamPsi(int
           MPI_Recv(&upstream_psi[block_addr],
                    static_cast<int>(message_size),
                    MPI_DOUBLE,
-                   comm_set.MapIonJ(locJ, Chi::mpi.location_id),
+                   comm_set_.MapIonJ(locJ, Chi::mpi.location_id),
                    max_num_mess * angle_set_num + m, // tag
-                   comm_set.LocICommunicator(Chi::mpi.location_id),
+                   comm_set_.LocICommunicator(Chi::mpi.location_id),
                    MPI_STATUS_IGNORE);
 
         prelocI_message_received[prelocI][m] = true;

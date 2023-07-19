@@ -249,15 +249,6 @@ void AAH_FLUDS::AllocateOutgoingPsi(size_t num_grps,
   }
 }
 
-void AAH_FLUDS::AllocateIncomingPsi(size_t num_grps,
-                                    size_t num_angles,
-                                    size_t num_loc_deps)
-{
-  prelocI_outgoing_psi_.resize(num_loc_deps, std::vector<double>());
-  for (size_t prelocI = 0; prelocI < num_loc_deps; prelocI++)
-    chi_math::Set(prelocI_outgoing_psi_[prelocI], 0.0);
-}
-
 void AAH_FLUDS::AllocateDelayedLocalPsi(size_t num_grps, size_t num_angles)
 {
   delayed_local_psi_.resize(common_data_.delayed_local_psi_stride *
@@ -307,16 +298,7 @@ void AAH_FLUDS::AllocateDelayedPrelocIOutgoingPsi(size_t num_grps,
 
 std::vector<double>& AAH_FLUDS::DelayedLocalPsi() { return delayed_local_psi_; }
 
-const std::vector<double>& AAH_FLUDS::DelayedLocalPsi() const
-{
-  return delayed_local_psi_;
-}
 std::vector<double>& AAH_FLUDS::DelayedLocalPsiOld()
-{
-  return delayed_local_psi_old_;
-}
-
-const std::vector<double>& AAH_FLUDS::DelayedLocalPsiOld() const
 {
   return delayed_local_psi_old_;
 }
@@ -325,16 +307,8 @@ std::vector<std::vector<double>>& AAH_FLUDS::DeplocIOutgoingPsi()
 {
   return deplocI_outgoing_psi_;
 }
-const std::vector<std::vector<double>>& AAH_FLUDS::DeplocIOutgoingPsi() const
-{
-  return deplocI_outgoing_psi_;
-}
 
 std::vector<std::vector<double>>& AAH_FLUDS::PrelocIOutgoingPsi()
-{
-  return prelocI_outgoing_psi_;
-}
-const std::vector<std::vector<double>>& AAH_FLUDS::PrelocIOutgoingPsi() const
 {
   return prelocI_outgoing_psi_;
 }
@@ -343,17 +317,7 @@ std::vector<std::vector<double>>& AAH_FLUDS::DelayedPrelocIOutgoingPsi()
 {
   return delayed_prelocI_outgoing_psi_;
 }
-const std::vector<std::vector<double>>&
-AAH_FLUDS::DelayedPrelocIOutgoingPsi() const
-{
-  return delayed_prelocI_outgoing_psi_;
-}
 std::vector<std::vector<double>>& AAH_FLUDS::DelayedPrelocIOutgoingPsiOld()
-{
-  return delayed_prelocI_outgoing_psi_old_;
-}
-const std::vector<std::vector<double>>&
-AAH_FLUDS::DelayedPrelocIOutgoingPsiOld() const
 {
   return delayed_prelocI_outgoing_psi_old_;
 }

@@ -7,11 +7,11 @@
 /**Returns a pointer to a reflected flux storage location.*/
 double* chi_mesh::sweep_management::BoundaryReflecting::
 HeterogeneousPsiIncoming(uint64_t cell_local_id,
-                         int face_num,
-                         int fi,
-                         int angle_num,
+  unsigned int face_num,
+  unsigned int fi,
+  unsigned int angle_num,
                          int group_num,
-                         int gs_ss_begin)
+  size_t gs_ss_begin)
 {
   double* Psi;
 
@@ -39,10 +39,10 @@ HeterogeneousPsiIncoming(uint64_t cell_local_id,
 /**Returns a pointer to a heterogeneous flux storage location.*/
 double* chi_mesh::sweep_management::BoundaryReflecting::
 HeterogeneousPsiOutgoing(uint64_t cell_local_id,
-                         int face_num,
-                         int fi,
-                         int angle_num,
-                         int gs_ss_begin)
+  unsigned int face_num,
+  unsigned int fi,
+  unsigned int angle_num,
+  size_t gs_ss_begin)
 {
   return &hetero_boundary_flux_[angle_num]
   [cell_local_id]

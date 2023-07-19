@@ -27,6 +27,13 @@ chi::InputParameters lbs::DiscreteOrdinatesSolver::GetInputParameters()
     std::vector<size_t>(),
     "List of direction id's for which sweep ordering info is to be printed.");
 
+  params.AddOptionalParameter(
+    "sweep_type", "AAH", "The sweep type to use for sweep operatorations.");
+
+  using namespace chi_data_types;
+  params.ConstrainParameterRange("sweep_type",
+                                 AllowableRangeList::New({"AAH", "CBC"}));
+
   return params;
 }
 
@@ -35,7 +42,8 @@ lbs::DiscreteOrdinatesSolver::DiscreteOrdinatesSolver(
   const chi::InputParameters& params)
   : LBSSolver(params),
     verbose_sweep_angles_(
-      params.GetParamVectorValue<size_t>("directions_sweep_order_to_print"))
+      params.GetParamVectorValue<size_t>("directions_sweep_order_to_print")),
+    sweep_type_(params.GetParamValue<std::string>("sweep_type"))
 {
 }
 

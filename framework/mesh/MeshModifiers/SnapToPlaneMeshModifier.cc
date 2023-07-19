@@ -113,7 +113,7 @@ void SnapToPlaneMeshModifier::Apply()
   for (const uint64_t cell_local_id : cell_ids_modified)
   {
     grid.local_cells[cell_local_id].RecomputeCentroidsAndNormals(grid);
-    //for (const auto& face : grid.local_cells[cell_local_id].faces_)
+    //for (const auto& face : grid.local_cells[cell_local_id_].faces_)
     //  chi::log.Log() << face.normal_.PrintStr();
   }
 

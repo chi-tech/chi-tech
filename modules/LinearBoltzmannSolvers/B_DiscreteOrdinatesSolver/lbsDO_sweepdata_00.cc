@@ -11,6 +11,9 @@
 #include "mesh/SweepUtilities/SPDS/SPDS_AdamsAdamsHawkins.h"
 #include "mesh/SweepUtilities/FLUDS/AAH_FLUDS.h"
 
+#include "Sweepers/CBC_SPDS.h"
+#include "Sweepers/CBC_FLUDSCommonData.h"
+
 #define ParallelParmetisNeedsCycles                                            \
   "When using PARMETIS type partitioning then groupset iterative method"       \
   " must be NPT_CLASSICRICHARDSON_CYCLES or NPT_GMRES_CYCLES"
@@ -97,13 +100,27 @@ void DiscreteOrdinatesSolver::InitializeSweepDataStructures()
             break;
           }
 
-      using namespace chi_mesh::sweep_management;
-      const auto new_swp_order = std::make_shared<SPDS_AdamsAdamsHawkins>(
-        omega,
-        *this->grid_ptr_,
-        quadrature_allow_cycles_map_[quadrature],
-        verbose);
-      quadrature_spds_map_[quadrature].push_back(new_swp_order);
+      if (sweep_type_ == "AAH")
+      {
+        using namespace chi_mesh::sweep_management;
+        const auto new_swp_order = std::make_shared<SPDS_AdamsAdamsHawkins>(
+          omega,
+          *this->grid_ptr_,
+          quadrature_allow_cycles_map_[quadrature],
+          verbose);
+        quadrature_spds_map_[quadrature].push_back(new_swp_order);
+      }
+      else if (sweep_type_ == "CBC")
+      {
+        const auto new_swp_order =
+          std::make_shared<CBC_SPDS>(omega,
+                                     *this->grid_ptr_,
+                                     quadrature_allow_cycles_map_[quadrature],
+                                     verbose);
+        quadrature_spds_map_[quadrature].push_back(new_swp_order);
+      }
+      else
+        ChiInvalidArgument("Unsupported sweeptype \"" + sweep_type_ + "\"");
     }
   } // quadrature info-pack
 
@@ -113,9 +130,21 @@ void DiscreteOrdinatesSolver::InitializeSweepDataStructures()
   {
     using namespace chi_mesh::sweep_management;
     for (const auto& spds : spds_list)
-      quadrature_fluds_commondata_map_[quadrature].push_back(
-        std::make_unique<AAH_FLUDSCommonData>(
-          grid_nodal_mappings_, *spds, *grid_face_histogram_));
+    {
+      if (sweep_type_ == "AAH")
+      {
+        quadrature_fluds_commondata_map_[quadrature].push_back(
+          std::make_unique<AAH_FLUDSCommonData>(
+            grid_nodal_mappings_, *spds, *grid_face_histogram_));
+      }
+      else if (sweep_type_ == "CBC")
+      {
+        quadrature_fluds_commondata_map_[quadrature].push_back(
+          std::make_unique<CBC_FLUDSCommonData>(*spds, grid_nodal_mappings_));
+      }
+      else
+        ChiInvalidArgument("Unsupported sweeptype \"" + sweep_type_ + "\"");
+    }
   } // for quadrature spds-list pair
 
   Chi::log.Log() << Chi::program_timer.GetTimeString()

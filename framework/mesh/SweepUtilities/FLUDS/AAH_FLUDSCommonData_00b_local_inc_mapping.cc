@@ -33,10 +33,10 @@ void AAH_FLUDSCommonData::LocalIncidentMapping(
         incoming_face_count++;
         //======================================== Find associated face for
         //                                         dof mapping
-        int ass_face = cell_nodal_mapping[f].associated_face;
+        int ass_face = cell_nodal_mapping[f].associated_face_;
 
         std::pair<int,std::vector<short>> dof_mapping;
-        dof_mapping.second = cell_nodal_mapping[f].node_mapping;
+        dof_mapping.second = cell_nodal_mapping[f].face_node_mapping_;
 
         //======================================== Find associated face
         //                                         counter for slot lookup
