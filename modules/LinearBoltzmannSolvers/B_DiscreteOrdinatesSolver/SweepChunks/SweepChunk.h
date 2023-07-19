@@ -88,7 +88,6 @@ protected:
   const LBSGroupset& groupset_;
   const std::map<int, XSPtr>& xs_;
   const int num_moments_;
-  const size_t num_groups_;
   const bool save_angular_flux_;
 
   std::unique_ptr<SweepDependencyInterface> sweep_dependency_interface_ptr_;

@@ -12,7 +12,7 @@ AsynchronousCommunicator::AsynchronousCommunicator(
 }
 
 std::vector<double>&
-AsynchronousCommunicator::GetDownwindMessageData(int location_id,
+AsynchronousCommunicator::InitGetDownwindMessageData(int location_id,
                                                  uint64_t cell_global_id,
                                                  unsigned int face_id,
                                                  size_t angle_set_id,

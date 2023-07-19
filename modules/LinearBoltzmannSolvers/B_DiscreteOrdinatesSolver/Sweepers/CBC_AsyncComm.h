@@ -35,16 +35,16 @@ public:
     chi_mesh::sweep_management::FLUDS& fluds,
     const chi::ChiMPICommunicatorSet& comm_set);
 
-  typedef std::tuple</*location_id*/int,
-                     /*cell_global_id*/uint64_t,
-                     /*face_id*/unsigned int,
-                     /*angle_set_id*/size_t> MessageKey;
+  typedef std::tuple</*location_id*/ int,
+                     /*cell_global_id*/ uint64_t,
+                     /*face_id*/ unsigned int>
+    MessageKey;
 
-  std::vector<double>& GetDownwindMessageData(int location_id,
-                                              uint64_t cell_global_id,
-                                              unsigned int face_id,
-                                              size_t angle_set_id,
-                                              size_t data_size) override;
+  std::vector<double>& InitGetDownwindMessageData(int location_id,
+                                                  uint64_t cell_global_id,
+                                                  unsigned int face_id,
+                                                  size_t angle_set_id,
+                                                  size_t data_size) override;
 
   bool SendData();
   std::vector<uint64_t> ReceiveData();

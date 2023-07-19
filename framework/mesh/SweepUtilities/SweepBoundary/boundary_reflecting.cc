@@ -56,7 +56,7 @@ HeterogeneousPsiOutgoing(uint64_t cell_local_id,
 void chi_mesh::sweep_management::BoundaryReflecting::
 UpdateAnglesReadyStatus(const std::vector<size_t>& angles, size_t gs_ss)
 {
-  for (auto& n : angles)
+  for (const size_t n : angles)
     angle_readyflags_[reflected_anglenum_[n]][gs_ss] = true;
 }
 

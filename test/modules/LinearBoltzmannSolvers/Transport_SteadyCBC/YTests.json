@@ -2,40 +2,38 @@
   {
     "file": "Transport1D_1.lua",
     "comment": "1D LinearBSolver Test - PWLD",
-    "num_procs": 1,
-    "args" : ["-v 2"],
+    "num_procs": 3,
     "checks": [
       {
         "type": "KeyValuePair",
         "key": "[0]  Max-value1=",
-        "goldvalue": 1.99518,
+        "goldvalue": 0.49903,
         "tol": 1.0e-5
       },
       {
         "type": "KeyValuePair",
         "key": "[0]  Max-value2=",
-        "goldvalue": 1.30704e-14,
-        "tol": 1.0e-17
+        "goldvalue": 7.18231e-04,
+        "tol": 1.0e-8
       }
     ]
   },
   {
-    "file": "Transport2D_1.lua",
+    "file": "Transport2D_1Poly.lua",
     "comment": "2D LinearBSolver Test - PWLD",
-    "num_procs": 1,
-    "args" : ["-v 2"],
+    "num_procs": 4,
     "checks": [
       {
         "type": "KeyValuePair",
         "key": "[0]  Max-value1=",
-        "goldvalue": 2.40136,
-        "tol": 1.0e-5
+        "goldvalue": 0.50758,
+        "tol": 0.0001
       },
       {
         "type": "KeyValuePair",
         "key": "[0]  Max-value2=",
-        "goldvalue": 1.57528e-17,
-        "tol": 1.0e-20
+        "goldvalue": 0.000252527,
+        "tol": 0.0001
       }
     ]
   }
