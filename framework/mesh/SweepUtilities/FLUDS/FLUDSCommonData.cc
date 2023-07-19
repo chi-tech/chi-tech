@@ -10,9 +10,13 @@ FLUDSCommonData::FLUDSCommonData(
 {
 }
 
-const SPDS& FLUDSCommonData::GetSPDS() const
+const SPDS& FLUDSCommonData::GetSPDS() const { return spds_; }
+
+const FaceNodalMapping&
+FLUDSCommonData::GetFaceNodalMapping(uint64_t cell_local_id,
+                                     unsigned int face_id) const
 {
-  return spds_;
+  return grid_nodal_mappings_[cell_local_id][face_id];
 }
 
 } // namespace chi_mesh::sweep_management

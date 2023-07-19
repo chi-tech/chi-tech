@@ -6,6 +6,8 @@
 namespace lbs
 {
 
+class CBC_ASynchronousCommunicator;
+
 /**Base class for Discrete Ordinates solvers. This class mostly establishes
  * utilities related to sweeping. From here we can derive a steady-state,
  * transient, adjoint, and k-eigenvalue solver.*/
@@ -21,10 +23,6 @@ protected:
   typedef std::shared_ptr<chi_mesh::sweep_management::SPDS> SPDS_ptr;
   typedef std::vector<SPDS_ptr> SPDS_ptrs;
 
-  //typedef chi_mesh::sweep_management::PRIMARY_FLUDS FLUDSTemplate;
-  //typedef std::shared_ptr<FLUDSTemplate> FLUDSTemplatePtr;
-  //typedef std::vector<FLUDSTemplatePtr> FLUDSTemplatePtrs;
-
   typedef chi_mesh::sweep_management::FLUDSCommonData FLUDSCommonData;
   typedef std::unique_ptr<FLUDSCommonData> FLUDSCommonDataPtr;
   typedef std::vector<FLUDSCommonDataPtr> FLUDSCommonDataPtrs;
@@ -32,10 +30,10 @@ protected:
 protected:
   std::map<AngQuadPtr, SwpOrderGroupingInfo> quadrature_unq_so_grouping_map_;
   std::map<AngQuadPtr, SPDS_ptrs> quadrature_spds_map_;
-  //std::map<AngQuadPtr, FLUDSTemplatePtrs> quadrature_fluds_templates_map_;
   std::map<AngQuadPtr, FLUDSCommonDataPtrs> quadrature_fluds_commondata_map_;
 
   std::vector<size_t> verbose_sweep_angles_;
+  const std::string sweep_type_;
 
 public:
   static chi::InputParameters GetInputParameters();
@@ -45,6 +43,7 @@ protected:
   explicit DiscreteOrdinatesSolver(const std::string& text_name);
 
 public:
+  const std::string& SweepType() const {return sweep_type_;}
   virtual ~DiscreteOrdinatesSolver() override;
 
   std::pair<size_t, size_t> GetNumPhiIterativeUnknowns() override;

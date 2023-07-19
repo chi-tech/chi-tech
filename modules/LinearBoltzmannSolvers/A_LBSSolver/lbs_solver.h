@@ -21,7 +21,7 @@ class AGSLinearSolver;
 template <class MatType, class VecType, class SolverType>
 class WGSLinearSolver;
 template <class MatType, class VecType, class SolverType>
-class WGSContext;
+struct WGSContext;
 } // namespace lbs
 
 namespace chi

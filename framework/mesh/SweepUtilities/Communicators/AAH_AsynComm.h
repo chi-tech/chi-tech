@@ -4,6 +4,8 @@
 #include "mesh/SweepUtilities/sweep_namespace.h"
 #include "chi_mpi.h"
 
+#include "AsyncComm.h"
+
 typedef unsigned long long int u_ll_int;
 
 namespace chi
@@ -19,13 +21,11 @@ class FLUDS;
 // ###################################################################
 /**Handles the swift communication of interprocess communication
  * related to sweeping.*/
-class AAH_ASynchronousCommunicator
+class AAH_ASynchronousCommunicator : public AsynchronousCommunicator
 {
 private:
-  FLUDS& fluds_;
   const size_t num_groups_;
   const size_t num_angles_;
-  const chi::ChiMPICommunicatorSet& comm_set;
 
   bool done_sending;
   bool data_initialized;

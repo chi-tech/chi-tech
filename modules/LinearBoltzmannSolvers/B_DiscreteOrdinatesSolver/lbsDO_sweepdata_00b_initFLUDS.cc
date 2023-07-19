@@ -5,6 +5,10 @@
 #include "mesh/SweepUtilities/FLUDS/AAH_FLUDS.h"
 #include "mesh/SweepUtilities/AngleSet/AAH_AngleSet.h"
 
+#include "Sweepers/CBC_FLUDS.h"
+#include "Sweepers/CBC_AngleSet.h"
+#include "Sweepers/CBC_AsyncComm.h"
+
 #include "console/chi_console.h"
 
 #include "mesh/MeshHandler/chi_meshhandler.h"
@@ -20,8 +24,7 @@
 #include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
 // ###################################################################
-/**Initializes fluds data structures.*/
-
+/**Initializes fluds_ data structures.*/
 void lbs::DiscreteOrdinatesSolver::InitFluxDataStructures(LBSGroupset& groupset)
 {
   namespace sweep_namespace = chi_mesh::sweep_management;
@@ -44,6 +47,7 @@ void lbs::DiscreteOrdinatesSolver::InitFluxDataStructures(LBSGroupset& groupset)
     sweep_boundaries_, gs_num_grps, gs_num_ss, groupset.quadrature_, grid_ptr_);
 
   TAngleSetGroup angle_set_group;
+  size_t angle_set_id = 0;
   for (const auto& so_grouping : unique_so_groupings)
   {
     const size_t master_dir_id = so_grouping.front();
@@ -74,31 +78,54 @@ void lbs::DiscreteOrdinatesSolver::InitFluxDataStructures(LBSGroupset& groupset)
             angle_indices[k++] = so_grouping[n];
         }
 
-        using namespace chi_mesh::sweep_management;
-        // TODO: for different types
-        using namespace chi_mesh::sweep_management;
-        auto aux_fluds = std::make_shared<AAH_FLUDS>(
-          gs_ss_size,
-          angle_indices.size(),
-          dynamic_cast<const AAH_FLUDSCommonData&>(fluds_common_data));
+        if (sweep_type_ == "AAH")
+        {
+          using namespace chi_mesh::sweep_management;
+          std::shared_ptr<FLUDS> fluds = std::make_shared<AAH_FLUDS>(
+            gs_ss_size,
+            angle_indices.size(),
+            dynamic_cast<const AAH_FLUDSCommonData&>(fluds_common_data));
 
-        auto fluds = std::dynamic_pointer_cast<FLUDS>(aux_fluds);
+          auto angleSet =
+            std::make_shared<TAAH_AngleSet>(angle_set_id++,
+                                            gs_ss_size,
+                                            gs_ss,
+                                            *sweep_ordering,
+                                            fluds,
+                                            angle_indices,
+                                            sweep_boundaries_,
+                                            options_.sweep_eager_limit,
+                                            *grid_local_comm_set_);
 
-        if (not fluds)
-          throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +
-                                   ": Casting failure.");
+          angle_set_group.AngleSets().push_back(angleSet);
+        }
+        else if (sweep_type_ == "CBC")
+        {
+          ChiLogicalErrorIf(not options_.save_angular_flux,
+                            "When using sweep_type \"CBC\" then "
+                            "\"save_angular_flux\" must be true.");
+          using namespace chi_mesh::sweep_management;
+          std::shared_ptr<FLUDS> fluds = std::make_shared<CBC_FLUDS>(
+            gs_ss_size,
+            angle_indices.size(),
+            dynamic_cast<const CBC_FLUDSCommonData&>(fluds_common_data),
+            psi_new_local_[groupset.id_],
+            groupset.psi_uk_man_,
+            *discretization_);
 
-        auto angleSet =
-          std::make_shared<TAAH_AngleSet>(gs_ss_size,
-                                          gs_ss,
-                                          *sweep_ordering,
-                                          fluds,
-                                          angle_indices,
-                                          sweep_boundaries_,
-                                          options_.sweep_eager_limit,
-                                          *grid_local_comm_set_);
+          auto angleSet = std::make_shared<CBC_AngleSet>(angle_set_id++,
+                                                         gs_ss_size,
+                                                         *sweep_ordering,
+                                                         fluds,
+                                                         angle_indices,
+                                                         sweep_boundaries_,
+                                                         gs_ss,
+                                                         *grid_local_comm_set_);
 
-        angle_set_group.angle_sets.push_back(angleSet);
+          angle_set_group.AngleSets().push_back(angleSet);
+        }
+        else
+          ChiInvalidArgument("Unsupported sweeptype \"" + sweep_type_ + "\"");
       } // for an_ss
     }   // for gs_ss
   }     // for so_grouping

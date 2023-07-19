@@ -2,17 +2,26 @@
 #define CHITECH_FLUDSCOMMONDATA_H
 
 #include <vector>
+#include <cstdint>
 
 namespace chi_mesh::sweep_management
 {
 class SPDS;
 struct FaceNodalMapping
 {
-  const int associated_face;
-  const std::vector<short> node_mapping;
+  /**Face index on the neighbor cell.*/
+  const int associated_face_;
+  /**Face-node index on the neighbor face.*/
+  const std::vector<short> face_node_mapping_;
+  /**Cell-node index on the neighbor cell.*/
+  const std::vector<short> cell_node_mapping_;
 
-  FaceNodalMapping(int in_ass_face, std::vector<short>& in_node_mapping)
-    : associated_face(in_ass_face), node_mapping(in_node_mapping)
+  FaceNodalMapping(int ass_face,
+                   const std::vector<short>& node_mapping,
+                   const std::vector<short>& cell_node_mapping)
+    : associated_face_(ass_face),
+      face_node_mapping_(node_mapping),
+      cell_node_mapping_(cell_node_mapping)
   {
   }
 };
@@ -28,6 +37,8 @@ public:
   virtual ~FLUDSCommonData() = default;
 
   const SPDS& GetSPDS() const;
+  const FaceNodalMapping& GetFaceNodalMapping(uint64_t cell_local_id,
+                                              unsigned int face_id) const;
 
 protected:
   const SPDS& spds_;

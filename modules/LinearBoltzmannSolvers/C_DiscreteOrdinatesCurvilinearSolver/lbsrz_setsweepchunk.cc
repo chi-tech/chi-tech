@@ -2,12 +2,10 @@
 
 #include "SweepChunks/lbs_curvilinear_sweepchunk_pwl.h"
 
-typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
-
 namespace lbs
 {
 
-std::shared_ptr<SweepChunk>
+std::shared_ptr<chi_mesh::sweep_management::SweepChunk>
 lbs::DiscreteOrdinatesCurvilinearSolver::SetSweepChunk(
   lbs::LBSGroupset& groupset)
 {

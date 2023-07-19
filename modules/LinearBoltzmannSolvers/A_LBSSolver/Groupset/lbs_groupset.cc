@@ -294,10 +294,10 @@ void lbs::LBSGroupset::PrintSweepInfoFile(size_t ev_tag,
   {
     ofile << "Angle-set group " << q << ":\n";
     auto& ang_set_grp = angle_agg_->angle_set_groups[q];
-    int num_ang_sets_per_grp = (int)ang_set_grp.angle_sets.size();
+    int num_ang_sets_per_grp = (int)ang_set_grp.AngleSets().size();
     for (int as = 0; as < num_ang_sets_per_grp; ++as)
     {
-      auto ang_set = ang_set_grp.angle_sets[as];
+      auto ang_set = ang_set_grp.AngleSets()[as];
 
       int ang_set_num = as + q * num_ang_sets_per_grp;
 

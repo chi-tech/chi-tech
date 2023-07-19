@@ -45,7 +45,7 @@ void lbs::LBSSolver::
     "Each record:\n"
     "size_t-cell_global_id\n"
     "unsigned int-node_number\n"
-    "unsigned int-angle_num\n"
+    "unsigned int-angle_num_\n"
     "unsigned int-group_num\n"
     "double-angular_flux\n";
 

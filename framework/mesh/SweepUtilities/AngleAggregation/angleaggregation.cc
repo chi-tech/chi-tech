@@ -42,12 +42,12 @@ chi_mesh::sweep_management::AngleAggregation::AngleAggregation(
 void chi_mesh::sweep_management::AngleAggregation::ZeroOutgoingDelayedPsi()
 {
   for (auto& angsetgrp : angle_set_groups)
-    for (auto& angset : angsetgrp.angle_sets)
+    for (auto& angset : angsetgrp.AngleSets())
       for (auto& delayed_data : angset->GetFLUDS().DelayedPrelocIOutgoingPsi())
         chi_math::Set(delayed_data, 0.0);
 
   for (auto& angsetgrp : angle_set_groups)
-    for (auto& angset : angsetgrp.angle_sets)
+    for (auto& angset : angsetgrp.AngleSets())
       chi_math::Set(angset->GetFLUDS().DelayedLocalPsi(), 0.0);
 }
 
@@ -76,12 +76,12 @@ void chi_mesh::sweep_management::AngleAggregation::ZeroIncomingDelayedPsi()
 
   //======================================== Intra-cell cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       chi_math::Set(angle_set->GetFLUDS().DelayedLocalPsiOld(), 0.0);
 
   //======================================== Inter location cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       for (auto& loc_vector : angle_set->GetFLUDS().DelayedPrelocIOutgoingPsiOld())
         chi_math::Set(loc_vector, 0.0);
 }
@@ -272,12 +272,12 @@ chi_mesh::sweep_management::AngleAggregation::GetNumDelayedAngularDOFs()
 
   //======================================== Intra-cell cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       local_ang_unknowns += angle_set->GetFLUDS().DelayedLocalPsi().size();
 
   //======================================== Inter location cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       for (auto& loc_vector : angle_set->GetFLUDS().DelayedPrelocIOutgoingPsi())
         local_ang_unknowns += loc_vector.size();
 
@@ -323,7 +323,7 @@ void chi_mesh::sweep_management::AngleAggregation::
 
   //======================================== Intra-cell cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       for (auto val : angle_set->GetFLUDS().DelayedLocalPsi())
       {
         index++;
@@ -332,7 +332,7 @@ void chi_mesh::sweep_management::AngleAggregation::
 
   //======================================== Inter location cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       for (auto& loc_vector : angle_set->GetFLUDS().DelayedPrelocIOutgoingPsi())
         for (auto val : loc_vector)
         {
@@ -369,7 +369,7 @@ void chi_mesh::sweep_management::AngleAggregation::
 
   //======================================== Intra-cell cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       for (auto val : angle_set->GetFLUDS().DelayedLocalPsiOld())
       {
         index++;
@@ -378,7 +378,7 @@ void chi_mesh::sweep_management::AngleAggregation::
 
   //======================================== Inter location cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       for (auto& loc_vector : angle_set->GetFLUDS().DelayedPrelocIOutgoingPsiOld())
         for (auto val : loc_vector)
         {
@@ -415,7 +415,7 @@ void chi_mesh::sweep_management::AngleAggregation::
 
   //======================================== Intra-cell cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       for (auto& val : angle_set->GetFLUDS().DelayedLocalPsiOld())
       {
         index++;
@@ -424,7 +424,7 @@ void chi_mesh::sweep_management::AngleAggregation::
 
   //======================================== Inter location cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       for (auto& loc_vector : angle_set->GetFLUDS().DelayedPrelocIOutgoingPsiOld())
         for (auto& val : loc_vector)
         {
@@ -461,7 +461,7 @@ void chi_mesh::sweep_management::AngleAggregation::
 
   //======================================== Intra-cell cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       for (auto& val : angle_set->GetFLUDS().DelayedLocalPsi())
       {
         index++;
@@ -470,7 +470,7 @@ void chi_mesh::sweep_management::AngleAggregation::
 
   //======================================== Inter location cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       for (auto& loc_vector : angle_set->GetFLUDS().DelayedPrelocIOutgoingPsi())
         for (auto& val : loc_vector)
         {
@@ -509,13 +509,13 @@ std::vector<double> chi_mesh::sweep_management::AngleAggregation::
 
   //======================================== Intra-cell cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       for (auto val : angle_set->GetFLUDS().DelayedLocalPsi())
         psi_vector.push_back(val);
 
   //======================================== Inter location cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       for (auto& loc_vector : angle_set->GetFLUDS().DelayedPrelocIOutgoingPsi())
         for (auto val : loc_vector)
           psi_vector.push_back(val);
@@ -558,13 +558,13 @@ void chi_mesh::sweep_management::AngleAggregation::
 
   //======================================== Intra-cell cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       for (auto& val : angle_set->GetFLUDS().DelayedLocalPsi())
         val = stl_vector[index++];
 
   //======================================== Inter location cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       for (auto& loc_vector : angle_set->GetFLUDS().DelayedPrelocIOutgoingPsi())
         for (auto& val : loc_vector)
           val = stl_vector[index++];
@@ -600,13 +600,13 @@ std::vector<double> chi_mesh::sweep_management::AngleAggregation::
 
   //======================================== Intra-cell cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       for (auto val : angle_set->GetFLUDS().DelayedLocalPsiOld())
         psi_vector.push_back(val);
 
   //======================================== Inter location cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       for (auto& loc_vector : angle_set->GetFLUDS().DelayedPrelocIOutgoingPsiOld())
         for (auto val : loc_vector)
           psi_vector.push_back(val);
@@ -649,13 +649,13 @@ void chi_mesh::sweep_management::AngleAggregation::
 
   //======================================== Intra-cell cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       for (auto& val : angle_set->GetFLUDS().DelayedLocalPsiOld())
         val = stl_vector[index++];
 
   //======================================== Inter location cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       for (auto& loc_vector : angle_set->GetFLUDS().DelayedPrelocIOutgoingPsiOld())
         for (auto& val : loc_vector)
           val = stl_vector[index++];
@@ -680,13 +680,13 @@ void chi_mesh::sweep_management::AngleAggregation::SetDelayedPsiOld2New()
 
   //======================================== Intra-cell cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       angle_set->GetFLUDS().DelayedLocalPsi() =
         angle_set->GetFLUDS().DelayedLocalPsiOld();
 
   //======================================== Inter location cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       angle_set->GetFLUDS().DelayedPrelocIOutgoingPsi() =
         angle_set->GetFLUDS().DelayedPrelocIOutgoingPsiOld();
 }
@@ -710,13 +710,13 @@ void chi_mesh::sweep_management::AngleAggregation::SetDelayedPsiNew2Old()
 
   //======================================== Intra-cell cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       angle_set->GetFLUDS().DelayedLocalPsiOld() =
         angle_set->GetFLUDS().DelayedLocalPsi();
 
   //======================================== Inter location cycles
   for (auto& as_group : angle_set_groups)
-    for (auto& angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.AngleSets())
       angle_set->GetFLUDS().DelayedPrelocIOutgoingPsiOld() =
         angle_set->GetFLUDS().DelayedPrelocIOutgoingPsi();
 }

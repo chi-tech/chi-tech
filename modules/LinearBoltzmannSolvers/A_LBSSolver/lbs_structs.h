@@ -26,24 +26,23 @@ typedef std::shared_ptr<chi_physics::IsotropicMultiGrpSource> IsotropicSrcPtr;
 enum class SolverType
 {
   DISCRETE_ORDINATES = 1,
-  DIFFUSION_DFEM     = 2,
-  DIFFUSION_CFEM     = 3,
+  DIFFUSION_DFEM = 2,
+  DIFFUSION_CFEM = 3,
 };
 
 enum class GeometryType
 {
-  NO_GEOMETRY_SET  = 0,
-  ONED_SLAB        = 1,
+  NO_GEOMETRY_SET = 0,
+  ONED_SLAB = 1,
   ONED_CYLINDRICAL = 2,
-  ONED_SPHERICAL   = 3,
-  TWOD_CARTESIAN   = 4,
+  ONED_SPHERICAL = 3,
+  TWOD_CARTESIAN = 4,
   TWOD_CYLINDRICAL = 5,
   THREED_CARTESIAN = 6
 };
 
-inline
-chi_math::CoordinateSystemType
-  MapGeometryTypeToCoordSys(const GeometryType gtype)
+inline chi_math::CoordinateSystemType
+MapGeometryTypeToCoordSys(const GeometryType gtype)
 {
   using namespace chi_math;
   switch (gtype)
@@ -87,20 +86,18 @@ struct BoundaryPreference
 
 enum SourceFlags : int
 {
-  NO_FLAGS_SET              = 0,
-  APPLY_FIXED_SOURCES       = (1 << 0),
+  NO_FLAGS_SET = 0,
+  APPLY_FIXED_SOURCES = (1 << 0),
   APPLY_WGS_SCATTER_SOURCES = (1 << 1),
   APPLY_AGS_SCATTER_SOURCES = (1 << 2),
   APPLY_WGS_FISSION_SOURCES = (1 << 3),
   APPLY_AGS_FISSION_SOURCES = (1 << 4),
-  SUPPRESS_WG_SCATTER       = (1 << 5)
+  SUPPRESS_WG_SCATTER = (1 << 5)
 };
 
-inline SourceFlags operator|(const SourceFlags f1,
-                             const SourceFlags f2)
+inline SourceFlags operator|(const SourceFlags f1, const SourceFlags f2)
 {
-  return static_cast<SourceFlags>(static_cast<int>(f1) |
-                                  static_cast<int>(f2));
+  return static_cast<SourceFlags>(static_cast<int>(f1) | static_cast<int>(f2));
 }
 
 enum class PhiSTLOption
@@ -110,11 +107,11 @@ enum class PhiSTLOption
 };
 
 class LBSGroupset;
-typedef std::function<void(LBSGroupset&               groupset,
-                           std::vector<double>&       destination_q,
+typedef std::function<void(LBSGroupset& groupset,
+                           std::vector<double>& destination_q,
                            const std::vector<double>& phi,
-                           SourceFlags                source_flags)>
-                      SetSourceFunction;
+                           SourceFlags source_flags)>
+  SetSourceFunction;
 
 class AGSSchemeEntry;
 
@@ -125,16 +122,16 @@ struct Options
 
   GeometryType geometry_type = GeometryType::NO_GEOMETRY_SET;
   SDMType sd_type = SDMType::PIECEWISE_LINEAR_DISCONTINUOUS;
-  unsigned int scattering_order=1;
-  int  sweep_eager_limit= 32000; //see chiLBSSetProperty documentation
+  unsigned int scattering_order = 1;
+  int sweep_eager_limit = 32000; // see chiLBSSetProperty documentation
 
-  bool read_restart_data=false;
+  bool read_restart_data = false;
   std::string read_restart_folder_name = std::string("YRestart");
-  std::string read_restart_file_base   = std::string("restart");
+  std::string read_restart_file_base = std::string("restart");
 
-  bool write_restart_data=false;
+  bool write_restart_data = false;
   std::string write_restart_folder_name = std::string("YRestart");
-  std::string write_restart_file_base   = std::string("restart");
+  std::string write_restart_file_base = std::string("restart");
   double write_restart_interval = 30.0;
 
   bool use_precursors = false;
@@ -147,17 +144,16 @@ struct Options
   bool verbose_outer_iterations = true;
 
   bool power_field_function_on = false;
-  double power_default_kappa = 3.20435e-11; //200MeV to Joule
+  double power_default_kappa = 3.20435e-11; // 200MeV to Joule
   double power_normalization = -1.0;
 
   std::string field_function_prefix_option = "prefix";
-  std::string field_function_prefix; //Default is empty
+  std::string field_function_prefix; // Default is empty
 
   Options() = default;
 
   std::vector<AGSSchemeEntry> ags_scheme;
 };
-
 
 /**Transport view of a cell*/
 class CellLBSView
@@ -169,7 +165,8 @@ private:
   int num_grps_moms_;
   const chi_physics::MultiGroupXS* xs_;
   double volume_;
-  std::vector<bool> face_local_flags_ = {};
+  const std::vector<bool> face_local_flags_;
+  const std::vector<int> face_locality_;
   std::vector<double> outflow_;
 
 public:
@@ -180,17 +177,18 @@ public:
               const chi_physics::MultiGroupXS& xs_mapping,
               double volume,
               const std::vector<bool>& face_local_flags,
-              bool cell_on_boundary) :
-      phi_address_(phi_address),
+              const std::vector<int>& face_locality,
+              bool cell_on_boundary)
+    : phi_address_(phi_address),
       num_nodes_(num_nodes),
       num_groups_(num_groups),
       num_grps_moms_(num_groups * num_moments),
       xs_(&xs_mapping),
       volume_(volume),
-      face_local_flags_(face_local_flags)
+      face_local_flags_(face_local_flags),
+      face_locality_(face_locality)
   {
-    if (cell_on_boundary)
-      outflow_.resize(num_groups_, 0.0);
+    if (cell_on_boundary) outflow_.resize(num_groups_, 0.0);
   }
 
   size_t MapDOF(int node, int moment, int grp) const
@@ -198,16 +196,20 @@ public:
     return phi_address_ + node * num_grps_moms_ + num_groups_ * moment + grp;
   }
 
-  const chi_physics::MultiGroupXS& XS() const{ return *xs_; }
+  const chi_physics::MultiGroupXS& XS() const { return *xs_; }
 
-  bool IsFaceLocal(int f) const {return face_local_flags_[f];}
+  bool IsFaceLocal(int f) const { return face_local_flags_[f]; }
+  int FaceLocality(int f) const { return face_locality_[f];}
 
-  int NumNodes() const {return num_nodes_;}
+  int NumNodes() const { return num_nodes_; }
 
-  double Volume() const {return volume_;}
+  double Volume() const { return volume_; }
 
-  void ZeroOutflow(     ) {outflow_.assign(outflow_.size(), 0.0);}
-  void ZeroOutflow(int g) {if (g < outflow_.size()) outflow_[g]=0.0;}
+  void ZeroOutflow() { outflow_.assign(outflow_.size(), 0.0); }
+  void ZeroOutflow(int g)
+  {
+    if (g < outflow_.size()) outflow_[g] = 0.0;
+  }
   void AddOutflow(int g, double intS_mu_psi)
   {
     if (g < outflow_.size()) outflow_[g] += intS_mu_psi;
@@ -216,30 +218,32 @@ public:
   double GetOutflow(int g) const
   {
     if (g < outflow_.size()) return outflow_[g];
-    else return 0.0;
+    else
+      return 0.0;
   }
 
   void ReassingXS(const chi_physics::MultiGroupXS& xs_mapped)
-  { xs_ = &xs_mapped; }
+  {
+    xs_ = &xs_mapped;
+  }
 };
-
 
 struct UnitCellMatrices
 {
-  MatDbl  K_matrix;
+  MatDbl K_matrix;
   MatVec3 G_matrix;
-  MatDbl  M_matrix;
-  VecDbl  Vi_vectors;
+  MatDbl M_matrix;
+  VecDbl Vi_vectors;
 
-  std::vector<MatDbl>  face_M_matrices;
+  std::vector<MatDbl> face_M_matrices;
   std::vector<MatVec3> face_G_matrices;
-  std::vector<VecDbl>  face_Si_vectors;
+  std::vector<VecDbl> face_Si_vectors;
 };
 
 enum class AGSSchemeEntryType
 {
   GROUPSET_ID = 1,
-  SCHEME      = 2
+  SCHEME = 2
 };
 
 class AGSSchemeEntry
@@ -249,25 +253,24 @@ private:
   const int groupset_id_ = 0;
   const std::string scheme_name_;
   std::vector<AGSSchemeEntry> scheme_entries_;
+
 public:
-  explicit
-  AGSSchemeEntry(int groupset_id) :
-    type_(AGSSchemeEntryType::GROUPSET_ID),
-    groupset_id_(groupset_id)
-  {}
+  explicit AGSSchemeEntry(int groupset_id)
+    : type_(AGSSchemeEntryType::GROUPSET_ID), groupset_id_(groupset_id)
+  {
+  }
 
-  explicit
-  AGSSchemeEntry(const std::string& scheme) :
-    type_(AGSSchemeEntryType::SCHEME),
-    scheme_name_(scheme)
-  {}
+  explicit AGSSchemeEntry(const std::string& scheme)
+    : type_(AGSSchemeEntryType::SCHEME), scheme_name_(scheme)
+  {
+  }
 
-  AGSSchemeEntryType Type() const {return type_;}
-  int GroupsetID() const {return groupset_id_;}
+  AGSSchemeEntryType Type() const { return type_; }
+  int GroupsetID() const { return groupset_id_; }
 
-  std::vector<AGSSchemeEntry>& SchemeEntries() {return scheme_entries_;}
+  std::vector<AGSSchemeEntry>& SchemeEntries() { return scheme_entries_; }
 };
 
-}//namespace lbs
+} // namespace lbs
 
 #endif

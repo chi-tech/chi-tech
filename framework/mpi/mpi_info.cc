@@ -1,5 +1,7 @@
 #include "mpi_info.h"
 
+#include "chi_log_exceptions.h"
+
 namespace chi
 {
 
@@ -36,6 +38,19 @@ void MPI_Info::SetProcessCount(int in_process_count)
 void MPI_Info::Barrier() const
 {
   MPI_Barrier(this->communicator_);
+}
+
+void MPI_Info::Call(int mpi_error_code)
+{
+  if (mpi_error_code == MPI_SUCCESS) return;
+  else
+  {
+    char estring[MPI_MAX_ERROR_STRING];
+    int resultlen;
+    MPI_Error_string(mpi_error_code, estring, &resultlen);
+
+    ChiLogicalError(estring);
+  }
 }
 
 }//namespace chi_objects

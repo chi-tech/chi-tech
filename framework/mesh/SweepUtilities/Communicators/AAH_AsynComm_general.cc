@@ -6,16 +6,14 @@
 // ###################################################################
 /**Constructor.*/
 chi_mesh::sweep_management::AAH_ASynchronousCommunicator::
-  AAH_ASynchronousCommunicator(
-  FLUDS& fluds,
-  size_t num_groups,
-  size_t num_angles,
-  int sweep_eager_limit,
-  const chi::ChiMPICommunicatorSet& in_comm_set)
-  : fluds_(fluds),
+  AAH_ASynchronousCommunicator(FLUDS& fluds,
+                               size_t num_groups,
+                               size_t num_angles,
+                               int sweep_eager_limit,
+                               const chi::ChiMPICommunicatorSet& in_comm_set)
+  : AsynchronousCommunicator(fluds, in_comm_set),
     num_groups_(num_groups),
-    num_angles_(num_angles),
-    comm_set(in_comm_set)
+    num_angles_(num_angles)
 {
   done_sending = false;
   data_initialized = false;
@@ -29,7 +27,8 @@ chi_mesh::sweep_management::AAH_ASynchronousCommunicator::
 
 // ###################################################################
 /**Returns the private flag done_sending.*/
-bool chi_mesh::sweep_management::AAH_ASynchronousCommunicator::DoneSending() const
+bool chi_mesh::sweep_management::AAH_ASynchronousCommunicator::DoneSending()
+  const
 {
   return done_sending;
 }
@@ -37,14 +36,16 @@ bool chi_mesh::sweep_management::AAH_ASynchronousCommunicator::DoneSending() con
 // ###################################################################
 /**Receive all upstream Psi. This method is called from within
  * an advancement of an angleset, right after execution.*/
-void chi_mesh::sweep_management::AAH_ASynchronousCommunicator::ClearLocalAndReceiveBuffers()
+void chi_mesh::sweep_management::AAH_ASynchronousCommunicator::
+  ClearLocalAndReceiveBuffers()
 {
   fluds_.ClearLocalAndReceivePsi();
 }
 
 // ###################################################################
 /**Sends downstream psi.*/
-void chi_mesh::sweep_management::AAH_ASynchronousCommunicator::ClearDownstreamBuffers()
+void chi_mesh::sweep_management::AAH_ASynchronousCommunicator::
+  ClearDownstreamBuffers()
 {
   if (done_sending) return;
 

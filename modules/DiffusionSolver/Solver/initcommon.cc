@@ -90,7 +90,7 @@ void chi_diffusion::Solver::InitializeCommonItems()
         << "No boundary preference found for boundary \"" << bndry_name
         << "\" Dirichlet boundary added with zero boundary value.";
     }
-  }//for bndry_id
+  }//for neighbor_id_
 
   common_items_initialized_ = true;
 }

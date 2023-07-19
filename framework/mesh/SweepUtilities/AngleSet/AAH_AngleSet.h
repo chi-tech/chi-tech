@@ -10,11 +10,9 @@ namespace chi_mesh::sweep_management
 /**Manages the workstages of a single angle set.*/
 class AAH_AngleSet : public AngleSet
 {
-private:
-  chi_mesh::sweep_management::AAH_ASynchronousCommunicator sweep_buffer;
-
 public:
-  AAH_AngleSet(size_t in_numgrps,
+  AAH_AngleSet(size_t id,
+               size_t in_numgrps,
                size_t in_ref_subset,
                const SPDS& in_spds,
                std::shared_ptr<FLUDS>& in_fluds,
@@ -31,27 +29,29 @@ public:
 
   AngleSetStatus AngleSetAdvance(
     SweepChunk& sweep_chunk,
-    int angle_set_num,
     const std::vector<size_t>& timing_tags,
     ExecutionPermission permission) override;
   AngleSetStatus FlushSendBuffers() override;
   void ResetSweepBuffers() override;
-  bool ReceiveDelayedData(size_t angle_set_num) override;
+  bool ReceiveDelayedData() override;
 
   const double* PsiBndry(uint64_t bndry_map,
-                         int angle_num,
+                         unsigned int angle_num,
                          uint64_t cell_local_id,
-                         int face_num,
-                         int fi,
+                         unsigned int face_num,
+                         unsigned int fi,
                          int g,
-                         int gs_ss_begin,
+                         size_t gs_ss_begin,
                          bool surface_source_active) override;
   double* ReflectingPsiOutBoundBndry(uint64_t bndry_map,
-                                     int angle_num,
+                                     unsigned int angle_num,
                                      uint64_t cell_local_id,
-                                     int face_num,
-                                     int fi,
-                                     int gs_ss_begin) override;
+                                     unsigned int face_num,
+                                     unsigned int fi,
+                                     size_t gs_ss_begin) override;
+
+protected:
+  chi_mesh::sweep_management::AAH_ASynchronousCommunicator async_comm_;
 };
 
 }

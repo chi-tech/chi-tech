@@ -32,9 +32,9 @@ bool chi_mesh::sweep_management::AAH_ASynchronousCommunicator::ReceiveDelayedDat
       if (not delayed_prelocI_message_received[prelocI][m])
       {
         int message_available = 0;
-        MPI_Iprobe(comm_set.MapIonJ(locJ, Chi::mpi.location_id),
+        MPI_Iprobe(comm_set_.MapIonJ(locJ, Chi::mpi.location_id),
                    max_num_mess * angle_set_num + m, // tag
-                   comm_set.LocICommunicator(Chi::mpi.location_id),
+                   comm_set_.LocICommunicator(Chi::mpi.location_id),
                    &message_available,
                    MPI_STATUS_IGNORE);
 
@@ -55,9 +55,9 @@ bool chi_mesh::sweep_management::AAH_ASynchronousCommunicator::ReceiveDelayedDat
           MPI_Recv(&upstream_psi[block_addr],
                    static_cast<int>(message_size),
                    MPI_DOUBLE,
-                   comm_set.MapIonJ(locJ, Chi::mpi.location_id),
+                   comm_set_.MapIonJ(locJ, Chi::mpi.location_id),
                    max_num_mess * angle_set_num + m, // tag
-                   comm_set.LocICommunicator(Chi::mpi.location_id),
+                   comm_set_.LocICommunicator(Chi::mpi.location_id),
                    MPI_STATUS_IGNORE);
 
         delayed_prelocI_message_received[prelocI][m] = true;

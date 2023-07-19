@@ -24,10 +24,7 @@ public:
   const chi_mesh::MeshContinuum& Grid() const { return grid_; }
   const chi_mesh::Vector3& Omega() const { return omega_; }
   const SPLS& GetSPLS() const { return spls_; }
-  const std::vector<STDG>& GetGlobalSweepPlanes() const
-  {
-    return global_sweep_planes_;
-  }
+
   typedef std::vector<int> VecInt;
   const VecInt& GetLocationDependencies() const
   {
@@ -54,13 +51,15 @@ public:
   int MapLocJToPrelocI(int locJ) const;
   int MapLocJToDeplocI(int locJ) const;
 
+  virtual ~SPDS() = default;
+
 protected:
   chi_mesh::Vector3 omega_;
 
   const chi_mesh::MeshContinuum& grid_;
 
   SPLS spls_;
-  std::vector<STDG> global_sweep_planes_; ///< Processor sweep planes
+
   std::vector<int> location_dependencies_;
   std::vector<int> location_successors_;
   std::vector<int> delayed_location_dependencies_;
@@ -79,9 +78,7 @@ protected:
     std::set<int>& location_successors,
     std::vector<std::set<std::pair<int, double>>>& cell_successors);
 
-  void BuildTaskDependencyGraph(
-    const std::vector<std::vector<int>>& global_dependencies,
-    bool cycle_allowance_flag);
+
 
   void PrintedGhostedGraph() const;
 };

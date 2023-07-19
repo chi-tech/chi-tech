@@ -1,56 +1,85 @@
-#ifndef CHITECH_LBS_SWEEPCHUNK_H
-#define CHITECH_LBS_SWEEPCHUNK_H
+#ifndef CHITECH_SWEEPCHUNK_H
+#define CHITECH_SWEEPCHUNK_H
 
 #include "mesh/SweepUtilities/sweepchunk_base.h"
+#include "A_LBSSolver/lbs_structs.h"
 
-#include "math/SpatialDiscretization/spatial_discretization.h"
-#include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
+namespace chi_math
+{
+class CellMapping;
+}
 
 namespace lbs
 {
 
-// ##################################################################
-/**Simple utility structure for controlling counters and calls
- * to upstream data.*/
-struct SweepSurfaceStatusInfo
+struct SweepDependencyInterface
 {
-  chi_mesh::sweep_management::AngleSet* angle_set;
-  chi_mesh::sweep_management::FLUDS* fluds;
-  bool surface_source_active = false;
-  size_t gs_ss_size_ = 0;
+  chi_mesh::sweep_management::AngleSet* angle_set_ = nullptr;
+  bool surface_source_active_ = false;
+
   size_t gs_ss_begin_ = 0;
   int gs_gi_ = 0;
 
-  size_t spls_index = 0;
-  uint64_t cell_local_id = 0;
+  const chi_mesh::Cell* cell_ptr_ = nullptr;
+  uint64_t cell_local_id_ = 0;
 
-  size_t angle_set_index = 0;
-  size_t angle_num = 0;
+  size_t angle_set_index_ = 0;
+  size_t angle_num_ = 0;
 
-  int in_face_counter = 0;
-  int preloc_face_counter = 0;
-  int out_face_counter = 0;
-  int deploc_face_counter = 0;
+public: // Set using SetupIncomingFace
+  int current_face_idx_ = 0;
+  size_t num_face_nodes_ = 0;
+  uint64_t neighbor_id_ = 0;
+  int face_locality_ = 0;
 
-  uint64_t bndry_id = 0;
-  int f = 0;
+  bool on_local_face_ = false;
+  bool on_boundary_ = false;
 
-  bool on_local_face = false;
-  bool on_boundary = false;
+public:
   bool is_reflecting_bndry_ = false;
 
-  const double* GetUpwindPsi(int fj) const;
-  double* GetDownwindPsi(int fi) const;
+  SweepDependencyInterface() = default;
+
+  virtual const double* GetUpwindPsi(int face_node_local_idx) const = 0;
+  virtual double* GetDownwindPsi(int face_node_local_idx) const = 0;
+
+  virtual void SetupIncomingFace(int face_id,
+                                 size_t num_face_nodes,
+                                 uint64_t neighbor_id,
+                                 bool on_local_face,
+                                 bool on_boundary);
+  virtual void SetupOutgoingFace(int face_id,
+                                 size_t num_face_nodes,
+                                 uint64_t neighbor_id,
+                                 bool on_local_face,
+                                 bool on_boundary,
+                                 int locality);
+
+  virtual ~SweepDependencyInterface() = default;
 };
 
 // ##################################################################
-/**The new sweep chunk class.*/
-class LBSSweepChunk : public chi_mesh::sweep_management::SweepChunk
+/**Base class for LBS sweepers*/
+class SweepChunk : public chi_mesh::sweep_management::SweepChunk
 {
+public:
+  SweepChunk(
+    std::vector<double>& destination_phi,
+    std::vector<double>& destination_psi,
+    const chi_mesh::MeshContinuum& grid,
+    const chi_math::SpatialDiscretization& discretization,
+    const std::vector<UnitCellMatrices>& unit_cell_matrices,
+    std::vector<lbs::CellLBSView>& cell_transport_views,
+    const std::vector<double>& source_moments,
+    const LBSGroupset& groupset,
+    const std::map<int, XSPtr>& xs,
+    int num_moments,
+    int max_num_cell_dofs,
+    std::unique_ptr<SweepDependencyInterface> sweep_dependency_interface_ptr);
+
 protected:
   typedef std::function<void()> CallbackFunction;
 
-protected:
   const chi_mesh::MeshContinuum& grid_;
   const chi_math::SpatialDiscretization& grid_fe_view_;
   const std::vector<UnitCellMatrices>& unit_cell_matrices_;
@@ -62,18 +91,20 @@ protected:
   const size_t num_groups_;
   const bool save_angular_flux_;
 
+  std::unique_ptr<SweepDependencyInterface> sweep_dependency_interface_ptr_;
+  SweepDependencyInterface& sweep_dependency_interface_;
+
+  // Runtime params
   size_t gs_ss_size_ = 0;
   size_t gs_ss_begin_ = 0;
   int gs_gi_ = 0;
 
-  // Runtime params
   std::vector<std::vector<double>> Amat_;
   std::vector<std::vector<double>> Atemp_;
   std::vector<double> source_;
   std::vector<std::vector<double>> b_;
 
-  SweepSurfaceStatusInfo sweep_surface_status_info_;
-
+  // Cell items
   uint64_t cell_local_id_ = 0;
   const chi_mesh::Cell* cell_ = nullptr;
   const chi_math::CellMapping* cell_mapping_ = nullptr;
@@ -112,40 +143,27 @@ protected:
   /**Callbacks at phase 6 : Post cell-dir sweep*/
   std::vector<CallbackFunction> post_cell_dir_sweep_callbacks_;
 
-private:
-  std::map<std::string, CallbackFunction> kernels_;
-
-public:
-  LBSSweepChunk(const chi_mesh::MeshContinuum& grid,
-                const chi_math::SpatialDiscretization& discretization,
-                const std::vector<UnitCellMatrices>& unit_cell_matrices,
-                std::vector<lbs::CellLBSView>& cell_transport_views,
-                std::vector<double>& destination_phi,
-                std::vector<double>& destination_psi,
-                const std::vector<double>& source_moments,
-                const LBSGroupset& groupset,
-                const std::map<int, XSPtr>& xs,
-                int num_moments,
-                int max_num_cell_dofs);
-
-  // 01
-  void Sweep(chi_mesh::sweep_management::AngleSet* angle_set) override;
-
-protected:
   // 02 operations
+  /**Registers a kernel as a named callback function*/
   void RegisterKernel(const std::string& name, CallbackFunction function);
+  /**Returns a kernel if the given name exists.*/
   CallbackFunction Kernel(const std::string& name) const;
+  /**Executes the supplied kernels list.*/
   static void ExecuteKernels(const std::vector<CallbackFunction>& kernels);
   virtual void OutgoingSurfaceOperations();
 
-  // 03 kernels
+  // kernels
+public: // public so that we can use bind
   void KernelFEMVolumetricGradientTerm();
   void KernelFEMUpwindSurfaceIntegrals();
   void KernelFEMSTDMassTerms();
   void KernelPhiUpdate();
   void KernelPsiUpdate();
+
+private:
+  std::map<std::string, CallbackFunction> kernels_;
 };
 
 } // namespace lbs
 
-#endif // CHITECH_LBS_SWEEPCHUNK_H
+#endif // CHITECH_SWEEPCHUNK_H
