@@ -101,7 +101,7 @@ Before building the dependencies, you need to export a few variables for the PET
 Go to the chi-tech folder you have just cloned and type:
 ```bash
     $ cd chi-tech
-    $ python3 resources/configure_dependencies.py ../dependencies
+    $ python3 resources/configure_dependencies.py -d ../dependencies
 ```
 The configure script will attempt to download and install all the necessary 
 dependencies **and may take a long time**
