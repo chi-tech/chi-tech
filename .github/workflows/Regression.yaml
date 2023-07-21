@@ -24,4 +24,7 @@ jobs:
           make -j64
       - name: test
         shell: bash
-        run: test/run_tests -d test/modules
+        run: |
+          export MODULEPATH=/scratch-local/software/modulefiles
+          module load chitech/gcc/12.3.0
+          test/run_tests -d test/modules
