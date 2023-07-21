@@ -1,4 +1,4 @@
-name: Chi-Tech Regression Tests
+name: Development Branch Regression Tests
 
 on:
   schedule:

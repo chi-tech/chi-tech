@@ -1,4 +1,4 @@
-![Developer Branch Regression Tests](https://github.com/wdhawkins/chi-tech/actions/workflows/Regression.yaml/badge.svg?branch=development)
+![Developer Branch Regression Tests](https://github.com/chi-tech/chi-tech/actions/workflows/Regression.yaml/badge.svg?branch=development)
 
 <p align="center">
   <img src="doc/HTMLimages/CoolPics/banner.png" width="700">
