@@ -139,10 +139,12 @@ class StrCompareCheck(Check):
                         return True
                     words = re.split(r'\s+|,+|=+', line.rstrip())
 
-                    if len(words) < self.wordnum:
-                        warnings.warn("word count: " + str(len(words)) + " " +
-                                      line + "\n" + words.__str__())
-                        raise ValueError
+                    if len(words) <= self.wordnum:
+                        warnings.warn("word count: " + str(len(words)) +
+                                      "\nline: " +
+                                      line.rstrip() +
+                                      "\nwords: " + words.__str__())
+                        raise ValueError(f"Required word {self.wordnum} does not exist")
 
                     value = words[self.wordnum]
 
@@ -158,11 +160,11 @@ class StrCompareCheck(Check):
 
             file.close()
         except FileNotFoundError as e:
-            warnings.warn(str(e))
+            print(str(e))
         except Exception as e:
             self.annotations.append("Python error")
             if verbose:
-                warnings.warn(str(e))
+                print(str(e))
 
         return False
 
@@ -212,10 +214,12 @@ class FloatCompareCheck(Check):
                 if key_pos >= 0:
                     words = re.split(r'\s+|,+|=+', line.rstrip())
 
-                    if len(words) < self.wordnum:
-                        warnings.warn("word count: " + str(len(words)) + " " +
-                                      line + "\n" + words.__str__())
-                        raise ValueError
+                    if len(words) <= self.wordnum:
+                        warnings.warn("word count: " + str(len(words)) +
+                                      "\nline: " +
+                                      line + "\n" +
+                                      "\nwords: " + words.__str__())
+                        raise ValueError(f"Required word {self.wordnum} does not exist")
 
                     value = float(words[self.wordnum])
 
@@ -231,11 +235,11 @@ class FloatCompareCheck(Check):
 
             file.close()
         except FileNotFoundError as e:
-            warnings.warn(str(e))
+            print(str(e))
         except Exception as e:
             self.annotations.append("Python error")
             if verbose:
-                warnings.warn(str(e))
+                print(str(e))
 
         return False
 
@@ -280,10 +284,12 @@ class IntCompareCheck(Check):
                 if key_pos >= 0:
                     words = re.split(r'\s+|,+|=+', line.rstrip())
 
-                    if len(words) < self.wordnum:
-                        warnings.warn("word count: " + str(len(words)) + " " +
-                                      line + "\n" + words.__str__())
-                        raise ValueError
+                    if len(words) <= self.wordnum:
+                        warnings.warn("word count: " + str(len(words)) +
+                                      "\nline: " +
+                                      line + "\n" +
+                                      "\nwords: " + words.__str__())
+                        raise ValueError(f"Required word {self.wordnum} does not exist")
 
                     value = int(words[self.wordnum])
 
@@ -299,11 +305,11 @@ class IntCompareCheck(Check):
 
             file.close()
         except FileNotFoundError as e:
-            warnings.warn(str(e))
+            print(str(e))
         except Exception as e:
             self.annotations.append("Python error")
             if verbose:
-                warnings.warn(str(e))
+                print(str(e))
 
         return False
 
