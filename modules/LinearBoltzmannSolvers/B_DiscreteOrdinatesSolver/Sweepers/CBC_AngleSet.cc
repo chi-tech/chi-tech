@@ -6,6 +6,7 @@
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_runtime.h"
+#include "chi_log.h"
 
 namespace lbs
 {
@@ -65,7 +66,11 @@ chi_mesh::sweep_management::AngleSetStatus CBC_AngleSet::AngleSetAdvance(
     if (cell_task.num_dependencies_ == 0 and not cell_task.completed_)
     {
       sweep_chunk.SetCell(&grid.local_cells[cell_task.reference_id_], *this);
+
+      Chi::log.LogEvent(timing_tags[0], chi::ChiLog::EventType::EVENT_BEGIN);
       sweep_chunk.Sweep(*this);
+      Chi::log.LogEvent(timing_tags[0], chi::ChiLog::EventType::EVENT_END);
+
       for (uint64_t local_task_num : cell_task.successors_)
         --current_task_list_[local_task_num].num_dependencies_;
 
