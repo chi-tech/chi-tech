@@ -92,7 +92,8 @@ enum SourceFlags : int
   APPLY_AGS_SCATTER_SOURCES = (1 << 2),
   APPLY_WGS_FISSION_SOURCES = (1 << 3),
   APPLY_AGS_FISSION_SOURCES = (1 << 4),
-  SUPPRESS_WG_SCATTER = (1 << 5)
+  SUPPRESS_WG_SCATTER = (1 << 5),
+  ZERO_INCOMING_DELAYED_PSI = (1 << 6)
 };
 
 inline SourceFlags operator|(const SourceFlags f1, const SourceFlags f2)
