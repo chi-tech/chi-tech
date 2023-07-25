@@ -113,7 +113,8 @@ void SweepWGSContext<Mat, Vec, KSP>::ApplyInverseTransportOperator(int scope)
 
   sweep_scheduler_.SetBoundarySourceActiveFlag(use_bndry_source_flag);
 
-  if (scope & APPLY_FIXED_SOURCES) sweep_scheduler_.ZeroIncomingDelayedPsi();
+  if (scope & ZERO_INCOMING_DELAYED_PSI)
+    sweep_scheduler_.ZeroIncomingDelayedPsi();
 
   // Sweep
   sweep_scheduler_.ZeroOutputFluxDataStructures();
@@ -131,22 +132,21 @@ void SweepWGSContext<Mat, Vec, KSP>::PostSolveCallback()
   //================================================== Perform final sweep
   //                                                   with converged phi and
   //                                                   delayed psi dofs
-  lbs_ss_solver_.ZeroOutflowBalanceVars(groupset_);
+  if (groupset_.iterative_method_ != IterativeMethod::KRYLOV_RICHARDSON)
+  {
+    lbs_ss_solver_.ZeroOutflowBalanceVars(groupset_);
 
-  sweep_scheduler_.SetDestinationPhi(lbs_solver_.PhiNewLocal());
-  sweep_scheduler_.SetBoundarySourceActiveFlag(rhs_src_scope_ &
-                                               APPLY_FIXED_SOURCES);
+    const int scope = lhs_src_scope_ | rhs_src_scope_;
 
-  set_source_function_(groupset_,
-                       lbs_solver_.QMomentsLocal(),
-                       lbs_solver_.PhiOldLocal(),
-                       lhs_src_scope_ | rhs_src_scope_);
+    set_source_function_(
+      groupset_, lbs_solver_.QMomentsLocal(), lbs_solver_.PhiOldLocal(), scope);
+    sweep_scheduler_.SetDestinationPhi(lbs_solver_.PhiNewLocal());
 
-  sweep_scheduler_.ZeroDestinationPhi();
-  sweep_scheduler_.Sweep();
+    ApplyInverseTransportOperator(scope);
 
-  lbs_solver_.GSScopedCopyPrimarySTLvectors(
-    groupset_, PhiSTLOption::PHI_NEW, PhiSTLOption::PHI_OLD);
+    lbs_solver_.GSScopedCopyPrimarySTLvectors(
+      groupset_, PhiSTLOption::PHI_NEW, PhiSTLOption::PHI_OLD);
+  }
 
   //==================================================== Print solution info
   {

@@ -107,7 +107,8 @@ void LinearSolver<Mat, Vec, KSP>::Solve()
   this->SetInitialGuess();
   this->SetRHS();
 
-  KSPSolve(solver_, b_, x_);
+  if (not suppress_kspsolve_)
+    KSPSolve(solver_, b_, x_);
   this->PostSolveCallback();
 }
 
