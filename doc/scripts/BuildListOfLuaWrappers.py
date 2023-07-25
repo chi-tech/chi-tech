@@ -30,7 +30,6 @@ input_files = []
 main_input_proxies_file = open("doc/generated_files/input_wrappers_main.h", "w")
 main_input_proxies_file.write("/** \page LuaInputExamples Lua Input Examples \n\n")
 
-
 for input_file_folder in input_file_folders:
     # r=root, d=directories, f=files
     for r, d, f in os.walk(input_file_folder):
@@ -51,10 +50,10 @@ for input_file_folder in input_file_folders:
                     if not os.path.exists(incremental_root):
                         os.mkdir(incremental_root)
 
-                input_proxies_file = open("doc/generated_files/" + r + "/" +\
+                input_proxies_file = open("doc/generated_files/" + r + "/" + \
                                           proxy_name + ".h", "w")
 
-                input_proxies_file.write("/** \page " + proxy_name + " " +\
+                input_proxies_file.write("/** \page " + proxy_name + " " + \
                                          file_path + "\n")
                 input_proxies_file.write("\ingroup LuaInputExamples\n\n")
                 input_proxies_file.write("\code\n")
@@ -77,6 +76,8 @@ main_input_proxies_file.close()
 The following function searches for the use of a function name in all
 the lua input files
 """
+
+
 def SearchForFunction(function_name, input_files):
     file_list = []
 
@@ -90,6 +91,7 @@ def SearchForFunction(function_name, input_files):
         file.close()
 
     return file_list
+
 
 """
 Next each file is scanned. Doxygen comments are extracted as well
@@ -141,7 +143,11 @@ for src_path in wrapper_sources:
             if param_start >= 0:
                 words = line[param_start:].split()
                 if len(words) >= 3:
-                    params.append(words[2] + " " + words[1])
+                    param_type = words[2]
+                    param_name = words[1]
+                    if param_type[-1] == '.':
+                        param_type = param_type[:(len(params)-2)]
+                    params.append(param_type + " " + param_name)
             return_start = line.find(r"\return")
             if return_start >= 0:
                 words = line[return_start:].split()
@@ -151,13 +157,18 @@ for src_path in wrapper_sources:
         if line.find("*/") >= 0:
             in_comment = False
 
-        if line.find("int") >= 0 and line.find("chi") >= 0 and \
-                line.find("lua_State") >= 0:
+        int_find = line.find("int")
+        chi_find = line.find("chi")
+        state_find = line.find("lua_State")
+
+        if int_find >= 0 and chi_find >= 0 and state_find >= 0 and \
+                (state_find > chi_find > int_find):
             words = re.split(r"\(|\)|\s", line.strip())
 
             # Build function name and filelist
             function_name = words[1]
             file_list = SearchForFunction(function_name, input_files)
+
 
             def WriteUsageExamples():
                 if len(file_list) > 0:
@@ -167,6 +178,7 @@ for src_path in wrapper_sources:
                         proxy_name = proxy_name.replace(".", "_")
                         definition_file.write("\\ref " + proxy_name + "  \n")
 
+
             if len(returns) > 0:
                 function_line = returns[0] + " "
             else:
@@ -175,7 +187,7 @@ for src_path in wrapper_sources:
             function_line += function_name + "("
             for k in range(0, len(params)):
                 function_line += params[k]
-                if k < (len(params)-1):
+                if k < (len(params) - 1):
                     function_line += ", "
             function_line += ")"
 
@@ -186,10 +198,10 @@ for src_path in wrapper_sources:
                 WriteUsageExamples()
                 definition_file.write("*/\n")
             elif num_comment_lines > 1:
-                for k in range(0, num_comment_lines-1):
+                for k in range(0, num_comment_lines - 1):
                     definition_file.write(comment_lines[k])
                 WriteUsageExamples()
-                definition_file.write(comment_lines[num_comment_lines-1])
+                definition_file.write(comment_lines[num_comment_lines - 1])
 
             definition_file.write(function_line + "{}\n")
             declaration_file.write(function_line + ";\n")
