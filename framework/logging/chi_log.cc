@@ -7,7 +7,7 @@
 
 #include <sstream>
 
-//###################################################################
+// ###################################################################
 /**Access to the singleton*/
 chi::ChiLog& chi::ChiLog::GetInstance() noexcept
 {
@@ -15,7 +15,7 @@ chi::ChiLog& chi::ChiLog::GetInstance() noexcept
   return instance;
 }
 
-//###################################################################
+// ###################################################################
 /** Default constructor*/
 chi::ChiLog::ChiLog() noexcept
 {
@@ -25,14 +25,14 @@ chi::ChiLog::ChiLog() noexcept
 
   RepeatingEvent& ref_rep_event = repeating_events.back();
 
-  ref_rep_event.events.emplace_back(Chi::program_timer.GetTime(),
-    EventType::EVENT_CREATED,
-    std::make_shared<EventInfo>());
+  ref_rep_event.Events().emplace_back(Chi::program_timer.GetTime(),
+                                      EventType::EVENT_CREATED,
+                                      std::make_shared<EventInfo>());
 }
 
-//###################################################################
+// ###################################################################
 /** Makes a log entry.*/
-chi::LogStream chi::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
+chi::LogStream chi::ChiLog::Log(LOG_LVL level /*=LOG_0*/)
 {
   switch (level)
   {
@@ -160,22 +160,18 @@ chi::LogStream chi::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
   }
 }
 
-
-//###################################################################
+// ###################################################################
 /** Sets the verbosity level.*/
 void chi::ChiLog::SetVerbosity(int int_level)
 {
   verbosity_ = std::min(int_level, 2);
 }
 
-//###################################################################
+// ###################################################################
 /** Gets the current verbosity level.*/
-int chi::ChiLog::GetVerbosity() const
-{
-  return verbosity_;
-}
+int chi::ChiLog::GetVerbosity() const { return verbosity_; }
 
-//###################################################################
+// ###################################################################
 /** Returns a unique tag to a newly created repeating event.*/
 size_t chi::ChiLog::GetRepeatingEventTag(std::string event_name)
 {
@@ -183,47 +179,53 @@ size_t chi::ChiLog::GetRepeatingEventTag(std::string event_name)
 
   RepeatingEvent& ref_rep_event = repeating_events.back();
 
-  ref_rep_event.events.emplace_back(Chi::program_timer.GetTime(),
-    EventType::EVENT_CREATED,
-    std::make_shared<EventInfo>());
+  ref_rep_event.Events().emplace_back(Chi::program_timer.GetTime(),
+                                      EventType::EVENT_CREATED,
+                                      std::make_shared<EventInfo>());
 
-  return repeating_events.size()-1;
+  return repeating_events.size() - 1;
 }
 
-//###################################################################
+// ###################################################################
+/** Returns a unique tag to the latest version of an existing repeating event.*/
+size_t chi::ChiLog::GetExistingRepeatingEventTag(std::string event_name)
+{
+  const size_t num_rep_events = repeating_events.size();
+  for (size_t k=num_rep_events-1; k!=0; --k)
+    if (repeating_events[k].Name() == event_name)
+      return k;
+
+  ChiLogicalError("Tag could not be found for repeating event name \"" +
+                  event_name + "\"");
+}
+
+// ###################################################################
 /**Logs an event with the supplied event information.*/
 void chi::ChiLog::LogEvent(size_t ev_tag,
-                                   EventType ev_type,
-                                   const std::shared_ptr<EventInfo>& ev_info)
+                           EventType ev_type,
+                           const std::shared_ptr<EventInfo>& ev_info)
 {
-  if (ev_tag >= repeating_events.size())
-    return;
+  if (ev_tag >= repeating_events.size()) return;
 
   RepeatingEvent& ref_rep_event = repeating_events[ev_tag];
 
-  ref_rep_event.events.emplace_back(
-    Chi::program_timer.GetTime(),
-    ev_type,
-    ev_info);
+  ref_rep_event.Events().emplace_back(
+    Chi::program_timer.GetTime(), ev_type, ev_info);
 }
 
-//###################################################################
+// ###################################################################
 /**Logs an event without any event information.*/
-void chi::ChiLog::LogEvent(size_t ev_tag,
-                                   EventType ev_type)
+void chi::ChiLog::LogEvent(size_t ev_tag, EventType ev_type)
 {
-  if (ev_tag >= repeating_events.size())
-    return;
+  if (ev_tag >= repeating_events.size()) return;
 
   RepeatingEvent& ref_rep_event = repeating_events[ev_tag];
 
-  ref_rep_event.events.emplace_back(
-    Chi::program_timer.GetTime(),
-    ev_type,
-    nullptr);
+  ref_rep_event.Events().emplace_back(
+    Chi::program_timer.GetTime(), ev_type, nullptr);
 }
 
-//###################################################################
+// ###################################################################
 /**Returns a string representation of the event history associated with
  * the tag. Each event entry will be prepended by the location id and
  * the program timestamp in seconds. This method uses the
@@ -232,17 +234,16 @@ void chi::ChiLog::LogEvent(size_t ev_tag,
 std::string chi::ChiLog::PrintEventHistory(size_t ev_tag)
 {
   std::stringstream outstr;
-  if (ev_tag >= repeating_events.size())
-    return outstr.str();
+  if (ev_tag >= repeating_events.size()) return outstr.str();
 
   RepeatingEvent& ref_rep_event = repeating_events[ev_tag];
 
-  for (auto& event : ref_rep_event.events)
+  for (auto& event : ref_rep_event.Events())
   {
     outstr << "[" << Chi::mpi.location_id << "] ";
 
     char buf[100];
-    snprintf(buf,100,"%16.9f",event.ev_time/1000.0);
+    snprintf(buf, 100, "%16.9f", event.ev_time / 1000.0);
     outstr << buf << " ";
 
     switch (event.ev_type)
@@ -261,22 +262,20 @@ std::string chi::ChiLog::PrintEventHistory(size_t ev_tag)
         break;
     }
 
-    if (event.ev_info != nullptr)
-      outstr << event.ev_info->GetString();
+    if (event.ev_info != nullptr) outstr << event.ev_info->GetString();
     outstr << std::endl;
   }
 
   return outstr.str();
 }
 
-//###################################################################
+// ###################################################################
 /**Processes an event given an event operation. See ChiLog for further
  * reference.*/
 double chi::ChiLog::ProcessEvent(size_t ev_tag,
                                  chi::ChiLog::EventOperation ev_operation)
 {
-  if (ev_tag >= repeating_events.size())
-    return 0.0;
+  if (ev_tag >= repeating_events.size()) return 0.0;
 
   RepeatingEvent& ref_rep_event = repeating_events[ev_tag];
 
@@ -285,25 +284,24 @@ double chi::ChiLog::ProcessEvent(size_t ev_tag,
   {
     case EventOperation::NUMBER_OF_OCCURRENCES:
     {
-      for (auto& event : ref_rep_event.events)
+      for (auto& event : ref_rep_event.Events())
       {
-        if ( (event.ev_type == EventType::EVENT_CREATED) or
-             (event.ev_type == EventType::SINGLE_OCCURRENCE) or
-             (event.ev_type == EventType::EVENT_BEGIN))
+        if ((event.ev_type == EventType::EVENT_CREATED) or
+            (event.ev_type == EventType::SINGLE_OCCURRENCE) or
+            (event.ev_type == EventType::EVENT_BEGIN))
           ret_val += 1.0;
-      }//for events
+      } // for events
       break;
     }
     case EventOperation::TOTAL_DURATION:
     {
       double start_time = 0.0;
-      for (auto& event : ref_rep_event.events)
+      for (auto& event : ref_rep_event.Events())
       {
-        if (event.ev_type == EventType::EVENT_BEGIN)
-          start_time = event.ev_time;
+        if (event.ev_type == EventType::EVENT_BEGIN) start_time = event.ev_time;
         if (event.ev_type == EventType::EVENT_END)
           ret_val += event.ev_time - start_time;
-      }//for events
+      } // for events
       ret_val *= 1000.0;
       break;
     }
@@ -311,40 +309,39 @@ double chi::ChiLog::ProcessEvent(size_t ev_tag,
     {
       double start_time = 0.0;
       int counter = 0;
-      for (auto& event : ref_rep_event.events)
+      for (auto& event : ref_rep_event.Events())
       {
-        if (event.ev_type == EventType::EVENT_BEGIN)
-          start_time = event.ev_time;
+        if (event.ev_type == EventType::EVENT_BEGIN) start_time = event.ev_time;
 
         if (event.ev_type == EventType::EVENT_END)
         {
           ret_val += event.ev_time - start_time;
           counter++;
         }
-      }//for events
-      ret_val /= (1000.0*counter);
+      } // for events
+      ret_val /= (1000.0 * counter);
       break;
     }
     case EventOperation::MAX_VALUE:
     {
       ret_val = 0.0;
-      for (auto& event : ref_rep_event.events)
+      for (auto& event : ref_rep_event.Events())
       {
         if ((event.ev_type == EventType::SINGLE_OCCURRENCE) or
             (event.ev_type == EventType::EVENT_BEGIN) or
             (event.ev_type == EventType::EVENT_END))
         {
           if (event.ev_info != nullptr)
-            ret_val = std::max(event.ev_info->arb_value,ret_val);
+            ret_val = std::max(event.ev_info->arb_value, ret_val);
         }
-      }//for events
+      } // for events
       break;
     }
     case EventOperation::AVERAGE_VALUE:
     {
       ret_val = 0.0;
       int count = 0;
-      for (auto& event : ref_rep_event.events)
+      for (auto& event : ref_rep_event.Events())
       {
         if ((event.ev_type == EventType::SINGLE_OCCURRENCE) or
             (event.ev_type == EventType::EVENT_BEGIN) or
@@ -356,12 +353,12 @@ double chi::ChiLog::ProcessEvent(size_t ev_tag,
             ++count;
           }
         }
-      }//for events
+      } // for events
       if (count == 0) count = 1;
       ret_val /= count;
       break;
     }
-  }//switch
+  } // switch
 
   return ret_val;
 }

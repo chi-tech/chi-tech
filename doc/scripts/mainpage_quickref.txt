@@ -3,8 +3,9 @@ function: chiMPIBarrier
 module_end
 
 module: Logging Utilities
-function: chiLogSetVerbosity
 function: chiLog
+function: chiLogSetVerbosity
+function: chiLogProcessEvent
 module_end
 
 module: Math Utilities
