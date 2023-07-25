@@ -11,6 +11,7 @@ namespace chi_log_utils::lua_utils
 
 RegisterLuaFunctionAsIs(chiLogSetVerbosity);
 RegisterLuaFunctionAsIs(chiLog);
+RegisterLuaFunctionAsIs(chiLogProcessEvent);
 
 RegisterLuaConstantAsIs(LOG_0, chi_data_types::Varying(1));
 RegisterLuaConstantAsIs(LOG_0WARNING, chi_data_types::Varying(2));
@@ -101,6 +102,51 @@ int chiLog(lua_State* L)
   Chi::log.Log(static_cast<chi::ChiLog::LOG_LVL>(mode)) << message << std::endl;
 
   return 0;
+}
+
+/**Processes the sub-events of a repeating event and converts it to a
+* meaningful value (floating-point).
+*
+\param event_name string Required. Name of the event.
+\param event_operation_name string Required. What kind of operation to be
+                           applied. See `chi::ChiLog::EventOperation`
+*
+\return double The processed value.
+*/
+int chiLogProcessEvent(lua_State* L)
+{
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
+  if (num_args != 2) LuaPostArgAmountError(fname, 2, num_args);
+
+  LuaCheckStringValue(fname, L, 1);
+  LuaCheckStringValue(fname, L, 2);
+
+  const std::string event_name = lua_tostring(L, 1);
+  const std::string event_operation_name = lua_tostring(L, 2);
+
+  const size_t event_tag = Chi::log.GetExistingRepeatingEventTag(event_name);
+
+  chi::ChiLog::EventOperation event_operation;
+
+  if (event_operation_name == "NUMBER_OF_OCCURRENCES")
+    event_operation = chi::ChiLog::EventOperation::NUMBER_OF_OCCURRENCES;
+  else if (event_operation_name == "TOTAL_DURATION")
+    event_operation = chi::ChiLog::EventOperation::TOTAL_DURATION;
+  else if (event_operation_name == "AVERAGE_DURATION")
+    event_operation = chi::ChiLog::EventOperation::AVERAGE_DURATION;
+  else if (event_operation_name == "MAX_VALUE")
+    event_operation = chi::ChiLog::EventOperation::MAX_VALUE;
+  else if (event_operation_name == "AVERAGE_VALUE")
+    event_operation = chi::ChiLog::EventOperation::AVERAGE_VALUE;
+  else
+    ChiInvalidArgument("Unsupported event operation name \"" +
+                       event_operation_name + "\".");
+
+  const double value = Chi::log.ProcessEvent(event_tag, event_operation);
+
+  lua_pushnumber(L, static_cast<lua_Number>(value));
+  return 1;
 }
 
 } // namespace chi_log_utils::lua_utils
