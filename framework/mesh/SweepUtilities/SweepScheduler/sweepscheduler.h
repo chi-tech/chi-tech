@@ -48,9 +48,9 @@ private:
   std::vector<RULE_VALUES> rule_values_;
 
   SweepChunk& sweep_chunk_;
+  const size_t sweep_event_tag_;
   const std::vector<size_t> sweep_timing_events_tag_;
 
-  const size_t sweep_event_tag_;
 
 public:
   SweepScheduler(SchedulingAlgorithm in_scheduler_type,

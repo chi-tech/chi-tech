@@ -27,7 +27,7 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoFIFO(
     for (auto& angle_set_group : angle_agg_.angle_set_groups)
       for (auto& angle_set : angle_set_group.AngleSets())
       {
-        auto angle_set_status = angle_set->AngleSetAdvance(
+        const auto angle_set_status = angle_set->AngleSetAdvance(
           sweep_chunk, sweep_timing_events_tag_, ExecutionPermission::EXECUTE);
         if (angle_set_status == AngleSetStatus::NOT_FINISHED)
           completion_status = AngleSetStatus::NOT_FINISHED;

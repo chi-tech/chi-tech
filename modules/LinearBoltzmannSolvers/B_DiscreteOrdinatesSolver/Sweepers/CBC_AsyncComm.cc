@@ -33,36 +33,50 @@ std::vector<double>& CBC_ASynchronousCommunicator::InitGetDownwindMessageData(
   size_t data_size)
 {
   MessageKey key{location_id, cell_global_id, face_id};
-  if (outgoing_message_queue_.count(key) == 0)
-  {
-    std::vector<double>& data = outgoing_message_queue_[key];
+
+  std::vector<double>& data = outgoing_message_queue_[key];
+  if (data.empty())
     data.assign(data_size, 0.0);
-    return data;
-  }
-  else
-    return outgoing_message_queue_[key];
+
+  return data;
 }
 
 bool CBC_ASynchronousCommunicator::SendData()
 {
+  typedef int MPIRank;
+
   // First we convert any new outgoing messages from the queue into
-  // buffer messages
-  for (const auto& [msg_key, data] : outgoing_message_queue_)
+  // buffer messages. We aggregate these messages per location-id
+  // they need to be sent to
+  if (not outgoing_message_queue_.empty())
   {
-    BufferItem buffer_item;
-    buffer_item.destination_ = std::get<0>(msg_key);
-    auto& buffer_array = buffer_item.data_array_;
+    std::map<MPIRank, BufferItem> locI_buffer_map;
 
-    buffer_array.Write(std::get<1>(msg_key)); // cell_global_id
-    buffer_array.Write(std::get<2>(msg_key)); // face_id
-    buffer_array.Write(data.size());          // data_size
+    for (const auto& [msg_key, data] : outgoing_message_queue_)
+    {
+      const MPIRank locI = std::get<0>(msg_key);
+      const uint64_t cell_global_id = std::get<1>(msg_key);
+      const uint face_id = std::get<2>(msg_key);
+      const size_t data_size = data.size();
 
-    for (const double value : data) // actual psi_data
-      buffer_array.Write(value);
+      BufferItem& buffer_item = locI_buffer_map[locI];
 
-    send_buffer_.push_back(std::move(buffer_item));
-  } // for item in queue
-  outgoing_message_queue_.clear();
+      buffer_item.destination_ = locI;
+      auto& buffer_array = buffer_item.data_array_;
+
+      buffer_array.Write(cell_global_id);
+      buffer_array.Write(face_id);
+      buffer_array.Write(data_size);
+
+      for (const double value : data) // actual psi_data
+        buffer_array.Write(value);
+    } // for item in queue
+
+    for (auto& [locI, buffer] : locI_buffer_map)
+      send_buffer_.push_back(std::move(buffer));
+
+    outgoing_message_queue_.clear();
+  } // if there are outgoing messages
 
   // Now we attempt to flush items in the send buffer
   bool all_messages_sent = true;
@@ -120,28 +134,32 @@ std::vector<uint64_t> CBC_ASynchronousCommunicator::ReceiveData()
       MPI_Get_count(&status, MPI_BYTE, &num_items);
       std::vector<std::byte> recv_buffer(num_items);
       chi::MPI_Info::Call(
-        MPI_Recv(recv_buffer.data(), // recv_buffer
-                 num_items,          // count
-                 MPI_BYTE,           // datatype
-                 MPI_ANY_SOURCE,     // src
-                 status.MPI_TAG,     // tag
+        MPI_Recv(recv_buffer.data(),                            // recv_buffer
+                 num_items,                                     // count
+                 MPI_BYTE,                                      // datatype
+                 comm_set_.MapIonJ(locJ, Chi::mpi.location_id), // src
+                 status.MPI_TAG,                                // tag
                  comm_set_.LocICommunicator(Chi::mpi.location_id), // comm
                  MPI_STATUS_IGNORE));                              // status
 
       chi_data_types::ByteArray data_array(recv_buffer);
-      const uint64_t cell_global_id = data_array.Read<uint64_t>();
-      const uint face_id = data_array.Read<uint>();
-      const size_t data_size = data_array.Read<size_t>();
 
-      std::vector<double> psi_data;
-      psi_data.reserve(data_size);
-      for (size_t k = 0; k < data_size; ++k)
-        psi_data.push_back(data_array.Read<double>());
+      while (not data_array.EndOfBuffer())
+      {
+        const uint64_t cell_global_id = data_array.Read<uint64_t>();
+        const uint face_id = data_array.Read<uint>();
+        const size_t data_size = data_array.Read<size_t>();
 
-      received_messages[{cell_global_id, face_id}] = std::move(psi_data);
-      cells_who_received_data.push_back(
-        fluds_.GetSPDS().Grid().MapCellGlobalID2LocalID(cell_global_id));
-    }
+        std::vector<double> psi_data;
+        psi_data.reserve(data_size);
+        for (size_t k = 0; k < data_size; ++k)
+          psi_data.push_back(data_array.Read<double>());
+
+        received_messages[{cell_global_id, face_id}] = std::move(psi_data);
+        cells_who_received_data.push_back(
+          fluds_.GetSPDS().Grid().MapCellGlobalID2LocalID(cell_global_id));
+      } // while not at end of buffer
+    }// Process each message embedded in buffer
   }
 
   cbc_fluds_.DeplocsOutgoingMessages().merge(received_messages);

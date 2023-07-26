@@ -217,8 +217,6 @@ void SweepChunk::KernelPsiUpdate()
 {
   if (not save_angular_flux_) return;
 
-  //typedef const int64_t cint64_t;
-
   auto& output_psi = GetDestinationPsi();
   double* cell_psi_data = &output_psi[grid_fe_view_.MapDOFLocal(
     *cell_, 0, groupset_.psi_uk_man_, 0, 0)];
@@ -230,11 +228,6 @@ void SweepChunk::KernelPsiUpdate()
                         direction_num_ * groupset_group_stride_ + gs_ss_begin_;
     for (int gsg = 0; gsg < gs_ss_size_; ++gsg)
       cell_psi_data[imap + gsg] = b_[gsg][i];
-
-     //cint64_t imap = grid_fe_view_.MapDOFLocal(
-     //  *cell_, i, groupset_.psi_uk_man_, direction_num_, gs_ss_begin_);
-     //for (int gsg = 0; gsg < gs_ss_size_; ++gsg)
-     //  output_psi[imap + gsg] = b_[gsg][i];
   } // for i
 }
 
