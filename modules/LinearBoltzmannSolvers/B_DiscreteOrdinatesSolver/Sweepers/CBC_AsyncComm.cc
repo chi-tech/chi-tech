@@ -10,6 +10,8 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
+#define uint unsigned int
+
 namespace lbs
 {
 
@@ -72,7 +74,7 @@ bool CBC_ASynchronousCommunicator::SendData()
       chi::MPI_Info::Call(
         MPI_Isend(buffer_item.data_array_.Data().data(),            // buf
                   static_cast<int>(buffer_item.data_array_.Size()), // count
-                  MPI_BYTE,                                         // datatype
+                  MPI_BYTE,                                         //
                   comm_set_.MapIonJ(locJ, locJ),    // destination
                   static_cast<int>(angle_set_id_),  // tag
                   comm_set_.LocICommunicator(locJ), // comm
@@ -96,11 +98,7 @@ bool CBC_ASynchronousCommunicator::SendData()
 
 std::vector<uint64_t> CBC_ASynchronousCommunicator::ReceiveData()
 {
-  const auto& grid = fluds_.GetSPDS().Grid();
-
-  typedef std::pair</*cell_global_id*/ uint64_t,
-                    /*face_id*/ unsigned int>
-    CellFaceKey;
+  typedef std::pair<uint64_t, uint> CellFaceKey; // cell_gid + face_id
 
   std::map<CellFaceKey, std::vector<double>> received_messages;
   std::vector<uint64_t> cells_who_received_data;
@@ -132,7 +130,7 @@ std::vector<uint64_t> CBC_ASynchronousCommunicator::ReceiveData()
 
       chi_data_types::ByteArray data_array(recv_buffer);
       const uint64_t cell_global_id = data_array.Read<uint64_t>();
-      const unsigned int face_id = data_array.Read<unsigned int>();
+      const uint face_id = data_array.Read<uint>();
       const size_t data_size = data_array.Read<size_t>();
 
       std::vector<double> psi_data;
@@ -141,7 +139,8 @@ std::vector<uint64_t> CBC_ASynchronousCommunicator::ReceiveData()
         psi_data.push_back(data_array.Read<double>());
 
       received_messages[{cell_global_id, face_id}] = std::move(psi_data);
-      cells_who_received_data.push_back(grid.cells[cell_global_id].local_id_);
+      cells_who_received_data.push_back(
+        fluds_.GetSPDS().Grid().MapCellGlobalID2LocalID(cell_global_id));
     }
   }
 

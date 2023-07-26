@@ -168,6 +168,7 @@ private:
   double volume_;
   const std::vector<bool> face_local_flags_;
   const std::vector<int> face_locality_;
+  const std::vector<const chi_mesh::Cell*> neighbor_cell_ptrs_;
   std::vector<double> outflow_;
 
 public:
@@ -179,6 +180,7 @@ public:
               double volume,
               const std::vector<bool>& face_local_flags,
               const std::vector<int>& face_locality,
+              const std::vector<const chi_mesh::Cell*>& neighbor_cell_ptrs,
               bool cell_on_boundary)
     : phi_address_(phi_address),
       num_nodes_(num_nodes),
@@ -187,7 +189,8 @@ public:
       xs_(&xs_mapping),
       volume_(volume),
       face_local_flags_(face_local_flags),
-      face_locality_(face_locality)
+      face_locality_(face_locality),
+      neighbor_cell_ptrs_(neighbor_cell_ptrs)
   {
     if (cell_on_boundary) outflow_.resize(num_groups_, 0.0);
   }
@@ -200,7 +203,11 @@ public:
   const chi_physics::MultiGroupXS& XS() const { return *xs_; }
 
   bool IsFaceLocal(int f) const { return face_local_flags_[f]; }
-  int FaceLocality(int f) const { return face_locality_[f];}
+  int FaceLocality(int f) const { return face_locality_[f]; }
+  const chi_mesh::Cell* FaceNeighbor(int f) const
+  {
+    return neighbor_cell_ptrs_[f];
+  }
 
   int NumNodes() const { return num_nodes_; }
 

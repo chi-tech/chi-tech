@@ -35,7 +35,9 @@ CBC_SweepChunk::CBC_SweepChunk(
                xs,
                num_moments,
                max_num_cell_dofs,
-               std::make_unique<CBC_SweepDependencyInterface>())
+               std::make_unique<CBC_SweepDependencyInterface>()),
+    cbc_sweep_depinterf_(
+      dynamic_cast<CBC_SweepDependencyInterface&>(sweep_dependency_interface_))
 {
   // ================================== Register kernels
   RegisterKernel("FEMVolumetricGradTerm",
@@ -63,11 +65,9 @@ CBC_SweepChunk::CBC_SweepChunk(
   post_cell_dir_sweep_callbacks_ = {};
 }
 
-void CBC_SweepChunk::SetCell(const chi_mesh::Cell* cell_ptr,
-                             chi_mesh::sweep_management::AngleSet& angle_set)
+void CBC_SweepChunk::SetAngleSet(chi_mesh::sweep_management::AngleSet& angle_set)
 {
-  cell_ptr_ = cell_ptr;
-  cell_local_id_ = cell_ptr_->local_id_;
+  cbc_sweep_depinterf_.fluds_ = &dynamic_cast<CBC_FLUDS&>(angle_set.GetFLUDS());
 
   const SubSetInfo& grp_ss_info =
     groupset_.grp_subset_infos_[angle_set.GetRefGroupSubset()];
@@ -81,13 +81,16 @@ void CBC_SweepChunk::SetCell(const chi_mesh::Cell* cell_ptr,
   sweep_dependency_interface_.gs_ss_begin_ = gs_ss_begin_;
   sweep_dependency_interface_.gs_gi_ = gs_gi_;
 
-  auto& cbc_sweep_depinterf =
-    dynamic_cast<CBC_SweepDependencyInterface&>(sweep_dependency_interface_);
-  cbc_sweep_depinterf.fluds_ = &dynamic_cast<CBC_FLUDS&>(angle_set.GetFLUDS());
-
-  cbc_sweep_depinterf.group_stride_ = angle_set.GetNumGroups();
-  cbc_sweep_depinterf.group_angle_stride_ =
+  cbc_sweep_depinterf_.group_stride_ = angle_set.GetNumGroups();
+  cbc_sweep_depinterf_.group_angle_stride_ =
     angle_set.GetNumGroups() * angle_set.GetNumAngles();
+}
+
+void CBC_SweepChunk::SetCell(const chi_mesh::Cell* cell_ptr,
+                             chi_mesh::sweep_management::AngleSet& angle_set)
+{
+  cell_ptr_ = cell_ptr;
+  cell_local_id_ = cell_ptr_->local_id_;
 
   cell_ = &grid_.local_cells[cell_local_id_];
   sweep_dependency_interface_.cell_ptr_ = cell_;
@@ -107,6 +110,13 @@ void CBC_SweepChunk::SetCell(const chi_mesh::Cell* cell_ptr,
 
   for (auto& callback : cell_data_callbacks_)
     callback();
+
+  cbc_sweep_depinterf_.cell_transport_view_ = cell_transport_view_;
+}
+
+void CBC_SweepChunk::SetCells(const std::vector<const chi_mesh::Cell*>& cell_ptrs)
+{
+  cell_ptrs_ = cell_ptrs;
 }
 
 void CBC_SweepChunk::Sweep(chi_mesh::sweep_management::AngleSet& angle_set)
@@ -219,12 +229,14 @@ void CBC_SweepDependencyInterface::SetupIncomingFace(int face_id,
 
   if (on_local_face_)
   {
-    neighbor_cell_ptr_ = &fluds_->GetSPDS().Grid().cells[neighbor_id_];
-    psi_upwnd_data_ = &fluds_->GetLocalUpwindData();
+    neighbor_cell_ptr_ = cell_transport_view_->FaceNeighbor(face_id);
+    psi_upwnd_data_block_ = &fluds_->GetLocalUpwindDataBlock();
+    psi_local_face_upwnd_data_ = fluds_->GetLocalCellUpwindPsi(
+      *psi_upwnd_data_block_, *neighbor_cell_ptr_);
   }
   else if (not on_boundary_)
   {
-    psi_upwnd_data_ =
+    psi_upwnd_data_block_ =
       &fluds_->GetNonLocalUpwindData(cell_ptr_->global_id_, current_face_idx_);
   }
 }
@@ -274,11 +286,9 @@ CBC_SweepDependencyInterface::GetUpwindPsi(int face_node_local_idx) const
     const unsigned int adj_cell_node =
       face_nodal_mapping_->cell_node_mapping_[face_node_local_idx];
 
-    return fluds_->GetLocalUpwindPsi(*psi_upwnd_data_,
-                                     *neighbor_cell_ptr_,
-                                     adj_cell_node,
-                                     angle_num_,
-                                     gs_ss_begin_);
+    return &psi_local_face_upwnd_data_[adj_cell_node * groupset_angle_group_stride_ +
+                                  angle_num_ * groupset_group_stride_ +
+                                  gs_ss_begin_];
   }
   else if (not on_boundary_)
   {
@@ -286,7 +296,7 @@ CBC_SweepDependencyInterface::GetUpwindPsi(int face_node_local_idx) const
       face_nodal_mapping_->face_node_mapping_[face_node_local_idx];
 
     psi = fluds_->GetNonLocalUpwindPsi(
-      *psi_upwnd_data_, adj_face_node, angle_set_index_);
+      *psi_upwnd_data_block_, adj_face_node, angle_set_index_);
   }
   else
     psi = angle_set_->PsiBndry(neighbor_id_,
@@ -312,7 +322,7 @@ CBC_SweepDependencyInterface::GetDownwindPsi(int face_node_local_idx) const
     const size_t addr_offset = face_node_local_idx * group_angle_stride_ +
                                angle_set_index_ * group_stride_;
 
-    psi = &(*psi_dnwnd_data_).at(addr_offset);
+    psi = &(*psi_dnwnd_data_)[addr_offset];
   }
   else if (is_reflecting_bndry_)
     psi = angle_set_->ReflectingPsiOutBoundBndry(neighbor_id_,

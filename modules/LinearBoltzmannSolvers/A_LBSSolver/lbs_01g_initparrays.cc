@@ -104,8 +104,10 @@ void lbs::LBSSolver::InitializeParrays()
 
     size_t cell_phi_address = block_MG_counter;
 
-    std::vector<bool> face_local_flags(cell.faces_.size(), true);
-    std::vector<int> face_locality(cell.faces_.size(), Chi::mpi.location_id);
+    const size_t num_faces = cell.faces_.size();
+    std::vector<bool> face_local_flags(num_faces, true);
+    std::vector<int> face_locality(num_faces, Chi::mpi.location_id);
+    std::vector<const chi_mesh::Cell*> neighbor_cell_ptrs(num_faces, nullptr);
     bool cell_on_boundary = false;
     int f = 0;
     for (auto& face : cell.faces_)
@@ -138,6 +140,7 @@ void lbs::LBSSolver::InitializeParrays()
         const int neighbor_partition = face.GetNeighborPartitionID(*grid_ptr_);
         face_local_flags[f] = (neighbor_partition == Chi::mpi.location_id);
         face_locality[f] = neighbor_partition;
+        neighbor_cell_ptrs[f] = &grid_ptr_->cells[face.neighbor_id_];
       }
 
       ++f;
@@ -153,6 +156,7 @@ void lbs::LBSSolver::InitializeParrays()
                                        cell_volume,
                                        face_local_flags,
                                        face_locality,
+                                       neighbor_cell_ptrs,
                                        cell_on_boundary);
     block_MG_counter += num_nodes * num_grps * num_moments_;
   } // for local cell

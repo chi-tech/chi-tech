@@ -67,6 +67,7 @@ protected:
     bool send_initiated_ = false;
     bool completed_ = false;
     chi_data_types::ByteArray data_array_;
+    std::vector<std::byte> data_array2_;
   };
   std::vector<BufferItem> send_buffer_;
 };

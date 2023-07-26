@@ -36,13 +36,20 @@ SweepChunk::SweepChunk(
     num_moments_(num_moments),
     save_angular_flux_(!destination_psi.empty()),
     sweep_dependency_interface_ptr_(std::move(sweep_dependency_interface_ptr)),
-    sweep_dependency_interface_(*sweep_dependency_interface_ptr_)
+    sweep_dependency_interface_(*sweep_dependency_interface_ptr_),
+    groupset_angle_group_stride_(groupset_.psi_uk_man_.NumberOfUnknowns() *
+                                 groupset_.groups_.size()),
+    groupset_group_stride_(groupset_.groups_.size())
 {
   Amat_.resize(max_num_cell_dofs, std::vector<double>(max_num_cell_dofs));
   Atemp_.resize(max_num_cell_dofs, std::vector<double>(max_num_cell_dofs));
   b_.resize(groupset.groups_.size(),
             std::vector<double>(max_num_cell_dofs, 0.0));
   source_.resize(max_num_cell_dofs, 0.0);
+
+  sweep_dependency_interface_.groupset_angle_group_stride_ =
+    groupset_angle_group_stride_;
+  sweep_dependency_interface_.groupset_group_stride_ = groupset_group_stride_;
 }
 
 // ##################################################################
@@ -210,16 +217,24 @@ void SweepChunk::KernelPsiUpdate()
 {
   if (not save_angular_flux_) return;
 
-  typedef const int64_t cint64_t;
+  //typedef const int64_t cint64_t;
 
   auto& output_psi = GetDestinationPsi();
+  double* cell_psi_data = &output_psi[grid_fe_view_.MapDOFLocal(
+    *cell_, 0, groupset_.psi_uk_man_, 0, 0)];
 
-  for (int i = 0; i < cell_num_nodes_; ++i)
+
+  for (size_t i = 0; i < cell_num_nodes_; ++i)
   {
-    cint64_t imap = grid_fe_view_.MapDOFLocal(
-      *cell_, i, groupset_.psi_uk_man_, direction_num_, gs_ss_begin_);
+    const size_t imap = i * groupset_angle_group_stride_ +
+                        direction_num_ * groupset_group_stride_ + gs_ss_begin_;
     for (int gsg = 0; gsg < gs_ss_size_; ++gsg)
-      output_psi[imap + gsg] = b_[gsg][i];
+      cell_psi_data[imap + gsg] = b_[gsg][i];
+
+     //cint64_t imap = grid_fe_view_.MapDOFLocal(
+     //  *cell_, i, groupset_.psi_uk_man_, direction_num_, gs_ss_begin_);
+     //for (int gsg = 0; gsg < gs_ss_size_; ++gsg)
+     //  output_psi[imap + gsg] = b_[gsg][i];
   } // for i
 }
 
