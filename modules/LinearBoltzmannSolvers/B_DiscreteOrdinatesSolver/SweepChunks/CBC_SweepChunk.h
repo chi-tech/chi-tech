@@ -15,12 +15,15 @@ struct CBC_SweepDependencyInterface : public SweepDependencyInterface
   const chi_mesh::Cell* neighbor_cell_ptr_ = nullptr;
 
   /**Upwind angular flux*/
-  const std::vector<double>* psi_upwnd_data_ = nullptr;
+  const std::vector<double>* psi_upwnd_data_block_ = nullptr;
+  const double* psi_local_face_upwnd_data_ = nullptr;
   /**Downwind angular flux*/
   std::vector<double>* psi_dnwnd_data_ = nullptr;
 
   size_t group_stride_;
   size_t group_angle_stride_;
+
+  const CellLBSView* cell_transport_view_;
 
   // Set using SetupIncomingFace
   const chi_mesh::sweep_management::FaceNodalMapping* face_nodal_mapping_ =
@@ -56,14 +59,21 @@ public:
                  int num_moments,
                  int max_num_cell_dofs);
 
+  void SetAngleSet(chi_mesh::sweep_management::AngleSet& angle_set) override;
+
   void SetCell(chi_mesh::Cell const* cell_ptr,
                chi_mesh::sweep_management::AngleSet& angle_set) override;
+
+  void SetCells(const std::vector<const chi_mesh::Cell*>& cell_ptrs) override;
 
   void Sweep(chi_mesh::sweep_management::AngleSet& angle_set) override;
 
 protected:
+  CBC_SweepDependencyInterface& cbc_sweep_depinterf_;
   chi_mesh::Cell const* cell_ptr_ = nullptr;
   uint64_t cell_local_id_ = 0;
+
+  std::vector<const chi_mesh::Cell*> cell_ptrs_;
 };
 
 } // namespace lbs

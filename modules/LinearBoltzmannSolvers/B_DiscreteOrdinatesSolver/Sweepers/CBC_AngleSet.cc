@@ -4,6 +4,7 @@
 #include "CBC_SPDS.h"
 #include "mesh/SweepUtilities/sweepchunk_base.h"
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
+#include "math/chi_math_range.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -27,6 +28,7 @@ CBC_AngleSet::CBC_AngleSet(
                                          angle_indices,
                                          sim_boundaries,
                                          in_ref_subset),
+    cbc_spds_(dynamic_cast<const CBC_SPDS&>(spds_)),
     async_comm_(id, *fluds, comm_set)
 {
 }
@@ -43,11 +45,12 @@ chi_mesh::sweep_management::AngleSetStatus CBC_AngleSet::AngleSetAdvance(
   const std::vector<size_t>& timing_tags,
   chi_mesh::sweep_management::ExecutionPermission permission)
 {
-  const auto& grid = spds_.Grid();
   if (executed_) return chi_mesh::sweep_management::AngleSetStatus::FINISHED;
 
-  const auto& cbc_spds = dynamic_cast<const CBC_SPDS&>(spds_);
-  if (current_task_list_.empty()) current_task_list_ = cbc_spds.TaskList();
+  if (current_task_list_.empty())
+    current_task_list_ = cbc_spds_.TaskList();
+
+  sweep_chunk.SetAngleSet(*this);
 
   auto tasks_who_received_data = async_comm_.ReceiveData();
 
@@ -65,14 +68,13 @@ chi_mesh::sweep_management::AngleSetStatus CBC_AngleSet::AngleSetAdvance(
     if (not cell_task.completed_) all_tasks_completed = false;
     if (cell_task.num_dependencies_ == 0 and not cell_task.completed_)
     {
-      sweep_chunk.SetCell(&grid.local_cells[cell_task.reference_id_], *this);
-
       Chi::log.LogEvent(timing_tags[0], chi::ChiLog::EventType::EVENT_BEGIN);
+      sweep_chunk.SetCell(cell_task.cell_ptr_, *this);
       sweep_chunk.Sweep(*this);
-      Chi::log.LogEvent(timing_tags[0], chi::ChiLog::EventType::EVENT_END);
 
       for (uint64_t local_task_num : cell_task.successors_)
         --current_task_list_[local_task_num].num_dependencies_;
+      Chi::log.LogEvent(timing_tags[0], chi::ChiLog::EventType::EVENT_END);
 
       cell_task.completed_ = true;
     }

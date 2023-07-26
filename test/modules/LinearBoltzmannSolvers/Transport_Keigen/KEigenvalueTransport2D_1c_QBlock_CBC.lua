@@ -20,7 +20,7 @@ lbs_block =
       l_max_its = 1,
       gmres_restart_interval = 50,
       l_abs_tol = 1.0e-10,
-      groupset_num_subsets = 2,
+      groupset_num_subsets = 1,
     }
   },
   options =
@@ -31,7 +31,7 @@ lbs_block =
 
     use_precursors = false,
 
-    verbose_inner_iterations = false,
+    verbose_inner_iterations = true,
     verbose_outer_iterations = true,
     save_angular_flux = true
   },

@@ -7,6 +7,7 @@
 namespace lbs
 {
 
+class CBC_SPDS;
 struct Task;
 
 class CBC_AngleSet : public chi_mesh::sweep_management::AngleSet
@@ -55,7 +56,9 @@ public:
 
 
 protected:
+  const CBC_SPDS& cbc_spds_;
   std::vector<chi_mesh::sweep_management::Task> current_task_list_;
+  std::set<size_t> incomplete_tasks_;
   CBC_ASynchronousCommunicator async_comm_;
 };
 

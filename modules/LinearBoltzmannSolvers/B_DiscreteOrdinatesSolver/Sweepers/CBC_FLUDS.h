@@ -32,13 +32,10 @@ public:
 
   const chi_mesh::sweep_management::FLUDSCommonData& CommonData() const;
 
-  const std::vector<double>& GetLocalUpwindData() const;
+  const std::vector<double>& GetLocalUpwindDataBlock() const;
 
-  const double* GetLocalUpwindPsi(const std::vector<double>& psi_data,
-                                  const chi_mesh::Cell& cell,
-                                  unsigned int cell_node,
-                                  unsigned int angle_id,
-                                  size_t g);
+  const double* GetLocalCellUpwindPsi(const std::vector<double>& psi_data_block,
+                                      const chi_mesh::Cell& cell);
 
   const std::vector<double>& GetNonLocalUpwindData(uint64_t cell_global_id,
                                                    unsigned int face_id) const;

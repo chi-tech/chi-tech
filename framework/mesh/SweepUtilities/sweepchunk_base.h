@@ -37,12 +37,17 @@ public:
   /**Sweep chunks should override this.*/
   virtual void Sweep(AngleSet& angle_set) {}
 
+  /**Sets the currently active FLUx Data Structure*/
+  virtual void SetAngleSet(AngleSet& angle_set) {}
+
   /**For cell-by-cell methods or computing the residual on a
    * single cell.*/
   virtual void SetCell(chi_mesh::Cell const* cell_ptr,
                        chi_mesh::sweep_management::AngleSet& angle_set)
   {
   }
+
+  virtual void SetCells(const std::vector<const chi_mesh::Cell*>& cell_ptrs) {}
 
   virtual ~SweepChunk() = default;
 

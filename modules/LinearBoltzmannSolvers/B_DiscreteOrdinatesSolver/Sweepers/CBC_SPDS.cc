@@ -138,6 +138,7 @@ CBC_SPDS::CBC_SPDS(const chi_mesh::Vector3& omega,
     task_list_.push_back({num_dependencies,
                           succesors,
                           /*reference_id_=*/cell.local_id_,
+                          /*cell_ptr_=*/&cell,
                           /*completed_=*/false});
   } // for cell in SPLS
 

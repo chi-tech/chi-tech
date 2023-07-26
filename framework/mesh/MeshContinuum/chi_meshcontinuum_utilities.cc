@@ -286,6 +286,15 @@ size_t chi_mesh::MeshContinuum::MapCellFace(const chi_mesh::Cell& cur_cell,
 }
 
 // ###################################################################
+/**Given a global-id of a cell, will return the local-id if the
+ * cell is local, otherwise will throw logic_error.*/
+size_t
+chi_mesh::MeshContinuum::MapCellGlobalID2LocalID(uint64_t global_id) const
+{
+  return global_cell_id_to_local_id_map_.at(global_id);
+}
+
+// ###################################################################
 /**Computes the centroid from nodes specified by the given list.*/
 chi_mesh::Vector3 chi_mesh::MeshContinuum::ComputeCentroidFromListOfNodes(
   const std::vector<uint64_t>& list) const

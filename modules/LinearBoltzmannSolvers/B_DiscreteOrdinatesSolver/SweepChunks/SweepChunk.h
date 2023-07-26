@@ -14,6 +14,9 @@ namespace lbs
 
 struct SweepDependencyInterface
 {
+  size_t groupset_angle_group_stride_;
+  size_t groupset_group_stride_;
+
   chi_mesh::sweep_management::AngleSet* angle_set_ = nullptr;
   bool surface_source_active_ = false;
 
@@ -92,6 +95,9 @@ protected:
 
   std::unique_ptr<SweepDependencyInterface> sweep_dependency_interface_ptr_;
   SweepDependencyInterface& sweep_dependency_interface_;
+
+  const size_t groupset_angle_group_stride_;
+  const size_t groupset_group_stride_;
 
   // Runtime params
   size_t gs_ss_size_ = 0;
