@@ -35,10 +35,10 @@ public:
     chi_mesh::sweep_management::FLUDS& fluds,
     const chi::ChiMPICommunicatorSet& comm_set);
 
-  typedef std::tuple</*location_id*/ int,
-                     /*cell_global_id*/ uint64_t,
-                     /*face_id*/ unsigned int>
-    MessageKey;
+  // location_id
+  // cell_global_id
+  // face_id
+  typedef std::tuple<int, uint64_t, unsigned int> MessageKey;
 
   std::vector<double>& InitGetDownwindMessageData(int location_id,
                                                   uint64_t cell_global_id,
@@ -67,7 +67,6 @@ protected:
     bool send_initiated_ = false;
     bool completed_ = false;
     chi_data_types::ByteArray data_array_;
-    std::vector<std::byte> data_array2_;
   };
   std::vector<BufferItem> send_buffer_;
 };

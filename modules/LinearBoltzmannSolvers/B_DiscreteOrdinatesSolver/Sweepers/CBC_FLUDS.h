@@ -93,9 +93,9 @@ public:
     return delayed_prelocI_outgoing_psi_old_;
   }
 
-  typedef std::pair</*cell_global_id*/ uint64_t,
-                    /*face_id*/ unsigned int>
-    CellFaceKey;
+  // cell_global_id
+  // face_id
+  typedef std::pair<uint64_t, unsigned int> CellFaceKey;
 
   std::map<CellFaceKey, std::vector<double>>& DeplocsOutgoingMessages()
   {

@@ -45,7 +45,10 @@ chi_mesh::sweep_management::AngleSetStatus CBC_AngleSet::AngleSetAdvance(
   const std::vector<size_t>& timing_tags,
   chi_mesh::sweep_management::ExecutionPermission permission)
 {
-  if (executed_) return chi_mesh::sweep_management::AngleSetStatus::FINISHED;
+  typedef chi_mesh::sweep_management::AngleSetStatus Status;
+
+  if (executed_) return Status::FINISHED;
+
 
   if (current_task_list_.empty())
     current_task_list_ = cbc_spds_.TaskList();
@@ -57,30 +60,57 @@ chi_mesh::sweep_management::AngleSetStatus CBC_AngleSet::AngleSetAdvance(
   for (const uint64_t task_number : tasks_who_received_data)
     --current_task_list_[task_number].num_dependencies_;
 
+  async_comm_.SendData();
+
   // Check if boundaries allow for execution
   for (auto& [bid, bndry] : ref_boundaries_)
     if (not bndry->CheckAnglesReadyStatus(angles_, ref_group_subset_))
-      return chi_mesh::sweep_management::AngleSetStatus::NOT_FINISHED;
+      return Status::NOT_FINISHED;
 
   bool all_tasks_completed = true;
-  for (auto& cell_task : current_task_list_)
+  bool a_task_executed = true;
+  while (a_task_executed)
   {
-    if (not cell_task.completed_) all_tasks_completed = false;
-    if (cell_task.num_dependencies_ == 0 and not cell_task.completed_)
+    a_task_executed = false;
+    for (auto& cell_task : current_task_list_)
     {
-      Chi::log.LogEvent(timing_tags[0], chi::ChiLog::EventType::EVENT_BEGIN);
-      sweep_chunk.SetCell(cell_task.cell_ptr_, *this);
-      sweep_chunk.Sweep(*this);
+      if (not cell_task.completed_) all_tasks_completed = false;
+      if (cell_task.num_dependencies_ == 0 and not cell_task.completed_)
+      {
+        Chi::log.LogEvent(timing_tags[0], chi::ChiLog::EventType::EVENT_BEGIN);
+        sweep_chunk.SetCell(cell_task.cell_ptr_, *this);
+        sweep_chunk.Sweep(*this);
 
-      for (uint64_t local_task_num : cell_task.successors_)
-        --current_task_list_[local_task_num].num_dependencies_;
-      Chi::log.LogEvent(timing_tags[0], chi::ChiLog::EventType::EVENT_END);
+        for (uint64_t local_task_num : cell_task.successors_)
+          --current_task_list_[local_task_num].num_dependencies_;
+        Chi::log.LogEvent(timing_tags[0], chi::ChiLog::EventType::EVENT_END);
 
-      cell_task.completed_ = true;
-    }
-  } // for cell_task
+        cell_task.completed_ = true;
+        a_task_executed = true;
+        async_comm_.SendData();
+      }
+    } // for cell_task
+    async_comm_.SendData();
+  }
+  //for (auto& cell_task : current_task_list_)
+  //{
+  //  if (not cell_task.completed_) all_tasks_completed = false;
+  //  if (cell_task.num_dependencies_ == 0 and not cell_task.completed_)
+  //  {
+  //    Chi::log.LogEvent(timing_tags[0], chi::ChiLog::EventType::EVENT_BEGIN);
+  //    sweep_chunk.SetCell(cell_task.cell_ptr_, *this);
+  //    sweep_chunk.Sweep(*this);
+  //
+  //    for (uint64_t local_task_num : cell_task.successors_)
+  //      --current_task_list_[local_task_num].num_dependencies_;
+  //    Chi::log.LogEvent(timing_tags[0], chi::ChiLog::EventType::EVENT_END);
+  //
+  //    cell_task.completed_ = true;
+  //    async_comm_.SendData();
+  //  }
+  //} // for cell_task
 
-  bool all_messages_sent = async_comm_.SendData();
+  const bool all_messages_sent = async_comm_.SendData();
 
   if (all_tasks_completed and all_messages_sent)
   {
@@ -88,10 +118,10 @@ chi_mesh::sweep_management::AngleSetStatus CBC_AngleSet::AngleSetAdvance(
     for (auto& [bid, bndry] : ref_boundaries_)
       bndry->UpdateAnglesReadyStatus(angles_, ref_group_subset_);
     executed_ = true;
-    return chi_mesh::sweep_management::AngleSetStatus::FINISHED;
+    return Status::FINISHED;
   }
 
-  return chi_mesh::sweep_management::AngleSetStatus::NOT_FINISHED;
+  return Status::NOT_FINISHED;
 }
 
 // ###################################################################

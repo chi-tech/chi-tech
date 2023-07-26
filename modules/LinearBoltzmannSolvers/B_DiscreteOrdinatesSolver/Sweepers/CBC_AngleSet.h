@@ -22,7 +22,8 @@ public:
                size_t in_ref_subset,
                const chi::ChiMPICommunicatorSet& comm_set);
 
-  chi_mesh::sweep_management::AsynchronousCommunicator* GetCommunicator() override;
+  chi_mesh::sweep_management::AsynchronousCommunicator*
+  GetCommunicator() override;
   void InitializeDelayedUpstreamData() override {}
   int GetMaxBufferMessages() const override { return 0; }
   void SetMaxBufferMessages(int new_max) override {}
@@ -34,7 +35,10 @@ public:
 
   chi_mesh::sweep_management::AngleSetStatus FlushSendBuffers() override
   {
-    return chi_mesh::sweep_management::AngleSetStatus::MESSAGES_SENT;
+    const bool all_messages_sent = async_comm_.SendData();
+    return all_messages_sent
+             ? chi_mesh::sweep_management::AngleSetStatus::MESSAGES_SENT
+             : chi_mesh::sweep_management::AngleSetStatus::MESSAGES_PENDING;
   }
   void ResetSweepBuffers() override;
   bool ReceiveDelayedData() override { return true; }
@@ -53,12 +57,9 @@ public:
                                      unsigned int fi,
                                      size_t gs_ss_begin) override;
 
-
-
 protected:
   const CBC_SPDS& cbc_spds_;
   std::vector<chi_mesh::sweep_management::Task> current_task_list_;
-  std::set<size_t> incomplete_tasks_;
   CBC_ASynchronousCommunicator async_comm_;
 };
 
