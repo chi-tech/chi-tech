@@ -2,6 +2,7 @@
 
 #include "math/Quadratures/cylindrical_angular_quadrature.h"
 #include "math/Quadratures/spherical_angular_quadrature.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

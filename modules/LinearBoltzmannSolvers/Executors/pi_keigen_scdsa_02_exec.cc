@@ -30,6 +30,10 @@ void XXPowerIterationKEigenSCDSA::Execute()
     SetLBSScatterSource(/*in*/ phi_temp, additive, suppress_wg_scat);
   };
 
+  const size_t tag_SCDSA_solve_time =
+    Chi::log.GetRepeatingEventTag("SCDSA_solve_time");
+  const size_t tag_sweep_timing = Chi::log.GetRepeatingEventTag("Sweep Timing");
+
   using namespace chi_math;
 
   k_eff_ = 1.0;
@@ -81,7 +85,7 @@ void XXPowerIterationKEigenSCDSA::Execute()
                       /*in*/ epsilon_k + phi0_lph_ip1,
                       /*out*/ phi_temp);
 
-      //double production_k = lbs_solver_.ComputeFissionProduction(phi_temp);
+      // double production_k = lbs_solver_.ComputeFissionProduction(phi_temp);
 
       SetLBSFissionSource(phi_temp, /*additive=*/false);
       Scale(q_moments_local_, 1.0 / lambda_k);
@@ -99,8 +103,12 @@ void XXPowerIterationKEigenSCDSA::Execute()
         auto Ss = CopyOnlyPhi0(front_gs_, q_moments_local_);
 
         // Solve the diffusion system
+        Chi::log.LogEvent(tag_SCDSA_solve_time,
+                          chi::ChiLog::EventType::EVENT_BEGIN);
         diffusion_solver_->Assemble_b(Ss + Sfaux + Ss_res - Sf0_ell);
         diffusion_solver_->Solve(epsilon_kp1, /*use_initial_guess=*/true);
+        Chi::log.LogEvent(tag_SCDSA_solve_time,
+                          chi::ChiLog::EventType::EVENT_END);
 
         epsilon_k = epsilon_kp1;
       }
@@ -169,10 +177,20 @@ void XXPowerIterationKEigenSCDSA::Execute()
   Chi::log.Log() << "\n";
   Chi::log.Log() << "        Final k-eigenvalue    :        "
                  << std::setprecision(7) << k_eff_;
-  Chi::log.Log() << "        Final change          :        "
-                 << std::setprecision(6) << k_eff_change << " (num_TrOps:"
-                 << front_wgs_context_->counter_applications_of_inv_op_ << ")"
-                 << "\n";
+  Chi::log.Log()
+    << "        Final change          :        " << std::setprecision(6)
+    << k_eff_change
+    << " (num_TrOps:" << front_wgs_context_->counter_applications_of_inv_op_
+    << ")"
+    << "\n"
+    << "        Diffusion solve time  :        "
+    << Chi::log.ProcessEvent(tag_SCDSA_solve_time,
+                             chi::ChiLog::EventOperation::TOTAL_DURATION) *
+         1.0e-6
+    << "s\n"
+    << "        Total sweep time      :        "
+    << Chi::log.ProcessEvent(tag_sweep_timing,
+                             chi::ChiLog::EventOperation::TOTAL_DURATION);
   Chi::log.Log() << "\n";
 
   if (lbs_solver_.Options().use_precursors)

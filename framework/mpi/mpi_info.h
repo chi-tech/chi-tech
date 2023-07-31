@@ -48,6 +48,7 @@ protected:
 public:
   /**Calls the generic `MPI_Barrier` with the current communicator.*/
   void Barrier() const;
+  static void Call(int mpi_error_code);
 
 };
 

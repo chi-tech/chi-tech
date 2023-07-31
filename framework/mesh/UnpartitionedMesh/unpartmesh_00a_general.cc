@@ -12,7 +12,6 @@ chi_mesh::UnpartitionedMesh::~UnpartitionedMesh()
 {
   for (auto& cell : raw_cells_)          delete cell;
   for (auto& cell : raw_boundary_cells_) delete cell;
-  Chi::log.Log0Verbose2() << "~UnpartitionedMesh";
 }
 
 /**Compute centroids for all cells.*/

@@ -103,12 +103,12 @@ int chi_mesh::CellFace::
 
   auto& adj_cell = grid.cells[neighbor_id_];
 
-  return adj_cell.partition_id_;
+  return static_cast<int>(adj_cell.partition_id_);
 }
 
 //###################################################################
 /**Determines the neighbor's local id.*/
-int chi_mesh::CellFace::
+uint64_t chi_mesh::CellFace::
   GetNeighborLocalID(const chi_mesh::MeshContinuum& grid) const
 {
   if (not has_neighbor_) return -1;

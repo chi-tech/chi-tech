@@ -4,6 +4,8 @@
 
 #include "A_LBSSolver/Acceleration/diffusion_mip.h"
 
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
+
 // ###################################################################
 /**Initializes the Within-Group DSA solver. */
 void lbs::LBSSolver::InitTGDSA(LBSGroupset& groupset)

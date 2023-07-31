@@ -1,6 +1,7 @@
 #include "lbsadj_solver.h"
 
 #include "math/SpatialDiscretization/FiniteElement/spatial_discretization_FE.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 //###################################################################
 /**Computes the inner product of the flux and the material source.*/

@@ -3,6 +3,8 @@
 #include "ChiObjectFactory.h"
 #include "chi_log.h"
 
+#include "A_LBSSolver/IterativeMethods/poweriteration_keigen.h"
+
 namespace lbs
 {
 
@@ -10,8 +12,7 @@ RegisterChiObject(lbs, XXNonLinearKEigen);
 
 chi::InputParameters XXNonLinearKEigen::GetInputParameters()
 {
-  chi::InputParameters params =
-    chi_physics::Solver::GetInputParameters();
+  chi::InputParameters params = chi_physics::Solver::GetInputParameters();
 
   params.SetGeneralDescription(
     "Generalized implementation of a non-linear k-Eigenvalue solver");
@@ -44,6 +45,11 @@ chi::InputParameters XXNonLinearKEigen::GetInputParameters()
   params.AddOptionalParameter(
     "reinit_phi_1", true, "If true, reinitializes scalar phi fluxes to 1");
 
+  params.AddOptionalParameter("num_free_power_iterations",
+                              0,
+                              "The number of free power iterations to execute "
+                              "before entering the non-linear algorithm");
+
   return params;
 }
 
@@ -53,7 +59,8 @@ XXNonLinearKEigen::XXNonLinearKEigen(const chi::InputParameters& params)
       Chi::object_stack, params.GetParamValue<size_t>("lbs_solver_handle"))),
     nl_context_(std::make_shared<NLKEigenAGSContext<Vec, SNES>>(lbs_solver_)),
     nl_solver_(SNESNEWTONLS, nl_context_),
-    reinit_phi_1_(params.GetParamValue<bool>("reinit_phi_1"))
+    reinit_phi_1_(params.GetParamValue<bool>("reinit_phi_1")),
+    num_free_power_its_(params.GetParamValue<int>("num_free_power_iterations"))
 {
   auto& tolerances = nl_solver_.ToleranceOptions();
 
@@ -72,15 +79,21 @@ XXNonLinearKEigen::XXNonLinearKEigen(const chi::InputParameters& params)
     params.GetParamValue<double>("l_gmres_breakdown_tol");
 }
 
-void XXNonLinearKEigen::Initialize()
-{
-  lbs_solver_.Initialize();
-}
+void XXNonLinearKEigen::Initialize() { lbs_solver_.Initialize(); }
 
 void XXNonLinearKEigen::Execute()
 {
   if (reinit_phi_1_)
     lbs_solver_.SetPhiVectorScalarValues(lbs_solver_.PhiOldLocal(), 1.0);
+
+  if (num_free_power_its_ > 0)
+  {
+    double k_eff = 1.0;
+    PowerIterationKEigen(lbs_solver_,
+                         nl_solver_.ToleranceOptions().nl_absolute_tol,
+                         num_free_power_its_,
+                         k_eff);
+  }
 
   nl_solver_.Setup();
   nl_solver_.Solve();

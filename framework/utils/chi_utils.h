@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 
 /**Miscellaneous utilities. These utilities should have no dependencies.*/
@@ -38,6 +39,12 @@ namespace chi
                                      const std::string& search_string);
 
   void AssertReadibleFile(const std::string& file_name);
+
+  template<typename T, typename B>
+  bool VectorListHas(const std::vector<T>& list, const B& val)
+  {
+    return std::find(list.begin(), list.end(), val) != list.end();
+  }
 }//namespace chi_misc_utils
 
 #endif // CHITECH_CHI_UTILS_H

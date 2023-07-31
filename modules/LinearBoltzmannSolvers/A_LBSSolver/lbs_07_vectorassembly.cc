@@ -1,6 +1,8 @@
 #include "lbs_solver.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
+
 //###################################################################
 /**Sets a value to the zeroth (scalar) moment of the vector.*/
 void lbs::LBSSolver::SetPhiVectorScalarValues(std::vector<double> &phi_vector,

@@ -1,6 +1,7 @@
 #include "lbs_solver.h"
 
 #include "physics/PhysicsMaterial/chi_physicsmaterial.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

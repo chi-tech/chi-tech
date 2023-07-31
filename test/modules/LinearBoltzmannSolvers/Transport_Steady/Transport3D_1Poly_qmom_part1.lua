@@ -91,7 +91,7 @@ lbs_block =
       groupset_num_subsets = 1,
       inner_linear_method = "richardson",
       l_abs_tol = 1.0e-6,
-      l_max_its = 0,
+      l_max_its = 1,
       gmres_restart_interval = 100,
     },
   }

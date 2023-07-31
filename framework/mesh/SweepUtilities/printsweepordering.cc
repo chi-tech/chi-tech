@@ -39,9 +39,9 @@ void chi_mesh::sweep_management::
 //  //======================================================= Traverse the graph
 //  int max_rank=-1;
 //
-//  for (int ci=0; ci<sweep_order->spls->item_id.size(); ci++)
+//  for (int ci=0; ci<sweep_order->spls_->item_id.size(); ci++)
 //  {
-//    int cell_index = sweep_order->spls->item_id[ci];
+//    int cell_index = sweep_order->spls_->item_id[ci];
 //    chi_mesh::Cell* cell =  vol_continuum->cells[cell_index];
 //
 //    for (int e=0; e < cell->faces.size(); e++)
@@ -99,7 +99,7 @@ void chi_mesh::sweep_management::
 //    ranks[rank]->push_back(c);
 //  }
 //
-//  //for (int sp=0; sp<sweep_order->spls.size(); sp++)
+//  //for (int sp=0; sp<sweep_order->spls_.size(); sp++)
 //  for (int sp=0; sp<(max_rank+1); sp++)
 //  //for (int sp=0; sp<1; sp++)
 //  {

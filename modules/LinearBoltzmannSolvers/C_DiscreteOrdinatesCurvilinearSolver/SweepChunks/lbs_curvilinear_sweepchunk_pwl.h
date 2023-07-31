@@ -1,7 +1,7 @@
 #ifndef LBS_CURVILINEAR_SWEEPCHUNK_PWL2_H
 #define LBS_CURVILINEAR_SWEEPCHUNK_PWL2_H
 
-#include "B_DiscreteOrdinatesSolver/SweepChunks/lbs_sweepchunk.h"
+#include "B_DiscreteOrdinatesSolver/SweepChunks/AAH_SweepChunk.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
 namespace lbs
@@ -9,7 +9,7 @@ namespace lbs
 
 /** A sweep-chunk in point-symmetric and axial-symmetric
  *  curvilinear coordinates. */
-class SweepChunkPWLRZ : public lbs::LBSSweepChunk
+class SweepChunkPWLRZ : public lbs::AAH_SweepChunk
 {
   //  Attributes
 private:

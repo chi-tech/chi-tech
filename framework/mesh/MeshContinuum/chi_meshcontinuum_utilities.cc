@@ -164,18 +164,14 @@ int chi_mesh::MeshContinuum::GetCellDimension(const chi_mesh::Cell& cell)
 void chi_mesh::MeshContinuum::FindAssociatedVertices(
   const chi_mesh::CellFace& cur_face, std::vector<short>& dof_mapping) const
 {
-  int associated_face = cur_face.GetNeighborAssociatedFace(*this);
-  //======================================== Check index validity
-  if ((not cur_face.has_neighbor_) || (not cur_face.IsNeighborLocal(*this)))
-  {
-    Chi::log.LogAllError() << "Invalid cell index encountered in call to "
-                           << "MeshContinuum::FindAssociatedVertices. Index "
-                              "points to either a boundary"
-                           << "or a non-local cell.";
-    Chi::Exit(EXIT_FAILURE);
-  }
+  const int associated_face = cur_face.GetNeighborAssociatedFace(*this);
+  //======================================== Check face validity
+  ChiLogicalErrorIf(not cur_face.has_neighbor_,
+                    "Invalid cell index encountered in call to "
+                    "MeshContinuum::FindAssociatedVertices. Index "
+                    "points to a boundary");
 
-  auto& adj_cell = local_cells[cur_face.GetNeighborLocalID(*this)];
+  auto& adj_cell = cells[cur_face.neighbor_id_];
 
   dof_mapping.reserve(cur_face.vertex_ids_.size());
 
@@ -194,6 +190,48 @@ void chi_mesh::MeshContinuum::FindAssociatedVertices(
         break;
       }
       afv++;
+    }
+
+    if (!found)
+    {
+      Chi::log.LogAllError()
+        << "Face DOF mapping failed in call to "
+        << "MeshContinuum::FindAssociatedVertices. Could not find a matching"
+           "node."
+        << cur_face.neighbor_id_ << " " << cur_face.centroid_.PrintS();
+      Chi::Exit(EXIT_FAILURE);
+    }
+  }
+}
+
+// ###################################################################
+/**General map vertices*/
+void chi_mesh::MeshContinuum::FindAssociatedCellVertices(
+  const chi_mesh::CellFace& cur_face, std::vector<short>& dof_mapping) const
+{
+  //======================================== Check face validity
+  ChiLogicalErrorIf(not cur_face.has_neighbor_,
+                    "Invalid cell index encountered in call to "
+                    "MeshContinuum::FindAssociatedVertices. Index "
+                    "points to a boundary");
+
+  auto& adj_cell = cells[cur_face.neighbor_id_];
+
+  dof_mapping.reserve(cur_face.vertex_ids_.size());
+
+  for (auto cfvid : cur_face.vertex_ids_)
+  {
+    bool found = false;
+    short acv = 0;
+    for (auto acvid : adj_cell.vertex_ids_)
+    {
+      if (cfvid == acvid)
+      {
+        dof_mapping.push_back(acv);
+        found = true;
+        break;
+      }
+      ++acv;
     }
 
     if (!found)
@@ -248,6 +286,15 @@ size_t chi_mesh::MeshContinuum::MapCellFace(const chi_mesh::Cell& cur_cell,
 }
 
 // ###################################################################
+/**Given a global-id of a cell, will return the local-id if the
+ * cell is local, otherwise will throw logic_error.*/
+size_t
+chi_mesh::MeshContinuum::MapCellGlobalID2LocalID(uint64_t global_id) const
+{
+  return global_cell_id_to_local_id_map_.at(global_id);
+}
+
+// ###################################################################
 /**Computes the centroid from nodes specified by the given list.*/
 chi_mesh::Vector3 chi_mesh::MeshContinuum::ComputeCentroidFromListOfNodes(
   const std::vector<uint64_t>& list) const
@@ -281,7 +328,7 @@ size_t chi_mesh::MeshContinuum::CountCellsInLogicalVolume(
                 1,                      // count
                 MPI_UNSIGNED_LONG_LONG, // datatype
                 MPI_SUM,                // op
-                Chi::mpi.comm);        // communicator
+                Chi::mpi.comm);         // communicator
 
   return global_count;
 }
