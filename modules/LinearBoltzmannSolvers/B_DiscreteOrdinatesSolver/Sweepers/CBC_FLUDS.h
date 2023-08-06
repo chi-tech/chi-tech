@@ -5,6 +5,7 @@
 #include "CBC_FLUDSCommonData.h"
 
 #include <map>
+#include <functional>
 
 namespace chi_math
 {
