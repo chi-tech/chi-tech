@@ -153,7 +153,8 @@ void chi_mesh::MeshContinuum::
       //then exodus would create the original triangle. Eventually I found that
       //there was an offset of +2 after numerous paraview visualizations and
       //inspections. Bizarre!
-      face_mapping = {2, 3, 4};
+      //face_mapping = {2, 3, 4};
+      face_mapping = {0, 1, 2};
     else
     {
       for (size_t f=0; f<cell.faces_.size(); ++f)
@@ -353,8 +354,8 @@ void chi_mesh::MeshContinuum::
   Chi::log.Log() << "Num Side Sets:  " << em->GetNumberOfSideSets();
   Chi::log.Log() << "Dimension    :  " << em->GetDimension();
 
-  writer->PrintSelf(std::cout, vtkIndent());
+  //writer->PrintSelf(std::cout, vtkIndent());
 
-  Chi::log.Log() << "Done exporting mesh to VTK.";
+  Chi::log.Log() << "Done exporting mesh to exodus.";
   Chi::mpi.Barrier();
 }
