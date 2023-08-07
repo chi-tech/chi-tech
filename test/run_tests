@@ -22,13 +22,9 @@ import os
 import sys
 import argparse
 import textwrap
+import warnings
 
 from src import jobmanager
-
-import pathlib
-# filedir = str(pathlib.Path(__file__).parent.resolve())
-# sys.path.append(filedir + "/src/")
-
 
 if sys.version_info.major < 3:
     raise Exception("Python version detected to be " +
@@ -73,6 +69,11 @@ parser.add_argument(
     help="Controls verbose failure"
 )
 
+parser.add_argument("-w", "--weights", default=3, type=int, required=False,
+                    help="Test weight configuration. Single numeric value,"
+                         " 1 is short tests only. 2 is long tests "
+                         "only. 3 (default) is short + long tests.")
+
 argv = parser.parse_args()  # argv = argument values
 
 # ========================================================= Check stuff
@@ -94,11 +95,11 @@ if argv.directory is None:
 
 # ========================================================= Main execution
 test_hierarchy = jobmanager.BuildSearchHierarchyForTests(argv)
-tests = jobmanager.ConfigureTests(test_hierarchy, argv)
+with warnings.catch_warnings(record=True) as warning_manager1:
+    tests = jobmanager.ConfigureTests(test_hierarchy, argv)
 
 # EchoTests(tests)
 
-# ========================================================= Header section
 print("""
 ***************************** ChiTech Test system *****************************
 
@@ -130,5 +131,16 @@ print("\033[36m[Python error]\033[0m = A python error occurred. Run with -v 1 "
 
 print()
 
-retval = jobmanager.RunTests(tests, argv)
+jobmanager.PrintCaughtWarnings(warning_manager1,
+                               "Warnings during test configuration")
+print()
+
+with warnings.catch_warnings(record=True) as warning_manager2:
+    retval = jobmanager.RunTests(tests, argv)
+
+jobmanager.PrintCaughtWarnings(warning_manager1,
+                               "Warnings during test configuration")
+jobmanager.PrintCaughtWarnings(warning_manager2,
+                               "Warnings during test execution")
+
 sys.exit(retval)
