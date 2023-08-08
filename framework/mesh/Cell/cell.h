@@ -45,7 +45,7 @@ public:
 public:
   bool IsNeighborLocal(const chi_mesh::MeshContinuum& grid) const;
   int  GetNeighborPartitionID(const chi_mesh::MeshContinuum& grid) const;
-  int  GetNeighborLocalID(const chi_mesh::MeshContinuum& grid) const;
+  uint64_t GetNeighborLocalID(const chi_mesh::MeshContinuum& grid) const;
   int  GetNeighborAssociatedFace(const chi_mesh::MeshContinuum& grid) const;
 
 public:

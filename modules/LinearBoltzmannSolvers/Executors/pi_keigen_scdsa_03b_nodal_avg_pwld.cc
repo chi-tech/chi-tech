@@ -1,6 +1,7 @@
 #include "pi_keigen_scdsa.h"
 
 #include "math/VectorGhostCommunicator/vector_ghost_communicator.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_log.h"
 

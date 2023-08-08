@@ -6,16 +6,13 @@
 #include "mesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/Groupset/lbs_groupset.h"
 
-namespace lbs
-{
-  class DiscreteOrdinatesSolver;
-}
+#include "B_DiscreteOrdinatesSolver/lbs_discrete_ordinates_solver.h"
 
 namespace lbs
 {
 
-template<class MatType, class VecType, class SolverType>
-struct SweepWGSContext : public WGSContext<MatType,VecType,SolverType>
+template <class MatType, class VecType, class SolverType>
+struct SweepWGSContext : public WGSContext<MatType, VecType, SolverType>
 {
   std::shared_ptr<chi_mesh::sweep_management::SweepChunk> sweep_chunk_;
   chi_mesh::sweep_management::SweepScheduler sweep_scheduler_;
@@ -24,24 +21,28 @@ struct SweepWGSContext : public WGSContext<MatType,VecType,SolverType>
 
   SweepWGSContext(
     DiscreteOrdinatesSolver& lbs_solver,
-                  LBSGroupset& groupset,
-                  const SetSourceFunction& set_source_function,
-                  int lhs_scope, int rhs_scope,
-                  bool log_info,
-                  std::shared_ptr<chi_mesh::sweep_management::SweepChunk>
-                   sweep_chunk) :
-    WGSContext<MatType, VecType, SolverType>(lbs_solver,
-                                             groupset,
-                                             set_source_function,
-                                             lhs_scope, rhs_scope,
-                                             log_info),
-    sweep_chunk_(std::move(sweep_chunk)),
-    sweep_scheduler_(
-      chi_mesh::sweep_management::SchedulingAlgorithm::DEPTH_OF_GRAPH,
-      *groupset.angle_agg_,
-      *sweep_chunk_),
-    lbs_ss_solver_(lbs_solver)
-  {}
+    LBSGroupset& groupset,
+    const SetSourceFunction& set_source_function,
+    int lhs_scope,
+    int rhs_scope,
+    bool log_info,
+    std::shared_ptr<chi_mesh::sweep_management::SweepChunk> sweep_chunk)
+    : WGSContext<MatType, VecType, SolverType>(lbs_solver,
+                                               groupset,
+                                               set_source_function,
+                                               lhs_scope,
+                                               rhs_scope,
+                                               log_info),
+      sweep_chunk_(std::move(sweep_chunk)),
+      sweep_scheduler_(
+        lbs_solver.SweepType() == "AAH"
+          ? chi_mesh::sweep_management::SchedulingAlgorithm::DEPTH_OF_GRAPH
+          : chi_mesh::sweep_management::SchedulingAlgorithm::FIRST_IN_FIRST_OUT,
+        *groupset.angle_agg_,
+        *sweep_chunk_),
+      lbs_ss_solver_(lbs_solver)
+  {
+  }
 
   void PreSetupCallback() override;
 
@@ -54,6 +55,6 @@ struct SweepWGSContext : public WGSContext<MatType,VecType,SolverType>
   void PostSolveCallback() override;
 };
 
-}//namespace lbs
+} // namespace lbs
 
-#endif //CHITECH_SWEEP_WGS_CONTEXT_H
+#endif // CHITECH_SWEEP_WGS_CONTEXT_H

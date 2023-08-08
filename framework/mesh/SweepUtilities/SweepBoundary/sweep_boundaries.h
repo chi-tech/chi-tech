@@ -52,17 +52,17 @@ public:
 
 
   virtual double* HeterogeneousPsiIncoming(uint64_t cell_local_id,
-                                           int face_num,
-                                           int fi,
-                                           int angle_num,
+                                           unsigned int face_num,
+                                           unsigned int fi,
+                                           unsigned int angle_num,
                                            int group_num,
-                                           int gs_ss_begin);
+                                           size_t gs_ss_begin);
 
   virtual double* HeterogeneousPsiOutgoing(uint64_t cell_local_id,
-                                           int face_num,
-                                           int fi,
-                                           int angle_num,
-                                           int gs_ss_begin);
+                                           unsigned int face_num,
+                                           unsigned int fi,
+                                           unsigned int angle_num,
+                                           size_t gs_ss_begin);
 
   virtual void UpdateAnglesReadyStatus(const std::vector<size_t>& angles,
                                        size_t gs_ss)
@@ -93,11 +93,11 @@ public:
 
   double* HeterogeneousPsiIncoming(
     uint64_t cell_local_id,
-    int face_num,
-    int fi,
-    int angle_num,
+                                   unsigned int face_num,
+                                   unsigned int fi,
+                                   unsigned int angle_num,
     int group_num,
-    int gs_ss_begin) override;
+                                   size_t gs_ss_begin) override;
 };
 
 
@@ -120,11 +120,11 @@ public:
 
   double* HeterogeneousPsiIncoming(
     uint64_t cell_local_id,
-    int face_num,
-    int fi,
-    int angle_num,
+                                   unsigned int face_num,
+                                   unsigned int fi,
+                                   unsigned int angle_num,
     int group_num,
-    int gs_ss_begin) override;
+                                   size_t gs_ss_begin) override;
 };
 
 //###################################################################
@@ -169,16 +169,16 @@ public:
   GetAngleReadyFlags() {return angle_readyflags_;}
 
   double* HeterogeneousPsiIncoming(uint64_t cell_local_id,
-                                   int face_num,
-                                   int fi,
-                                   int angle_num,
+                                   unsigned int face_num,
+                                   unsigned int fi,
+                                   unsigned int angle_num,
                                    int group_num,
-                                   int gs_ss_begin) override;
+                                   size_t gs_ss_begin) override;
   double* HeterogeneousPsiOutgoing(uint64_t cell_local_id,
-                                   int face_num,
-                                   int fi,
-                                   int angle_num,
-                                   int gs_ss_begin) override;
+                                   unsigned int face_num,
+                                   unsigned int fi,
+                                   unsigned int angle_num,
+                                   size_t gs_ss_begin) override;
 
   void UpdateAnglesReadyStatus(const std::vector<size_t>& angles,
                                size_t gs_ss) override;
@@ -236,11 +236,11 @@ public:
   {}
 
   double* HeterogeneousPsiIncoming(uint64_t cell_local_id,
-                                   int face_num,
-                                   int fi,
-                                   int angle_num,
+                                   unsigned int face_num,
+                                   unsigned int fi,
+                                   unsigned int angle_num,
                                    int group_num,
-                                   int gs_ss_begin) override;
+                                   size_t gs_ss_begin) override;
 
   void Setup(const chi_mesh::MeshContinuum &grid,
              const chi_math::AngularQuadrature &quadrature) override;

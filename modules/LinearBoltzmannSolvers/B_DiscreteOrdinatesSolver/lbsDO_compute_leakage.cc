@@ -1,5 +1,7 @@
 #include "lbs_discrete_ordinates_solver.h"
 
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
+
 /**Computes the angular flux based leakage from boundary surfaces.
 \param groupset_id The groupset for which to compute the leakage.
 \param boundary_id uint64_t The boundary-id for which to perform the integration.

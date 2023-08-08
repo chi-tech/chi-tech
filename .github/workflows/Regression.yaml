@@ -1,0 +1,30 @@
+name: Development Branch Regression Tests
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+    
+jobs:
+  test:
+    runs-on: 'self-hosted'
+    steps:
+      - uses: actions/checkout@v2
+      - name: configure
+        shell: bash
+        run: |
+          export MODULEPATH=/scratch-local/software/modulefiles
+          module load chitech/gcc/12.3.0
+          ./configure.sh
+      - name: make
+        shell: bash
+        run: |
+          export MODULEPATH=/scratch-local/software/modulefiles
+          module load chitech/gcc/12.3.0
+          make -j64
+      - name: test
+        shell: bash
+        run: |
+          export MODULEPATH=/scratch-local/software/modulefiles
+          module load chitech/gcc/12.3.0
+          test/run_tests -d test/modules

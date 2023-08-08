@@ -25,8 +25,8 @@ gcc --version
 This should display something like this:
 
     $ gcc --version
-    gcc (Ubuntu 7.3.0-30ubuntu1~18.04.york0) 7.3.0
-    Copyright (C) 2017 Free Software Foundation, Inc.
+    gcc (Ubuntu 11.3.0-1ubuntu1~22.04.1) 11.3.0
+    Copyright (C) 2021 Free Software Foundation, Inc.
     This is free software; see the source for copying conditions.  There is NO
     warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
@@ -48,11 +48,6 @@ Now, install the remaining packages needed to build Chi-Tech and its dependencie
 sudo apt-get install cmake python3 git zlib1g-dev libx11-dev unzip
 ```
 (note the use of python3)
-
-<u>NOTE</u>: If you want to install the *optional* OpenGL package for VTK, do this
-```bash
-sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev
-```
 
 ### Step 2 - An MPI flavor
 
@@ -106,7 +101,7 @@ Before building the dependencies, you need to export a few variables for the PET
 Go to the chi-tech folder you have just cloned and type:
 ```bash
     $ cd chi-tech
-    $ python3 resources/configure_dependencies.py ../dependencies
+    $ python3 resources/configure_dependencies.py -d ../dependencies
 ```
 The configure script will attempt to download and install all the necessary 
 dependencies **and may take a long time**
@@ -117,7 +112,7 @@ The next step in this process is to setup the environment variables for compilin
 Chi-Tech.
 
 ```bash
-    $source ./dependencies/configure_deproots.sh
+    $source ../dependencies/configure_deproots.sh
 ```
 **Note:** You can replace ```$source ``` in the above with ```$. ```
 
@@ -153,21 +148,18 @@ To check if the code compiled correctly execute the test scripts:
     $ python3 tests/Z_Run_all.py
 ```
 
-### Step 7 - Chi-Tech documentation
+### Step 8 - Chi-Tech documentation
 
 You can either access the documentation online [here](https://chi-tech.github.io), or generate it locally.
 
 To generate the documentation from your local working copy, first make sure
-Doxygen, LaTeX, and lua (currently, lua is at version 5.4) are installed:
+Doxygen and LaTeX are installed:
 
 ```bash
-sudo apt-get install doxygen 
-sudo apt-get install texlive
-sudo apt install texlive-font-utils
-sudo apt-get install lua5.4
+sudo apt-get install doxygen texlive
 ```
 
-The documentation is contained in the `doc` folder and can be generated
+The documentation is contained in the *doc* folder and can be generated
 using a script provided in that folder:
 
 ```bash

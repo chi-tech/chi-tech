@@ -8,18 +8,17 @@
 void chi_mesh::sweep_management::SweepScheduler::
      Sweep()
 {
-  if (scheduler_type == SchedulingAlgorithm::FIRST_IN_FIRST_OUT)
-    ScheduleAlgoFIFO(m_sweep_chunk);
-  else if (scheduler_type == SchedulingAlgorithm::DEPTH_OF_GRAPH)
-    ScheduleAlgoDOG(m_sweep_chunk);
+  if (scheduler_type_ == SchedulingAlgorithm::FIRST_IN_FIRST_OUT)
+    ScheduleAlgoFIFO(sweep_chunk_);
+  else if (scheduler_type_ == SchedulingAlgorithm::DEPTH_OF_GRAPH)
+    ScheduleAlgoDOG(sweep_chunk_);
 }
 
 //###################################################################
 /**Get average sweep time from logging system.*/
 double chi_mesh::sweep_management::SweepScheduler::GetAverageSweepTime() const
 {
-  return Chi::log.ProcessEvent(
-    sweep_event_tag,
+  return Chi::log.ProcessEvent(sweep_event_tag_,
                                chi::ChiLog::EventOperation::AVERAGE_DURATION);
 }
 
@@ -35,10 +34,12 @@ std::vector<double>
 {
   std::vector<double> info;
 
-  double total_sweep_time = Chi::log.ProcessEvent(sweep_event_tag, chi::ChiLog::EventOperation::TOTAL_DURATION);
+  double total_sweep_time = Chi::log.ProcessEvent(
+    sweep_event_tag_, chi::ChiLog::EventOperation::TOTAL_DURATION);
 
   double total_chunk_time =
-    Chi::log.ProcessEvent(sweep_timing_events_tag[0], chi::ChiLog::EventOperation::TOTAL_DURATION);
+    Chi::log.ProcessEvent(
+    sweep_timing_events_tag_[0], chi::ChiLog::EventOperation::TOTAL_DURATION);
 
   double ratio_sweep_to_chunk = total_chunk_time/total_sweep_time;
 

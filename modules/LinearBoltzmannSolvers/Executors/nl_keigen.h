@@ -18,6 +18,7 @@ protected:
   NLKEigenvalueAGSSolver<Mat,Vec,SNES> nl_solver_;
 
   bool reinit_phi_1_;
+  int num_free_power_its_;
 
 public:
   static chi::InputParameters GetInputParameters();

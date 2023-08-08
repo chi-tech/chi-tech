@@ -7,7 +7,7 @@
 #include "math/chi_math_range.h"
 
 #include "chi_runtime.h"
-#include "chi_mpi.h"
+#include "chi_log.h"
 
 #include "console/chi_console.h"
 
@@ -120,6 +120,7 @@ IJKArrayDbl WDD_IJK_Sweep2(const std::array<size_t, 3>& mesh_divs,
 chi::ParameterBlock
 chi_math_Test01_WDD_IJK_Sweep(const chi::InputParameters&)
 {
+  Chi::log.Log() << "GOLD_BEGIN";
   bool verbose = true;
   const std::array<size_t, 3> mesh_divisions = {1, 1, 10};
   const std::array<double, 3> mesh_lengths = {1.0, 1.0, 10.0};
@@ -146,6 +147,7 @@ chi_math_Test01_WDD_IJK_Sweep(const chi::InputParameters&)
       std::cout << i << "\n";
   }
 
+  Chi::log.Log() << "GOLD_END";
   return chi::ParameterBlock();
 }
 

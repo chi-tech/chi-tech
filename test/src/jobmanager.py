@@ -334,3 +334,7 @@ def RunTests(tests: list, argv):
     print(f"Number of tests run    : {len(test_slots)}")
     print(f"Number of failed tests : {num_tests_failed}")
     print()
+
+    if num_tests_failed > 0:
+      return 1
+    return 0

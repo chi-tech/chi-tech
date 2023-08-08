@@ -7,6 +7,7 @@ import difflib
 
 class Check:
     """Base class for a Check data structure"""
+
     def __init__(self):
         self.annotations = []
 
@@ -25,6 +26,7 @@ class Check:
 class KeyValuePairCheck(Check):
     """Given a string key, checks the floating point value of the word
        immediately following the key"""
+
     def __init__(self, params: dict, message_prefix: str):
         super().__init__()
         self.key: str = ""
@@ -99,6 +101,7 @@ class KeyValuePairCheck(Check):
 class StrCompareCheck(Check):
     """Given a key to identify a line, compares the specific word number against
        a golden value. The word is expected to be a string"""
+
     def __init__(self, params: dict, message_prefix: str):
         super().__init__()
         self.key: str = ""
@@ -136,10 +139,12 @@ class StrCompareCheck(Check):
                         return True
                     words = re.split(r'\s+|,+|=+', line.rstrip())
 
-                    if len(words) < self.wordnum:
-                        warnings.warn("word count: " + str(len(words)) + " " +
-                                      line + "\n" + words.__str__())
-                        raise ValueError
+                    if len(words) <= self.wordnum:
+                        warnings.warn("word count: " + str(len(words)) +
+                                      "\nline: " +
+                                      line.rstrip() +
+                                      "\nwords: " + words.__str__())
+                        raise ValueError(f"Required word {self.wordnum} does not exist")
 
                     value = words[self.wordnum]
 
@@ -155,11 +160,11 @@ class StrCompareCheck(Check):
 
             file.close()
         except FileNotFoundError as e:
-            warnings.warn(str(e))
+            print(str(e))
         except Exception as e:
             self.annotations.append("Python error")
             if verbose:
-                warnings.warn(str(e))
+                print(str(e))
 
         return False
 
@@ -168,6 +173,7 @@ class StrCompareCheck(Check):
 class FloatCompareCheck(Check):
     """Given a key to identify a line, compares the specific word number against
        a golden value. The word is expected to be a float"""
+
     def __init__(self, params: dict, message_prefix: str):
         super().__init__()
         self.key: str = ""
@@ -208,10 +214,12 @@ class FloatCompareCheck(Check):
                 if key_pos >= 0:
                     words = re.split(r'\s+|,+|=+', line.rstrip())
 
-                    if len(words) < self.wordnum:
-                        warnings.warn("word count: " + str(len(words)) + " " +
-                                      line + "\n" + words.__str__())
-                        raise ValueError
+                    if len(words) <= self.wordnum:
+                        warnings.warn("word count: " + str(len(words)) +
+                                      "\nline: " +
+                                      line + "\n" +
+                                      "\nwords: " + words.__str__())
+                        raise ValueError(f"Required word {self.wordnum} does not exist")
 
                     value = float(words[self.wordnum])
 
@@ -227,11 +235,11 @@ class FloatCompareCheck(Check):
 
             file.close()
         except FileNotFoundError as e:
-            warnings.warn(str(e))
+            print(str(e))
         except Exception as e:
             self.annotations.append("Python error")
             if verbose:
-                warnings.warn(str(e))
+                print(str(e))
 
         return False
 
@@ -240,6 +248,7 @@ class FloatCompareCheck(Check):
 class IntCompareCheck(Check):
     """Given a key to identify a line, compares the specific word number against
        a golden value. The word is expected to be a int"""
+
     def __init__(self, params: dict, message_prefix: str):
         super().__init__()
         self.key: str = ""
@@ -275,10 +284,12 @@ class IntCompareCheck(Check):
                 if key_pos >= 0:
                     words = re.split(r'\s+|,+|=+', line.rstrip())
 
-                    if len(words) < self.wordnum:
-                        warnings.warn("word count: " + str(len(words)) + " " +
-                                      line + "\n" + words.__str__())
-                        raise ValueError
+                    if len(words) <= self.wordnum:
+                        warnings.warn("word count: " + str(len(words)) +
+                                      "\nline: " +
+                                      line + "\n" +
+                                      "\nwords: " + words.__str__())
+                        raise ValueError(f"Required word {self.wordnum} does not exist")
 
                     value = int(words[self.wordnum])
 
@@ -294,11 +305,11 @@ class IntCompareCheck(Check):
 
             file.close()
         except FileNotFoundError as e:
-            warnings.warn(str(e))
+            print(str(e))
         except Exception as e:
             self.annotations.append("Python error")
             if verbose:
-                warnings.warn(str(e))
+                print(str(e))
 
         return False
 
@@ -308,6 +319,7 @@ class ErrorCodeCheck(Check):
     """Purely compares the error_code of the simulation. Useful for seeing if
       the program just runs (not crashing) and for checking that programs fail
       in a sane way"""
+
     def __init__(self, params: dict, message_prefix: str):
         super().__init__()
         self.error_code: int = 0
@@ -341,9 +353,13 @@ class ErrorCodeCheck(Check):
 # ===================================================================
 class GoldFileCheck(Check):
     """Compares the output of a test against a gold-file"""
+
     def __init__(self, params: dict, message_prefix: str):
         super().__init__()
         self.scope_keyword: str = ""
+
+        if "scope_keyword" in params:
+            self.scope_keyword = params["scope_keyword"]
 
     def __str__(self):
         if self.scope_keyword != "":
@@ -367,6 +383,19 @@ class GoldFileCheck(Check):
                 return False
 
             lines_a, lines_b = self.GetFileLines(filename, golddir + goldfilename)
+
+            if len(lines_a) == 0:
+                if verbose:
+                    print(f"no lines to compare in {filename}. " +
+                          f"Maybe {self.scope_keyword}_BEGIN/_END was not found?")
+                return False
+
+            if len(lines_b) == 0:
+                if verbose:
+                    print(f"no lines to compare in {golddir + goldfilename}. " +
+                          f"Maybe {self.scope_keyword}_BEGIN/_END was not found?")
+                return False
+
             diff = list(difflib.unified_diff(lines_a, lines_b,
                                              fromfile=filename,
                                              tofile=golddir + goldfilename,
@@ -398,10 +427,10 @@ class GoldFileCheck(Check):
             lines = []
             read_gate_open = False
             for line in input_lines:
-                if line.find(scope_keyword + "_BEGIN"):
+                if line.find(scope_keyword + "_BEGIN") >= 0:
                     read_gate_open = True
 
-                if line.find(scope_keyword + "_END"):
+                if line.find(scope_keyword + "_END") >= 0:
                     read_gate_open = False
 
                 if read_gate_open:

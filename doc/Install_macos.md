@@ -7,25 +7,27 @@ The following instructions assume that all of the prerequisite software packages
 will be installed by hand.  These packages may also be installed via **Brew** or
 **MacPorts**.
 
-#### Step 1 - Install MPI
+#### Step 1 - Install gcc
+```shell
+brew install gcc
+```
+
+<u>NOTE:</u> If you ever tried to install gcc directly from source on MacOS you
+will likely find that this is hard to do. This is especially hard on M1 
+processors.
+
+#### Step 2 - Install MPI
 
 Install either **OpenMPI** or **MPICH**.  **MPICH** is recommended for
 better performance and stability.
 
-**MPICH**: https://www.mpich.org/
-
-**OpenMPI**: https://www.open-mpi.org/
-
-Download and extract your preferred MPI package and install:
-```console
-    $ ./configure --prefix=/Path/to/MPI
-    $ make
-    $ make install
+```shell
+brew install mpich
 ```
 
 Once the installation is complete, add the MPI binaries directory to your path:
-```console
-    $ export PATH=/Path/to/MPI/bin:$PATH
+```shell
+$ export PATH=<path-to-mpi>/bin:$PATH
 ```
 <u>NOTE:</u> *You may want to permanently add this and the other `export ...`
 commands below to your bash profile file, so that you don't have to execute these
@@ -42,27 +44,27 @@ To check that the install was successful, execute one of the compiler wrappers:
     InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
 ```
 
-#### Step 2 - Install PETSc
+#### Step 3 - Install PETSc
 
 The current supported version is
-[petsc version 3.12.5](http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.12.5.tar.gz).
+[petsc version 3.17.0](https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.17.0.tar.gz).
 
 
-Return to your *projects* folder (or whatever you chose to place stuff). Run
-the following
+Return to your *projects* folder (or whatever you chose to place stuff). Do
+the following. Download and extract the archive file to a folder of your choice
+then navigate into the directory containing the "configure" script.
 
 ```bash
-wget http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.12.5.tar.gz
-tar -zxf petsc-3.12.5.tar.gz
-cd petsc-3.12.5
+wget https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.17.0.tar.gz
+tar -zxf petsc-3.17.0.tar.gz
+cd petsc-3.17.0
 ```
 
-Download and extract the archive file to a folder of your choice then navigate
-into the directory containing the "configure" script and execute the following:
+and execute the following:
 
 ```bash
 ./configure  \
---prefix=</path/to/install>  \
+--prefix=$PWD/../petsc-3.17.0-install  \
 --download-hypre=1  \
 --with-ssl=0  \
 --with-debugging=0  \
@@ -87,15 +89,7 @@ FOPTFLAGS='-O3 -march=native -mtune=native'  \
 PETSC_DIR=$PWD
 ```
 
-The installation prefix ```</path/to/install>``` must be replaced with 
-the desired installation directory for this script to execute properly.
-
 If the configuration fails then consult PETSc's user documentation.
-
-<u>NOTE:</u> *The recommended version of PETSc requires Python 2.6+ for its configuration.
-If you need to use Python 3.4+ (which is typically pre-installed on modern Linux systems as
-`python3`), you will need to download PETSc 3.11 (current most recent version is 3.11.3)
-and run the above configure script as `python3 ./configure ...`*
 
 Upon completion of the configure step, PETSc will provide the make command
 that you should use. Execute this command.
@@ -118,16 +112,16 @@ export PETSC_ROOT=$PWD/install
 
 Again, this is also something you'd like to add to your bash profile.
 
-#### Step 3 - Install the Visualization Tool Kit
+#### Step 4 - Install the Visualization Tool Kit
 
 In your projects folder install VTK using the following commands:
 
 ```bash
 mkdir VTK
 cd VTK
-wget https://www.vtk.org/files/release/8.2/VTK-8.2.0.tar.gz
-tar -zxf VTK-8.2.0.tar.gz
-cd VTK-8.2.0
+wget https://www.vtk.org/files/release/9.1/VTK-9.1.0.tar.gz
+tar -zxf VTK-9.1.0.tar.gz
+cd VTK-9.1.0
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=$PWD/../install  + \
@@ -156,7 +150,9 @@ This will also take a while. Finally, export the *VTK_DIR* variable:
 export VTK_DIR=$PWD/install
 ```
 
-#### Step 4 - Install Lua
+Again, this is also something you'd like to add to your bash profile.
+
+#### Step 5 - Install Lua
 
 Download and extract **Lua** from https://www.lua.org.  v5.3.5+ is recommended.
 Before installing **Lua** edit the Makefile and set INSTALL_TOP to your desired
@@ -173,7 +169,7 @@ Set the LUA_ROOT environment variable to the **Lua** install location:
     $export LUA_ROOT=/Path/to/Lua
 ```
 
-#### Step 5 - Configure and Build Chi-Tech
+#### Step 6 - Configure and Build Chi-Tech
 
 Clone the **Chi-Tech** repository:
 ```console
@@ -197,19 +193,33 @@ Once configure.sh has completed, build **Chi-Tech** with:
 To check if the code compiled correctly execute the test scripts:
 
 ```bash
-    $ python3 tests/Z_Run_all.py
+    $ test/run_tests -d test/ -j8
 ```
 
 
-#### Step 7 - Generate the documentation
+### Step 8 - Chi-Tech documentation
 
-You can either access the documentation online [here](https://chi-tech.github.io),
-or generate it locally.
+You can either access the documentation online [here](https://chi-tech.github.io), or generate it locally.
 
-To generate the documentation locally, Google and follow the online instructions
-for installing installing doxygen and lua then run:
-```console
-    $ cd doc/
-    $ ./YReGenerateDocumentation.sh
+To generate the documentation from your local working copy, first make sure
+Doxygen and LaTeX are installed:
+
+```bash
+sudo apt-get install doxygen texlive
 ```
-Open the documentation index file at doc/HTMLdocs/html/index.html.
+
+The documentation is contained in the *doc* folder and can be generated
+using a script provided in that folder:
+
+```bash
+cd doc/
+./YReGenerateDocumentation.sh
+```
+
+Once finished, you can view the generated documentation by opening
+
+```bash
+doc/HTMLdocs/html/index.html
+```
+
+in your favorite browser.

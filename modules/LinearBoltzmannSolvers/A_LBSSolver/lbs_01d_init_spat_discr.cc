@@ -1,6 +1,7 @@
 #include "lbs_solver.h"
 
 #include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

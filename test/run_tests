@@ -130,4 +130,5 @@ print("\033[36m[Python error]\033[0m = A python error occurred. Run with -v 1 "
 
 print()
 
-jobmanager.RunTests(tests, argv)
+retval = jobmanager.RunTests(tests, argv)
+sys.exit(retval)

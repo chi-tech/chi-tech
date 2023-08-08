@@ -8,11 +8,11 @@
 /**Returns a pointer to a heterogeneous flux storage location.*/
 double* chi_mesh::sweep_management::SweepBoundary::
 HeterogeneousPsiIncoming(uint64_t cell_local_id,
-                         int face_num,
-                         int fi,
-                         int angle_num,
+  unsigned int face_num,
+  unsigned int fi,
+  unsigned int angle_num,
                          int group_num,
-                         int gs_ss_begin)
+  size_t gs_ss_begin)
 {
   Chi::log.LogAllError()
     << "HeterogeneousPsiIncoming call made to boundary "
@@ -25,10 +25,10 @@ HeterogeneousPsiIncoming(uint64_t cell_local_id,
 /**Returns a pointer to a heterogeneous flux storage location.*/
 double* chi_mesh::sweep_management::SweepBoundary::
 HeterogeneousPsiOutgoing(uint64_t cell_local_id,
-                         int face_num,
-                         int fi,
-                         int angle_num,
-                         int gs_ss_begin)
+  unsigned int face_num,
+  unsigned int fi,
+  unsigned int angle_num,
+  size_t gs_ss_begin)
 {
   Chi::log.LogAllError()
     << "HeterogeneousPsiOutgoing call made to boundary "

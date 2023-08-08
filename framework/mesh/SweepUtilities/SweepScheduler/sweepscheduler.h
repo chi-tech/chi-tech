@@ -23,8 +23,8 @@ typedef std::vector<TGSPO>                        TLEVELED_GRAPH;
 class chi_mesh::sweep_management::SweepScheduler
 {
 private:
-  SchedulingAlgorithm       scheduler_type;
-  AngleAggregation&         angle_agg;
+  SchedulingAlgorithm scheduler_type_;
+  AngleAggregation& angle_agg_;
 
   struct RULE_VALUES
   {
@@ -45,20 +45,21 @@ private:
       sign_of_omegaz = 1;
     }
   };
-  std::vector<RULE_VALUES> rule_values;
+  std::vector<RULE_VALUES> rule_values_;
 
-  SweepChunk& m_sweep_chunk;
-  const std::vector<size_t> sweep_timing_events_tag;
+  SweepChunk& sweep_chunk_;
+  const size_t sweep_event_tag_;
+  const std::vector<size_t> sweep_timing_events_tag_;
 
-public:
-  const size_t sweep_event_tag;
 
 public:
   SweepScheduler(SchedulingAlgorithm in_scheduler_type,
                  AngleAggregation& in_angle_agg,
                  SweepChunk& in_sweep_chunk);
 
-  AngleAggregation& AngleAgg() {return angle_agg;}
+  AngleAggregation& AngleAgg() {return angle_agg_;}
+
+  size_t SweepEventTag() const {return sweep_event_tag_;}
 
   void Sweep();
   double GetAverageSweepTime() const;
