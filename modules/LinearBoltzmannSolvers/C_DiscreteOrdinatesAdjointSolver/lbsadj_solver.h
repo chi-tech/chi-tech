@@ -38,6 +38,8 @@ public:
   const std::vector<RespFuncAndSubs>& GetResponseFunctions() const;
 
   void Initialize() override;
+  void MakeAdjointXSs();
+  void InitQOIs();
   void Execute() override;
 
   // 04
