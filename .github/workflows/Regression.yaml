@@ -27,4 +27,4 @@ jobs:
         run: |
           export MODULEPATH=/scratch-local/software/modulefiles
           module load chitech/gcc/12.3.0
-          test/run_tests -d test/ -j 32 -v 1 
+          test/run_tests -d test/ -j 32 -v 1 -w 7

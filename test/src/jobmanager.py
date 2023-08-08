@@ -180,7 +180,7 @@ def ParseTestConfiguration(file_path: str):
         if "weight_class" in test_block:
             if isinstance(test_block["weight_class"], str):
                 input_weight_class = test_block["weight_class"]
-                allowable_list = ["short", "long"]
+                allowable_list = ["short", "intermediate", "long"]
                 if input_weight_class not in allowable_list:
                     warnings.warn(message_prefix + '"weight_class" field, with ' +
                                   f'value "{input_weight_class}" must be in the ' +
@@ -303,15 +303,13 @@ def RunTests(tests: list, argv):
     if argv.test is not None:
         specific_test = argv.test
 
+    weight_class_map = ["long", "intermediate", "short"]
     weight_classes_allowed = []
-    if argv.weights == 0:
-        weight_classes_allowed = []
-    elif argv.weights == 1:
-        weight_classes_allowed = ["short"]
-    elif argv.weights == 2:
-        weight_classes_allowed = ["long"]
-    elif argv.weights == 3:
-        weight_classes_allowed = ["short", "long"]
+    if 0 <= argv.weights <= 7:
+        binary_weights = '{0:03b}'.format(argv.weights)
+        for k in range(0, 3):
+            if binary_weights[k] == '1':
+                weight_classes_allowed.append(weight_class_map[k])
     else:
         warnings.warn('Illegal value "' + str(argv.weights) + '" supplied ' +
                       'for argument -w, --weights')

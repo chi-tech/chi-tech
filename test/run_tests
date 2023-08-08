@@ -70,9 +70,13 @@ parser.add_argument(
 )
 
 parser.add_argument("-w", "--weights", default=3, type=int, required=False,
-                    help="Test weight configuration. Single numeric value,"
-                         " 1 is short tests only. 2 is long tests "
-                         "only. 3 (default) is short + long tests.")
+                    help="Test weight configuration. Single numeric value < 7,"
+                         " converted to binary gives the long, intermediate, "
+                         "short test weight configuration flag. For example:"
+                         " 111 -> [long, intermediate, short], "
+                         "7 -> 111 runs short, intermediate and long tests."
+                         "4 -> 100 runs only the long tests. 3-> 011 runs the "
+                         "short and intermediate tests.")
 
 argv = parser.parse_args()  # argv = argument values
 
