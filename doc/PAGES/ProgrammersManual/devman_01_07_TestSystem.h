@@ -94,6 +94,8 @@ Parameters:
 - `"num_procs"` : The number of mpi processes to use.
 - `"checks"` : An array of checks `[..Checks..]`
 - `"args"` : An array of arguments to pass to the executable
+- `"weight_class"` : An optional string, either "short" or "long" used to filter different
+   tests length. The default is "short". "long" should be used for tests >15s.
 
 All other keys are ignored so feel free to peruse something like `"comment"` to
 annotate the test.

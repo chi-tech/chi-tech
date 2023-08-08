@@ -306,6 +306,7 @@
     "file": "Transport3D_3a_DSA_ortho.lua",
     "comment": "3D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
     "num_procs": 4,
+    "weight_class" : "long",
     "checks": [
       {
         "type": "StrCompare",
@@ -358,6 +359,7 @@
     "file": "Transport3D_5Cycles2.lua",
     "comment": "3D LinearBSolver Test STAR-CCM+ mesh - PWLD",
     "num_procs": 4,
+    "weight_class" : "long",
     "checks": [
       {
         "type": "KeyValuePair",

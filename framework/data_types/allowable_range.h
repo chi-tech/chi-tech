@@ -64,8 +64,23 @@ public:
   }
 
   template <typename T>
+  AllowableRangeList(const std::vector<T>& raw_list)
+  {
+    for (const auto& val : raw_list)
+      list_.emplace_back(val);
+  }
+
+  template <typename T>
   static std::unique_ptr<AllowableRangeList>
   New(const std::initializer_list<T>& raw_list)
+  {
+    return std::unique_ptr<AllowableRangeList>{
+      new AllowableRangeList(raw_list)};
+  }
+
+  template <typename T>
+  static std::unique_ptr<AllowableRangeList>
+  New(const std::vector<T>& raw_list)
   {
     return std::unique_ptr<AllowableRangeList>{
       new AllowableRangeList(raw_list)};
