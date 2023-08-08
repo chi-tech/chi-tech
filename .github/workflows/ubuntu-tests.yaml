@@ -6,9 +6,9 @@ on:
 #    branches:
 #      - workflows_2023_08_week1
 #      - development
-#  pull_request_target:
-#    types: [opened, reopened]
-#    branches: [development]
+  pull_request_target:
+    types: [opened, reopened]
+    branches: [development]
 
 jobs:
   test1:
