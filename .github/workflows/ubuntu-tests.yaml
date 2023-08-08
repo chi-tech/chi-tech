@@ -15,9 +15,6 @@ jobs:
     runs-on: [self-hosted, jan16core]
     steps:
       - uses: actions/checkout@v2
-        with:
-          ref: ${{github.event.pull_request.head.ref}}
-          repository: ${{github.event.pull_request.head.repo.full_name}}
       - name: configure
         shell: bash -l {0}
         run: |
