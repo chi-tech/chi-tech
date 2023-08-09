@@ -7,7 +7,7 @@ on:
     
 jobs:
   test:
-    runs-on: '[self-hosted, class01]'
+    runs-on: [self-hosted, class01]
     steps:
       - uses: actions/checkout@v2
       - name: configure
