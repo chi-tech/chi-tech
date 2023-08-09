@@ -1,4 +1,4 @@
-![Developer Branch Regression Tests](https://github.com/chi-tech/chi-tech/actions/workflows/Regression.yaml/badge.svg?branch=development)
+[![Development Branch Regression Tests](https://github.com/chi-tech/chi-tech/actions/workflows/Regression.yaml/badge.svg)](https://github.com/chi-tech/chi-tech/actions/workflows/Regression.yaml)  
 [![Compiler Tests](https://github.com/chi-tech/chi-tech/actions/workflows/ubuntu-tests.yaml/badge.svg)](https://github.com/chi-tech/chi-tech/actions/workflows/ubuntu-tests.yaml)
 
 <p align="center">
