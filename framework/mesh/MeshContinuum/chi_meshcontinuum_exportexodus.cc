@@ -146,14 +146,6 @@ void chi_mesh::MeshContinuum::
       face_mapping = { 2, 3, 4, 0, 1 };
     else if (cell.SubType() == CellType::HEXAHEDRON)
       face_mapping = { 2, 1, 3, 0, 4, 5 };
-    else if (cell.SubType() == CellType::TRIANGLE)
-      //Now this just absolutely baffles me. Something about a triangle
-      //is special. I discovered this mapping entirely by trial and error.
-      //When the mapping was straight {0,1,2}, everytime a face was #0 or #1
-      //then exodus would create the original triangle. Eventually I found that
-      //there was an offset of +2 after numerous paraview visualizations and
-      //inspections. Bizarre!
-      face_mapping = {2, 3, 4};
     else
     {
       for (size_t f=0; f<cell.faces_.size(); ++f)
@@ -353,8 +345,8 @@ void chi_mesh::MeshContinuum::
   Chi::log.Log() << "Num Side Sets:  " << em->GetNumberOfSideSets();
   Chi::log.Log() << "Dimension    :  " << em->GetDimension();
 
-  writer->PrintSelf(std::cout, vtkIndent());
+  //writer->PrintSelf(std::cout, vtkIndent());
 
-  Chi::log.Log() << "Done exporting mesh to VTK.";
+  Chi::log.Log() << "Done exporting mesh to exodus.";
   Chi::mpi.Barrier();
 }

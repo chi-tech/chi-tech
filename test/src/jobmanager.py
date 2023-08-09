@@ -17,11 +17,13 @@ class TestConfiguration:
                  checks_params: list,
                  message_prefix: str,
                  dependency: str,
-                 args: list):
+                 args: list,
+                 weight_class: str):
         """Constructor. Load checks into the data structure"""
         self.file_dir = file_dir
         self.filename = filename
         self.num_procs = num_procs
+        self.weight_class = weight_class  # default "short"
         self.checks = []
         self.ran = False
         self.submitted = False
@@ -174,15 +176,31 @@ def ParseTestConfiguration(file_path: str):
         if "dependency" in test_block:
             dependency = test_block["dependency"]
 
+        weight_class = "short"
+        if "weight_class" in test_block:
+            if isinstance(test_block["weight_class"], str):
+                input_weight_class = test_block["weight_class"]
+                allowable_list = ["short", "intermediate", "long"]
+                if input_weight_class not in allowable_list:
+                    warnings.warn(message_prefix + '"weight_class" field, with ' +
+                                  f'value "{input_weight_class}" must be in the ' +
+                                  'list: ' + allowable_list.__str__())
+                    continue
+                weight_class = input_weight_class
+            else:
+                warnings.warn(message_prefix + '"weight_class" field must be a str')
+                continue
+
         try:
             new_test = TestConfiguration(file_dir=os.path.dirname(file_path) +
-                                         "/",
+                                                  "/",
                                          filename=test_block["file"],
                                          num_procs=test_block["num_procs"],
                                          checks_params=test_block["checks"],
                                          message_prefix=message_prefix,
                                          dependency=dependency,
-                                         args=args)
+                                         args=args,
+                                         weight_class=weight_class)
             test_objects.append(new_test)
         except ValueError:
             continue
@@ -285,6 +303,19 @@ def RunTests(tests: list, argv):
     if argv.test is not None:
         specific_test = argv.test
 
+    weight_class_map = ["long", "intermediate", "short"]
+    weight_classes_allowed = []
+    if 0 <= argv.weights <= 7:
+        binary_weights = '{0:03b}'.format(argv.weights)
+        for k in range(0, 3):
+            if binary_weights[k] == '1':
+                weight_classes_allowed.append(weight_class_map[k])
+    else:
+        warnings.warn('Illegal value "' + str(argv.weights) + '" supplied ' +
+                      'for argument -w, --weights')
+
+    print("Executing tests with class in: " + weight_classes_allowed.__str__())
+
     k = 0
     while True:
         k += 1
@@ -292,7 +323,7 @@ def RunTests(tests: list, argv):
         done = True
         # Check for tests to run
         for test in tests:
-            if test.ran:
+            if test.ran or (test.weight_class not in weight_classes_allowed):
                 continue
             done = False
 
@@ -329,12 +360,40 @@ def RunTests(tests: list, argv):
     end_time = time.perf_counter()
     elapsed_time = end_time - start_time
 
+    print("Done executing tests with class in: " +
+          weight_classes_allowed.__str__())
+
+    num_skipped_tests = 0
+    for test in tests:
+        if not test.ran:
+            num_skipped_tests += 1
+
+    if num_skipped_tests > 0:
+        print()
+        print(f"\033[93mNumber of skipped tests : {num_skipped_tests}\033[0m")
+
+        if num_skipped_tests > 0:
+            print("\033[93mSkipped tests:")
+            for test in tests:
+                if not test.ran:
+                    print(test.filename + f' class="{test.weight_class}"')
+            print("\033[0m", end='')
+
     print()
-    print("Elapsed time           : {:.2f} seconds".format(elapsed_time))
-    print(f"Number of tests run    : {len(test_slots)}")
-    print(f"Number of failed tests : {num_tests_failed}")
-    print()
+    print("Elapsed time            : {:.2f} seconds".format(elapsed_time))
+    print(f"Number of tests run     : {len(test_slots)}")
+    print(f"Number of failed tests  : {num_tests_failed}")
+
+
 
     if num_tests_failed > 0:
-      return 1
+        return 1
     return 0
+
+
+def PrintCaughtWarnings(warning_manager, name: str):
+    if len(warning_manager) > 0:
+        print(f"{name}:")
+    for w in warning_manager:
+        print("\033[93m" + str(w.category) + "\033[0m", end='')
+        print(" ", w.message)

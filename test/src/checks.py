@@ -79,6 +79,7 @@ class KeyValuePairCheck(Check):
                         return False
 
                     if abs(value - self.goldvalue) <= self.tol:
+                        file.close()
                         return True
                     elif verbose:
                         print("Check failed : " + self.__str__() + "\n" + line)
@@ -136,6 +137,7 @@ class StrCompareCheck(Check):
                 key_pos = line.find(self.key)
                 if key_pos >= 0:
                     if self.wordnum < 0:
+                        file.close()
                         return True
                     words = re.split(r'\s+|,+|=+', line.rstrip())
 
@@ -149,6 +151,7 @@ class StrCompareCheck(Check):
                     value = words[self.wordnum]
 
                     if value == self.gold:
+                        file.close()
                         return True
                     elif verbose:
                         warnings.warn("Check failed : " + self.__str__() + "\n" +
@@ -224,6 +227,7 @@ class FloatCompareCheck(Check):
                     value = float(words[self.wordnum])
 
                     if abs(value - self.gold) <= self.tol:
+                        file.close()
                         return True
                     elif verbose:
                         warnings.warn("Check failed : " + self.__str__() + "\n" +
@@ -294,6 +298,7 @@ class IntCompareCheck(Check):
                     value = int(words[self.wordnum])
 
                     if value == self.gold:
+                        file.close()
                         return True
                     elif verbose:
                         warnings.warn("Check failed : " + self.__str__() + "\n" +

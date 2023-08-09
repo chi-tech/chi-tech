@@ -7,7 +7,7 @@ on:
     
 jobs:
   test:
-    runs-on: 'self-hosted'
+    runs-on: '[self-hosted, class01]'
     steps:
       - uses: actions/checkout@v2
       - name: configure
@@ -27,4 +27,4 @@ jobs:
         run: |
           export MODULEPATH=/scratch-local/software/modulefiles
           module load chitech/gcc/12.3.0
-          test/run_tests -d test/modules
+          test/run_tests -d test/ -j 32 -v 1 -w 7
