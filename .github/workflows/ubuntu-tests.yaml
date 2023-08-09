@@ -1,0 +1,91 @@
+name: Compiler Tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [development]
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+    branches: [development]
+
+jobs:
+  test1:
+    name: "mpich-4.0.2-gcc-12.2.0"
+    runs-on: [self-hosted, jan16core]
+    steps:
+      - uses: actions/checkout@v3
+      - name: configure
+        shell: bash -l {0}
+        run: |
+          module load chi-tech-mpich-4.0.2-gcc-12.2.0
+          ./configure.sh
+      - name: make
+        shell: bash -l {0}
+        run: |
+          module load chi-tech-mpich-4.0.2-gcc-12.2.0
+          make -j16
+      - name: test
+        shell: bash -l {0}
+        run: |
+          module load chi-tech-mpich-4.0.2-gcc-12.2.0
+          test/run_tests -d test/framework -j 16 -v 1 -w 1
+  test2:
+    name: "mpich-4.0.2-gcc-10.2.0"
+    runs-on: [ self-hosted, jan16core ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: configure
+        shell: bash -l {0}
+        run: |
+          module load chi-tech-mpich-4.0.2-gcc-10.2.0
+          ./configure.sh
+      - name: make
+        shell: bash -l {0}
+        run: |
+          module load chi-tech-mpich-4.0.2-gcc-10.2.0
+          make -j16
+      - name: test
+        shell: bash -l {0}
+        run: |
+          module load chi-tech-mpich-4.0.2-gcc-10.2.0
+          test/run_tests -d test/framework -j 16 -v 1 -w 1
+  test3:
+    name: "mpich-4.0.2-gcc-9.4.0"
+    runs-on: [ self-hosted, jan16core ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: configure
+        shell: bash -l {0}
+        run: |
+          module load chi-tech-mpich-4.0.2-gcc-9.4.0
+          ./configure.sh
+      - name: make
+        shell: bash -l {0}
+        run: |
+          module load chi-tech-mpich-4.0.2-gcc-9.4.0
+          make -j16
+      - name: test
+        shell: bash -l {0}
+        run: |
+          module load chi-tech-mpich-4.0.2-gcc-9.4.0
+          test/run_tests -d test/framework -j 16 -v 1 -w 1
+  test4:
+    name: "mpich-4.0.2-clang-14.0.3"
+    runs-on: [ self-hosted, jan16core ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: configure
+        shell: bash -l {0}
+        run: |
+          module load chi-tech-mpich-4.0.2-clang-14.0.3
+          ./configure.sh
+      - name: make
+        shell: bash -l {0}
+        run: |
+          module load chi-tech-mpich-4.0.2-clang-14.0.3
+          make -j16
+      - name: test
+        shell: bash -l {0}
+        run: |
+          module load chi-tech-mpich-4.0.2-clang-14.0.3
+          test/run_tests -d test/framework -j 16 -v 1 -w 1
