@@ -1,7 +1,6 @@
 #include "CBC_SweepChunk.h"
 
 #include "mesh/Cell/cell.h"
-#include "A_LBSSolver/Tools/lbs_make_subset.h"
 #include "A_LBSSolver/Groupset/lbs_groupset.h"
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 #include "math/SpatialDiscretization/spatial_discretization.h"
@@ -69,7 +68,7 @@ void CBC_SweepChunk::SetAngleSet(chi_mesh::sweep_management::AngleSet& angle_set
 {
   cbc_sweep_depinterf_.fluds_ = &dynamic_cast<CBC_FLUDS&>(angle_set.GetFLUDS());
 
-  const SubSetInfo& grp_ss_info =
+  const chi::SubSetInfo& grp_ss_info =
     groupset_.grp_subset_infos_[angle_set.GetRefGroupSubset()];
 
   gs_ss_size_ = grp_ss_info.ss_size;

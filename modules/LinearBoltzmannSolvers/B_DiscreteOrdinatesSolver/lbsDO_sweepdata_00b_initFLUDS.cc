@@ -1,7 +1,5 @@
 #include "lbs_discrete_ordinates_solver.h"
 
-#include "LinearBoltzmannSolvers/A_LBSSolver/Tools/lbs_make_subset.h"
-
 #include "mesh/SweepUtilities/FLUDS/AAH_FLUDS.h"
 #include "mesh/SweepUtilities/AngleSet/AAH_AngleSet.h"
 
@@ -60,7 +58,7 @@ void lbs::DiscreteOrdinatesSolver::InitFluxDataStructures(LBSGroupset& groupset)
 
     // Compute direction subsets
     const auto dir_subsets =
-      lbs::MakeSubSets(so_grouping.size(), groupset.master_num_ang_subsets_);
+      chi::MakeSubSets(so_grouping.size(), groupset.master_num_ang_subsets_);
 
     for (size_t gs_ss = 0; gs_ss < gs_num_ss; gs_ss++)
     {

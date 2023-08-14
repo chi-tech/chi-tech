@@ -237,8 +237,9 @@ public:
     for (const auto& param : parameters_)
       if (param.Type() != front_param.Type())
         throw std::logic_error(
-          error_origin_scope_ + std::string(__PRETTY_FUNCTION__) +
-          ": Cannot construct vector from block because "
+          error_origin_scope_ + " " + std::string(__PRETTY_FUNCTION__) +
+          ": Parameter \"" + name_ +
+          "\", cannot construct vector from block because "
           "the sub_parameters do not all have the correct type. param->" +
           ParameterBlockTypeName(param.Type()) + " vs param0->" +
           ParameterBlockTypeName(front_param.Type()));
@@ -262,12 +263,56 @@ public:
     return param.GetVectorValue<T>();
   }
 
+  // Iterator
+  // clang-format off
+  class iterator
+  {
+  public:
+    ParameterBlock& ref_block;
+    size_t ref_id;
+
+    iterator(ParameterBlock& in_block, size_t i) :
+             ref_block(in_block), ref_id(i) {}
+
+    iterator operator++()    { iterator i = *this; ref_id++; return i; }
+    iterator operator++(int) { ref_id++; return *this; }
+
+    ParameterBlock& operator*() { return ref_block.parameters_[ref_id]; }
+    bool operator==(const iterator& rhs) const { return ref_id == rhs.ref_id; }
+    bool operator!=(const iterator& rhs) const { return ref_id != rhs.ref_id; }
+  };
+  class const_iterator
+  {
+  public:
+    const ParameterBlock& ref_block;
+    size_t ref_id;
+
+    const_iterator(const ParameterBlock& in_block, size_t i) :
+                   ref_block(in_block), ref_id(i) {}
+
+    const_iterator operator++(){ const_iterator i = *this; ref_id++; return i; }
+    const_iterator operator++(int) { ref_id++; return *this; }
+
+    const ParameterBlock& operator*() { return ref_block.parameters_[ref_id]; }
+    bool operator==(const const_iterator& rhs) const
+    { return ref_id == rhs.ref_id; }
+    bool operator!=(const const_iterator& rhs) const
+    { return ref_id != rhs.ref_id; }
+  };
+  // clang-format on
+
+  iterator begin() { return {*this, 0}; }
+  iterator end() { return {*this, parameters_.size()}; }
+
+  const_iterator begin() const { return {*this, 0}; }
+  const_iterator end() const { return {*this, parameters_.size()}; }
+
   /**Given a reference to a string, recursively travels the parameter
    * tree and print values into the reference string.*/
   void RecursiveDumpToString(std::string& outstr,
                              const std::string& offset = "") const;
 };
 
-} // namespace chi_objects
+} // namespace chi
 
 #endif // CHITECH_PARAMETER_BLOCK_H

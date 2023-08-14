@@ -45,6 +45,20 @@ namespace chi
   {
     return std::find(list.begin(), list.end(), val) != list.end();
   }
+
+  struct SubSetInfo
+  {
+    size_t ss_begin;
+    size_t ss_end;
+    size_t ss_size;
+  };
+  /**Subdivides a number of items (X) into a desired number of sub sets (Y). The
+  * remainder of X/Y, i.e. r=X/Y obeys the indentity r < Y. These items will be
+  * distributed to the first Y sub-sets. Example:
+  * MakeSubSets(6659, 8) generates subsets of sizes
+  * {833,833,833,832,832,832,832,832}.*/
+  std::vector<SubSetInfo> MakeSubSets(size_t num_items,
+                                      size_t desired_num_subsets);
 }//namespace chi_misc_utils
 
 #endif // CHITECH_CHI_UTILS_H
