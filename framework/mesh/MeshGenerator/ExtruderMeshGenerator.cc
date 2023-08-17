@@ -112,10 +112,10 @@ ExtruderMeshGenerator::ExtruderMeshGenerator(const chi::InputParameters& params)
 
 // ##################################################################
 std::unique_ptr<UnpartitionedMesh>
-ExtruderMeshGenerator::GenerateUnparitionedMesh(
+ExtruderMeshGenerator::GenerateUnpartitionedMesh(
   std::unique_ptr<UnpartitionedMesh> input_umesh)
 {
-  Chi::log.Log0Verbose1() << "ExtruderMeshGenerator::GenerateUnparitionedMesh";
+  Chi::log.Log0Verbose1() << "ExtruderMeshGenerator::GenerateUnpartitionedMesh";
   const chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
 
   ChiInvalidArgumentIf(
@@ -272,7 +272,7 @@ ExtruderMeshGenerator::GenerateUnparitionedMesh(
   umesh->BuildMeshConnectivity();
 
   Chi::log.Log0Verbose1()
-    << "ExtruderMeshGenerator::GenerateUnparitionedMesh Done";
+    << "ExtruderMeshGenerator::GenerateUnpartitionedMesh Done";
   return umesh;
 }
 

@@ -47,7 +47,7 @@ FromFileMeshGenerator::FromFileMeshGenerator(const chi::InputParameters& params)
 }
 
 std::unique_ptr<UnpartitionedMesh>
-FromFileMeshGenerator::GenerateUnparitionedMesh(
+FromFileMeshGenerator::GenerateUnpartitionedMesh(
   std::unique_ptr<UnpartitionedMesh> input_umesh)
 {
   ChiInvalidArgumentIf(

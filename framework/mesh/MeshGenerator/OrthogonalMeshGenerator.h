@@ -13,7 +13,7 @@ public:
   explicit OrthogonalMeshGenerator(const chi::InputParameters& params);
 
 protected:
-  std::unique_ptr<UnpartitionedMesh> GenerateUnparitionedMesh(
+  std::unique_ptr<UnpartitionedMesh> GenerateUnpartitionedMesh(
     std::unique_ptr<UnpartitionedMesh> input_umesh) override;
 
   static std::unique_ptr<UnpartitionedMesh>

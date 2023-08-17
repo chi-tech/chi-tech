@@ -25,14 +25,17 @@ MeshGenerator::SetupMesh(std::unique_ptr<UnpartitionedMesh> input_umesh_ptr)
 
   cell_graph.reserve(num_raw_cells);
   cell_centroids.reserve(num_raw_cells);
-  for (const auto& raw_cell_ptr : raw_cells)
   {
-    CellGraphNode cell_graph_node;
-    for (auto& face : raw_cell_ptr->faces)
-      if (face.has_neighbor) cell_graph_node.push_back(face.neighbor);
+    uint64_t cell_globl_id = 0;
+    for (const auto& raw_cell_ptr : raw_cells)
+    {
+      CellGraphNode cell_graph_node = {cell_globl_id++};
+      for (auto& face : raw_cell_ptr->faces)
+        if (face.has_neighbor) cell_graph_node.push_back(face.neighbor);
 
-    cell_graph.push_back(cell_graph_node);
-    cell_centroids.push_back(raw_cell_ptr->centroid);
+      cell_graph.push_back(cell_graph_node);
+      cell_centroids.push_back(raw_cell_ptr->centroid);
+    }
   }
 
   //============================================= Execute partitioner

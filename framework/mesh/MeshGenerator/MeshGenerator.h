@@ -43,7 +43,7 @@ public:
 protected:
   /**Virtual method to generate the unpartitioned mesh for the next step.*/
   virtual std::unique_ptr<UnpartitionedMesh>
-  GenerateUnparitionedMesh(std::unique_ptr<UnpartitionedMesh> input_umesh);
+  GenerateUnpartitionedMesh(std::unique_ptr<UnpartitionedMesh> input_umesh);
 
   // 01
   /**Executes the partitioner and configures the mesh as a real mesh.*/
@@ -52,7 +52,7 @@ protected:
 
   // 02 utils
   /**Determines if a cells needs to be included as a ghost or as a local cell.*/
-  static bool
+  bool
   CellHasLocalScope(const chi_mesh::UnpartitionedMesh::LightWeightCell& lwcell,
                     uint64_t cell_global_id,
                     const std::vector<std::set<uint64_t>>& vertex_subscriptions,
@@ -66,6 +66,7 @@ protected:
             const std::vector<chi_mesh::Vector3>& vertices);
 
   const double scale_;
+  const bool replicated_;
   std::vector<MeshGenerator*> inputs_;
   chi::GraphPartitioner* partitioner_ = nullptr;
 };

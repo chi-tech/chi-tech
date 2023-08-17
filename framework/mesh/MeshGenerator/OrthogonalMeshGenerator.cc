@@ -84,7 +84,7 @@ OrthogonalMeshGenerator::OrthogonalMeshGenerator(
 
 // ##################################################################
 std::unique_ptr<UnpartitionedMesh>
-OrthogonalMeshGenerator::GenerateUnparitionedMesh(
+OrthogonalMeshGenerator::GenerateUnpartitionedMesh(
   std::unique_ptr<UnpartitionedMesh> input_umesh)
 {
   ChiInvalidArgumentIf(

@@ -37,12 +37,18 @@ chi::InputParameters MeshGenerator::GetInputParameters()
     "Handle to a GraphPartitioner object to use for parallel partitioning."
     "This will default to PETScGraphPartitioner with a \"parmetis\" setting");
 
+  params.AddOptionalParameter(
+    "replicated_mesh",
+    false,
+    "Flag, when set, makes the mesh appear in full fidelity on each process");
+
   return params;
 }
 
 MeshGenerator::MeshGenerator(const chi::InputParameters& params)
   : ChiObject(params),
-    scale_(params.GetParamValue<double>("scale"))
+    scale_(params.GetParamValue<double>("scale")),
+    replicated_(params.GetParamValue<bool>("replicated_mesh"))
 {
   //============================================= Convert input handles
   auto input_handles = params.GetParamVectorValue<size_t>("inputs");
@@ -71,7 +77,7 @@ MeshGenerator::MeshGenerator(const chi::InputParameters& params)
 
 // ##################################################################
 /**Default behavior here is to return the input umesh unaltered.*/
-std::unique_ptr<UnpartitionedMesh> MeshGenerator::GenerateUnparitionedMesh(
+std::unique_ptr<UnpartitionedMesh> MeshGenerator::GenerateUnpartitionedMesh(
   std::unique_ptr<UnpartitionedMesh> input_umesh)
 {
   return input_umesh;
@@ -86,12 +92,12 @@ void MeshGenerator::Execute()
   for (auto mesh_generator_ptr : inputs_)
   {
     auto new_umesh =
-      mesh_generator_ptr->GenerateUnparitionedMesh(std::move(current_umesh));
+      mesh_generator_ptr->GenerateUnpartitionedMesh(std::move(current_umesh));
     current_umesh = std::move(new_umesh);
   }
 
   //======================================== Generate final umesh and convert it
-  current_umesh = GenerateUnparitionedMesh(std::move(current_umesh));
+  current_umesh = GenerateUnpartitionedMesh(std::move(current_umesh));
   auto grid_ptr = SetupMesh(std::move(current_umesh));
 
   //======================================== Assign the mesh to a VolumeMesher
@@ -99,8 +105,7 @@ void MeshGenerator::Execute()
     std::make_shared<chi_mesh::VolumeMesher>(VolumeMesherType::UNPARTITIONED);
   new_mesher->SetContinuum(grid_ptr);
 
-  if (Chi::current_mesh_handler < 0)
-    chi_mesh::PushNewHandlerAndGetIndex();
+  if (Chi::current_mesh_handler < 0) chi_mesh::PushNewHandlerAndGetIndex();
 
   auto& cur_hndlr = chi_mesh::GetCurrentHandler();
   cur_hndlr.SetVolumeMesher(new_mesher);

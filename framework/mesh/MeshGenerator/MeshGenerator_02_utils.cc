@@ -11,6 +11,8 @@ bool chi_mesh::MeshGenerator::CellHasLocalScope(
   const std::vector<std::set<uint64_t>>& vertex_subscriptions,
   const std::vector<int64_t>& cell_partition_ids)
 {
+  if (replicated_)
+    return true;
   // First determine if the cell is a local cell
   int cell_pid = static_cast<int>(cell_partition_ids[cell_global_id]);
   if (cell_pid == Chi::mpi.location_id) return true;
