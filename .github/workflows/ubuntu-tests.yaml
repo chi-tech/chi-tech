@@ -89,3 +89,23 @@ jobs:
         run: |
           module load chi-tech-mpich-4.0.2-clang-14.0.3
           test/run_tests -d test/framework -j 16 -v 1 -w 1
+  test5:
+    name: "chi-tech-openmpi-4.0.5-gcc-10.2.0"
+    runs-on: [ self-hosted, jan16core ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: configure
+        shell: bash -l {0}
+        run: |
+          module load chi-tech-openmpi-4.0.5-gcc-10.2.0
+          ./configure.sh
+      - name: make
+        shell: bash -l {0}
+        run: |
+          module load chi-tech-openmpi-4.0.5-gcc-10.2.0
+          make -j16
+      - name: test
+        shell: bash -l {0}
+        run: |
+          module load chi-tech-openmpi-4.0.5-gcc-10.2.0
+          test/run_tests -d test/framework -j 16 -v 1 -w 1
