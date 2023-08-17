@@ -1,0 +1,43 @@
+name: Documentation builder
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [development]
+
+jobs:
+  build_docs:
+    name: "Build documentation"
+    runs-on: [self-hosted, jan16core]
+    steps:
+      - uses: actions/checkout@v3
+      - name: configure
+        shell: bash -l {0}
+        run: |
+          module load chi-tech-mpich-4.0.2-gcc-12.2.0
+          ./configure.sh
+      - name: make
+        shell: bash -l {0}
+        run: |
+          module load chi-tech-mpich-4.0.2-gcc-12.2.0
+          make -j16
+      - name: build_doc
+        shell: bash -l {0}
+        run: |
+          module load chi-tech-mpich-4.0.2-gcc-12.2.0
+          module load doxygen-1.9.3
+          cd doc/
+          ./YReGenerateDocumentation.sh
+      - name: get_doc_repo
+        shell: bash -l {0}
+        run: |
+          export CUR_SHA=${{ github.sha }}
+          export CUR_WDIR=$PWD
+          mkdir scratch
+          cd scratch/
+          git clone https://${{secrets.CHI_REPO_ACCESS_TOKEN}}@github.com/chi-tech/chi-tech.github.io
+          cd chi-tech.github.io
+          cp -R $CUR_WDIR/doc/HTMLdocs/html/* ./
+          git add -A
+          git commit -m "Update for ${CUR_SHA}"
+          git push
