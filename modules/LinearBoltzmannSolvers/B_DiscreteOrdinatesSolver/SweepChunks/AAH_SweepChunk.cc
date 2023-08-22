@@ -61,7 +61,7 @@ AAH_SweepChunk::AAH_SweepChunk(
 
 void AAH_SweepChunk::Sweep(chi_mesh::sweep_management::AngleSet& angle_set)
 {
-  const SubSetInfo& grp_ss_info =
+  const chi::SubSetInfo& grp_ss_info =
     groupset_.grp_subset_infos_[angle_set.GetRefGroupSubset()];
 
   gs_ss_size_ = grp_ss_info.ss_size;

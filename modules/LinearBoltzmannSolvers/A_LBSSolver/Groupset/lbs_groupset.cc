@@ -1,6 +1,5 @@
 #include "lbs_groupset.h"
 
-#include "LinearBoltzmannSolvers/A_LBSSolver/Tools/lbs_make_subset.h"
 #include "LinearBoltzmannSolvers/A_LBSSolver/lbs_solver.h"
 
 #include "chi_runtime.h"
@@ -264,7 +263,7 @@ void lbs::LBSGroupset::BuildMomDiscOperator(unsigned int scattering_order,
 /**Constructs the groupset subsets.*/
 void lbs::LBSGroupset::BuildSubsets()
 {
-  grp_subset_infos_ = lbs::MakeSubSets(groups_.size(), master_num_grp_subsets_);
+  grp_subset_infos_ = chi::MakeSubSets(groups_.size(), master_num_grp_subsets_);
   {
     size_t ss = 0;
     for (const auto& info : grp_subset_infos_)

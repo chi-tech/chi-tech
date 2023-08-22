@@ -13,11 +13,12 @@
 #include "mesh/SweepUtilities/AngleAggregation/angleaggregation.h"
 
 #include "LinearBoltzmannSolvers/A_LBSSolver/lbs_structs.h"
-#include "LinearBoltzmannSolvers/A_LBSSolver/Tools/lbs_make_subset.h"
 
 #include "physics/chi_physics_namespace.h"
 
 #include "A_LBSSolver/Acceleration/acceleration.h"
+
+#include "utils/chi_utils.h"
 
 namespace lbs::acceleration
 {
@@ -46,7 +47,7 @@ public:
   int                                          master_num_grp_subsets_ = 1;
   int                                          master_num_ang_subsets_ = 1;
 
-  std::vector<SubSetInfo>                      grp_subset_infos_;
+  std::vector<chi::SubSetInfo>                 grp_subset_infos_;
 
   IterativeMethod      iterative_method_ = IterativeMethod::CLASSICRICHARDSON;
   AngleAggregationType angleagg_method_ = AngleAggregationType::POLAR;

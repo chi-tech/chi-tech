@@ -213,7 +213,23 @@ void ParameterBlock::SortParameters()
     }
   };
 
-  std::sort(parameters_.begin(), parameters_.end(), AlphabeticFunctor());
+  struct AlphabeticNumericFunctor
+  {
+    bool operator()(const ParameterBlock& paramA, const ParameterBlock& paramB)
+    {
+      return std::stoi(paramA.Name()) < std::stoi(paramB.Name());
+    }
+  };
+
+  // The different functor here is necessary when the parameters are guaranteed
+  // to have integer names that were converted to strings. It never showed up
+  // because we were not testing with enough values. Essentially "11" < "2" in
+  // the realm of strings but not in integer world.
+  if (this->Type() != ParameterBlockType::ARRAY)
+    std::sort(parameters_.begin(), parameters_.end(), AlphabeticFunctor());
+  else
+    std::sort(
+      parameters_.begin(), parameters_.end(), AlphabeticNumericFunctor());
 }
 
 // #################################################################
@@ -343,4 +359,4 @@ void ParameterBlock::RecursiveDumpToString(std::string& outstr,
 }
 // NOLINTEND(misc-no-recursion)
 
-} // namespace chi_objects
+} // namespace chi
