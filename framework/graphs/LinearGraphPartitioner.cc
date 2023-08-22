@@ -20,7 +20,8 @@ InputParameters LinearGraphPartitioner::GetInputParameters()
   params.SetGeneralDescription("Basic linear partitioning. "
 "This type of partitioner works basically only for testing. Orthogonal meshes"
 " can produce decent partitioning but for unstructured grids it can be pretty"
-" bad.");
+" bad. It partitions cells based on their linear index \"global_id\" instead "
+"of actually working with the graph.");
   // clang-format on
   params.SetDocGroup("Graphs");
 

@@ -16,7 +16,9 @@ chi::InputParameters OrthogonalMeshGenerator::GetInputParameters()
   params.SetGeneralDescription("Creates orthogonal meshes.");
   params.SetDocGroup("MeshGenerator");
 
-  params.AddRequiredParameterArray("node_sets", "Sets of nodes per dimension.");
+  params.AddRequiredParameterArray("node_sets",
+                                   "Sets of nodes per dimension. Node values "
+                                   "must be monotonically increasing");
 
   return params;
 }
