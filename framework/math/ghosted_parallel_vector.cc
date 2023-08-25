@@ -16,6 +16,34 @@ GhostedParallelVector::GhostedParallelVector(
     : ParallelVector(local_size, global_size, communicator),
       ghost_indices_(ghost_indices)
 {
+  Reinit(local_size, global_size, ghost_indices);
+}
+
+
+void GhostedParallelVector::Clear()
+{
+  ParallelVector::Clear();
+  ghost_indices_.clear();
+
+  sendcounts_.clear();
+  senddispls_.clear();
+  recvcounts_.clear();
+  recvdispls_.clear();
+
+  local_ids_to_send_.clear();
+  ghost_ids_to_recv_map_.clear();
+}
+
+
+void GhostedParallelVector::Reinit(
+    const uint64_t local_size,
+    const uint64_t global_size,
+    const std::vector<int64_t>& ghost_indices)
+{
+  Clear();
+  ParallelVector::Reinit(local_size, global_size);
+  ghost_indices_ = ghost_indices;
+
   // Resize the vector for ghosted entries
   values_.assign(local_size_ + ghost_indices_.size(), 0.0);
 
@@ -64,17 +92,17 @@ GhostedParallelVector::GhostedParallelVector(
   for (const auto& [pid, ghost_ids_list] : send_map)
     for (int64_t ghost_id : ghost_ids_list)
     {
-      const auto local_block_beg = locJ_extents_[location_id_];
-      const auto local_block_end = locJ_extents_[location_id_ + 1];
+      const auto local_block_beg = extents_[location_id_];
+      const auto local_block_end = extents_[location_id_ + 1];
 
       ChiLogicalErrorIf(
           ghost_id < local_block_beg or ghost_id >= local_block_end,
           std::string(__FUNCTION__) + ": " +
-          "Problem determining communication pattern. Process " +
-          std::to_string(pid) + " determined that process " +
-          std::to_string(location_id_) + " needs to communicate global index " +
-          std::to_string(ghost_id) + " to it, but this index does not " +
-          "belong on process " + std::to_string(pid));
+                                    "Problem determining communication pattern. Process " +
+                                    std::to_string(pid) + " determined that process " +
+                                    std::to_string(location_id_) + " needs to communicate global index " +
+                                    std::to_string(ghost_id) + " to it, but this index does not " +
+                                    "belong on process " + std::to_string(pid));
 
       local_ids_to_send_.push_back(ghost_id - local_block_beg);
     }
@@ -90,6 +118,13 @@ GhostedParallelVector::GhostedParallelVector(
     senddispls_[pid] = total_sendcounts;
     total_sendcounts += ghost_id_list.size();
   }
+}
+
+
+void GhostedParallelVector::Assemble()
+{
+  ParallelVector::Assemble();
+  CommunicateGhostEntries();
 }
 
 

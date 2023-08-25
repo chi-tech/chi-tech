@@ -12,16 +12,42 @@
 namespace chi_math
 {
 
+ParallelVector::ParallelVector(const MPI_Comm communicator)
+    : ParallelVector(0, 0, communicator)
+{}
+
+
 ParallelVector::ParallelVector(const uint64_t local_size,
                                const uint64_t global_size,
                                const MPI_Comm communicator)
-    : local_size_(local_size),
-      global_size_(global_size),
-      communicator_(communicator)
+    : communicator_(communicator)
 {
   // Get the processor ID and the number of processors
   MPI_Comm_rank(communicator_, &location_id_);
   MPI_Comm_size(communicator_, &process_count_);
+
+  // Reinitialize the vector
+  Reinit(local_size, global_size);
+}
+
+
+void ParallelVector::Clear()
+{
+  local_size_ = 0;
+  global_size_ = 0;
+  extents_.clear();
+  values_.clear();
+  op_cache_.clear();
+}
+
+
+void ParallelVector::Reinit(const uint64_t local_size,
+                            const uint64_t global_size)
+{
+  Clear();
+
+  local_size_ = local_size;
+  global_size_ = global_size;
 
   // Set the local vector to zero
   values_.assign(local_size_, 0.0);
@@ -38,11 +64,12 @@ ParallelVector::ParallelVector(const uint64_t local_size,
   // processor can be defined using a cumulative sum per processor.
   // This allows for the determination of whether a global index is
   // locally owned or not.
-  locJ_extents_.assign(process_count_ + 1, 0);
+  extents_.assign(process_count_ + 1, 0);
   for (size_t locJ = 1; locJ < process_count_; ++locJ)
-    locJ_extents_[locJ] = locJ_extents_[locJ - 1] + locJ_local_size[locJ - 1];
-  locJ_extents_[process_count_] =
-      locJ_extents_[process_count_ - 1] + locJ_local_size.back();
+    extents_[locJ] = extents_[locJ - 1] + locJ_local_size[locJ - 1];
+  extents_[process_count_] =
+      extents_[process_count_ - 1] + locJ_local_size.back();
+
 }
 
 
@@ -149,7 +176,7 @@ void ParallelVector::Assemble()
       const double value = byte_array.Read<double>();
 
       // Check that the global ID is in fact valid for this process
-      const int64_t local_id = global_id - locJ_extents_[location_id_];
+      const int64_t local_id = global_id - extents_[location_id_];
 
       ChiLogicalErrorIf(
           local_id < 0 or local_id >= local_size_,
@@ -176,8 +203,8 @@ int ParallelVector::FindProcessID(const uint64_t global_id) const
       "The specified global ID is greater than the global vector size.");
 
   for (int locJ = 0; locJ < process_count_; ++locJ)
-    if (global_id >= locJ_extents_[locJ] and
-        global_id < locJ_extents_[locJ + 1])
+    if (global_id >= extents_[locJ] and
+        global_id < extents_[locJ + 1])
       return locJ;
   return -1;
 

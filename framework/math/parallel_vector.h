@@ -19,9 +19,10 @@ namespace chi_math
 class ParallelVector
 {
 public:
-  /**
-   * Initialize a zero parallel vector with the given local and global sizes.
-   */
+  /// Initialize an empty parallel vector.
+  ParallelVector(const MPI_Comm communicator = MPI_COMM_WORLD);
+
+  /// Initialize a zero parallel vector with the given local and global sizes.
   ParallelVector(const uint64_t local_size,
                  const uint64_t global_size,
                  const MPI_Comm communicator = MPI_COMM_WORLD);
@@ -31,6 +32,18 @@ public:
 
   /// Return the global size of the vector.
   uint64_t GlobalSize() const { return global_size_;}
+
+  /// Clear the parallel vector, returning it to an uninitialized state.
+  virtual void Clear();
+
+  /**
+   * Reinitialize the parallel vector to the given local and global sizes.
+   *
+   * This routine clears all data in the current parallel vectors and
+   * results in a zero vector.
+   */
+  void Reinit(const uint64_t local_size,
+              const uint64_t global_size);
 
   /**
    * Set all elements in the parallel vector to the given value.
@@ -61,7 +74,7 @@ public:
    *
    * This routine clears the operation cache once completed.
    */
-  void Assemble();
+  virtual void Assemble();
 
   /// Return the <tt>i</tt>'th element of the local vector.
   double operator[](const int64_t i) const;
@@ -75,13 +88,13 @@ protected:
   int FindProcessID(const uint64_t global_id) const;
 
 protected:
-  const uint64_t local_size_;
-  const uint64_t global_size_;
+  uint64_t local_size_;
+  uint64_t global_size_;
   const MPI_Comm communicator_;
 
   int location_id_ = 0;
   int process_count_ = 0;
-  std::vector<uint64_t> locJ_extents_;
+  std::vector<uint64_t> extents_;
 
   std::vector<double> values_;
 
