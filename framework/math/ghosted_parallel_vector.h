@@ -36,7 +36,6 @@ public:
       ghost_comm_(other.ghost_comm_)
   {}
 
-
   GhostedParallelVector(GhostedParallelVector&& other)
     : ParallelVector(other),
       num_ghosts_(other.num_ghosts_),
@@ -46,6 +45,8 @@ public:
 
   uint64_t NumGhosts() const { return num_ghosts_; }
   uint64_t TotalLocalSize() const override { return local_size_ + num_ghosts_; }
+
+  std::vector<double> MakeGhostedLocalVector() const { return values_; }
 
   /**
    * Return the value of the parallel vector for the specified global index.

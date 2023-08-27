@@ -28,6 +28,13 @@ ParallelVector::ParallelVector(const uint64_t local_size,
 }
 
 
+std::vector<double> ParallelVector::MakeLocalVector()
+{
+  return std::vector<double>(values_.begin(),
+                             values_.begin() + local_size_);
+}
+
+
 double ParallelVector::operator[](const int64_t local_id) const
 {
   ChiInvalidArgumentIf(

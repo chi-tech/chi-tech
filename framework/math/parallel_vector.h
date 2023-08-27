@@ -19,6 +19,10 @@ namespace chi_math
 class ParallelVector
 {
 public:
+  using iterator = std::vector<double>::iterator;
+  using const_iterator = std::vector<double>::const_iterator;
+
+public:
   ParallelVector() = delete;
 
   /**
@@ -51,11 +55,10 @@ public:
   virtual uint64_t TotalLocalSize() const { return local_size_; }
   uint64_t GlobalSize() const { return global_size_;}
 
-  /// Return the value of a local entry
   double operator[](const int64_t local_id) const;
-
-  /// Return a reference to a local entry.
   double& operator[](const int64_t local_id);
+
+  std::vector<double> MakeLocalVector();
 
   /// Set all elements in the parallel vector to the given value.
   virtual void
