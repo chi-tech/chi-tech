@@ -62,38 +62,105 @@ void ParallelVector::Set(const std::vector<double>& local_vector)
 }
 
 
-void ParallelVector::AddValue(const int64_t index, const double value)
+void ParallelVector::SetValue(const int64_t global_id,
+                              const double value,
+                              const OperationType op_type)
 {
-  if (index >= extents_[location_id_] and
-      index < extents_[location_id_ + 1])
-    values_[index - extents_[location_id_]] += value;
-  else if (index >= 0 and index < global_size_)
-    op_cache_.push_back({index, value});
+  ChiInvalidArgumentIf(
+      global_id < 0 or global_id >= global_size_,
+      "Invalid global index encountered. Global indices "
+      "must be in the range [0, this->GlobalSize()].");
+
+  if (op_type == SET_VALUE)
+  {
+    ChiLogicalErrorIf(
+        not add_cache_.empty(),
+        "When the add operation cache is not empty, set operations "
+        "are not permissible.");
+
+    set_cache_.push_back({global_id, value});
+  }
+  else if (op_type == ADD_VALUE)
+  {
+    ChiLogicalErrorIf(
+        not set_cache_.empty(),
+        "When the set operation cache is not empty, add operations "
+        "are not permissible.");
+
+    add_cache_.push_back({global_id, value});
+  }
   else
-    ChiInvalidArgument("Invalid global index encountered. Global indices "
-                       "must be in the range [0, this->GlobalSize()].");
+  {
+    ChiLogicalError("Unrecognized operation type.");
+  }
 }
 
 
-void ParallelVector::AddValues(const std::vector<int64_t>& indices,
-                               const std::vector<double>& values)
+void ParallelVector::SetValues(const std::vector<int64_t>& global_ids,
+                               const std::vector<double>& values,
+                               const OperationType op_type)
 {
   ChiInvalidArgumentIf(
-      indices.size() != values.size(),
+      global_ids.size() != values.size(),
       std::string(__FUNCTION__) + ": " +
       "Size mismatch between indices and values.");
 
-  for (size_t i = 0; i < indices.size(); ++i)
-    AddValue(indices[i], values[i]);
+  for (size_t i = 0; i < global_ids.size(); ++i)
+    SetValue(global_ids[i], values[i], op_type);
 }
 
 
 void ParallelVector::Assemble()
 {
-  // Define a mapping between processes and serialized operations that
-  // need to be communicated.
+  // Define the local operation mode. 0=Do Nothing, 1=Set, 2=Add, 3=INVALID
+  const short local_mode =
+      short(set_cache_.empty()) + short(add_cache_.empty()) * 2;
+  ChiLogicalErrorIf(
+      local_mode == 3,
+      "Invalid operation mode. All operations must be either set or add.");
+
+  // Now, check whether all modes are equivalent
+  short global_mode;
+  MPI_Allreduce(&local_mode, &global_mode, 1,
+                MPI_SHORT, MPI_MAX, comm_);
+
+  ChiLogicalErrorIf(
+      local_mode != 0 and local_mode != global_mode,
+      "The operation on each process must be either 0 (do nothing),"
+      "or the same across all processes.");
+
+  // If the modes are valid, get the appropriate local cache
+  auto& op_cache = global_mode == 1 ? set_cache_ : add_cache_;
+
+  // First, segregate the local and non-local operations
+  std::vector<std::pair<int64_t, double>> local_cache;
+  std::vector<std::pair<int64_t, double>> nonlocal_cache;
+  for (const auto& op : op_cache)
+  {
+    const int op_pid = FindOwnerPID(op.first);
+    if (op_pid == location_id_) local_cache.push_back(op);
+    else nonlocal_cache.push_back(op);
+  }
+
+  // The local operations can be handled immediately
+  for (const auto& [global_id, value] : local_cache)
+  {
+    const int64_t local_id = global_id - extents_[location_id_];
+    ChiLogicalErrorIf(
+        local_id < 0 or local_id >= local_size_,
+        "Invalid mapping from global to local.");
+
+    if (local_mode == 1) values_[local_id] = value;
+    else values_[local_id] += value;
+  }
+
+  // With this, the data that needs to be sent to other processes must be
+  // determined. Here, a mapping is developed between the processes that
+  // need to be sent information, and the serialized operations that need
+  // to be sent. The operations are serialized by converting the
+  // int64_t-double pair to bytes.
   std::map<int, chi_data_types::ByteArray> pid_send_map;
-  for (const auto& [global_id, value] : op_cache_)
+  for (const auto& [global_id, value] : nonlocal_cache)
   {
     const int pid = FindOwnerPID(global_id);
     auto& byte_array = pid_send_map[pid];
@@ -101,20 +168,25 @@ void ParallelVector::Assemble()
     byte_array.Write(value);
   }
 
-  // Convert this mapping to a vector of bytes.
+  // For use with MPI, the byte arrays from above is converted to an
+  // STL vector of bytes.
   std::map<int, std::vector<std::byte>> pid_send_map_bytes;
   for (const auto& [pid, byte_array] : pid_send_map)
     pid_send_map_bytes[pid] = byte_array.Data();
 
-  // Next, communicate what is going where to all other processes so that
-  // each process knows what it will be receiving.
+  // With the information that needs to be sent to other processes obtained,
+  // now, the information to be received from other processes is needed.
+  // To do this, each process must send to each other process the information
+  // that it needs. With each process knowing what each other process needs
+  // from it, a map of information to be sent is obtained.
   std::map<int, std::vector<std::byte>> pid_recv_map_bytes =
       chi_mpi_utils::MapAllToAll(pid_send_map_bytes, MPI_BYTE);
 
-  // Now, deserialize the received data and contribute it to the vector
+  // The received information is now processed, unpacked, and the
+  // necessary operations performed
   for (const auto& [pid, byte_vector] : pid_recv_map_bytes)
   {
-    const auto packet_size = sizeof(int64_t) + sizeof(double);
+    const auto packet_size = sizeof(std::pair<int64_t, double>);
 
     ChiLogicalErrorIf(
         byte_vector.size() % packet_size != 0,
@@ -142,12 +214,13 @@ void ParallelVector::Assemble()
           std::to_string(pid) + " during vector assembly.");
 
       // Contribute to the local vector
-      values_[local_id] += value;
+      if (local_mode == 1) values_[local_id] = value;
+      else if (local_mode == 2) values_[local_id] += value;
     }
   }
 
   // Finally, clear the operation cache
-  op_cache_.clear();
+  op_cache.clear();
 }
 
 

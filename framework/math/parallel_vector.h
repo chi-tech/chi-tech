@@ -13,6 +13,13 @@
 namespace chi_math
 {
 
+enum OperationType
+{
+  SET_VALUE = 0,
+  ADD_VALUE = 1
+};
+
+
 /**
  * An implementation of a parallel vector.
  */
@@ -66,36 +73,40 @@ public:
 
   std::vector<double> MakeLocalVector();
 
-  /// Set all elements in the parallel vector to the given value.
+  /// Set all elements of the local parallel vector to the given value.
   virtual void
   Set(const double value) { values_.assign(values_.size(), value); }
 
-  /// Set the parallel vector with the given local vectors.
+  /// Set all elements of the local parallel vector with an STL vector.
   virtual void Set(const std::vector<double>& local_vector);
 
   /**
-   * Add the given value to the given global index of the parallel vector.
+   * Define a set or add operation for the given global id-value pair
    *
-   * This routine stores the global index-value pair until the Assemble
-   * routine is called, when all operations are communicated to the processes
-   * that own the corresponding global index.
+   * This routine adds the global id-value pair to the set operation cache,
+   * which upon execution of Assemble, communicates the operations to the
+   * appropriate process.
    */
-  void AddValue(const int64_t index, const double value);
+  void SetValue(const int64_t global_id,
+                const double value,
+                const OperationType op_type);
 
   /**
-   * Add multiple values to multiple global indices of the parallel vector.
+   * Group multiple operations into a single call.
    *
-   * This routine simply goes through each global index-value pair and calls
-   * AddValue.
+   * This routine goes through the given global id-value pairs and calls
+   * SetValue for each.
    */
-  void AddValues(const std::vector<int64_t>& indices,
-                 const std::vector<double>& values);
+  void SetValues(const std::vector<int64_t>& global_ids,
+                 const std::vector<double>& values,
+                 const OperationType op_type);
 
   /**
    * Communicate all operations stored within the operation cache to the
-   * corresponding processes that own the respective global indices.
+   * corresponding processes that own the respective global indices, and
+   * apply the operations.
    *
-   * This routine clears the operation cache once completed.
+   * This routine clears the respective operation cache once completed.
    */
   virtual void Assemble();
 
@@ -116,8 +127,9 @@ protected:
 
   std::vector<double> values_;
 
-  using VecAddOp = std::pair<int64_t, double>;
-  std::vector<VecAddOp> op_cache_;
+  using Operation = std::pair<int64_t, double>;
+  std::vector<Operation> set_cache_;
+  std::vector<Operation> add_cache_;
 
   const MPI_Comm comm_;
 };
