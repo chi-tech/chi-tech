@@ -58,6 +58,12 @@ public:
   double operator[](const int64_t local_id) const;
   double& operator[](const int64_t local_id);
 
+  iterator begin() { return values_.begin(); }
+  iterator end() { return values_.begin() + local_size_; }
+
+  const_iterator begin() const { return values_.begin(); }
+  const_iterator end() const { return values_.begin() + local_size_; }
+
   std::vector<double> MakeLocalVector();
 
   /// Set all elements in the parallel vector to the given value.
