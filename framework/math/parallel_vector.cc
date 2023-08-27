@@ -12,110 +12,59 @@
 namespace chi_math
 {
 
-ParallelVector::ParallelVector(const MPI_Comm communicator)
-    : ParallelVector(0, 0, communicator)
-{}
-
-
 ParallelVector::ParallelVector(const uint64_t local_size,
                                const uint64_t global_size,
                                const MPI_Comm communicator)
-    : communicator_(communicator)
+  : local_size_(local_size),
+    global_size_(global_size),
+    comm_(communicator)
 {
   // Get the processor ID and the number of processors
-  MPI_Comm_rank(communicator_, &location_id_);
-  MPI_Comm_size(communicator_, &process_count_);
+  MPI_Comm_rank(comm_, &location_id_);
+  MPI_Comm_size(comm_, &process_count_);
 
-  // Reinitialize the vector
-  Reinit(local_size, global_size);
-}
-
-
-void ParallelVector::Clear()
-{
-  local_size_ = 0;
-  global_size_ = 0;
-  extents_.clear();
-  values_.clear();
-  op_cache_.clear();
-}
-
-
-void ParallelVector::Reinit(const uint64_t local_size,
-                            const uint64_t global_size)
-{
-  Clear();
-
-  local_size_ = local_size;
-  global_size_ = global_size;
-
-  // Set the local vector to zero
+  DefineParallelStructure();
   values_.assign(local_size_, 0.0);
-
-  // Get the local vector sizes per processor
-  std::vector<uint64_t> locJ_local_size(process_count_, 0);
-  MPI_Allgather(&local_size,            //sendbuf
-                1, MPI_UINT64_T,        //sendcount + sendtype
-                locJ_local_size.data(), //recvbuf
-                1, MPI_UINT64_T,        //recvcount + recvtype
-                communicator_);         //communicator
-
-  // With the vector sizes per processor, now the offsets for each
-  // processor can be defined using a cumulative sum per processor.
-  // This allows for the determination of whether a global index is
-  // locally owned or not.
-  extents_.assign(process_count_ + 1, 0);
-  for (size_t locJ = 1; locJ < process_count_; ++locJ)
-    extents_[locJ] = extents_[locJ - 1] + locJ_local_size[locJ - 1];
-  extents_[process_count_] =
-      extents_[process_count_ - 1] + locJ_local_size.back();
-
 }
 
 
-double ParallelVector::operator[](const int64_t i) const
+double ParallelVector::operator[](const int64_t local_id) const
 {
   ChiInvalidArgumentIf(
-      i < 0 or i >= local_size_,
-      std::string(__FUNCTION__) + ": " +
-      "Invalid local ID encountered on process " +
-      std::to_string(location_id_) + ". Local IDs must be in the range " +
-      "[0, local_size_ - 1].");
-
-  return values_[i];
+      local_id < 0 or local_id >= local_size_,
+      std::string(__FUNCTION__) + ": Invalid local index provided.");
+  return values_[local_id];
 }
 
 
-double& ParallelVector::operator[](const int64_t i)
+double& ParallelVector::operator[](const int64_t local_id)
 {
   ChiInvalidArgumentIf(
-      i < 0 or i >= local_size_,
-      std::string(__FUNCTION__) + ": " +
-      "Invalid local ID encountered on process " +
-      std::to_string(location_id_) + ". Local IDs must be in the range " +
-      "[0, local_size_ - 1].");
-
-  return values_[i];
+      local_id < 0 or local_id >= local_size_,
+      std::string(__FUNCTION__) + ": Invalid local index provided.");
+  return values_[local_id];
 }
 
 
-void ParallelVector::Set(const double value)
+void ParallelVector::Set(const std::vector<double>& local_vector)
 {
-  values_.assign(local_size_, value);
+  ChiInvalidArgumentIf(
+      local_vector.size() != local_size_,
+      std::string(__FUNCTION__) + ": Incompatible local vector size.");
+  values_ = local_vector;
 }
 
 
 void ParallelVector::AddValue(const int64_t index, const double value)
 {
-  ChiInvalidArgumentIf(
-      index < 0 or index >= global_size_,
-      std::string(__FUNCTION__) + ": " +
-      "Invalid global index encountered. Global indices cannot be "
-      "negative or exceed the global vector size. Provided index was " +
-      std::to_string(index) + " and global size is " +
-      std::to_string(global_size_) + ".");
-
-  op_cache_.push_back({index, value});
+  if (index >= extents_[location_id_] and
+      index < extents_[location_id_ + 1])
+    values_[index - extents_[location_id_]] += value;
+  else if (index >= 0 and index < global_size_)
+    op_cache_.push_back({index, value});
+  else
+    ChiInvalidArgument("Invalid global index encountered. Global indices "
+                       "must be in the range [0, this->GlobalSize()].");
 }
 
 
@@ -139,7 +88,7 @@ void ParallelVector::Assemble()
   std::map<int, chi_data_types::ByteArray> pid_send_map;
   for (const auto& [global_id, value] : op_cache_)
   {
-    const int pid = FindProcessID(global_id);
+    const int pid = FindOwnerPID(global_id);
     auto& byte_array = pid_send_map[pid];
     byte_array.Write(global_id);
     byte_array.Write(value);
@@ -195,17 +144,39 @@ void ParallelVector::Assemble()
 }
 
 
-int ParallelVector::FindProcessID(const uint64_t global_id) const
+void ParallelVector::DefineParallelStructure()
+{
+  // Get the local vector sizes per processor
+  std::vector<uint64_t> local_sizes(process_count_, 0);
+  MPI_Allgather(&local_size_,            //sendbuf
+                1, MPI_UINT64_T,        //sendcount + sendtype
+                local_sizes.data(), //recvbuf
+                1, MPI_UINT64_T,        //recvcount + recvtype
+                comm_);         //communicator
+
+  // With the vector sizes per processor, now the offsets for each
+  // processor can be defined using a cumulative sum per processor.
+  // This allows for the determination of whether a global index is
+  // locally owned or not.
+  extents_.assign(process_count_ + 1, 0);
+  for (size_t p = 1; p < process_count_; ++p)
+    extents_[p] = extents_[p - 1] + local_sizes[p - 1];
+  extents_[process_count_] =
+      extents_[process_count_ - 1] + local_sizes.back();
+}
+
+
+int ParallelVector::FindOwnerPID(const uint64_t global_id) const
 {
   ChiInvalidArgumentIf(
       global_id >= global_size_,
       std::string(__FUNCTION__) + ": " +
       "The specified global ID is greater than the global vector size.");
 
-  for (int locJ = 0; locJ < process_count_; ++locJ)
-    if (global_id >= extents_[locJ] and
-        global_id < extents_[locJ + 1])
-      return locJ;
+  for (int p = 0; p < process_count_; ++p)
+    if (global_id >= extents_[p] and
+        global_id < extents_[p + 1])
+      return p;
   return -1;
 
 }

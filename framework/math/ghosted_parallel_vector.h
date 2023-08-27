@@ -13,54 +13,60 @@ namespace chi_math
 class GhostedParallelVector : public ParallelVector
 {
 public:
+  GhostedParallelVector() = delete;
+
   /**
-   * Initialize a ghosted parallel vector with the given local and global
-   * sizes with the given global ghost indices.
+   * Initialize the ghosted parallel vector with the given local and global
+   * sizes, with the specified global ghost indices.
    */
   GhostedParallelVector(const uint64_t local_size,
                         const uint64_t global_size,
-                        const std::vector<int64_t>& ghost_indices,
-                        const MPI_Comm communicator = MPI_COMM_WORLD);
+                        const std::vector<int64_t>& ghost_ids,
+                        const MPI_Comm communicator = MPI_COMM_WORLD)
+    : ParallelVector(local_size, global_size, communicator),
+      num_ghosts_(ghost_ids.size()),
+      ghost_ids_(ghost_ids),
+      ghost_comm_(local_size, global_size, ghost_ids, communicator)
+  {}
 
-  /// Return the number of ghosts that belong to this process.
-  uint64_t NumGhosts() const { return ghost_indices_.size(); }
+  GhostedParallelVector(const GhostedParallelVector& other)
+    : ParallelVector(other),
+      num_ghosts_(other.num_ghosts_),
+      ghost_ids_(other.ghost_ids_),
+      ghost_comm_(other.ghost_comm_)
+  {}
 
-  /// Clear the ghosted parallel vector, returning it to an unintialized state.
-  void Clear() override;
+
+  GhostedParallelVector(GhostedParallelVector&& other)
+    : ParallelVector(other),
+      num_ghosts_(other.num_ghosts_),
+      ghost_ids_(other.ghost_ids_),
+      ghost_comm_(other.ghost_comm_)
+  {}
+
+  uint64_t NumGhosts() const { return num_ghosts_; }
+  uint64_t TotalLocalSize() const override { return local_size_ + num_ghosts_; }
 
   /**
-   * Reinitialize the ghosted parallel vector to the given local and global
-   * sizes with the given global ghost indices.
-   */
-  void Reinit(const uint64_t local_size,
-              const uint64_t global_size,
-              const std::vector<int64_t>& ghost_indices);
-
-  /**
-   * Communicate all operations stored within the operation cache to the
-   * corresponding processes that own the respective global indices, then
-   * communicate ghost entries.
+   * Return the value of the parallel vector for the specified global index.
    *
-   * This routine clears the operation cache once completed.
+   * An error is thrown if the global index does not belong to a locally
+   * owned, or ghost entry.
    */
-  void Assemble() override;
+  double GetGlobalValue(const int64_t global_id) const;
 
   /**
    * Communicate the current ghost entries to all other processes to
    * update the locally stored ghost data.
    */
-  void CommunicateGhostEntries();
+  void CommunicateGhostEntries()
+  { ghost_comm_.CommunicateGhostEntries(values_); }
 
-protected:
-  std::vector<int64_t> ghost_indices_;
+private:
+  const uint64_t num_ghosts_;
+  const std::vector<int64_t> ghost_ids_;
+  VectorGhostCommunicator ghost_comm_;
 
-  std::vector<int> sendcounts_;
-  std::vector<int> senddispls_;
-  std::vector<int> recvcounts_;
-  std::vector<int> recvdispls_;
-
-  std::vector<int64_t> local_ids_to_send_;
-  std::map<int64_t, size_t> ghost_ids_to_recv_map_;
 
 };
 

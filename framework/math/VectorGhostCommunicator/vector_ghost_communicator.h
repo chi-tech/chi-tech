@@ -13,36 +13,43 @@ namespace chi_math
 /**Vector with allocation space for ghosts.*/
 class VectorGhostCommunicator
 {
-protected:
-  const uint64_t             local_size_;
-  const uint64_t             globl_size_;
-  const std::vector<int64_t> ghost_indices_;
-  const MPI_Comm             comm_;
-  int                        location_id_ = 0;
-  int                        process_count_ = 0;
-  std::vector<uint64_t>      locI_extents_;
-  std::vector<int>           sendcounts_;
-  std::vector<int>           senddispls_;
-  std::vector<int>           recvcounts_;
-  std::vector<int>           recvdispls_;
-  std::vector<int64_t>       takers_local_ids_;
-  std::map<int64_t,size_t>   ghost_ids_to_recv_map_;
 
 public:
-  VectorGhostCommunicator(uint64_t local_size,
-                          uint64_t global_size,
-                          std::vector<int64_t> ghost_indices,
-                          MPI_Comm communicator);
+  VectorGhostCommunicator(const uint64_t local_size,
+                          const uint64_t global_size,
+                          const std::vector<int64_t>& ghost_ids,
+                          const MPI_Comm communicator);
 
-private:
-  int FindOwnerPID(uint64_t global_id) const;
+  uint64_t NumGhosts() const { return ghost_ids_.size(); }
+  int64_t MapGhostToLocal(const int64_t ghost_id) const;
 
-public:
-  void CommunicateGhostEntries(std::vector<double>& local_vector) const;
+  void CommunicateGhostEntries(std::vector<double>& ghosted_vector) const;
 
   std::vector<double> MakeGhostedVector() const;
-  std::vector<double> MakeGhostedVector(
-    const std::vector<double>& unghosted_vector) const;
+  std::vector<double>
+  MakeGhostedVector(const std::vector<double>& local_vector) const;
+
+private:
+  int FindOwnerPID(const int64_t global_id) const;
+
+protected:
+  const uint64_t local_size_;
+  const uint64_t global_size_;
+  const std::vector<int64_t> ghost_ids_;
+  const MPI_Comm comm_;
+
+  int location_id_;
+  int process_count_;
+  std::vector<uint64_t> extents_;
+
+  std::vector<int> sendcounts_;
+  std::vector<int> senddispls_;
+  std::vector<int> recvcounts_;
+  std::vector<int> recvdispls_;
+
+  std::vector<int64_t> local_ids_to_send_;
+  std::map<int64_t, size_t> ghost_to_recv_map_;
+
 };
 
 }//namespace chi_math

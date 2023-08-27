@@ -1,186 +1,156 @@
 #include "vector_ghost_communicator.h"
 
-#include <map>
-#include <string>
-
 #include "mpi/chi_mpi_utils_map_all2all.h"
 
-chi_math::VectorGhostCommunicator::
-  VectorGhostCommunicator(uint64_t local_size,
-                          uint64_t global_size,
-                          std::vector<int64_t> ghost_indices,
-                          MPI_Comm communicator) :
-    local_size_(local_size),
-    globl_size_(global_size),
-    ghost_indices_(std::move(ghost_indices)),
-    comm_(communicator)
+#include "chi_log_exceptions.h"
+
+#include <map>
+#include <string>
+#include <algorithm>
+
+
+namespace chi_math
 {
-  const std::string fname = "chi_math::VectorWithGhosts::VectorWithGhosts";
+
+//######################################################################
+VectorGhostCommunicator::VectorGhostCommunicator(
+    const uint64_t local_size,
+    const uint64_t global_size,
+    const std::vector<int64_t>& ghost_ids,
+    const MPI_Comm communicator)
+    : local_size_(local_size),
+      global_size_(global_size),
+      ghost_ids_(ghost_ids),
+      comm_(communicator)
+{
+  // Get the process ID and total process count
   MPI_Comm_rank(comm_, &location_id_);
   MPI_Comm_size(comm_, &process_count_);
 
-  std::vector<uint64_t> locI_local_size(process_count_, 0);
+  // Get the local vector sizes per process
+  std::vector<uint64_t> local_sizes(process_count_, 0);
+  MPI_Allgather(&local_size_,         //sendbuf
+                1, MPI_UINT64_T,      //sendcount + sendtype
+                local_sizes.data(),   //recvbuf
+                1, MPI_UINT64_T,      //recvcount + recvtype
+                comm_);               //communicator
 
-  MPI_Allgather(&local_size_,          //sendbuf
-                1, MPI_UINT64_T,        //sendcount + sendtype
-                locI_local_size.data(), //recvbuf
-                1, MPI_UINT64_T,        //recvcount + recvtype
-                comm_);                //communicator
+  // With the vector sizes per processor, now the offsets for each
+  // processor can be defined using a cumulative sum per processor.
+  // This allows for the determination of whether a global index is
+  // locally owned or not.
+  extents_.assign(process_count_ + 1, 0);
+  for (size_t locJ = 1; locJ < process_count_; ++locJ)
+    extents_[locJ] = extents_[locJ - 1] + local_sizes[locJ - 1];
+  extents_[process_count_] =
+      extents_[process_count_ - 1] + local_sizes.back();
 
-  //======================================== Determine location extents
-  //This will allow us to locally determine
-  //entry ownership
-  locI_extents_.assign(process_count_ + 1, 0);
-  uint64_t offset = 0;
-  for (size_t locI=0; locI < process_count_; ++locI)
-  {
-    locI_extents_[locI] = offset;
-    offset += locI_local_size[locI];
-  }
-  locI_extents_.back() = offset;
+  // Construct a mapping between processes and the ghost indices
+  // that belong to them. This information yields what this process
+  // needs to be receive from other processes.
+  std::map<int, std::vector<int64_t>> recv_map;
+  for (int64_t ghost_id : ghost_ids)
+    recv_map[FindOwnerPID(ghost_id)].push_back(ghost_id);
 
-  //======================================== READ THIS
-  // The next steps can be a little confusing. What we essentially want to
-  // know is the information necessary to perform a vector-scatter operation
-  // multiple times and as efficiently as possible. This information includes
-  // what information to send to other locations AS WELL AS what information
-  // we will be receiving.
-  // Definitions:
-  //   giver - locations that need to send this location something
-  //   taker - locations to whom this location needs to send something
+  // This process will receive data in process-contiguous manner,
+  // so a mapping needs to be developed to map each ghost id to
+  // its respective ordering in the received data.
+  size_t count = 0;
+  for (const auto& [pid, gids] : recv_map)
+    for (const int64_t gid : gids)
+      ghost_to_recv_map_[gid] = count++;
 
-  //======================================== Build giver query-map
-  //This map is keyed by giver location.
-  std::map<int, std::vector<int64_t>> giver_query_map;
-  for (int64_t ggid : ghost_indices_)
-    giver_query_map[FindOwnerPID(ggid)].push_back(ggid);
-
-  //======================================== Build recv-map
-  //Buy building the query-map we essentially
-  //the order in which the ghost values will be
-  //received. Therefore, we have to keep track
-  //of these changes by storing a map of their
-  //reconfiguration.
-  //This map will be used during a communication.
-  size_t recv_id=0;
-  for (const auto& pid_list : giver_query_map)
-    for (int64_t gid : pid_list.second)
-    {
-      ghost_ids_to_recv_map_[gid] = recv_id;
-      ++recv_id;
-    }
-
-  //======================================== Build recvcounts and recvdispls
-  //Since the giver query-map contains the ids of information to be obtained
-  //from the givers we can also build recvcounts and recvdispls from it
-  //since, during each scatter, this is the configuration in which the info
-  //will come from the givers. This will be used in a call to
-  //MPI_Alltoallv.
+  // Now, the structure of the data being received from communication
+  // is developed. This involves determining the amount of data
+  // being sent per process and the starting position of the data in
+  // the receive buffer per process.
+  int total_recvcounts = 0;
   recvcounts_.assign(process_count_, 0);
   recvdispls_.assign(process_count_, 0);
-  uint64_t total_recvcounts = 0;
-  for (const auto& pid_vec_pair : giver_query_map)
+  for (const auto& [pid, gids] : recv_map)
   {
-    const int    pid        = pid_vec_pair.first;
-    const size_t num_counts = pid_vec_pair.second.size();
-    recvcounts_[pid] = static_cast<int>(num_counts);
-    recvdispls_[pid] = static_cast<int>(total_recvcounts);
-    total_recvcounts += num_counts;
+    recvcounts_[pid] = static_cast<int>(gids.size());
+    recvdispls_[pid] = total_recvcounts;
+    total_recvcounts += gids.size();
   }
 
-  //======================================== Communicate giver query map
-  //Here the giver_query_map is transformed into
-  //a taker_query_map. This is now a different perspective
-  //and this location now has a map of what data is needed
-  //by each dependent process.
-  auto taker_query_map = chi_mpi_utils::MapAllToAll(
-      giver_query_map, //map key+list
-    MPI_INT64_T,     //datatype of list
-    comm_           //communicator
-  );
+  // For communication, each process must also know what it is
+  // sending to other processors. If each processor sends each
+  // other process the global ids it needs to receive, then each
+  // process will know what other processes need from it. The
+  // MPI utility MapAllToAll in Chi-Tech accomplishes this task,
+  // returning a mapping of processes to the global ids that this
+  // process needs to send.
+  std::map<int, std::vector<int64_t>> send_map =
+      chi_mpi_utils::MapAllToAll(recv_map, MPI_INT64_T, comm_);
 
-  //======================================== Map the query indices to
-  //                                         local indices
-  //First determine how much data we will
-  //eventually have to send. This allows us
-  //to reserve some space.
-  size_t amount_to_give = 0;
-  for (const auto& pid_list_pair : taker_query_map)
-    amount_to_give += pid_list_pair.second.size();
+  // With this information, the amount of information that needs
+  // to be sent can be determined.
+  size_t send_size = 0;
+  for (const auto& [pid, gids] : send_map)
+    send_size += gids.size();
 
-  //======================================== Premap local ids
-  //These will be used during a communication.
-  takers_local_ids_.clear();
-  takers_local_ids_.reserve(amount_to_give);
-  for (const auto& pid_list_pair : taker_query_map)
-  {
-    const auto& list = pid_list_pair.second;
-    for (int64_t gid : list)
+  // Next, the local ids on this process that need to be
+  // communicated to other processes can be determined and stored.
+  local_ids_to_send_.reserve(send_size);
+  for (const auto& [pid, gids] : send_map)
+    for (const int64_t gid : gids)
     {
-      const uint64_t local_block_beg = locI_extents_[location_id_];
-      const uint64_t local_block_end = locI_extents_[location_id_ + 1];
-      if (not (gid >= local_block_beg and gid <  local_block_end))
-        throw std::logic_error(fname + ": Error mapping index in "
-                                       "takers_query_map.");
+      ChiLogicalErrorIf(
+          gid < extents_[location_id_] or
+          gid >= extents_[location_id_ + 1],
+          std::string(__FUNCTION__) + ": " +
+          "Problem determining communication pattern. Process " +
+          std::to_string(pid) + " determined that process " +
+          std::to_string(location_id_) + " needs to communicate global id " +
+          std::to_string(gid) + " to it, but this id is not locally owned.");
 
-      takers_local_ids_.push_back(gid - static_cast<int64_t>(local_block_beg));
-    }//for gid
-  }
+      local_ids_to_send_.push_back(gid - extents_[location_id_]);
+    }
 
-  //======================================== Build sendcounts and senddispls
-  //Since we now know what the structure will
-  //of sending the data we can compute m_sendcounts
-  //and m_senddispls, which will be used in a call
-  //to MPI_Alltoallv
+  // Finally, the communication pattern for the data being sent
+  // can be constructed similarly to that for the received data.
+  int total_sendcounts = 0;
   sendcounts_.assign(process_count_, 0);
   senddispls_.assign(process_count_, 0);
-
-  uint64_t total_sendcounts = 0;
-  for (const auto& pid_vec_pair : taker_query_map)
+  for (const auto& [pid, gids] : send_map)
   {
-    const int    pid        = pid_vec_pair.first;
-    const size_t num_counts = pid_vec_pair.second.size();
-    sendcounts_[pid] = static_cast<int>(num_counts);
-    senddispls_[pid] = static_cast<int>(total_sendcounts);
-    total_sendcounts += num_counts;
+    sendcounts_[pid] = static_cast<int>(gids.size());
+    senddispls_[pid] = total_sendcounts;
+    total_sendcounts += gids.size();
   }
 }
 
 
-//###################################################################
-int chi_math::VectorGhostCommunicator::FindOwnerPID(uint64_t global_id) const
+//######################################################################
+int64_t VectorGhostCommunicator::
+MapGhostToLocal(const int64_t ghost_id) const
 {
-  if (global_id >= globl_size_)
-    throw std::logic_error(
-      "chi_math::VectorWithGhosts:FindOwnerPID global_id >= m_globl_size");
-  for (int locI=0; locI<static_cast<int>(process_count_); ++locI)
-    if (global_id >= locI_extents_[locI] and
-        global_id < locI_extents_[locI + 1])
-      return locI;
-  return int(-1);
+  const auto it = std::find(ghost_ids_.begin(), ghost_ids_.end(), ghost_id);
+  return it != ghost_ids_.end() ? it - ghost_ids_.begin() : -1;
 }
 
-//###################################################################
-void chi_math::VectorGhostCommunicator::
-  CommunicateGhostEntries(std::vector<double> &local_vector) const
+
+//######################################################################
+void VectorGhostCommunicator::
+CommunicateGhostEntries(std::vector<double>& ghosted_vector) const
 {
-  if (local_vector.size() != (local_size_ + ghost_indices_.size()))
-    throw std::logic_error(
-      "chi_math::VectorWithGhosts::CommunicateGhostEntries: Vector size "
-      "mismatch.");
+  ChiInvalidArgumentIf(
+      ghosted_vector.size() != local_size_ + ghost_ids_.size(),
+      std::string(__FUNCTION__) + ": Vector size mismatch.");
 
-  //======================================== Build data to be sent
-  const size_t amount_to_send = takers_local_ids_.size();
+  // Serialize the data that needs to be sent
+  const size_t send_size = local_ids_to_send_.size();
   std::vector<double> send_data;
-  send_data.reserve(amount_to_send);
-  for (const int64_t local_id : takers_local_ids_)
-    send_data.push_back(local_vector[local_id]);
+  send_data.reserve(send_size);
+  for (const int64_t local_id : local_ids_to_send_)
+    send_data.push_back(ghosted_vector[local_id]);
 
-  //======================================== Allocate receive buffer
-  const size_t amount_to_recv = ghost_indices_.size();
-  std::vector<double> recv_data(amount_to_recv, 0.0);
+  // Create serialized storage for the data to be received
+  const size_t recv_size = ghost_ids_.size();
+  std::vector<double> recv_data(recv_size, 0.0);
 
-  //======================================== Communicate
+  // Communicate the ghost data
   MPI_Alltoallv(send_data.data(),
                 sendcounts_.data(),
                 senddispls_.data(),
@@ -191,44 +161,53 @@ void chi_math::VectorGhostCommunicator::
                 MPI_DOUBLE,
                 comm_);
 
-  //======================================== Populate local vector with ghost
-  //                                         data
-  for (size_t k=0; k<amount_to_recv; ++k)
-  {
-    const int64_t gid = ghost_indices_[k];
-    const size_t  rid = ghost_ids_to_recv_map_.at(gid);
-    local_vector[local_size_ + k] = recv_data[rid];
-  }
+  // Lastly, populate the local vector with ghost data. All ghost data is
+  // appended to the back of the local vector. Using the mapping between
+  // ghost indices and the relative ghost index position along with the
+  // ordering of the ghost indices, this can be accomplished.
+  for (size_t k = 0; k < recv_size; ++k)
+    ghosted_vector[local_size_ + k] =
+        recv_data[ghost_to_recv_map_.at(ghost_ids_[k])];
 }
 
 
-//#########################################################
-/**Returns a vector with enough space to hold both `local_size` entries,
- * as specified in the VectorGhostCommunicator-constructor, and entries
- * associated with the ghost-ids. The entries default to zero.*/
-std::vector<double> chi_math::VectorGhostCommunicator::
-  MakeGhostedVector() const
+//######################################################################
+std::vector<double> VectorGhostCommunicator::MakeGhostedVector() const
 {
-  std::vector<double> vec(local_size_ + ghost_indices_.size(), 0.0);
-  return vec;
+  const auto ghosted_size = local_size_ + ghost_ids_.size();
+  return std::vector<double>(ghosted_size, 0.0);
 }
 
 
-//#########################################################
-/**Returns a vector with enough space to hold both `local_size` entries,
- * as specified in the VectorGhostCommunicator-constructor, and entries
- * associated with the ghost-ids. The local entries are copied from the
- * vector supplied as an argument whilst the ghosts are defaulted to zero.*/
-std::vector<double> chi_math::VectorGhostCommunicator::
-  MakeGhostedVector(const std::vector<double>& unghosted_vector) const
+//######################################################################
+std::vector<double> VectorGhostCommunicator::
+MakeGhostedVector(const std::vector<double>& local_vector) const
 {
-  if (unghosted_vector.size() < local_size_)
-    throw std::logic_error(
-      "chi_math::VectorGhostCommunicator::MakeGhostedVector: "
-      "unghosted_vector.size() < m_local_size");
+  ChiInvalidArgumentIf(
+      local_vector.size() != local_size_,
+      std::string(__FUNCTION__) + ": Incompatible unghosted vector." +
+      "unghosted_vector.size() != local_size_");
 
-  std::vector<double> vec(local_size_ + ghost_indices_.size(), 0.0);
-  for (size_t i=0; i < local_size_; ++i)
-    vec[i] = unghosted_vector[i];
+  // Add ghost indices to the back of the unghosted vector
+  std::vector<double> vec = local_vector;
+  for (size_t i = 0; i < ghost_ids_.size(); ++i)
+    vec.emplace_back(0.0);
   return vec;
+}
+
+//###################################################################
+int VectorGhostCommunicator::
+FindOwnerPID(const int64_t global_id) const
+{
+  ChiInvalidArgumentIf(
+      global_id < 0 or global_id >= global_size_,
+      std::string(__FUNCTION__) + ": Invalid global id." +
+                                "Global ids must be in [0, global_size_).");
+
+  for (int p = 0; p < process_count_; ++p)
+    if (global_id >= extents_[p] and global_id < extents_[p + 1])
+      return p;
+  return -1;
+}
+
 }

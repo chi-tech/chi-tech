@@ -19,36 +19,50 @@ namespace chi_math
 class ParallelVector
 {
 public:
-  /// Initialize an empty parallel vector.
-  ParallelVector(const MPI_Comm communicator = MPI_COMM_WORLD);
+  ParallelVector() = delete;
 
-  /// Initialize a zero parallel vector with the given local and global sizes.
+  /**
+   * Initialize a parallel vector with the given local and global sizes with
+   * the given communicator whose elements are set to zero.
+   */
   ParallelVector(const uint64_t local_size,
                  const uint64_t global_size,
                  const MPI_Comm communicator = MPI_COMM_WORLD);
 
-  /// Return the local size of the vector.
-  uint64_t LocalSize() const { return local_size_; }
+  ParallelVector(const ParallelVector& other)
+    : local_size_(other.local_size_),
+      global_size_(other.global_size_),
+      location_id_(other.location_id_),
+      process_count_(other.process_count_),
+      values_(other.values_),
+      comm_(other.comm_)
+  {}
 
-  /// Return the global size of the vector.
+  ParallelVector(ParallelVector&& other)
+    : local_size_(other.local_size_),
+      global_size_(other.global_size_),
+      location_id_(other.location_id_),
+      process_count_(other.process_count_),
+      values_(other.values_),
+      comm_(other.comm_)
+  {}
+
+  uint64_t LocalSize() const { return local_size_; }
+  virtual uint64_t TotalLocalSize() const { return local_size_; }
   uint64_t GlobalSize() const { return global_size_;}
 
-  /// Clear the parallel vector, returning it to an uninitialized state.
-  virtual void Clear();
+  /// Return the value of a local entry
+  double operator[](const int64_t local_id) const;
 
-  /**
-   * Reinitialize the parallel vector to the given local and global sizes.
-   *
-   * This routine clears all data in the current parallel vectors and
-   * results in a zero vector.
-   */
-  void Reinit(const uint64_t local_size,
-              const uint64_t global_size);
+  /// Return a reference to a local entry.
+  double& operator[](const int64_t local_id);
 
-  /**
-   * Set all elements in the parallel vector to the given value.
-   */
-  void Set(const double value);
+  /// Set all elements in the parallel vector to the given value.
+  virtual void
+  Set(const double value) { values_.assign(values_.size(), value); }
+
+  /// Set the parallel vector with the given local vectors.
+  virtual void Set(const std::vector<double>& local_vector);
 
   /**
    * Add the given value to the given global index of the parallel vector.
@@ -76,24 +90,19 @@ public:
    */
   virtual void Assemble();
 
-  /// Return the <tt>i</tt>'th element of the local vector.
-  double operator[](const int64_t i) const;
-
-  /// Return a reference to the <tt>i</tt>'th element of the local vector.
-  double& operator[](const int64_t i);
-
+  /// Print the local vectors to stings.
   std::string PrintStr() const;
 
 protected:
-  int FindProcessID(const uint64_t global_id) const;
+  void DefineParallelStructure();
+  int FindOwnerPID(const uint64_t global_id) const;
 
 protected:
-  uint64_t local_size_;
-  uint64_t global_size_;
-  const MPI_Comm communicator_;
+  const uint64_t local_size_;
+  const uint64_t global_size_;
 
-  int location_id_ = 0;
-  int process_count_ = 0;
+  int location_id_;
+  int process_count_;
   std::vector<uint64_t> extents_;
 
   std::vector<double> values_;
@@ -101,6 +110,7 @@ protected:
   using VecAddOp = std::pair<int64_t, double>;
   std::vector<VecAddOp> op_cache_;
 
+  const MPI_Comm comm_;
 };
 
 }
