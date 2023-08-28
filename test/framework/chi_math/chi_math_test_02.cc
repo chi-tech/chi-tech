@@ -1,5 +1,5 @@
-#include "math/parallel_vector.h"
-#include "math/ghosted_parallel_vector.h"
+#include "math/ParallelVector/parallel_vector.h"
+#include "math/ParallelVector/ghosted_parallel_vector.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

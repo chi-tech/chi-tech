@@ -74,10 +74,10 @@ void ParallelVector::SetValue(const int64_t global_id,
       "Invalid global index encountered. Global indices "
       "must be in the range [0, this->GlobalSize()].");
 
-  if (op_type == OperationType::SET_VALUE)
-    set_cache_.push_back({global_id, value});
-  else
-    add_cache_.push_back({global_id, value});
+  auto& op_cache = op_type == OperationType::SET_VALUE ?
+                   set_cache_ : add_cache_;
+  op_cache.emplace_back(global_id, value);
+
 }
 
 
@@ -85,12 +85,20 @@ void ParallelVector::SetValues(const std::vector<int64_t>& global_ids,
                                const std::vector<double>& values,
                                const OperationType op_type)
 {
-  ChiInvalidArgumentIf(
-      global_ids.size() != values.size(),
-      "Size mismatch between indices and values.");
+  ChiInvalidArgumentIf(global_ids.size() != values.size(),
+                       "Size mismatch between indices and values.");
 
+  auto& op_cache = op_type == OperationType::SET_VALUE ?
+                   set_cache_ : add_cache_;
   for (size_t i = 0; i < global_ids.size(); ++i)
-    SetValue(global_ids[i], values[i], op_type);
+  {
+    const auto& global_id = global_ids[i];
+    ChiInvalidArgumentIf(
+        global_id < 0 or global_id >= global_size_,
+        "Invalid global index encountered. Global indices "
+        "must be in the range [0, this->GlobalSize()].");
+    op_cache.emplace_back(global_id, values[i]);
+  }
 }
 
 
@@ -130,8 +138,8 @@ void ParallelVector::Assemble()
   for (const auto& op : op_cache)
   {
     const int op_pid = FindOwnerPID(op.first);
-    if (op_pid == location_id_) local_cache.push_back(op);
-    else nonlocal_cache.push_back(op);
+    if (op_pid == location_id_) local_cache.emplace_back(op);
+    else nonlocal_cache.emplace_back(op);
   }
 
   // The local operations can be handled immediately
