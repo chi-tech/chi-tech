@@ -40,7 +40,8 @@ double ParallelVector::operator[](const int64_t local_id) const
 {
   ChiInvalidArgumentIf(
       local_id < 0 or local_id >= values_.size(),
-      std::string(__FUNCTION__) + ": Invalid local index provided.");
+      "Invalid local index provided.");
+
   return values_[local_id];
 }
 
@@ -49,16 +50,17 @@ double& ParallelVector::operator[](const int64_t local_id)
 {
   ChiInvalidArgumentIf(
       local_id < 0 or local_id >= local_size_,
-      std::string(__FUNCTION__) + ": Invalid local index provided.");
+      "Invalid local index provided.");
+
   return values_[local_id];
 }
 
 
 void ParallelVector::Set(const std::vector<double>& local_vector)
 {
-  ChiInvalidArgumentIf(
-      local_vector.size() != local_size_,
-      std::string(__FUNCTION__) + ": Incompatible local vector size.");
+  ChiInvalidArgumentIf(local_vector.size() != local_size_,
+                       "Incompatible local vector size.");
+
   values_ = local_vector;
 }
 
@@ -71,6 +73,7 @@ void ParallelVector::SetValue(const int64_t global_id,
       global_id < 0 or global_id >= global_size_,
       "Invalid global index encountered. Global indices "
       "must be in the range [0, this->GlobalSize()].");
+
   if (op_type == OperationType::SET_VALUE)
     set_cache_.push_back({global_id, value});
   else
@@ -84,7 +87,6 @@ void ParallelVector::SetValues(const std::vector<int64_t>& global_ids,
 {
   ChiInvalidArgumentIf(
       global_ids.size() != values.size(),
-      std::string(__FUNCTION__) + ": " +
       "Size mismatch between indices and values.");
 
   for (size_t i = 0; i < global_ids.size(); ++i)
@@ -180,7 +182,6 @@ void ParallelVector::Assemble()
 
     ChiLogicalErrorIf(
         byte_vector.size() % packet_size != 0,
-        std::string(__FUNCTION__) + ": " +
         "Unrecognized received operations. Operations are serialized with "
         "an int64_t and double, but the received packet from process " +
         std::to_string(pid) + " on process " + std::to_string(location_id_) +
@@ -198,7 +199,6 @@ void ParallelVector::Assemble()
 
       ChiLogicalErrorIf(
           local_id < 0 or local_id >= local_size_,
-          std::string(__FUNCTION__) + ": " +
           "A non-local global ID was received by process " +
           std::to_string(location_id_) + " by process " + std::to_string(pid) +
           " during vector assembly.");
@@ -238,10 +238,8 @@ void ParallelVector::DefineParallelStructure()
 
 int ParallelVector::FindOwnerPID(const uint64_t global_id) const
 {
-  ChiInvalidArgumentIf(
-      global_id >= global_size_,
-      std::string(__FUNCTION__) + ": " +
-      "The specified global ID is greater than the global vector size.");
+  ChiInvalidArgumentIf(global_id >= global_size_,
+                       "Invalid global id specified.");
 
   for (int p = 0; p < process_count_; ++p)
     if (global_id >= extents_[p] and

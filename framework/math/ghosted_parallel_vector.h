@@ -13,8 +13,6 @@ namespace chi_math
 class GhostedParallelVector : public ParallelVector
 {
 public:
-  GhostedParallelVector() = delete;
-
   /**
    * Initialize the ghosted parallel vector with the given local and global
    * sizes, with the specified global ghost indices.
@@ -27,7 +25,7 @@ public:
       ghost_comm_(local_size, global_size, ghost_ids, communicator)
   { values_.assign(local_size_ + ghost_comm_.NumGhosts(), 0.0); }
 
-  /// Initialize a ghosted parallel vector with a ghost communicator.
+  /// Initialize a ghosted parallel vector from a ghost communicator.
   GhostedParallelVector(const VectorGhostCommunicator& ghost_comm)
     : ParallelVector(ghost_comm.LocalSize(),
                      ghost_comm.GlobalSize(),
@@ -45,18 +43,23 @@ public:
     : GhostedParallelVector(other.ghost_comm_)
   {}
 
+  /// Return the number of ghosts associated with the local vector.
   uint64_t NumGhosts() const { return ghost_comm_.NumGhosts(); }
-  uint64_t TotalLocalSize() const override
-  { return local_size_ + ghost_comm_.NumGhosts(); }
 
+  /// Return the total size of the local vector, including ghosts.
+  uint64_t LocalSizeWithGhosts() const { return values_.size(); }
+
+  /// Return the ghost indices associated with the local vector.
   const std::vector<int64_t>&
   GhostIndices() const { return ghost_comm_.GhostIndices(); }
 
+  /// Map a global ghost id to its respective local id.
   int64_t MapGhostToLocal(const int64_t ghost_id) const
   { return ghost_comm_.MapGhostToLocal(ghost_id); }
 
+  /// Return a vector containing the locally owned data and ghost data.
   std::vector<double> MakeGhostedLocalVector() const { return values_; }
-  
+
   /**
    * Return the value of the parallel vector for the specified global index.
    *

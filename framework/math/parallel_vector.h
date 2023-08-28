@@ -30,11 +30,9 @@ public:
   using const_iterator = std::vector<double>::const_iterator;
 
 public:
-  ParallelVector() = delete;
-
   /**
    * Initialize a parallel vector with the given local and global sizes with
-   * the given communicator whose elements are set to zero.
+   * the given communicator whose entries are set to zero.
    */
   ParallelVector(const uint64_t local_size,
                  const uint64_t global_size,
@@ -58,27 +56,46 @@ public:
       comm_(other.comm_)
   {}
 
+  /// Return the size of the locally owned portion of the parallel vector.
   uint64_t LocalSize() const { return local_size_; }
-  virtual uint64_t TotalLocalSize() const { return local_size_; }
+
+  /// Return the global size of the parallel vector.
   uint64_t GlobalSize() const { return global_size_;}
 
+  /**
+   * Read only accessor to the entry at the given local index of
+   * the local vector.
+   *
+   * \note This accessor allows access to all locally stored elements,
+   *       including any data beyond local_size_ that may exist in derived
+   *       classes.
+   */
   double operator[](const int64_t local_id) const;
+
+  /**
+   * Read/write accessor to the entry at the given local index of
+   * the local vector.
+   *
+   * \note This accessor only allows access to the locally owned entries
+   *       of the parallel vector, and does not allow access for any data
+   *       beyond local_size_ that may exist in derived classes.
+   */
   double& operator[](const int64_t local_id);
 
-  iterator begin() { return values_.begin(); }
-  iterator end() { return values_.begin() + local_size_; }
-
-  const_iterator begin() const { return values_.begin(); }
-  const_iterator end() const { return values_.end(); }
-
+  /// Return a vector containing the locally owned data.
   std::vector<double> MakeLocalVector();
 
-  /// Set all elements of the local parallel vector to the given value.
-  virtual void
-  Set(const double value) { values_.assign(values_.size(), value); }
+  /**
+   * Set the entries of the locally owned portion of the parallel vector
+   * to the given value.
+   */
+  void Set(const double value) { values_.assign(values_.size(), value); }
 
-  /// Set all elements of the local parallel vector with an STL vector.
-  virtual void Set(const std::vector<double>& local_vector);
+  /**
+   * Set the entries of the locally owned portion of the parallel vector
+   * to the given STL vector.
+   */
+  void Set(const std::vector<double>& local_vector);
 
   /**
    * Define a set or add operation for the given global id-value pair

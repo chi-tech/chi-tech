@@ -16,9 +16,10 @@ double GhostedParallelVector::GetGlobalValue(const int64_t global_id) const
 
   ChiInvalidArgumentIf(
       ghost_comm_.MapGhostToLocal(global_id) == -1,
-      std::string(__FUNCTION__) + ": Invalid global id specified." +
-      "Specified global ids must be locally owned or ghosts.");
+      "Invalid global id specified. Specified global ids must be "
+      "locally owned or ghosts.");
   return values_[ghost_comm_.MapGhostToLocal(global_id)];
 }
+
 
 }
