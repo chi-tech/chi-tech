@@ -15,8 +15,8 @@ namespace chi_math
 
 enum class OperationType : short
 {
-  SET_VALUE = 0,
-  ADD_VALUE = 1
+  SET_VALUE = 1,
+  ADD_VALUE = 2
 };
 
 

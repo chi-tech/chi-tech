@@ -6,6 +6,8 @@
 
 #include "console/chi_console.h"
 
+#include <unistd.h>
+
 
 namespace chi_unit_tests
 {
@@ -21,51 +23,48 @@ RegisterWrapperFunction(/*namespace_name=*/chi_unit_tests,
 chi::ParameterBlock
 chi_math_Test02(const chi::InputParameters& params)
 {
+  using namespace chi_math;
+
   Chi::log.Log() << "GOLD_BEGIN";
 
-  Chi::mpi.Barrier();
-  if (Chi::mpi.location_id == 0) Chi::mpi.Barrier();
-  Chi::log.LogAll() << "Testing chi_math::ParallelVector" << std::endl;
-  Chi::mpi.Barrier();
+  Chi::log.Log() << "Testing chi_math::ParallelVector" << std::endl;
 
-  chi_math::ParallelVector vec(5, 10, Chi::mpi.comm);
+  ParallelVector vec(5, 10, Chi::mpi.comm);
 
   if (Chi::mpi.location_id == 0)
-    vec.AddValues({5, 1}, {2.0, 2.0});
+    vec.SetValue(5, 2.0, OperationType::SET_VALUE);
   else
-    vec.AddValues({0, 6}, {1.0, 1.0});
+    vec.SetValue(0, 1.0, OperationType::SET_VALUE);
   vec.Assemble();
 
   Chi::mpi.Barrier();
-  if (Chi::mpi.location_id == 0) Chi::mpi.Barrier();
   Chi::log.LogAll() << vec.PrintStr() << std::endl;
   Chi::mpi.Barrier();
+  usleep(1'000);
 
-  Chi::mpi.Barrier();
-  if (Chi::mpi.location_id == 0) Chi::mpi.Barrier();
-  Chi::log.LogAll()
+  Chi::log.Log()
       << "Testing chi_math::GhostedParallelVector" << std::endl;
-  Chi::mpi.Barrier();
 
   const int64_t ghost_id = Chi::mpi.location_id == 0 ? 5 : 4;
-  chi_math::GhostedParallelVector ghost_vec(5, 10, {ghost_id}, Chi::mpi.comm);
+  GhostedParallelVector ghost_vec(5, 10, {ghost_id}, Chi::mpi.comm);
 
   Chi::mpi.Barrier();
-  if (Chi::mpi.location_id == 0) Chi::mpi.Barrier();
   Chi::log.LogAll()
       << "Number of Ghosts: " << ghost_vec.NumGhosts() << std::endl;
   Chi::mpi.Barrier();
+  usleep(1'000);
 
   if (Chi::mpi.location_id == 0)
-    ghost_vec.AddValue(5, 2.0);
+    ghost_vec.SetValue(5, 2.0, OperationType::SET_VALUE);
   else
-    ghost_vec.AddValue(4, 1.0);
+    ghost_vec.SetValue(4, 1.0, OperationType::SET_VALUE);
   ghost_vec.Assemble();
+  ghost_vec.CommunicateGhostEntries();
 
   Chi::mpi.Barrier();
-  if (Chi::mpi.location_id == 0) Chi::mpi.Barrier();
   Chi::log.LogAll() << ghost_vec.PrintStr() << std::endl;
   Chi::mpi.Barrier();
+  usleep(1'000);
 
   Chi::log.Log() << "GOLD_END";
   return chi::ParameterBlock();

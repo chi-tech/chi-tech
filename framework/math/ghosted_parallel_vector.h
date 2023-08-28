@@ -27,20 +27,22 @@ public:
       num_ghosts_(ghost_ids.size()),
       ghost_ids_(ghost_ids),
       ghost_comm_(local_size, global_size, ghost_ids, communicator)
-  {}
+  {
+    values_.assign(local_size_ + ghost_ids_.size(), 0.0);
+  }
 
   GhostedParallelVector(const GhostedParallelVector& other)
-    : ParallelVector(other),
-      num_ghosts_(other.num_ghosts_),
-      ghost_ids_(other.ghost_ids_),
-      ghost_comm_(other.ghost_comm_)
+    : GhostedParallelVector(other.local_size_,
+                            other.global_size_,
+                            other.ghost_ids_,
+                            other.comm_)
   {}
 
   GhostedParallelVector(GhostedParallelVector&& other)
-    : ParallelVector(other),
-      num_ghosts_(other.num_ghosts_),
-      ghost_ids_(other.ghost_ids_),
-      ghost_comm_(other.ghost_comm_)
+    : GhostedParallelVector(other.local_size_,
+                            other.global_size_,
+                            other.ghost_ids_,
+                            other.comm_)
   {}
 
   uint64_t NumGhosts() const { return num_ghosts_; }

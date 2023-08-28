@@ -3,6 +3,7 @@
 #include "chi_mpi_utils_map_all2all.h"
 #include "data_types/byte_array.h"
 
+#include "chi_log.h"
 #include "chi_log_exceptions.h"
 
 #include <sstream>
@@ -96,10 +97,8 @@ void ParallelVector::Assemble()
   // Define the local operation mode.
   // 0=Do Nothing, 1=Set, 2=Add, 3=INVALID (mixed set/add ops)
   const short local_mode =
-      short(set_cache_.empty()) + short(add_cache_.empty()) * 2;
-  ChiLogicalErrorIf(
-      local_mode == 3,
-      "Invalid operation mode. All operations must be either set or add.");
+      short(not set_cache_.empty()) + short(not add_cache_.empty()) * 2;
+  ChiLogicalErrorIf(local_mode == 3, "Invalid operation mode.");
 
   // Now, determine the global operation mode
   short global_mode;
@@ -122,6 +121,7 @@ void ParallelVector::Assemble()
   auto& op_cache = global_op_type == OpType ::SET_VALUE ?
                    set_cache_ : add_cache_;
 
+
   // First, segregate the local and non-local operations
   std::vector<std::pair<int64_t, double>> local_cache;
   std::vector<std::pair<int64_t, double>> nonlocal_cache;
@@ -140,7 +140,7 @@ void ParallelVector::Assemble()
         local_id < 0 or local_id >= local_size_,
         "Invalid mapping from global to local.");
 
-    if (local_mode == 1) values_[local_id] = value;
+    if (global_op_type == OpType::SET_VALUE) values_[local_id] = value;
     else values_[local_id] += value;
   }
 
