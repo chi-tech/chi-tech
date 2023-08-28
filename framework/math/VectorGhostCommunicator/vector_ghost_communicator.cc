@@ -47,7 +47,7 @@ VectorGhostCommunicator::VectorGhostCommunicator(
 
   // Construct a mapping between processes and the ghost indices
   // that belong to them. This information yields what this process
-  // needs to be receive from other processes.
+  // needs to receive from other processes.
   std::map<int, std::vector<int64_t>> recv_map;
   for (int64_t ghost_id : ghost_ids)
     recv_map[FindOwnerPID(ghost_id)].push_back(ghost_id);
@@ -126,8 +126,16 @@ VectorGhostCommunicator::VectorGhostCommunicator(
 int64_t VectorGhostCommunicator::
 MapGhostToLocal(const int64_t ghost_id) const
 {
-  const auto it = std::find(ghost_ids_.begin(), ghost_ids_.end(), ghost_id);
-  return it != ghost_ids_.end() ? it - ghost_ids_.begin() : -1;
+  ChiInvalidArgumentIf(
+      ghost_to_recv_map_.count(ghost_id) == 0,
+      "The given ghost id does not belong to this communicator.");
+
+  // Get the position within the ghost id vector of the given ghost id
+  const auto k = std::find(ghost_ids_.begin(),
+                           ghost_ids_.end(), ghost_id) - ghost_ids_.begin();
+
+  // Local index is local size plus the position in the ghost id vector
+  return local_size_ + k;
 }
 
 

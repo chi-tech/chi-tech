@@ -24,29 +24,36 @@ public:
                         const std::vector<int64_t>& ghost_ids,
                         const MPI_Comm communicator = MPI_COMM_WORLD)
     : ParallelVector(local_size, global_size, communicator),
-      num_ghosts_(ghost_ids.size()),
-      ghost_ids_(ghost_ids),
       ghost_comm_(local_size, global_size, ghost_ids, communicator)
+  { values_.assign(local_size_ + ghost_comm_.NumGhosts(), 0.0); }
+
+  /// Initialize a ghosted parallel vector with a ghost communicator.
+  GhostedParallelVector(const VectorGhostCommunicator& ghost_comm)
+    : ParallelVector(ghost_comm.LocalSize(),
+                     ghost_comm.GlobalSize(),
+                     ghost_comm.Communicator()),
+      ghost_comm_(ghost_comm)
   {
-    values_.assign(local_size_ + ghost_ids_.size(), 0.0);
+    values_.assign(local_size_ + ghost_comm_.NumGhosts(), 0.0);
   }
 
   GhostedParallelVector(const GhostedParallelVector& other)
-    : GhostedParallelVector(other.local_size_,
-                            other.global_size_,
-                            other.ghost_ids_,
-                            other.comm_)
+    : GhostedParallelVector(other.ghost_comm_)
   {}
 
   GhostedParallelVector(GhostedParallelVector&& other)
-    : GhostedParallelVector(other.local_size_,
-                            other.global_size_,
-                            other.ghost_ids_,
-                            other.comm_)
+    : GhostedParallelVector(other.ghost_comm_)
   {}
 
-  uint64_t NumGhosts() const { return num_ghosts_; }
-  uint64_t TotalLocalSize() const override { return local_size_ + num_ghosts_; }
+  uint64_t NumGhosts() const { return ghost_comm_.NumGhosts(); }
+  uint64_t TotalLocalSize() const override
+  { return local_size_ + ghost_comm_.NumGhosts(); }
+
+  const std::vector<int64_t>&
+  GhostIndices() const { return ghost_comm_.GhostIndices(); }
+
+  int64_t MapGhostToLocal(const int64_t ghost_id) const
+  { return ghost_comm_.MapGhostToLocal(ghost_id); }
 
   std::vector<double> MakeGhostedLocalVector() const { return values_; }
 
@@ -66,8 +73,6 @@ public:
   { ghost_comm_.CommunicateGhostEntries(values_); }
 
 private:
-  const uint64_t num_ghosts_;
-  const std::vector<int64_t> ghost_ids_;
   VectorGhostCommunicator ghost_comm_;
 
 

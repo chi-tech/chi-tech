@@ -20,7 +20,14 @@ public:
                           const std::vector<int64_t>& ghost_ids,
                           const MPI_Comm communicator);
 
+  uint64_t LocalSize() const { return local_size_; }
+  uint64_t GlobalSize() const { return global_size_; }
+
   uint64_t NumGhosts() const { return ghost_ids_.size(); }
+  const std::vector<int64_t>& GhostIndices() const { return ghost_ids_; }
+
+  MPI_Comm Communicator() const { return comm_; }
+
   int64_t MapGhostToLocal(const int64_t ghost_id) const;
 
   void CommunicateGhostEntries(std::vector<double>& ghosted_vector) const;

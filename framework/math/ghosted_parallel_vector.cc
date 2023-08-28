@@ -1,8 +1,5 @@
 #include "ghosted_parallel_vector.h"
 
-#include "chi_mpi_utils_map_all2all.h"
-
-#include "chi_log.h"
 #include "chi_log_exceptions.h"
 
 #include <algorithm>
