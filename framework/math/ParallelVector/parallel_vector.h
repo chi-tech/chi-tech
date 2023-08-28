@@ -13,7 +13,7 @@
 namespace chi_math
 {
 
-enum class OperationType : short
+enum class VecOpType : short
 {
   SET_VALUE = 1,
   ADD_VALUE = 2
@@ -25,10 +25,6 @@ enum class OperationType : short
  */
 class ParallelVector
 {
-public:
-  using iterator = std::vector<double>::iterator;
-  using const_iterator = std::vector<double>::const_iterator;
-
 public:
   /**
    * Initialize a parallel vector with the given local and global sizes with
@@ -76,9 +72,9 @@ public:
    * Read/write accessor to the entry at the given local index of
    * the local vector.
    *
-   * \note This accessor only allows access to the locally owned entries
-   *       of the parallel vector, and does not allow access for any data
-   *       beyond local_size_ that may exist in derived classes.
+   * \note This accessor allows access to all locally stored elements,
+   *       including any data beyond local_size_ that may exist in derived
+   *       classes.
    */
   double& operator[](const int64_t local_id);
 
@@ -106,7 +102,7 @@ public:
    */
   void SetValue(const int64_t global_id,
                 const double value,
-                const OperationType op_type);
+                const VecOpType op_type);
 
   /**
    * Group multiple operations into a single call.
@@ -116,7 +112,7 @@ public:
    */
   void SetValues(const std::vector<int64_t>& global_ids,
                  const std::vector<double>& values,
-                 const OperationType op_type);
+                 const VecOpType op_type);
 
   /**
    * Communicate all operations stored within the operation cache to the

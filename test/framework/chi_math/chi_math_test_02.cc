@@ -32,9 +32,9 @@ chi_math_Test02(const chi::InputParameters& params)
   ParallelVector vec(5, 10, Chi::mpi.comm);
 
   if (Chi::mpi.location_id == 0)
-    vec.SetValue(5, 2.0, OperationType::SET_VALUE);
+    vec.SetValue(5, 2.0, VecOpType::SET_VALUE);
   else
-    vec.SetValue(0, 1.0, OperationType::SET_VALUE);
+    vec.SetValue(0, 1.0, VecOpType::SET_VALUE);
   vec.Assemble();
 
   Chi::mpi.Barrier();
@@ -55,9 +55,9 @@ chi_math_Test02(const chi::InputParameters& params)
   usleep(1'000);
 
   if (Chi::mpi.location_id == 0)
-    ghost_vec.SetValue(5, 2.0, OperationType::SET_VALUE);
+    ghost_vec.SetValue(5, 2.0, VecOpType::SET_VALUE);
   else
-    ghost_vec.SetValue(4, 1.0, OperationType::SET_VALUE);
+    ghost_vec.SetValue(4, 1.0, VecOpType::SET_VALUE);
   ghost_vec.Assemble();
   ghost_vec.CommunicateGhostEntries();
 

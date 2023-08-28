@@ -49,7 +49,7 @@ double ParallelVector::operator[](const int64_t local_id) const
 double& ParallelVector::operator[](const int64_t local_id)
 {
   ChiInvalidArgumentIf(
-      local_id < 0 or local_id >= local_size_,
+      local_id < 0 or local_id >= values_.size(),
       "Invalid local index provided.");
 
   return values_[local_id];
@@ -67,14 +67,14 @@ void ParallelVector::Set(const std::vector<double>& local_vector)
 
 void ParallelVector::SetValue(const int64_t global_id,
                               const double value,
-                              const OperationType op_type)
+                              const VecOpType op_type)
 {
   ChiInvalidArgumentIf(
       global_id < 0 or global_id >= global_size_,
       "Invalid global index encountered. Global indices "
       "must be in the range [0, this->GlobalSize()].");
 
-  auto& op_cache = op_type == OperationType::SET_VALUE ?
+  auto& op_cache = op_type == VecOpType::SET_VALUE ?
                    set_cache_ : add_cache_;
   op_cache.emplace_back(global_id, value);
 
@@ -83,12 +83,12 @@ void ParallelVector::SetValue(const int64_t global_id,
 
 void ParallelVector::SetValues(const std::vector<int64_t>& global_ids,
                                const std::vector<double>& values,
-                               const OperationType op_type)
+                               const VecOpType op_type)
 {
   ChiInvalidArgumentIf(global_ids.size() != values.size(),
                        "Size mismatch between indices and values.");
 
-  auto& op_cache = op_type == OperationType::SET_VALUE ?
+  auto& op_cache = op_type == VecOpType::SET_VALUE ?
                    set_cache_ : add_cache_;
   for (size_t i = 0; i < global_ids.size(); ++i)
   {
@@ -126,7 +126,7 @@ void ParallelVector::Assemble()
       "or the same across all processes.");
 
   // Now, store the global operation type and get the appropriate cache
-  using OpType = OperationType;
+  using OpType = VecOpType;
   const auto global_op_type = static_cast<OpType>(global_mode);
   auto& op_cache = global_op_type == OpType ::SET_VALUE ?
                    set_cache_ : add_cache_;
