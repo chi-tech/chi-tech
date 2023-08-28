@@ -69,7 +69,7 @@ public:
   iterator end() { return values_.begin() + local_size_; }
 
   const_iterator begin() const { return values_.begin(); }
-  const_iterator end() const { return values_.begin() + local_size_; }
+  const_iterator end() const { return values_.end(); }
 
   std::vector<double> MakeLocalVector();
 

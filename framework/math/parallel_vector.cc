@@ -39,7 +39,7 @@ std::vector<double> ParallelVector::MakeLocalVector()
 double ParallelVector::operator[](const int64_t local_id) const
 {
   ChiInvalidArgumentIf(
-      local_id < 0 or local_id >= local_size_,
+      local_id < 0 or local_id >= values_.size(),
       std::string(__FUNCTION__) + ": Invalid local index provided.");
   return values_[local_id];
 }

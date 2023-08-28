@@ -56,7 +56,7 @@ public:
   { return ghost_comm_.MapGhostToLocal(ghost_id); }
 
   std::vector<double> MakeGhostedLocalVector() const { return values_; }
-
+  
   /**
    * Return the value of the parallel vector for the specified global index.
    *
