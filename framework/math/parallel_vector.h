@@ -13,7 +13,7 @@
 namespace chi_math
 {
 
-enum OperationType
+enum class OperationType : short
 {
   SET_VALUE = 0,
   ADD_VALUE = 1

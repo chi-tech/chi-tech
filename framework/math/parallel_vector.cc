@@ -70,29 +70,10 @@ void ParallelVector::SetValue(const int64_t global_id,
       global_id < 0 or global_id >= global_size_,
       "Invalid global index encountered. Global indices "
       "must be in the range [0, this->GlobalSize()].");
-
-  if (op_type == SET_VALUE)
-  {
-    ChiLogicalErrorIf(
-        not add_cache_.empty(),
-        "When the add operation cache is not empty, set operations "
-        "are not permissible.");
-
+  if (op_type == OperationType::SET_VALUE)
     set_cache_.push_back({global_id, value});
-  }
-  else if (op_type == ADD_VALUE)
-  {
-    ChiLogicalErrorIf(
-        not set_cache_.empty(),
-        "When the set operation cache is not empty, add operations "
-        "are not permissible.");
-
-    add_cache_.push_back({global_id, value});
-  }
   else
-  {
-    ChiLogicalError("Unrecognized operation type.");
-  }
+    add_cache_.push_back({global_id, value});
 }
 
 
@@ -112,25 +93,34 @@ void ParallelVector::SetValues(const std::vector<int64_t>& global_ids,
 
 void ParallelVector::Assemble()
 {
-  // Define the local operation mode. 0=Do Nothing, 1=Set, 2=Add, 3=INVALID
+  // Define the local operation mode.
+  // 0=Do Nothing, 1=Set, 2=Add, 3=INVALID (mixed set/add ops)
   const short local_mode =
       short(set_cache_.empty()) + short(add_cache_.empty()) * 2;
   ChiLogicalErrorIf(
       local_mode == 3,
       "Invalid operation mode. All operations must be either set or add.");
 
-  // Now, check whether all modes are equivalent
+  // Now, determine the global operation mode
   short global_mode;
   MPI_Allreduce(&local_mode, &global_mode, 1,
                 MPI_SHORT, MPI_MAX, comm_);
 
+  // If the mode is to do nothing, exit
+  if (global_mode == 0)
+    return;
+
+  // Next, ensure that all operation types are compatible
   ChiLogicalErrorIf(
       local_mode != 0 and local_mode != global_mode,
       "The operation on each process must be either 0 (do nothing),"
       "or the same across all processes.");
 
-  // If the modes are valid, get the appropriate local cache
-  auto& op_cache = global_mode == 1 ? set_cache_ : add_cache_;
+  // Now, store the global operation type and get the appropriate cache
+  using OpType = OperationType;
+  const auto global_op_type = static_cast<OpType>(global_mode);
+  auto& op_cache = global_op_type == OpType ::SET_VALUE ?
+                   set_cache_ : add_cache_;
 
   // First, segregate the local and non-local operations
   std::vector<std::pair<int64_t, double>> local_cache;
@@ -196,7 +186,7 @@ void ParallelVector::Assemble()
         std::to_string(pid) + " on process " + std::to_string(location_id_) +
         " is not an integer multiple of the size of an int64_t and double.");
 
-    const size_t num_ops = byte_vector.size() / packet_size ;
+    const size_t num_ops = byte_vector.size() / packet_size;
     chi_data_types::ByteArray byte_array(byte_vector);
     for (size_t k = 0; k < num_ops; ++k)
     {
@@ -210,12 +200,12 @@ void ParallelVector::Assemble()
           local_id < 0 or local_id >= local_size_,
           std::string(__FUNCTION__) + ": " +
           "A non-local global ID was received by process " +
-          std::to_string(location_id_) + " by process " +
-          std::to_string(pid) + " during vector assembly.");
+          std::to_string(location_id_) + " by process " + std::to_string(pid) +
+          " during vector assembly.");
 
       // Contribute to the local vector
-      if (local_mode == 1) values_[local_id] = value;
-      else if (local_mode == 2) values_[local_id] += value;
+      if (global_op_type == OpType ::SET_VALUE) values_[local_id] = value;
+      else values_[local_id] += value;
     }
   }
 
