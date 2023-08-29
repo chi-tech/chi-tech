@@ -17,10 +17,12 @@
   },
   {
     "file" : "chi_math_test_02.lua", "num_procs" : 2, "checks" :
-  [
-    {
-      "type" : "GoldFile", "scope_keyword" : "GOLD"
-    }
-  ]
+    [
+      { "type" : "StrCompare", "key" : "[0]  vec after assembly: [1 0 0 0 0]" },
+      { "type" : "StrCompare", "key" : "[1]  vec after assembly: [2 0 0 0 0]" },
+      { "type" : "StrCompare", "key" : "[0]  Ghost vec after communicate: [0 0 0 0 1 2]" },
+      { "type" : "StrCompare", "key" : "[1]  Ghost vec after communicate: [2 0 0 0 0 1]" },
+      { "type" :  "ErrorCode", "error_code" :  0}
+    ]
   }
 ]

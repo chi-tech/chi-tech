@@ -145,7 +145,7 @@ you can run
 To check if the code compiled correctly execute the test scripts:
 
 ```bash
-    $ python3 tests/Z_Run_all.py
+    $ test/run_tests -d test/ -j8
 ```
 
 ### Step 8 - Chi-Tech documentation

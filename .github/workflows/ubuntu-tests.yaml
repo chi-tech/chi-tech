@@ -4,9 +4,8 @@ on:
   workflow_dispatch:
   push:
     branches: [development]
-  pull_request_target:
+  pull_request:
     types: [opened, reopened, synchronize]
-    branches: [development]
 
 jobs:
   test1:
