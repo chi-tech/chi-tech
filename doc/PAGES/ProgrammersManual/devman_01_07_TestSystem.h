@@ -94,8 +94,12 @@ Parameters:
 - `"num_procs"` : The number of mpi processes to use.
 - `"checks"` : An array of checks `[..Checks..]`
 - `"args"` : An array of arguments to pass to the executable
-- `"weight_class"` : An optional string, either "short" or "long" used to filter different
-   tests length. The default is "short". "long" should be used for tests >15s.
+- `"weight_class"` : An optional string, either "short", "intermediate" or
+   "long" used to filter different
+   tests length. The default is "short". "long" should be used for tests >2min.
+- `"outfileprefix"` : Optional parameter. Will default to `"file"` but can be
+  to change the output file name (outfileprefix+".out") so that the same input
+  file can be used for different tests.
 
 All other keys are ignored so feel free to peruse something like `"comment"` to
 annotate the test.
@@ -115,6 +119,11 @@ Parameters:
 - `"key"` : The key-string to look for
 - `"goldvalue"` : Float value
 - `"tol"` : Tolerance on the goldvalue
+- `"skip_lines_until"` : Optional. Do not check lines in the output file until
+  this string is encountered.
+  e.g. `"skip_lines_until": "LinearBoltzmann::KEigenvalueSolver execution"`. This
+  is useful if a simulation is expected to have multiples of the key-string but
+  you only want the last one.
 
 \subsubsection DevManTestSystem_sec2_2_2 2.2.2 StrCompareCheck
 Can do one of two things, 1) looks for the presence of the key, returns success
@@ -126,6 +135,11 @@ Parameters:
 - `"key"` : The key-string to look for
 - `"wordnum"` : Optional. If supplied then "gold" needs to specified.
 - `"gold"` : Golden word
+- `"skip_lines_until"` : Optional. Do not check lines in the output file until
+  this string is encountered.
+  e.g. `"skip_lines_until": "LinearBoltzmann::KEigenvalueSolver execution"`. This
+  is useful if a simulation is expected to have multiples of the key-string but
+  you only want the last one.
 
 \subsubsection DevManTestSystem_sec2_2_3 2.2.3 FloatCompareCheck
 On the line containing the key, compares the `"wordnum"`-th word against the
@@ -137,6 +151,11 @@ Parameters:
                 used in the check.
 - `"gold"` : Golden value (`float`)
 - `"tol"` : The floating point tolerance to use
+- `"skip_lines_until"` : Optional. Do not check lines in the output file until
+  this string is encountered.
+  e.g. `"skip_lines_until": "LinearBoltzmann::KEigenvalueSolver execution"`. This
+  is useful if a simulation is expected to have multiples of the key-string but
+  you only want the last one.
 
 \subsubsection DevManTestSystem_sec2_2_4 2.2.4 IntCompareCheck
 Integer version of \ref DevManTestSystem_sec2_2_3. On the line containing the
@@ -148,6 +167,11 @@ Parameters:
 - `"wordnum"` : The word number on the line containing the key that will be
                 used in the check.
 - `"gold"` : Golden value (`int`)
+- `"skip_lines_until"` : Optional. Do not check lines in the output file until
+  this string is encountered.
+  e.g. `"skip_lines_until": "LinearBoltzmann::KEigenvalueSolver execution"`. This
+  is useful if a simulation is expected to have multiples of the key-string but
+  you only want the last one.
 
 \subsubsection DevManTestSystem_sec2_2_5 2.2.5 ErrorCodeCheck
 Compares the return/error code of the test with a specified value.\n

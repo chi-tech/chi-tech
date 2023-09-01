@@ -31,8 +31,8 @@ resources/Dependencies/glew-2.1.0/
 # All vtk mesh files
 /*.vtu
 /*.pvtu
-test/**/.pvtu
-test/**/.vtu
+test/**/*.pvtu
+test/**/*.vtu
 test/modules/LinearBoltzmannSolvers/DSA/SimTest_92b_DSA_PWLC.pvtu
 test/modules/LinearBoltzmannSolvers/DSA/SimTest_92b_DSA_PWLC_0.vtu
 
