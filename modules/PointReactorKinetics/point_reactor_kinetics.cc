@@ -41,7 +41,6 @@ chi::InputParameters TransientSolver::GetInputParameters()
 
   params.AddOptionalParameter(
     "initial_population", 1.0, "Initial neutron population");
-  params.AddOptionalParameter("dt", 0.01, "Default timestep size [s]");
 
   params.AddOptionalParameter(
     "time_integration", "implicit_euler", "Time integration scheme to use");
@@ -55,8 +54,6 @@ chi::InputParameters TransientSolver::GetInputParameters()
 
   params.ConstrainParameterRange("gen_time",
                                  AllowableRangeLowLimit::New(1.0e-12));
-  params.ConstrainParameterRange(
-    "dt", AllowableRangeLowHighLimit::New(1.0e-12, 100.0));
   params.ConstrainParameterRange("initial_source",
                                  AllowableRangeLowLimit::New(0.0));
   params.ConstrainParameterRange("initial_population",
@@ -72,7 +69,6 @@ TransientSolver::TransientSolver(const chi::InputParameters& params)
     gen_time_(params.GetParamValue<double>("gen_time")),
     rho_(params.GetParamValue<double>("initial_rho")),
     source_strength_(params.GetParamValue<double>("initial_source")),
-    dt_(params.GetParamValue<double>("dt")),
     time_integration_(params.GetParamValue<std::string>("time_integration")),
     num_precursors_(lambdas_.size())
 {
@@ -196,6 +192,41 @@ void TransientSolver::Advance()
 {
   time_ += dt_;
   x_t_ = x_tp1_;
+}
+
+chi::ParameterBlock
+TransientSolver::GetInfo(const chi::ParameterBlock& params) const
+{
+  const auto param_name = params.GetParamValue<std::string>("name");
+
+  if (param_name == "neutron_population")
+    return chi::ParameterBlock("", x_t_[0]);
+  else if (param_name == "population_next")
+    return chi::ParameterBlock("", PopulationNext());
+  else if (param_name == "period")
+    return chi::ParameterBlock("", period_tph_);
+  else if (param_name == "rho")
+    return chi::ParameterBlock("", rho_);
+  else if (param_name == "solution")
+    return chi::ParameterBlock("", x_t_.elements_);
+  else if (param_name == "time_integration")
+    return chi::ParameterBlock("", time_integration_);
+  else if (param_name == "time_next")
+    return chi::ParameterBlock("", TimeNext());
+  else if (param_name == "test_arb_info")
+  {
+    chi::ParameterBlock block;
+
+    block.AddParameter("name", TextName());
+    block.AddParameter("time_integration", time_integration_);
+    block.AddParameter("rho", rho_);
+    block.AddParameter("max_timesteps", MaxTimeSteps());
+
+    return block;
+  }
+  else
+    ChiInvalidArgument("Unsupported info name \"" + param_name + "\".");
+
 }
 
 // ##################################################################

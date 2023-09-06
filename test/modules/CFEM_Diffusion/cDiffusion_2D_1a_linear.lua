@@ -58,6 +58,7 @@ chiCFEMDiffusionSetBCProperty(phys1,"boundary_type",n_bndry,"reflecting")
 chiCFEMDiffusionSetBCProperty(phys1,"boundary_type",s_bndry,"reflecting")
 chiCFEMDiffusionSetBCProperty(phys1,"boundary_type",w_bndry,"robin", 0.25, 0.5, 1.0)
 
+
 chiSolverInitialize(phys1)
 chiSolverExecute(phys1)
 
@@ -84,15 +85,14 @@ if (master_export == nil) then
 end
 
 --############################################### Volume integrations
-vol0 = chi_mesh.RPPLogicalVolume.Create({infx=true, infy=true, infz=true})
 
-ffvol = chiFFInterpolationCreate(VOLUME)
-chiFFInterpolationSetProperty(ffvol,OPERATION,OP_MAX)
-chiFFInterpolationSetProperty(ffvol,LOGICAL_VOLUME,vol0)
-chiFFInterpolationSetProperty(ffvol,ADD_FIELDFUNCTION,fflist[1])
+--############################################### PostProcessors
+chi.MaxMinAvgNodalValuePostProcessor.Create
+({
+    name = "maxval",
+    field_function = math.floor(fflist[1]),
+    operation = "max"
+})
+chi.ExecutePostProcessors({"maxval"})
 
-chiFFInterpolationInitialize(ffvol)
-chiFFInterpolationExecute(ffvol)
-maxval = chiFFInterpolationGetValue(ffvol)
 
-chiLog(LOG_0,string.format("Max-value=%.6f", maxval))

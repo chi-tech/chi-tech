@@ -55,7 +55,7 @@ class KeyValuePairCheck(Check):
             self.skip_lines_until = val
 
     def __str__(self):
-        return f'key="{self.key}", ' + \
+        return 'type="KeyValuePair", ' + f'key="{self.key}", ' + \
             f'goldvalue={self.goldvalue}, ' + \
             f'tol={self.tol}'
 
@@ -150,8 +150,8 @@ class StrCompareCheck(Check):
             self.skip_lines_until = val
 
     def __str__(self):
-        return f'key="{self.key}", ' + \
-            f'wordnum={self.wordnum} ' + \
+        return 'type="StrCompare", ' + f'key="{self.key}", ' + \
+            f'wordnum={self.wordnum}, ' + \
             f'gold={self.gold} '
 
     def PerformCheck(self, filename, errorcode, verbose: bool):
@@ -248,8 +248,8 @@ class FloatCompareCheck(Check):
             self.skip_lines_until = val
 
     def __str__(self):
-        return f'key="{self.key}", ' + \
-            f'wordnum={self.wordnum}' + \
+        return 'type="FloatCompare", ' + f'key="{self.key}", ' + \
+            f'wordnum={self.wordnum}, ' + \
             f'gold={self.gold} '
 
     def PerformCheck(self, filename, errorcode, verbose: bool):
@@ -286,7 +286,18 @@ class FloatCompareCheck(Check):
                                       "\nwords: " + words.__str__())
                         raise ValueError(f"Required word {self.wordnum} does not exist")
 
-                    value = float(words[self.wordnum])
+                    value = 0.0
+                    try:
+                        value = float(words[self.wordnum])
+                    except Exception as e:
+                        self.annotations.append("Python error")
+                        warnings.warn("    Check failed :\n" +
+                                      "    Check = " + self.__str__() + "\n" +
+                                      "    line = " + line +
+                                      "    words = " + words.__str__() + "\n" +
+                                      "    info = Failed to convert word " +
+                                      str(self.wordnum) + " to float.")
+                        return False
 
                     if abs(value - self.gold) <= self.tol:
                         file.close()
@@ -306,6 +317,7 @@ class FloatCompareCheck(Check):
             self.annotations.append("Python error")
             if verbose:
                 print(str(e))
+
 
         return False
 
@@ -343,8 +355,8 @@ class IntCompareCheck(Check):
             self.skip_lines_until = val
 
     def __str__(self):
-        return f'key="{self.key}", ' + \
-            f'wordnum={self.wordnum}' + \
+        return 'type="IntCompare", ' + f'key="{self.key}", ' + \
+            f'wordnum={self.wordnum}, ' + \
             f'gold={self.gold} '
 
     def PerformCheck(self, filename, errorcode, verbose: bool):
@@ -376,7 +388,18 @@ class IntCompareCheck(Check):
                                       "\nwords: " + words.__str__())
                         raise ValueError(f"Required word {self.wordnum} does not exist")
 
-                    value = int(words[self.wordnum])
+                    value = 0.0
+                    try:
+                        value = int(words[self.wordnum])
+                    except Exception as e:
+                        self.annotations.append("Python error")
+                        warnings.warn("    Check failed :\n" +
+                                      "    Check = " + self.__str__() + "\n" +
+                                      "    line = " + line +
+                                      "    words = " + words.__str__() + "\n" +
+                                      "    info = Failed to convert word " +
+                                      str(self.wordnum) + " to int.")
+                        return False
 
                     if value == self.gold:
                         file.close()
@@ -443,9 +466,15 @@ class GoldFileCheck(Check):
     def __init__(self, params: dict, message_prefix: str):
         super().__init__()
         self.scope_keyword: str = ""
+        self.candidate_filename: str = ""
+        self.skiplines_top: int = 0
 
         if "scope_keyword" in params:
             self.scope_keyword = params["scope_keyword"]
+        if "candidate_filename" in params:
+            self.candidate_filename = params["candidate_filename"]
+        if "skiplines_top" in params:
+            self.skiplines_top = params["skiplines_top"]
 
     def __str__(self):
         if self.scope_keyword != "":
@@ -457,9 +486,14 @@ class GoldFileCheck(Check):
     def PerformCheck(self, filename, errorcode, verbose: bool):
         try:
             outfiledir = pathlib.Path(os.path.dirname(filename) + "/")
+            if self.candidate_filename != "":
+                filename = str(outfiledir.parent.absolute()) + "/" + \
+                           self.candidate_filename
             golddir = str(outfiledir.parent.absolute()) + "/gold/"
 
             goldfilename = os.path.splitext(os.path.basename(filename))[0] + ".gold"
+            if self.candidate_filename != "":
+                goldfilename = self.candidate_filename + ".gold"
 
             if not os.path.isfile(golddir + goldfilename):
                 if verbose:
@@ -482,7 +516,8 @@ class GoldFileCheck(Check):
                           f"Maybe {self.scope_keyword}_BEGIN/_END was not found?")
                 return False
 
-            diff = list(difflib.unified_diff(lines_a, lines_b,
+            diff = list(difflib.unified_diff(lines_a[self.skiplines_top:],
+                                             lines_b[self.skiplines_top:],
                                              fromfile=filename,
                                              tofile=golddir + goldfilename,
                                              n=0  # Removes context

@@ -2,6 +2,7 @@
 
 #include "physics/SolverBase/chi_solver.h"
 #include "physics/FieldFunction/fieldfunction_gridbased.h"
+#include "physics/PhysicsEventPublisher.h"
 
 #include "ChiObjectFactory.h"
 
@@ -23,6 +24,7 @@ RegisterLuaFunctionAsIs(chiSolverAdvance);
 RegisterLuaFunctionAsIs(chiSolverSetBasicOption);
 RegisterLuaFunctionAsIs(chiSolverGetName);
 RegisterLuaFunctionAsIs(chiSolverGetFieldFunctionList);
+RegisterLuaFunctionAsIs(chiSolverGetInfo);
 
 // #############################################################################
 /**Generic lua routine for the creation of solvers.
@@ -72,7 +74,7 @@ int chiSolverInitialize(lua_State* L)
   auto& solver = Chi::GetStackItem<chi_physics::Solver>(
     Chi::object_stack, solver_handle, fname);
 
-  solver.Initialize();
+  PhysicsEventPublisher::GetInstance().SolverInitialize(solver);
 
   return 0;
 }
@@ -98,7 +100,7 @@ int chiSolverExecute(lua_State* L)
   auto& solver = Chi::GetStackItem<chi_physics::Solver>(
     Chi::object_stack, solver_handle, fname);
 
-  solver.Execute();
+  PhysicsEventPublisher::GetInstance().SolverExecute(solver);
 
   return 0;
 }
@@ -124,7 +126,7 @@ int chiSolverStep(lua_State* L)
   auto& solver = Chi::GetStackItem<chi_physics::Solver>(
     Chi::object_stack, solver_handle, fname);
 
-  solver.Step();
+  PhysicsEventPublisher::GetInstance().SolverStep(solver);
 
   return 0;
 }
@@ -150,7 +152,7 @@ int chiSolverAdvance(lua_State* L)
   auto& solver = Chi::GetStackItem<chi_physics::Solver>(
     Chi::object_stack, solver_handle, fname);
 
-  solver.Advance();
+  PhysicsEventPublisher::GetInstance().SolverAdvance(solver);
 
   return 0;
 }
@@ -288,9 +290,9 @@ int chiSolverGetFieldFunctionList(lua_State* L)
     bool found = false;
     for (auto& pff : Chi::field_function_stack) // pff pointer to field func
     {
-      //const auto& compare_ff_ptr = solver.GetFieldFunctions()[ff];
-      //const auto compare_base_ptr =
-      //  std::static_pointer_cast<chi_physics::FieldFunction>(compare_ff_ptr);
+      // const auto& compare_ff_ptr = solver.GetFieldFunctions()[ff];
+      // const auto compare_base_ptr =
+      //   std::static_pointer_cast<chi_physics::FieldFunction>(compare_ff_ptr);
       ++pff_count;
       if (pff == solver.GetFieldFunctions()[ff])
       {
@@ -312,5 +314,45 @@ int chiSolverGetFieldFunctionList(lua_State* L)
 
   return 2;
 }
-//}//namespace temp
+
+// #############################################################################
+/** Returns the text name of the solver.
+
+\param solver_handle int Handle to the solver.
+\param info varying A single string or a table of values to call the solver
+with.
+
+\ingroup LuaSolver
+\author Jan*/
+int chiSolverGetInfo(lua_State* L)
+{
+  const std::string fname = "chiSolverGetInfo";
+  const int num_args = lua_gettop(L);
+
+  if (num_args != 2) LuaPostArgAmountError(fname, 2, num_args);
+  LuaCheckNilValue(fname, L, 1);
+  LuaCheckIntegerValue(fname, L, 1);
+
+  const size_t solver_handle = lua_tointeger(L, 1);
+
+  const auto& solver = Chi::GetStackItem<chi_physics::Solver>(
+    Chi::object_stack, solver_handle, fname);
+
+  chi::ParameterBlock params;
+  if (lua_isstring(L, 2))
+    params.AddParameter("name", std::string(lua_tostring(L, 2)));
+  else if (lua_istable(L, 2))
+    params = chi_lua::TableParserAsParameterBlock::ParseTable(L, 2);
+  else
+    ChiInvalidArgument("Argument 2 can only take a string or a table");
+
+  const auto output_params = solver.GetInfo(params);
+
+  chi_lua::PushParameterBlock(L, output_params);
+
+  const int num_sub_params = static_cast<int>(output_params.NumParameters());
+
+  return output_params.IsScalar() ? 1 : num_sub_params;
+}
+
 } // namespace chi_physics::lua_utils

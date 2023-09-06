@@ -11,9 +11,7 @@ namespace chi_mesh::lua_utils
 
 int chiMeshGeneratorExecute(lua_State* L);
 
-RegisterLuaFunctionMethod(chiMeshGeneratorExecute,
-                          chi_mesh::MeshGenerator,
-                          Execute);
+RegisterLuaFunction(chiMeshGeneratorExecute, chi_mesh::MeshGenerator, Execute);
 
 int chiMeshGeneratorExecute(lua_State* L)
 {

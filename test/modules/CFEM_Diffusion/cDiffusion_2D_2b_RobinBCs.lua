@@ -75,15 +75,12 @@ if (master_export == nil) then
 end
 
 --############################################### Volume integrations
-vol0 = chi_mesh.RPPLogicalVolume.Create({infx=true, infy=true, infz=true})
 
-ffvol = chiFFInterpolationCreate(VOLUME)
-chiFFInterpolationSetProperty(ffvol,OPERATION,OP_AVG)
-chiFFInterpolationSetProperty(ffvol,LOGICAL_VOLUME,vol0)
-chiFFInterpolationSetProperty(ffvol,ADD_FIELDFUNCTION,fflist[1])
-
-chiFFInterpolationInitialize(ffvol)
-chiFFInterpolationExecute(ffvol)
-maxval = chiFFInterpolationGetValue(ffvol)
-
-chiLog(LOG_0,string.format("Avg-value=%.6f", maxval))
+--############################################### PostProcessors
+chi.CellVolumeIntegralPostProcessor.Create
+({
+    name = "avgval",
+    field_function = math.floor(fflist[1]),
+    compute_volume_average = true
+})
+chi.ExecutePostProcessors({"avgval"})

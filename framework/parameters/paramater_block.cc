@@ -55,15 +55,18 @@ ParameterBlock::ParameterBlock(const ParameterBlock& other)
 /**Copy assignment operator*/
 ParameterBlock& ParameterBlock::operator=(const ParameterBlock& other)
 {
-  type_ = other.type_;
-  name_ = other.name_;
+  if (this != &other)
+  {
+    type_ = other.type_;
+    name_ = other.name_;
 
-  using namespace chi_data_types;
-  if (other.value_ptr_)
-    value_ptr_ = std::make_unique<Varying>(*other.value_ptr_);
+    using namespace chi_data_types;
+    if (other.value_ptr_)
+      value_ptr_ = std::make_unique<Varying>(*other.value_ptr_);
 
-  parameters_ = other.parameters_;
-  error_origin_scope_ = other.error_origin_scope_;
+    parameters_ = other.parameters_;
+    error_origin_scope_ = other.error_origin_scope_;
+  }
 
   return *this;
 }
@@ -79,8 +82,29 @@ ParameterBlock::ParameterBlock(ParameterBlock&& other) noexcept
   std::swap(error_origin_scope_, other.error_origin_scope_);
 }
 
+// #################################################################
+/**Move assigment operator.*/
+ParameterBlock& ParameterBlock::operator=(ParameterBlock&& other) noexcept
+{
+  if (this != &other)
+  {
+    std::swap(type_, other.type_);
+    std::swap(name_, other.name_);
+    std::swap(value_ptr_, other.value_ptr_);
+    std::swap(parameters_, other.parameters_);
+    std::swap(error_origin_scope_, other.error_origin_scope_);
+  }
+
+  return *this;
+}
+
 // Accessors
 ParameterBlockType ParameterBlock::Type() const { return type_; }
+bool ParameterBlock::IsScalar() const
+{
+  return (type_ >= ParameterBlockType::BOOLEAN and
+          type_ <= ParameterBlockType::INTEGER);
+}
 std::string ParameterBlock::TypeName() const
 {
   return ParameterBlockTypeName(type_);
@@ -124,6 +148,12 @@ const std::vector<ParameterBlock>& ParameterBlock::Parameters() const
 {
   return parameters_;
 }
+
+// ################################################################
+/**Returns whether or not the block has a value. If this block has
+ * sub-parameters it should not have a value. This is a good way to
+ * check if the block is actually a single value.*/
+bool ParameterBlock::HasValue() const { return value_ptr_ != nullptr; }
 
 // Mutators
 // #################################################################

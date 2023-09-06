@@ -5,9 +5,10 @@
     "num_procs": 1,
     "checks": [
       {
-        "type": "KeyValuePair",
-        "key": "[0]  Max-value=",
-        "goldvalue": 2.666667,
+        "type": "FloatCompare",
+        "key": "maxval(latest)",
+        "wordnum" : 4,
+        "gold": 2.666667,
         "tol": 1e-10
       }
     ]
@@ -18,9 +19,10 @@
     "num_procs": 1,
     "checks": [
       {
-        "type": "KeyValuePair",
-        "key": "[0]  Avg-value=",
-        "goldvalue": 0.295902,
+        "type": "FloatCompare",
+        "key": "avgval(latest)",
+        "wordnum" : 4,
+        "gold": 0.295902,
         "tol": 1e-10
       }
     ]
@@ -31,9 +33,10 @@
     "num_procs": 1,
     "checks": [
       {
-        "type": "KeyValuePair",
-        "key": "[0]  Avg-value=",
-        "goldvalue": 0.241751,
+        "type": "FloatCompare",
+        "key": "avgval(latest)",
+        "wordnum" : 4,
+        "gold": 0.241751,
         "tol": 1e-10
       }
     ]
@@ -44,9 +47,10 @@
     "num_procs": 1,
     "checks": [
       {
-        "type": "KeyValuePair",
-        "key": "[0]  Max-value=",
-        "goldvalue": 0.021921,
+        "type": "FloatCompare",
+        "key": "maxval(latest)",
+        "wordnum" : 4,
+        "gold": 0.021921,
         "tol": 1e-10
       }
     ]
@@ -57,9 +61,10 @@
     "num_procs": 1,
     "checks": [
       {
-        "type": "KeyValuePair",
-        "key": "[0]  Max-value=",
-        "goldvalue": 1.000244,
+        "type": "FloatCompare",
+        "key": "maxval(latest)",
+        "wordnum" : 4,
+        "gold": 1.000244,
         "tol": 1e-10
       }
     ]
