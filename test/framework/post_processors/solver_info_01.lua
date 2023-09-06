@@ -22,9 +22,7 @@ chiSolverInitialize(phys0)
 for t=1,20 do
   chiSolverStep(phys0)
   time = chiSolverGetInfo(phys0, "time_next")
-  print(t, time,
-    chiSolverGetInfo(phys0, "population_next"),
-    chiSolverGetInfo(phys0, "period"))
+  print(t, string.format("%.3f %.5f",time, chiSolverGetInfo(phys0, "population_next")))
 
   chiSolverAdvance(phys0)
   if (time > 0.1) then
