@@ -13,7 +13,10 @@ class TestConfiguration:
     """Data structure to hold all the necessary info to define a test and
        it's checks"""
 
-    def __init__(self, file_dir: str, filename: str, num_procs: int,
+    def __init__(self, file_dir: str,
+                 filename: str,
+                 outfileprefix: str,
+                 num_procs: int,
                  checks_params: list,
                  message_prefix: str,
                  dependency: str,
@@ -22,6 +25,7 @@ class TestConfiguration:
         """Constructor. Load checks into the data structure"""
         self.file_dir = file_dir
         self.filename = filename
+        self.outfileprefix = outfileprefix
         self.num_procs = num_procs
         self.weight_class = weight_class  # default "short"
         self.checks = []
@@ -97,6 +101,12 @@ class TestConfiguration:
     def GetTestPath(self):
         """Shorthand utility get a relative path to a test"""
         return os.path.relpath(self.file_dir + self.filename)
+
+    def GetOutFilenamePrefix(self) -> str:
+        if self.outfileprefix == "":
+            return self.filename
+        else:
+            return self.outfileprefix
 
     def __str__(self):
         """Converts the class to a readable format"""
@@ -191,10 +201,18 @@ def ParseTestConfiguration(file_path: str):
                 warnings.warn(message_prefix + '"weight_class" field must be a str')
                 continue
 
+        outfileprefix = ""
+        if "outfileprefix" in test_block:
+            if isinstance(test_block["outfileprefix"], str):
+                outfileprefix = test_block["outfileprefix"]
+            else:
+                warnings.warn(message_prefix + '"outfileprefix" field must be a str')
+                continue
+
         try:
-            new_test = TestConfiguration(file_dir=os.path.dirname(file_path) +
-                                                  "/",
+            new_test = TestConfiguration(file_dir=os.path.dirname(file_path) + "/",
                                          filename=test_block["file"],
+                                         outfileprefix=outfileprefix,
                                          num_procs=test_block["num_procs"],
                                          checks_params=test_block["checks"],
                                          message_prefix=message_prefix,
@@ -383,8 +401,6 @@ def RunTests(tests: list, argv):
     print("Elapsed time            : {:.2f} seconds".format(elapsed_time))
     print(f"Number of tests run     : {len(test_slots)}")
     print(f"Number of failed tests  : {num_tests_failed}")
-
-
 
     if num_tests_failed > 0:
         return 1

@@ -3,6 +3,8 @@ name: Development Branch Regression Tests
 on:
   schedule:
     - cron: "0 0 * * *"
+  push:
+    branches: [ development ]
   workflow_dispatch:
     
 jobs:

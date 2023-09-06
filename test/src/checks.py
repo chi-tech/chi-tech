@@ -32,6 +32,7 @@ class KeyValuePairCheck(Check):
         self.key: str = ""
         self.goldvalue: float = 0.0
         self.tol: float = 1.0
+        self.skip_lines_until: str = ""
 
         if "key" not in params:
             warnings.warn(message_prefix + 'Missing "key" field')
@@ -47,6 +48,12 @@ class KeyValuePairCheck(Check):
         self.goldvalue = params["goldvalue"]
         self.tol = params["tol"]
 
+        if "skip_lines_until" in params:
+            val = params["skip_lines_until"]
+            if not isinstance(val, str):
+                raise ValueError("Expected 'skip_lines_until' value to be str")
+            self.skip_lines_until = val
+
     def __str__(self):
         return f'key="{self.key}", ' + \
             f'goldvalue={self.goldvalue}, ' + \
@@ -56,8 +63,20 @@ class KeyValuePairCheck(Check):
         try:
             file = open(filename, "r")
 
+            skip_lines = False
+            perform_skip_check = bool(self.skip_lines_until != "")
+            if perform_skip_check:
+                skip_lines = True
+
             lines = file.readlines()
             for line in lines:
+                if perform_skip_check:
+                    if line.find(self.skip_lines_until) >= 0:
+                        skip_lines = False
+                        perform_skip_check = False
+                if skip_lines:
+                    continue
+
                 key_pos = line.find(self.key)
                 if key_pos >= 0:
                     postkey = line[(key_pos + len(self.key)):].strip()
@@ -108,6 +127,7 @@ class StrCompareCheck(Check):
         self.key: str = ""
         self.wordnum: int = -1
         self.gold: str = ""
+        self.skip_lines_until: str = ""
 
         if "key" not in params:
             warnings.warn(message_prefix + 'Missing "key" field')
@@ -123,6 +143,12 @@ class StrCompareCheck(Check):
             self.wordnum = params["wordnum"]
             self.gold = params["gold"]
 
+        if "skip_lines_until" in params:
+            val = params["skip_lines_until"]
+            if not isinstance(val, str):
+                raise ValueError("Expected 'skip_lines_until' value to be str")
+            self.skip_lines_until = val
+
     def __str__(self):
         return f'key="{self.key}", ' + \
             f'wordnum={self.wordnum} ' + \
@@ -132,8 +158,20 @@ class StrCompareCheck(Check):
         try:
             file = open(filename, "r")
 
+            skip_lines = False
+            perform_skip_check = bool(self.skip_lines_until != "")
+            if perform_skip_check:
+                skip_lines = True
+
             lines = file.readlines()
             for line in lines:
+                if perform_skip_check:
+                    if line.find(self.skip_lines_until) >= 0:
+                        skip_lines = False
+                        perform_skip_check = False
+                if skip_lines:
+                    continue
+
                 key_pos = line.find(self.key)
                 if key_pos >= 0:
                     if self.wordnum < 0:
@@ -183,6 +221,7 @@ class FloatCompareCheck(Check):
         self.wordnum: int = 0
         self.gold: float = 0.0
         self.tol: float = 1.0e-6
+        self.skip_lines_until: str = ""
 
         if "key" not in params:
             warnings.warn(message_prefix + 'Missing "key" field')
@@ -202,6 +241,12 @@ class FloatCompareCheck(Check):
         self.gold = params["gold"]
         self.tol = params["tol"]
 
+        if "skip_lines_until" in params:
+            val = params["skip_lines_until"]
+            if not isinstance(val, str):
+                raise ValueError("Expected 'skip_lines_until' value to be str")
+            self.skip_lines_until = val
+
     def __str__(self):
         return f'key="{self.key}", ' + \
             f'wordnum={self.wordnum}' + \
@@ -211,8 +256,25 @@ class FloatCompareCheck(Check):
         try:
             file = open(filename, "r")
 
+            skip_lines = False
+            perform_skip_check = bool(self.skip_lines_until != "")
+            if perform_skip_check:
+                skip_lines = True
+
+            skip_lines = False
+            perform_skip_check = bool(self.skip_lines_until != "")
+            if perform_skip_check:
+                skip_lines = True
+
             lines = file.readlines()
             for line in lines:
+                if perform_skip_check:
+                    if line.find(self.skip_lines_until) >= 0:
+                        skip_lines = False
+                        perform_skip_check = False
+                if skip_lines:
+                    continue
+
                 key_pos = line.find(self.key)
                 if key_pos >= 0:
                     words = re.split(r'\s+|,+|=+', line.rstrip())
@@ -258,6 +320,7 @@ class IntCompareCheck(Check):
         self.key: str = ""
         self.wordnum: int = 0
         self.gold: int = 0
+        self.skip_lines_until: str = ""
 
         if "key" not in params:
             warnings.warn(message_prefix + 'Missing "key" field')
@@ -273,6 +336,12 @@ class IntCompareCheck(Check):
         self.wordnum = params["wordnum"]
         self.gold = params["gold"]
 
+        if "skip_lines_until" in params:
+            val = params["skip_lines_until"]
+            if not isinstance(val, str):
+                raise ValueError("Expected 'skip_lines_until' value to be str")
+            self.skip_lines_until = val
+
     def __str__(self):
         return f'key="{self.key}", ' + \
             f'wordnum={self.wordnum}' + \
@@ -282,8 +351,20 @@ class IntCompareCheck(Check):
         try:
             file = open(filename, "r")
 
+            skip_lines = False
+            perform_skip_check = bool(self.skip_lines_until != "")
+            if perform_skip_check:
+                skip_lines = True
+
             lines = file.readlines()
             for line in lines:
+                if perform_skip_check:
+                    if line.find(self.skip_lines_until) >= 0:
+                        skip_lines = False
+                        perform_skip_check = False
+                if skip_lines:
+                    continue
+
                 key_pos = line.find(self.key)
                 if key_pos >= 0:
                     words = re.split(r'\s+|,+|=+', line.rstrip())

@@ -6,6 +6,7 @@ import time
 class TestSlot:
     """Data structure to hold information regarding the parallel execution
        of a test"""
+
     def __init__(self, test, argv):
         self.process = None
         self.test = test
@@ -14,6 +15,7 @@ class TestSlot:
 
         self.time_start = time.perf_counter()
         self.time_end = self.time_start
+        self.command: str = ""
 
         self._Run()
 
@@ -30,7 +32,12 @@ class TestSlot:
         cmd += "--supress_beg_end_timelog "
         cmd += "master_export=false "
         for arg in test.args:
-            cmd += arg + " "
+            if arg.find("\"") >= 0:
+                cmd += "'" + arg + "' "
+            else:
+                cmd += arg + " "
+        self.command = cmd
+
         # cmd += f"> out/{test.filename}.out "
         # cmd += "2>&1 "
         self.process = subprocess.Popen(cmd,
@@ -56,7 +63,8 @@ class TestSlot:
 
             self.time_end = time.perf_counter()
 
-            file = open(test.file_dir + f"out/{test.filename}.out", "w")
+            file = open(test.file_dir + f"out/{test.GetOutFilenamePrefix()}.out", "w")
+            file.write(self.command + "\n")
             file.write(out + "\n")
             file.write(err + "\n")
             file.close()
@@ -75,7 +83,7 @@ class TestSlot:
         """Applies to check-suite for the test"""
         test = self.test
         passed = True
-        output_filename = f"{test.file_dir}out/{test.filename}.out"
+        output_filename = f"{test.file_dir}out/{test.GetOutFilenamePrefix()}.out"
 
         error_code = self.process.returncode
         for check in self.test.checks:
