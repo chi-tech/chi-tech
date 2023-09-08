@@ -46,7 +46,7 @@ public:
   const std::vector<std::shared_ptr<FieldFunctionGridBased>>&
   GetFieldFunctions() const;
 
-  virtual double DeltaT() const;
+  virtual double TimeStepSize() const;
   virtual double Time() const;
   virtual double EndTime() const;
   virtual int MaxTimeSteps() const;

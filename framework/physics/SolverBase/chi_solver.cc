@@ -78,7 +78,7 @@ Solver::GetFieldFunctions()
   return field_functions_;
 }
 
-double Solver::DeltaT() const { return dt_; }
+double Solver::TimeStepSize() const { return dt_; }
 double Solver::Time() const { return time_; }
 double Solver::EndTime() const { return end_time_; }
 

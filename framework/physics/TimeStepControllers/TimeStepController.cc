@@ -18,14 +18,4 @@ TimeStepController::TimeStepController(const chi::InputParameters& params)
 {
 }
 
-double TimeStepController::GetDeltaT()
-{
-  return current_timestep_size_;
-}
-
-void TimeStepController::ManuallySetDeltaT(double dt)
-{
-  current_timestep_size_ = dt;
-}
-
 } // namespace chi_physics
