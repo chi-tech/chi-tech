@@ -33,14 +33,14 @@ chi::InputParameters Solver::GetInputParameters()
     "timestep_controller", 0, "Timestep controller to use for timestepping.");
 
   using namespace chi_data_types;
-  params.ConstrainParameterRange(
-    "dt", AllowableRangeLowHighLimit::New(1.0e-12, 100.0));
+  params.ConstrainParameterRange("dt", AllowableRangeLowLimit::New(1.0e-12));
 
   return params;
 }
 
 Solver::Solver(const chi::InputParameters& params)
-  : ChiObject(params), text_name_(params.GetParamValue<std::string>("name")),
+  : ChiObject(params),
+    text_name_(params.GetParamValue<std::string>("name")),
     dt_(params.GetParamValue<double>("dt")),
     time_(params.GetParamValue<double>("time")),
     end_time_(params.GetParamValue<double>("end_time")),

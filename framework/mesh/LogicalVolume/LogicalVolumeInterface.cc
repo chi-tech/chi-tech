@@ -30,9 +30,7 @@ LogicalVolumeInterface::LogicalVolumeInterface(
 
 const LogicalVolume* LogicalVolumeInterface::GetLogicalVolume() const
 {
-  if (not logical_volume_) return &(*logical_volume_);
-
-  return nullptr;
+  return logical_volume_ ? &(*logical_volume_) : nullptr;
 }
 
 } // namespace chi_mesh

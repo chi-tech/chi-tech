@@ -74,10 +74,10 @@ protected:
 
   double dt_ = 0.01;
   double time_ = 0.0;
+  size_t t_index_ = 0;
+
   double end_time_ = 1.0;
   int max_time_steps_ = -1;
-
-  size_t t_index_ = 0;
 };
 
 #endif

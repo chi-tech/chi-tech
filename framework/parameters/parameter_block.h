@@ -12,7 +12,7 @@ namespace chi
 
 enum class ParameterBlockType
 {
-  INVALID_VAL = 0,
+  INVALID_VALUE = 0,
   BOOLEAN = 1,
   FLOAT = 3,
   STRING = 4,
@@ -119,7 +119,8 @@ public:
 
   // Accessors
   ParameterBlockType Type() const;
-  /**Returns true if the parameter block comprises a single value.*/
+  /**Returns true if the parameter block comprises a single value of any of
+  * the types BOOLEAN, FLOAT, STRING, INTEGER.*/
   bool IsScalar() const;
   /**Returns a string version of the type.*/
   std::string TypeName() const;

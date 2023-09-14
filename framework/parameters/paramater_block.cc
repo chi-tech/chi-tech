@@ -100,6 +100,8 @@ ParameterBlock& ParameterBlock::operator=(ParameterBlock&& other) noexcept
 
 // Accessors
 ParameterBlockType ParameterBlock::Type() const { return type_; }
+/**Returns true if the parameter block comprises a single value of any of
+  * the types BOOLEAN, FLOAT, STRING, INTEGER.*/
 bool ParameterBlock::IsScalar() const
 {
   return (type_ >= ParameterBlockType::BOOLEAN and
@@ -152,7 +154,8 @@ const std::vector<ParameterBlock>& ParameterBlock::Parameters() const
 // ################################################################
 /**Returns whether or not the block has a value. If this block has
  * sub-parameters it should not have a value. This is a good way to
- * check if the block is actually a single value.*/
+ * check if the block is actually a single value because some
+ * Parameter blocks can be passed as empty.*/
 bool ParameterBlock::HasValue() const { return value_ptr_ != nullptr; }
 
 // Mutators

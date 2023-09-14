@@ -26,10 +26,7 @@ GridBasedFieldFunctionInterface::GetGridBasedFieldFunction() const
   const auto* grid_based_ff_ptr =
     dynamic_cast<const FieldFunctionGridBased*>(ff_ptr);
 
-  if (not grid_based_ff_ptr)
-    return nullptr;
-
-  return grid_based_ff_ptr;
+  return grid_based_ff_ptr ? grid_based_ff_ptr : nullptr;
 }
 
 } // namespace chi_physics

@@ -290,9 +290,6 @@ int chiSolverGetFieldFunctionList(lua_State* L)
     bool found = false;
     for (auto& pff : Chi::field_function_stack) // pff pointer to field func
     {
-      // const auto& compare_ff_ptr = solver.GetFieldFunctions()[ff];
-      // const auto compare_base_ptr =
-      //   std::static_pointer_cast<chi_physics::FieldFunction>(compare_ff_ptr);
       ++pff_count;
       if (pff == solver.GetFieldFunctions()[ff])
       {
@@ -316,7 +313,7 @@ int chiSolverGetFieldFunctionList(lua_State* L)
 }
 
 // #############################################################################
-/** Returns the text name of the solver.
+/** Returns arbitrary info specific for each solver.
 
 \param solver_handle int Handle to the solver.
 \param info varying A single string or a table of values to call the solver
