@@ -1,4 +1,4 @@
-#include "MaxMinAvgNodalValuePostProcessor.h"
+#include "AggregateNodalValuePostProcessor.h"
 
 #include "ChiObjectFactory.h"
 
@@ -10,9 +10,9 @@
 namespace chi
 {
 
-RegisterChiObject(chi, MaxMinAvgNodalValuePostProcessor);
+RegisterChiObject(chi, AggregateNodalValuePostProcessor);
 
-InputParameters MaxMinAvgNodalValuePostProcessor::GetInputParameters()
+InputParameters AggregateNodalValuePostProcessor::GetInputParameters()
 {
   InputParameters params = PostProcessor::GetInputParameters();
   params += chi_physics::GridBasedFieldFunctionInterface::GetInputParameters();
@@ -33,7 +33,7 @@ InputParameters MaxMinAvgNodalValuePostProcessor::GetInputParameters()
   return params;
 }
 
-MaxMinAvgNodalValuePostProcessor::MaxMinAvgNodalValuePostProcessor(
+AggregateNodalValuePostProcessor::AggregateNodalValuePostProcessor(
   const InputParameters& params)
   : PostProcessor(params, PPType::SCALAR),
     chi_physics::GridBasedFieldFunctionInterface(params),
@@ -43,7 +43,7 @@ MaxMinAvgNodalValuePostProcessor::MaxMinAvgNodalValuePostProcessor(
 }
 
 // ##################################################################
-void MaxMinAvgNodalValuePostProcessor::Initialize()
+void AggregateNodalValuePostProcessor::Initialize()
 {
   const auto* grid_field_function = GetGridBasedFieldFunction();
 
@@ -71,7 +71,7 @@ void MaxMinAvgNodalValuePostProcessor::Initialize()
 }
 
 // ##################################################################
-void MaxMinAvgNodalValuePostProcessor::Execute(const Event& event_context)
+void AggregateNodalValuePostProcessor::Execute(const Event& event_context)
 {
   if (not initialized_) Initialize();
 

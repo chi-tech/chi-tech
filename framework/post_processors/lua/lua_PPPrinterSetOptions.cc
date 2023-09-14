@@ -1,6 +1,7 @@
 #include "post_processors/PostProcessorPrinter.h"
 
 #include "parameters/input_parameters.h"
+#include "utils/chi_utils.h"
 
 #include "console/chi_console.h"
 #include "ChiObjectFactory.h"
@@ -116,60 +117,54 @@ ParameterBlock PostProcessorPrinterSetOptions(const InputParameters& params)
   for (const auto& param : set_params)
   {
     const std::string param_name = param.Name();
-    if (param_name == "scalar_pp_table_format")
+    
+    uint32_t param_name_hash = chi::hash_djb2a(param_name);
+    // clang-format off
+    switch (param_name_hash)
     {
-      const auto option = param.GetValue<std::string>();
-      if (option == "vertical")
-        printer.SetScalarPPTableFormat(ScalarPPTableFormat::VERTICAL);
-      else if (option == "horizontal")
-        printer.SetScalarPPTableFormat(ScalarPPTableFormat::HORIZONTAL);
-      else
-        ChiInvalidArgument(
-          "Unsupported format \"" + option +
-          "\" specified for option \"scalar_pp_table_format\"");
+      case "scalar_pp_table_format"_hash:
+      {
+        const auto option = param.GetValue<std::string>();
+        if (option == "vertical")
+          printer.SetScalarPPTableFormat(ScalarPPTableFormat::VERTICAL);
+        else if (option == "horizontal")
+          printer.SetScalarPPTableFormat(ScalarPPTableFormat::HORIZONTAL);
+        else
+          ChiInvalidArgument(
+            "Unsupported format \"" + option +
+            "\" specified for option \"scalar_pp_table_format\"");
 
-      Chi::log.Log() << "PostProcessorPrinter scalar_pp_table_format set to "
-                     << option;
-    }
-    else if (param_name == "events_on_which_to_print_postprocs")
-    {
-      const auto list = param.GetVectorValue<std::string>();
+        Chi::log.Log() << "PostProcessorPrinter scalar_pp_table_format set to "
+                       << option;
+        break;
+      }
+      case "events_on_which_to_print_postprocs"_hash:
+      {
+        const auto list = param.GetVectorValue<std::string>();
 
-      printer.SetEventsOnWhichPrintPPs(list);
+        printer.SetEventsOnWhichPrintPPs(list);
 
-      Chi::log.Log()
-        << "PostProcessorPrinter events_on_which_to_print_postprocs set";
-    }
-    else if (param_name == "print_scalar_time_history")
-    {
-      printer.SetPrintScalarTimeHistory(param.GetValue<bool>());
-    }
-    else if (param_name == "print_vector_time_history")
-    {
-      printer.SetPrintVectorTimeHistory(param.GetValue<bool>());
-    }
-    else if (param_name == "per_column_size_scalars")
-    {
-      printer.SetScalarPerColumnSize(param.GetValue<bool>());
-    }
-    else if (param_name == "per_column_size_vectors")
-    {
-      printer.SetVectorPerColumnSize(param.GetValue<bool>());
-    }
-    else if (param_name == "table_column_limit")
-    {
-      printer.SetTableColumnLimit(param.GetValue<size_t>());
-    }
-    else if (param_name == "time_history_limit")
-    {
-      printer.SetTimeHistoryLimit(param.GetValue<size_t>());
-    }
-    else if (param_name == "csv_filename")
-    {
-      printer.SetCSVFilename(param.GetValue<std::string>());
-    }
-    else
-      ChiInvalidArgument("Invalid option \"" + param.Name() + "\"");
+        Chi::log.Log()
+          << "PostProcessorPrinter events_on_which_to_print_postprocs set";
+        break;
+      }
+      case "print_scalar_time_history"_hash:
+        { printer.SetPrintScalarTimeHistory(param.GetValue<bool>()); break; }
+      case "print_vector_time_history"_hash:
+        { printer.SetPrintVectorTimeHistory(param.GetValue<bool>()); break;}
+      case "per_column_size_scalars"_hash:
+        { printer.SetScalarPerColumnSize(param.GetValue<bool>()); break;}
+      case "per_column_size_vectors"_hash:
+        { printer.SetVectorPerColumnSize(param.GetValue<bool>()); break;}
+      case "table_column_limit"_hash:
+        { printer.SetTableColumnLimit(param.GetValue<size_t>()); break;}
+      case "time_history_limit"_hash:
+        { printer.SetTimeHistoryLimit(param.GetValue<size_t>()); break;}
+      case "csv_filename"_hash:
+        { printer.SetCSVFilename(param.GetValue<std::string>()); break;}
+      default: ChiInvalidArgument("Invalid option \"" + param.Name() + "\"");
+    }// switch
+    // clang-format on
   }
   return ParameterBlock{};
 }

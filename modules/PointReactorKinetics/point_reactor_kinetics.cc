@@ -202,7 +202,7 @@ TransientSolver::GetInfo(const chi::ParameterBlock& params) const
   if (param_name == "neutron_population")
     return chi::ParameterBlock("", x_t_[0]);
   else if (param_name == "population_next")
-    return chi::ParameterBlock("", PopulationNext());
+    return chi::ParameterBlock("", PopulationNew());
   else if (param_name == "period")
     return chi::ParameterBlock("", period_tph_);
   else if (param_name == "rho")
@@ -212,7 +212,7 @@ TransientSolver::GetInfo(const chi::ParameterBlock& params) const
   else if (param_name == "time_integration")
     return chi::ParameterBlock("", time_integration_);
   else if (param_name == "time_next")
-    return chi::ParameterBlock("", TimeNext());
+    return chi::ParameterBlock("", TimeNew());
   else if (param_name == "test_arb_info")
   {
     chi::ParameterBlock block;
@@ -233,7 +233,7 @@ TransientSolver::GetInfo(const chi::ParameterBlock& params) const
 /**Returns the population at the previous time step.*/
 double TransientSolver::PopulationPrev() const { return x_t_[0]; }
 /**Returns the population at the next time step.*/
-double TransientSolver::PopulationNext() const { return x_tp1_[0]; }
+double TransientSolver::PopulationNew() const { return x_tp1_[0]; }
 
 /**Returns the period computed for the last time step.*/
 double TransientSolver::Period() const { return period_tph_; }
@@ -242,7 +242,7 @@ double TransientSolver::Period() const { return period_tph_; }
 double TransientSolver::TimePrev() const { return time_; }
 
 /**Returns the time computed for the next time step.*/
-double TransientSolver::TimeNext() const { return time_ + dt_; }
+double TransientSolver::TimeNew() const { return time_ + dt_; }
 
 /**Returns the solution at the previous time step.*/
 std::vector<double> TransientSolver::SolutionPrev() const
@@ -250,7 +250,7 @@ std::vector<double> TransientSolver::SolutionPrev() const
   return x_t_.elements_;
 }
 /**Returns the solution at the next time step.*/
-std::vector<double> TransientSolver::SolutionNext() const
+std::vector<double> TransientSolver::SolutionNew() const
 {
   return x_tp1_.elements_;
 }

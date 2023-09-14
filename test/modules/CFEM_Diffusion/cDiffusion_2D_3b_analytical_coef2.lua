@@ -76,7 +76,7 @@ end
 --############################################### Volume integrations
 
 --############################################### PostProcessors
-chi.MaxMinAvgNodalValuePostProcessor.Create
+chi.AggregateNodalValuePostProcessor.Create
 ({
     name = "maxval",
     field_function = math.floor(fflist[1]),

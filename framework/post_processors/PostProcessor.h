@@ -1,5 +1,5 @@
-#ifndef PIPER_POSTPROCESSOR_H
-#define PIPER_POSTPROCESSOR_H
+#ifndef CHITECH_POSTPROCESSOR_H
+#define CHITECH_POSTPROCESSOR_H
 
 #include "ChiObject.h"
 #include "event_system/EventSubscriber.h"
@@ -100,4 +100,4 @@ private:
 
 } // namespace chi
 
-#endif // PIPER_POSTPROCESSOR_H
+#endif // CHITECH_POSTPROCESSOR_H

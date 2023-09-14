@@ -37,13 +37,13 @@ int chiPRKGetParam(lua_State* L)
   if (param_name == "population_prev")
     lua_pushnumber(L, solver.PopulationPrev());
   else if (param_name == "population_next")
-    lua_pushnumber(L, solver.PopulationNext());
+    lua_pushnumber(L, solver.PopulationNew());
   else if (param_name == "period")
     lua_pushnumber(L, solver.Period());
   else if (param_name == "time_prev")
     lua_pushnumber(L, solver.TimePrev());
   else if (param_name == "time_next")
-    lua_pushnumber(L, solver.TimeNext());
+    lua_pushnumber(L, solver.TimeNew());
   else
     throw std::invalid_argument(fname + ": Invalid parameter \"" + param_name +
                                 "\".");
@@ -183,13 +183,13 @@ chi::ParameterBlock GetParam(const chi::InputParameters& params)
   if (param_name == "population_prev")
     outputs.AddParameter("", solver.PopulationPrev());
   else if (param_name == "population_next")
-    outputs.AddParameter("", solver.PopulationNext());
+    outputs.AddParameter("", solver.PopulationNew());
   else if (param_name == "period")
     outputs.AddParameter("", solver.Period());
   else if (param_name == "time_prev")
     outputs.AddParameter("", solver.TimePrev());
   else if (param_name == "time_next")
-    outputs.AddParameter("", solver.TimeNext());
+    outputs.AddParameter("", solver.TimeNew());
   else
     ChiInvalidArgument("Invalid property name \"" + param_name);
 

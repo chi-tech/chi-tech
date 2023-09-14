@@ -10,8 +10,8 @@ namespace chi_physics
 class TimeStepController : public ChiObject
 {
 public:
-  virtual double GetTimeStepSize() { return current_timestep_size_; }
-  void SetTimeStepSize(double dt) { current_timestep_size_ = dt; }
+  virtual double GetTimeStepSize();
+  void SetTimeStepSize(double dt);
 
 protected:
   static chi::InputParameters GetInputParameters();

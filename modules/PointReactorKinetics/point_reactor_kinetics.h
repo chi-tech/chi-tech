@@ -40,13 +40,12 @@ public:
 
   // Getters and Setters
   double PopulationPrev() const;
-  double PopulationNext() const;
+  double PopulationNew() const;
   double Period() const;
   double TimePrev() const;
-  double TimeNext() const;
+  double TimeNew() const;
   std::vector<double> SolutionPrev() const;
-  std::vector<double> SolutionNext() const;
-
+  std::vector<double> SolutionNew() const;
 
   void SetRho(double value);
 };

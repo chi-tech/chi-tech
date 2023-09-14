@@ -1,5 +1,5 @@
-#ifndef CHITECH_MAXMINAVGNODALVALUEPOSTPROCESSOR_H
-#define CHITECH_MAXMINAVGNODALVALUEPOSTPROCESSOR_H
+#ifndef CHITECH_AGGREGATENODALVALUEPOSTPROCESSOR_H
+#define CHITECH_AGGREGATENODALVALUEPOSTPROCESSOR_H
 
 #include "PostProcessor.h"
 #include "physics/FieldFunction/GridBasedFieldFunctionInterface.h"
@@ -17,14 +17,14 @@ class FieldFunctionGridBased;
 namespace chi
 {
 
-class MaxMinAvgNodalValuePostProcessor
+class AggregateNodalValuePostProcessor
   : public PostProcessor,
     public chi_physics::GridBasedFieldFunctionInterface,
     public chi_mesh::LogicalVolumeInterface
 {
 public:
   static InputParameters GetInputParameters();
-  explicit MaxMinAvgNodalValuePostProcessor(const InputParameters& params);
+  explicit AggregateNodalValuePostProcessor(const InputParameters& params);
 
   void Execute(const Event& event_context) override;
 
@@ -39,4 +39,4 @@ protected:
 
 } // namespace chi
 
-#endif // CHITECH_MAXMINAVGNODALVALUEPOSTPROCESSOR_H
+#endif // CHITECH_AGGREGATENODALVALUEPOSTPROCESSOR_H

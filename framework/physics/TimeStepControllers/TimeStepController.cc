@@ -18,4 +18,11 @@ TimeStepController::TimeStepController(const chi::InputParameters& params)
 {
 }
 
+double TimeStepController::GetTimeStepSize() { return current_timestep_size_; }
+
+void TimeStepController::SetTimeStepSize(double dt)
+{
+  current_timestep_size_ = dt;
+}
+
 } // namespace chi_physics
