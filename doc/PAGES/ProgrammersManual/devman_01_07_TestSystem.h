@@ -100,6 +100,8 @@ Parameters:
 - `"outfileprefix"` : Optional parameter. Will default to `"file"` but can be
   to change the output file name (outfileprefix+".out") so that the same input
   file can be used for different tests.
+- `"skip"` : Optional parameter. Must be non-empty string stating the reason the
+  test was skipped. The presence of this string causes the test to be skipped.
 
 All other keys are ignored so feel free to peruse something like `"comment"` to
 annotate the test.

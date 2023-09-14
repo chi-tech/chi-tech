@@ -24,6 +24,9 @@ class TestSlot:
         test = self.test
         self.test.submitted = True
 
+        if test.skip != "":
+            return
+
         cmd = "mpiexec "
         cmd += "-np " + str(test.num_procs) + " "
         cmd += self.argv.exe + " "
@@ -46,7 +49,7 @@ class TestSlot:
                                         stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE,
                                         universal_newlines=True)
-        test_path = os.path.relpath(test.file_dir + test.filename)
+        # test_path = os.path.relpath(test.file_dir + test.filename)
         # print("Submitting test " + test_path)
 
     def Probe(self):
@@ -55,7 +58,14 @@ class TestSlot:
         test = self.test
 
         if test.ran:
-            return False
+            running = False
+            return running
+
+        if not test.ran and test.skip != "":
+            self.PerformChecks()
+            test.ran = True
+            running = False
+            return running
 
         if self.process.poll() is not None:
 
@@ -85,16 +95,19 @@ class TestSlot:
         passed = True
         output_filename = f"{test.file_dir}out/{test.GetOutFilenamePrefix()}.out"
 
-        error_code = self.process.returncode
-        for check in self.test.checks:
-            verbose = self.argv.verbose
-            check_passed = check.PerformCheck(output_filename,
-                                              error_code, verbose)
-            passed = passed and check_passed
+        if test.skip == "":
+            error_code = self.process.returncode
+            for check in self.test.checks:
+                verbose = self.argv.verbose
+                check_passed = check.PerformCheck(output_filename,
+                                                  error_code, verbose)
+                passed = passed and check_passed
 
-            check_annotations = check.GetAnnotations()
-            for ann in check_annotations:
-                test.annotations.append(ann)
+                check_annotations = check.GetAnnotations()
+                for ann in check_annotations:
+                    test.annotations.append(ann)
+        else:
+            test.annotations.append("skipped")
 
         test_path = os.path.relpath(test.file_dir + test.filename)
 
@@ -124,3 +137,5 @@ class TestSlot:
         time_taken_message = " {:.2f}s".format(self.time_end - self.time_start)
 
         print(prefix + test_path + message + time_taken_message)
+        if test.skip != "":
+            print("Skip reason: " + test.skip)
