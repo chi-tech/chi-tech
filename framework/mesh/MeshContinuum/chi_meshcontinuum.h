@@ -25,6 +25,7 @@ class ChiMPICommunicatorSet;
 namespace chi_mesh
 {
 class GridFaceHistogram;
+class MeshGenerator;
 }
 
 // ######################################################### Class Definition
@@ -162,6 +163,7 @@ public:
 
 private:
   friend class chi_mesh::VolumeMesher;
+  friend class chi_mesh::MeshGenerator;
   void SetAttributes(MeshAttributes new_attribs,
                      std::array<size_t, 3> ortho_Nis = {0, 0, 0})
   {

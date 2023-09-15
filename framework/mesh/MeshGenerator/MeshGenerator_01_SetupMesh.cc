@@ -68,6 +68,11 @@ MeshGenerator::SetupMesh(std::unique_ptr<UnpartitionedMesh> input_umesh_ptr)
     ++cell_globl_id;
   } // for raw_cell
 
+  grid_ptr->SetAttributes(input_umesh_ptr->GetMeshAttributes(),
+                          {input_umesh_ptr->GetMeshOptions().ortho_Nx,
+                           input_umesh_ptr->GetMeshOptions().ortho_Ny,
+                           input_umesh_ptr->GetMeshOptions().ortho_Nz});
+
   grid_ptr->SetGlobalVertexCount(input_umesh_ptr->GetVertices().size());
 
   //======================================== Concluding messages
