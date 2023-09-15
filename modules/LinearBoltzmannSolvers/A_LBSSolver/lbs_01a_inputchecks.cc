@@ -58,9 +58,12 @@ void lbs::LBSSolver::PerformInputChecks()
   const auto grid_attribs = grid_ptr_->Attributes();
   if (grid_attribs & DIMENSION_1)
     options_.geometry_type = GeometryType::ONED_SLAB;
-  if (grid_attribs & DIMENSION_2)
+  else if (grid_attribs & DIMENSION_2)
     options_.geometry_type = GeometryType::TWOD_CARTESIAN;
-  if (grid_attribs & DIMENSION_3)
+  else if (grid_attribs & DIMENSION_3)
     options_.geometry_type = GeometryType::THREED_CARTESIAN;
+  else
+    ChiLogicalError("Cannot deduce geometry type from mesh.");
+
 
 }
