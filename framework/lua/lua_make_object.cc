@@ -34,11 +34,7 @@ RegisterLuaFunctionAsIs(chiMakeObjectType);
   const std::string type = params.GetParamValue<std::string>("chi_obj_type");
 
   lua_pushinteger(L, static_cast<lua_Integer>(handle));
-
-  lua_newtable(L);
-  Console::SetObjectMethodsToTable(type, handle);
-
-  return 2;
+  return 1;
 }
 
 // #############################################################################
@@ -63,11 +59,7 @@ int chiMakeObjectType(lua_State* L)
   const size_t handle = object_maker.MakeRegisteredObjectOfType(type, params);
 
   lua_pushinteger(L, static_cast<lua_Integer>(handle));
-
-  lua_newtable(L);
-  Console::SetObjectMethodsToTable(type, handle);
-
-  return 2;
+  return 1;
 }
 
 } // namespace chi_objects::lua_utils

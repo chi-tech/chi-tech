@@ -112,18 +112,11 @@ char chi::Console::AddFunctionToRegistryGlobalNamespace(
 char chi::Console::AddFunctionToRegistryInNamespaceWithName(
   lua_CFunction function_ptr,
   const std::string& namespace_name,
-  const std::string& function_name,
-  bool self_callable /*=false*/)
+  const std::string& function_name)
 {
   const std::string name_in_lua = namespace_name + "::" + function_name;
 
   AddFunctionToRegistry(name_in_lua, function_ptr);
-
-  if (self_callable and not namespace_name.empty())
-  {
-    auto& console = Console::GetInstance();
-    console.class_method_registry_[namespace_name].push_back(function_name);
-  }
 
   return 0;
 }
@@ -342,44 +335,6 @@ void chi::Console::FleshOutLuaTableStructure(
       }
     }
   } // for table_key in table_keys
-}
-
-// ##################################################################
-/**Assumes a table is on top of the stack, then loads the table
- * with chunks that call registered methods of the class with the first
- * argument being the object's handle.*/
-void chi::Console::SetObjectMethodsToTable(const std::string& class_name,
-                                              size_t handle)
-{
-  auto& console = GetInstance();
-  auto L = console.console_state_;
-
-  const auto& class_method_registry = console.class_method_registry_;
-  if (class_method_registry.count(class_name) == 0) return;
-
-  const auto& method_list = class_method_registry.at(class_name);
-  for (const auto& method_name : method_list)
-  {
-    std::string function_name = class_name;
-    function_name += "::";
-    function_name += method_name;
-
-    const auto path_names = chi::StringSplit(function_name, "::");
-    std::string path_dot_name;
-    for (const auto& name : path_names)
-    {
-      path_dot_name += name;
-      if (name != path_names.back()) path_dot_name += ".";
-    }
-
-    std::string chunk_code = "local params = ...; ";
-    chunk_code +=
-      "return " + path_dot_name + "(" + std::to_string(handle) + ", ...)";
-
-    lua_pushstring(L, method_name.c_str());
-    luaL_loadstring(L, chunk_code.c_str());
-    lua_settable(L, -3);
-  }
 }
 
 // ##################################################################

@@ -21,7 +21,8 @@ class TestConfiguration:
                  message_prefix: str,
                  dependency: str,
                  args: list,
-                 weight_class: str):
+                 weight_class: str,
+                 skip: str):
         """Constructor. Load checks into the data structure"""
         self.file_dir = file_dir
         self.filename = filename
@@ -34,6 +35,7 @@ class TestConfiguration:
         self.annotations = []
         self.dependency = dependency
         self.args = args
+        self.skip = skip
 
         check_num = 0
         for check_params in checks_params:
@@ -209,6 +211,19 @@ def ParseTestConfiguration(file_path: str):
                 warnings.warn(message_prefix + '"outfileprefix" field must be a str')
                 continue
 
+        skip_reason = ""
+        if "skip" in test_block:
+            if isinstance(test_block["skip"], str):
+                input_reason = test_block["skip"]
+                if len(input_reason) == 0:
+                    warnings.warn(message_prefix + '"skip" field must be a '
+                                                   'non-zero length str')
+                    continue
+                skip_reason = test_block["skip"]
+            else:
+                warnings.warn(message_prefix + '"skip" field must be a str')
+                continue
+
         try:
             new_test = TestConfiguration(file_dir=os.path.dirname(file_path) + "/",
                                          filename=test_block["file"],
@@ -218,7 +233,8 @@ def ParseTestConfiguration(file_path: str):
                                          message_prefix=message_prefix,
                                          dependency=dependency,
                                          args=args,
-                                         weight_class=weight_class)
+                                         weight_class=weight_class,
+                                         skip=skip_reason)
             test_objects.append(new_test)
         except ValueError:
             continue

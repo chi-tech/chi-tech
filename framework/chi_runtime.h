@@ -55,6 +55,8 @@ namespace chi
 class Timer;
 class Console;
 class ChiLog;
+class PostProcessor;
+typedef std::shared_ptr<PostProcessor> PostProcessorPtr;
 /**Stores all the keys currently in the registries.*/
 struct RegistryStatuses
 {
@@ -63,6 +65,7 @@ struct RegistryStatuses
   std::vector<std::string> console_lua_wrapper_keys_;
 };
 } // namespace chi
+
 
 class ChiObject;
 typedef std::shared_ptr<ChiObject> ChiObjectPtr;
@@ -92,6 +95,7 @@ public:
 
   static std::vector<ChiObjectPtr> object_stack;
   static std::vector<chi_math::SpatialDiscretizationPtr> sdm_stack;
+  static std::vector<chi::PostProcessorPtr> postprocessor_stack;
 
   static const size_t SIZE_T_INVALID = ((size_t)-1);
 

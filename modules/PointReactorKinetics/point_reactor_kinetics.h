@@ -19,14 +19,12 @@ private:
   double gen_time_;
   double rho_;
   double source_strength_;
-  double dt_;
   std::string time_integration_;
 
   size_t num_precursors_;
   chi_math::DynamicMatrix<double> A_, I_;
   chi_math::DynamicVector<double> x_t_, x_tp1_, q_;
   double beta_ = 1.0;
-  double time_ = 0.0;
   double period_tph_ = 0.0;
 
 public:
@@ -38,15 +36,16 @@ public:
   void Step() override;
   void Advance() override;
 
+  chi::ParameterBlock GetInfo(const chi::ParameterBlock& params) const override;
+
   // Getters and Setters
   double PopulationPrev() const;
-  double PopulationNext() const;
+  double PopulationNew() const;
   double Period() const;
   double TimePrev() const;
-  double TimeNext() const;
+  double TimeNew() const;
   std::vector<double> SolutionPrev() const;
-  std::vector<double> SolutionNext() const;
-
+  std::vector<double> SolutionNew() const;
 
   void SetRho(double value);
 };

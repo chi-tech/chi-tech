@@ -69,7 +69,9 @@ int Console::LuaWrapperCall(lua_State* L)
   output_params.SetErrorOriginScope(fname + ":output:");
   chi_lua::PushParameterBlock(L, output_params);
 
-  return static_cast<int>(output_params.NumParameters());
+  const int num_sub_params = static_cast<int>(output_params.NumParameters());
+
+  return output_params.IsScalar() ? 1 : num_sub_params;
 }
 
 } // namespace chi_objects

@@ -183,6 +183,8 @@ add_subdirectory("${CHI_TECH_DIR}/framework/logging")
 add_subdirectory("${CHI_TECH_DIR}/framework/data_types")
 add_subdirectory("${CHI_TECH_DIR}/framework/utils")
 add_subdirectory("${CHI_TECH_DIR}/framework/interfaces")
+add_subdirectory("${CHI_TECH_DIR}/framework/event_system")
+add_subdirectory("${CHI_TECH_DIR}/framework/post_processors")
 
 add_subdirectory("${CHI_TECH_MOD}")
 

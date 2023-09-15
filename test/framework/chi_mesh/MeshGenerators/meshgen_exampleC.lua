@@ -2,10 +2,10 @@ meshgen1 = chi_mesh.ExtruderMeshGenerator.Create
 ({
   inputs =
   {
-    [0] = chi_mesh.FromFileMeshGenerator.Create
-          ({
-            filename="TriangleMesh2x2.obj"
-          }),
+    chi_mesh.FromFileMeshGenerator.Create
+    ({
+      filename="TriangleMesh2x2.obj"
+    }),
   },
   layers = {{z=1.1, n=2}, {z=2.1, n=3}}
 })

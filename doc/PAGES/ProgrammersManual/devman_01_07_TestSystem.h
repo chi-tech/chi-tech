@@ -100,6 +100,8 @@ Parameters:
 - `"outfileprefix"` : Optional parameter. Will default to `"file"` but can be
   to change the output file name (outfileprefix+".out") so that the same input
   file can be used for different tests.
+- `"skip"` : Optional parameter. Must be non-empty string stating the reason the
+  test was skipped. The presence of this string causes the test to be skipped.
 
 All other keys are ignored so feel free to peruse something like `"comment"` to
 annotate the test.
@@ -186,6 +188,11 @@ Parameters:
 - `"scope_keyword"` : Optional. Restrict the gold comparison to within a section
   of the respective gold/output file that are between the keywords
   `<scope_keyword>_BEGIN` and `<scope_keyword>_END`.
+- `"candidate_filename"` : Optional. If supplied, this check will use this file
+  rather than the test's output file. For example if `zorba.csv` is provided then
+  `zorba.csv` will be compared against `zorba.csv.gold`.
+- `"skiplines_top"`: Number of lines at the top of both the gold and comparison
+  file to skip in the comparison check.
 
 \section DevManTestSystem_sec3 3 Running the test system
 The tests are executed by executing the `run_tests` script, for example:

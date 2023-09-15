@@ -12,6 +12,7 @@ namespace chi
 
 enum class ParameterBlockType
 {
+  INVALID_VALUE = 0,
   BOOLEAN = 1,
   FLOAT = 3,
   STRING = 4,
@@ -77,7 +78,7 @@ public:
   /**Constructs an empty parameter block with the given name and type BLOCK.*/
   explicit ParameterBlock(const std::string& name = "");
 
-  /***/
+  /**Derived type constructor*/
   template <typename T>
   ParameterBlock(const std::string& name, const std::vector<T>& array)
     : type_(ParameterBlockType::ARRAY), name_(name)
@@ -113,13 +114,25 @@ public:
   /**Move constructor*/
   ParameterBlock(ParameterBlock&& other) noexcept;
 
+  /**Move assignment operator*/
+  ParameterBlock& operator=(ParameterBlock&& other) noexcept;
+
   // Accessors
   ParameterBlockType Type() const;
+  /**Returns true if the parameter block comprises a single value of any of
+  * the types BOOLEAN, FLOAT, STRING, INTEGER.*/
+  bool IsScalar() const;
+  /**Returns a string version of the type.*/
   std::string TypeName() const;
   std::string Name() const;
   const chi_data_types::Varying& Value() const;
   size_t NumParameters() const;
+  /**Returns the sub-parameters of this block.*/
   const std::vector<ParameterBlock>& Parameters() const;
+  /**Returns whether or not the block has a value. If this block has
+* sub-parameters it should not have a value. This is a good way to
+* check if the block is actually a single value.*/
+  bool HasValue() const;
 
   // Mutators
   /**Changes the block type to array, making it accessible via integer

@@ -41,7 +41,6 @@ chi::InputParameters TransientSolver::GetInputParameters()
 
   params.AddOptionalParameter(
     "initial_population", 1.0, "Initial neutron population");
-  params.AddOptionalParameter("dt", 0.01, "Default timestep size [s]");
 
   params.AddOptionalParameter(
     "time_integration", "implicit_euler", "Time integration scheme to use");
@@ -55,8 +54,6 @@ chi::InputParameters TransientSolver::GetInputParameters()
 
   params.ConstrainParameterRange("gen_time",
                                  AllowableRangeLowLimit::New(1.0e-12));
-  params.ConstrainParameterRange(
-    "dt", AllowableRangeLowHighLimit::New(1.0e-12, 100.0));
   params.ConstrainParameterRange("initial_source",
                                  AllowableRangeLowLimit::New(0.0));
   params.ConstrainParameterRange("initial_population",
@@ -72,7 +69,6 @@ TransientSolver::TransientSolver(const chi::InputParameters& params)
     gen_time_(params.GetParamValue<double>("gen_time")),
     rho_(params.GetParamValue<double>("initial_rho")),
     source_strength_(params.GetParamValue<double>("initial_source")),
-    dt_(params.GetParamValue<double>("dt")),
     time_integration_(params.GetParamValue<std::string>("time_integration")),
     num_precursors_(lambdas_.size())
 {
@@ -198,11 +194,46 @@ void TransientSolver::Advance()
   x_t_ = x_tp1_;
 }
 
+chi::ParameterBlock
+TransientSolver::GetInfo(const chi::ParameterBlock& params) const
+{
+  const auto param_name = params.GetParamValue<std::string>("name");
+
+  if (param_name == "neutron_population")
+    return chi::ParameterBlock("", x_t_[0]);
+  else if (param_name == "population_next")
+    return chi::ParameterBlock("", PopulationNew());
+  else if (param_name == "period")
+    return chi::ParameterBlock("", period_tph_);
+  else if (param_name == "rho")
+    return chi::ParameterBlock("", rho_);
+  else if (param_name == "solution")
+    return chi::ParameterBlock("", x_t_.elements_);
+  else if (param_name == "time_integration")
+    return chi::ParameterBlock("", time_integration_);
+  else if (param_name == "time_next")
+    return chi::ParameterBlock("", TimeNew());
+  else if (param_name == "test_arb_info")
+  {
+    chi::ParameterBlock block;
+
+    block.AddParameter("name", TextName());
+    block.AddParameter("time_integration", time_integration_);
+    block.AddParameter("rho", rho_);
+    block.AddParameter("max_timesteps", MaxTimeSteps());
+
+    return block;
+  }
+  else
+    ChiInvalidArgument("Unsupported info name \"" + param_name + "\".");
+
+}
+
 // ##################################################################
 /**Returns the population at the previous time step.*/
 double TransientSolver::PopulationPrev() const { return x_t_[0]; }
 /**Returns the population at the next time step.*/
-double TransientSolver::PopulationNext() const { return x_tp1_[0]; }
+double TransientSolver::PopulationNew() const { return x_tp1_[0]; }
 
 /**Returns the period computed for the last time step.*/
 double TransientSolver::Period() const { return period_tph_; }
@@ -211,7 +242,7 @@ double TransientSolver::Period() const { return period_tph_; }
 double TransientSolver::TimePrev() const { return time_; }
 
 /**Returns the time computed for the next time step.*/
-double TransientSolver::TimeNext() const { return time_ + dt_; }
+double TransientSolver::TimeNew() const { return time_ + dt_; }
 
 /**Returns the solution at the previous time step.*/
 std::vector<double> TransientSolver::SolutionPrev() const
@@ -219,7 +250,7 @@ std::vector<double> TransientSolver::SolutionPrev() const
   return x_t_.elements_;
 }
 /**Returns the solution at the next time step.*/
-std::vector<double> TransientSolver::SolutionNext() const
+std::vector<double> TransientSolver::SolutionNew() const
 {
   return x_tp1_.elements_;
 }

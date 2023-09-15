@@ -49,6 +49,7 @@ private:
 
 public:
   InputParameters() = default;
+  InputParameters& operator+=(InputParameters other);
   template <typename T>
   static InputParameters MakeForObject(const ParameterBlock& params)
   {

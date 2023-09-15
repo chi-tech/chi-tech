@@ -23,6 +23,97 @@ const std::vector<std::string> InputParameters::system_ignored_param_names_ = {
   "chi_obj_type"};
 
 // #################################################################
+InputParameters& InputParameters::operator+=(InputParameters other)
+{
+  for (const auto& param : other)
+    AddParameter(param);
+
+  // Copy maps
+  {
+    auto& other_map = other.parameter_class_tags_;
+    auto& this_map = parameter_class_tags_;
+    for (const auto& [param_name, tag] : other_map)
+    {
+      ChiLogicalErrorIf(this_map.count(param_name) != 0,
+                        "Duplicate tags detected.");
+      this_map[param_name] = tag;
+    }
+  }
+  {
+    auto& other_map = other.parameter_doc_string_;
+    auto& this_map = parameter_doc_string_;
+    for (const auto& [param_name, tag] : other_map)
+    {
+      ChiLogicalErrorIf(this_map.count(param_name) != 0,
+                        "Duplicate tags detected.");
+      this_map[param_name] = tag;
+    }
+  }
+  {
+    auto& other_map = other.deprecation_warning_tags_;
+    auto& this_map = deprecation_warning_tags_;
+    for (const auto& [param_name, tag] : other_map)
+    {
+      ChiLogicalErrorIf(this_map.count(param_name) != 0,
+                        "Duplicate tags detected.");
+      this_map[param_name] = tag;
+    }
+  }
+  {
+    auto& other_map = other.deprecation_error_tags_;
+    auto& this_map = deprecation_error_tags_;
+    for (const auto& [param_name, tag] : other_map)
+    {
+      ChiLogicalErrorIf(this_map.count(param_name) != 0,
+                        "Duplicate tags detected.");
+      this_map[param_name] = tag;
+    }
+  }
+  {
+    auto& other_map = other.renamed_error_tags_;
+    auto& this_map = renamed_error_tags_;
+    for (const auto& [param_name, tag] : other_map)
+    {
+      ChiLogicalErrorIf(this_map.count(param_name) != 0,
+                        "Duplicate tags detected.");
+      this_map[param_name] = tag;
+    }
+  }
+  {
+    auto& other_map = other.type_mismatch_allowed_tags_;
+    auto& this_map = type_mismatch_allowed_tags_;
+    for (const auto& [param_name, tag] : other_map)
+    {
+      ChiLogicalErrorIf(this_map.count(param_name) != 0,
+                        "Duplicate tags detected.");
+      this_map[param_name] = tag;
+    }
+  }
+  {
+    auto& other_map = other.parameter_link_;
+    auto& this_map = parameter_link_;
+    for (const auto& [param_name, tag] : other_map)
+    {
+      ChiLogicalErrorIf(this_map.count(param_name) != 0,
+                        "Duplicate tags detected.");
+      this_map[param_name] = tag;
+    }
+  }
+  {
+    auto& other_map = other.constraint_tags_;
+    auto& this_map = constraint_tags_;
+    for (auto& [param_name, tag] : other_map)
+    {
+      ChiLogicalErrorIf(this_map.count(param_name) != 0,
+                        "Duplicate tags detected.");
+      this_map[param_name] = std::move(tag);
+    }
+  }
+
+  return *this;
+}
+
+// #################################################################
 /**Sets the object type string for more descriptive error messages.*/
 void InputParameters::SetObjectType(const std::string& obj_type)
 {
@@ -141,8 +232,9 @@ void InputParameters::AssignParameters(const ParameterBlock& params)
   param_block_at_assignment_ = params;
   std::stringstream err_stream;
 
-  if (Chi::log.GetVerbosity() >= 1)
-    Chi::log.Log() << "Number of parameters " << params.NumParameters();
+  if (Chi::log.GetVerbosity() >= 2)
+    Chi::log.Log0Verbose2()
+      << "Number of parameters " << params.NumParameters();
 
   // ================================== Check required parameters
   // Loops over all input-parameters that have been
@@ -163,7 +255,8 @@ void InputParameters::AssignParameters(const ParameterBlock& params)
     if (not params.Has(req_param_name))
       err_stream << "Required param \"" << req_param_name
                  << "\" not supplied.\ndoc-string: "
-                 << GetParameterDocString(req_param_name);
+                 << GetParameterDocString(req_param_name)
+                 << "\nEnsure the parameter given is supplied or not nil";
   }
 
   if (not err_stream.str().empty()) ThrowInputError;
@@ -267,8 +360,8 @@ void InputParameters::AssignParameters(const ParameterBlock& params)
       }
     } // if constraint
 
-    if (Chi::log.GetVerbosity() >= 1)
-      Chi::log.Log() << "Setting parameter " << param_name;
+    if (Chi::log.GetVerbosity() >= 2)
+      Chi::log.Log0Verbose2() << "Setting parameter " << param_name;
     input_param = param;
   } // for input params
 
@@ -397,10 +490,7 @@ void InputParameters::DumpParameters() const
     }
 
     const auto& linkage = GetParameterDocumentationLink(param_name);
-    if (not linkage.empty())
-    {
-      Chi::log.Log() << sp4 << "LINKS " << linkage;
-    }
+    if (not linkage.empty()) { Chi::log.Log() << sp4 << "LINKS " << linkage; }
 
     Chi::log.Log() << sp2 << "PARAM_END";
   }

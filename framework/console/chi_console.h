@@ -53,19 +53,6 @@ class Chi;
     chi::Console::AddFunctionToRegistryInNamespaceWithName(                 \
       function, #namespace_name, #func_name)
 
-/**Macro for registering a lua_CFunction within the Console
-* singleton, functioning as a method of the class pointed to by the namespace.
-\param function LuaCFunction. The function to use.
-\param namespace_name NonQuotedString. May include scope resolution
-\param func_name NonQuotedString. The name of the function as it will appear in
-                 the lua console.
-*/
-#define RegisterLuaFunctionMethod(function, namespace_name, func_name)         \
-  static char ConsoleJoinWordsB(unique_var_name_luacfunc_##func_name##_,    \
-                                   __COUNTER__) =                              \
-    chi::Console::AddFunctionToRegistryInNamespaceWithName(                 \
-      function, #namespace_name, #func_name, true)
-
 #define RegisterWrapperFunction(                                               \
   namespace_name, name_in_lua, syntax_function, actual_function)               \
   static char ConsoleJoinWordsB(unique_var_name_luacfunc_##name_in_lua##_,  \
@@ -126,8 +113,6 @@ private:
 
   std::map<std::string, LuaFunctionRegistryEntry> lua_function_registry_;
 
-  std::map<std::string, std::vector<std::string>> class_method_registry_;
-
   std::map<std::string, LuaFuncWrapperRegEntry> function_wrapper_registry_;
 
   std::map<std::string, chi_data_types::Varying> lua_constants_registry_;
@@ -180,8 +165,7 @@ public:
   static char
   AddFunctionToRegistryInNamespaceWithName(lua_CFunction function_ptr,
                                            const std::string& namespace_name,
-                                           const std::string& function_name,
-                                           bool self_callable = false);
+                                           const std::string& function_name);
 
   /**\brief Adds a constant to the lua state.*/
   static char AddLuaConstantToRegistry(const std::string& namespace_name,
@@ -217,10 +201,6 @@ public:
   /**\brief Makes sure a table structure exists for the list of table names.*/
   static void
   FleshOutLuaTableStructure(const std::vector<std::string>& table_names);
-
-  /**\brief Attaches methods to a table.*/
-  static void SetObjectMethodsToTable(const std::string& class_name,
-                                      size_t handle);
 
   /**Sets a lua constant in the lua state.*/
   static void SetLuaConstant(const std::string& constant_name,

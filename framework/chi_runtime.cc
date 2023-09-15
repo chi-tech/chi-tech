@@ -8,6 +8,12 @@
 
 #include "physics/chi_physics_namespace.h"
 
+#include "post_processors/PostProcessor.h"
+
+#include "event_system/SystemWideEventPublisher.h"
+#include "event_system/EventCodes.h"
+#include "event_system/Event.h"
+
 #include "ChiObjectFactory.h"
 
 #include "chi_mpi.h"
@@ -42,6 +48,7 @@ std::vector<chi_math::AngularQuadraturePtr> Chi::angular_quadrature_stack;
 
 std::vector<ChiObjectPtr> Chi::object_stack;
 std::vector<chi_math::SpatialDiscretizationPtr> Chi::sdm_stack;
+std::vector<chi::PostProcessorPtr> Chi::postprocessor_stack;
 
 //================================ run_time quantities
 bool Chi::run_time::termination_posted_ = false;
@@ -161,14 +168,13 @@ void Chi::run_time::ParseArguments(int argc, char** argv)
 /**Initializes all necessary items for ChiTech.
 \param argc int    Number of arguments supplied.
 \param argv char** Array of strings representing each argument.
+\param communicator MPI_Comm The main communicator, used system wide.
  */
-int Chi::Initialize(int argc,
-                    char** argv,
-                    MPI_Comm communicator)
+int Chi::Initialize(int argc, char** argv, MPI_Comm communicator)
 {
   int location_id = 0, number_processes = 1;
 
-  MPI_Init(&argc, &argv);                           /* starts MPI */
+  MPI_Init(&argc, &argv);                         /* starts MPI */
   MPI_Comm_rank(communicator, &location_id);      /* get cur process id */
   MPI_Comm_size(communicator, &number_processes); /* get num of processes */
 
@@ -182,6 +188,9 @@ int Chi::Initialize(int argc,
   run_time::ParseArguments(argc, argv);
 
   run_time::InitPetSc(argc, argv);
+
+  chi::SystemWideEventPublisher::GetInstance().PublishEvent(chi::Event(
+    "ProgramStart", chi::GetStandardEventCode("ProgramStart")));
 
   return 0;
 }
@@ -204,6 +213,8 @@ int Chi::run_time::InitPetSc(int argc, char** argv)
  * */
 void Chi::Finalize()
 {
+  chi::SystemWideEventPublisher::GetInstance().PublishEvent(chi::Event(
+    "ProgramExecuted", chi::GetStandardEventCode("ProgramExecuted")));
   meshhandler_stack.clear();
 
   surface_mesh_stack.clear();

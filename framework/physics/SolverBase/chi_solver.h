@@ -5,57 +5,79 @@
 #include "physics/chi_physics_namespace.h"
 
 #include "physics/BasicOptions/basic_options.h"
-#include"parameters/parameter_block.h"
+#include "parameters/parameter_block.h"
 
 #include <iostream>
 #include <utility>
 
 namespace chi_physics
 {
-  class FieldFunctionGridBased;
+class FieldFunctionGridBased;
+class TimeStepController;
 }
-
 
 /**\defgroup LuaSolver Solvers
  * \ingroup LuaPhysics*/
 
-//######################################################### Solver parent class
+// ######################################################### Solver parent class
 class chi_physics::Solver : public ChiObject
 {
-private:
-  const std::string text_name_;
-protected:
-  BasicOptions basic_options_;
-  std::vector<std::shared_ptr<FieldFunctionGridBased>> field_functions_;
-
 public:
   static chi::InputParameters GetInputParameters();
-  explicit
-  Solver(std::string  in_text_name) : text_name_(std::move(in_text_name)) {}
-  Solver(std::string  in_text_name,
-         std::initializer_list<BasicOption> in_options) :
-    text_name_(std::move(in_text_name)),
-    basic_options_(in_options) {}
+  explicit Solver(std::string in_text_name)
+    : text_name_(std::move(in_text_name))
+  {
+  }
+  Solver(std::string in_text_name,
+         std::initializer_list<BasicOption> in_options)
+    : text_name_(std::move(in_text_name)), basic_options_(in_options)
+  {
+  }
   explicit Solver(const chi::InputParameters& params);
   virtual ~Solver() = default;
 
-  BasicOptions& GetBasicOptions() {return basic_options_;}
-  const BasicOptions& GetBasicOptions() const {return basic_options_;}
+  std::string TextName() const;
 
-  std::vector<std::shared_ptr<FieldFunctionGridBased>>&
-  GetFieldFunctions() {return field_functions_;}
+  BasicOptions& GetBasicOptions();
+  const BasicOptions& GetBasicOptions() const;
+
+  std::vector<std::shared_ptr<FieldFunctionGridBased>>& GetFieldFunctions();
 
   const std::vector<std::shared_ptr<FieldFunctionGridBased>>&
-  GetFieldFunctions() const {return field_functions_;}
+  GetFieldFunctions() const;
 
-  std::string TextName() const {return text_name_;}
+  virtual double TimeStepSize() const;
+  virtual double Time() const;
+  virtual double EndTime() const;
+  virtual int MaxTimeSteps() const;
+  virtual size_t TimeStepIndex() const;
 
   virtual void Initialize();
   virtual void Execute();
   virtual void Step();
   virtual void Advance();
+
+  /**Generalized query for information supporting varying returns.*/
+  virtual chi::ParameterBlock GetInfo(const chi::ParameterBlock& params) const;
+  /**PreCheck call to GetInfo.*/
+  chi::ParameterBlock
+  GetInfoWithPreCheck(const chi::ParameterBlock& params) const;
+
+private:
+  const std::string text_name_;
+
+protected:
+  BasicOptions basic_options_;
+  std::vector<std::shared_ptr<FieldFunctionGridBased>> field_functions_;
+
+  std::shared_ptr<TimeStepController> time_step_controller_ = nullptr;
+
+  double dt_ = 0.01;
+  double time_ = 0.0;
+  size_t t_index_ = 0;
+
+  double end_time_ = 1.0;
+  int max_time_steps_ = -1;
 };
-
-
 
 #endif
