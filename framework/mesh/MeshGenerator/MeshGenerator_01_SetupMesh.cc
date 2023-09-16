@@ -26,10 +26,9 @@ MeshGenerator::SetupMesh(std::unique_ptr<UnpartitionedMesh> input_umesh_ptr)
   cell_graph.reserve(num_raw_cells);
   cell_centroids.reserve(num_raw_cells);
   {
-    uint64_t cell_globl_id = 0;
     for (const auto& raw_cell_ptr : raw_cells)
     {
-      CellGraphNode cell_graph_node = {cell_globl_id++};
+      CellGraphNode cell_graph_node; // <-- Note A
       for (auto& face : raw_cell_ptr->faces)
         if (face.has_neighbor) cell_graph_node.push_back(face.neighbor);
 
@@ -37,6 +36,9 @@ MeshGenerator::SetupMesh(std::unique_ptr<UnpartitionedMesh> input_umesh_ptr)
       cell_centroids.push_back(raw_cell_ptr->centroid);
     }
   }
+
+  // Note A: We do not add the diagonal here. If we do it, ParMETIS seems
+  // to produce sub-optimal partitions
 
   //============================================= Execute partitioner
   auto cell_pids =
