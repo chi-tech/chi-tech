@@ -16,15 +16,17 @@ if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
 end
 
 --############################################### Setup mesh
-chiMeshHandlerCreate()
-
-umesh = chiUnpartitionedMeshFromWavefrontOBJ("../../../resources/TestMeshes/TriangleMesh2x2.obj")
-
-chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED)
-chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED,umesh)
-
-chiSurfaceMesherExecute()
-chiVolumeMesherExecute()
+meshgen1 = chi_mesh.MeshGenerator.Create
+({
+  inputs =
+  {
+    chi_mesh.FromFileMeshGenerator.Create
+    ({
+      filename = "../../../resources/TestMeshes/TriangleMesh2x2.obj"
+    })
+  }
+})
+chi_mesh.MeshGenerator.Execute(meshgen1)
 
 --############################################### Set Material IDs
 vol0 = chi_mesh.RPPLogicalVolume.Create({infx=true, infy=true, infz=true})

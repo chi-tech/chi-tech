@@ -3,7 +3,7 @@ chiMeshHandlerCreate()
 
 if (nmesh==nil) then nmesh = 10 end
 
-mesh={}
+nodes={}
 N=nmesh
 L=2
 xmin = -L/2
@@ -11,23 +11,22 @@ xmin = -L/2
 dx = L/N
 for i=1,(N+1) do
     k=i-1
-    mesh[i] = xmin + k*dx
+    nodes[i] = xmin + k*dx
 end
 
-zmesh={}
+znodes={}
 Nz=8
 Lz=1.6
 zmin=0.0
 dz=Lz/Nz
 for i=1,(Nz+1) do
     k=i-1
-    zmesh[i] = zmin + k*dz
+    znodes[i] = zmin + k*dz
 end
 
---chiMeshCreateUnpartitioned3DOrthoMesh(mesh,mesh,mesh)
-chiMeshCreateUnpartitioned2DOrthoMesh(mesh,mesh)
---chiMeshCreateUnpartitioned1DOrthoMesh(mesh)
-chiVolumeMesherExecute();
+meshgen1 = chi_mesh.OrthogonalMeshGenerator.Create({ node_sets = {nodes,nodes} })
+-- meshgen1 = chi_mesh.OrthogonalMeshGenerator.Create({ node_sets = {nodes,nodes,znodes} })
+chi_mesh.MeshGenerator.Execute(meshgen1)
 
 --############################################### Set Material IDs
 chiVolumeMesherSetMatIDToAll(0)

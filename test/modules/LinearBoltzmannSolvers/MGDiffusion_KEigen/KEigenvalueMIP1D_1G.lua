@@ -50,8 +50,8 @@ dx = L/n_cells
 for i=0,n_cells do
   nodes[i+1] = i*dx
 end
-chiMeshCreateUnpartitioned1DOrthoMesh(nodes)
-chiVolumeMesherExecute()
+meshgen1 = chi_mesh.OrthogonalMeshGenerator.Create({ node_sets = {nodes} })
+chi_mesh.MeshGenerator.Execute(meshgen1)
 
 --############################################### Set Material IDs
 chiVolumeMesherSetMatIDToAll(0)

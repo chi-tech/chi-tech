@@ -21,11 +21,11 @@ chiMeshHandlerCreate()
 L=2.0
 N=32
 ds=L/N
-xmesh={}
+nodes={}
 for k=0,N do
-    xmesh[k+1] = -1.0 + ds*k
+    nodes[k+1] = -1.0 + ds*k
 end
-umesh = chiMeshCreateUnpartitioned2DOrthoMesh(xmesh,xmesh);
+umesh = chiMeshCreateUnpartitioned2DOrthoMesh(nodes,nodes);
 
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
 chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER,

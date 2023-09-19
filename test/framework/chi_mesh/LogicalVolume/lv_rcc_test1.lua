@@ -1,16 +1,19 @@
 chiMeshHandlerCreate()
 
-mesh={}
+nodes={}
 N=40
 L=5
 xmin = -L/2
 dx = L/N
 for i=1,(N+1) do
   k=i-1
-  mesh[i] = xmin + k*dx
+  nodes[i] = xmin + k*dx
 end
-chiMeshCreateUnpartitioned3DOrthoMesh(mesh,mesh,mesh)
-chiVolumeMesherExecute();
+meshgen1 = chi_mesh.OrthogonalMeshGenerator.Create
+({
+  node_sets = {nodes,nodes,nodes},
+})
+chi_mesh.MeshGenerator.Execute(meshgen1)
 
 lv1 = chi_mesh.RCCLogicalVolume.Create({r = 1.3, x0=L/2, y0=L/2, z0 = -1.0, vz = 2.0})
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL, lv1, 1)
