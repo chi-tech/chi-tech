@@ -1,6 +1,4 @@
 --############################################### Setup mesh
-chiMeshHandlerCreate()
-
 nodes={}
 N=32
 ds=2.0/N

@@ -16,8 +16,6 @@ if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
 end
 
 --############################################### Setup mesh
-tmesh = chiMeshHandlerCreate()
-
 nodes={}
 N=60
 L=5.0
@@ -26,8 +24,8 @@ xmin=0.0
 for i=0,N do
     nodes[i+1] = xmin + i*ds
 end
-mesh = chiMeshCreateUnpartitioned2DOrthoMesh(nodes,nodes)
-chiVolumeMesherExecute();
+meshgen1 = chi_mesh.OrthogonalMeshGenerator.Create({ node_sets = {nodes,nodes} })
+chi_mesh.MeshGenerator.Execute(meshgen1)
 
 ----############################################### Set Material IDs
 NewRPP = chi_mesh.RPPLogicalVolume.Create

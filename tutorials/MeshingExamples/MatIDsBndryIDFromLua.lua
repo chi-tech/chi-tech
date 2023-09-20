@@ -1,6 +1,4 @@
 --############################################### Setup mesh
-chiMeshHandlerCreate()
-
 nodes={}
 N=10
 L=5
@@ -10,6 +8,7 @@ for i=1,(N+1) do
     k=i-1
     nodes[i] = xmin + k*dx
 end
+
 meshgen1 = chi_mesh.OrthogonalMeshGenerator.Create({ node_sets = {nodes,nodes,nodes} })
 chi_mesh.MeshGenerator.Execute(meshgen1)
 

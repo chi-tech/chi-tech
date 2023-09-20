@@ -18,20 +18,22 @@ if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
 end
 
 --############################################### Setup mesh
-chiMeshHandlerCreate()
-
-umesh = chiUnpartitionedMeshFromEnsightGold("../../../../resources/TestMeshes/Sphere.case")
-
-chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED)
-chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED, umesh)
-
-chiVolumeMesherSetProperty(VOLUMEPARTITION_X,2)
-chiVolumeMesherSetProperty(VOLUMEPARTITION_Y,2)
-chiVolumeMesherSetProperty(CUTS_X,0.0)
-chiVolumeMesherSetProperty(CUTS_Y,0.0)
-
-chiSurfaceMesherExecute()
-chiVolumeMesherExecute()
+meshgen1 = chi_mesh.MeshGenerator.Create
+({
+  inputs =
+  {
+    chi_mesh.FromFileMeshGenerator.Create
+    ({
+      filename = "../../../../resources/TestMeshes/Sphere.case"
+    }),
+  },
+  partitioner = chi.KBAGraphPartitioner.Create
+  ({
+    nx = 2, ny=2, nz=1,
+    xcuts = {0.0}, ycuts = {0.0}
+  })
+})
+chi_mesh.MeshGenerator.Execute(meshgen1)
 
 --############################################### Add materials
 materials = {}

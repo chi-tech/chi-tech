@@ -16,29 +16,24 @@ if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
 end
 
 --############################################### Setup mesh
-chiMeshHandlerCreate()
+meshgen1 = chi_mesh.ExtruderMeshGenerator.Create
+({
+  inputs =
+  {
+    chi_mesh.FromFileMeshGenerator.Create
+    ({
+      filename = "../../../../resources/TestMeshes/TriangleMesh2x2Cuts.obj"
+    }),
+  },
+  layers = {{z=0.4,n=2},{z=0.8,n=2},{z=1.2,n=2},{z=1.6,n=2}}, -- layers
+  partitioner = chi.KBAGraphPartitioner.Create
+  ({
+    nx = 2, ny=2,
+    xcuts = {0.0}, ycuts = {0.0}
+  })
+})
+chi_mesh.MeshGenerator.Execute(meshgen1)
 
-unpart_mesh = chiUnpartitionedMeshFromWavefrontOBJ(
-  "../../../../resources/TestMeshes/TriangleMesh2x2Cuts.obj")
-
-chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER,
-  ExtruderTemplateType.UNPARTITIONED_MESH,
-  unpart_mesh);
-
-NZ=2
-chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--0.4
-chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--0.8
-chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--1.2
-chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--1.6
-
-chiVolumeMesherSetProperty(PARTITION_TYPE,KBA_STYLE_XYZ)
-chiVolumeMesherSetKBAPartitioningPxPyPz(2,2,1)
-chiVolumeMesherSetKBACutsX({0.0})
-chiVolumeMesherSetKBACutsY({0.0})
-
-chiSurfaceMesherExecute();
-chiVolumeMesherExecute();
 
 --############################################### Set Material IDs
 vol0 = chi_mesh.RPPLogicalVolume.Create({infx=true, infy=true, infz=true})

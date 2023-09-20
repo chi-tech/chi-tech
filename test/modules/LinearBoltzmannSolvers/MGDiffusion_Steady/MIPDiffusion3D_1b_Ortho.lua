@@ -16,8 +16,6 @@ if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
 end
 
 --############################################### Setup mesh
-chiMeshHandlerCreate()
-
 nodes={}
 N=10
 L=5

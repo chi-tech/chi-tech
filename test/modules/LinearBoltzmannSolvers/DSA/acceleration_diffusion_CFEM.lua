@@ -1,11 +1,9 @@
 --############################################### Setup mesh
-chiMeshHandlerCreate()
-
 if (nmesh==nil) then nmesh = 10 end
 
 nodes={}
 N=nmesh
-L=2
+L=2.0
 xmin = -L/2
 --xmin = 0.0
 dx = L/N

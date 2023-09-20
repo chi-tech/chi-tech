@@ -1,9 +1,7 @@
 --############################################### Setup mesh
-chiMeshHandlerCreate()
-
 nodes={}
 N=40
-L=14
+L=14.0
 xmin = 0.0
 dx = L/N
 for i=1,(N+1) do

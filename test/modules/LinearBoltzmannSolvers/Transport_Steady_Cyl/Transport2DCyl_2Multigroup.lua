@@ -17,7 +17,6 @@ if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
 end
 
 --############################################### Setup mesh
-chiMeshHandlerCreate()
 dim = 2
 length = {1.0, 2.0, }
 ncells = {50, 100, }
@@ -29,9 +28,9 @@ for d = 1, dim do
     nodes[d][i+1] = i*delta
   end
 end
-surf_mesh = chiMeshCreateUnpartitioned2DOrthoMesh(nodes[1], nodes[2])
-chiVolumeMesherSetProperty(PARTITION_TYPE, PARMETIS)
-chiVolumeMesherExecute()
+
+meshgen1 = chi_mesh.OrthogonalMeshGenerator.Create({ node_sets = {nodes[1],nodes[2]} })
+chi_mesh.MeshGenerator.Execute(meshgen1)
 
 --############################################### Set Material IDs
 vol0 = chi_mesh.RPPLogicalVolume.Create
@@ -61,6 +60,7 @@ pquad0 = chiCreateCylindricalProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV, 4, 8)
 
 lbs_block =
 {
+  coord_system = 2,
   num_groups = ngrp,
   groupsets =
   {
@@ -83,7 +83,7 @@ lbs_options =
   boundary_conditions = { { name = "xmin", type = "reflecting"} },
   scattering_order = 0,
 }
-lbs_block.coord_system = 2
+
 phys1 = lbs.DiscreteOrdinatesCurvilinearSolver.Create(lbs_block)
 lbs.SetOptions(phys1, lbs_options)
 

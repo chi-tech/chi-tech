@@ -1,5 +1,3 @@
-chiMeshHandlerCreate()
-
 nodes={}
 N=40
 L=5

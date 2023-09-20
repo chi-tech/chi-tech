@@ -4,7 +4,7 @@
     [
       {
         "type" : "StrCompare",
-        "key" : "VolumeMesherPredefinedUnpartitioned: Cells created = 3242"
+        "key" : "MeshGenerator: Cells created = 3242"
       }
     ]
   }

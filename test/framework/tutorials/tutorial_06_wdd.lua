@@ -1,6 +1,4 @@
 --############################################### Setup mesh
-chiMeshHandlerCreate()
-
 if (nmesh==nil) then nmesh = 10 end
 
 nodes={}
