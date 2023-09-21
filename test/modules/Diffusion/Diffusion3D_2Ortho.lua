@@ -16,32 +16,28 @@ if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
 end
 
 --############################################### Setup mesh
-chiMeshHandlerCreate()
-
 L=2.0
 N=32
 ds=L/N
-xmesh={}
+nodes={}
 for k=0,N do
-    xmesh[k+1] = -1.0 + ds*k
+    nodes[k+1] = -1.0 + ds*k
 end
-umesh = chiMeshCreateUnpartitioned2DOrthoMesh(xmesh,xmesh);
+meshgen1 = chi_mesh.ExtruderMeshGenerator.Create
+({
+  inputs =
+  {
+    chi_mesh.OrthogonalMeshGenerator.Create({ node_sets = {nodes,nodes} }),
+  },
+  layers = {{z=0.2,n=2}}, -- layers
+  partitioner = chi.KBAGraphPartitioner.Create
+  ({
+    nx = 2, ny=2, nz=1,
+    xcuts = {0.0}, ycuts = {0.0}
+  })
+})
+chi_mesh.MeshGenerator.Execute(meshgen1)
 
-chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER,
-                      ExtruderTemplateType.UNPARTITIONED_MESH,
-                      umesh);
-
-NZ=2
-chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
---chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
---chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
---chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
-
-chiVolumeMesherSetProperty(PARTITION_TYPE,KBA_STYLE_XYZ)
-
-chiSurfaceMesherExecute();
-chiVolumeMesherExecute();
 
 --############################################### Set Material IDs
 vol0 = chi_mesh.RPPLogicalVolume.Create({infx=true, infy=true, infz=true})

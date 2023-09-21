@@ -1,19 +1,16 @@
 --############################################### Setup mesh
-chiMeshHandlerCreate()
-
-mesh={}
+nodes={}
 N=10
 L=5
 xmin = -L/2
 dx = L/N
 for i=1,(N+1) do
     k=i-1
-    mesh[i] = xmin + k*dx
+    nodes[i] = xmin + k*dx
 end
 
-chiMeshCreateUnpartitioned3DOrthoMesh(mesh,mesh,mesh)
-
-chiVolumeMesherExecute();
+meshgen1 = chi_mesh.OrthogonalMeshGenerator.Create({ node_sets = {nodes,nodes,nodes} })
+chi_mesh.MeshGenerator.Execute(meshgen1)
 
 chiMeshHandlerExportMeshToVTK("ZMeshPhase1")
 

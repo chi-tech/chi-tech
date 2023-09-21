@@ -36,7 +36,7 @@ fi
 
 #============================== Transform lua wrappers for documentation
 # Lua wrapper functions are normally int chiFunction(lua_State* L)
-# The scipt below uses their doc-strings to transform to doxy style
+# The script below uses their doc-strings to transform to doxy style
 # functions
 python3 "doc/scripts/BuildListOfLuaWrappers.py"
 

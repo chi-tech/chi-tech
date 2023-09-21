@@ -1,19 +1,15 @@
 --############################################### Setup mesh
-chiMeshHandlerCreate()
-
-mesh={}
+nodes={}
 N=40
-L=14
+L=14.0
 xmin = 0.0
 dx = L/N
 for i=1,(N+1) do
     k=i-1
-    mesh[i] = xmin + k*dx
+    nodes[i] = xmin + k*dx
 end
-
-chiMeshCreateUnpartitioned2DOrthoMesh(mesh,mesh)
-
-chiVolumeMesherExecute();
+meshgen1 = chi_mesh.OrthogonalMeshGenerator.Create({ node_sets = {nodes,nodes} })
+chi_mesh.MeshGenerator.Execute(meshgen1)
 
 chiVolumeMesherSetMatIDToAll(0)
 

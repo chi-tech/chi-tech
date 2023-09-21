@@ -1,20 +1,12 @@
 --############################################### Setup mesh
-chiMeshHandlerCreate()
-
 nodes={}
 N=32
 ds=2.0/N
 for i=0,N do
     nodes[i+1] = -1.0 + i*ds
 end
-surf_mesh,region1 = chiMeshCreateUnpartitioned3DOrthoMesh(nodes,nodes,nodes)
-
---chiSurfaceMesherSetProperty(PARTITION_X,2)
---chiSurfaceMesherSetProperty(PARTITION_Y,2)
---chiSurfaceMesherSetProperty(CUT_X,0.0)
---chiSurfaceMesherSetProperty(CUT_Y,0.0)
-
-chiVolumeMesherExecute();
+meshgen1 = chi_mesh.OrthogonalMeshGenerator.Create({ node_sets = {nodes,nodes,nodes} })
+chi_mesh.MeshGenerator.Execute(meshgen1)
 
 -- Set Material IDs
 vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)

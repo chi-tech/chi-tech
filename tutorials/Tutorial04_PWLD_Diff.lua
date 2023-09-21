@@ -3,8 +3,6 @@
 
 
 --############################################### Setup mesh
-chiMeshHandlerCreate()
-
 nodes={}
 N=32
 L=1.0
@@ -14,8 +12,8 @@ for i=0,N do
     nodes[i+1] = xmin + i*ds
 end
 
-chiMeshCreateUnpartitioned2DOrthoMesh(nodes,nodes)
-chiVolumeMesherExecute();
+meshgen1 = chi_mesh.OrthogonalMeshGenerator.Create({ node_sets = {nodes,nodes} })
+chi_mesh.MeshGenerator.Execute(meshgen1)
 
 --############################################### Set Material IDs
 material = chiPhysicsAddMaterial("Homogenous_Material");

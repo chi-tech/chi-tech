@@ -16,28 +16,26 @@ if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
 end
 
 --############################################### Setup mesh
-chiMeshHandlerCreate()
-
-mesh={}
+nodes={}
 N=10
 L=5
 xmin = -L/2
 dx = L/N
 for i=1,(N+1) do
   k=i-1
-  mesh[i] = xmin + k*dx
+  nodes[i] = xmin + k*dx
 end
-zmesh={}
+znodes={}
 for i=1,(N/2+1) do
   k=i-1
-  zmesh[i] = xmin + k*dx
+  znodes[i] = xmin + k*dx
 end
 if (reflecting) then
-  chiMeshCreateUnpartitioned3DOrthoMesh(mesh,mesh,zmesh)
+  meshgen1 = chi_mesh.OrthogonalMeshGenerator.Create({ node_sets = {nodes,nodes,znodes} })
 else
-  chiMeshCreateUnpartitioned3DOrthoMesh(mesh,mesh,mesh)
+  meshgen1 = chi_mesh.OrthogonalMeshGenerator.Create({ node_sets = {nodes,nodes,nodes} })
 end
-chiVolumeMesherExecute();
+chi_mesh.MeshGenerator.Execute(meshgen1)
 
 --############################################### Set Material IDs
 vol0 = chi_mesh.RPPLogicalVolume.Create({infx=true, infy=true, infz=true})

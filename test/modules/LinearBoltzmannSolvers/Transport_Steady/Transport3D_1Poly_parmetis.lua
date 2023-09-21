@@ -16,8 +16,6 @@ if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
 end
 
 --############################################### Setup mesh
-chiMeshHandlerCreate()
-
 Nxy = 32
 nodesxy = {}
 dxy = 2/Nxy
@@ -30,9 +28,8 @@ for k=0,8 do
   nodesz[k+1] = 0.0 + k*dz
 end
 
-chiMeshCreateUnpartitioned3DOrthoMesh(nodesxy,nodesxy,nodesz)
-chiVolumeMesherSetProperty(PARTITION_TYPE,PARMETIS)
-chiVolumeMesherExecute();
+meshgen1 = chi_mesh.OrthogonalMeshGenerator.Create({ node_sets = {nodesxy,nodesxy,nodesz} })
+chi_mesh.MeshGenerator.Execute(meshgen1)
 
 --############################################### Set Material IDs
 vol0 = chi_mesh.RPPLogicalVolume.Create({infx=true, infy=true, infz=true})
