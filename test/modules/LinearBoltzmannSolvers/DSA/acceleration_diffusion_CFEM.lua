@@ -12,18 +12,7 @@ for i=1,(N+1) do
     nodes[i] = xmin + k*dx
 end
 
-znodes={}
-Nz=8
-Lz=1.6
-zmin=0.0
-dz=Lz/Nz
-for i=1,(Nz+1) do
-    k=i-1
-    znodes[i] = zmin + k*dz
-end
-
 meshgen1 = chi_mesh.OrthogonalMeshGenerator.Create({ node_sets = {nodes,nodes} })
--- meshgen1 = chi_mesh.OrthogonalMeshGenerator.Create({ node_sets = {nodes,nodes,znodes} })
 chi_mesh.MeshGenerator.Execute(meshgen1)
 
 --############################################### Set Material IDs

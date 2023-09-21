@@ -465,14 +465,19 @@ FOPTFLAGS='-O3 -march=native -mtune=native'  \\"""
             log_file.write(f"{command}\n{err}\n")
             package_log_file.write(f"{command}\n{err}\n")
 
-        command = f"make OMAKE_PRINTDIR=gmake all -j{argv.jobs}"
+        make_command = "make"
+        s, e, outstr = ExecSub(make_command + " --version")
+        if outstr.find("GNU Make") > 0:
+            make_command = "make OMAKE_PRINTDIR=gmake"
+        command = f"{make_command} all -j{argv.jobs}"
+
         success, err = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
         if not success:
             print(command, err)
             log_file.write(f"{command}\n{err}\n")
             package_log_file.write(f"{command}\n{err}\n")
 
-        command = "make OMAKE_PRINTDIR=gmake install"
+        command = "make install"
         success, err = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
         if not success:
             print(command, err)
