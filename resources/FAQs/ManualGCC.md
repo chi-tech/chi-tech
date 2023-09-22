@@ -51,7 +51,7 @@ an additional argument:
 ```
 
 ## Step 5
-Make it. Grab a cup of coffee this takes long. I used `j16` and it took 
+Make it. Grab a cup of coffee this takes a long time. I used `j16` and it took 
 14 minutes.
 ```bash
 make -j4
