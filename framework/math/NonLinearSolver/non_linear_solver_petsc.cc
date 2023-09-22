@@ -2,10 +2,13 @@
 
 #include <petscsnes.h>
 
+#include "chi_log.h"
+#include "logging/stringstream_color.h"
+
 namespace chi_math
 {
 
-template<>
+template <>
 NonLinearSolver<Mat, Vec, SNES>::~NonLinearSolver()
 {
   SNESDestroy(&nl_solver_);
@@ -14,74 +17,86 @@ NonLinearSolver<Mat, Vec, SNES>::~NonLinearSolver()
   MatDestroy(&J_);
 }
 
-template<>
+template <>
 void NonLinearSolver<Mat, Vec, SNES>::ApplyToleranceOptions()
 {
   SNESSetTolerances(nl_solver_,
-                    tolerance_options_.nl_absolute_tol,
-                    tolerance_options_.nl_relative_tol,
-                    tolerance_options_.nl_solution_tol,
-                    tolerance_options_.nl_max_iterations,
-                    tolerance_options_.nl_max_r_evaluations);
-  SNESSetMaxLinearSolveFailures(nl_solver_,
-                                tolerance_options_.l_max_failed_iterations);
+                    options_.nl_abs_tol_,
+                    options_.nl_rel_tol_,
+                    options_.nl_sol_tol_,
+                    options_.nl_max_its_,
+                    options_.nl_max_r_evaluations_);
+  SNESSetMaxLinearSolveFailures(nl_solver_, options_.l_max_failed_iterations_);
   KSP ksp;
   SNESGetKSP(nl_solver_, &ksp);
   KSPSetTolerances(ksp,
-                   tolerance_options_.l_relative_tol,
-                   tolerance_options_.l_absolute_tol,
-                   tolerance_options_.l_divergence_tol,
-                   tolerance_options_.l_max_iterations);
-  if (linear_method_ == "gmres")
+                   options_.l_rel_tol_,
+                   options_.l_abs_tol_,
+                   options_.l_div_tol_,
+                   options_.l_max_its_);
+  if (options_.l_method_ == "gmres")
   {
-    KSPGMRESSetRestart(ksp, tolerance_options_.l_gmres_restart_interval);
-    KSPGMRESSetBreakdownTolerance(ksp,
-                                  tolerance_options_.l_gmres_breakdown_tol);
+    KSPGMRESSetRestart(ksp, options_.l_gmres_restart_intvl_);
+    KSPGMRESSetBreakdownTolerance(ksp, options_.l_gmres_breakdown_tol_);
   }
   KSPSetInitialGuessNonzero(ksp, PETSC_FALSE);
 }
-template<>
+template <>
 void NonLinearSolver<Mat, Vec, SNES>::PreSetupCallback()
-{}
+{
+}
 
-template<>
+template <>
 void NonLinearSolver<Mat, Vec, SNES>::SetOptions()
-{}
+{
+}
 
-template<>
+template <>
 void NonLinearSolver<Mat, Vec, SNES>::SetSolverContext()
 {
   SNESSetApplicationContext(nl_solver_, &(*context_ptr_));
 }
 
-template<>
+template <>
 void NonLinearSolver<Mat, Vec, SNES>::SetConvergenceTest()
-{}
+{
+}
 
-template<>
+template <>
 void NonLinearSolver<Mat, Vec, SNES>::SetMonitor()
-{}
+{
+}
 
-template<>
+template <>
 void NonLinearSolver<Mat, Vec, SNES>::SetPreconditioner()
-{}
+{
+}
 
-template<>
+template <>
 void NonLinearSolver<Mat, Vec, SNES>::PostSetupCallback()
-{}
+{
+}
 
-template<>
+template <>
 void NonLinearSolver<Mat, Vec, SNES>::Setup()
 {
   if (IsSystemSet()) return;
   this->PreSetupCallback();
 
-  SNESCreate(PETSC_COMM_WORLD, &nl_solver_);
-  SNESSetType(nl_solver_, nl_method_.c_str());
+  SNESCreate(Chi::mpi.comm, &nl_solver_);
+
+  SNESSetOptionsPrefix(nl_solver_, solver_name_.c_str());
+
+  SNESSetType(nl_solver_, options_.petsc_snes_type_.c_str());
+  SNESLineSearch    linesearch;
+  SNESGetLineSearch(nl_solver_, &linesearch);
+  SNESLineSearchSetType(linesearch, SNESLINESEARCHBT);
 
   KSP ksp;
   SNESGetKSP(nl_solver_, &ksp);
-  KSPSetType(ksp, linear_method_.c_str());
+  KSPSetType(ksp, options_.l_method_.c_str());
+
+  KSPSetOptionsPrefix(ksp, solver_name_.c_str());
 
   this->ApplyToleranceOptions();
 
@@ -93,7 +108,6 @@ void NonLinearSolver<Mat, Vec, SNES>::Setup()
   this->SetSolverContext();
   this->SetConvergenceTest();
   this->SetMonitor();
-
 
   this->SetSystemSize();
   this->SetSystem();
@@ -107,22 +121,52 @@ void NonLinearSolver<Mat, Vec, SNES>::Setup()
   system_set_ = true;
 }
 
-template<>
+template <>
 void NonLinearSolver<Mat, Vec, SNES>::PreSolveCallback()
-{}
+{
+}
 
-template<>
+template <>
 void NonLinearSolver<Mat, Vec, SNES>::PostSolveCallback()
-{}
+{
+}
 
-template<>
+template <>
 void NonLinearSolver<Mat, Vec, SNES>::Solve()
 {
+  converged_ = false;
+  converged_reason_string_ = "Reason not obtained";
   this->PreSolveCallback();
   this->SetInitialGuess();
 
   SNESSolve(nl_solver_, nullptr, x_);
   this->PostSolveCallback();
+
+  SNESConvergedReason conv_reason;
+  SNESGetConvergedReason(nl_solver_, &conv_reason);
+
+  if (conv_reason > 0) converged_ = true;
+
+  const char* strreason;
+  SNESGetConvergedReasonString(nl_solver_, &strreason);
+
+  converged_reason_string_ = std::string(strreason);
 }
 
-}//namespace chi_math
+template <>
+std::string NonLinearSolver<Mat, Vec, SNES>::GetConvergedReasonString() const
+{
+  std::stringstream outstr;
+  if (converged_)
+    outstr << chi::StringStreamColor(chi::FG_GREEN) << std::string(10, ' ')
+           << "Converged " << converged_reason_string_
+           << chi::StringStreamColor(chi::RESET);
+  else
+    outstr << chi::StringStreamColor(chi::FG_RED) << std::string(10, ' ')
+           << "Convergence failure " << converged_reason_string_
+           << chi::StringStreamColor(chi::RESET);
+
+  return outstr.str();
+}
+
+} // namespace chi_math
