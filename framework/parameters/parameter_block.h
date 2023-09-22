@@ -160,9 +160,7 @@ public:
    * throws a `std::logic_error`.*/
   void RequireParameter(const std::string& param_name) const;
 
-public:
   // utilities
-public:
   /**Adds a parameter to the sub-parameter list.*/
   void AddParameter(ParameterBlock block);
   /**Makes a ParameterBlock and adds it to the sub-parameters list.*/
@@ -172,7 +170,6 @@ public:
     AddParameter(ParameterBlock(name, value));
   }
 
-public:
   /**Sorts the sub-parameter list according to name. This is useful
    * for regression testing.*/
   void SortParameters();

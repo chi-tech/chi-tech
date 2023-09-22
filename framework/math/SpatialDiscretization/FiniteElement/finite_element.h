@@ -129,6 +129,7 @@ namespace chi_math::finite_element
                         VecDbl                    JxW,
                         std::vector<std::vector<int>> face_dof_mappings,
                         size_t num_nodes);
+    void InitializeEmpty();
     const std::vector<unsigned int>&
       QuadraturePointIndices() const;
     chi_mesh::Vector3
@@ -137,6 +138,11 @@ namespace chi_math::finite_element
       ShapeValue(unsigned int i, unsigned int qp) const;
     chi_mesh::Vector3
       ShapeGrad(unsigned int i, unsigned int qp) const;
+    const VecVec3& QPointsXYZ() const;
+    const std::vector<VecDbl>& ShapeValues() const;
+    const std::vector<VecVec3>& ShapeGradValues() const;
+    const std::vector<double>& JxW_Values() const;
+
     double
       JxW(unsigned int qp) const;
     int
@@ -163,6 +169,7 @@ namespace chi_math::finite_element
                         size_t num_nodes);
     chi_mesh::Vector3
       Normal(unsigned int qp) const;
+    const VecVec3& Normals() const;
   };
 }
 

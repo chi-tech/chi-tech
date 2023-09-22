@@ -50,6 +50,12 @@ protected:
   {
   }
 
+public:
+  /**Utility method for getting node indices seperately for domain internal
+  * local nodes, and boundary nodes.*/
+  std::pair<std::set<uint32_t>, std::set<uint32_t>>
+  MakeCellInternalAndBndryNodeIDs(const chi_mesh::Cell& cell) const;
+
   // 01 AddViewOfContinuum
 public:
   const CellMapping& GetCellMapping(const chi_mesh::Cell& cell) const;

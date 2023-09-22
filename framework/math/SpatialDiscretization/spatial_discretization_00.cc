@@ -44,3 +44,33 @@ size_t chi_math::SpatialDiscretization::GetNumLocalAndGhostDOFs(
 {
   return GetNumLocalDOFs(unknown_manager) + GetNumGhostDOFs(unknown_manager);
 }
+
+std::pair<std::set<uint32_t>, std::set<uint32_t>>
+chi_math::SpatialDiscretization::MakeCellInternalAndBndryNodeIDs(
+  const chi_mesh::Cell& cell) const
+{
+  const auto& cell_mapping = GetCellMapping(cell);
+  const size_t num_faces = cell.faces_.size();
+  const size_t num_nodes = cell_mapping.NumNodes();
+
+  //====================================== Determine which nodes are on the
+  //                                       boundary
+  std::set<uint32_t> boundary_nodes;
+  for (size_t f = 0; f < num_faces; ++f)
+  {
+    if (not cell.faces_[f].has_neighbor_)
+    {
+      const size_t num_face_nodes = cell_mapping.NumFaceNodes(f);
+      for (size_t fi = 0; fi < num_face_nodes; ++fi)
+        boundary_nodes.insert(cell_mapping.MapFaceNode(f, fi));
+    }
+  } // for f
+
+  //====================================== Determine non-boundary nodes
+  std::set<uint32_t> internal_nodes;
+  for (size_t i = 0; i < num_nodes; ++i)
+    if (boundary_nodes.find(i) == boundary_nodes.end())
+      internal_nodes.insert(i);
+
+  return {internal_nodes, boundary_nodes};
+}
