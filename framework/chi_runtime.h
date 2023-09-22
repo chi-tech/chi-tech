@@ -174,8 +174,9 @@ public:
    * Example usage:
    *
    * \code
-   * const auto& surf_mesh = chi::GetStackItem<chi_mesh::SurfaceMesh>(
-        chi::surface_mesh_stack, surface_hndl);
+   * const auto& surf_mesh = Chi::GetStackItem<chi_mesh::SurfaceMesh>(
+        Chi::object_stack, surface_hndl);
+     // Returns chi_mesh::SurfaceMesh&
    * \endcode
    * */
   template <class R, class T>
@@ -208,8 +209,10 @@ public:
    * Example usage:
    *
    * \code
-   * auto surf_mesh_ptr = chi::GetStackItemPtr<chi_mesh::SurfaceMesh>(
-      chi::surface_mesh_stack, surf_mesh_hndle, fname);
+   * auto surf_mesh_ptr =
+   *   Chi::GetStackItemPtrAsType<chi_mesh::SurfaceMesh>(
+         Chi::object_stack, surf_mesh_hndle, fname);
+     // Returns std::shared_ptr<chi_mesh::SurfaceMesh>
    * \endcode
    * */
   template <class T, class P>
@@ -245,8 +248,9 @@ public:
    * Example usage:
    *
    * \code
-   * auto surf_mesh_ptr = chi::GetStackItemPtr<chi_mesh::SurfaceMesh>(
-      chi::surface_mesh_stack, surf_mesh_hndle, fname);
+   * auto surf_mesh_ptr = Chi::GetStackItemPtr(
+      Chi::object_stack, surf_mesh_hndle, fname);
+     // Returns std::shared_ptr<ChiObject>
    * \endcode
    * */
   template <class T>
