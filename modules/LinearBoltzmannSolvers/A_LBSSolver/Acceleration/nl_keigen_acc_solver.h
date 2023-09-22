@@ -16,7 +16,7 @@ public:
   typedef std::shared_ptr<NLKEigenDiffContext> NLKEigenDiffContextPtr;
 
   explicit NLKEigenDiffSolver(NLKEigenDiffContextPtr nlk_diff_context_ptr) :
-    chi_math::NonLinearSolver<Mat, Vec, SNES>(SNESNEWTONLS, nlk_diff_context_ptr)
+    chi_math::NonLinearSolver<Mat, Vec, SNES>(nlk_diff_context_ptr)
   {}
 
   virtual ~NLKEigenDiffSolver() override = default;

@@ -58,24 +58,24 @@ XXNonLinearKEigen::XXNonLinearKEigen(const chi::InputParameters& params)
     lbs_solver_(Chi::GetStackItem<LBSSolver>(
       Chi::object_stack, params.GetParamValue<size_t>("lbs_solver_handle"))),
     nl_context_(std::make_shared<NLKEigenAGSContext<Vec, SNES>>(lbs_solver_)),
-    nl_solver_(SNESNEWTONLS, nl_context_),
+    nl_solver_(nl_context_),
     reinit_phi_1_(params.GetParamValue<bool>("reinit_phi_1")),
     num_free_power_its_(params.GetParamValue<int>("num_free_power_iterations"))
 {
   auto& tolerances = nl_solver_.ToleranceOptions();
 
-  tolerances.nl_absolute_tol = params.GetParamValue<double>("nl_abs_tol");
-  tolerances.nl_relative_tol = params.GetParamValue<double>("nl_rel_tol");
-  tolerances.nl_solution_tol = params.GetParamValue<double>("nl_sol_tol");
-  tolerances.nl_max_iterations = params.GetParamValue<int>("nl_max_its");
+  tolerances.nl_abs_tol_ = params.GetParamValue<double>("nl_abs_tol");
+  tolerances.nl_rel_tol_ = params.GetParamValue<double>("nl_rel_tol");
+  tolerances.nl_sol_tol_ = params.GetParamValue<double>("nl_sol_tol");
+  tolerances.nl_max_its_ = params.GetParamValue<int>("nl_max_its");
 
-  tolerances.l_relative_tol = params.GetParamValue<double>("l_rel_tol");
-  tolerances.l_absolute_tol = params.GetParamValue<double>("l_abs_tol");
-  tolerances.l_divergence_tol = params.GetParamValue<double>("l_div_tol");
-  tolerances.l_max_iterations = params.GetParamValue<int>("l_max_its");
-  tolerances.l_gmres_restart_interval =
+  tolerances.l_rel_tol_ = params.GetParamValue<double>("l_rel_tol");
+  tolerances.l_abs_tol_ = params.GetParamValue<double>("l_abs_tol");
+  tolerances.l_div_tol_ = params.GetParamValue<double>("l_div_tol");
+  tolerances.l_max_its_ = params.GetParamValue<int>("l_max_its");
+  tolerances.l_gmres_restart_intvl_ =
     params.GetParamValue<int>("l_gmres_restart_intvl");
-  tolerances.l_gmres_breakdown_tol =
+  tolerances.l_gmres_breakdown_tol_ =
     params.GetParamValue<double>("l_gmres_breakdown_tol");
 }
 
@@ -90,7 +90,7 @@ void XXNonLinearKEigen::Execute()
   {
     double k_eff = 1.0;
     PowerIterationKEigen(lbs_solver_,
-                         nl_solver_.ToleranceOptions().nl_absolute_tol,
+                         nl_solver_.ToleranceOptions().nl_abs_tol_,
                          num_free_power_its_,
                          k_eff);
   }
