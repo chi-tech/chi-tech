@@ -85,12 +85,12 @@ package_info = {
                  "ftp://ftp.gnu.org/gnu/readline/readline-8.0.tar.gz"],
     "ncurses": ["6.1",
                 "https://invisible-mirror.net/archives/ncurses/ncurses-6.1.tar.gz"],
-    "lua": ["5.3.5",
-            "https://www.lua.org/ftp/lua-5.3.5.tar.gz"],
+    "lua": ["5.4.6",
+            "https://www.lua.org/ftp/lua-5.4.6.tar.gz"],
     "petsc": ["3.17.0",
               "https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.17.0.tar.gz"],
-    "vtk": ["9.1.0",
-            "https://www.vtk.org/files/release/9.1/VTK-9.1.0.tar.gz"]
+    "vtk": ["9.3.0.rc1",
+            "https://www.vtk.org/files/release/9.3/VTK-9.3.0.rc1.tar.gz"]
 }
 
 log_file.write("Packages in the dependency list:\n")
@@ -126,7 +126,19 @@ def ExecSub(command: str,
     if result.returncode != 0:
         success = False
 
-    return success, error.decode("utf8")
+    outputstr = ""
+    if output is not None:
+        outputstr = output.decode('ascii')
+
+    return success, error.decode("utf8"), outputstr
+
+
+# ######################################
+# Redefine make command for gnu
+make_command = "make"
+s, e, outstr = ExecSub(make_command + " --version")
+if outstr.find("GNU Make") >= 0:
+    make_command = "make OMAKE_PRINTDIR=gmake"
 
 
 # ######################################
@@ -134,7 +146,7 @@ def ExecSub(command: str,
 def CheckExecutableExists(thingname: str, thing: str):
     log_file.write(f"Checking for {thingname}:\n")
     log_file.flush()
-    success, errorc = ExecSub(f"{thing} --version", out_log=log_file)
+    success, errorc, outstr = ExecSub(f"{thing} --version", out_log=log_file)
     if not success:
         log_file.write(errorc)
         print(error_beg + f"Valid {thingname} not found" + error_end)
@@ -189,7 +201,7 @@ def MakeDirectory(dirpath: str):
 def ExtractPackage(pkg, ver):
     print(f"Extracting package with command tar -zxf {pkg}-{ver}.tar.gz")
 
-    success, err = ExecSub(f"tar -zxf {pkg}-{ver}.tar.gz", log_file)
+    success, err, outstr = ExecSub(f"tar -zxf {pkg}-{ver}.tar.gz", log_file)
 
     if not success:
         print(err)
@@ -197,7 +209,7 @@ def ExtractPackage(pkg, ver):
 
     # Check if folder defaulted to upper
     if os.path.exists(f"{pkg.upper()}-{ver}") and not os.path.exists(f"{pkg}-{ver}"):
-        success, err = ExecSub(f"mv {pkg.upper()}-{ver}/ {pkg}-{ver}/", log_file)
+        success, err, outstr = ExecSub(f"mv {pkg.upper()}-{ver}/ {pkg}-{ver}/", log_file)
 
         if not success:
             print(err)
@@ -269,6 +281,7 @@ if argv.download_only:
 
 print()
 
+
 # ========================================== Install command for ncurses and
 # readline
 def InstallPackage(pkg: str, ver: str, gold_file: str):
@@ -301,21 +314,21 @@ def InstallPackage(pkg: str, ver: str, gold_file: str):
             env_vars["FC"] = shutil.which("mpifort")
 
         command = f"./configure --prefix={pkg_install_dir}"
-        success, err = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
+        success, err, outstr = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
         if not success:
             print(command, err)
             log_file.write(f"{command}\n{err}\n")
             package_log_file.write(f"{command}\n{err}\n")
 
         command = f"make -j{argv.jobs}"
-        success, err = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
+        success, err, outstr = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
         if not success:
             print(command, err)
             log_file.write(f"{command}\n{err}\n")
             package_log_file.write(f"{command}\n{err}\n")
 
         command = "make install"
-        success, err = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
+        success, err, outstr = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
         if not success:
             print(command, err)
             log_file.write(f"{command}\n{err}\n")
@@ -379,14 +392,14 @@ def InstallLuaPackage(pkg: str, ver: str, gold_file: str,
             os_tag = "macosx"
 
         command = f"make {os_tag} MYCFLAGS=-fPIC MYLIBS=-lncurses -j{argv.jobs}"
-        success, err = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
+        success, err, outstr = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
         if not success:
             print(command, err)
             log_file.write(f"{command}\n{err}\n")
             package_log_file.write(f"{command}\n{err}\n")
 
         command = "make local"
-        success, err = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
+        success, err, outstr = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
         if not success:
             print(command, err)
             log_file.write(f"{command}\n{err}\n")
@@ -459,21 +472,21 @@ CXXOPTFLAGS='-O3 -march=native -mtune=native'  \\
 FOPTFLAGS='-O3 -march=native -mtune=native'  \\"""
         command += f"PETSC_DIR={install_dir}/{pkg.upper()}/{pkg}-{ver}"
 
-        success, err = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
+        success, err, outstr = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
         if not success:
             print(command, err)
             log_file.write(f"{command}\n{err}\n")
             package_log_file.write(f"{command}\n{err}\n")
 
-        command = f"make all -j{argv.jobs}"
-        success, err = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
+        command = f"{make_command} all -j{argv.jobs}"
+        success, err, outstr = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
         if not success:
             print(command, err)
             log_file.write(f"{command}\n{err}\n")
             package_log_file.write(f"{command}\n{err}\n")
 
-        command = "make install"
-        success, err = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
+        command = f"{make_command} install"
+        success, err, outstr = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
         if not success:
             print(command, err)
             log_file.write(f"{command}\n{err}\n")
@@ -538,21 +551,21 @@ def InstallVTK(pkg: str, ver: str, gold_file: str):
 -DCMAKE_CXX_FLAGS=-std=c++11 \\
 ../
 """
-        success, err = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
+        success, err, outstr = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
         if not success:
             print(command, err)
             log_file.write(f"{command}\n{err}\n")
             package_log_file.write(f"{command}\n{err}\n")
 
-        command = f"make -j{argv.jobs}"
-        success, err = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
+        command = f"{make_command} -j{argv.jobs}"
+        success, err, outstr = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
         if not success:
             print(command, err)
             log_file.write(f"{command}\n{err}\n")
             package_log_file.write(f"{command}\n{err}\n")
 
-        command = "make install"
-        success, err = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
+        command = f"{make_command} install"
+        success, err, outstr = ExecSub(command, out_log=package_log_file, env_vars=env_vars)
         if not success:
             print(command, err)
             log_file.write(f"{command}\n{err}\n")
@@ -670,4 +683,3 @@ else:
 print()
 print(f"To set these terminal environment variables automatically, execute:")
 print(f"    $. {install_dir}/configure_deproots.sh\n")
-
