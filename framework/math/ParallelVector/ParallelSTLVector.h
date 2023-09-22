@@ -24,8 +24,8 @@ public:
    * the given communicator whose entries are set to zero.
    */
   ParallelSTLVector(uint64_t local_size,
-                 uint64_t global_size,
-                 MPI_Comm communicator);
+                    uint64_t global_size,
+                    MPI_Comm communicator);
 
   /**Copy constructor.*/
   ParallelSTLVector(const ParallelSTLVector& other);
@@ -116,6 +116,10 @@ public:
 
   void BlockCopyLocalValues(const ParallelVector& y,
                             int64_t y_offset,
+                            int64_t local_offset,
+                            int64_t num_values) override;
+
+  void BlockCopyLocalValues(const std::vector<double>& y,
                             int64_t local_offset,
                             int64_t num_values) override;
 

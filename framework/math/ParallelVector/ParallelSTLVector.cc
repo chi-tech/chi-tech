@@ -197,12 +197,31 @@ void ParallelSTLVector::BlockCopyLocalValues(const ParallelVector& y,
 
   ChiInvalidArgumentIf(
     local_end > local_size_,
-    "local_offset + num_values=" + std::to_string(y_end) +
+    "local_offset + num_values=" + std::to_string(local_end) +
       ", is out of range for destination vector with local size " +
       std::to_string(local_size_));
 
   for (int64_t i = 0; i < num_values; ++i)
     values_[local_offset + i] = y[y_offset + i];
+}
+
+void ParallelSTLVector::BlockCopyLocalValues(const std::vector<double>& y,
+                                             int64_t local_offset,
+                                             int64_t num_values)
+{
+  ChiInvalidArgumentIf(y.size() < num_values,
+                       "y.size() < num_values " + std::to_string(y.size()) +
+                         " < " + std::to_string(num_values));
+
+  const int64_t local_end = local_offset + num_values;
+  ChiInvalidArgumentIf(
+    local_end > local_size_,
+    "local_offset + num_values=" + std::to_string(local_end) +
+      ", is out of range for destination vector with local size " +
+      std::to_string(local_size_));
+
+  for (int64_t i = 0; i < num_values; ++i)
+    values_[local_offset + i] = y[i];
 }
 
 /**Returns the specified norm of the vector.*/

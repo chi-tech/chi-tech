@@ -119,6 +119,14 @@ public:
                                     int64_t local_offset,
                                     int64_t num_values) = 0;
 
+  /**Copies a contiguous block of local data from the source STL vector to the
+   * current vector. The local block offset is specified with the local-offset
+   * value. The input STL vector must have num_values entries.
+   * */
+  virtual void BlockCopyLocalValues(const std::vector<double>& y,
+                                    int64_t local_offset,
+                                    int64_t num_values) = 0;
+
   /**Returns the specified norm of the vector.*/
   virtual double ComputeNorm(chi_math::NormType norm_type) const = 0;
 
