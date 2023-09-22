@@ -32,6 +32,11 @@ chi::InputParameters Solver::GetInputParameters()
   params.AddOptionalParameter(
     "timestep_controller", 0, "Timestep controller to use for timestepping.");
 
+  params.AddOptionalParameterBlock(
+    "time_controls",
+    chi::ParameterBlock{},
+    "Parameters to pass to the time_controller.");
+
   using namespace chi_data_types;
   params.ConstrainParameterRange("dt", AllowableRangeLowLimit::New(1.0e-12));
 
@@ -48,10 +53,13 @@ Solver::Solver(const chi::InputParameters& params)
 {
   const auto& user_params = params.ParametersAtAssignment();
 
-  if (not user_params.Has("timestep_controller"))
+  const bool has_controller = user_params.Has("timestep_controller");
+  const bool has_time_controls = user_params.Has("time_controls");
+
+  if (not has_controller)
   {
     chi::ParameterBlock ts_params;
-    ts_params.AddParameter("initial_dt", dt_);
+    if (has_time_controls) ts_params = user_params.GetParam("time_controls");
 
     size_t handle = ChiObjectFactory::GetInstance().MakeRegisteredObjectOfType(
       "chi_physics::ConstantTimeStepController", ts_params);
@@ -64,6 +72,10 @@ Solver::Solver(const chi::InputParameters& params)
     time_step_controller_ = Chi::GetStackItemPtrAsType<TimeStepController>(
       Chi::object_stack, handle, __FUNCTION__);
   }
+
+  ChiInvalidArgumentIf(has_controller and has_time_controls,
+                       "Both \"has_controller\" and \"has_time_controls\" "
+                       "cannot be specified at the same time.");
 }
 
 std::string Solver::TextName() const { return text_name_; }
