@@ -9,7 +9,8 @@ void chi_physics::FieldFunctionGridBased::
     throw std::logic_error("chi_physics::FieldFunction::UpdateFieldVector: "
                            "Attempted update with a vector of insufficient size.");
 
-  field_vector_ = field_vector;
+  for (size_t i=0; i<field_vector_.size(); ++i)
+    field_vector_[i] = field_vector[i];
 }
 
 //###################################################################
