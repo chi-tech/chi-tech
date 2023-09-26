@@ -152,10 +152,10 @@ void CellVolumeIntegralPostProcessor::Execute(const Event& event_context)
   {
     const auto& event_params = event_context.Parameters();
 
-    if (event_params.Has("timestep_index") and event_params.Has("timestamp"))
+    if (event_params.Has("timestep_index") and event_params.Has("time"))
     {
       const size_t index = event_params.GetParamValue<size_t>("timestep_index");
-      const double time = event_params.GetParamValue<double>("timestamp");
+      const double time = event_params.GetParamValue<double>("time");
       TimeHistoryEntry entry{index, time, value_};
       time_history_.push_back(std::move(entry));
     }

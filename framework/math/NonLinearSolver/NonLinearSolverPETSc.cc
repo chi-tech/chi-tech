@@ -1,4 +1,4 @@
-#include "non_linear_solver.h"
+#include "NonLinearSolverPETSc.h"
 
 #include <petscsnes.h>
 
@@ -9,7 +9,7 @@ namespace chi_math
 {
 
 template <>
-NonLinearSolver<Mat, Vec, SNES>::~NonLinearSolver()
+NonLinearSolverPETSc::~NonLinearSolver()
 {
   SNESDestroy(&nl_solver_);
   VecDestroy(&x_);
@@ -18,7 +18,7 @@ NonLinearSolver<Mat, Vec, SNES>::~NonLinearSolver()
 }
 
 template <>
-void NonLinearSolver<Mat, Vec, SNES>::ApplyToleranceOptions()
+void NonLinearSolverPETSc::ApplyToleranceOptions()
 {
   SNESSetTolerances(nl_solver_,
                     options_.nl_abs_tol_,
@@ -42,43 +42,43 @@ void NonLinearSolver<Mat, Vec, SNES>::ApplyToleranceOptions()
   KSPSetInitialGuessNonzero(ksp, PETSC_FALSE);
 }
 template <>
-void NonLinearSolver<Mat, Vec, SNES>::PreSetupCallback()
+void NonLinearSolverPETSc::PreSetupCallback()
 {
 }
 
 template <>
-void NonLinearSolver<Mat, Vec, SNES>::SetOptions()
+void NonLinearSolverPETSc::SetOptions()
 {
 }
 
 template <>
-void NonLinearSolver<Mat, Vec, SNES>::SetSolverContext()
+void NonLinearSolverPETSc::SetSolverContext()
 {
   SNESSetApplicationContext(nl_solver_, &(*context_ptr_));
 }
 
 template <>
-void NonLinearSolver<Mat, Vec, SNES>::SetConvergenceTest()
+void NonLinearSolverPETSc::SetConvergenceTest()
 {
 }
 
 template <>
-void NonLinearSolver<Mat, Vec, SNES>::SetMonitor()
+void NonLinearSolverPETSc::SetMonitor()
 {
 }
 
 template <>
-void NonLinearSolver<Mat, Vec, SNES>::SetPreconditioner()
+void NonLinearSolverPETSc::SetPreconditioner()
 {
 }
 
 template <>
-void NonLinearSolver<Mat, Vec, SNES>::PostSetupCallback()
+void NonLinearSolverPETSc::PostSetupCallback()
 {
 }
 
 template <>
-void NonLinearSolver<Mat, Vec, SNES>::Setup()
+void NonLinearSolverPETSc::Setup()
 {
   if (IsSystemSet()) return;
   this->PreSetupCallback();
@@ -122,17 +122,17 @@ void NonLinearSolver<Mat, Vec, SNES>::Setup()
 }
 
 template <>
-void NonLinearSolver<Mat, Vec, SNES>::PreSolveCallback()
+void NonLinearSolverPETSc::PreSolveCallback()
 {
 }
 
 template <>
-void NonLinearSolver<Mat, Vec, SNES>::PostSolveCallback()
+void NonLinearSolverPETSc::PostSolveCallback()
 {
 }
 
 template <>
-void NonLinearSolver<Mat, Vec, SNES>::Solve()
+void NonLinearSolverPETSc::Solve()
 {
   converged_ = false;
   converged_reason_string_ = "Reason not obtained";
@@ -154,7 +154,7 @@ void NonLinearSolver<Mat, Vec, SNES>::Solve()
 }
 
 template <>
-std::string NonLinearSolver<Mat, Vec, SNES>::GetConvergedReasonString() const
+std::string NonLinearSolverPETSc::GetConvergedReasonString() const
 {
   std::stringstream outstr;
   if (converged_)

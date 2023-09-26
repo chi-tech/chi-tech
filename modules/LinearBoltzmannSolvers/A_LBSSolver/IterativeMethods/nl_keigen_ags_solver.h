@@ -1,7 +1,7 @@
 #ifndef CHITECH_LBS_NL_KEIGEN_AGS_SOLVER_H
 #define CHITECH_LBS_NL_KEIGEN_AGS_SOLVER_H
 
-#include "math/NonLinearSolver/non_linear_solver.h"
+#include "math/NonLinearSolver/NonLinearSolver.h"
 #include "nl_keigen_ags_context.h"
 
 namespace lbs

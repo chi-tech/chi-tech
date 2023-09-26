@@ -5,7 +5,7 @@
 namespace chi_math
 {
 
-RegisterChiObject(chi_math, NonLinearSolverOptions);
+RegisterChiObjectParametersOnly(chi_math, NonLinearSolverOptions);
 
 chi::InputParameters NonLinearSolverOptions::GetInputParameters()
 {
@@ -48,7 +48,7 @@ chi::InputParameters NonLinearSolverOptions::GetInputParameters()
   params.AddOptionalParameter(
     "nl_max_r_evaluations",
     -1,
-    "Negative number disables this. The maximum allowed residual evaluations.");
+    "The maximum allowed residual evaluations. Negative number disables this.");
   params.AddOptionalParameter("l_max_failed_iterations",
                               1000,
                               "The maximum allowed non-linear iterations "

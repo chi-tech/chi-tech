@@ -1,7 +1,7 @@
 #ifndef CHITECH_CHI_MATH_NON_LINEAR_SOLVER_H
 #define CHITECH_CHI_MATH_NON_LINEAR_SOLVER_H
 
-#include "nl_solver_context.h"
+#include "NonLinearSolverContext.h"
 #include "NonLinearSolverOptions.h"
 
 #include <string>

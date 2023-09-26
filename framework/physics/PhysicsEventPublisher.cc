@@ -48,7 +48,7 @@ void PhysicsEventPublisher::SolverInitialize(Solver& solver)
     chi::ParameterBlock params;
     params.AddParameter("solver_name", solver.TextName());
     params.AddParameter("solver_handle", solver.StackID());
-    params.AddParameter("timestamp", solver.Time());
+    params.AddParameter("time", solver.Time());
 
     PublishEvent(
       chi::Event(event_name, chi::GetStandardEventCode(event_name), params));
@@ -127,7 +127,7 @@ void PhysicsEventPublisher::SolverAdvance(Solver& solver)
     chi::ParameterBlock params;
     params.AddParameter("solver_name", solver.TextName());
     params.AddParameter("solver_handle", solver.StackID());
-    params.AddParameter("timestamp", solver.Time());
+    params.AddParameter("time", solver.Time());
     params.AddParameter("timestep_index", solver.TimeStepIndex());
 
     PublishEvent(

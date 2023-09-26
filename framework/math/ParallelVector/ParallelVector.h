@@ -34,7 +34,12 @@ public:
   /**Move constructor.*/
   ParallelVector(ParallelVector&& other) noexcept;
 
+  /**Creates a copy of the vector datastructures AND values.
+  * This routine requires no communication.*/
   virtual std::unique_ptr<ParallelVector> MakeCopy() const = 0;
+
+  /**Creates a copy of the vector datastructures but NOT the values. The
+  * values are defaulted to zero. This routine requires no communication.*/
   virtual std::unique_ptr<ParallelVector> MakeNewVector() const = 0;
 
   /** Returns the raw stl-vector associated with the local data of this
@@ -111,17 +116,17 @@ public:
    * compatible.*/
   virtual void CopyValues(const ParallelVector& y) = 0;
 
-  /**Copies a contiguous block of local data from the source vector to the
-   * current vector. The blocks are specified with offset values and num_values.
-   * */
+  /**Copies a contiguous block of local data (num_values entries) from the
+  * source vector (starting at y_offset) to the
+   * current vector starting at local_offset. */
   virtual void BlockCopyLocalValues(const ParallelVector& y,
                                     int64_t y_offset,
                                     int64_t local_offset,
                                     int64_t num_values) = 0;
 
-  /**Copies a contiguous block of local data from the source STL vector to the
-   * current vector. The local block offset is specified with the local-offset
-   * value. The input STL vector must have num_values entries.
+  /**Copies a contiguous block of data from the source STL vector to the
+   * current vector starting at local_offset. The input STL vector must have
+   * exactly num_values entries.
    * */
   virtual void BlockCopyLocalValues(const std::vector<double>& y,
                                     int64_t local_offset,

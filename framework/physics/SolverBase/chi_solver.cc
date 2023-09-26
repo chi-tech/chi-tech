@@ -30,12 +30,19 @@ chi::InputParameters Solver::GetInputParameters()
     "Maximum number of timesteps to allow. Negative values disables this.");
 
   params.AddOptionalParameter(
-    "timestep_controller", 0, "Timestep controller to use for timestepping.");
+    "timestep_controller",
+    0,
+    "Timestep controller to use for timestepping. "
+    "Cannot be supplied if the time_controls parameter is supplied");
 
   params.AddOptionalParameterBlock(
     "time_controls",
     chi::ParameterBlock{},
-    "Parameters to pass to the time_controller.");
+    "Parameters to pass to the default time_controller. If a "
+    "timestep_controller is specified then this parameter can not be "
+    "specified.");
+  params.LinkParameterToBlock("time_controls",
+                              "chi_physics::TimeStepController");
 
   using namespace chi_data_types;
   params.ConstrainParameterRange("dt", AllowableRangeLowLimit::New(1.0e-12));

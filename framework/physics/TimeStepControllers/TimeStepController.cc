@@ -21,8 +21,8 @@ chi::InputParameters TimeStepController::GetInputParameters()
 
   params.AddOptionalParameter("eps",
                               1.0e-12,
-                              "General time tolerance. This is used to "
-                              "constrict the dt to the end-time.");
+                              "General time tolerance. This is used in "
+                              "fuzzy equals.");
 
   return params;
 }

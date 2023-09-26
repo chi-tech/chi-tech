@@ -1,7 +1,7 @@
 #ifndef CHITECH_LBS_NL_KEIGEN_ACC_CONTEXT_H
 #define CHITECH_LBS_NL_KEIGEN_ACC_CONTEXT_H
 
-#include "math/NonLinearSolver/nl_solver_context.h"
+#include "math/NonLinearSolver/NonLinearSolverContext.h"
 
 #include "diffusion_mip.h"
 #include "A_LBSSolver/IterativeMethods/snes_k_residual_func_context.h"
