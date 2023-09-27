@@ -50,7 +50,7 @@ public:
   }
 
   std::unique_ptr<ParallelVector> MakeCopy() const override;
-  std::unique_ptr<ParallelVector> MakeNewVector() const override;
+  std::unique_ptr<ParallelVector> MakeClone() const override;
 
   /// Return the number of ghosts associated with the local vector.
   uint64_t NumGhosts() const { return ghost_comm_.NumGhosts(); }

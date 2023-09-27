@@ -35,16 +35,20 @@ public:
   ParallelVector(ParallelVector&& other) noexcept;
 
   /**Creates a copy of the vector datastructures AND values.
-  * This routine requires no communication.*/
+   * This routine requires no communication.*/
   virtual std::unique_ptr<ParallelVector> MakeCopy() const = 0;
 
   /**Creates a copy of the vector datastructures but NOT the values. The
-  * values are defaulted to zero. This routine requires no communication.*/
-  virtual std::unique_ptr<ParallelVector> MakeNewVector() const = 0;
+   * values are defaulted to zero. This routine requires no communication.*/
+  virtual std::unique_ptr<ParallelVector> MakeClone() const = 0;
 
-  /** Returns the raw stl-vector associated with the local data of this
-   * vector.*/
-  virtual std::vector<double>& RawValues() = 0;
+  /** Returns a direct pointer to the memory array used internally by the vector
+   * to store its owned elements*/
+  virtual double* Data() = 0;
+
+  /** Returns a direct const pointer to the memory array used internally by the
+   * vector to store its owned elements*/
+  virtual const double* Data() const = 0;
 
   /// Return the size of the locally owned portion of the parallel vector.
   uint64_t LocalSize() const { return local_size_; }
@@ -87,6 +91,26 @@ public:
    */
   virtual void Set(const std::vector<double>& local_vector) = 0;
 
+  /**Copies a contiguous block of data from the source STL vector to the
+   * current vector starting at local_offset. The input STL vector must have
+   * exactly num_values entries.
+   * */
+  virtual void BlockSet(const std::vector<double>& y,
+                        int64_t local_offset,
+                        int64_t num_values) = 0;
+
+  /**Sets the local values of one vector equal to another. The sizes must be
+   * compatible.*/
+  virtual void CopyLocalValues(const ParallelVector& y) = 0;
+
+  /**Copies a contiguous block of local data (num_values entries) from the
+   * source vector (starting at y_offset) to the
+   * current vector starting at local_offset. */
+  virtual void BlockCopyLocalValues(const ParallelVector& y,
+                                    int64_t y_offset,
+                                    int64_t local_offset,
+                                    int64_t num_values) = 0;
+
   /**
    * Define a set or add operation for the given global id-value pair
    *
@@ -110,27 +134,16 @@ public:
   virtual void operator+=(const ParallelVector& y) = 0;
 
   /**Adds a vector multiplied by scalar a. Optimized for a=1.0 and -1.0*/
-  virtual void PlusAY(double a, const ParallelVector& y) = 0;
+  virtual void PlusAY(const ParallelVector& y, double a) = 0;
 
-  /**Sets the local values of one vector equal to another. The sizes must be
-   * compatible.*/
-  virtual void CopyValues(const ParallelVector& y) = 0;
+  /**Performs x = a*x + y with the current vector being x.*/
+  virtual void AXPlusY(double a, const ParallelVector& y) = 0;
 
-  /**Copies a contiguous block of local data (num_values entries) from the
-  * source vector (starting at y_offset) to the
-   * current vector starting at local_offset. */
-  virtual void BlockCopyLocalValues(const ParallelVector& y,
-                                    int64_t y_offset,
-                                    int64_t local_offset,
-                                    int64_t num_values) = 0;
+  /**Scales a vector by a scalar*/
+  virtual void Scale(double a) = 0;
 
-  /**Copies a contiguous block of data from the source STL vector to the
-   * current vector starting at local_offset. The input STL vector must have
-   * exactly num_values entries.
-   * */
-  virtual void BlockCopyLocalValues(const std::vector<double>& y,
-                                    int64_t local_offset,
-                                    int64_t num_values) = 0;
+  /**Adds a constant scalar value to all the entries of the vector*/
+  virtual void Shift(double a) = 0;
 
   /**Returns the specified norm of the vector.*/
   virtual double ComputeNorm(chi_math::NormType norm_type) const = 0;

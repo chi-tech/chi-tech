@@ -56,9 +56,10 @@ chi::ParameterBlock chi_math_Test02_ParallelVector(const chi::InputParameters&)
 
   {
     std::stringstream outstr;
-    const auto& raw_vals = ghost_vec.RawValues();
-    for (double val : raw_vals)
-      outstr << val << " ";
+    //const auto& raw_vals = ghost_vec.MakeLocalVector();
+    const double* data = ghost_vec.Data();
+    for (size_t i=0; i<ghost_vec.LocalSizeWithGhosts(); ++i)
+      outstr << data[i] << " ";
     Chi::log.LogAll() << "Ghost vec raw values: " << outstr.str();
   }
 
@@ -90,7 +91,7 @@ chi::ParameterBlock chi_math_Test02_ParallelVector(const chi::InputParameters&)
                  << "ADD_VALUE and CopyValues" << std::endl;
   ParallelSTLVector vec2(5, 10, Chi::mpi.comm);
 
-  vec2.CopyValues(vec);
+  vec2.CopyLocalValues(vec);
 
   if (Chi::mpi.location_id == 0) vec2.SetValue(5, 2.0, VecOpType::ADD_VALUE);
   else

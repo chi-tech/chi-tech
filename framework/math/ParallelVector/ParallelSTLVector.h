@@ -34,11 +34,15 @@ public:
   ParallelSTLVector(ParallelSTLVector&& other) noexcept;
 
   std::unique_ptr<ParallelVector> MakeCopy() const override;
-  std::unique_ptr<ParallelVector> MakeNewVector() const override;
+  std::unique_ptr<ParallelVector> MakeClone() const override;
 
-  /** Returns the raw stl-vector associated with the local data of this
-   * vector.*/
-  std::vector<double>& RawValues() override { return values_; }
+  /** Returns a direct pointer to the memory array used internally by the
+   * vector to store its owned elements.*/
+  double* Data() override;
+
+  /** Returns a direct const pointer to the memory array used internally by the
+   * vector to store its owned elements*/
+  const double* Data() const override;
 
   /**
    * Read only accessor to the entry at the given local index of
@@ -67,16 +71,33 @@ public:
    * Set the entries of the locally owned portion of the parallel vector
    * to the given value.
    */
-  void Set(const double value) override
-  {
-    values_.assign(values_.size(), value);
-  }
+  void Set(double value) override;
 
   /**
    * Set the entries of the locally owned portion of the parallel vector
    * to the given STL vector.
    */
   void Set(const std::vector<double>& local_vector) override;
+
+  /**Copies a contiguous block of data from the source STL vector to the
+   * current vector starting at local_offset. The input STL vector must have
+   * exactly num_values entries.
+   * */
+  void BlockSet(const std::vector<double>& y,
+                int64_t local_offset,
+                int64_t num_values) override;
+
+  /**Sets the local values of one vector equal to another. The sizes must be
+   * compatible.*/
+  void CopyLocalValues(const ParallelVector& y) override;
+
+  /**Copies a contiguous block of local data (num_values entries) from the
+   * source vector (starting at y_offset) to the
+   * current vector starting at local_offset. */
+  void BlockCopyLocalValues(const ParallelVector& y,
+                            int64_t y_offset,
+                            int64_t local_offset,
+                            int64_t num_values) override;
 
   /**
    * Define a set or add operation for the given global id-value pair
@@ -100,28 +121,17 @@ public:
   /**In place adding of vectors. The sizes must be compatible.*/
   void operator+=(const ParallelVector& y) override;
 
-  /**In place adding of vectors. The sizes must be compatible.*/
-  void operator+=(const ParallelSTLVector& y);
-
   /**Adds a vector multiplied by scalar a. Optimized for a=1.0 and -1.0*/
-  void PlusAY(double a, const ParallelVector& y) override;
+  void PlusAY(const ParallelVector& y, double a) override;
 
-  /**Sets the local values of one vector equal to another. The sizes must be
-   * compatible.*/
-  void CopyValues(const ParallelVector& y) override;
+  /**Performs x = a*x + y with the current vector being x.*/
+  void AXPlusY(double a, const ParallelVector& y) override;
 
-  /**Sets the local values of one vector equal to another. The sizes must be
-   * compatible.*/
-  void CopyValues(const ParallelSTLVector& y);
+  /**Adds a constant scalar value to all the entries of the vector*/
+  void Scale(double a) override;
 
-  void BlockCopyLocalValues(const ParallelVector& y,
-                            int64_t y_offset,
-                            int64_t local_offset,
-                            int64_t num_values) override;
-
-  void BlockCopyLocalValues(const std::vector<double>& y,
-                            int64_t local_offset,
-                            int64_t num_values) override;
+  /**Returns the specified norm of the vector.*/
+  void Shift(double a) override;
 
   /**Returns the specified norm of the vector.*/
   double ComputeNorm(chi_math::NormType norm_type) const override;

@@ -3,6 +3,7 @@
 #include "ChiObjectFactory.h"
 
 #include "physics/SolverBase/chi_solver.h"
+#include "physics/TimeStepControllers/TimeStepper.h"
 #include "event_system/Event.h"
 
 #include <algorithm>
@@ -58,7 +59,9 @@ void SolverInfoPostProcessor::Execute(const Event& event_context)
   if (event_code == 32 /*SolverInitialized*/ or
       event_code == 38 /*SolverAdvanced*/)
   {
-    TimeHistoryEntry entry{solver_.TimeStepIndex(), solver_.Time(), value_};
+    TimeHistoryEntry entry{solver_.GetTimeStepper().TimeStepIndex(),
+                           solver_.GetTimeStepper().Time(),
+                           value_};
     time_history_.push_back(std::move(entry));
   }
 }

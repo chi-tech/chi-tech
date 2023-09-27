@@ -12,7 +12,7 @@ std::unique_ptr<ParallelVector> GhostedParallelSTLVector::MakeCopy() const
   return std::make_unique<GhostedParallelSTLVector>(*this);
 }
 
-std::unique_ptr<ParallelVector> GhostedParallelSTLVector::MakeNewVector() const
+std::unique_ptr<ParallelVector> GhostedParallelSTLVector::MakeClone() const
 {
   auto new_vec = std::make_unique<GhostedParallelSTLVector>(*this);
 

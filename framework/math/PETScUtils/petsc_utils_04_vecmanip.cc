@@ -15,6 +15,10 @@ void chi_math::PETScUtils::CopyVecToSTLvector(Vec x,
     data.clear();
     data.assign(N, 0.0);
   }
+  else
+    ChiLogicalErrorIf(data.size() < N,
+                      "data.size() < N, " + std::to_string(data.size()) +
+                        " < " + std::to_string(N));
 
   const double* x_ref;
   VecGetArrayRead(x, &x_ref);
@@ -36,6 +40,10 @@ void chi_math::PETScUtils::CopyVecToSTLvectorWithGhosts(
     data.clear();
     data.assign(N, 0.0);
   }
+  else
+    ChiLogicalErrorIf(data.size() != N,
+                      "data.size() != N, " + std::to_string(data.size()) +
+                        " < " + std::to_string(N));
 
   auto info = GetGhostVectorLocalViewRead(x);
   const double* x_ref = info.x_localized_raw;

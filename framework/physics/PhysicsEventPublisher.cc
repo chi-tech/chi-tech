@@ -4,6 +4,7 @@
 #include "event_system/EventCodes.h"
 
 #include "SolverBase/chi_solver.h"
+#include "TimeStepControllers/TimeStepper.h"
 
 namespace chi_physics
 {
@@ -48,7 +49,7 @@ void PhysicsEventPublisher::SolverInitialize(Solver& solver)
     chi::ParameterBlock params;
     params.AddParameter("solver_name", solver.TextName());
     params.AddParameter("solver_handle", solver.StackID());
-    params.AddParameter("time", solver.Time());
+    params.AddParameter("time", solver.GetTimeStepper().Time());
 
     PublishEvent(
       chi::Event(event_name, chi::GetStandardEventCode(event_name), params));
@@ -127,8 +128,9 @@ void PhysicsEventPublisher::SolverAdvance(Solver& solver)
     chi::ParameterBlock params;
     params.AddParameter("solver_name", solver.TextName());
     params.AddParameter("solver_handle", solver.StackID());
-    params.AddParameter("time", solver.Time());
-    params.AddParameter("timestep_index", solver.TimeStepIndex());
+    params.AddParameter("time", solver.GetTimeStepper().Time());
+    params.AddParameter("timestep_index",
+                        solver.GetTimeStepper().TimeStepIndex());
 
     PublishEvent(
       chi::Event(event_name, chi::GetStandardEventCode(event_name), params));

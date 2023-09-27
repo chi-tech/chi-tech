@@ -44,7 +44,7 @@ std::unique_ptr<ParallelVector> ParallelSTLVector::MakeCopy() const
   return std::make_unique<ParallelSTLVector>(*this);
 }
 
-std::unique_ptr<ParallelVector> ParallelSTLVector::MakeNewVector() const
+std::unique_ptr<ParallelVector> ParallelSTLVector::MakeClone() const
 {
   auto new_vec = std::make_unique<ParallelSTLVector>(*this);
 
@@ -52,6 +52,9 @@ std::unique_ptr<ParallelVector> ParallelSTLVector::MakeNewVector() const
 
   return new_vec;
 }
+
+double* ParallelSTLVector::Data() { return values_.data(); }
+const double* ParallelSTLVector::Data() const { return values_.data(); }
 
 std::vector<double> ParallelSTLVector::MakeLocalVector()
 {
@@ -79,12 +82,84 @@ double& ParallelSTLVector::operator[](const int64_t local_id)
   return values_[local_id];
 }
 
+void ParallelSTLVector::Set(const double value)
+{
+  values_.assign(values_.size(), value);
+}
+
 void ParallelSTLVector::Set(const std::vector<double>& local_vector)
 {
-  ChiInvalidArgumentIf(local_vector.size() != local_size_,
+  ChiInvalidArgumentIf(local_vector.size() < local_size_,
                        "Incompatible local vector size.");
 
-  values_ = local_vector;
+  // We cannot assign values = local_vector because this might
+  // destroy the internals of a ghosted vector
+  for (size_t i = 0; i < local_size_; ++i)
+    values_[i] = local_vector[i];
+}
+
+void ParallelSTLVector::BlockSet(const std::vector<double>& y,
+                                 int64_t local_offset,
+                                 int64_t num_values)
+{
+  ChiInvalidArgumentIf(y.size() < num_values,
+                       "y.size() < num_values " + std::to_string(y.size()) +
+                         " < " + std::to_string(num_values));
+
+  const int64_t local_end = local_offset + num_values;
+  ChiInvalidArgumentIf(
+    local_end > local_size_,
+    "local_offset + num_values=" + std::to_string(local_end) +
+      ", is out of range for destination vector with local size " +
+      std::to_string(local_size_));
+
+  for (int64_t i = 0; i < num_values; ++i)
+    values_[local_offset + i] = y[i];
+}
+
+void ParallelSTLVector::CopyLocalValues(const ParallelVector& y)
+{
+  ChiLogicalErrorIf(y.LocalSize() != local_size_,
+                    "y.LocalSize() != local_size_");
+  ChiLogicalErrorIf(y.GlobalSize() != global_size_,
+                    "y.GlobalSize() != global_size_");
+
+  // This prevents us from unnecessarily going through the operator[]
+  // of y, which again applies bounds checking
+  const double* y_data = y.Data();
+
+  for (int64_t i = 0; i < local_size_; ++i)
+    values_[i] = y_data[i];
+}
+
+void ParallelSTLVector::BlockCopyLocalValues(const ParallelVector& y,
+                                             int64_t y_offset,
+                                             int64_t local_offset,
+                                             int64_t num_values)
+{
+  ChiInvalidArgumentIf(y_offset < 0, "y_offset < 0.");
+  ChiInvalidArgumentIf(local_offset < 0, "local_offset < 0.");
+
+  const int64_t y_end = y_offset + num_values;
+  const int64_t local_end = local_offset + num_values;
+
+  ChiInvalidArgumentIf(y_end > y.LocalSize(),
+                       "y_offset + num_values=" + std::to_string(y_end) +
+                         ", is out of range for vector y with local size " +
+                         std::to_string(y.LocalSize()));
+
+  ChiInvalidArgumentIf(
+    local_end > local_size_,
+    "local_offset + num_values=" + std::to_string(local_end) +
+      ", is out of range for destination vector with local size " +
+      std::to_string(local_size_));
+
+  // This prevents us from unnecessarily going through the operator[]
+  // of y, which again applies bounds checking
+  const double* y_data = y.Data();
+
+  for (int64_t i = 0; i < num_values; ++i)
+    values_[local_offset + i] = y_data[y_offset + i];
 }
 
 void ParallelSTLVector::SetValue(const int64_t global_id,
@@ -124,104 +199,61 @@ void ParallelSTLVector::operator+=(const ParallelVector& y)
   ChiLogicalErrorIf(y.GlobalSize() != global_size_,
                     "y.GlobalSize() != global_size_");
 
-  for (size_t i = 0; i < local_size_; ++i)
-    values_[i] += y[scint64_t(i)];
+  // This prevents us from unnecessarily going through the operator[]
+  // of y, which again applies bounds checking
+  const double* y_data = y.Data();
+
+  for (int64_t i = 0; i < local_size_; ++i)
+    values_[i] += y_data[i];
 }
 
-void ParallelSTLVector::operator+=(const ParallelSTLVector& y)
+void ParallelSTLVector::PlusAY(const ParallelVector& y, double a)
 {
   ChiLogicalErrorIf(y.LocalSize() != local_size_,
                     "y.LocalSize() != local_size_");
   ChiLogicalErrorIf(y.GlobalSize() != global_size_,
                     "y.GlobalSize() != global_size_");
 
-  for (size_t i = 0; i < local_size_; ++i)
-    values_[i] += y.values_[i];
-}
-
-void ParallelSTLVector::PlusAY(double a, const ParallelVector& y)
-{
-  ChiLogicalErrorIf(y.LocalSize() != local_size_,
-                    "y.LocalSize() != local_size_");
-  ChiLogicalErrorIf(y.GlobalSize() != global_size_,
-                    "y.GlobalSize() != global_size_");
+  // This prevents us from unnecessarily going through the operator[]
+  // of y, which again applies bounds checking
+  const double* y_data = y.Data();
 
   if (a == 1.0)
-    for (size_t i = 0; i < local_size_; ++i)
-      values_[i] += y[scint64_t(i)];
+    for (int64_t i = 0; i < local_size_; ++i)
+      values_[i] += y_data[i];
   else if (a == -1.0)
-    for (size_t i = 0; i < local_size_; ++i)
-      values_[i] -= y[scint64_t(i)];
+    for (int64_t i = 0; i < local_size_; ++i)
+      values_[i] -= y_data[i];
   else
-    for (size_t i = 0; i < local_size_; ++i)
-      values_[i] += a * y[scint64_t(i)];
+    for (int64_t i = 0; i < local_size_; ++i)
+      values_[i] += a * y_data[i];
 }
 
-void ParallelSTLVector::CopyValues(const ParallelVector& y)
+void ParallelSTLVector::AXPlusY(double a, const ParallelVector& y)
 {
   ChiLogicalErrorIf(y.LocalSize() != local_size_,
                     "y.LocalSize() != local_size_");
   ChiLogicalErrorIf(y.GlobalSize() != global_size_,
                     "y.GlobalSize() != global_size_");
 
+  // This prevents us from unnecessarily going through the operator[]
+  // of y, which again applies bounds checking
+  const double* y_data = y.Data();
+
+  for (int64_t i = 0; i < local_size_; ++i)
+    values_[i] = a * values_[i] + y_data[i];
+}
+
+void ParallelSTLVector::Scale(double a)
+{
   for (size_t i = 0; i < local_size_; ++i)
-    values_[i] = y[scint64_t(i)];
+    values_[i] *= a;
 }
 
-void ParallelSTLVector::CopyValues(const ParallelSTLVector& y)
+void ParallelSTLVector::Shift(double a)
 {
-  ChiLogicalErrorIf(y.LocalSize() != local_size_,
-                    "y.LocalSize() != local_size_");
-  ChiLogicalErrorIf(y.GlobalSize() != global_size_,
-                    "y.GlobalSize() != global_size_");
-
   for (size_t i = 0; i < local_size_; ++i)
-    values_[i] = y.values_[i];
-}
-
-void ParallelSTLVector::BlockCopyLocalValues(const ParallelVector& y,
-                                             int64_t y_offset,
-                                             int64_t local_offset,
-                                             int64_t num_values)
-{
-  ChiInvalidArgumentIf(y_offset < 0, "y_offset < 0.");
-  ChiInvalidArgumentIf(local_offset < 0, "local_offset < 0.");
-
-  const int64_t y_end = y_offset + num_values;
-  const int64_t local_end = local_offset + num_values;
-
-  ChiInvalidArgumentIf(y_end > y.LocalSize(),
-                       "y_offset + num_values=" + std::to_string(y_end) +
-                         ", is out of range for vector y with local size " +
-                         std::to_string(y.LocalSize()));
-
-  ChiInvalidArgumentIf(
-    local_end > local_size_,
-    "local_offset + num_values=" + std::to_string(local_end) +
-      ", is out of range for destination vector with local size " +
-      std::to_string(local_size_));
-
-  for (int64_t i = 0; i < num_values; ++i)
-    values_[local_offset + i] = y[y_offset + i];
-}
-
-void ParallelSTLVector::BlockCopyLocalValues(const std::vector<double>& y,
-                                             int64_t local_offset,
-                                             int64_t num_values)
-{
-  ChiInvalidArgumentIf(y.size() < num_values,
-                       "y.size() < num_values " + std::to_string(y.size()) +
-                         " < " + std::to_string(num_values));
-
-  const int64_t local_end = local_offset + num_values;
-  ChiInvalidArgumentIf(
-    local_end > local_size_,
-    "local_offset + num_values=" + std::to_string(local_end) +
-      ", is out of range for destination vector with local size " +
-      std::to_string(local_size_));
-
-  for (int64_t i = 0; i < num_values; ++i)
-    values_[local_offset + i] = y[i];
+    values_[i] += a;
 }
 
 /**Returns the specified norm of the vector.*/
