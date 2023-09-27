@@ -154,6 +154,20 @@ void ParallelSTLVector::CopyLocalValues(Vec y)
   VecRestoreArrayRead(y, &x);
 }
 
+void ParallelSTLVector::CopyLocalValues(Vec y)
+{
+  PetscInt n;
+  VecGetLocalSize(y, &n);
+
+  ChiInvalidArgumentIf(n < local_size_,
+                       "Attempted update with a vector of insufficient size.");
+
+  const double* x;
+  VecGetArrayRead(y, &x);
+  std::copy(x, x + n, values_.begin());
+  VecRestoreArrayRead(y, &x);
+}
+
 void ParallelSTLVector::BlockCopyLocalValues(const ParallelVector& y,
                                              int64_t y_offset,
                                              int64_t local_offset,
