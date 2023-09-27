@@ -1,6 +1,6 @@
 #include "point_reactor_kinetics.h"
 
-#include "physics/TimeStepControllers/TimeStepper.h"
+#include "physics/TimeSteppers/TimeStepper.h"
 #include "physics/PhysicsEventPublisher.h"
 
 #include "ChiObjectFactory.h"

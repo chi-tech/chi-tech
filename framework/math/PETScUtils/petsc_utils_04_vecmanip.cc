@@ -59,8 +59,7 @@ void chi_math::PETScUtils::CopySTLvectorToVec(const std::vector<double>& data,
   double* x_ref;
   VecGetArray(x, &x_ref);
 
-  for (size_t i = 0; i < N; ++i)
-    x_ref[i] = data[i];
+  std::copy(data.begin(), data.end(), x_ref);
 
   VecRestoreArray(x, &x_ref);
 }
@@ -103,8 +102,7 @@ void chi_math::PETScUtils::CopyGlobalVecToSTLvector(
   const double* x_ref;
   VecGetArrayRead(local_vec, &x_ref);
 
-  for (size_t i = 0; i < N; ++i)
-    data[i] = x_ref[i];
+  std::copy(x_ref, x_ref+N, data.begin());
 
   VecRestoreArrayRead(x, &x_ref);
 

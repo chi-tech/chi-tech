@@ -94,8 +94,9 @@ void ParallelSTLVector::Set(const std::vector<double>& local_vector)
 
   // We cannot assign values = local_vector because this might
   // destroy the internals of a ghosted vector
-  for (size_t i = 0; i < local_size_; ++i)
-    values_[i] = local_vector[i];
+  std::copy(local_vector.begin(),
+            local_vector.begin() + scint64_t(local_size_),
+            values_.begin());
 }
 
 void ParallelSTLVector::BlockSet(const std::vector<double>& y,
@@ -113,8 +114,7 @@ void ParallelSTLVector::BlockSet(const std::vector<double>& y,
       ", is out of range for destination vector with local size " +
       std::to_string(local_size_));
 
-  for (int64_t i = 0; i < num_values; ++i)
-    values_[local_offset + i] = y[i];
+  std::copy(y.begin(), y.begin() + num_values, values_.begin() + local_offset);
 }
 
 void ParallelSTLVector::CopyLocalValues(const ParallelVector& y)
@@ -128,8 +128,7 @@ void ParallelSTLVector::CopyLocalValues(const ParallelVector& y)
   // of y, which again applies bounds checking
   const double* y_data = y.Data();
 
-  for (int64_t i = 0; i < local_size_; ++i)
-    values_[i] = y_data[i];
+  std::copy(y_data, y_data + local_size_, values_.begin());
 }
 
 void ParallelSTLVector::BlockCopyLocalValues(const ParallelVector& y,
@@ -158,8 +157,9 @@ void ParallelSTLVector::BlockCopyLocalValues(const ParallelVector& y,
   // of y, which again applies bounds checking
   const double* y_data = y.Data();
 
-  for (int64_t i = 0; i < num_values; ++i)
-    values_[local_offset + i] = y_data[y_offset + i];
+  std::copy(y_data + y_offset,
+            y_data + y_offset + num_values,
+            values_.begin() + local_offset);
 }
 
 void ParallelSTLVector::SetValue(const int64_t global_id,

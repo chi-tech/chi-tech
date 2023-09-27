@@ -59,7 +59,8 @@ public:
   * advance time and the time index.*/
   virtual void Advance();
 
-  /**Adapts according to the timestep status.*/
+  /**Adapts according to the timestep status. If it could provide a change
+  * it returns true, otherwise false.*/
   virtual bool Adapt(TimeStepStatus time_step_status) {return false;}
 
   /**Builds a formatted string of the time information.*/

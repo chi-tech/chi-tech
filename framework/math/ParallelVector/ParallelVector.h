@@ -133,7 +133,8 @@ public:
   /**In place adding of vectors. The sizes must be compatible.*/
   virtual void operator+=(const ParallelVector& y) = 0;
 
-  /**Adds a vector multiplied by scalar a. Optimized for a=1.0 and -1.0*/
+  /**Adds a vector multiplied by scalar a, x=x+a*y. Optimized for a=1.0 and
+   * -1.0*/
   virtual void PlusAY(const ParallelVector& y, double a) = 0;
 
   /**Performs x = a*x + y with the current vector being x.*/

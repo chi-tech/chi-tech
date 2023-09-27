@@ -3,7 +3,7 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-#include "physics/TimeStepControllers/ConstantTimeStepper.h"
+#include "physics/TimeSteppers/ConstantTimeStepper.h"
 
 #include "ChiObjectFactory.h"
 
@@ -23,7 +23,7 @@ chi::InputParameters Solver::GetInputParameters()
   params.AddOptionalParameter("dt", 0.01, "Desired initial timestep size.");
   params.AddOptionalParameter("time", 0.0, "Current time of the solver.");
   params.AddOptionalParameter(
-    "start_time", 1.0, "Transient start-time if applicable.");
+    "start_time", 0.0, "Transient start-time if applicable.");
   params.AddOptionalParameter(
     "end_time", 1.0, "Transient end-time if applicable.");
   params.AddOptionalParameter(
