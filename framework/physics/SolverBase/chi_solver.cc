@@ -3,7 +3,7 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-#include "physics/TimeStepControllers/ConstantTimeStepController.h"
+#include "physics/TimeSteppers/ConstantTimeStepper.h"
 
 #include "ChiObjectFactory.h"
 
@@ -23,6 +23,8 @@ chi::InputParameters Solver::GetInputParameters()
   params.AddOptionalParameter("dt", 0.01, "Desired initial timestep size.");
   params.AddOptionalParameter("time", 0.0, "Current time of the solver.");
   params.AddOptionalParameter(
+    "start_time", 0.0, "Transient start-time if applicable.");
+  params.AddOptionalParameter(
     "end_time", 1.0, "Transient end-time if applicable.");
   params.AddOptionalParameter(
     "max_time_steps",
@@ -30,7 +32,10 @@ chi::InputParameters Solver::GetInputParameters()
     "Maximum number of timesteps to allow. Negative values disables this.");
 
   params.AddOptionalParameter(
-    "timestep_controller", 0, "Timestep controller to use for timestepping.");
+    "timestepper",
+    0,
+    "Handle to a timestepper. If not supplied then a ConstantTimeStepper "
+    "will be created.");
 
   using namespace chi_data_types;
   params.ConstrainParameterRange("dt", AllowableRangeLowLimit::New(1.0e-12));
@@ -38,31 +43,69 @@ chi::InputParameters Solver::GetInputParameters()
   return params;
 }
 
+Solver::Solver(std::string in_text_name)
+  : timestepper_(InitTimeStepper(GetInputParameters())),
+    text_name_(std::move(in_text_name))
+{
+}
+
+Solver::Solver(std::string in_text_name,
+               std::initializer_list<BasicOption> in_options)
+  : basic_options_(in_options),
+    timestepper_(InitTimeStepper(GetInputParameters())),
+    text_name_(std::move(in_text_name))
+{
+}
+
 Solver::Solver(const chi::InputParameters& params)
   : ChiObject(params),
-    text_name_(params.GetParamValue<std::string>("name")),
-    dt_(params.GetParamValue<double>("dt")),
-    time_(params.GetParamValue<double>("time")),
-    end_time_(params.GetParamValue<double>("end_time")),
-    max_time_steps_(params.GetParamValue<int>("max_time_steps"))
+    timestepper_(InitTimeStepper(params)),
+    text_name_(params.GetParamValue<std::string>("name"))
+{
+}
+
+std::shared_ptr<TimeStepper>
+Solver::InitTimeStepper(const chi::InputParameters& params)
 {
   const auto& user_params = params.ParametersAtAssignment();
 
-  if (not user_params.Has("timestep_controller"))
+  if (user_params.Has("timestepper"))
   {
-    chi::ParameterBlock ts_params;
-    ts_params.AddParameter("initial_dt", dt_);
+    auto stepper = Chi::GetStackItemPtrAsType<TimeStepper>(
+      /*stack=*/Chi::object_stack,
+      /*handle=*/params.GetParamValue<size_t>("timestepper"),
+      /*calling_function_name=*/__FUNCTION__);
 
-    size_t handle = ChiObjectFactory::GetInstance().MakeRegisteredObjectOfType(
-      "chi_physics::ConstantTimeStepController", ts_params);
-    time_step_controller_ = Chi::GetStackItemPtrAsType<TimeStepController>(
-      Chi::object_stack, handle, __FUNCTION__);
+    stepper->SetTimeStepSize(params.GetParamValue<double>("dt"));
+    stepper->SetTime(params.GetParamValue<double>("time"));
+    stepper->SetStartTime(params.GetParamValue<double>("start_time"));
+    stepper->SetEndTime(params.GetParamValue<double>("end_time"));
+    stepper->SetMaxTimeSteps(params.GetParamValue<int>("max_time_steps"));
+
+    return stepper;
   }
   else
   {
-    const size_t handle = params.GetParamValue<size_t>("timestep_controller");
-    time_step_controller_ = Chi::GetStackItemPtrAsType<TimeStepController>(
-      Chi::object_stack, handle, __FUNCTION__);
+    auto& factory = ChiObjectFactory::GetInstance();
+
+    const std::string obj_type = "chi_physics::ConstantTimeStepper";
+    auto valid_params = factory.GetRegisteredObjectParameters(obj_type);
+    chi::ParameterBlock custom_params;
+
+    if (params.NumParameters() != 0)
+    {
+      custom_params.AddParameter(params.GetParam("dt"));
+      custom_params.AddParameter(params.GetParam("time"));
+      custom_params.AddParameter(params.GetParam("start_time"));
+      custom_params.AddParameter(params.GetParam("end_time"));
+      custom_params.AddParameter(params.GetParam("max_time_steps"));
+    }
+
+    auto stepper = std::make_shared<ConstantTimeStepper>(valid_params);
+    Chi::object_stack.push_back(stepper);
+    stepper->SetStackID(Chi::object_stack.size() - 1);
+
+    return stepper;
   }
 }
 
@@ -78,13 +121,17 @@ Solver::GetFieldFunctions()
   return field_functions_;
 }
 
-double Solver::TimeStepSize() const { return dt_; }
-double Solver::Time() const { return time_; }
-double Solver::EndTime() const { return end_time_; }
+TimeStepper& Solver::GetTimeStepper()
+{
+  ChiLogicalErrorIf(not timestepper_, "Bad trouble: Timestepper not assigned.");
+  return *timestepper_;
+}
 
-int Solver::MaxTimeSteps() const { return max_time_steps_; }
-
-size_t Solver::TimeStepIndex() const { return t_index_; }
+const TimeStepper& Solver::GetTimeStepper() const
+{
+  ChiLogicalErrorIf(not timestepper_, "Bad trouble: Timestepper not assigned.");
+  return *timestepper_;
+}
 
 const std::vector<std::shared_ptr<FieldFunctionGridBased>>&
 Solver::GetFieldFunctions() const

@@ -72,17 +72,17 @@ void PowerIterationKEigen2(LBSSolver& lbs_solver,
 
   auto& tolerances = nl_keigen_diff_solver.ToleranceOptions();
 
-  tolerances.nl_absolute_tol = basic_options("PISA_NL_ABS_TOL").FloatValue();
-  tolerances.nl_relative_tol = basic_options("PISA_NL_REL_TOL").FloatValue();
-  tolerances.nl_solution_tol = basic_options("PISA_NL_SOL_TOL").FloatValue();
-  tolerances.nl_max_iterations =
+  tolerances.nl_abs_tol_ = basic_options("PISA_NL_ABS_TOL").FloatValue();
+  tolerances.nl_rel_tol_ = basic_options("PISA_NL_REL_TOL").FloatValue();
+  tolerances.nl_sol_tol_ = basic_options("PISA_NL_SOL_TOL").FloatValue();
+  tolerances.nl_max_its_ =
     static_cast<int>(basic_options("PISA_NL_MAX_ITS").IntegerValue());
 
-  tolerances.l_absolute_tol = basic_options("PISA_L_ABS_TOL").FloatValue();
-  tolerances.l_relative_tol = basic_options("PISA_L_REL_TOL").FloatValue();
-  tolerances.l_max_iterations =
+  tolerances.l_abs_tol_ = basic_options("PISA_L_ABS_TOL").FloatValue();
+  tolerances.l_rel_tol_ = basic_options("PISA_L_REL_TOL").FloatValue();
+  tolerances.l_max_its_ =
     static_cast<int>(basic_options("PISA_L_MAX_ITS").IntegerValue());
-  tolerances.l_gmres_restart_interval =
+  tolerances.l_gmres_restart_intvl_ =
     static_cast<int>(basic_options("PISA_L_MAX_ITS").IntegerValue());
 
   double F_prev = 1.0;

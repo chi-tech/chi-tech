@@ -6,6 +6,7 @@
 #include "math/SpatialDiscretization/spatial_discretization.h"
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 #include "mesh/LogicalVolume/LogicalVolume.h"
+#include "event_system/Event.h"
 
 namespace chi
 {
@@ -163,6 +164,21 @@ void AggregateNodalValuePostProcessor::Execute(const Event& event_context)
   }
   else
     ChiLogicalError("Unsupported operation type \"" + operation_ + "\".");
+
+  const int event_code = event_context.Code();
+  if (event_code == 32 /*SolverInitialized*/ or
+      event_code == 38 /*SolverAdvanced*/)
+  {
+    const auto& event_params = event_context.Parameters();
+
+    if (event_params.Has("timestep_index") and event_params.Has("time"))
+    {
+      const size_t index = event_params.GetParamValue<size_t>("timestep_index");
+      const double time = event_params.GetParamValue<double>("time");
+      TimeHistoryEntry entry{index, time, value_};
+      time_history_.push_back(std::move(entry));
+    }
+  }
 }
 
 } // namespace chi

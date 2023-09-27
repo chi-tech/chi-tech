@@ -1,25 +1,25 @@
 #ifndef CHITECH_LBS_NL_KEIGEN_AGS_SOLVER_H
 #define CHITECH_LBS_NL_KEIGEN_AGS_SOLVER_H
 
-#include "math/NonLinearSolver/non_linear_solver.h"
+#include "math/NonLinearSolver/NonLinearSolver.h"
 #include "nl_keigen_ags_context.h"
 
 namespace lbs
 {
 
-template<class MatType, class VecType, class SolverType>
-class NLKEigenvalueAGSSolver :
-  public chi_math::NonLinearSolver<MatType,VecType,SolverType>
+template <class MatType, class VecType, class SolverType>
+class NLKEigenvalueAGSSolver
+  : public chi_math::NonLinearSolver<MatType, VecType, SolverType>
 {
 public:
   typedef NLKEigenAGSContext<VecType, SolverType> NLKAGSContext;
   typedef std::shared_ptr<NLKAGSContext> NLKAGSContextPtr;
 
-  NLKEigenvalueAGSSolver(std::string nl_method,
-                         NLKAGSContextPtr nlk_ags_context_ptr) :
-    chi_math::NonLinearSolver<MatType,VecType,SolverType>
-      (std::move(nl_method),nlk_ags_context_ptr)
-  {}
+  explicit NLKEigenvalueAGSSolver(NLKAGSContextPtr nlk_ags_context_ptr)
+    : chi_math::NonLinearSolver<MatType, VecType, SolverType>(
+        nlk_ags_context_ptr)
+  {
+  }
 
   virtual ~NLKEigenvalueAGSSolver() override = default;
 
@@ -43,11 +43,10 @@ protected:
   /*void PreSolveCallback();*/
   void SetInitialGuess() override;
   void PostSolveCallback() override;
-//public:
-//  void Solve();
-
+  // public:
+  //   void Solve();
 };
 
-}//namespace lbs
+} // namespace lbs
 
-#endif //CHITECH_LBS_NL_KEIGEN_AGS_SOLVER_H
+#endif // CHITECH_LBS_NL_KEIGEN_AGS_SOLVER_H

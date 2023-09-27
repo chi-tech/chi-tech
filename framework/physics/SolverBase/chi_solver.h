@@ -13,26 +13,19 @@
 namespace chi_physics
 {
 class FieldFunctionGridBased;
-class TimeStepController;
-}
+class TimeStepper;
 
 /**\defgroup LuaSolver Solvers
  * \ingroup LuaPhysics*/
 
 // ######################################################### Solver parent class
-class chi_physics::Solver : public ChiObject
+class Solver : public ChiObject
 {
 public:
   static chi::InputParameters GetInputParameters();
-  explicit Solver(std::string in_text_name)
-    : text_name_(std::move(in_text_name))
-  {
-  }
+  explicit Solver(std::string in_text_name);
   Solver(std::string in_text_name,
-         std::initializer_list<BasicOption> in_options)
-    : text_name_(std::move(in_text_name)), basic_options_(in_options)
-  {
-  }
+         std::initializer_list<BasicOption> in_options);
   explicit Solver(const chi::InputParameters& params);
   virtual ~Solver() = default;
 
@@ -46,11 +39,8 @@ public:
   const std::vector<std::shared_ptr<FieldFunctionGridBased>>&
   GetFieldFunctions() const;
 
-  virtual double TimeStepSize() const;
-  virtual double Time() const;
-  virtual double EndTime() const;
-  virtual int MaxTimeSteps() const;
-  virtual size_t TimeStepIndex() const;
+  TimeStepper& GetTimeStepper();
+  const TimeStepper& GetTimeStepper() const;
 
   virtual void Initialize();
   virtual void Execute();
@@ -63,21 +53,17 @@ public:
   chi::ParameterBlock
   GetInfoWithPreCheck(const chi::ParameterBlock& params) const;
 
-private:
-  const std::string text_name_;
-
 protected:
   BasicOptions basic_options_;
   std::vector<std::shared_ptr<FieldFunctionGridBased>> field_functions_;
+  std::shared_ptr<TimeStepper> timestepper_ = nullptr;
 
-  std::shared_ptr<TimeStepController> time_step_controller_ = nullptr;
-
-  double dt_ = 0.01;
-  double time_ = 0.0;
-  size_t t_index_ = 0;
-
-  double end_time_ = 1.0;
-  int max_time_steps_ = -1;
+private:
+  static std::shared_ptr<TimeStepper>
+  InitTimeStepper(const chi::InputParameters& params);
+  const std::string text_name_;
 };
+
+} // namespace chi_physics
 
 #endif

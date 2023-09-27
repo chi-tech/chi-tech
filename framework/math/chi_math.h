@@ -43,6 +43,13 @@ namespace chi_math
     LAGRANGE_DISCONTINUOUS         = 5
   };
 
+  enum class NormType : int
+  {
+    L1_NORM = 1,
+    L2_NORM = 2,
+    LINF_NORM = 3
+  };
+
   int SampleCDF(double x, std::vector<double> cdf_bin);
 
   //01 Utility

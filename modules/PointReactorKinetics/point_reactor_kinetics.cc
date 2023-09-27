@@ -1,5 +1,8 @@
 #include "point_reactor_kinetics.h"
 
+#include "physics/TimeSteppers/TimeStepper.h"
+#include "physics/PhysicsEventPublisher.h"
+
 #include "ChiObjectFactory.h"
 
 #include "chi_runtime.h"
@@ -149,11 +152,25 @@ void TransientSolver::Initialize()
 }
 
 /**Execution function.*/
-void TransientSolver::Execute() {}
+void TransientSolver::Execute()
+{
+  auto& physics_ev_pub = chi_physics::PhysicsEventPublisher::GetInstance();
+
+  while (timestepper_->IsActive())
+  {
+    physics_ev_pub.SolverStep(*this);
+    physics_ev_pub.SolverAdvance(*this);
+  }
+}
 
 /**Step function*/
 void TransientSolver::Step()
 {
+  Chi::log.Log() << "Solver \"" + TextName() + "\" " +
+                      timestepper_->StringTimeInfo();
+
+  const double dt = timestepper_->TimeStepSize();
+
   A_[0][0] = beta_ * (rho_ - 1.0) / gen_time_;
 
   if (time_integration_ == "implicit_euler" or
@@ -165,7 +182,7 @@ void TransientSolver::Step()
     else if (time_integration_ == "crank_nicolson")
       theta = 0.5;
 
-    const double inv_tau = theta * dt_;
+    const double inv_tau = theta * dt;
 
     auto A_theta = I_ - inv_tau * A_;
     auto b_theta = x_t_ + inv_tau * q_;
@@ -176,12 +193,12 @@ void TransientSolver::Step()
   }
   else if (time_integration_ == "explicit_euler")
   {
-    x_tp1_ = x_t_ + dt_ * A_ * x_t_ + dt_ * q_;
+    x_tp1_ = x_t_ + dt * A_ * x_t_ + dt * q_;
   }
   else
     ChiLogicalError("Unsupported time integration scheme.");
 
-  period_tph_ = dt_ / log(x_tp1_[0] / x_t_[0]);
+  period_tph_ = dt / log(x_tp1_[0] / x_t_[0]);
 
   if (period_tph_ > 0.0 and period_tph_ > 1.0e6) period_tph_ = 1.0e6;
   if (period_tph_ < 0.0 and period_tph_ < -1.0e6) period_tph_ = -1.0e6;
@@ -190,8 +207,8 @@ void TransientSolver::Step()
 /**Advance time values function.*/
 void TransientSolver::Advance()
 {
-  time_ += dt_;
   x_t_ = x_tp1_;
+  timestepper_->Advance();
 }
 
 chi::ParameterBlock
@@ -220,13 +237,12 @@ TransientSolver::GetInfo(const chi::ParameterBlock& params) const
     block.AddParameter("name", TextName());
     block.AddParameter("time_integration", time_integration_);
     block.AddParameter("rho", rho_);
-    block.AddParameter("max_timesteps", MaxTimeSteps());
+    block.AddParameter("max_timesteps", timestepper_->MaxTimeSteps());
 
     return block;
   }
   else
     ChiInvalidArgument("Unsupported info name \"" + param_name + "\".");
-
 }
 
 // ##################################################################
@@ -239,10 +255,13 @@ double TransientSolver::PopulationNew() const { return x_tp1_[0]; }
 double TransientSolver::Period() const { return period_tph_; }
 
 /**Returns the time computed for the last time step.*/
-double TransientSolver::TimePrev() const { return time_; }
+double TransientSolver::TimePrev() const { return timestepper_->Time(); }
 
 /**Returns the time computed for the next time step.*/
-double TransientSolver::TimeNew() const { return time_ + dt_; }
+double TransientSolver::TimeNew() const
+{
+  return timestepper_->Time() + timestepper_->TimeStepSize();
+}
 
 /**Returns the solution at the previous time step.*/
 std::vector<double> TransientSolver::SolutionPrev() const

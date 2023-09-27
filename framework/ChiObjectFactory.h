@@ -1,7 +1,7 @@
 #ifndef CHITECH_OBJECT_FACTORY_H
 #define CHITECH_OBJECT_FACTORY_H
 
-#include"parameters/input_parameters.h"
+#include "parameters/input_parameters.h"
 #include "ChiObject.h"
 
 #include "chi_log_exceptions.h"
@@ -139,6 +139,10 @@ public:
   size_t MakeRegisteredObject(const chi::ParameterBlock& params) const;
   size_t MakeRegisteredObjectOfType(const std::string& type,
                                     const chi::ParameterBlock& params) const;
+
+  /**Returns the input parameters of a registered object.*/
+  chi::InputParameters
+  GetRegisteredObjectParameters(const std::string& type) const;
 
   /**\brief Dumps the object registry to stdout.*/
   void DumpRegister() const;

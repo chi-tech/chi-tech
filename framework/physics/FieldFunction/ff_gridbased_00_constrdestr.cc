@@ -24,6 +24,10 @@ chi::InputParameters FieldFunctionGridBased::GetInputParameters()
   params.AddOptionalParameter(
     "initial_value", 0.0, "The initial value to assign to the field function");
 
+  using namespace chi_data_types;
+  params.ConstrainParameterRange(
+    "sdm_type", AllowableRangeList::New({"FV", "PWLC", "PWLD"}));
+
   return params;
 }
 

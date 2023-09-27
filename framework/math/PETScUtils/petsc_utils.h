@@ -62,8 +62,10 @@ namespace chi_math::PETScUtils
                      PetscReal rnorm, void *);
 
   //04
-  void CopyVecToSTLvector(Vec x, std::vector<double>& data, size_t N);
-  void CopyVecToSTLvectorWithGhosts(Vec x, std::vector<double>& data, size_t N);
+  void CopyVecToSTLvector(Vec x, std::vector<double>& data, size_t N, bool resize_STL = true);
+  void CopyVecToSTLvectorWithGhosts(Vec x, std::vector<double>& data, size_t N, bool resize_STL = true);
+
+  void CopySTLvectorToVec(const std::vector<double>& data, Vec x, size_t N);
 
   void CopyGlobalVecToSTLvector(
     Vec x,

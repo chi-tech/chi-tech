@@ -31,8 +31,7 @@ bool ChiObjectFactory::RegistryHasKey(const std::string& key) const
  * object stack. Returns a handle to the object. The object type is
  * obtained from a string parameter name `chi_obj_type`.*/
 size_t
-ChiObjectFactory::MakeRegisteredObject(
-  const chi::ParameterBlock& params) const
+ChiObjectFactory::MakeRegisteredObject(const chi::ParameterBlock& params) const
 {
   if (Chi::log.GetVerbosity() >= 2)
     Chi::log.Log() << "Making object with type from parameters";
@@ -77,6 +76,7 @@ size_t ChiObjectFactory::MakeRegisteredObjectOfType(
   auto input_params = object_entry.get_in_params_func();
 
   input_params.SetObjectType(type);
+  input_params.SetErrorOriginScope(type);
 
   if (Chi::log.GetVerbosity() >= 2)
     Chi::log.Log() << "Assigning parameters for object " << type;
@@ -95,6 +95,21 @@ size_t ChiObjectFactory::MakeRegisteredObjectOfType(
                    << new_object->StackID();
 
   return new_object->StackID();
+}
+
+// ##################################################################
+/**Returns the input parameters of a registered object.*/
+chi::InputParameters
+ChiObjectFactory::GetRegisteredObjectParameters(const std::string& type) const
+{
+  auto iter = object_registry_.find(type);
+  ChiInvalidArgumentIf(iter == object_registry_.end(),
+                       "Object type \"" + type +
+                         "\" is not registered in ChiObjectFactory.");
+
+  auto& reg_entry = iter->second;
+
+  return reg_entry.get_in_params_func();
 }
 
 // ##################################################################

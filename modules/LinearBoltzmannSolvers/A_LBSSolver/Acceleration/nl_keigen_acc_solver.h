@@ -1,7 +1,7 @@
 #ifndef CHITECH_LBS_NL_KEIGEN_ACC_SOLVER_H
 #define CHITECH_LBS_NL_KEIGEN_ACC_SOLVER_H
 
-#include "math/NonLinearSolver/non_linear_solver.h"
+#include "math/NonLinearSolver/NonLinearSolver.h"
 
 #include "nl_keigen_acc_context.h"
 
@@ -16,7 +16,7 @@ public:
   typedef std::shared_ptr<NLKEigenDiffContext> NLKEigenDiffContextPtr;
 
   explicit NLKEigenDiffSolver(NLKEigenDiffContextPtr nlk_diff_context_ptr) :
-    chi_math::NonLinearSolver<Mat, Vec, SNES>(SNESNEWTONLS, nlk_diff_context_ptr)
+    chi_math::NonLinearSolver<Mat, Vec, SNES>(nlk_diff_context_ptr)
   {}
 
   virtual ~NLKEigenDiffSolver() override = default;
