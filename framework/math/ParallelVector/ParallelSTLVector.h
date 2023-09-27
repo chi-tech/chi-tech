@@ -44,6 +44,11 @@ public:
    * vector to store its owned elements*/
   const double* Data() const override;
 
+  /**Returns a constant reference to the local data of the vector.*/
+  const std::vector<double>& LocalSTLData() const;
+  /**Returns a reference to the local data of the vector.*/
+  std::vector<double>& LocalSTLData();
+
   /**
    * Read only accessor to the entry at the given local index of
    * the local vector.
@@ -90,6 +95,10 @@ public:
   /**Sets the local values of one vector equal to another. The sizes must be
    * compatible.*/
   void CopyLocalValues(const ParallelVector& y) override;
+
+  /**Sets the local values of the vector equal to that of the PETSc vector.
+  * The sizes must be compatible.*/
+  void CopyLocalValues(Vec y) override;
 
   /**Copies a contiguous block of local data (num_values entries) from the
    * source vector (starting at y_offset) to the

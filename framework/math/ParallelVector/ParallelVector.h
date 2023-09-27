@@ -2,6 +2,7 @@
 #define CHITECH_PARALLELVECTOR_H
 
 #include "math/chi_math.h"
+#include "math/PETScUtils/petsc_forward_declarations.h"
 
 #include <cstdint>
 
@@ -102,6 +103,10 @@ public:
   /**Sets the local values of one vector equal to another. The sizes must be
    * compatible.*/
   virtual void CopyLocalValues(const ParallelVector& y) = 0;
+
+  /**Sets the local values of the vector equal to that of the PETSc vector.
+  * The sizes must be compatible.*/
+  virtual void CopyLocalValues(Vec y) = 0;
 
   /**Copies a contiguous block of local data (num_values entries) from the
    * source vector (starting at y_offset) to the

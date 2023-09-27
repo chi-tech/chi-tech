@@ -3,6 +3,8 @@
 #include "chi_mpi_utils_map_all2all.h"
 #include "data_types/byte_array.h"
 
+#include <petsc.h>
+
 #include "chi_log.h"
 #include "chi_log_exceptions.h"
 
@@ -55,6 +57,13 @@ std::unique_ptr<ParallelVector> ParallelSTLVector::MakeClone() const
 
 double* ParallelSTLVector::Data() { return values_.data(); }
 const double* ParallelSTLVector::Data() const { return values_.data(); }
+
+const std::vector<double>& ParallelSTLVector::LocalSTLData() const
+{
+  return values_;
+}
+
+std::vector<double>& ParallelSTLVector::LocalSTLData() { return values_; }
 
 std::vector<double> ParallelSTLVector::MakeLocalVector()
 {
@@ -130,6 +139,20 @@ void ParallelSTLVector::CopyLocalValues(const ParallelVector& y)
 
   for (int64_t i = 0; i < local_size_; ++i)
     values_[i] = y_data[i];
+}
+
+void ParallelSTLVector::CopyLocalValues(Vec y)
+{
+  PetscInt n;
+  VecGetLocalSize(y, &n);
+
+  ChiInvalidArgumentIf(n < local_size_,
+                       "Attempted update with a vector of insufficient size.");
+
+  const double* x;
+  VecGetArrayRead(y, &x);
+  std::copy(x, x + n, values_.begin());
+  VecRestoreArrayRead(y, &x);
 }
 
 void ParallelSTLVector::BlockCopyLocalValues(const ParallelVector& y,
