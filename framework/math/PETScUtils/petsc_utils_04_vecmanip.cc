@@ -23,8 +23,7 @@ void chi_math::PETScUtils::CopyVecToSTLvector(Vec x,
   const double* x_ref;
   VecGetArrayRead(x, &x_ref);
 
-  for (size_t i = 0; i < N; ++i)
-    data[i] = x_ref[i];
+  std::copy(x_ref, x_ref+N, data.begin());
 
   VecRestoreArrayRead(x, &x_ref);
 }
@@ -48,8 +47,7 @@ void chi_math::PETScUtils::CopyVecToSTLvectorWithGhosts(
   auto info = GetGhostVectorLocalViewRead(x);
   const double* x_ref = info.x_localized_raw;
 
-  for (size_t i = 0; i < N; ++i)
-    data[i] = x_ref[i];
+  std::copy(x_ref, x_ref+N, data.begin());
 
   RestoreGhostVectorLocalViewRead(x, info);
 }

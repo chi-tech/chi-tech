@@ -26,7 +26,7 @@ chi::InputParameters FieldFunctionGridBased::GetInputParameters()
 
   using namespace chi_data_types;
   params.ConstrainParameterRange(
-    "sdm_type", AllowableRangeList::New({"FiniteVolume", "PWLC", "PWLD"}));
+    "sdm_type", AllowableRangeList::New({"FV", "PWLC", "PWLD"}));
 
   return params;
 }
