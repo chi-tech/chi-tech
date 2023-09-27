@@ -1,33 +1,28 @@
 #include "fieldfunction_gridbased.h"
 
-//###################################################################
-/**Updates the field data with a STL vector.*/
-void chi_physics::FieldFunctionGridBased::
-  UpdateFieldVector(const std::vector<double> &field_vector)
-{
-  if (field_vector.size() < field_vector_.size())
-    throw std::logic_error("chi_physics::FieldFunction::UpdateFieldVector: "
-                           "Attempted update with a vector of insufficient size.");
+#include <petsc.h>
 
-  for (size_t i=0; i<field_vector_.size(); ++i)
-    field_vector_[i] = field_vector[i];
+#include "chi_log.h"
+
+// ###################################################################
+/**Updates the field data with a STL vector.*/
+void chi_physics::FieldFunctionGridBased::UpdateFieldVector(
+  const std::vector<double>& field_vector)
+{
+  ChiInvalidArgumentIf(field_vector.size() < ghosted_field_vector_->LocalSize(),
+                       "Attempted update with a vector of insufficient size.");
+
+  ghosted_field_vector_->Set(field_vector);
+
+  ghosted_field_vector_->CommunicateGhostEntries();
 }
 
-//###################################################################
+// ###################################################################
 /**Updates the field data with a PETSc vector.*/
-void chi_physics::FieldFunctionGridBased::
-  UpdateFieldVector(const Vec& field_vector)
+void chi_physics::FieldFunctionGridBased::UpdateFieldVector(
+  const Vec& field_vector)
 {
-  PetscInt n;
-  VecGetLocalSize(field_vector, &n);
+  ghosted_field_vector_->CopyLocalValues(field_vector);
 
-  if (n < field_vector_.size())
-    throw std::logic_error("chi_physics::FieldFunction::UpdateFieldVector: "
-                           "Attempted update with a vector of insufficient size.");
-
-  const double* x;
-  VecGetArrayRead(field_vector, &x);
-  for (size_t i=0; i<n; ++i)
-    field_vector_[i] = x[i];
-  VecRestoreArrayRead(field_vector, &x);
+  ghosted_field_vector_->CommunicateGhostEntries();
 }
