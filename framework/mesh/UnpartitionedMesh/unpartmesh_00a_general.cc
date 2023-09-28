@@ -22,7 +22,7 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
 {
   const chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
 
-  Chi::log.Log() << "Computing cell-centroids.";
+  Chi::log.Log0Verbose1() << "Computing cell-centroids.";
   for (auto cell : raw_cells_)
   {
     cell->centroid = chi_mesh::Vertex(0.0, 0.0, 0.0);
@@ -32,9 +32,9 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
     cell->centroid =
       cell->centroid / static_cast<double>(cell->vertex_ids.size());
   }
-  Chi::log.Log() << "Done computing cell-centroids.";
+  Chi::log.Log0Verbose1() << "Done computing cell-centroids.";
 
-  Chi::log.Log() << "Checking cell-center-to-face orientations";
+  Chi::log.Log0Verbose1() << "Checking cell-center-to-face orientations";
   size_t num_negative_volume_elements = 0;
   for (auto cell : raw_cells_)
   {
@@ -89,6 +89,50 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
       } // for face
     }   // if polyhedron
   }     // for cell in raw_cells
+
+  Chi::log.Log0Verbose1() << "Checking face sizes";
+  size_t cell_id = 0;
+  for (auto cell : raw_cells_)
+  {
+    if (cell->type == CellType::POLYGON)
+    {
+      size_t f = 0;
+      for (const auto& face : cell->faces)
+      {
+        const auto& v0 = vertices_.at(face.vertex_ids[0]);
+        const auto& v1 = vertices_.at(face.vertex_ids[1]);
+        ChiLogicalErrorIf((v1 - v0).Norm() < 1.0e-12,
+                          "Cell " + std::to_string(cell_id) + " (centroid=" +
+                            cell->centroid.PrintStr() + ") face " +
+                            std::to_string(f) + ": Face has length < 1.0e-12.");
+        ++f;
+      }
+    } // if polygon
+    if (cell->type == CellType::POLYHEDRON)
+    {
+      size_t f = 0;
+      for (const auto& face : cell->faces)
+      {
+        size_t num_face_verts = face.vertex_ids.size();
+        for (size_t s = 0; s < face.vertex_ids.size(); ++s)
+        {
+          size_t fvp1 = (s < (num_face_verts - 1)) ? s + 1 : 0;
+
+          const auto& v0 = vertices_.at(face.vertex_ids[s]);
+          const auto& v1 = vertices_.at(face.vertex_ids[fvp1]);
+
+          ChiLogicalErrorIf((v1 - v0).Norm() < 1.0e-12,
+                            "Cell " + std::to_string(cell_id) + " (centroid=" +
+                              cell->centroid.PrintStr() + ") face " +
+                              std::to_string(f) + " side " + std::to_string(s) +
+                              ": Side has length < 1.0e-12.");
+        }
+
+        ++f;
+      }
+    } // if polyhedron
+    ++cell_id;
+  } // for cell in raw_cells
 
   if (num_negative_volume_elements > 0)
     Chi::log.LogAllWarning()
