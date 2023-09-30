@@ -12,7 +12,8 @@
 void chi_mesh::FieldFunctionInterpolationPoint::Initialize()
 {
   const std::string fname = "FieldFunctionInterpolationPoint::Initialize";
-  const auto& grid = field_functions_.front()->SDM().Grid();
+  const auto& grid =
+    field_functions_.front()->GetSpatialDiscretization().Grid();
 
   std::vector<uint64_t> cells_potentially_owning_point;
   for (const auto& cell : grid.local_cells)
@@ -75,10 +76,10 @@ void chi_mesh::FieldFunctionInterpolationPoint::Execute()
   if (not locally_owned_) return;
 
   const auto& ref_ff = *field_functions_.front();
-  const auto& sdm    = ref_ff.SDM();
+  const auto& sdm    = ref_ff.GetSpatialDiscretization();
   const auto& grid   = sdm.Grid();
 
-  const auto& uk_man = ref_ff.UnkManager();
+  const auto& uk_man = ref_ff.GetUnknownManager();
   const auto uid = 0;
   const auto cid = ref_component_;
 

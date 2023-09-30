@@ -18,10 +18,10 @@ void chi_mesh::FieldFunctionInterpolationLine::Execute()
   {
           auto& ff_ctx = ff_contexts_[ff];
     const auto& ref_ff = *ff_ctx.ref_ff;
-    const auto& sdm    = ref_ff.SDM();
+    const auto& sdm    = ref_ff.GetSpatialDiscretization();
     const auto& grid   = sdm.Grid();
 
-    const auto& uk_man = ref_ff.UnkManager();
+    const auto& uk_man = ref_ff.GetUnknownManager();
     const auto uid = 0;
     const auto cid = ref_component_;
 

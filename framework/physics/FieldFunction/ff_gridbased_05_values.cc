@@ -16,7 +16,7 @@ std::vector<double>
 FieldFunctionGridBased::GetPointValue(const chi_mesh::Vector3& point) const
 {
   typedef const int64_t cint64_t;
-  const auto& uk_man = UnkManager();
+  const auto& uk_man = GetUnknownManager();
   const size_t num_components = uk_man.GetTotalUnknownStructureSize();
 
   size_t local_num_point_hits = 0;
@@ -105,7 +105,7 @@ double FieldFunctionGridBased::Evaluate(const chi_mesh::Cell& cell,
   const size_t num_nodes = cell_mapping.NumNodes();
   for (size_t j=0; j<num_nodes; ++j)
   {
-    cint64_t dof_map = sdm_->MapDOFLocal(cell, j, UnkManager(), 0, component);
+    cint64_t dof_map = sdm_->MapDOFLocal(cell, j, GetUnknownManager(), 0, component);
 
     value += field_vector[dof_map] * shape_values[j];
   }

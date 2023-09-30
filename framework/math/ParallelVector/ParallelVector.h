@@ -116,6 +116,14 @@ public:
                                     int64_t local_offset,
                                     int64_t num_values) = 0;
 
+  /**Copies a contiguous block of local data (num_values entries) from the
+   * source vector (starting at y_offset) to the
+   * current vector starting at local_offset. PETSc flavor.*/
+  virtual void BlockCopyLocalValues(Vec y,
+                                    int64_t y_offset,
+                                    int64_t local_offset,
+                                    int64_t num_values) = 0;
+
   /**
    * Define a set or add operation for the given global id-value pair
    *

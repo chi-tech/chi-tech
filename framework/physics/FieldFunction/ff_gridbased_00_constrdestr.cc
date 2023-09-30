@@ -50,8 +50,8 @@ chi::InputParameters FieldFunctionGridBased::GetInputParameters()
 FieldFunctionGridBased::FieldFunctionGridBased(
   const chi::InputParameters& params)
   : FieldFunction(params),
-    sdm_(MakeSDM(params)),
-    ghosted_field_vector_(MakeFieldVector(*sdm_, UnkManager())),
+    sdm_(MakeSpatialDiscretization(params)),
+    ghosted_field_vector_(MakeFieldVector(*sdm_, GetUnknownManager())),
     local_grid_bounding_box_(
       chi_mesh::GetCurrentHandler().GetGrid()->GetLocalBoundingBox())
 {
@@ -59,12 +59,13 @@ FieldFunctionGridBased::FieldFunctionGridBased(
 }
 
 // ##################################################################
-FieldFunctionGridBased::FieldFunctionGridBased(const std::string& text_name,
-                                               chi_math::SMDPtr& sdm_ptr,
-                                               chi_math::Unknown unknown)
+FieldFunctionGridBased::FieldFunctionGridBased(
+  const std::string& text_name,
+  chi_math::SDMPtr& discretization_ptr,
+  chi_math::Unknown unknown)
   : FieldFunction(text_name, std::move(unknown)),
-    sdm_(sdm_ptr),
-    ghosted_field_vector_(MakeFieldVector(*sdm_, UnkManager())),
+    sdm_(discretization_ptr),
+    ghosted_field_vector_(MakeFieldVector(*sdm_, GetUnknownManager())),
     local_grid_bounding_box_(sdm_->Grid().GetLocalBoundingBox())
 {
 }
@@ -72,12 +73,12 @@ FieldFunctionGridBased::FieldFunctionGridBased(const std::string& text_name,
 // ##################################################################
 FieldFunctionGridBased::FieldFunctionGridBased(
   const std::string& text_name,
-  chi_math::SMDPtr& sdm_ptr,
+  chi_math::SDMPtr& sdm_ptr,
   chi_math::Unknown unknown,
   const std::vector<double>& field_vector)
   : FieldFunction(text_name, std::move(unknown)),
     sdm_(sdm_ptr),
-    ghosted_field_vector_(MakeFieldVector(*sdm_, UnkManager())),
+    ghosted_field_vector_(MakeFieldVector(*sdm_, GetUnknownManager())),
     local_grid_bounding_box_(sdm_->Grid().GetLocalBoundingBox())
 {
   ChiInvalidArgumentIf(
@@ -89,15 +90,23 @@ FieldFunctionGridBased::FieldFunctionGridBased(
 
 // ##################################################################
 FieldFunctionGridBased::FieldFunctionGridBased(const std::string& text_name,
-                                               chi_math::SMDPtr& sdm_ptr,
+                                               chi_math::SDMPtr& sdm_ptr,
                                                chi_math::Unknown unknown,
                                                double field_value)
   : FieldFunction(text_name, std::move(unknown)),
     sdm_(sdm_ptr),
-    ghosted_field_vector_(MakeFieldVector(*sdm_, UnkManager())),
+    ghosted_field_vector_(MakeFieldVector(*sdm_, GetUnknownManager())),
     local_grid_bounding_box_(sdm_->Grid().GetLocalBoundingBox())
 {
   ghosted_field_vector_->Set(field_value);
+}
+
+// ##################################################################
+/**Returns the spatial discretization method.*/
+const chi_math::SpatialDiscretization&
+FieldFunctionGridBased::GetSpatialDiscretization() const
+{
+  return *sdm_;
 }
 
 // ##################################################################
@@ -114,8 +123,8 @@ std::vector<double>& FieldFunctionGridBased::FieldVector()
 
 // ##################################################################
 /**Private method for creating the spatial discretization method.*/
-chi_math::SMDPtr
-FieldFunctionGridBased::MakeSDM(const chi::InputParameters& params)
+chi_math::SDMPtr FieldFunctionGridBased::MakeSpatialDiscretization(
+  const chi::InputParameters& params)
 {
   const auto& user_params = params.ParametersAtAssignment();
   const auto& grid_ptr = chi_mesh::GetCurrentHandler().GetGrid();
@@ -169,13 +178,13 @@ FieldFunctionGridBased::MakeSDM(const chi::InputParameters& params)
 /**Private method for creating the field vector.*/
 std::unique_ptr<chi_math::GhostedParallelSTLVector>
 FieldFunctionGridBased::MakeFieldVector(
-  const chi_math::SpatialDiscretization& sdm,
+  const chi_math::SpatialDiscretization& discretization,
   const chi_math::UnknownManager& uk_man)
 {
   auto field = std::make_unique<chi_math::GhostedParallelSTLVector>(
-    sdm.GetNumLocalDOFs(uk_man),
-    sdm.GetNumGlobalDOFs(uk_man),
-    sdm.GetGhostDOFIndices(uk_man),
+    discretization.GetNumLocalDOFs(uk_man),
+    discretization.GetNumGlobalDOFs(uk_man),
+    discretization.GetGhostDOFIndices(uk_man),
     Chi::mpi.comm);
 
   return field;

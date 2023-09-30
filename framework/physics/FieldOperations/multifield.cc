@@ -138,8 +138,8 @@ void MultiFieldOperation::Execute()
 {
   typedef unsigned int uint;
   typedef const int64_t cint64_t;
-  const auto& sdm = primary_ff_->SDM();
-  const auto& uk_man = primary_ff_->UnkManager();
+  const auto& sdm = primary_ff_->GetSpatialDiscretization();
+  const auto& uk_man = primary_ff_->GetUnknownManager();
   const auto& grid = sdm.Grid();
 
   const size_t num_deps = dependent_ffs_.size();

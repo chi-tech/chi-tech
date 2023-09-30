@@ -17,7 +17,7 @@
 namespace chi_math
 {
 class SpatialDiscretization;
-typedef std::shared_ptr<SpatialDiscretization> SMDPtr;
+typedef std::shared_ptr<SpatialDiscretization> SDMPtr;
 class GhostedParallelSTLVector;
 } // namespace chi_math
 
@@ -39,20 +39,20 @@ public:
 
   /**Creates a field function, filling it with zeros.*/
   FieldFunctionGridBased(const std::string& text_name,
-                         chi_math::SMDPtr& sdm_ptr,
+                         chi_math::SDMPtr& discretization_ptr,
                          chi_math::Unknown unknown);
 
   /**Creates a field function with an associated field vector.
    * The field's data vector is set to the incoming field vector.*/
   FieldFunctionGridBased(const std::string& text_name,
-                         chi_math::SMDPtr& sdm_ptr,
+                         chi_math::SDMPtr& sdm_ptr,
                          chi_math::Unknown unknown,
                          const std::vector<double>& field_vector);
 
   /**Creates a field function where all the values are assigned to
    * the single supplied value.*/
   FieldFunctionGridBased(const std::string& text_name,
-                         chi_math::SMDPtr& sdm_ptr,
+                         chi_math::SDMPtr& sdm_ptr,
                          chi_math::Unknown unknown,
                          double field_value);
 
@@ -60,7 +60,8 @@ public:
 
   // Getters
   /**Returns the spatial discretization method.*/
-  const chi_math::SpatialDiscretization& SDM() const { return *sdm_; }
+  const chi_math::SpatialDiscretization& GetSpatialDiscretization() const;
+
   /**Returns a read-only reference to the locally stored field data.*/
   const std::vector<double>& FieldVectorRead() const;
   /**Returns a reference to the locally stored field data.*/
@@ -93,15 +94,17 @@ public:
                   unsigned int component) const override;
 
 protected:
-  chi_math::SMDPtr sdm_;
+  chi_math::SDMPtr sdm_;
   std::unique_ptr<chi_math::GhostedParallelSTLVector> ghosted_field_vector_;
 
 private:
-  /**Static method for making the SDM for the constructors.*/
-  static chi_math::SMDPtr MakeSDM(const chi::InputParameters& params);
+  /**Static method for making the GetSpatialDiscretization for the
+   * constructors.*/
+  static chi_math::SDMPtr
+  MakeSpatialDiscretization(const chi::InputParameters& params);
   /**Static method for making the ghosted vector for the constructors.*/
   static std::unique_ptr<chi_math::GhostedParallelSTLVector>
-  MakeFieldVector(const chi_math::SpatialDiscretization& sdm,
+  MakeFieldVector(const chi_math::SpatialDiscretization& discretization,
                   const chi_math::UnknownManager& uk_man);
 
   const BoundingBox local_grid_bounding_box_;

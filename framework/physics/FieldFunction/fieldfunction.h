@@ -39,7 +39,7 @@ public:
   const chi_math::Unknown& Unknown() const { return unknown_; }
   /**Returns a reference to the unknown manager that can be used in
   * spatial discretizations.*/
-  const chi_math::UnknownManager& UnkManager() const
+  const chi_math::UnknownManager& GetUnknownManager() const
   {
     return unknown_manager_;
   }

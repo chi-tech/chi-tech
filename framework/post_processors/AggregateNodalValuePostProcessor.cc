@@ -52,7 +52,7 @@ void AggregateNodalValuePostProcessor::Initialize()
                     "Attempted to access invalid field"
                     "function");
 
-  const auto& grid = grid_field_function->SDM().Grid();
+  const auto& grid = grid_field_function->GetSpatialDiscretization().Grid();
 
   const auto* logical_volume_ptr_ = GetLogicalVolume();
   if (logical_volume_ptr_ == nullptr)
@@ -83,16 +83,17 @@ void AggregateNodalValuePostProcessor::Execute(const Event& event_context)
                     "function");
 
   const auto& ref_ff = *grid_field_function;
-  const auto& sdm = ref_ff.SDM();
+  const auto& sdm = ref_ff.GetSpatialDiscretization();
   const auto& grid = sdm.Grid();
 
-  const auto& uk_man = ref_ff.UnkManager();
+  const auto& uk_man = ref_ff.GetUnknownManager();
   const auto uid = 0;
   const auto cid = 0;
 
   const auto field_data = ref_ff.GetGhostedFieldVector();
   const size_t num_local_dofs =
-    ref_ff.SDM().GetNumLocalDOFs(ref_ff.UnkManager());
+    ref_ff.GetSpatialDiscretization().GetNumLocalDOFs(
+      ref_ff.GetUnknownManager());
 
   double local_max_value = 0.0;
   double local_min_value = 0.0;
@@ -159,7 +160,8 @@ void AggregateNodalValuePostProcessor::Execute(const Event& event_context)
                   Chi::mpi.comm); // communicator
 
     const size_t num_globl_dofs =
-      ref_ff.SDM().GetNumGlobalDOFs(ref_ff.UnkManager());
+      ref_ff.GetSpatialDiscretization().GetNumGlobalDOFs(
+        ref_ff.GetUnknownManager());
     value_ = ParameterBlock("", globl_accumulation / double(num_globl_dofs));
   }
   else

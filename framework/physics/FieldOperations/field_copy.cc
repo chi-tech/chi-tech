@@ -108,13 +108,13 @@ FieldCopyOperation::FieldCopyOperation(
   else
   {
     ChiInvalidArgumentIf(
-      to_ff_->UnkManager().GetTotalUnknownStructureSize() !=
-        from_ff_->UnkManager().GetTotalUnknownStructureSize(),
+      to_ff_->GetUnknownManager().GetTotalUnknownStructureSize() !=
+        from_ff_->GetUnknownManager().GetTotalUnknownStructureSize(),
       "The number of components of the unknowns in the field functions are"
       " not compatible");
 
     const size_t num_comps =
-      to_ff_->UnkManager().GetTotalUnknownStructureSize();
+      to_ff_->GetUnknownManager().GetTotalUnknownStructureSize();
     to_components_.reserve(num_comps);
     from_components_.reserve(num_comps);
     for (size_t c = 0; c < num_comps; ++c)
@@ -125,8 +125,8 @@ FieldCopyOperation::FieldCopyOperation(
   }
 
   //============================================= Check grids are compatible
-  ChiInvalidArgumentIf(std::addressof(to_ff_->SDM().Grid()) !=
-                         std::addressof(from_ff_->SDM().Grid()),
+  ChiInvalidArgumentIf(std::addressof(to_ff_->GetSpatialDiscretization().Grid()) !=
+                         std::addressof(from_ff_->GetSpatialDiscretization().Grid()),
                        "Currently the two field functions must operate on the "
                        "same grid");
 }
@@ -134,8 +134,8 @@ FieldCopyOperation::FieldCopyOperation(
 void FieldCopyOperation::Execute()
 {
   typedef const int64_t cint64_t;
-  const auto& sdm = to_ff_->SDM();
-  const auto& uk_man = to_ff_->UnkManager();
+  const auto& sdm = to_ff_->GetSpatialDiscretization();
+  const auto& uk_man = to_ff_->GetUnknownManager();
   const auto& grid = sdm.Grid();
 
   const size_t num_comps = to_components_.size();

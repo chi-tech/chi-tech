@@ -28,7 +28,8 @@ void chi_mesh::FieldFunctionInterpolationSlice::
     throw std::logic_error("Unassigned field function in slice "
                            "field function interpolator.");
 
-  const auto& grid = field_functions_.front()->SDM().Grid();
+  const auto& grid =
+    field_functions_.front()->GetSpatialDiscretization().Grid();
 
   //================================================== Find cells intersecting
   //                                                   plane
