@@ -3,6 +3,8 @@
 #include "chi_mpi_utils_map_all2all.h"
 #include "data_types/byte_array.h"
 
+#include <petsc.h>
+
 #include "chi_log.h"
 #include "chi_log_exceptions.h"
 
@@ -55,6 +57,13 @@ std::unique_ptr<ParallelVector> ParallelSTLVector::MakeClone() const
 
 double* ParallelSTLVector::Data() { return values_.data(); }
 const double* ParallelSTLVector::Data() const { return values_.data(); }
+
+const std::vector<double>& ParallelSTLVector::LocalSTLData() const
+{
+  return values_;
+}
+
+std::vector<double>& ParallelSTLVector::LocalSTLData() { return values_; }
 
 std::vector<double> ParallelSTLVector::MakeLocalVector()
 {
@@ -131,6 +140,20 @@ void ParallelSTLVector::CopyLocalValues(const ParallelVector& y)
   std::copy(y_data, y_data + local_size_, values_.begin());
 }
 
+void ParallelSTLVector::CopyLocalValues(Vec y)
+{
+  PetscInt n;
+  VecGetLocalSize(y, &n);
+
+  ChiInvalidArgumentIf(n < local_size_,
+                       "Attempted update with a vector of insufficient size.");
+
+  const double* x;
+  VecGetArrayRead(y, &x);
+  std::copy(x, x + n, values_.begin());
+  VecRestoreArrayRead(y, &x);
+}
+
 void ParallelSTLVector::BlockCopyLocalValues(const ParallelVector& y,
                                              int64_t y_offset,
                                              int64_t local_offset,
@@ -160,6 +183,41 @@ void ParallelSTLVector::BlockCopyLocalValues(const ParallelVector& y,
   std::copy(y_data + y_offset,
             y_data + y_offset + num_values,
             values_.begin() + local_offset);
+}
+
+void ParallelSTLVector::BlockCopyLocalValues(Vec y,
+                                             int64_t y_offset,
+                                             int64_t local_offset,
+                                             int64_t num_values)
+{
+  ChiInvalidArgumentIf(y_offset < 0, "y_offset < 0.");
+  ChiInvalidArgumentIf(local_offset < 0, "local_offset < 0.");
+
+  const int64_t y_end = y_offset + num_values;
+  const int64_t local_end = local_offset + num_values;
+
+  int64_t y_local_size;
+  VecGetLocalSize(y, &y_local_size);
+
+  ChiInvalidArgumentIf(y_end > y_local_size,
+                       "y_offset + num_values=" + std::to_string(y_end) +
+                         ", is out of range for vector y with local size " +
+                         std::to_string(y_local_size));
+
+  ChiInvalidArgumentIf(
+    local_end > local_size_,
+    "local_offset + num_values=" + std::to_string(local_end) +
+      ", is out of range for destination vector with local size " +
+      std::to_string(local_size_));
+
+  const double* y_data;
+  VecGetArrayRead(y, &y_data);
+
+  std::copy(y_data + y_offset,
+            y_data + y_offset + num_values,
+            values_.begin() + local_offset);
+
+  VecRestoreArrayRead(y, &y_data);
 }
 
 void ParallelSTLVector::SetValue(const int64_t global_id,

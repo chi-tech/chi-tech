@@ -1,30 +1,9 @@
 #include "fieldfunction_gridbased.h"
 
-#include "math/SpatialDiscretization/spatial_discretization.h"
-#include "math/VectorGhostCommunicator/vector_ghost_communicator.h"
-
-#include "mesh/MeshContinuum/chi_meshcontinuum.h"
-
 // #########################################################
 /**Makes a ghosted version of the field vector.*/
-std::vector<double> chi_physics::FieldFunctionGridBased::GetGhostedFieldVector() const
+std::vector<double>
+chi_physics::FieldFunctionGridBased::GetGhostedFieldVector() const
 {
-  // const size_t num_local_dofs = sdm_->GetNumLocalDOFs(unknown_manager_);
-  // const size_t num_globl_dofs = sdm_->GetNumGlobalDOFs(unknown_manager_);
-  // const std::vector<int64_t> ghost_ids =
-  //   sdm_->GetGhostDOFIndices(unknown_manager_);
-  //
-  // chi_math::VectorGhostCommunicator vgc(
-  //   num_local_dofs, num_globl_dofs, ghost_ids, Chi::mpi.comm);
-  // std::vector<double> field_wg = vgc.MakeGhostedVector(FieldVectorRead());
-
-  // vgc.CommunicateGhostEntries(field_wg);
-
-  const auto& vgc = *vector_ghost_communicator_;
-
-   std::vector<double> field_wg = vgc.MakeGhostedVector(FieldVectorRead());
-
-   vgc.CommunicateGhostEntries(field_wg);
-
-  return field_wg;
+  return ghosted_field_vector_->LocalSTLData();
 }

@@ -7,6 +7,7 @@
 #include "mesh/MeshContinuum/chi_grid_vtk_utils.h"
 
 #include "math/SpatialDiscretization/spatial_discretization.h"
+#include "vtkUnstructuredGrid.h"
 
 #include <vtkCellData.h>
 #include <vtkPointData.h>
@@ -49,7 +50,7 @@ void chi_physics::FieldFunctionGridBased::
   {
     const auto field_vector = ff_ptr->GetGhostedFieldVector();
 
-    const auto& uk_man = ff_ptr->UnkManager();
+    const auto& uk_man = ff_ptr->GetUnknownManager();
     const auto& unknown = ff_ptr->Unknown();
     const auto& sdm = ff_ptr->sdm_;
     const size_t num_comps = unknown.NumComponents();

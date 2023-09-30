@@ -1,6 +1,7 @@
 #include "fieldfunction_gridbased.h"
 
 #include "math/SpatialDiscretization/spatial_discretization.h"
+
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_runtime.h"
@@ -15,7 +16,7 @@ std::vector<double>
 FieldFunctionGridBased::GetPointValue(const chi_mesh::Vector3& point) const
 {
   typedef const int64_t cint64_t;
-  const auto& uk_man = UnkManager();
+  const auto& uk_man = GetUnknownManager();
   const size_t num_components = uk_man.GetTotalUnknownStructureSize();
 
   size_t local_num_point_hits = 0;
@@ -31,6 +32,8 @@ FieldFunctionGridBased::GetPointValue(const chi_mesh::Vector3& point) const
   const double xmax = xyz_max.x;
   const double ymax = xyz_max.y;
   const double zmax = xyz_max.z;
+
+  const auto& field_vector = *ghosted_field_vector_;
 
   if (point.x >= xmin and point.x <= xmax and point.y >= ymin and
       point.y <= ymax and point.z >= zmin and point.z <= zmax)
@@ -52,7 +55,7 @@ FieldFunctionGridBased::GetPointValue(const chi_mesh::Vector3& point) const
           for (size_t j = 0; j < num_nodes; ++j)
           {
             cint64_t dof_map_j = sdm_->MapDOFLocal(cell, j, uk_man, 0, c);
-            const double dof_value_j = field_vector_[dof_map_j];
+            const double dof_value_j = field_vector[dof_map_j];
 
             local_point_value[c] += dof_value_j * shape_values[j];
           } // for node i
@@ -90,6 +93,8 @@ double FieldFunctionGridBased::Evaluate(const chi_mesh::Cell& cell,
                                         const chi_mesh::Vector3& position,
                                         unsigned int component) const
 {
+  const auto& field_vector = *ghosted_field_vector_;
+
   typedef const int64_t cint64_t;
   const auto& cell_mapping = sdm_->GetCellMapping(cell);
 
@@ -100,9 +105,9 @@ double FieldFunctionGridBased::Evaluate(const chi_mesh::Cell& cell,
   const size_t num_nodes = cell_mapping.NumNodes();
   for (size_t j=0; j<num_nodes; ++j)
   {
-    cint64_t dof_map = sdm_->MapDOFLocal(cell, j, UnkManager(), 0, component);
+    cint64_t dof_map = sdm_->MapDOFLocal(cell, j, GetUnknownManager(), 0, component);
 
-    value += field_vector_.at(dof_map) * shape_values[j];
+    value += field_vector[dof_map] * shape_values[j];
   }
 
   return value;

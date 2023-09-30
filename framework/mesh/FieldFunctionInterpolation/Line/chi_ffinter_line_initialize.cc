@@ -39,7 +39,7 @@ void chi_mesh::FieldFunctionInterpolationLine::
     auto& ff_context = ff_contexts_.back();
 
     ff_context.ref_ff = field_functions_[ff];
-    const auto& sdm = ff_context.ref_ff->SDM();
+    const auto& sdm = ff_context.ref_ff->GetSpatialDiscretization();
     const auto& grid = sdm.Grid();
 
     ff_context.interpolation_points_ass_cell.assign(number_of_points_, 0);

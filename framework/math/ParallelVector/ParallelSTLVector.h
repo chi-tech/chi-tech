@@ -44,6 +44,11 @@ public:
    * vector to store its owned elements*/
   const double* Data() const override;
 
+  /**Returns a constant reference to the local data of the vector.*/
+  const std::vector<double>& LocalSTLData() const;
+  /**Returns a reference to the local data of the vector.*/
+  std::vector<double>& LocalSTLData();
+
   /**
    * Read only accessor to the entry at the given local index of
    * the local vector.
@@ -91,10 +96,22 @@ public:
    * compatible.*/
   void CopyLocalValues(const ParallelVector& y) override;
 
+  /**Sets the local values of the vector equal to that of the PETSc vector.
+   * The sizes must be compatible.*/
+  void CopyLocalValues(Vec y) override;
+
   /**Copies a contiguous block of local data (num_values entries) from the
    * source vector (starting at y_offset) to the
    * current vector starting at local_offset. */
   void BlockCopyLocalValues(const ParallelVector& y,
+                            int64_t y_offset,
+                            int64_t local_offset,
+                            int64_t num_values) override;
+
+  /**Copies a contiguous block of local data (num_values entries) from the
+   * source vector (starting at y_offset) to the
+   * current vector starting at local_offset. PETSc flavor.*/
+  void BlockCopyLocalValues(Vec y,
                             int64_t y_offset,
                             int64_t local_offset,
                             int64_t num_values) override;
@@ -121,8 +138,8 @@ public:
   /**In place adding of vectors. The sizes must be compatible.*/
   void operator+=(const ParallelVector& y) override;
 
-  /**Adds a vector multiplied by scalar a, `x = x + a*y`. Optimized for a=1.0 and
-   * -1.0*/
+  /**Adds a vector multiplied by scalar a, `x = x + a*y`. Optimized for a=1.0
+   * and -1.0*/
   void PlusAY(const ParallelVector& y, double a) override;
 
   /**Performs x = a*x + y with the current vector being x.*/

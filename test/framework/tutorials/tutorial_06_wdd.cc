@@ -16,6 +16,8 @@
 
 #include "console/chi_console.h"
 
+#include <iomanip>
+
 namespace chi_unit_sim_testsB
 {
 typedef chi_math::AngularQuadrature::HarmonicIndices YlmIndices;
