@@ -76,8 +76,7 @@ void chi_mesh::sweep_management::SPDS::PopulateCellRelationships(
       const double mu = omega.Dot(face.normal_);
 
       bool owns_face = true;
-      if (face.has_neighbor_ and cell.global_id_ > face.neighbor_id_ and
-          grid_.IsCellLocal(face.neighbor_id_))
+      if (face.has_neighbor_ and cell.global_id_ > face.neighbor_id_)
         owns_face = false;
 
       if (owns_face)
