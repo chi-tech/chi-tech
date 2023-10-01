@@ -1,7 +1,7 @@
 #include "SweepChunk.h"
 
 #include "A_LBSSolver/Groupset/lbs_groupset.h"
-#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/PieceWiseLinearDiscontinuous.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

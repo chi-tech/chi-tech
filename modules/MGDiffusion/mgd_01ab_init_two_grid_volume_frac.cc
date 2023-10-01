@@ -1,7 +1,7 @@
 #include "mg_diffusion_solver.h"
 #include "utils/chi_timer.h"
-#include "math/SpatialDiscretization/spatial_discretization.h"
-#include "math/SpatialDiscretization/FiniteElement/finite_element.h"
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
+#include "math/SpatialDiscretization/FiniteElement/QuadraturePointData.h"
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 //============================================= assemble matrix A
@@ -17,7 +17,7 @@ void mg_diffusion::Solver::Compute_TwoGrid_VolumeFractions()
   for (const auto& cell : grid.local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
-    const auto  qp_data      = cell_mapping.MakeVolumeQuadraturePointData();
+    const auto  qp_data      = cell_mapping.MakeInternalQuadraturePointData();
     const size_t num_nodes   = cell_mapping.NumNodes();
 
     VF_[counter].resize(num_nodes, 0.0);

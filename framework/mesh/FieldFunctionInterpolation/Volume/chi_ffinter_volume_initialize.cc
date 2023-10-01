@@ -4,7 +4,7 @@
 #include "chi_log.h"
 
 #include "physics/FieldFunction/fieldfunction_gridbased.h"
-#include "math/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 //###################################################################

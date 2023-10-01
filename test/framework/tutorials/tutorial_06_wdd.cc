@@ -1,7 +1,7 @@
 #include "mesh/MeshHandler/chi_meshhandler.h"
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "math/SpatialDiscretization/FiniteVolume/fv.h"
+#include "math/SpatialDiscretization/FiniteVolume/FiniteVolume.h"
 #include "math/Quadratures/angular_quadrature_base.h"
 #include "math/Quadratures/angular_product_quadrature.h"
 #include "math/chi_math_range.h"
@@ -80,7 +80,7 @@ chiSimTest06_WDD(const chi::InputParameters&)
 
   //============================================= Make SDM
   typedef std::shared_ptr<chi_math::SpatialDiscretization> SDMPtr;
-  SDMPtr sdm_ptr = chi_math::SpatialDiscretization_FV::New(grid);
+  SDMPtr sdm_ptr = chi_math::spatial_discretization::FiniteVolume::New(grid);
   const auto& sdm = *sdm_ptr;
 
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;

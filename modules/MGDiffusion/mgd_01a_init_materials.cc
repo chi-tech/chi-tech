@@ -5,7 +5,7 @@
 
 #include "mesh/MeshHandler/chi_meshhandler.h"
 
-#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/PieceWiseLinearContinuous.h"
 #include "physics/PhysicsMaterial/chi_physicsmaterial.h"
 #include "physics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
 #include "physics/PhysicsMaterial/material_property_isotropic_mg_src.h"

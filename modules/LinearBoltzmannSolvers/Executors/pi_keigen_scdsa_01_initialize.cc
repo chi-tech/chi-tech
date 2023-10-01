@@ -3,7 +3,7 @@
 #include "A_LBSSolver/Acceleration/diffusion_mip.h"
 #include "A_LBSSolver/Acceleration/diffusion_PWLC.h"
 
-#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/PieceWiseLinearContinuous.h"
 #include "math/PETScUtils/petsc_utils.h"
 
 #include "chi_runtime.h"
@@ -47,7 +47,7 @@ void XXPowerIterationKEigenSCDSA::Initialize()
   else
   {
     continuous_sdm_ptr_ =
-      chi_math::SpatialDiscretization_PWLC::New(sdm.Grid());
+      chi_math::spatial_discretization::PieceWiseLinearContinuous::New(sdm.Grid());
     diffusion_solver_ = std::make_shared<acceleration::DiffusionPWLCSolver>(
       std::string(TextName() + "_WGDSA"),
       *continuous_sdm_ptr_,

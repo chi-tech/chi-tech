@@ -3,7 +3,7 @@
 #include "mesh/Cell/cell.h"
 #include "A_LBSSolver/Groupset/lbs_groupset.h"
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
-#include "math/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
 #include "B_DiscreteOrdinatesSolver/Sweepers/CBC_FLUDS.h"
 
 #define scint static_cast<int>

@@ -1,9 +1,9 @@
 #include "chi_ffinter_slice.h"
 
 #include "math/VectorGhostCommunicator/vector_ghost_communicator.h"
-#include "math/SpatialDiscretization/FiniteElement/finite_element.h"
+#include "math/SpatialDiscretization/FiniteElement/QuadraturePointData.h"
 #include "physics/FieldFunction/fieldfunction_gridbased.h"
-#include "math/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 //###################################################################

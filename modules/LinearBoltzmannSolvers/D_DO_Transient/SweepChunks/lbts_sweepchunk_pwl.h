@@ -3,7 +3,7 @@
 
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "math/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
 
 #include "mesh/SweepUtilities/sweepchunk_base.h"
 

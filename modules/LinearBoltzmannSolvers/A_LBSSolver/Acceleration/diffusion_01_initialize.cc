@@ -2,7 +2,7 @@
 
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "math/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
 #include "math/PETScUtils/petsc_utils.h"
 
 #include "chi_runtime.h"

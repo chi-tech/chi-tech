@@ -3,8 +3,8 @@
 
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "math/SpatialDiscretization/spatial_discretization.h"
-#include "math/SpatialDiscretization/FiniteElement/finite_element.h"
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
+#include "math/SpatialDiscretization/FiniteElement/QuadraturePointData.h"
 
 #include "physics/PhysicsMaterial/MultiGroupXS/multigroup_xs.h"
 
@@ -40,7 +40,7 @@ void lbs::acceleration::DiffusionMIPSolver::
     const size_t num_faces    = cell.faces_.size();
     const auto&  cell_mapping = sdm_.GetCellMapping(cell);
     const size_t num_nodes    = cell_mapping.NumNodes();
-    const auto   qp_data      = cell_mapping.MakeVolumeQuadraturePointData();
+    const auto   qp_data      = cell_mapping.MakeInternalQuadraturePointData();
     const size_t num_groups   = uk_man_.unknowns_.front().num_components_;
 
     const auto& xs = mat_id_2_xs_map_.at(cell.material_id_);

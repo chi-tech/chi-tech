@@ -1,7 +1,7 @@
 #include "mesh/MeshHandler/chi_meshhandler.h"
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/PieceWiseLinearDiscontinuous.h"
 
 #include "A_LBSSolver/Acceleration/acceleration.h"
 #include "A_LBSSolver/Acceleration/diffusion_mip.h"
@@ -39,7 +39,7 @@ acceleration_Diffusion_DFEM(const chi::InputParameters&)
 
   //============================================= Make SDM
   typedef std::shared_ptr<chi_math::SpatialDiscretization> SDMPtr;
-  SDMPtr sdm_ptr = chi_math::SpatialDiscretization_PWLD::New(grid);
+  SDMPtr sdm_ptr = chi_math::spatial_discretization::PieceWiseLinearDiscontinuous::New(grid);
   const auto& sdm = *sdm_ptr;
 
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;
@@ -75,7 +75,7 @@ acceleration_Diffusion_DFEM(const chi::InputParameters&)
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t cell_num_faces = cell.faces_.size();
     const size_t cell_num_nodes = cell_mapping.NumNodes();
-    const auto vol_qp_data = cell_mapping.MakeVolumeQuadraturePointData();
+    const auto vol_qp_data = cell_mapping.MakeInternalQuadraturePointData();
 
     MatDbl  IntV_gradshapeI_gradshapeJ(cell_num_nodes, VecDbl(cell_num_nodes));
     MatDbl  IntV_shapeI_shapeJ(cell_num_nodes, VecDbl(cell_num_nodes));
@@ -205,7 +205,7 @@ acceleration_Diffusion_DFEM(const chi::InputParameters&)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
-    const auto qp_data = cell_mapping.MakeVolumeQuadraturePointData();
+    const auto qp_data = cell_mapping.MakeInternalQuadraturePointData();
 
     //======================= Grab nodal phi values
     std::vector<double> nodal_phi(num_nodes,0.0);

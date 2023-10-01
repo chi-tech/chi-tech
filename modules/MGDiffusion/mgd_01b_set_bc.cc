@@ -8,7 +8,7 @@
 
 #include "mg_diffusion_bndry.h"
 
-#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/PieceWiseLinearContinuous.h"
 
 #include "physics/PhysicsMaterial/chi_physicsmaterial.h"
 

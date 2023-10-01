@@ -1,8 +1,8 @@
 #include "mg_diffusion_solver.h"
 
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
-#include "math/SpatialDiscretization/spatial_discretization.h"
-#include "math/SpatialDiscretization/FiniteElement/finite_element.h"
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
+#include "math/SpatialDiscretization/FiniteElement/QuadraturePointData.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

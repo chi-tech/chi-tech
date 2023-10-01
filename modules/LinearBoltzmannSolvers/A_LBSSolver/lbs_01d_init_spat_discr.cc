@@ -1,6 +1,6 @@
 #include "lbs_solver.h"
 
-#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/PieceWiseLinearDiscontinuous.h"
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_runtime.h"
@@ -8,15 +8,13 @@
 
 #include "console/chi_console.h"
 
-
-
 #include <iomanip>
 
 void lbs::LBSSolver::InitializeSpatialDiscretization()
 {
   using namespace chi_math::finite_element;
   Chi::log.Log() << "Initializing spatial discretization.\n";
-  discretization_ = chi_math::SpatialDiscretization_PWLD::New(*grid_ptr_);
+  discretization_ = chi_math::spatial_discretization::PieceWiseLinearDiscontinuous::New(*grid_ptr_);
 
   ComputeUnitIntegrals();
 }
@@ -58,7 +56,7 @@ void lbs::LBSSolver::ComputeUnitIntegrals()
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t cell_num_faces = cell.faces_.size();
     const size_t cell_num_nodes = cell_mapping.NumNodes();
-    const auto vol_qp_data = cell_mapping.MakeVolumeQuadraturePointData();
+    const auto vol_qp_data = cell_mapping.MakeInternalQuadraturePointData();
 
     MatDbl  IntV_gradshapeI_gradshapeJ(cell_num_nodes, VecDbl(cell_num_nodes));
     MatVec3 IntV_shapeI_gradshapeJ(cell_num_nodes, VecVec3(cell_num_nodes));

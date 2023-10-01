@@ -6,7 +6,7 @@
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 #include "mesh/MeshContinuum/chi_grid_vtk_utils.h"
 
-#include "math/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
 #include "vtkUnstructuredGrid.h"
 
 #include <vtkCellData.h>

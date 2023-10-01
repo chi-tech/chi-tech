@@ -11,7 +11,7 @@
 
 #include "physics/FieldFunction/fieldfunction_gridbased.h"
 
-#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/PieceWiseLinearDiscontinuous.h"
 
 #define DefaultBCDirichlet BoundaryCondition{BCType::DIRICHLET,{0,0,0}}
 
@@ -124,7 +124,7 @@ void dfem_diffusion::Solver::Initialize()
   }//for bndry
   
   //============================================= Make SDM
-  sdm_ptr_ = chi_math::SpatialDiscretization_PWLD::New(*grid_ptr_);
+  sdm_ptr_ = chi_math::spatial_discretization::PieceWiseLinearDiscontinuous::New(*grid_ptr_);
   const auto& sdm = *sdm_ptr_;
  
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;
@@ -192,7 +192,7 @@ void dfem_diffusion::Solver::Execute()
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes   = cell_mapping.NumNodes();
     const auto   cc_nodes    = cell_mapping.GetNodeLocations();
-    const auto  qp_data      = cell_mapping.MakeVolumeQuadraturePointData();
+    const auto  qp_data      = cell_mapping.MakeInternalQuadraturePointData();
 
     const auto imat  = cell.material_id_;
     MatDbl Acell(num_nodes, VecDbl(num_nodes, 0.0));

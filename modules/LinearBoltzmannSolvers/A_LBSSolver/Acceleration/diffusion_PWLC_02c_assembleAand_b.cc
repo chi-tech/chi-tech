@@ -1,7 +1,7 @@
 #include "diffusion_PWLC.h"
 
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
-#include "math/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
 
 #include "A_LBSSolver/lbs_structs.h"
 

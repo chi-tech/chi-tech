@@ -1,7 +1,7 @@
 #include "mg_diffusion_solver.h"
 #include "chi_runtime.h"
 #include "chi_log.h"
-#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/PieceWiseLinearContinuous.h"
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 //========================================================== Solve 1g problem
@@ -20,7 +20,7 @@ void mg_diffusion::Solver::Assemble_RHS(const unsigned int g,
   for (const auto& cell :  mg_diffusion::Solver::grid_ptr_->local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
-    const auto  qp_data      = cell_mapping.MakeVolumeQuadraturePointData();
+    const auto  qp_data      = cell_mapping.MakeInternalQuadraturePointData();
     const size_t num_nodes   = cell_mapping.NumNodes();
 
     const auto& xs = matid_to_xs_map.at(cell.material_id_);

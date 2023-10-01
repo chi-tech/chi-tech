@@ -4,12 +4,13 @@
 #include "mesh/Cell/cell.h"
 
 #include "DiffusionSolver/Boundaries/chi_diffusion_bndry.h"
+#include "DiffusionSolver/UnitIntegralContainer.h"
 
 #include "DiffusionSolver/chi_diffusion.h"
 #include "physics/SolverBase/chi_solver.h"
-#include "math/SpatialDiscretization/spatial_discretization.h"
-#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
-#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/PieceWiseLinearDiscontinuous.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/PieceWiseLinearContinuous.h"
 
 #include "mesh/VolumeMesher/chi_volumemesher.h"
 
@@ -74,6 +75,8 @@ public:
   int    G_ = 1;
   std::string options_string_;
 
+  std::map<uint64_t, UnitIntegralContainer> unit_integrals_;
+
 public:
   //00
   Solver (const Solver&) = delete;
@@ -114,7 +117,7 @@ public:
   //03b
   double HPerpendicular(
       const chi_mesh::Cell& cell,
-      const chi_math::finite_element::UnitIntegralData& fe_intgrl_values,
+      const UnitIntegralContainer& fe_intgrl_values,
       unsigned int f);
 
   static uint64_t

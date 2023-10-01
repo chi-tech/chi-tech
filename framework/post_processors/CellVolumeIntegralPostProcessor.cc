@@ -3,8 +3,8 @@
 #include "event_system/Event.h"
 
 #include "physics/FieldFunction/fieldfunction_gridbased.h"
-#include "math/SpatialDiscretization/spatial_discretization.h"
-#include "math/SpatialDiscretization/FiniteElement/finite_element.h"
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
+#include "math/SpatialDiscretization/FiniteElement/QuadraturePointData.h"
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 #include "mesh/LogicalVolume/LogicalVolume.h"
 
@@ -104,7 +104,7 @@ void CellVolumeIntegralPostProcessor::Execute(const Event& event_context)
     const auto& cell = grid.local_cells[cell_local_id];
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
-    const auto qp_data = cell_mapping.MakeVolumeQuadraturePointData();
+    const auto qp_data = cell_mapping.MakeInternalQuadraturePointData();
 
     std::vector<double> node_dof_values(num_nodes, 0.0);
     for (size_t i = 0; i < num_nodes; ++i)

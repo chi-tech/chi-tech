@@ -4,7 +4,7 @@
 #include "chi_log.h"
 #include "utils/chi_timer.h"
 
-#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/PieceWiseLinearContinuous.h"
 
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
@@ -20,7 +20,7 @@ void mg_diffusion::Solver::Assemble_A_bext()
   for (const auto& cell : grid.local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
-    const auto  qp_data      = cell_mapping.MakeVolumeQuadraturePointData();
+    const auto  qp_data      = cell_mapping.MakeInternalQuadraturePointData();
     const size_t num_nodes   = cell_mapping.NumNodes();
 
     const auto& xs   = matid_to_xs_map.at(cell.material_id_);

@@ -1,4 +1,4 @@
-#include "pwlc.h"
+#include "PieceWiseLinearContinuous.h"
 
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
@@ -11,10 +11,13 @@
 
 #include <algorithm>
 
+namespace chi_math::spatial_discretization
+{
+
 // ###################################################################
 /**Reorders the nodes for parallel computation in a Continuous
  * Finite Element calculation.*/
-void chi_math::SpatialDiscretization_PWLC::OrderNodes()
+void PieceWiseLinearContinuous::OrderNodes()
 {
   const std::string fname = __FUNCTION__;
   //============================================= Build set of local scope nodes
@@ -71,7 +74,7 @@ void chi_math::SpatialDiscretization_PWLC::OrderNodes()
                 MPI_UINT64_T,            // sendcount, sendtype
                 locJ_block_size_.data(), // recvbuf
                 1,
-                MPI_UINT64_T,    // recvcount, recvtype
+                MPI_UINT64_T,   // recvcount, recvtype
                 Chi::mpi.comm); // comm
 
   //============================================= Build block addresses
@@ -153,3 +156,5 @@ void chi_math::SpatialDiscretization_PWLC::OrderNodes()
                            lerr.what());
   }
 }
+
+} // namespace chi_math::spatial_discretization

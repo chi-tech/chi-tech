@@ -1,7 +1,7 @@
 #include "mg_diffusion_solver.h"
 
 #include "physics/FieldFunction/fieldfunction_gridbased.h"
-#include "math/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
 
 //###################################################################
 /**Updates the field functions with the lates data.*/

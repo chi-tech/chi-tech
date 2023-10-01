@@ -1,6 +1,6 @@
 #include "diffusion_mip.h"
 
-#include "math/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
 
 #include <utility>
 

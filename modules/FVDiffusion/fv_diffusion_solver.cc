@@ -5,12 +5,13 @@
 #include "utils/chi_timer.h"
 
 #include "mesh/MeshHandler/chi_meshhandler.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "fv_diffusion_bndry.h"
 
 #include "physics/FieldFunction/fieldfunction_gridbased.h"
 
-#include "math/SpatialDiscretization/FiniteVolume/fv.h"
+#include "math/SpatialDiscretization/FiniteVolume/FiniteVolume.h"
 
 //============================================= constructor
 fv_diffusion::Solver::Solver(const std::string& in_solver_name):
@@ -121,7 +122,7 @@ void fv_diffusion::Solver::Initialize()
   }//for bndry
   
   //============================================= Make SDM
-  sdm_ptr_ = chi_math::SpatialDiscretization_FV::New(*grid_ptr_);
+  sdm_ptr_ = chi_math::spatial_discretization::FiniteVolume::New(*grid_ptr_);
   const auto& sdm = *sdm_ptr_;
  
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;

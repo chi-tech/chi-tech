@@ -1,4 +1,4 @@
-#include "pwlc.h"
+#include "PieceWiseLinearContinuous.h"
 
 #include "chi_runtime.h"
 
@@ -6,9 +6,12 @@
 
 #define sc_int64 static_cast<int64_t>
 
+namespace chi_math::spatial_discretization
+{
+
 // ###################################################################
 /**Get the number of ghost degrees-of-freedom.*/
-size_t chi_math::SpatialDiscretization_PWLC::GetNumGhostDOFs(
+size_t PieceWiseLinearContinuous::GetNumGhostDOFs(
   const chi_math::UnknownManager& unknown_manager) const
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
@@ -18,7 +21,7 @@ size_t chi_math::SpatialDiscretization_PWLC::GetNumGhostDOFs(
 
 // ###################################################################
 /**Returns the ghost DOF indices.*/
-std::vector<int64_t> chi_math::SpatialDiscretization_PWLC::GetGhostDOFIndices(
+std::vector<int64_t> PieceWiseLinearContinuous::GetGhostDOFIndices(
   const chi_math::UnknownManager& unknown_manager) const
 {
   std::vector<int64_t> dof_ids;
@@ -66,3 +69,5 @@ std::vector<int64_t> chi_math::SpatialDiscretization_PWLC::GetGhostDOFIndices(
 
   return dof_ids;
 }
+
+} // namespace chi_math::spatial_discretization
