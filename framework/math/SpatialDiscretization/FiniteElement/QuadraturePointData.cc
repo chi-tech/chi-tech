@@ -2,9 +2,9 @@
 
 namespace chi_math::finite_element
 {
-InternalQuadraturePointData::InternalQuadraturePointData() {}
+VolumetricQuadraturePointData::VolumetricQuadraturePointData() {}
 
-InternalQuadraturePointData::InternalQuadraturePointData(
+VolumetricQuadraturePointData::VolumetricQuadraturePointData(
   std::vector<unsigned int> quadrature_point_indices,
   VecVec3 qpoints_xyz,
   std::vector<VecDbl> shape_value,
@@ -23,61 +23,63 @@ InternalQuadraturePointData::InternalQuadraturePointData(
 }
 
 const std::vector<unsigned int>&
-InternalQuadraturePointData::QuadraturePointIndices() const
+VolumetricQuadraturePointData::QuadraturePointIndices() const
 {
   return quadrature_point_indices_;
 }
-chi_mesh::Vector3 InternalQuadraturePointData::QPointXYZ(unsigned int qp) const
+chi_mesh::Vector3
+VolumetricQuadraturePointData::QPointXYZ(unsigned int qp) const
 {
   return qpoints_xyz_.at(qp);
 }
-double InternalQuadraturePointData::ShapeValue(unsigned int i,
+double VolumetricQuadraturePointData::ShapeValue(unsigned int i,
                                                unsigned int qp) const
 {
   auto& qp_data = shape_value_.at(i);
   return qp_data.at(qp);
 }
-chi_mesh::Vector3 InternalQuadraturePointData::ShapeGrad(unsigned int i,
+chi_mesh::Vector3
+VolumetricQuadraturePointData::ShapeGrad(unsigned int i,
                                                          unsigned int qp) const
 {
   auto& qp_data = shape_grad_.at(i);
   return qp_data.at(qp);
 }
 
-const VecVec3& InternalQuadraturePointData::QPointsXYZ() const
+const VecVec3& VolumetricQuadraturePointData::QPointsXYZ() const
 {
   return qpoints_xyz_;
 }
 
-const std::vector<VecDbl>& InternalQuadraturePointData::ShapeValues() const
+const std::vector<VecDbl>& VolumetricQuadraturePointData::ShapeValues() const
 {
   return shape_value_;
 }
-const std::vector<VecVec3>& InternalQuadraturePointData::ShapeGradValues() const
+const std::vector<VecVec3>&
+VolumetricQuadraturePointData::ShapeGradValues() const
 {
   return shape_grad_;
 }
-const std::vector<double>& InternalQuadraturePointData::JxW_Values() const
+const std::vector<double>& VolumetricQuadraturePointData::JxW_Values() const
 {
   return JxW_;
 }
-double InternalQuadraturePointData::JxW(unsigned int qp) const
+double VolumetricQuadraturePointData::JxW(unsigned int qp) const
 {
   return JxW_.at(qp);
 }
-int InternalQuadraturePointData::FaceDofMapping(size_t face,
+int VolumetricQuadraturePointData::FaceDofMapping(size_t face,
                                                 size_t face_node_index) const
 {
   auto& face_data = face_dof_mappings_.at(face);
   return face_data.at(face_node_index);
 }
-size_t InternalQuadraturePointData::NumNodes() const { return num_nodes_; }
+size_t VolumetricQuadraturePointData::NumNodes() const { return num_nodes_; }
 
-
-FaceQuadraturePointData::FaceQuadraturePointData()
+SurfaceQuadraturePointData::SurfaceQuadraturePointData()
 {}
 
-FaceQuadraturePointData::FaceQuadraturePointData(
+SurfaceQuadraturePointData::SurfaceQuadraturePointData(
   std::vector<unsigned int> quadrature_point_indices,
   VecVec3 qpoints_xyz,
   std::vector<VecDbl> shape_value,
@@ -86,7 +88,7 @@ FaceQuadraturePointData::FaceQuadraturePointData(
   VecVec3 normals,
   std::vector<std::vector<int>> face_dof_mappings,
   size_t num_nodes)
-  : InternalQuadraturePointData(std::move(quadrature_point_indices),
+  : VolumetricQuadraturePointData(std::move(quadrature_point_indices),
                                 std::move(qpoints_xyz),
                                 std::move(shape_value),
                                 std::move(shape_grad),
@@ -97,11 +99,11 @@ FaceQuadraturePointData::FaceQuadraturePointData(
 {
 }
 
-chi_mesh::Vector3 FaceQuadraturePointData::Normal(unsigned int qp) const
+chi_mesh::Vector3 SurfaceQuadraturePointData::Normal(unsigned int qp) const
 {
   return normals_.at(qp);
 }
 
-const VecVec3& FaceQuadraturePointData::Normals() const { return normals_; }
+const VecVec3& SurfaceQuadraturePointData::Normals() const { return normals_; }
 
 } // namespace chi_math::finite_element

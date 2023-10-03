@@ -1,4 +1,4 @@
-#include "math/SpatialDiscretization/CellMapping.h"
+#include "math/SpatialDiscretization/CellMappings/CellMapping.h"
 
 #include <utility>
 

@@ -1,6 +1,6 @@
 #include "UnitIntegralContainer.h"
 
-#include "math/SpatialDiscretization/CellMapping.h"
+#include "math/SpatialDiscretization/CellMappings/CellMapping.h"
 #include "math/SpatialDiscretization/FiniteElement/QuadraturePointData.h"
 
 #include "mesh/Cell/cell.h"
@@ -35,13 +35,13 @@ UnitIntegralContainer::UnitIntegralContainer(
 UnitIntegralContainer
 UnitIntegralContainer::Make(const chi_math::CellMapping& cell_mapping)
 {
-  typedef chi_math::finite_element::InternalQuadraturePointData VolQPData;
-  typedef chi_math::finite_element::FaceQuadraturePointData FaceQPData;
+  typedef chi_math::finite_element::VolumetricQuadraturePointData VolQPData;
+  typedef chi_math::finite_element::SurfaceQuadraturePointData FaceQPData;
 
-  VolQPData internal_data = cell_mapping.MakeInternalQuadraturePointData();
+  VolQPData internal_data = cell_mapping.MakeVolumetricQuadraturePointData();
   std::vector<FaceQPData> faces_qp_data;
   for (size_t f = 0; f < cell_mapping.ReferenceCell().faces_.size(); ++f)
-    faces_qp_data.push_back(cell_mapping.MakeFaceQuadraturePointData(f));
+    faces_qp_data.push_back(cell_mapping.MakeSurfaceQuadraturePointData(f));
 
   const auto n_dof_per_cell = internal_data.NumNodes();
 

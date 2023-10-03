@@ -183,7 +183,7 @@ void cfem_diffusion::Solver::Execute()
   for (const auto& cell : grid.local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
-    const auto  qp_data      = cell_mapping.MakeInternalQuadraturePointData();
+    const auto  qp_data      = cell_mapping.MakeVolumetricQuadraturePointData();
  
     const auto imat  = cell.material_id_;
     const size_t num_nodes = cell_mapping.NumNodes();
@@ -230,7 +230,8 @@ void cfem_diffusion::Solver::Execute()
       // Robin boundary
       if (bndry.type_ == BoundaryType::Robin)
       { 
-        const auto  qp_face_data = cell_mapping.MakeFaceQuadraturePointData( f );
+        const auto  qp_face_data =
+          cell_mapping.MakeSurfaceQuadraturePointData(f);
         const size_t num_face_nodes = face.vertex_ids_.size();
 
         const auto& aval = bndry.values_[0];

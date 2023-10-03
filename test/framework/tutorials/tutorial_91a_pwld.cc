@@ -172,7 +172,7 @@ chiSimTest91_PWLD(const chi::InputParameters&)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
-    const auto vol_qp_data = cell_mapping.MakeInternalQuadraturePointData();
+    const auto vol_qp_data = cell_mapping.MakeVolumetricQuadraturePointData();
 
     MatVec3 IntV_shapeI_gradshapeJ(num_nodes,
                                    VecVec3(num_nodes, Vec3(0, 0, 0)));
@@ -198,7 +198,7 @@ chiSimTest91_PWLD(const chi::InputParameters&)
     VecMatDbl faces_Mmatrices;
     for (size_t f = 0; f < num_faces; ++f)
     {
-      const auto face_qp_data = cell_mapping.MakeFaceQuadraturePointData(f);
+      const auto face_qp_data = cell_mapping.MakeSurfaceQuadraturePointData(f);
       MatDbl IntS_shapeI_shapeJ(num_nodes, VecDbl(num_nodes, 0.0));
       for (unsigned int i = 0; i < num_nodes; ++i)
         for (unsigned int j = 0; j < num_nodes; ++j)

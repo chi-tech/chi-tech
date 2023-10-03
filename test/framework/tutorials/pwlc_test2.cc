@@ -112,7 +112,7 @@ chiSimTest04_PWLC(const chi::InputParameters& params)
   for (const auto& cell : grid.local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
-    const auto qp_data = cell_mapping.MakeInternalQuadraturePointData();
+    const auto qp_data = cell_mapping.MakeVolumetricQuadraturePointData();
     const auto cell_node_xyzs = cell_mapping.GetNodeLocations();
 
     const size_t num_nodes = cell_mapping.NumNodes();
@@ -241,7 +241,7 @@ chiSimTest04_PWLC(const chi::InputParameters& params)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
-    const auto qp_data = cell_mapping.MakeInternalQuadraturePointData();
+    const auto qp_data = cell_mapping.MakeVolumetricQuadraturePointData();
 
     //======================= Grab nodal phi values
     std::vector<double> nodal_phi(num_nodes, 0.0);

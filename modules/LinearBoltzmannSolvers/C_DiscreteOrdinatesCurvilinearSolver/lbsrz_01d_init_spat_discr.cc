@@ -103,7 +103,7 @@ void DiscreteOrdinatesCurvilinearSolver::ComputeSecondaryUnitIntegrals()
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     //    const size_t cell_num_faces = cell.faces.size();
     const size_t cell_num_nodes = cell_mapping.NumNodes();
-    const auto vol_qp_data = cell_mapping.MakeInternalQuadraturePointData();
+    const auto vol_qp_data = cell_mapping.MakeVolumetricQuadraturePointData();
 
     MatDbl IntV_shapeI_shapeJ(cell_num_nodes, VecDbl(cell_num_nodes));
 

@@ -10,11 +10,11 @@ typedef std::vector<chi_mesh::Vector3> VecVec3;
 // #############################################
 /**Stored relevant quadrature point information
  * for volumetric integrals.*/
-class InternalQuadraturePointData
+class VolumetricQuadraturePointData
 {
 public:
-  InternalQuadraturePointData();
-  InternalQuadraturePointData(
+  VolumetricQuadraturePointData();
+  VolumetricQuadraturePointData(
     std::vector<unsigned int> quadrature_point_indices,
     VecVec3 qpoints_xyz,
     std::vector<VecDbl> shape_value,
@@ -49,11 +49,11 @@ protected:
 // #############################################
 /**Stores relevant quadrature point information
  * for surface integrals.*/
-class FaceQuadraturePointData : public InternalQuadraturePointData
+class SurfaceQuadraturePointData : public VolumetricQuadraturePointData
 {
 public:
-  FaceQuadraturePointData();
-  FaceQuadraturePointData(std::vector<unsigned int> quadrature_point_indices,
+  SurfaceQuadraturePointData();
+  SurfaceQuadraturePointData(std::vector<unsigned int> quadrature_point_indices,
                       VecVec3 qpoints_xyz,
                       std::vector<VecDbl> shape_value,
                       std::vector<VecVec3> shape_grad,

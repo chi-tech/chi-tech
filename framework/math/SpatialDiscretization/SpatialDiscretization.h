@@ -6,7 +6,7 @@
 #include "math/chi_math.h"
 #include "math/UnknownManager/unknown_manager.h"
 #include "mesh/Cell/cell.h"
-#include "CellMapping.h"
+#include "math/SpatialDiscretization/CellMappings/CellMapping.h"
 
 #include <petscksp.h>
 

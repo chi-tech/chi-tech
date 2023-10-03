@@ -20,11 +20,11 @@ public:
                       const chi_mesh::MeshContinuum& ref_grid,
                       const QuadratureLine& volume_quadrature);
 
-  finite_element::InternalQuadraturePointData
-  MakeInternalQuadraturePointData() const override;
+  finite_element::VolumetricQuadraturePointData
+  MakeVolumetricQuadraturePointData() const override;
 
-  finite_element::FaceQuadraturePointData
-  MakeFaceQuadraturePointData(size_t face_index) const override;
+  finite_element::SurfaceQuadraturePointData
+  MakeSurfaceQuadraturePointData(size_t face_index) const override;
 
   // ################################################## Define standard
   //                                                    slab linear shape

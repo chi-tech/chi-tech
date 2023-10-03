@@ -5,13 +5,13 @@
 
 #include "mesh/chi_mesh.h"
 
-#include "math/SpatialDiscretization/CellMapping.h"
+#include "CellMapping.h"
 
 // ###################################################################
 namespace chi_math::cell_mapping
 {
 /** Base class for all cell piece-wise linear cell-mappings.
-* \ingroup doc_CellMappings*/
+ * \ingroup doc_CellMappings*/
 class PieceWiseLinearBaseMapping : public CellMapping
 {
 protected:
@@ -21,19 +21,10 @@ public:
 
 public:
   /** Constructor. */
-  explicit PieceWiseLinearBaseMapping(
-    const chi_mesh::MeshContinuum& grid,
-    const chi_mesh::Cell& cell,
-    size_t num_nodes,
-    std::vector<std::vector<int>> face_node_mappings)
-    : CellMapping(grid,
-                  cell,
-                  num_nodes,
-                  GetVertexLocations(grid, cell),
-                  std::move(face_node_mappings),
-                  &CellMapping::ComputeCellVolumeAndAreas)
-  {
-  }
+  PieceWiseLinearBaseMapping(const chi_mesh::MeshContinuum& grid,
+                             const chi_mesh::Cell& cell,
+                             size_t num_nodes,
+                             std::vector<std::vector<int>> face_node_mappings);
 
 protected:
   static std::vector<chi_mesh::Vector3>

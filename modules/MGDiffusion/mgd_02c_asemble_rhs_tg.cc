@@ -19,7 +19,7 @@ void mg_diffusion::Solver::Assemble_RHS_TwoGrid(const int64_t verbose)
   for (const auto& cell :  grid_ptr_->local_cells)
   {
     const auto &cell_mapping = sdm.GetCellMapping(cell);
-    const auto qp_data = cell_mapping.MakeInternalQuadraturePointData();
+    const auto qp_data = cell_mapping.MakeVolumetricQuadraturePointData();
     const size_t num_nodes = cell_mapping.NumNodes();
 
     const auto &S = matid_to_xs_map.at(cell.material_id_)->TransferMatrix(0);

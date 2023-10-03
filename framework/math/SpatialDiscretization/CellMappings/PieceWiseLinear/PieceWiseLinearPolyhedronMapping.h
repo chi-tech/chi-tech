@@ -21,11 +21,11 @@ public:
                           const QuadratureTetrahedron& volume_quadrature,
                           const QuadratureTriangle& surface_quadrature);
 
-  finite_element::InternalQuadraturePointData
-  MakeInternalQuadraturePointData() const override;
+  finite_element::VolumetricQuadraturePointData
+  MakeVolumetricQuadraturePointData() const override;
 
-  finite_element::FaceQuadraturePointData
-  MakeFaceQuadraturePointData(size_t face_index) const override;
+  finite_element::SurfaceQuadraturePointData
+  MakeSurfaceQuadraturePointData(size_t face_index) const override;
 
   // ############################################### Actual shape functions
   //                                                 as function of cartesian

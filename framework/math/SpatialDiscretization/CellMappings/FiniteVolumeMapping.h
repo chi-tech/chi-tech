@@ -3,7 +3,7 @@
 
 #include <utility>
 
-#include "math/SpatialDiscretization/CellMapping.h"
+#include "CellMapping.h"
 
 #include "mesh/Cell/cell.h"
 
@@ -59,11 +59,11 @@ public:
   }
 
   // 03 Quadrature
-  finite_element::InternalQuadraturePointData
-  MakeInternalQuadraturePointData() const override;
+  finite_element::VolumetricQuadraturePointData
+  MakeVolumetricQuadraturePointData() const override;
 
-  finite_element::FaceQuadraturePointData
-  MakeFaceQuadraturePointData(size_t face_index) const override;
+  finite_element::SurfaceQuadraturePointData
+  MakeSurfaceQuadraturePointData(size_t face_index) const override;
 };
 
 } // namespace chi_math::cell_mapping

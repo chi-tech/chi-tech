@@ -4,8 +4,8 @@ namespace chi_math::cell_mapping
 {
 
 double PieceWiseLinearPolygonMapping::TriShape(uint32_t index,
-                                      const chi_mesh::Vector3& qpoint,
-                                      bool on_surface /*false*/)
+                                               const chi_mesh::Vector3& qpoint,
+                                               bool on_surface /*false*/)
 {
   double xi;
   double eta;
@@ -34,9 +34,9 @@ double PieceWiseLinearPolygonMapping::TriShape(uint32_t index,
 /**Precomputation of the shape function at a quadrature point.*/
 double
 PieceWiseLinearPolygonMapping::SideShape(uint32_t side,
-                                       uint32_t i,
-                                       const chi_mesh::Vector3& qpoint,
-                                       bool on_surface /*=false*/) const
+                                         uint32_t i,
+                                         const chi_mesh::Vector3& qpoint,
+                                         bool on_surface /*=false*/) const
 {
   int index = node_to_side_map_[i][side];
   double value = 0.0;
@@ -50,7 +50,8 @@ PieceWiseLinearPolygonMapping::SideShape(uint32_t side,
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GradVarphi_x
 /**Precomputation of the partial derivative along x of the
  * shape function at a quadrature point.*/
-double PieceWiseLinearPolygonMapping::SideGradShape_x(uint32_t side, uint32_t i) const
+double PieceWiseLinearPolygonMapping::SideGradShape_x(uint32_t side,
+                                                      uint32_t i) const
 {
   int index = node_to_side_map_[i][side];
   double value = 0;
@@ -76,7 +77,8 @@ double PieceWiseLinearPolygonMapping::SideGradShape_x(uint32_t side, uint32_t i)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GradVarphi_y
 /**Precomputation of the partial derivative along y of the
  * shape function at a quadrature point.*/
-double PieceWiseLinearPolygonMapping::SideGradShape_y(uint32_t side, uint32_t i) const
+double PieceWiseLinearPolygonMapping::SideGradShape_y(uint32_t side,
+                                                      uint32_t i) const
 {
   int index = node_to_side_map_[i][side];
   double value = 0;

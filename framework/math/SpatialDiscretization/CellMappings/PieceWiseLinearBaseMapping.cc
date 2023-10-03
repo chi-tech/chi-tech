@@ -2,13 +2,25 @@
 
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "math/SpatialDiscretization/FiniteElement/QuadraturePointData.h"
-
 #include "chi_runtime.h"
 #include "chi_log.h"
 
 namespace chi_math::cell_mapping
 {
+
+PieceWiseLinearBaseMapping::PieceWiseLinearBaseMapping(
+  const chi_mesh::MeshContinuum& grid,
+  const chi_mesh::Cell& cell,
+  size_t num_nodes,
+  std::vector<std::vector<int>> face_node_mappings)
+  : CellMapping(grid,
+                cell,
+                num_nodes,
+                GetVertexLocations(grid, cell),
+                std::move(face_node_mappings),
+                &CellMapping::ComputeCellVolumeAndAreas)
+{
+}
 
 /** This section just determines a mapping of face dofs
 to cell dofs. This is pretty simple since we can
@@ -54,8 +66,8 @@ PieceWiseLinearBaseMapping::MakeFaceNodeMapping(const chi_mesh::Cell& cell)
   return mappings;
 }
 
-std::vector<chi_mesh::Vector3> PieceWiseLinearBaseMapping::GetVertexLocations(const chi_mesh::MeshContinuum& grid,
-                                      const chi_mesh::Cell& cell)
+std::vector<chi_mesh::Vector3> PieceWiseLinearBaseMapping::GetVertexLocations(
+  const chi_mesh::MeshContinuum& grid, const chi_mesh::Cell& cell)
 {
   std::vector<chi_mesh::Vector3> verts;
   verts.reserve(cell.vertex_ids_.size());

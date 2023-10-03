@@ -7,7 +7,6 @@
 #include "math/Quadratures/quadrature_triangle.h"
 #include "math/Quadratures/quadrature_quadrilateral.h"
 #include "math/Quadratures/quadrature_tetrahedron.h"
-#include "math/SpatialDiscretization/FiniteElement/FiniteElementBase.h"
 
 namespace chi_math::spatial_discretization
 {
@@ -17,18 +16,16 @@ namespace chi_math::spatial_discretization
 class PieceWiseLinearBase : public FiniteElementBase
 {
 protected:
+  explicit PieceWiseLinearBase(const chi_mesh::MeshContinuum& grid,
+                               QuadratureOrder q_order,
+                               SDMType sdm_type,
+                               CoordinateSystemType cs_type);
+
   QuadratureLine line_quad_order_arbitrary_;
   QuadratureTriangle tri_quad_order_arbitrary_;
   QuadratureQuadrilateral quad_quad_order_arbitrary_;
   QuadratureTetrahedron tet_quad_order_arbitrary_;
 
-protected:
-  explicit PieceWiseLinearBase(const chi_mesh::MeshContinuum& grid,
-                                         QuadratureOrder q_order,
-                                         SDMType sdm_type,
-                                         CoordinateSystemType cs_type);
-  // 01
-protected:
   void CreateCellMappings();
 };
 

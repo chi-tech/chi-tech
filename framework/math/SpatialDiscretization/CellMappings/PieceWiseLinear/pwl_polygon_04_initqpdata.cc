@@ -5,8 +5,8 @@
 namespace chi_math::cell_mapping
 {
 
-finite_element::InternalQuadraturePointData
-PieceWiseLinearPolygonMapping::MakeInternalQuadraturePointData() const
+finite_element::VolumetricQuadraturePointData
+PieceWiseLinearPolygonMapping::MakeVolumetricQuadraturePointData() const
 {
   //=================================== Determine number of internal qpoints
   size_t num_tris = sides_.size();
@@ -67,7 +67,7 @@ PieceWiseLinearPolygonMapping::MakeInternalQuadraturePointData() const
 
   V_num_nodes = num_nodes_;
 
-  return finite_element::InternalQuadraturePointData(V_quadrature_point_indices,
+  return finite_element::VolumetricQuadraturePointData(V_quadrature_point_indices,
                                                      V_qpoints_xyz,
                                                      V_shape_value,
                                                      V_shape_grad,
@@ -76,8 +76,8 @@ PieceWiseLinearPolygonMapping::MakeInternalQuadraturePointData() const
                                                      V_num_nodes);
 }
 
-finite_element::FaceQuadraturePointData
-PieceWiseLinearPolygonMapping::MakeFaceQuadraturePointData(size_t face_index) const
+finite_element::SurfaceQuadraturePointData
+PieceWiseLinearPolygonMapping::MakeSurfaceQuadraturePointData(size_t face_index) const
 {
   const bool ON_SURFACE = true;
 
@@ -138,7 +138,7 @@ PieceWiseLinearPolygonMapping::MakeFaceQuadraturePointData(size_t face_index) co
 
   F_num_nodes = 2;
 
-  return finite_element::FaceQuadraturePointData(F_quadrature_point_indices,
+  return finite_element::SurfaceQuadraturePointData(F_quadrature_point_indices,
                                                  F_qpoints_xyz,
                                                  F_shape_value,
                                                  F_shape_grad,

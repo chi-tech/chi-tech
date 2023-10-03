@@ -7,7 +7,9 @@
 #include "math/SpatialDiscretization/CellMappings/PieceWiseLinear/PieceWiseLinearPolyhedronMapping.h"
 
 #define UnsupportedCellType(fname)                                             \
-  std::invalid_argument((fname) + ": Unsupported cell type encountered.");
+  std::invalid_argument((fname) +                                              \
+                        ": Unsupported cell type encountered. type_id=" +      \
+                        std::to_string(static_cast<int>(cell.Type())));
 
 namespace chi_math::spatial_discretization
 {
@@ -27,8 +29,7 @@ PieceWiseLinearBase::PieceWiseLinearBase(const chi_mesh::MeshContinuum& grid,
 
 void PieceWiseLinearBase::CreateCellMappings()
 {
-  constexpr std::string_view fname = "chi_math::SpatialDiscretization_PWLBase::"
-                                     "CreateCellMappings";
+  constexpr std::string_view fname = __PRETTY_FUNCTION__;
 
   typedef cell_mapping::PieceWiseLinearSlabMapping SlabSlab;
   typedef cell_mapping::PieceWiseLinearPolygonMapping Polygon;

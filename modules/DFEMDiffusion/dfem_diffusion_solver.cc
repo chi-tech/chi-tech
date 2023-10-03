@@ -192,7 +192,7 @@ void dfem_diffusion::Solver::Execute()
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes   = cell_mapping.NumNodes();
     const auto   cc_nodes    = cell_mapping.GetNodeLocations();
-    const auto  qp_data      = cell_mapping.MakeInternalQuadraturePointData();
+    const auto  qp_data      = cell_mapping.MakeVolumetricQuadraturePointData();
 
     const auto imat  = cell.material_id_;
     MatDbl Acell(num_nodes, VecDbl(num_nodes, 0.0));
@@ -235,7 +235,7 @@ void dfem_diffusion::Solver::Execute()
       const auto &face = cell.faces_[f];
       const auto &n_f = face.normal_;
       const size_t num_face_nodes = cell_mapping.NumFaceNodes(f);
-      const auto fqp_data = cell_mapping.MakeFaceQuadraturePointData(f);
+      const auto fqp_data = cell_mapping.MakeSurfaceQuadraturePointData(f);
 
       const double hm = HPerpendicular(cell, f);
 
@@ -353,7 +353,8 @@ void dfem_diffusion::Solver::Execute()
         // Robin boundary
         if (bndry.type_ == BoundaryType::Robin)
         {
-          const auto qp_face_data = cell_mapping.MakeFaceQuadraturePointData(f);
+          const auto qp_face_data =
+            cell_mapping.MakeSurfaceQuadraturePointData(f);
 
           const auto &aval = bndry.values_[0];
           const auto &bval = bndry.values_[1];

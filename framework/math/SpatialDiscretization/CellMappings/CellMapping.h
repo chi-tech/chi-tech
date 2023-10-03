@@ -17,8 +17,8 @@ class Cell;
 
 namespace chi_math::finite_element
 {
-class InternalQuadraturePointData;
-class FaceQuadraturePointData;
+class VolumetricQuadraturePointData;
+class SurfaceQuadraturePointData;
 } // namespace chi_math::finite_element
 
 namespace chi_math
@@ -77,13 +77,13 @@ public:
 
   // 03 Quadrature
   /**Makes the volumetric/internal quadrature point data for this element.*/
-  virtual finite_element::InternalQuadraturePointData
-  MakeInternalQuadraturePointData() const = 0;
+  virtual finite_element::VolumetricQuadraturePointData
+  MakeVolumetricQuadraturePointData() const = 0;
 
   /**Makes the surface quadrature point data for this element, at the specified
    * face.*/
-  virtual finite_element::FaceQuadraturePointData
-  MakeFaceQuadraturePointData(size_t face_index) const = 0;
+  virtual finite_element::SurfaceQuadraturePointData
+  MakeSurfaceQuadraturePointData(size_t face_index) const = 0;
 
   virtual ~CellMapping() = default;
 
@@ -115,8 +115,10 @@ protected:
 
   const chi_mesh::MeshContinuum& ref_grid_;
   const chi_mesh::Cell& cell_;
+
   const size_t num_nodes_;
   const std::vector<chi_mesh::Vector3> node_locations_;
+
   double volume_ = 0.0;
   std::vector<double> areas_;
 

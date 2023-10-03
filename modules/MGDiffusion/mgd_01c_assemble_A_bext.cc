@@ -20,7 +20,7 @@ void mg_diffusion::Solver::Assemble_A_bext()
   for (const auto& cell : grid.local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
-    const auto  qp_data      = cell_mapping.MakeInternalQuadraturePointData();
+    const auto  qp_data      = cell_mapping.MakeVolumetricQuadraturePointData();
     const size_t num_nodes   = cell_mapping.NumNodes();
 
     const auto& xs   = matid_to_xs_map.at(cell.material_id_);
@@ -89,7 +89,8 @@ void mg_diffusion::Solver::Assemble_A_bext()
       //   for two-grid, it is homogenous Robin
       if (bndry.type_ == BoundaryType::Robin)
       {
-        const auto  qp_face_data = cell_mapping.MakeFaceQuadraturePointData(f);
+        const auto  qp_face_data =
+          cell_mapping.MakeSurfaceQuadraturePointData(f);
         const size_t num_face_nodes = face.vertex_ids_.size();
 
         auto& aval = bndry.mg_values_[0];

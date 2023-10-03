@@ -43,7 +43,7 @@ void lbs::acceleration::DiffusionMIPSolver::
     const auto&  cell_mapping = sdm_.GetCellMapping(cell);
     const size_t num_nodes    = cell_mapping.NumNodes();
     const auto   cc_nodes     = cell_mapping.GetNodeLocations();
-    const auto   qp_data      = cell_mapping.MakeInternalQuadraturePointData();
+    const auto   qp_data      = cell_mapping.MakeVolumetricQuadraturePointData();
 
     const auto& xs = mat_id_2_xs_map_.at(cell.material_id_);
 
@@ -104,7 +104,7 @@ void lbs::acceleration::DiffusionMIPSolver::
         const auto&  face           = cell.faces_[f];
         const auto&  n_f            = face.normal_;
         const size_t num_face_nodes = cell_mapping.NumFaceNodes(f);
-        const auto   fqp_data   = cell_mapping.MakeFaceQuadraturePointData(f);
+        const auto   fqp_data   = cell_mapping.MakeSurfaceQuadraturePointData(f);
 
         const double hm = HPerpendicular(cell, f);
 

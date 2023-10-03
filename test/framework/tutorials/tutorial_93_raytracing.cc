@@ -311,7 +311,7 @@ chiSimTest93_RayTracing(const chi::InputParameters&)
     //====================================== Compute mass matrix
     //                                       and its inverse
     const auto& cell_mapping = sdm.GetCellMapping(cell);
-    const auto& qp_data = cell_mapping.MakeInternalQuadraturePointData();
+    const auto& qp_data = cell_mapping.MakeVolumetricQuadraturePointData();
     const size_t num_nodes = cell_mapping.NumNodes();
 
     MatDbl M(num_nodes, VecDbl(num_nodes, 0.0));

@@ -22,24 +22,11 @@ public:
                        const QuadratureTriangle& volume_quadrature,
                        const QuadratureLine& surface_quadrature);
 
-  finite_element::InternalQuadraturePointData
-  MakeInternalQuadraturePointData() const override;
+  finite_element::VolumetricQuadraturePointData
+  MakeVolumetricQuadraturePointData() const override;
 
-  finite_element::FaceQuadraturePointData
-  MakeFaceQuadraturePointData(size_t face_index) const override;
-
-  // ################################################## Define standard
-  //                                                    triangle linear shape
-  //                                                    functions
-  static double TriShape(uint32_t index,
-                         const chi_mesh::Vector3& qpoint,
-                         bool on_surface = false);
-
-  // ############################################### Shape functions per side
-  double SideShape(uint32_t side,
-                   uint32_t i,
-                   const chi_mesh::Vector3& qpoint,
-                   bool on_surface = false) const;
+  finite_element::SurfaceQuadraturePointData
+  MakeSurfaceQuadraturePointData(size_t face_index) const override;
 
   double SideGradShape_x(uint32_t side, uint32_t i) const;
   double SideGradShape_y(uint32_t side, uint32_t i) const;
@@ -57,6 +44,20 @@ public:
     std::vector<chi_mesh::Vector3>& gradshape_values) const override;
 
 private:
+  // ################################################## Define standard
+  //                                                    triangle linear shape
+  //                                                    functions
+  static double TriShape(uint32_t index,
+                         const chi_mesh::Vector3& qpoint,
+                         bool on_surface = false);
+
+  // ############################################### Shape functions per side
+  double SideShape(uint32_t side,
+                   uint32_t i,
+                   const chi_mesh::Vector3& qpoint,
+                   bool on_surface = false) const;
+
+  // This structure goes into sides
   struct FEside_data2d
   {
     double detJ;
@@ -68,7 +69,6 @@ private:
     chi_mesh::Matrix3x3 JTinv;
     chi_mesh::Vector3 normal;
   };
-  // Goes into sides
 
   std::vector<FEside_data2d> sides_;
   const QuadratureTriangle& volume_quadrature_;
