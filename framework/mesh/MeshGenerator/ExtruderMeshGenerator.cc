@@ -234,19 +234,6 @@ ExtruderMeshGenerator::GenerateUnpartitionedMesh(
         } // for tc face
 
         //================================== Create top and bottom faces
-        // Bottom face
-        {
-          UnpartitionedMesh::LightWeightFace new_face;
-
-          new_face.vertex_ids.reserve(template_cell->vertex_ids.size());
-          auto& vs = template_cell->vertex_ids;
-          for (auto vid = vs.rbegin(); vid != vs.rend(); ++vid)
-            new_face.vertex_ids.push_back((*vid) + k * num_template_vertices);
-
-          if (k == 0) new_face.neighbor = zmin_bndry_id;
-
-          new_cell.faces.push_back(std::move(new_face));
-        }
         // Top face
         {
           UnpartitionedMesh::LightWeightFace new_face;
@@ -257,6 +244,19 @@ ExtruderMeshGenerator::GenerateUnpartitionedMesh(
                                           (k + 1) * num_template_vertices);
 
           if ((k + 1) == z_levels.size()) new_face.neighbor = zmax_bndry_id;
+
+          new_cell.faces.push_back(std::move(new_face));
+        }
+        // Bottom face
+        {
+          UnpartitionedMesh::LightWeightFace new_face;
+
+          new_face.vertex_ids.reserve(template_cell->vertex_ids.size());
+          auto& vs = template_cell->vertex_ids;
+          for (auto vid = vs.rbegin(); vid != vs.rend(); ++vid)
+            new_face.vertex_ids.push_back((*vid) + k * num_template_vertices);
+
+          if (k == 0) new_face.neighbor = zmin_bndry_id;
 
           new_cell.faces.push_back(std::move(new_face));
         }
