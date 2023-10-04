@@ -1,16 +1,12 @@
 #include "lbsadj_solver.h"
 
-#include "math/SpatialDiscretization/FiniteElement/spatial_discretization_FE.h"
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
-//###################################################################
+// ###################################################################
 /**Computes the inner product of the flux and the material source.*/
 double lbs::DiscreteOrdinatesAdjointSolver::ComputeInnerProduct()
 {
   double local_integral = 0.0;
-
-  auto pwl =
-      std::dynamic_pointer_cast<chi_math::SpatialDiscretization_FE>(discretization_);
 
   //============================================= Material sources
   for (const auto& cell : grid_ptr_->local_cells)
@@ -19,7 +15,7 @@ double lbs::DiscreteOrdinatesAdjointSolver::ComputeInnerProduct()
 
     const auto& transport_view = cell_transport_views_[cell.local_id_];
     const auto& source = matid_to_src_map_[cell.material_id_];
-    const auto& fe_values = pwl->GetUnitIntegrals(cell);
+    const auto& fe_values = unit_cell_matrices_[cell.local_id_];
 
     for (const auto& group : groups_)
     {
@@ -35,7 +31,7 @@ double lbs::DiscreteOrdinatesAdjointSolver::ComputeInnerProduct()
 
           const double phi = phi_old_local_[dof_map];
 
-          local_integral += Q * phi * fe_values.IntV_shapeI(i);
+          local_integral += Q * phi * fe_values.Vi_vectors[i];
         }//for node
       }//check source value >0
     }//for group
@@ -51,7 +47,6 @@ double lbs::DiscreteOrdinatesAdjointSolver::ComputeInnerProduct()
       const auto& transport_view = cell_transport_views_[cell.local_id_];
       const auto& source_strength = point_source.Strength();
       const auto& shape_values = info.shape_values;
-      const auto& fe_values = pwl->GetUnitIntegrals(cell);
 
       for (const auto& group : groups_)
       {

@@ -1,10 +1,11 @@
 #include "fieldfunction_gridbased.h"
 
-#include "math/SpatialDiscretization/FiniteVolume/fv.h"
-#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
-#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "math/SpatialDiscretization/FiniteVolume/FiniteVolume.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/PieceWiseLinearContinuous.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/PieceWiseLinearDiscontinuous.h"
 
 #include "mesh/MeshHandler/chi_meshhandler.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "ChiObjectFactory.h"
 
@@ -130,14 +131,12 @@ chi_math::SDMPtr FieldFunctionGridBased::MakeSpatialDiscretization(
   const auto& grid_ptr = chi_mesh::GetCurrentHandler().GetGrid();
   const auto sdm_type = params.GetParamValue<std::string>("sdm_type");
 
-  typedef chi_math::SpatialDiscretization_FV FV;
-  typedef chi_math::SpatialDiscretization_PWLC PWLC;
-  typedef chi_math::SpatialDiscretization_PWLD PWLD;
+  typedef chi_math::spatial_discretization::FiniteVolume FV;
+  typedef chi_math::spatial_discretization::PieceWiseLinearContinuous PWLC;
+  typedef chi_math::spatial_discretization::PieceWiseLinearDiscontinuous PWLD;
 
   if (sdm_type == "FiniteVolume") return FV::New(*grid_ptr);
 
-  chi_math::finite_element::SetupFlags setup_flags =
-    chi_math::finite_element::NO_FLAGS_SET;
   chi_math::QuadratureOrder q_order = chi_math::QuadratureOrder::SECOND;
   chi_math::CoordinateSystemType coordinate_system_type =
     chi_math::CoordinateSystemType::CARTESIAN;
@@ -167,9 +166,9 @@ chi_math::SDMPtr FieldFunctionGridBased::MakeSpatialDiscretization(
   }
 
   if (sdm_type == "PWLC")
-    return PWLC::New(*grid_ptr, setup_flags, q_order, coordinate_system_type);
+    return PWLC::New(*grid_ptr, q_order, coordinate_system_type);
   if (sdm_type == "PWLD")
-    return PWLD::New(*grid_ptr, setup_flags, q_order, coordinate_system_type);
+    return PWLD::New(*grid_ptr, q_order, coordinate_system_type);
 
   // If not returned by now
   ChiInvalidArgument("Unsupported sdm_type \"" + sdm_type + "\"");

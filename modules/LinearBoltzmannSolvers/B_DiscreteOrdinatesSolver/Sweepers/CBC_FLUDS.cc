@@ -1,6 +1,6 @@
 #include "CBC_FLUDS.h"
 
-#include "math/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
 #include "mesh/SweepUtilities/SPDS/SPDS.h"
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 

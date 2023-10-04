@@ -4,7 +4,7 @@
 #include "physics/SolverBase/chi_solver.h"
 
 #include "A_LBSSolver/Groupset/lbs_groupset.h"
-#include "math/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
 #include "math/LinearSolver/linear_solver.h"
 #include "lbs_structs.h"
 #include "mesh/SweepUtilities/sweep_namespace.h"

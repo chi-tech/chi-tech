@@ -1,7 +1,7 @@
 #include "chi_ffinter_point.h"
 
 #include "physics/FieldFunction/fieldfunction_gridbased.h"
-#include "math/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_runtime.h"

@@ -2,13 +2,14 @@
 
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
-//###################################################################
+// ###################################################################
 /**Assembles PWLC matrix for general cells.*/
 void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
                                                   int group)
 {
-  auto pwl_sdm = std::static_pointer_cast<chi_math::SpatialDiscretization_PWLC>(this->discretization_);
-  const auto& fe_intgrl_values = pwl_sdm->GetUnitIntegrals(cell);
+  auto pwl_sdm = std::static_pointer_cast<
+    chi_math::spatial_discretization::PieceWiseLinearContinuous>(this->discretization_);
+  const auto& fe_intgrl_values = unit_integrals_.at(cell.global_id_);
 
   size_t num_nodes = fe_intgrl_values.NumNodes();
 

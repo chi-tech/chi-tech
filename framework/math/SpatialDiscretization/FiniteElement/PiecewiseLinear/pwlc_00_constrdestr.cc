@@ -1,92 +1,33 @@
-#include "pwlc.h"
+#include "PieceWiseLinearContinuous.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
 
 #include "utils/chi_timer.h"
 
+namespace chi_math::spatial_discretization
+{
+
 // ###################################################################
 /**Constructor.*/
-chi_math::SpatialDiscretization_PWLC::SpatialDiscretization_PWLC(
-  const chi_mesh::MeshContinuum& in_grid,
-  chi_math::finite_element::SetupFlags setup_flags,
-  chi_math::QuadratureOrder qorder,
-  chi_math::CoordinateSystemType in_cs_type)
-  : SpatialDiscretization_PWLBase(in_grid,
-                                  setup_flags,
-                                  qorder,
-                                  SDMType::PIECEWISE_LINEAR_CONTINUOUS,
-                                  in_cs_type)
+PieceWiseLinearContinuous::PieceWiseLinearContinuous(
+  const chi_mesh::MeshContinuum& grid,
+  chi_math::QuadratureOrder q_order,
+  chi_math::CoordinateSystemType cs_type)
+  : spatial_discretization::PieceWiseLinearBase(
+      grid, q_order, SDMType::PIECEWISE_LINEAR_CONTINUOUS, cs_type)
 {
-  if (setup_flags == chi_math::finite_element::COMPUTE_UNIT_INTEGRALS)
-  {
-    int qorder_min;
-    switch (coord_sys_type_)
-    {
-      case chi_math::CoordinateSystemType::CARTESIAN:
-      {
-        qorder_min = static_cast<int>(chi_math::QuadratureOrder::SECOND);
-        break;
-      }
-      case chi_math::CoordinateSystemType::CYLINDRICAL:
-      {
-        qorder_min = static_cast<int>(chi_math::QuadratureOrder::THIRD);
-        break;
-      }
-      case chi_math::CoordinateSystemType::SPHERICAL:
-      {
-        qorder_min = static_cast<int>(chi_math::QuadratureOrder::FOURTH);
-        break;
-      }
-      default:
-        throw std::invalid_argument(
-          "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
-          "Unsupported coordinate system type encountered.");
-    }
-
-    if (static_cast<int>(line_quad_order_arbitrary_.order_) < qorder_min)
-      Chi::log.LogAllWarning()
-        << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
-        << "static_cast<int>(line_quad_order_arbitrary.order) < " << qorder_min
-        << ".";
-
-    if (static_cast<int>(tri_quad_order_arbitrary_.order_) < qorder_min)
-      Chi::log.LogAllWarning()
-        << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
-        << "static_cast<int>(tri_quad_order_arbitrary.order) < " << qorder_min
-        << ".";
-
-    if (static_cast<int>(quad_quad_order_arbitrary_.order_) < qorder_min)
-      Chi::log.LogAllWarning()
-        << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
-        << "static_cast<int>(quad_quad_order_arbitrary.order) < " << qorder_min
-        << ".";
-
-    if (static_cast<int>(tet_quad_order_arbitrary_.order_) < qorder_min)
-      Chi::log.LogAllWarning()
-        << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
-        << "static_cast<int>(tet_quad_order_arbitrary.order) < " << qorder_min
-        << ".";
-  }
-
   CreateCellMappings();
-  if (setup_flags != chi_math::finite_element::NO_FLAGS_SET)
-  {
-    PreComputeCellSDValues();
-    PreComputeNeighborCellSDValues();
-  }
 
   OrderNodes();
 }
 
 // ###################################################################
 /**Construct a shared object using the protected constructor.*/
-std::shared_ptr<chi_math::SpatialDiscretization_PWLC>
-chi_math::SpatialDiscretization_PWLC::New(
-  const chi_mesh::MeshContinuum& in_grid,
-  finite_element::SetupFlags setup_flags /*=finite_element::NO_FLAGS_SET*/,
-  QuadratureOrder qorder /*=QuadratureOrder::SECOND*/,
-  CoordinateSystemType in_cs_type /*=CoordinateSystemType::CARTESIAN*/)
+std::shared_ptr<PieceWiseLinearContinuous> PieceWiseLinearContinuous::New(
+  const chi_mesh::MeshContinuum& grid,
+  QuadratureOrder q_order /*=QuadratureOrder::SECOND*/,
+  CoordinateSystemType cs_type /*=CoordinateSystemType::CARTESIAN*/)
 
 {
   const auto PWLC = SpatialDiscretizationType::PIECEWISE_LINEAR_CONTINUOUS;
@@ -94,28 +35,29 @@ chi_math::SpatialDiscretization_PWLC::New(
   // one requested.
   for (auto& sdm : Chi::sdm_stack)
     if (sdm->Type() == PWLC and
-        std::addressof(sdm->Grid()) == std::addressof(in_grid) and
-        sdm->GetCoordinateSystemType() == in_cs_type)
+        std::addressof(sdm->Grid()) == std::addressof(grid) and
+        sdm->GetCoordinateSystemType() == cs_type)
     {
-      auto fe_ptr = std::dynamic_pointer_cast<SpatialDiscretization_FE>(sdm);
+      auto fe_ptr = std::dynamic_pointer_cast<FiniteElementBase>(sdm);
 
       ChiLogicalErrorIf(not fe_ptr, "Casting failure to FE");
 
-      if (fe_ptr->GetSetupFlags() != setup_flags) break;
-      if (fe_ptr->GetQuadratureOrder() != qorder) break;
+      if (fe_ptr->GetQuadratureOrder() != q_order) break;
 
       auto sdm_ptr =
-        std::dynamic_pointer_cast<SpatialDiscretization_PWLC>(fe_ptr);
+        std::dynamic_pointer_cast<PieceWiseLinearContinuous>(fe_ptr);
 
       ChiLogicalErrorIf(not sdm_ptr, "Casting failure");
 
       return sdm_ptr;
     }
 
-  auto new_sdm = std::shared_ptr<SpatialDiscretization_PWLC>(
-    new SpatialDiscretization_PWLC(in_grid, setup_flags, qorder, in_cs_type));
+  auto new_sdm = std::shared_ptr<PieceWiseLinearContinuous>(
+    new PieceWiseLinearContinuous(grid, q_order, cs_type));
 
   Chi::sdm_stack.push_back(new_sdm);
 
   return new_sdm;
 }
+
+} // namespace chi_math::spatial_discretization

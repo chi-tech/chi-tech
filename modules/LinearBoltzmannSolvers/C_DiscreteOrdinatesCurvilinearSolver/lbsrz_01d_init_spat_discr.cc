@@ -1,6 +1,6 @@
 #include "lbs_curvilinear_solver.h"
 
-#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/PieceWiseLinearDiscontinuous.h"
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_runtime.h"
@@ -17,7 +17,6 @@ void DiscreteOrdinatesCurvilinearSolver::InitializeSpatialDiscretization()
 {
   Chi::log.Log() << "Initializing spatial discretization_.\n";
 
-  const auto setup_flags = chi_math::finite_element::NO_FLAGS_SET;
   auto qorder = chi_math::QuadratureOrder::INVALID_ORDER;
   auto system = chi_math::CoordinateSystemType::UNDEFINED;
 
@@ -47,8 +46,9 @@ void DiscreteOrdinatesCurvilinearSolver::InitializeSpatialDiscretization()
     }
   }
 
-  typedef chi_math::SpatialDiscretization_PWLD SDM_PWLD;
-  discretization_ = SDM_PWLD::New(*grid_ptr_, setup_flags, qorder, system);
+  typedef chi_math::spatial_discretization::PieceWiseLinearDiscontinuous
+    SDM_PWLD;
+  discretization_ = SDM_PWLD::New(*grid_ptr_, qorder, system);
 
   ComputeUnitIntegrals();
 
@@ -82,7 +82,7 @@ void DiscreteOrdinatesCurvilinearSolver::InitializeSpatialDiscretization()
   }
 
   discretization_secondary_ =
-    SDM_PWLD::New(*grid_ptr_, setup_flags, qorder, system);
+    SDM_PWLD::New(*grid_ptr_, qorder, system);
 
   ComputeSecondaryUnitIntegrals();
 }
@@ -93,21 +93,17 @@ void DiscreteOrdinatesCurvilinearSolver::ComputeSecondaryUnitIntegrals()
   const auto& sdm = *discretization_;
 
   //======================================== Define spatial weighting functions
-  struct SpatialWeightFunction // SWF
-  {
-    virtual double operator()(const chi_mesh::Vector3& pt) const { return 1.0; }
-  };
-
-  auto swf_ptr = std::make_shared<SpatialWeightFunction>();
+  std::function<double(const chi_mesh::Vector3&)> swf =
+    chi_math::SpatialDiscretization::CylindricalRZSpatialWeightFunction;
 
   //======================================== Define lambda for cell-wise comps
   auto ComputeCellUnitIntegrals =
-    [&sdm](const chi_mesh::Cell& cell, const SpatialWeightFunction& swf)
+    [&sdm, &swf](const chi_mesh::Cell& cell)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     //    const size_t cell_num_faces = cell.faces.size();
     const size_t cell_num_nodes = cell_mapping.NumNodes();
-    const auto vol_qp_data = cell_mapping.MakeVolumeQuadraturePointData();
+    const auto vol_qp_data = cell_mapping.MakeVolumetricQuadraturePointData();
 
     MatDbl IntV_shapeI_shapeJ(cell_num_nodes, VecDbl(cell_num_nodes));
 
@@ -140,13 +136,12 @@ void DiscreteOrdinatesCurvilinearSolver::ComputeSecondaryUnitIntegrals()
 
   for (const auto& cell : grid_ptr_->local_cells)
     secondary_unit_cell_matrices_[cell.local_id_] =
-      ComputeCellUnitIntegrals(cell, *swf_ptr);
+      ComputeCellUnitIntegrals(cell);
 
   Chi::mpi.Barrier();
   Chi::log.Log()
     << "Secondary Cell matrices computed.         Process memory = "
-    << std::setprecision(3) << chi::Console::GetMemoryUsageInMB()
-    << " MB";
+    << std::setprecision(3) << chi::Console::GetMemoryUsageInMB() << " MB";
 }
 
 } // namespace lbs

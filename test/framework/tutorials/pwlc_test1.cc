@@ -1,7 +1,7 @@
 #include "mesh/MeshHandler/chi_meshhandler.h"
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/PieceWiseLinearContinuous.h"
 #include "math/PETScUtils/petsc_utils.h"
 
 #include "physics/FieldFunction/fieldfunction_gridbased.h"
@@ -37,7 +37,7 @@ chiSimTest03_PWLC(const chi::InputParameters&)
 
   //============================================= Make SDM
   typedef std::shared_ptr<chi_math::SpatialDiscretization> SDMPtr;
-  SDMPtr sdm_ptr = chi_math::SpatialDiscretization_PWLC::New(grid);
+  SDMPtr sdm_ptr = chi_math::spatial_discretization::PieceWiseLinearContinuous::New(grid);
   const auto& sdm = *sdm_ptr;
 
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;
@@ -71,7 +71,7 @@ chiSimTest03_PWLC(const chi::InputParameters&)
   for (const auto& cell : grid.local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
-    const auto qp_data = cell_mapping.MakeVolumeQuadraturePointData();
+    const auto qp_data = cell_mapping.MakeVolumetricQuadraturePointData();
 
     const size_t num_nodes = cell_mapping.NumNodes();
     MatDbl Acell(num_nodes, VecDbl(num_nodes, 0.0));

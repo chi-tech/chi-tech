@@ -4,7 +4,7 @@
 
 #include "physics/FieldFunction/fieldfunction_gridbased.h"
 
-#include "math/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
 
 #define scdouble static_cast<double>
 

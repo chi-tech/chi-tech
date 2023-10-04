@@ -9,7 +9,7 @@
 
 #include "physics/FieldFunction/fieldfunction_gridbased.h"
 
-#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/PieceWiseLinearContinuous.h"
 
 //============================================= constructor
 mg_diffusion::Solver::Solver(const std::string& in_solver_name):
@@ -95,7 +95,7 @@ void mg_diffusion::Solver::Initialize()
   mg_diffusion::Solver::Set_BCs(globl_unique_bndry_ids);
   
   //============================================= Make SDM
-  sdm_ptr_ = chi_math::SpatialDiscretization_PWLC::New(*grid_ptr_);
+  sdm_ptr_ = chi_math::spatial_discretization::PieceWiseLinearContinuous::New(*grid_ptr_);
   const auto& sdm = *sdm_ptr_;
  
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;

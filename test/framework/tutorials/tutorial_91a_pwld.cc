@@ -1,7 +1,7 @@
 #include "mesh/MeshHandler/chi_meshhandler.h"
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/PieceWiseLinearDiscontinuous.h"
 #include "math/Quadratures/angular_quadrature_base.h"
 #include "math/Quadratures/angular_product_quadrature.h"
 #include "math/chi_math_range.h"
@@ -65,7 +65,7 @@ chiSimTest91_PWLD(const chi::InputParameters&)
 
   //============================================= Make SDM
   typedef std::shared_ptr<chi_math::SpatialDiscretization> SDMPtr;
-  SDMPtr sdm_ptr = chi_math::SpatialDiscretization_PWLD::New(grid);
+  SDMPtr sdm_ptr = chi_math::spatial_discretization::PieceWiseLinearDiscontinuous::New(grid);
   const auto& sdm = *sdm_ptr;
 
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;
@@ -172,7 +172,7 @@ chiSimTest91_PWLD(const chi::InputParameters&)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
-    const auto vol_qp_data = cell_mapping.MakeVolumeQuadraturePointData();
+    const auto vol_qp_data = cell_mapping.MakeVolumetricQuadraturePointData();
 
     MatVec3 IntV_shapeI_gradshapeJ(num_nodes,
                                    VecVec3(num_nodes, Vec3(0, 0, 0)));
@@ -198,7 +198,7 @@ chiSimTest91_PWLD(const chi::InputParameters&)
     VecMatDbl faces_Mmatrices;
     for (size_t f = 0; f < num_faces; ++f)
     {
-      const auto face_qp_data = cell_mapping.MakeFaceQuadraturePointData(f);
+      const auto face_qp_data = cell_mapping.MakeSurfaceQuadraturePointData(f);
       MatDbl IntS_shapeI_shapeJ(num_nodes, VecDbl(num_nodes, 0.0));
       for (unsigned int i = 0; i < num_nodes; ++i)
         for (unsigned int j = 0; j < num_nodes; ++j)

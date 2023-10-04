@@ -1,17 +1,18 @@
 #include "diffusion_solver.h"
 
-#include "math/SpatialDiscretization/CellMappings/FE_PWL/pwl_cellbase.h"
+#include "math/SpatialDiscretization/CellMappings/PieceWiseLinearBaseMapping.h"
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_runtime.h"
 
-//###################################################################
+// ###################################################################
 /**Assembles PWLC matrix for polygon cells.*/
 void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
                                                   int component)
 {
-  auto pwl_sdm = std::static_pointer_cast<chi_math::SpatialDiscretization_PWLD>(this->discretization_);
-  const auto& fe_intgrl_values = pwl_sdm->GetUnitIntegrals(cell);
+  auto pwl_sdm = std::static_pointer_cast<
+    chi_math::spatial_discretization::PieceWiseLinearDiscontinuous>(this->discretization_);
+  const auto& fe_intgrl_values = unit_integrals_.at(cell.global_id_);
 
   size_t num_nodes = fe_intgrl_values.NumNodes();
 
@@ -66,8 +67,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
     if (face.has_neighbor_)
     {
       const auto& adj_cell = grid_ptr_->cells[face.neighbor_id_];
-      const auto& adj_fe_intgrl_values = pwl_sdm->GetUnitIntegrals(adj_cell);
-
+      const auto& adj_fe_intgrl_values = unit_integrals_.at(adj_cell.global_id_);
 
       //========================= Get the current map to the adj cell's face
       unsigned int fmap = MapCellFace(cell,adj_cell,f);
@@ -289,8 +289,9 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
 void chi_diffusion::Solver::PWLD_Assemble_b(const chi_mesh::Cell& cell,
                                             int component)
 {
-  auto pwl_sdm = std::static_pointer_cast<chi_math::SpatialDiscretization_PWLD>(this->discretization_);
-  const auto& fe_intgrl_values = pwl_sdm->GetUnitIntegrals(cell);
+  auto pwl_sdm = std::static_pointer_cast<
+    chi_math::spatial_discretization::PieceWiseLinearDiscontinuous>(this->discretization_);
+  const auto& fe_intgrl_values = unit_integrals_.at(cell.global_id_);
 
   size_t num_nodes = fe_intgrl_values.NumNodes();
 

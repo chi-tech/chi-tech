@@ -11,7 +11,7 @@
 
 #include "physics/FieldFunction/fieldfunction_gridbased.h"
 
-#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/PieceWiseLinearContinuous.h"
 
 //============================================= constructor
 cfem_diffusion::Solver::Solver(const std::string& in_solver_name):
@@ -122,7 +122,7 @@ void cfem_diffusion::Solver::Initialize()
   }//for bndry
   
   //============================================= Make SDM
-  sdm_ptr_ = chi_math::SpatialDiscretization_PWLC::New(*grid_ptr_);
+  sdm_ptr_ = chi_math::spatial_discretization::PieceWiseLinearContinuous::New(*grid_ptr_);
   const auto& sdm = *sdm_ptr_;
  
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;
@@ -183,7 +183,7 @@ void cfem_diffusion::Solver::Execute()
   for (const auto& cell : grid.local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
-    const auto  qp_data      = cell_mapping.MakeVolumeQuadraturePointData();
+    const auto  qp_data      = cell_mapping.MakeVolumetricQuadraturePointData();
  
     const auto imat  = cell.material_id_;
     const size_t num_nodes = cell_mapping.NumNodes();
@@ -230,7 +230,8 @@ void cfem_diffusion::Solver::Execute()
       // Robin boundary
       if (bndry.type_ == BoundaryType::Robin)
       { 
-        const auto  qp_face_data = cell_mapping.MakeFaceQuadraturePointData( f );
+        const auto  qp_face_data =
+          cell_mapping.MakeSurfaceQuadraturePointData(f);
         const size_t num_face_nodes = face.vertex_ids_.size();
 
         const auto& aval = bndry.values_[0];

@@ -2,7 +2,7 @@
 
 #include "ChiObjectFactory.h"
 
-#include "math/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 namespace chi_physics::field_operations

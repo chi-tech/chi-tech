@@ -1,8 +1,8 @@
 #include "mg_diffusion_solver.h"
 
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
-#include "math/SpatialDiscretization/spatial_discretization.h"
-#include "math/SpatialDiscretization/FiniteElement/finite_element.h"
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
+#include "math/SpatialDiscretization/FiniteElement/QuadraturePointData.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -19,7 +19,7 @@ void mg_diffusion::Solver::Assemble_RHS_TwoGrid(const int64_t verbose)
   for (const auto& cell :  grid_ptr_->local_cells)
   {
     const auto &cell_mapping = sdm.GetCellMapping(cell);
-    const auto qp_data = cell_mapping.MakeVolumeQuadraturePointData();
+    const auto qp_data = cell_mapping.MakeVolumetricQuadraturePointData();
     const size_t num_nodes = cell_mapping.NumNodes();
 
     const auto &S = matid_to_xs_map.at(cell.material_id_)->TransferMatrix(0);

@@ -17,7 +17,7 @@
  * should be replaced by edge length.*/
 double chi_diffusion::Solver::
   HPerpendicular(const chi_mesh::Cell& cell,
-                 const chi_math::finite_element::UnitIntegralData& fe_intgrl_values,
+                 const UnitIntegralContainer& fe_intgrl_values,
                  unsigned int f)
 {
   double hp=1.0;

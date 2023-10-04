@@ -6,7 +6,6 @@
 
 
 #include "math/chi_math_vectorNX.h"
-#include "math/SpatialDiscretization/FiniteElement/spatial_discretization_FE.h"
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "lbs_adjoint.h"
@@ -38,18 +37,12 @@ void lbs::DiscreteOrdinatesAdjointSolver::
 
   VecOfMGVec4 cell_avg_p1_moments(num_cells, MGVec4(num_groups));
   {
-    auto fe_sdm =
-      std::dynamic_pointer_cast<chi_math::SpatialDiscretization_FE>(discretization_);
-
-    if (not fe_sdm)
-      throw std::logic_error(fname + ": Error getting finite element spatial"
-                                     " discretization_.");
 
     for (const auto& cell : grid_ptr_->local_cells)
     {
       const auto& cell_view = cell_transport_views_[cell.local_id_];
       const int num_nodes = cell_view.NumNodes();
-      const auto& fe_values = fe_sdm->GetUnitIntegrals(cell);
+      const auto& fe_values = unit_cell_matrices_[cell.local_id_];
 
       VecOfMGVec4 nodal_p1_moments(num_nodes);
       for (int i = 0; i < num_nodes; ++i)
@@ -84,7 +77,7 @@ void lbs::DiscreteOrdinatesAdjointSolver::
         double volume_total = 0.0;
         for (int i=0; i < num_nodes; ++i)
         {
-          double IntV_shapeI = fe_values.IntV_shapeI(i);
+          double IntV_shapeI = fe_values.Vi_vectors[i];
           cell_p1_avg += nodal_p1_moments[i][g] * IntV_shapeI;
           volume_total += IntV_shapeI;
         }//for node i

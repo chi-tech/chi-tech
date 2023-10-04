@@ -1,7 +1,7 @@
 #include "diffusion.h"
 
 #include "math/PETScUtils/petsc_utils.h"
-#include "math/SpatialDiscretization/spatial_discretization.h"
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
 
 #include "physics/chi_physics_namespace.h"
 

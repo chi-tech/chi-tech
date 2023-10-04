@@ -2,7 +2,7 @@
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 #include "mesh/Raytrace/raytracing.h"
 
-#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/PieceWiseLinearDiscontinuous.h"
 #include "math/RandomNumberGeneration/random_number_generator.h"
 #include "math/Quadratures/LegendrePoly/legendrepoly.h"
 
@@ -67,7 +67,7 @@ chiSimTest93_RayTracing(const chi::InputParameters&)
 
   //============================================= Make SDM
   typedef std::shared_ptr<chi_math::SpatialDiscretization> SDMPtr;
-  SDMPtr sdm_ptr = chi_math::SpatialDiscretization_PWLD::New(grid);
+  SDMPtr sdm_ptr = chi_math::spatial_discretization::PieceWiseLinearDiscontinuous::New(grid);
   const auto& sdm = *sdm_ptr;
 
   chi_math::UnknownManager phi_uk_man;
@@ -311,7 +311,7 @@ chiSimTest93_RayTracing(const chi::InputParameters&)
     //====================================== Compute mass matrix
     //                                       and its inverse
     const auto& cell_mapping = sdm.GetCellMapping(cell);
-    const auto& qp_data = cell_mapping.MakeVolumeQuadraturePointData();
+    const auto& qp_data = cell_mapping.MakeVolumetricQuadraturePointData();
     const size_t num_nodes = cell_mapping.NumNodes();
 
     MatDbl M(num_nodes, VecDbl(num_nodes, 0.0));

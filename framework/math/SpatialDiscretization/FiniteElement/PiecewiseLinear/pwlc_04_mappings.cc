@@ -1,4 +1,4 @@
-#include "pwlc.h"
+#include "PieceWiseLinearContinuous.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -6,9 +6,12 @@
 
 #define sc_int64 static_cast<int64_t>
 
+namespace chi_math::spatial_discretization
+{
+
 // ###################################################################
 /**Maps a vertex id according to a developed node ordering.*/
-int64_t chi_math::SpatialDiscretization_PWLC::MapDOF(
+int64_t PieceWiseLinearContinuous::MapDOF(
   const chi_mesh::Cell& cell,
   const unsigned int node,
   const chi_math::UnknownManager& unknown_manager,
@@ -48,7 +51,7 @@ int64_t chi_math::SpatialDiscretization_PWLC::MapDOF(
 
 // ###################################################################
 /**Maps a vertex id according to a developed node ordering.*/
-int64_t chi_math::SpatialDiscretization_PWLC::MapDOFLocal(
+int64_t PieceWiseLinearContinuous::MapDOFLocal(
   const chi_mesh::Cell& cell,
   const unsigned int node,
   const chi_math::UnknownManager& unknown_manager,
@@ -105,3 +108,5 @@ int64_t chi_math::SpatialDiscretization_PWLC::MapDOFLocal(
 
   return address;
 }
+
+} // namespace chi_math::spatial_discretization
