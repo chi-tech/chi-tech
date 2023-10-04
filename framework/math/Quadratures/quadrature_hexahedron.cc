@@ -10,6 +10,8 @@ chi_math::QuadratureHexahedron::QuadratureHexahedron(QuadratureOrder order) :
 {
   QuadratureGaussLegendre legendre(order);
 
+  legendre.SetRange({-1.0,1.0});
+
   size_t N = legendre.qpoints_.size();
 
   qpoints_.resize(N * N * N);
