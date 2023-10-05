@@ -13,7 +13,7 @@
 /**Copies the vtk data structures to the current object's internal
  * data.*/
 void chi_mesh::UnpartitionedMesh::CopyUGridCellsAndPoints(
-  vtkUnstructuredGrid& ugrid, const double scale)
+  vtkUnstructuredGrid& ugrid, const double scale, int dimension_to_copy)
 {
   const std::string fname =
     "chi_mesh::UnpartitionedMesh::CopyUGridCellsAndPoints";
@@ -31,11 +31,14 @@ void chi_mesh::UnpartitionedMesh::CopyUGridCellsAndPoints(
   const auto& block_id_array_name = mesh_options_.material_id_fieldname;
 
   if (not ugrid.GetCellData()->GetArray(block_id_array_name.c_str()))
-    throw std::logic_error(fname + ": grid had not \"" + block_id_array_name +
+    throw std::logic_error(fname + ": grid has no \"" + block_id_array_name +
                            "\" array.");
 
   auto block_id_array = vtkIntArray::SafeDownCast(
     ugrid.GetCellData()->GetArray(block_id_array_name.c_str()));
+
+  ChiLogicalErrorIf(not block_id_array,
+                    "Failed to cast BlockID array to vtkInt");
 
   if (has_global_ids)
   {
@@ -78,6 +81,8 @@ void chi_mesh::UnpartitionedMesh::CopyUGridCellsAndPoints(
       auto vtk_celldim = vtk_cell->GetCellDimension();
       const vtkIdType cell_gid = cell_gids->GetValue(c) + cid_offset;
 
+      if (vtk_celldim != dimension_to_copy) continue;
+
       CellPtr raw_cell;
       if (vtk_celldim == 3) raw_cell = CreateCellFromVTKPolyhedron(vtk_cell);
       else if (vtk_celldim == 2)
@@ -87,7 +92,8 @@ void chi_mesh::UnpartitionedMesh::CopyUGridCellsAndPoints(
       else if (vtk_celldim == 0)
         raw_cell = CreateCellFromVTKVertex(vtk_cell);
       else
-        throw std::logic_error(fname + ": Unsupported cell dimension.");
+        throw std::logic_error(fname + ": Unsupported cell dimension ." +
+                               std::to_string(vtk_celldim));
 
       // Map the cell vertex-ids
       for (uint64_t& vid : raw_cell->vertex_ids)
@@ -138,6 +144,8 @@ void chi_mesh::UnpartitionedMesh::CopyUGridCellsAndPoints(
     {
       auto vtk_cell = ugrid.GetCell(static_cast<vtkIdType>(c));
       auto vtk_celldim = vtk_cell->GetCellDimension();
+
+      if (vtk_celldim != dimension_to_copy) continue;
 
       if (vtk_celldim == 3)
         raw_cells_.push_back(CreateCellFromVTKPolyhedron(vtk_cell));

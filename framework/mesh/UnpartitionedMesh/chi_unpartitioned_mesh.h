@@ -83,7 +83,9 @@ protected:
 
   typedef vtkSmartPointer<vtkUnstructuredGrid> vtkUGridPtr;
   typedef std::pair<vtkUGridPtr, std::string> vtkUGridPtrAndName;
-  void CopyUGridCellsAndPoints(vtkUnstructuredGrid& ugrid, double scale);
+  void CopyUGridCellsAndPoints(vtkUnstructuredGrid& ugrid,
+                               double scale,
+                               int dimension_to_copy);
 
   void SetMaterialIDsFromList(const std::vector<int>& material_ids);
 
@@ -106,10 +108,7 @@ public:
 
   void AddCell(LightWeightCell*& cell) { raw_cells_.push_back(cell); }
   size_t GetNumberOfCells() const { return raw_cells_.size(); }
-  std::vector<LightWeightCell*>& GetRawCells()
-  {
-    return raw_cells_;
-  }
+  std::vector<LightWeightCell*>& GetRawCells() { return raw_cells_; }
   const std::vector<LightWeightCell*>& GetRawCells() const
   {
     return raw_cells_;

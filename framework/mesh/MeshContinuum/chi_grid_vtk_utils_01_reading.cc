@@ -16,11 +16,17 @@
 int chi_mesh::FindHighestDimension(
   std::vector<vtkUGridPtrAndName>& ugrid_blocks)
 {
-
   int max_dim = 0;
   for (auto& ugrid : ugrid_blocks)
-    if (ugrid.first->GetNumberOfCells() != 0)
-      max_dim = std::max(max_dim, ugrid.first->GetCell(0)->GetCellDimension());
+  {
+    const int64_t num_cells = ugrid.first->GetNumberOfCells();
+    for (int64_t c = 0; c < num_cells; ++c)
+    {
+      auto cell = ugrid.first->GetCell(c);
+      ChiLogicalErrorIf(not cell, "Failed to obtain VTK-cell pointer");
+      max_dim = std::max(max_dim, cell->GetCellDimension());
+    }
+  }// for ugrid in block
 
   return max_dim;
 }
@@ -90,6 +96,37 @@ chi_mesh::vtkUGridPtr chi_mesh::ConsolidateGridBlocks(
                    << max_id;
   }
 
+  std::map<std::string, size_t> cell_type_count_map;
+  const int64_t num_cells = consolidated_ugrid->GetNumberOfCells();
+  for (int64_t c = 0; c < num_cells; ++c)
+  {
+    auto cell = consolidated_ugrid->GetCell(c);
+    ChiLogicalErrorIf(not cell, "Failed to obtain VTK-cell pointer");
+
+    auto cell_type_name = cell->GetClassName();
+    cell_type_count_map[cell_type_name] += 1;
+  }
+
+  if (Chi::log.GetVerbosity() >= 1)
+  {
+    std::stringstream outstr;
+    /**Lambda to right pad an entry.*/
+    auto RightPad = [](std::string& entry, size_t width)
+    {
+      const size_t pad_size = width - entry.size();
+      entry.append(std::string(pad_size, ' '));
+    };
+
+    outstr << "Block statistictics:\n";
+    for (const auto& [type_name, count] : cell_type_count_map)
+    {
+      auto temp_name = type_name;
+      RightPad(temp_name, 20);
+      outstr << "  " << temp_name << " " << count << "\n";
+    }
+    Chi::log.Log0Verbose1() << outstr.str();
+  }
+
   return consolidated_ugrid;
 }
 
@@ -104,7 +141,10 @@ std::vector<chi_mesh::vtkUGridPtrAndName> chi_mesh::GetBlocksOfDesiredDimension(
   {
     if (ugrid.first->GetNumberOfCells() == 0) continue;
 
-    if (ugrid.first->GetCell(0)->GetCellDimension() == desired_dimension)
+    std::vector<vtkUGridPtrAndName> single_grid = {ugrid};
+    int block_dimension = chi_mesh::FindHighestDimension(single_grid);
+
+    if (block_dimension == desired_dimension)
       desired_blocks.push_back(ugrid);
   }
 

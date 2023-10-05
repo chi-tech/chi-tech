@@ -49,6 +49,7 @@ void chi_mesh::UnpartitionedMesh::
 
   //======================================== Get the main + bndry blocks
   const int max_dimension = chi_mesh::FindHighestDimension(grid_blocks);
+  Chi::log.Log0Verbose1() << "Maximum dimension : " << max_dimension << "\n";
   std::vector<vtkUGridPtrAndName> domain_grid_blocks =
     chi_mesh::GetBlocksOfDesiredDimension(grid_blocks, max_dimension);
   std::vector<vtkUGridPtrAndName> bndry_grid_blocks =
@@ -58,7 +59,7 @@ void chi_mesh::UnpartitionedMesh::
   auto ugrid = chi_mesh::ConsolidateGridBlocks(domain_grid_blocks);
 
   //======================================== Copy Data
-  CopyUGridCellsAndPoints(*ugrid, options.scale);
+  CopyUGridCellsAndPoints(*ugrid, options.scale, max_dimension);
 
   //======================================== Set material ids
   const auto material_ids = chi_mesh::BuildCellMaterialIDsFromField(
