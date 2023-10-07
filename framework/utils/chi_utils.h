@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <fstream>
 
 /**Miscellaneous utilities. These utilities should have no dependencies.*/
 namespace chi
@@ -72,6 +73,20 @@ inline constexpr uint32_t hash_djb2a(const std::string_view sv)
 inline constexpr uint32_t operator"" _hash(const char* str, size_t len)
 {
   return hash_djb2a(std::string_view{str, len});
+}
+
+template<typename T>
+void WriteBinaryValue(std::ofstream& output_file, T value)
+{
+  output_file.write((char*)&value, sizeof(T));
+}
+template<typename T>
+T ReadBinaryValue(std::ifstream& input_file)
+{
+  T value;
+  input_file.read((char*)&value, sizeof(T));
+
+  return value;
 }
 } // namespace chi
 

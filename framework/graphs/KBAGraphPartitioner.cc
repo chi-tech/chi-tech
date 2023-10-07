@@ -86,54 +86,45 @@ KBAGraphPartitioner::Partition(const std::vector<std::vector<uint64_t>>& graph,
                                const std::vector<chi_mesh::Vector3>& centroids,
                                int number_of_parts)
 {
+  Chi::log.Log0Verbose1() << "Partitioning with KBAGraphPartitioner";
+
   ChiLogicalErrorIf(
     centroids.size() != graph.size(),
     "Graph number of entries not equal to centroids' number of entries.");
   const size_t num_cells = graph.size();
   std::vector<int64_t> pids(num_cells, 0);
-  if (Chi::mpi.location_id == 0)
+  for (size_t c = 0; c < num_cells; ++c)
   {
-    for (size_t c = 0; c < num_cells; ++c)
+    const auto& point = centroids[c];
+    // Partitions the point
+    std::array<size_t, 3> p_vals = {0, 0, 0};
+    for (size_t i = 0; i < 3; ++i)
     {
-      const auto& point = centroids[c];
-      // Partitions the point
-      std::array<size_t, 3> p_vals = {0, 0, 0};
-      for (size_t i = 0; i < 3; ++i)
-      {
-        const auto& cuts = *coordinate_infos_[i].cuts_;
-        const size_t num_cuts = cuts.size();
+      const auto& cuts = *coordinate_infos_[i].cuts_;
+      const size_t num_cuts = cuts.size();
 
-        size_t p_val;
-        bool home_found = false;
-        for (size_t j = 0; j < num_cuts; ++j)
-          if (cuts[j] > point[i])
-          {
-            p_val = j;
-            home_found = true;
-            break;
-          }
+      size_t p_val;
+      bool home_found = false;
+      for (size_t j = 0; j < num_cuts; ++j)
+        if (cuts[j] > point[i])
+        {
+          p_val = j;
+          home_found = true;
+          break;
+        }
 
-        p_vals[i] = home_found ? p_val : (coordinate_infos_[i].n_ - 1);
-      }
+      p_vals[i] = home_found ? p_val : (coordinate_infos_[i].n_ - 1);
+    }
 
-      const int64_t nx = static_cast<int64_t>(coordinate_infos_[0].n_);
-      const int64_t ny = static_cast<int64_t>(coordinate_infos_[1].n_);
+    const int64_t nx = static_cast<int64_t>(coordinate_infos_[0].n_);
+    const int64_t ny = static_cast<int64_t>(coordinate_infos_[1].n_);
 
-      const int64_t i = static_cast<int64_t>(p_vals[0]);
-      const int64_t j = static_cast<int64_t>(p_vals[1]);
-      const int64_t k = static_cast<int64_t>(p_vals[2]);
+    const int64_t i = static_cast<int64_t>(p_vals[0]);
+    const int64_t j = static_cast<int64_t>(p_vals[1]);
+    const int64_t k = static_cast<int64_t>(p_vals[2]);
 
-      pids[c] = nx * ny * k + ny * j + i;
-    } // for cell c
-  }   // if home location
-
-  //======================================== Broadcast partitioning to all
-  //                                         locations
-  MPI_Bcast(pids.data(),                 // buffer [IN/OUT]
-            static_cast<int>(num_cells), // count
-            MPI_LONG_LONG_INT,           // data type
-            0,                           // root
-            Chi::mpi.comm);              // communicator
+    pids[c] = nx * ny * k + ny * j + i;
+  } // for cell c
 
   if ((nx_ * ny_ * nz_) != number_of_parts)
     Chi::log.Log0Warning()
@@ -151,6 +142,8 @@ KBAGraphPartitioner::Partition(const std::vector<std::vector<uint64_t>>& graph,
         real_pids[c] = static_cast<int64_t>(p);
     }
   }
+
+  Chi::log.Log0Verbose1() << "Done partitioning with KBAGraphPartitioner";
 
   return real_pids;
 }

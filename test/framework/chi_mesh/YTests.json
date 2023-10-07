@@ -4,7 +4,7 @@
     [
       {
         "type" : "StrCompare",
-        "key" : "MeshGenerator: Cells created = 3242"
+        "key" : "Global cell count             : 3242"
       }
     ]
   }

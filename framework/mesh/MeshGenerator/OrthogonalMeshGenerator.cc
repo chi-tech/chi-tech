@@ -14,7 +14,7 @@ chi::InputParameters OrthogonalMeshGenerator::GetInputParameters()
   chi::InputParameters params = MeshGenerator::GetInputParameters();
 
   params.SetGeneralDescription("Creates orthogonal meshes.");
-  params.SetDocGroup("MeshGenerator");
+  params.SetDocGroup("doc_MeshGenerators");
 
   params.AddRequiredParameterArray("node_sets",
                                    "Sets of nodes per dimension. Node values "
@@ -47,6 +47,17 @@ OrthogonalMeshGenerator::OrthogonalMeshGenerator(
   ChiInvalidArgumentIf(
     node_sets_.empty(),
     "No nodes have been provided. At least one node set must be provided");
+
+  size_t ns = 0;
+  for (const auto& node_set : node_sets_)
+  {
+    ChiInvalidArgumentIf(
+      node_set.size() < 2,
+      "Node set " + std::to_string(ns) + " only has " +
+        std::to_string(node_set.size()) +
+        " nodes. A minimum of 2 is required to define a cell.");
+    ++ns;
+  }
 
   ChiInvalidArgumentIf(node_sets_.size() > 3,
                        "More than 3 node sets have been provided. Only a "
@@ -135,6 +146,7 @@ OrthogonalMeshGenerator::CreateUnpartitioned1DOrthoMesh(
     umesh->GetVertices().push_back(vertex);
 
   //======================================== Create cells
+  const size_t max_cz = zverts.size() - 2;
   for (size_t c = 0; c < (zverts.size() - 1); ++c)
   {
     auto cell =
@@ -148,8 +160,19 @@ OrthogonalMeshGenerator::CreateUnpartitioned1DOrthoMesh(
     left_face.vertex_ids = {c};
     rite_face.vertex_ids = {c + 1};
 
-    if (c == 0) left_face.neighbor = 5 /*ZMIN*/;
-    if (c == (zverts.size() - 2)) rite_face.neighbor = 4 /*ZMAX*/;
+    // if (c == 0) left_face.neighbor = 5 /*ZMIN*/;
+    // if (c == (zverts.size() - 2)) rite_face.neighbor = 4 /*ZMAX*/;
+
+    left_face.neighbor = c - 1;
+    rite_face.neighbor = c + 1;
+    left_face.has_neighbor = true;
+    rite_face.has_neighbor = true;
+
+    // boundary logic
+    // clang-format off
+    if (c == 0) { left_face.neighbor = 5 /*ZMIN*/; left_face.has_neighbor = false; }
+    if (c == max_cz) { rite_face.neighbor = 4 /*ZMAX*/; rite_face.has_neighbor = false; }
+    // clang-format on
 
     cell->faces.push_back(left_face);
     cell->faces.push_back(rite_face);
@@ -174,8 +197,8 @@ OrthogonalMeshGenerator::CreateUnpartitioned2DOrthoMesh(
   umesh->GetMeshAttributes() = DIMENSION_2 | ORTHOGONAL;
 
   //======================================== Create vertices
-  size_t Nx = vertices_1d_x.size();
-  size_t Ny = vertices_1d_y.size();
+  const size_t Nx = vertices_1d_x.size();
+  const size_t Ny = vertices_1d_y.size();
 
   umesh->GetMeshOptions().ortho_Nx = Nx - 1;
   umesh->GetMeshOptions().ortho_Ny = Ny - 1;
@@ -188,19 +211,32 @@ OrthogonalMeshGenerator::CreateUnpartitioned2DOrthoMesh(
   typedef std::vector<uint64_t> VecIDs;
   std::vector<VecIDs> vertex_ij_to_i_map(Ny, VecIDs(Nx));
   umesh->GetVertices().reserve(Nx * Ny);
-  uint64_t k = 0;
-  for (size_t i = 0; i < Ny; ++i)
   {
-    for (size_t j = 0; j < Nx; ++j)
+    uint64_t k = 0;
+    for (size_t i = 0; i < Ny; ++i)
     {
-      vertex_ij_to_i_map[i][j] = k++;
-      umesh->GetVertices().emplace_back(
-        vertices_1d_x[j], vertices_1d_y[i], 0.0);
-    } // for j
-  }   // for i
+      for (size_t j = 0; j < Nx; ++j)
+      {
+        vertex_ij_to_i_map[i][j] = k++;
+        umesh->GetVertices().emplace_back(
+          vertices_1d_x[j], vertices_1d_y[i], 0.0);
+      } // for j
+    }   // for i
+  }
+
+  std::vector<VecIDs> cells_ij_to_i_map(Ny - 1, VecIDs(Nx - 1));
+  {
+    uint64_t k = 0;
+    for (size_t i = 0; i < (Ny - 1); ++i)
+      for (size_t j = 0; j < (Nx - 1); ++j)
+        cells_ij_to_i_map[i][j] = k++;
+  }
 
   //======================================== Create cells
   auto& vmap = vertex_ij_to_i_map;
+  auto& cmap = cells_ij_to_i_map;
+  const size_t max_j = Nx - 2;
+  const size_t max_i = Ny - 2;
   for (size_t i = 0; i < (Ny - 1); ++i)
   {
     for (size_t j = 0; j < (Nx - 1); ++j)
@@ -229,11 +265,19 @@ OrthogonalMeshGenerator::CreateUnpartitioned2DOrthoMesh(
           face.vertex_ids =
             std::vector<uint64_t>{cell->vertex_ids[v], cell->vertex_ids[0]};
 
+        face.neighbor = true;
+        // clang-format off
+        if (v == 1 and i != max_j) face.neighbor = cmap[i][j+1]/*XMAX*/;
+        if (v == 3 and i != 0     ) face.neighbor = cmap[i][j-1]/*XMIN*/;
+        if (v == 2 and i != max_i) face.neighbor = cmap[i+1][j]/*YMAX*/;
+        if (v == 0 and i != 0     ) face.neighbor = cmap[i-1][j]/*YMIN*/;
+
         // boundary logic
-        if (j == (Nx - 2) and v == 1) face.neighbor = 0 /*XMAX*/;
-        if (j == 0 and v == 3) face.neighbor = 1 /*XMIN*/;
-        if (i == (Ny - 2) and v == 2) face.neighbor = 2 /*YMAX*/;
-        if (i == 0 and v == 0) face.neighbor = 3 /*YMIN*/;
+        if (v == 1 and j == max_j) { face.neighbor = 0 /*XMAX*/; face.has_neighbor = false; }
+        if (v == 3 and j == 0     ) { face.neighbor = 1 /*XMIN*/; face.has_neighbor = false; }
+        if (v == 2 and i == max_i) { face.neighbor = 2 /*YMAX*/; face.has_neighbor = false; }
+        if (v == 0 and i == 0     ) { face.neighbor = 3 /*YMIN*/; face.has_neighbor = false; }
+        // clang-format on
 
         cell->faces.push_back(face);
       }
@@ -286,22 +330,40 @@ OrthogonalMeshGenerator::CreateUnpartitioned3DOrthoMesh(
     vec.resize(Nx, VecIDs(Nz));
 
   umesh->GetVertices().reserve(Nx * Ny * Nz);
-  uint64_t c = 0;
-  for (size_t i = 0; i < Ny; ++i)
   {
-    for (size_t j = 0; j < Nx; ++j)
+    uint64_t c = 0;
+    for (size_t i = 0; i < Ny; ++i)
     {
-      for (size_t k = 0; k < Nz; ++k)
+      for (size_t j = 0; j < Nx; ++j)
       {
-        vertex_ijk_to_i_map[i][j][k] = c++;
-        umesh->GetVertices().emplace_back(
-          vertices_1d_x[j], vertices_1d_y[i], vertices_1d_z[k]);
-      } // for k
-    }   // for j
-  }     // for i
+        for (size_t k = 0; k < Nz; ++k)
+        {
+          vertex_ijk_to_i_map[i][j][k] = c++;
+          umesh->GetVertices().emplace_back(
+            vertices_1d_x[j], vertices_1d_y[i], vertices_1d_z[k]);
+        } // for k
+      }   // for j
+    }     // for i
+  }
+
+  std::vector<VecVecIDs> cells_ijk_to_i_map(Ny - 1);
+  for (auto& vec : cells_ijk_to_i_map)
+    vec.resize(Nx - 1, VecIDs(Nz - 1));
+
+  {
+    uint64_t c = 0;
+    for (size_t i = 0; i < (Ny - 1); ++i)
+      for (size_t j = 0; j < (Nx - 1); ++j)
+        for (size_t k = 0; k < (Nz - 1); ++k)
+          cells_ijk_to_i_map[i][j][k] = c++;
+  }
 
   //======================================== Create cells
   auto& vmap = vertex_ijk_to_i_map;
+  auto& cmap = cells_ijk_to_i_map;
+  const size_t max_j = Nx - 2;
+  const size_t max_i = Ny - 2;
+  const size_t max_k = Nz - 2;
   for (size_t i = 0; i < (Ny - 1); ++i)
   {
     for (size_t j = 0; j < (Nx - 1); ++j)
@@ -329,7 +391,8 @@ OrthogonalMeshGenerator::CreateUnpartitioned3DOrthoMesh(
                                                   vmap[i + 1][j + 1][k],
                                                   vmap[i + 1][j + 1][k + 1],
                                                   vmap[i][j + 1][k + 1]};
-          face.neighbor = 0 /*XMAX*/;
+          face.neighbor = (j == max_j) ? 0 /*XMAX*/ : cmap[i][j+1][k];
+          face.has_neighbor = (j != max_j);
           cell->faces.push_back(face);
         }
         // West face
@@ -340,7 +403,8 @@ OrthogonalMeshGenerator::CreateUnpartitioned3DOrthoMesh(
                                                   vmap[i][j][k + 1],
                                                   vmap[i + 1][j][k + 1],
                                                   vmap[i + 1][j][k]};
-          face.neighbor = 1 /*XMIN*/;
+          face.neighbor = (j == 0) ? 1 /*XMIN*/ : cmap[i][j-1][k];
+          face.has_neighbor = (j != 0);
           cell->faces.push_back(face);
         }
         // North face
@@ -351,7 +415,8 @@ OrthogonalMeshGenerator::CreateUnpartitioned3DOrthoMesh(
                                                   vmap[i + 1][j][k + 1],
                                                   vmap[i + 1][j + 1][k + 1],
                                                   vmap[i + 1][j + 1][k]};
-          face.neighbor = 2 /*YMAX*/;
+          face.neighbor = (i == max_i) ? 2 /*YMAX*/ : cmap[i+1][j][k];
+          face.has_neighbor = (i != max_i);
           cell->faces.push_back(face);
         }
         // South face
@@ -362,7 +427,8 @@ OrthogonalMeshGenerator::CreateUnpartitioned3DOrthoMesh(
                                                   vmap[i][j + 1][k],
                                                   vmap[i][j + 1][k + 1],
                                                   vmap[i][j][k + 1]};
-          face.neighbor = 3 /*YMIN*/;
+          face.neighbor = (i == 0) ? 3 /*YMIN*/ : cmap[i-1][j][k];
+          face.has_neighbor = (i != 0);
           cell->faces.push_back(face);
         }
         // Top face
@@ -373,7 +439,8 @@ OrthogonalMeshGenerator::CreateUnpartitioned3DOrthoMesh(
                                                   vmap[i][j + 1][k + 1],
                                                   vmap[i + 1][j + 1][k + 1],
                                                   vmap[i + 1][j][k + 1]};
-          face.neighbor = 4 /*ZMAX*/;
+          face.neighbor = (k == max_k) ? 4 /*ZMAX*/ : cmap[i][j][k+1];
+          face.has_neighbor = (k != max_k);
           cell->faces.push_back(face);
         }
         // Bottom face
@@ -384,7 +451,8 @@ OrthogonalMeshGenerator::CreateUnpartitioned3DOrthoMesh(
                                                   vmap[i + 1][j][k],
                                                   vmap[i + 1][j + 1][k],
                                                   vmap[i][j + 1][k]};
-          face.neighbor = 5 /*ZMIN*/;
+          face.neighbor = (k == 0) ? 5 /*ZMIN*/ : cmap[i][j][k-1];
+          face.has_neighbor = (k != 0);
           cell->faces.push_back(face);
         }
 

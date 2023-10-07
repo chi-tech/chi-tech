@@ -165,7 +165,6 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
                               << " Number of boundary faces "
                                  "after connectivity: " << num_bndry_faces;
 
-  Chi::mpi.Barrier();
   Chi::log.Log() << Chi::program_timer.GetTimeString()
                 << " Done establishing cell connectivity.";
 

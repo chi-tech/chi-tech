@@ -1,4 +1,5 @@
-/**\defgroup MeshGenerator Mesh Generators
+/**\defgroup doc_MeshGenerators Mesh Generators
+\ingroup LuaMesh
 *
 We split a `MeshGenerator`'s execution into a
 phase that generates an unpartitioned mesh and a phase that then converts
@@ -127,4 +128,68 @@ chiMeshHandlerExportMeshToVTK("ZMeshTest")
 
 \image html framework/chi_mesh/MeshGenerators/ParExample2.png width=500px
 
-\ingroup LuaMesh*/
+
+## The special SplitFileMeshGenerator
+
+For very large meshes the mesh generation process could both take very long and
+require a lot of memory. The current mode of operation of the mesh generators is
+that each process builds the mesh as an unpartitioned mesh then the mesh gets
+converted to a partitioned mesh. Therefore, when a lot of processes are used,
+there could be a large memory spike, large enough to be greater than what even
+an HPC node has available. To partly address this problem we have the
+\ref chi_mesh__SplitFileMeshGenerator. This generator will process multiple mesh inputs like
+any other mesh generator but instead of building the mesh on each processor only
+the home location builds the mesh. Thereafter the mesh is partitioned and each
+processors' local-cells, ghost-cells, and relevant vertices are written to
+separate binary files. The default folder, into which these files are written,
+is named "SplitMesh" and the default file names for the meshes are
+"split_mesh_x.cmesh", where the x represents the processors rank. Both the
+folder name and file name prefixes (i.e. the "split_mesh" part) can be altered
+via input parameters.
+
+It is also possible to generate split meshes in serial by supplying the
+`num_parts` parameter. Also, if a simulation uses the same mesh over and over
+then the parameter `read_only` can be used to suppress the mesh being
+created every single time.
+
+### SplitFile Example A
+
+\code
+meshgen1 = chi_mesh.SplitFileMeshGenerator.Create
+({
+  inputs =
+  {
+    chi_mesh.OrthogonalMeshGenerator.Create({ node_sets = {xmesh,ymesh,zmesh} })
+  },
+})
+
+chi_mesh.MeshGenerator.Execute(meshgen1)
+\endcode
+
+The examples below will create, in the current working directory, the folder
+`SplitMesh` and within it `split_mesh_0.cmesh`, `split_mesh_1.cmesh`, etc.
+
+### SplitFile Example B
+
+\code
+meshgen1 = chi_mesh.SplitFileMeshGenerator.Create
+({
+  inputs = {
+    chi_mesh.OrthogonalMeshGenerator.Create({ node_sets = {xmesh,ymesh} }),
+    chi_mesh.ExtruderMeshGenerator.Create
+    ({
+      layers = {{z=Lz, n=Nz}}
+    })
+  }
+})
+
+chi_mesh.MeshGenerator.Execute(meshgen1)
+\endcode
+
+This example is the same as the one above it, however, it uses the extruder
+mesh generator in a chain.
+
+\note Partitioning and the other parameters of \ref chi_mesh__SplitFileMeshGenerator are
+identical to that of the base \ref chi_mesh__MeshGenerator.
+
+*/
