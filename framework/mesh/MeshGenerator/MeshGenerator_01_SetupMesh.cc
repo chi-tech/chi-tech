@@ -8,11 +8,12 @@
 
 namespace chi_mesh
 {
-/**Executes the partitioner and configures the mesh as a real mesh.*/
-std::shared_ptr<MeshContinuum>
-MeshGenerator::SetupMesh(std::unique_ptr<UnpartitionedMesh> input_umesh_ptr)
+/**Builds a cell-graph and executes the partitioner.*/
+std::vector<int64_t>
+MeshGenerator::PartitionMesh(const UnpartitionedMesh& input_umesh,
+                             int num_parts)
 {
-  const auto& raw_cells = input_umesh_ptr->GetRawCells();
+  const auto& raw_cells = input_umesh.GetRawCells();
   const size_t num_raw_cells = raw_cells.size();
 
   ChiLogicalErrorIf(num_raw_cells == 0, "No cells in final input mesh");
@@ -41,9 +42,17 @@ MeshGenerator::SetupMesh(std::unique_ptr<UnpartitionedMesh> input_umesh_ptr)
   // to produce sub-optimal partitions
 
   //============================================= Execute partitioner
-  auto cell_pids =
-    partitioner_->Partition(cell_graph, cell_centroids, Chi::mpi.process_count);
+  std::vector<int64_t> cell_pids =
+    partitioner_->Partition(cell_graph, cell_centroids, num_parts);
 
+  return cell_pids;
+}
+
+/**Executes the partitioner and configures the mesh as a real mesh.*/
+std::shared_ptr<MeshContinuum>
+MeshGenerator::SetupMesh(std::unique_ptr<UnpartitionedMesh> input_umesh_ptr,
+                         const std::vector<int64_t>& cell_pids)
+{
   //============================================= Convert mesh
   auto grid_ptr = chi_mesh::MeshContinuum::New();
 
@@ -52,14 +61,19 @@ MeshGenerator::SetupMesh(std::unique_ptr<UnpartitionedMesh> input_umesh_ptr)
 
   auto& vertex_subs = input_umesh_ptr->GetVertextCellSubscriptions();
   size_t cell_globl_id = 0;
-  for (auto raw_cell : input_umesh_ptr->GetRawCells())
+  for (auto& raw_cell : input_umesh_ptr->GetRawCells())
   {
-    if (CellHasLocalScope(*raw_cell, cell_globl_id, vertex_subs, cell_pids))
+    if (CellHasLocalScope(Chi::mpi.location_id,
+                          *raw_cell,
+                          cell_globl_id,
+                          vertex_subs,
+                          cell_pids))
     {
-      auto cell = SetupCell(*raw_cell,
-                            cell_globl_id,
-                            cell_pids[cell_globl_id],
-                            input_umesh_ptr->GetVertices());
+      auto cell =
+        SetupCell(*raw_cell,
+                  cell_globl_id,
+                  cell_pids[cell_globl_id],
+                  STLVertexListHelper(input_umesh_ptr->GetVertices()));
 
       for (uint64_t vid : cell->vertex_ids_)
         grid_ptr->vertices.Insert(vid, input_umesh_ptr->GetVertices()[vid]);
@@ -67,33 +81,21 @@ MeshGenerator::SetupMesh(std::unique_ptr<UnpartitionedMesh> input_umesh_ptr)
       grid_ptr->cells.push_back(std::move(cell));
     }
 
+    delete raw_cell;
+    raw_cell = nullptr;
+
     ++cell_globl_id;
   } // for raw_cell
 
-  grid_ptr->SetAttributes(input_umesh_ptr->GetMeshAttributes(),
-                          {input_umesh_ptr->GetMeshOptions().ortho_Nx,
-                           input_umesh_ptr->GetMeshOptions().ortho_Ny,
-                           input_umesh_ptr->GetMeshOptions().ortho_Nz});
+  SetGridAttributes(*grid_ptr,
+                    input_umesh_ptr->GetMeshAttributes(),
+                    {input_umesh_ptr->GetMeshOptions().ortho_Nx,
+                     input_umesh_ptr->GetMeshOptions().ortho_Ny,
+                     input_umesh_ptr->GetMeshOptions().ortho_Nz});
 
   grid_ptr->SetGlobalVertexCount(input_umesh_ptr->GetVertices().size());
 
-  //======================================== Concluding messages
-  Chi::log.LogAllVerbose1()
-    << "### LOCATION[" << Chi::mpi.location_id
-    << "] amount of local cells=" << grid_ptr->local_cells.size();
-
-  size_t total_local_cells = grid_ptr->local_cells.size();
-  size_t total_global_cells = 0;
-
-  MPI_Allreduce(&total_local_cells,
-                &total_global_cells,
-                1,
-                MPI_UNSIGNED_LONG_LONG,
-                MPI_SUM,
-                Chi::mpi.comm);
-
-  Chi::log.Log() << "MeshGenerator: Cells created = " << total_global_cells
-                 << std::endl;
+  ComputeAndPrintStats(*grid_ptr);
 
   return grid_ptr;
 }

@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <ctime>
+#include <thread>
 
 //################################################################### Default constr
 /** Default constructor.*/
@@ -61,4 +62,10 @@ std::string chi::Timer::GetLocalDateTimeString()
   s[29] = '\0';
   if (end < 30)  s[end]='\0';
   return s;
+}
+
+//###################################################################
+void chi::Sleep(std::chrono::duration<double> time)
+{
+  std::this_thread::sleep_for(time);
 }

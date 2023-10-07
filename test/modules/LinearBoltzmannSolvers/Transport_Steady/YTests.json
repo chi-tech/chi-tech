@@ -375,5 +375,49 @@
         "tol": 0.0001
       }
     ]
+  },
+  {
+    "file": "Transport3D_6ASplitMesh.lua",
+    "comment": "3D LinearBSolver Test Split mesh configuration A",
+    "num_procs": 4,
+    "weight_class" : "intermediate",
+    "checks": [
+      {
+        "type": "FloatCompare",
+        "key": "max-grp0(latest)",
+        "wordnum" : 4,
+        "gold": 1.131566e-01,
+        "tol": 1.0e-6
+      },
+      {
+        "type": "FloatCompare",
+        "key": "max-grp19(latest)",
+        "wordnum" : 4,
+        "gold": 7.340585e-04,
+        "tol": 1.0e-9
+      }
+    ]
+  },
+  {
+    "file": "Transport3D_6BSplitMesh.lua",
+    "comment": "3D LinearBSolver Test Split mesh configuration A",
+    "num_procs": 4,
+    "weight_class" : "intermediate",
+    "checks": [
+      {
+        "type": "FloatCompare",
+        "key": "max-grp0(latest)",
+        "wordnum" : 4,
+        "gold": 1.131566e-01,
+        "tol": 1.0e-6
+      },
+      {
+        "type": "FloatCompare",
+        "key": "max-grp19(latest)",
+        "wordnum" : 4,
+        "gold": 7.340585e-04,
+        "tol": 1.0e-9
+      }
+    ]
   }
 ]

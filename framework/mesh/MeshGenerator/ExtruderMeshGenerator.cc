@@ -17,9 +17,9 @@ chi::InputParameters ExtrusionLayer::GetInputParameters()
 
   // clang-format off
   params.SetGeneralDescription(
-"A collection of parameters defining an extrusion layer.");
+  "A collection of parameters defining an extrusion layer.");
   // clang-format on
-  params.SetDocGroup("chi_mesh__ExtruderMeshGenerator");
+  params.SetDocGroup("doc_MeshGenerators");
 
   params.AddOptionalParameter(
     "h", 1.0, "Layer height. Cannot be specified if \"z\" is specified.");
@@ -126,6 +126,7 @@ ExtruderMeshGenerator::GenerateUnpartitionedMesh(
   const auto& template_cells = input_umesh->GetRawCells();
 
   const size_t num_template_vertices = template_vertices.size();
+  const size_t num_template_cells = template_cells.size();
 
   ChiLogicalErrorIf(template_vertices.empty(), "Input mesh has no vertices.");
   ChiLogicalErrorIf(template_cells.empty(), "Input mesh has no cells.");
@@ -188,6 +189,7 @@ ExtruderMeshGenerator::GenerateUnpartitionedMesh(
   {
     for (uint32_t n = 0; n < layer.num_sub_layers_; ++n)
     {
+      size_t tc_counter = 0;
       for (const auto& template_cell : template_cells)
       {
         //================================== Determine cell sub-type
@@ -230,7 +232,16 @@ ExtruderMeshGenerator::GenerateUnpartitionedMesh(
           new_face.vertex_ids[3] = tc_face.vertex_ids[0] + (k + 1) * num_template_vertices;
           // clang-format on
 
-          if (not tc_face.has_neighbor) new_face.neighbor = tc_face.neighbor;
+          if (tc_face.has_neighbor)
+          {
+            new_face.neighbor = num_template_cells * k + tc_face.neighbor;
+            new_face.has_neighbor = true;
+          }
+          else
+          {
+            new_face.neighbor = tc_face.neighbor;
+            new_face.has_neighbor = false;
+          }
 
           new_cell.faces.push_back(std::move(new_face));
         } // for tc face
@@ -245,10 +256,20 @@ ExtruderMeshGenerator::GenerateUnpartitionedMesh(
             new_face.vertex_ids.push_back(vid +
                                           (k + 1) * num_template_vertices);
 
-          if ((k + 1) == z_levels.size()) new_face.neighbor = zmax_bndry_id;
+          if (k == (z_levels.size()-2))
+          {
+            new_face.neighbor = zmax_bndry_id;
+            new_face.has_neighbor = false;
+          }
+          else
+          {
+            new_face.neighbor = num_template_cells * (k+1) + tc_counter;
+            new_face.has_neighbor = true;
+          }
 
           new_cell.faces.push_back(std::move(new_face));
         }
+
         // Bottom face
         {
           UnpartitionedMesh::LightWeightFace new_face;
@@ -258,11 +279,22 @@ ExtruderMeshGenerator::GenerateUnpartitionedMesh(
           for (auto vid = vs.rbegin(); vid != vs.rend(); ++vid)
             new_face.vertex_ids.push_back((*vid) + k * num_template_vertices);
 
-          if (k == 0) new_face.neighbor = zmin_bndry_id;
+          if (k == 0)
+          {
+            new_face.neighbor = zmin_bndry_id;
+            new_face.has_neighbor = false;
+          }
+          else
+          {
+            new_face.neighbor = num_template_cells * (k-1) + tc_counter;
+            new_face.has_neighbor = true;
+          }
 
           new_cell.faces.push_back(std::move(new_face));
         }
         umesh->GetRawCells().push_back(new_cell_ptr);
+
+        ++tc_counter;
       } // for template cell
       ++k;
     } // for sub-layer n

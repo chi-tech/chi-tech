@@ -4,18 +4,45 @@ namespace chi_mesh
 {
 
 // ###################################################################
+/**Broadcasts PIDs to other locations.*/
+void MeshGenerator::BroadCastPIDs(std::vector<int64_t>& cell_pids,
+                                  int root,
+                                  MPI_Comm communicator)
+{
+  size_t data_count = Chi::mpi.location_id == root ? cell_pids.size() : 0;
+
+  //======================================== Broadcast data_count to all
+  //                                         locations
+  MPI_Bcast(&data_count,   // buffer [IN/OUT]
+            1,             // count
+            MPI_UINT64_T,  // data type
+            root,          // root
+            communicator); // communicator
+
+  if (Chi::mpi.location_id != root) cell_pids.assign(data_count, 0);
+
+  //======================================== Broadcast partitioning to all
+  //                                         locations
+  MPI_Bcast(cell_pids.data(),             // buffer [IN/OUT]
+            static_cast<int>(data_count), // count
+            MPI_LONG_LONG_INT,            // data type
+            root,                         // root
+            communicator);                // communicator
+}
+
+// ###################################################################
 /**Determines if a cells needs to be included as a ghost or as a local cell.*/
-bool chi_mesh::MeshGenerator::CellHasLocalScope(
+bool MeshGenerator::CellHasLocalScope(
+  int location_id,
   const chi_mesh::UnpartitionedMesh::LightWeightCell& lwcell,
   uint64_t cell_global_id,
   const std::vector<std::set<uint64_t>>& vertex_subscriptions,
-  const std::vector<int64_t>& cell_partition_ids)
+  const std::vector<int64_t>& cell_partition_ids) const
 {
-  if (replicated_)
-    return true;
+  if (replicated_) return true;
   // First determine if the cell is a local cell
   int cell_pid = static_cast<int>(cell_partition_ids[cell_global_id]);
-  if (cell_pid == Chi::mpi.location_id) return true;
+  if (cell_pid == location_id) return true;
 
   // Now determine if the cell is a ghost cell
   for (uint64_t vid : lwcell.vertex_ids)
@@ -23,7 +50,7 @@ bool chi_mesh::MeshGenerator::CellHasLocalScope(
     {
       if (cid == cell_global_id) continue;
       int adj_pid = static_cast<int>(cell_partition_ids[cid]);
-      if (adj_pid == Chi::mpi.location_id) return true;
+      if (adj_pid == location_id) return true;
     }
 
   return false;
@@ -32,10 +59,11 @@ bool chi_mesh::MeshGenerator::CellHasLocalScope(
 // ###################################################################
 /**Converts a light-weight cell to a real cell.*/
 std::unique_ptr<chi_mesh::Cell>
-MeshGenerator::SetupCell(const UnpartitionedMesh::LightWeightCell& raw_cell,
-                         uint64_t global_id,
-                         uint64_t partition_id,
-                         const std::vector<chi_mesh::Vector3>& vertices)
+MeshGenerator::SetupCell(
+  const UnpartitionedMesh::LightWeightCell& raw_cell,
+  uint64_t global_id,
+  uint64_t partition_id,
+  const VertexListHelper& vertices)
 {
   auto cell =
     std::make_unique<chi_mesh::Cell>(raw_cell.type, raw_cell.sub_type);
@@ -57,7 +85,7 @@ MeshGenerator::SetupCell(const UnpartitionedMesh::LightWeightCell& raw_cell,
     newFace.vertex_ids_ = raw_face.vertex_ids;
     auto vfc = chi_mesh::Vertex(0.0, 0.0, 0.0);
     for (auto fvid : newFace.vertex_ids_)
-      vfc = vfc + vertices[fvid];
+      vfc = vfc + vertices.at(fvid);
     newFace.centroid_ = vfc / static_cast<double>(newFace.vertex_ids_.size());
 
     if (cell->Type() == CellType::SLAB)
@@ -77,7 +105,7 @@ MeshGenerator::SetupCell(const UnpartitionedMesh::LightWeightCell& raw_cell,
       // centroid. The normal is then just khat
       // cross-product with this vector.
       uint64_t fvid = newFace.vertex_ids_[0];
-      auto vec_vvc = vertices[fvid] - newFace.centroid_;
+      auto vec_vvc = vertices.at(fvid) - newFace.centroid_;
 
       newFace.normal_ = chi_mesh::Vector3(0.0, 0.0, 1.0).Cross(vec_vvc);
       newFace.normal_.Normalize();
@@ -97,8 +125,8 @@ MeshGenerator::SetupCell(const UnpartitionedMesh::LightWeightCell& raw_cell,
         uint64_t fvid_m = newFace.vertex_ids_[fv];
         uint64_t fvid_p = newFace.vertex_ids_[fvp1];
 
-        auto leg_m = vertices[fvid_m] - newFace.centroid_;
-        auto leg_p = vertices[fvid_p] - newFace.centroid_;
+        auto leg_m = vertices.at(fvid_m) - newFace.centroid_;
+        auto leg_p = vertices.at(fvid_p) - newFace.centroid_;
 
         auto vn = leg_m.Cross(leg_p);
 

@@ -20,7 +20,7 @@ chi::InputParameters FromFileMeshGenerator::GetInputParameters()
 
   params.SetGeneralDescription("Generator for loading an unpartitioned mesh"
                                " from a file.");
-  params.SetDocGroup("MeshGenerator");
+  params.SetDocGroup("doc_MeshGenerators");
 
   params.AddRequiredParameter<std::string>("filename", "Path to the file.");
   params.AddOptionalParameter(
