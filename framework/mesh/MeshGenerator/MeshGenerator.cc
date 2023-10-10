@@ -104,7 +104,7 @@ void MeshGenerator::Execute()
   if (Chi::mpi.location_id == 0)
     cell_pids = PartitionMesh(*current_umesh, Chi::mpi.process_count);
 
-  BroadCastPIDs(cell_pids, 0, Chi::mpi.comm);
+  BroadcastPIDs(cell_pids, 0, Chi::mpi.comm);
 
   auto grid_ptr = SetupMesh(std::move(current_umesh), cell_pids);
 
@@ -121,15 +121,15 @@ void MeshGenerator::Execute()
   Chi::mpi.Barrier();
 }
 
-void MeshGenerator::SetGridAttributes(chi_mesh::MeshContinuum& grid,
-                                      MeshAttributes new_attribs,
-                                      std::array<size_t, 3> ortho_Nis)
+void MeshGenerator::SetGridAttributes(
+  chi_mesh::MeshContinuum& grid,
+  MeshAttributes new_attribs,
+  std::array<size_t, 3> ortho_cells_per_dimension)
 {
-  grid.SetAttributes(new_attribs, ortho_Nis);
+  grid.SetAttributes(new_attribs, ortho_cells_per_dimension);
 }
 
-void MeshGenerator::ComputeAndPrintStats(
-  const chi_mesh::MeshContinuum& grid)
+void MeshGenerator::ComputeAndPrintStats(const chi_mesh::MeshContinuum& grid)
 {
   const size_t num_local_cells = grid.local_cells.size();
   size_t num_global_cells = 0;

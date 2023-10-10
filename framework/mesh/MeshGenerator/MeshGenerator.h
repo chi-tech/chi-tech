@@ -62,9 +62,9 @@ public:
 protected:
   // 01
   /**Builds a cell-graph and executes the partitioner that assigns cell
-   * partition ids based on the supplied number of parts.*/
+   * partition ids based on the supplied number of partitions.*/
   std::vector<int64_t> PartitionMesh(const UnpartitionedMesh& input_umesh,
-                                     int num_parts);
+                                     int num_partitions);
 
   /**Executes the partitioner and configures the mesh as a real mesh.*/
   std::shared_ptr<MeshContinuum>
@@ -74,7 +74,7 @@ protected:
   // 02 utils
   /**Broadcasts PIDs to other locations.*/
 
-  static void BroadCastPIDs(std::vector<int64_t>& cell_pids,
+  static void BroadcastPIDs(std::vector<int64_t>& cell_pids,
                             int root,
                             MPI_Comm communicator);
   /**Determines if a cells needs to be included as a ghost or as a local cell.*/
@@ -94,7 +94,7 @@ protected:
 
   static void SetGridAttributes(chi_mesh::MeshContinuum& grid,
                                 MeshAttributes new_attribs,
-                                std::array<size_t, 3> ortho_Nis);
+                                std::array<size_t, 3> ortho_cells_per_dimension);
 
   static void ComputeAndPrintStats(const chi_mesh::MeshContinuum& grid) ;
 

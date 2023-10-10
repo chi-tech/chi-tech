@@ -48,6 +48,10 @@ OrthogonalMeshGenerator::OrthogonalMeshGenerator(
     node_sets_.empty(),
     "No nodes have been provided. At least one node set must be provided");
 
+  ChiInvalidArgumentIf(node_sets_.size() > 3,
+                       "More than 3 node sets have been provided. The "
+                       "maximum allowed is 3.");
+
   size_t ns = 0;
   for (const auto& node_set : node_sets_)
   {
@@ -58,10 +62,6 @@ OrthogonalMeshGenerator::OrthogonalMeshGenerator(
         " nodes. A minimum of 2 is required to define a cell.");
     ++ns;
   }
-
-  ChiInvalidArgumentIf(node_sets_.size() > 3,
-                       "More than 3 node sets have been provided. Only a "
-                       "maximum of 3 are allowed");
 
   //======================================== Check each node_set
   size_t set_number = 0;
@@ -391,7 +391,7 @@ OrthogonalMeshGenerator::CreateUnpartitioned3DOrthoMesh(
                                                   vmap[i + 1][j + 1][k],
                                                   vmap[i + 1][j + 1][k + 1],
                                                   vmap[i][j + 1][k + 1]};
-          face.neighbor = (j == max_j) ? 0 /*XMAX*/ : cmap[i][j+1][k];
+          face.neighbor = (j == max_j) ? 0 /*XMAX*/ : cmap[i][j + 1][k];
           face.has_neighbor = (j != max_j);
           cell->faces.push_back(face);
         }
@@ -403,7 +403,7 @@ OrthogonalMeshGenerator::CreateUnpartitioned3DOrthoMesh(
                                                   vmap[i][j][k + 1],
                                                   vmap[i + 1][j][k + 1],
                                                   vmap[i + 1][j][k]};
-          face.neighbor = (j == 0) ? 1 /*XMIN*/ : cmap[i][j-1][k];
+          face.neighbor = (j == 0) ? 1 /*XMIN*/ : cmap[i][j - 1][k];
           face.has_neighbor = (j != 0);
           cell->faces.push_back(face);
         }
@@ -415,7 +415,7 @@ OrthogonalMeshGenerator::CreateUnpartitioned3DOrthoMesh(
                                                   vmap[i + 1][j][k + 1],
                                                   vmap[i + 1][j + 1][k + 1],
                                                   vmap[i + 1][j + 1][k]};
-          face.neighbor = (i == max_i) ? 2 /*YMAX*/ : cmap[i+1][j][k];
+          face.neighbor = (i == max_i) ? 2 /*YMAX*/ : cmap[i + 1][j][k];
           face.has_neighbor = (i != max_i);
           cell->faces.push_back(face);
         }
@@ -427,7 +427,7 @@ OrthogonalMeshGenerator::CreateUnpartitioned3DOrthoMesh(
                                                   vmap[i][j + 1][k],
                                                   vmap[i][j + 1][k + 1],
                                                   vmap[i][j][k + 1]};
-          face.neighbor = (i == 0) ? 3 /*YMIN*/ : cmap[i-1][j][k];
+          face.neighbor = (i == 0) ? 3 /*YMIN*/ : cmap[i - 1][j][k];
           face.has_neighbor = (i != 0);
           cell->faces.push_back(face);
         }
@@ -439,7 +439,7 @@ OrthogonalMeshGenerator::CreateUnpartitioned3DOrthoMesh(
                                                   vmap[i][j + 1][k + 1],
                                                   vmap[i + 1][j + 1][k + 1],
                                                   vmap[i + 1][j][k + 1]};
-          face.neighbor = (k == max_k) ? 4 /*ZMAX*/ : cmap[i][j][k+1];
+          face.neighbor = (k == max_k) ? 4 /*ZMAX*/ : cmap[i][j][k + 1];
           face.has_neighbor = (k != max_k);
           cell->faces.push_back(face);
         }
@@ -451,7 +451,7 @@ OrthogonalMeshGenerator::CreateUnpartitioned3DOrthoMesh(
                                                   vmap[i + 1][j][k],
                                                   vmap[i + 1][j + 1][k],
                                                   vmap[i][j + 1][k]};
-          face.neighbor = (k == 0) ? 5 /*ZMIN*/ : cmap[i][j][k-1];
+          face.neighbor = (k == 0) ? 5 /*ZMIN*/ : cmap[i][j][k - 1];
           face.has_neighbor = (k != 0);
           cell->faces.push_back(face);
         }

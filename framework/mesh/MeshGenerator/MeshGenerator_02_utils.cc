@@ -5,7 +5,7 @@ namespace chi_mesh
 
 // ###################################################################
 /**Broadcasts PIDs to other locations.*/
-void MeshGenerator::BroadCastPIDs(std::vector<int64_t>& cell_pids,
+void MeshGenerator::BroadcastPIDs(std::vector<int64_t>& cell_pids,
                                   int root,
                                   MPI_Comm communicator)
 {
