@@ -11,7 +11,7 @@ namespace chi_mesh
 /**Builds a cell-graph and executes the partitioner.*/
 std::vector<int64_t>
 MeshGenerator::PartitionMesh(const UnpartitionedMesh& input_umesh,
-                             int num_parts)
+                             int num_partitions)
 {
   const auto& raw_cells = input_umesh.GetRawCells();
   const size_t num_raw_cells = raw_cells.size();
@@ -43,7 +43,7 @@ MeshGenerator::PartitionMesh(const UnpartitionedMesh& input_umesh,
 
   //============================================= Execute partitioner
   std::vector<int64_t> cell_pids =
-    partitioner_->Partition(cell_graph, cell_centroids, num_parts);
+    partitioner_->Partition(cell_graph, cell_centroids, num_partitions);
 
   return cell_pids;
 }

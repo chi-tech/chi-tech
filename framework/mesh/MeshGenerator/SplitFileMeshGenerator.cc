@@ -32,11 +32,12 @@ chi::InputParameters SplitFileMeshGenerator::GetInputParameters()
     " mesh files for each location.");
   params.SetDocGroup("doc_MeshGenerators");
 
-  params.AddOptionalParameter("num_parts",
-                              0,
-                              "The number of parts to generate. If zero will "
-                              "default to the number of MPI processes. Is "
-                              "ignored if the number of MPI processes > 1.");
+  params.AddOptionalParameter(
+    "num_partitions",
+    0,
+    "The number of partitions to generate. If zero will "
+    "default to the number of MPI processes. Is "
+    "ignored if the number of MPI processes > 1.");
 
   params.AddOptionalParameter(
     "split_mesh_dir_path",
@@ -59,7 +60,7 @@ chi::InputParameters SplitFileMeshGenerator::GetInputParameters()
 SplitFileMeshGenerator::SplitFileMeshGenerator(
   const chi::InputParameters& params)
   : MeshGenerator(params),
-    num_parts_(params.GetParamValue<int>("num_parts")),
+    num_parts_(params.GetParamValue<int>("num_partitions")),
     split_mesh_dir_path_(
       params.GetParamValue<std::string>("split_mesh_dir_path")),
     split_file_prefix_(params.GetParamValue<std::string>("split_file_prefix")),
