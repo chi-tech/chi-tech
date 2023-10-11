@@ -3,13 +3,14 @@
 #include "mesh/UnpartitionedMesh/chi_unpartitioned_mesh.h"
 #include "mesh/MeshHandler/chi_meshhandler.h"
 #include "mesh/VolumeMesher/chi_volumemesher.h"
+#include "mesh/MeshContinuum/chi_meshcontinuum.h"
 #include "graphs/GraphPartitioner.h"
 #include "graphs/PETScGraphPartitioner.h"
 
 #include "ChiObjectFactory.h"
 
 #include "chi_runtime.h"
-#include "chi_log.h" // TODO: Remove
+#include "chi_log.h"
 
 namespace chi_mesh
 {
@@ -21,7 +22,7 @@ chi::InputParameters MeshGenerator::GetInputParameters()
   chi::InputParameters params = ChiObject::GetInputParameters();
 
   params.SetGeneralDescription("The base class for all mesh generators");
-  params.SetDocGroup("MeshGenerator");
+  params.SetDocGroup("doc_MeshGenerators");
 
   params.AddOptionalParameter(
     "scale", 1.0, "Uniform scale to apply to the mesh after reading.");
@@ -98,7 +99,14 @@ void MeshGenerator::Execute()
 
   //======================================== Generate final umesh and convert it
   current_umesh = GenerateUnpartitionedMesh(std::move(current_umesh));
-  auto grid_ptr = SetupMesh(std::move(current_umesh));
+
+  std::vector<int64_t> cell_pids;
+  if (Chi::mpi.location_id == 0)
+    cell_pids = PartitionMesh(*current_umesh, Chi::mpi.process_count);
+
+  BroadcastPIDs(cell_pids, 0, Chi::mpi.comm);
+
+  auto grid_ptr = SetupMesh(std::move(current_umesh), cell_pids);
 
   //======================================== Assign the mesh to a VolumeMesher
   auto new_mesher =
@@ -111,6 +119,72 @@ void MeshGenerator::Execute()
   cur_hndlr.SetVolumeMesher(new_mesher);
 
   Chi::mpi.Barrier();
+}
+
+void MeshGenerator::SetGridAttributes(
+  chi_mesh::MeshContinuum& grid,
+  MeshAttributes new_attribs,
+  std::array<size_t, 3> ortho_cells_per_dimension)
+{
+  grid.SetAttributes(new_attribs, ortho_cells_per_dimension);
+}
+
+void MeshGenerator::ComputeAndPrintStats(const chi_mesh::MeshContinuum& grid)
+{
+  const size_t num_local_cells = grid.local_cells.size();
+  size_t num_global_cells = 0;
+
+  MPI_Allreduce(&num_local_cells,       // sendbuf
+                &num_global_cells,      // recvbuf
+                1,                      // count
+                MPI_UNSIGNED_LONG_LONG, // datatype
+                MPI_SUM,                // operation
+                Chi::mpi.comm);         // communicator
+
+  size_t max_num_local_cells;
+  MPI_Allreduce(&num_local_cells,       // sendbuf
+                &max_num_local_cells,   // recvbuf
+                1,                      // count
+                MPI_UNSIGNED_LONG_LONG, // datatype
+                MPI_MAX,                // operation
+                Chi::mpi.comm);         // communicator
+
+  size_t min_num_local_cells;
+  MPI_Allreduce(&num_local_cells,       // sendbuf
+                &min_num_local_cells,   // recvbuf
+                1,                      // count
+                MPI_UNSIGNED_LONG_LONG, // datatype
+                MPI_MIN,                // operation
+                Chi::mpi.comm);         // communicator
+
+  const size_t avg_num_local_cells = num_global_cells / Chi::mpi.process_count;
+  const size_t num_local_ghosts = grid.cells.GetNumGhosts();
+  const double local_ghost_to_local_cell_ratio =
+    double(num_local_ghosts) / double(num_local_cells);
+
+  double average_ghost_ratio;
+  MPI_Allreduce(&local_ghost_to_local_cell_ratio, // sendbuf
+                &average_ghost_ratio,             // recvbuf
+                1,                                // count
+                MPI_DOUBLE,                       // datatype
+                MPI_SUM,                          // operation
+                Chi::mpi.comm);                   // communicator
+
+  average_ghost_ratio /= Chi::mpi.process_count;
+
+  std::stringstream outstr;
+  outstr << "Mesh statistics:\n";
+  outstr << "  Global cell count             : " << num_global_cells << "\n";
+  outstr << "  Local cell count (avg,max,min): ";
+  outstr << avg_num_local_cells << ",";
+  outstr << max_num_local_cells << ",";
+  outstr << min_num_local_cells << "\n";
+  outstr << "  Ghost-to-local ratio (avg)    : " << average_ghost_ratio;
+
+  Chi::log.Log() << "\n" << outstr.str() << "\n\n";
+
+  Chi::log.LogAllVerbose2()
+    << Chi::mpi.location_id << "Local cells=" << num_local_cells;
 }
 
 } // namespace chi_mesh
