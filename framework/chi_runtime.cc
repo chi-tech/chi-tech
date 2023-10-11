@@ -189,6 +189,8 @@ int Chi::Initialize(int argc, char** argv, MPI_Comm communicator)
 
   run_time::InitPetSc(argc, argv);
 
+  auto& t_main = Chi::log.CreateTimingBlock("ChiTech");
+  t_main.TimeSectionBegin();
   chi::SystemWideEventPublisher::GetInstance().PublishEvent(chi::Event(
     "ProgramStart", chi::GetStandardEventCode("ProgramStart")));
 
@@ -213,6 +215,8 @@ int Chi::run_time::InitPetSc(int argc, char** argv)
  * */
 void Chi::Finalize()
 {
+  auto& t_main = Chi::log.GetTimingBlock("ChiTech");
+  t_main.TimeSectionEnd();
   chi::SystemWideEventPublisher::GetInstance().PublishEvent(chi::Event(
     "ProgramExecuted", chi::GetStandardEventCode("ProgramExecuted")));
   meshhandler_stack.clear();
