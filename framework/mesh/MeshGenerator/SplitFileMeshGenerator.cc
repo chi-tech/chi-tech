@@ -53,6 +53,8 @@ chi::InputParameters SplitFileMeshGenerator::GetInputParameters()
     false,
     "Controls whether the split mesh is recreated or just read.");
 
+  params.AddOptionalParameter("verbose", true, "Verbose progress output.");
+
   return params;
 }
 
@@ -64,7 +66,8 @@ SplitFileMeshGenerator::SplitFileMeshGenerator(
     split_mesh_dir_path_(
       params.GetParamValue<std::string>("split_mesh_dir_path")),
     split_file_prefix_(params.GetParamValue<std::string>("split_file_prefix")),
-    read_only_(params.GetParamValue<bool>("read_only"))
+    read_only_(params.GetParamValue<bool>("read_only")),
+    verbose_(params.GetParamValue<bool>("verbose"))
 {
 }
 
@@ -121,7 +124,8 @@ void SplitFileMeshGenerator::Execute()
     Chi::log.Log0Warning()
       << "After creating a split-mesh with mpi-processes < "
          "num_parts the program will now auto terminate. This is not an error "
-         "and is the default behavior for the SplitFileMeshGenerator.";
+         "and is the default behavior for the SplitFileMeshGenerator.\n"
+      << Chi::log.GetTimingBlock("ChiTech").MakeGraphString();
     Chi::Exit(EXIT_SUCCESS);
   }
 
@@ -153,8 +157,20 @@ void SplitFileMeshGenerator::WriteSplitMesh(
   const auto& raw_cells = umesh.GetRawCells();
   const auto& raw_vertices = umesh.GetVertices();
 
+  auto& t_write =
+    Chi::log.CreateOrGetTimingBlock("FileMeshGenerator::WriteSplitMesh");
+  auto& t_sorting = Chi::log.CreateOrGetTimingBlock(
+    "Sorting data", "FileMeshGenerator::WriteSplitMesh");
+  auto& t_cells = Chi::log.CreateOrGetTimingBlock(
+    "WriteCells", "FileMeshGenerator::WriteSplitMesh");
+  auto& t_verts = Chi::log.CreateOrGetTimingBlock(
+    "WriteVerts", "FileMeshGenerator::WriteSplitMesh");
+  auto& t_serialize = Chi::log.CreateOrGetTimingBlock("Serialize");
+
+  uint64_t aux_counter = 0;
   for (int pid = 0; pid < num_parts; ++pid)
   {
+    t_write.TimeSectionBegin();
     const std::filesystem::path file_path = dir_path.string() + "/" +
                                             split_file_prefix_ + "_" +
                                             std::to_string(pid) + ".cmesh";
@@ -166,24 +182,44 @@ void SplitFileMeshGenerator::WriteSplitMesh(
                       "Failed to open " + file_path.string());
 
     // Appropriate cells and vertices to the current part being writting
-    std::vector<CellPIDGID> cells_needed;
+    t_sorting.TimeSectionBegin();
+
+    std::vector<uint64_t> local_cells_needed;
+    std::set<uint64_t> cells_needed;
     std::set<uint64_t> vertices_needed;
     {
-      uint64_t cell_global_id = 0;
-      for (const auto& raw_cell : raw_cells)
+      local_cells_needed.reserve(raw_cells.size() / num_parts);
       {
-        const auto cell_pid = cell_pids[cell_global_id];
-        if (CellHasLocalScope(
-              pid, *raw_cell, cell_global_id, vertex_subs, cell_pids))
+        uint64_t cell_global_id = 0;
+        for (auto cell_pid : cell_pids)
         {
-          cells_needed.emplace_back(cell_pid, cell_global_id);
-
-          for (uint64_t vid : raw_cell->vertex_ids)
-            vertices_needed.insert(vid);
+          if (cell_pid == pid) local_cells_needed.push_back(cell_global_id);
+          ++cell_global_id;
         }
-        ++cell_global_id;
-      } // for raw cell
+      }
+
+      for (uint64_t cell_global_id : local_cells_needed)
+      {
+        cells_needed.insert(cell_global_id);
+
+        const auto& raw_cell = *raw_cells[cell_global_id];
+
+        for (uint64_t vid : raw_cell.vertex_ids)
+        {
+          vertices_needed.insert(vid);
+          for (uint64_t ghost_gid : vertex_subs[vid])
+          {
+            if (ghost_gid == cell_global_id) continue;
+            cells_needed.insert(ghost_gid);
+
+            const auto& ghost_raw_cell = *raw_cells[ghost_gid];
+            for (uint64_t gvid : ghost_raw_cell.vertex_ids)
+              vertices_needed.insert(gvid);
+          }
+        }
+      }
     }
+    t_sorting.TimeSectionEnd();
 
     //================================================ Write mesh attributes
     //                                                 and general info
@@ -215,26 +251,67 @@ void SplitFileMeshGenerator::WriteSplitMesh(
     chi::WriteBinaryValue(ofile, vertices_needed.size()); // size_t
 
     //================================================ Write cells
-    for (const auto& [cell_pid, cell_global_id] : cells_needed)
+    const size_t BUFFER_SIZE = 4096 * 2;
+    chi_data_types::ByteArray serial_data;
+    serial_data.Data().reserve(BUFFER_SIZE * 2);
+    for (const auto& cell_global_id : cells_needed)
     {
-      const auto& cell = *raw_cells.at(cell_global_id);
-      chi_data_types::ByteArray serial_data;
-      serial_data.Write(cell_pid);       // int
+      t_cells.TimeSectionBegin();
+      t_serialize.TimeSectionBegin();
+      const auto& cell = *raw_cells[cell_global_id];
+      serial_data.Write(static_cast<int>(cell_pids[cell_global_id])); // int
       serial_data.Write(cell_global_id); // uint64_t
       SerializeCell(cell, serial_data);
+      t_serialize.TimeSectionEnd();
+      if (serial_data.Size() > BUFFER_SIZE)
+      {
+        ofile.write((char*)serial_data.Data().data(),
+                    scint(serial_data.Size()));
+        const size_t cap = serial_data.Data().capacity();
+        serial_data.Clear();
+        serial_data.Data().reserve(cap);
+      }
+      t_cells.TimeSectionEnd();
+    }
+    if (serial_data.Size() > 0)
+    {
       ofile.write((char*)serial_data.Data().data(), scint(serial_data.Size()));
+      serial_data.Clear();
     }
 
     //================================================ Write vertices
+    t_verts.TimeSectionBegin();
     for (const uint64_t vid : vertices_needed)
     {
-      chi_data_types::ByteArray serial_data;
       serial_data.Write(vid); // uint64_t
       serial_data.Write(raw_vertices[vid]);
-      ofile.write((char*)serial_data.Data().data(), scint(serial_data.Size()));
+      if (serial_data.Size() > BUFFER_SIZE)
+      {
+        ofile.write((char*)serial_data.Data().data(),
+                    scint(serial_data.Size()));
+        serial_data.Clear();
+      }
     }
+    if (serial_data.Size() > 0)
+    {
+      ofile.write((char*)serial_data.Data().data(), scint(serial_data.Size()));
+      serial_data.Clear();
+    }
+    t_verts.TimeSectionEnd();
 
     ofile.close();
+    t_write.TimeSectionEnd();
+
+    const double fraction_complete =
+      static_cast<double>(pid) / static_cast<double>(num_parts);
+    if (fraction_complete >= static_cast<double>(aux_counter + 1) * 0.1)
+    {
+      if (verbose_)
+        Chi::log.Log() << Chi::program_timer.GetTimeString()
+                       << " Surpassing part " << pid << " of " << num_parts
+                       << " (" << (aux_counter + 1) * 10 << "%)";
+      ++aux_counter;
+    }
   } // for p
 }
 
