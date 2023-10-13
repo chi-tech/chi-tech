@@ -3,6 +3,7 @@
 
 #include "chi_logstream.h"
 #include "chi_log_exceptions.h"
+#include "TimingLog.h"
 
 #include <utility>
 #include <vector>
@@ -189,7 +190,7 @@ namespace chi
   [0]      3.813122000 SINGLE_OCCURRENCE C
   \endverbatim
    * */
-class ChiLog
+class ChiLog : public TimingLog
 {
 public:
   /**Logging level*/

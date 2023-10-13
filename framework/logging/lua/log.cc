@@ -12,6 +12,7 @@ namespace chi_log_utils::lua_utils
 RegisterLuaFunctionAsIs(chiLogSetVerbosity);
 RegisterLuaFunctionAsIs(chiLog);
 RegisterLuaFunctionAsIs(chiLogProcessEvent);
+RegisterLuaFunctionAsIs(chiLogPrintTimingGraph);
 
 RegisterLuaConstantAsIs(LOG_0, chi_data_types::Varying(1));
 RegisterLuaConstantAsIs(LOG_0WARNING, chi_data_types::Varying(2));
@@ -25,11 +26,6 @@ RegisterLuaConstantAsIs(LOG_ALLERROR, chi_data_types::Varying(9));
 RegisterLuaConstantAsIs(LOG_ALLVERBOSE_0, chi_data_types::Varying(10));
 RegisterLuaConstantAsIs(LOG_ALLVERBOSE_1, chi_data_types::Varying(11));
 RegisterLuaConstantAsIs(LOG_ALLVERBOSE_2, chi_data_types::Varying(12));
-
-#define LUA_FMACRO1(x) lua_register(L, #x, x)
-#define LUA_CMACRO1(x, y)                                                      \
-  lua_pushnumber(L, y);                                                        \
-  lua_setglobal(L, #x)
 
 // ###################################################################
 /** Sets the verbosity level of the Logger.
@@ -111,6 +107,7 @@ int chiLog(lua_State* L)
 \param event_operation_name string Required. What kind of operation to be
                            applied. See `chi::ChiLog::EventOperation`
 *
+* \ingroup LuaLogging
 \return double The processed value.
 */
 int chiLogProcessEvent(lua_State* L)
@@ -147,6 +144,36 @@ int chiLogProcessEvent(lua_State* L)
 
   lua_pushnumber(L, static_cast<lua_Number>(value));
   return 1;
+}
+
+// ##################################################################
+/**Prints the performance graph.
+ * \params rank int Optional argument to print the graph for a specific rank.
+ *
+ * \ingroup LuaLogging
+ * */
+int chiLogPrintTimingGraph(lua_State* L)
+{
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
+  auto& chitech_timing = Chi::log.GetTimingBlock("ChiTech");
+
+  int rank = 0;
+  if (num_args >= 1)
+  {
+    LuaCheckIntegerValue(fname, L, 1);
+    rank = lua_tointeger(L, 1);
+  }
+
+  ChiInvalidArgumentIf(rank >= Chi::mpi.process_count,
+                       "rank >= process_count, i.e., " + std::to_string(rank)
+                         + " >= " + std::to_string(Chi::mpi.process_count));
+
+  if (Chi::mpi.location_id == rank)
+    Chi::log.LogAll() << "\nPerformance Graph:\n"
+                      << chitech_timing.MakeGraphString();
+
+  return 0;
 }
 
 } // namespace chi_log_utils::lua_utils
