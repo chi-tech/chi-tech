@@ -10,7 +10,7 @@ dofile("materials/materials.lua")
 --========== ProdQuad
 pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 2)
 --pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,1, 1)
-chiOptimizeAngularQuadratureForPolarSymmetry(pqaud, 4.0*math.pi)
+chiOptimizeAngularQuadratureForPolarSymmetry(pquad, 4.0*math.pi)
 
 
 phys1 = lbs.DiscreteOrdinatesSolver.Create

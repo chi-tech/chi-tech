@@ -6,7 +6,7 @@ dofile("utils/QBlock_materials.lua") --num_groups assigned here
 
 --############################################### Setup Physics
 pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,4, 4)
-chiOptimizeAngularQuadratureForPolarSymmetry(pqaud, 4.0*math.pi)
+chiOptimizeAngularQuadratureForPolarSymmetry(pquad, 4.0*math.pi)
 
 lbs_block =
 {

@@ -72,7 +72,7 @@ chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 
 --############################################### Setup Physics
 pquad0 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 2,false)
-chiOptimizeAngularQuadratureForPolarSymmetry(pqaud0, 4.0*math.pi)
+chiOptimizeAngularQuadratureForPolarSymmetry(pquad0, 4.0*math.pi)
 
 lbs_block =
 {
