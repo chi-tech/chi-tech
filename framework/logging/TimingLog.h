@@ -61,6 +61,8 @@ public:
   double TotalTime() const;
   /**Returns the average time per occurence.*/
   double AverageTime() const;
+  /**Returns the last computed time differential.*/
+  double LastDelta() const;
 
   /**Makes a string table of the timing block and all its children.*/
   std::string MakeGraphString();
@@ -79,6 +81,7 @@ protected:
   size_t num_occurences_ = 0;
   double total_time_ = 0.0;
   double reference_time_ = 0.0;
+  double last_delta_time_ = 0.0;
   std::vector<const TimingBlock*> children_;
 };
 

@@ -85,6 +85,7 @@ void TimingBlock::TimeSectionEnd()
   const double delta_t = Chi::program_timer.GetTime() - reference_time_;
   total_time_ += delta_t;
   num_occurences_ += 1;
+  last_delta_time_ = delta_t;
 }
 
 size_t TimingBlock::NumberOfOccurences() const { return num_occurences_; }
@@ -96,6 +97,11 @@ double TimingBlock::AverageTime() const
   if (num_occurences_ == 0) return 0.0;
 
   return total_time_ / static_cast<double>(num_occurences_);
+}
+
+double TimingBlock::LastDelta() const
+{
+  return last_delta_time_;
 }
 
 void TimingBlock::AddChild(const TimingBlock& child_block)
