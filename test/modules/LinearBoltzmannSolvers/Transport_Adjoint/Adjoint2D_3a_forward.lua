@@ -86,7 +86,7 @@ src[1] = 1.0
 
 --############################################### Setup Physics
 pquad0 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,12, 2)
-chiOptimizeAngularQuadratureForPolarSymmetry(pqaud0, 4.0*math.pi)
+chiOptimizeAngularQuadratureForPolarSymmetry(pquad0, 4.0*math.pi)
 
 lbs_block =
 {

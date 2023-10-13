@@ -48,7 +48,7 @@ chiPhysicsMaterialSetProperty(materials[1],
 --
 ----========== ProdQuad
 --pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,12*2*4, 12*4)
---chiOptimizeAngularQuadratureForPolarSymmetry(pqaud, 4.0*math.pi)
+--chiOptimizeAngularQuadratureForPolarSymmetry(pquad, 4.0*math.pi)
 --
 ----========== Groupset def
 --gs0 = chiLBSCreateGroupset(phys1)
@@ -88,7 +88,7 @@ chiPhysicsMaterialSetProperty(materials[1],
 --############################################### Setup Physics
 solver_name = "LBS"
 pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,12*2*4, 12*4)
-chiOptimizeAngularQuadratureForPolarSymmetry(pqaud, 4.0*math.pi)
+chiOptimizeAngularQuadratureForPolarSymmetry(pquad, 4.0*math.pi)
 lbs_block =
 {
     name = solver_name,
