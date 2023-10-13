@@ -101,15 +101,15 @@ int chiCreateProductQuadrature(lua_State *L)
     if (num_args<3)
       LuaPostArgAmountError("chiCreateProductQuadrature",3,num_args);
 
-    int Np = lua_tonumber(L,2);
-    int Na = lua_tonumber(L,3);
+    int Na = lua_tonumber(L,2);
+    int Np = lua_tonumber(L,3);
     if (num_args == 4)
       verbose = lua_toboolean(L,4);
 
     Chi::log.Log() << "Creating Gauss-Legendre-Legendre Quadrature\n";
 
     auto new_quad =
-      std::make_shared<chi_math::AngularQuadratureProdGLL>(Np,Na,verbose);
+      std::make_shared<chi_math::AngularQuadratureProdGLL>(Na,Np,verbose);
 
     Chi::angular_quadrature_stack.push_back(new_quad);
     const size_t index = Chi::angular_quadrature_stack.size() - 1;
@@ -132,15 +132,15 @@ int chiCreateProductQuadrature(lua_State *L)
     if (num_args<3)
       LuaPostArgAmountError("chiCreateProductQuadrature",3,num_args);
 
-    int Np = lua_tonumber(L,2);
-    int Na = lua_tonumber(L,3);
+    int Na = lua_tonumber(L,2);
+    int Np = lua_tonumber(L,3);
     if (num_args == 4)
       verbose = lua_toboolean(L,4);
 
     Chi::log.Log() << "Creating Gauss-Legendre-ChebyShev Quadrature\n";
 
     auto new_quad =
-      std::make_shared<chi_math::AngularQuadratureProdGLC>(Np,Na,verbose);
+      std::make_shared<chi_math::AngularQuadratureProdGLC>(Na,Np,verbose);
 
     Chi::angular_quadrature_stack.push_back(new_quad);
     const size_t index = Chi::angular_quadrature_stack.size() - 1;
