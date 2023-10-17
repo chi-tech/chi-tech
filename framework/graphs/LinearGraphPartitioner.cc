@@ -25,11 +25,18 @@ InputParameters LinearGraphPartitioner::GetInputParameters()
   // clang-format on
   params.SetDocGroup("Graphs");
 
+  params.AddOptionalParameter("all_to_rank",
+                              -1,
+                              "If non-zero will restrict all cells to this rank, "
+                              "essentially transforming this partitioner into a "
+                              "single-rank partitioner.");
+
   return params;
 }
 
 LinearGraphPartitioner::LinearGraphPartitioner(const InputParameters& params)
-  : GraphPartitioner(params)
+  : GraphPartitioner(params),
+    all_to_rank_(params.GetParamValue<int>("all_to_rank"))
 {
 }
 
@@ -45,10 +52,16 @@ std::vector<int64_t> LinearGraphPartitioner::Partition(
     chi::MakeSubSets(graph.size(), number_of_parts);
 
   std::vector<int64_t> pids(graph.size(), 0);
-  size_t n = 0;
-  for (int k = 0; k < number_of_parts; ++k)
-    for (size_t m = 0; m < sub_sets[k].ss_size; ++m)
-      pids[n++] = k;
+
+  if (all_to_rank_ < 0)
+  {
+    size_t n = 0;
+    for (int k = 0; k < number_of_parts; ++k)
+      for (size_t m = 0; m < sub_sets[k].ss_size; ++m)
+        pids[n++] = k;
+  }
+  else
+    pids.assign(graph.size(), all_to_rank_);
 
   Chi::log.Log0Verbose1() << "Done partitioning with LinearGraphPartitioner";
   return pids;

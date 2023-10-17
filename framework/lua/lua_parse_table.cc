@@ -4,7 +4,7 @@
 #include "chi_log_exceptions.h"
 
 #include "data_types/chi_data_types.h"
-#include"parameters/parameter_block.h"
+#include "parameters/parameter_block.h"
 
 #define ExceptionLuaNilValue                                                   \
   throw std::logic_error(std::string(__PRETTY_FUNCTION__) +                    \
@@ -111,8 +111,7 @@ void TableParserAsParameterBlock::RecursivelyParseTableKeys(
     {
       if (string_key_encountered) ExceptionMixStringNumberKeys;
 
-      if (block.Type() != chi::ParameterBlockType::ARRAY)
-        block.ChangeToArray();
+      if (block.Type() != chi::ParameterBlockType::ARRAY) block.ChangeToArray();
 
       number_key_encountered = true;
       const std::string key_str_name = std::to_string(key_number_index);
@@ -216,5 +215,35 @@ void PushParameterBlock(lua_State* L,
   }
 }
 //  NOLINTEND(misc-no-recursion)
+
+chi::ParameterBlock StackItemToParameterBlock(lua_State* L, int index)
+{
+  switch (lua_type(L, index))
+  {
+    case LUA_TNIL:
+      return ParamBlock{};
+    case LUA_TBOOLEAN:
+      return ParamBlock("", lua_toboolean(L, index));
+    case LUA_TNUMBER:
+    {
+      if (lua_isinteger(L, index))
+        return ParamBlock("", lua_tointeger(L, index));
+      else
+        return ParamBlock("", lua_tonumber(L, index));
+    }
+    case LUA_TSTRING:
+    {
+      const std::string value = lua_tostring(L, index);
+      return ParamBlock("", value);
+    }
+    case LUA_TTABLE:
+    {
+      auto paramblock = TableParserAsParameterBlock::ParseTable(L, index);
+      return paramblock;
+    }
+    default:
+      ChiLogicalError("Unhandled Lua type.");
+  }
+}
 
 } // namespace chi_lua

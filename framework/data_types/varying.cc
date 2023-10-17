@@ -282,11 +282,18 @@ size_t chi_data_types::Varying::ByteSize() const { return data_->Size(); }
 
 // ###################################################################
 /**Returns a string value for the value.*/
-std::string chi_data_types::Varying::PrintStr() const
+std::string chi_data_types::Varying::PrintStr(bool with_type/*=false*/) const
 {
   std::stringstream outstr;
 
-  outstr << *this;
+  if (this->Type() == chi_data_types::VaryingDataType::STRING)
+    outstr << "\"" << this->StringValue() << "\"";
+  else if (this->Type() == chi_data_types::VaryingDataType::FLOAT)
+    outstr << this->FloatValue() << (with_type ? "(double)" : "");
+  else if (this->Type() == chi_data_types::VaryingDataType::INTEGER)
+    outstr << this->IntegerValue();
+  else if (this->Type() == chi_data_types::VaryingDataType::BOOL)
+    outstr << (this->BoolValue() ? "true" : "false");
 
   return outstr.str();
 }
@@ -296,13 +303,6 @@ std::string chi_data_types::Varying::PrintStr() const
 std::ostream& operator<<(std::ostream& outstr,
                          const chi_data_types::Varying& value)
 {
-  if (value.Type() == chi_data_types::VaryingDataType::STRING)
-    outstr << "\"" << value.StringValue() << "\"";
-  else if (value.Type() == chi_data_types::VaryingDataType::FLOAT)
-    outstr << value.FloatValue() << "(double)";
-  else if (value.Type() == chi_data_types::VaryingDataType::INTEGER)
-    outstr << value.IntegerValue();
-  else if (value.Type() == chi_data_types::VaryingDataType::BOOL)
-    outstr << (value.BoolValue() ? "true" : "false");
+  outstr << value.PrintStr(false);
   return outstr;
 }

@@ -19,7 +19,7 @@ public:
 
   explicit GridBasedFieldFunctionInterface(const chi::InputParameters& params);
 
-  const FieldFunctionGridBased* GetGridBasedFieldFunction() const;
+  FieldFunctionGridBased* GetGridBasedFieldFunction() const;
 };
 
 }

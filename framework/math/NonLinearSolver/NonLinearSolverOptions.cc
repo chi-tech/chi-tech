@@ -66,7 +66,7 @@ chi::InputParameters NonLinearSolverOptions::GetInputParameters()
 
   using namespace chi_data_types;
   params.ConstrainParameterRange(
-    "nl_method", AllowableRangeList::New({"JFNK", "PJFNK", "NEWTON"}));
+    "nl_method", AllowableRangeList::New({"JFNK", "PJFNK", "NEWTON", "LINEAR"}));
 
   return params;
 }

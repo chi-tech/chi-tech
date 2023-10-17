@@ -7,6 +7,7 @@
 #include <vector>
 #include <array>
 #include <stdexcept>
+#include <string>
 
 namespace chi_data_types
 {

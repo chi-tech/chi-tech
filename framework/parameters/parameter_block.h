@@ -321,6 +321,8 @@ public:
    * tree and print values into the reference string.*/
   void RecursiveDumpToString(std::string& outstr,
                              const std::string& offset = "") const;
+
+  void RecursiveDumpToJSON(std::string& outstr) const;
 };
 
 } // namespace chi

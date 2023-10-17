@@ -54,6 +54,8 @@ namespace chi_lua
   * the parameters to the lua stack.*/
   void PushParameterBlock(
     lua_State* L, const chi::ParameterBlock& block, int level = 0);
+
+  chi::ParameterBlock StackItemToParameterBlock(lua_State* L, int index);
 }//namespace chi_lua
 
 #endif

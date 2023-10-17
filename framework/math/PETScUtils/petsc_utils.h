@@ -4,6 +4,11 @@
 #include <petscksp.h>
 #include <vector>
 
+namespace chi_math
+{
+class ParallelVector;
+}
+
 namespace chi_math::PETScUtils
 {
   /**Generalized solver structure.*/
@@ -66,6 +71,7 @@ namespace chi_math::PETScUtils
   void CopyVecToSTLvectorWithGhosts(Vec x, std::vector<double>& data, size_t N, bool resize_STL = true);
 
   void CopySTLvectorToVec(const std::vector<double>& data, Vec x, size_t N);
+  void CopyParallelVectorToVec(const ParallelVector& y, Vec x);
 
   void CopyGlobalVecToSTLvector(
     Vec x,

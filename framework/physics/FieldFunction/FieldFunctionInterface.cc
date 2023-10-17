@@ -25,9 +25,9 @@ FieldFunctionInterface::FieldFunctionInterface(
 {
 }
 
-const FieldFunction* FieldFunctionInterface::GetFieldFunction() const
+FieldFunction* FieldFunctionInterface::GetFieldFunction() const
 {
-  std::shared_ptr<const chi_physics::FieldFunction> ref_ff_ptr = nullptr;
+  std::shared_ptr<chi_physics::FieldFunction> ref_ff_ptr = nullptr;
   if (field_function_param_.Type() == chi::ParameterBlockType::STRING)
   {
     const auto name = field_function_param_.GetValue<std::string>();
@@ -40,7 +40,7 @@ const FieldFunction* FieldFunctionInterface::GetFieldFunction() const
   else if (field_function_param_.Type() == chi::ParameterBlockType::INTEGER)
   {
     const auto handle = field_function_param_.GetValue<size_t>();
-    ref_ff_ptr = Chi::GetStackItemPtrAsType<const chi_physics::FieldFunction>(
+    ref_ff_ptr = Chi::GetStackItemPtrAsType<chi_physics::FieldFunction>(
       Chi::field_function_stack, handle, __FUNCTION__);
   }
   else

@@ -1,5 +1,7 @@
 #include "petsc_utils.h"
 
+#include "math/ParallelVector/ParallelVector.h"
+
 #include "chi_log.h"
 
 // ###################################################################
@@ -23,7 +25,7 @@ void chi_math::PETScUtils::CopyVecToSTLvector(Vec x,
   const double* x_ref;
   VecGetArrayRead(x, &x_ref);
 
-  std::copy(x_ref, x_ref+N, data.begin());
+  std::copy(x_ref, x_ref + N, data.begin());
 
   VecRestoreArrayRead(x, &x_ref);
 }
@@ -47,7 +49,7 @@ void chi_math::PETScUtils::CopyVecToSTLvectorWithGhosts(
   auto info = GetGhostVectorLocalViewRead(x);
   const double* x_ref = info.x_localized_raw;
 
-  std::copy(x_ref, x_ref+N, data.begin());
+  std::copy(x_ref, x_ref + N, data.begin());
 
   RestoreGhostVectorLocalViewRead(x, info);
 }
@@ -62,6 +64,16 @@ void chi_math::PETScUtils::CopySTLvectorToVec(const std::vector<double>& data,
   std::copy(data.begin(), data.end(), x_ref);
 
   VecRestoreArray(x, &x_ref);
+}
+
+void chi_math::PETScUtils::CopyParallelVectorToVec(const ParallelVector& y,
+                                                   Vec x)
+{
+  const double* y_data = y.Data();
+  double* x_data;
+  VecGetArray(x, &x_data);
+  std::copy(y_data, y_data + y.LocalSize(), x_data);
+  VecRestoreArray(x, &x_data);
 }
 
 // ###################################################################
@@ -102,7 +114,7 @@ void chi_math::PETScUtils::CopyGlobalVecToSTLvector(
   const double* x_ref;
   VecGetArrayRead(local_vec, &x_ref);
 
-  std::copy(x_ref, x_ref+N, data.begin());
+  std::copy(x_ref, x_ref + N, data.begin());
 
   VecRestoreArrayRead(x, &x_ref);
 
