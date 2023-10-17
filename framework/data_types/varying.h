@@ -496,7 +496,7 @@ public:
   std::string TypeName() const { return VaryingDataTypeStringName(type_); }
 
   /**Returns a string value for the value.*/
-  std::string PrintStr() const;
+  std::string PrintStr(bool with_type = true) const;
 
 public:
   ~Varying() = default;

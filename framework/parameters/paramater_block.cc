@@ -1,6 +1,7 @@
 #include "parameter_block.h"
 
 #include <algorithm>
+#include <sstream>
 
 namespace chi
 {
@@ -101,7 +102,7 @@ ParameterBlock& ParameterBlock::operator=(ParameterBlock&& other) noexcept
 // Accessors
 ParameterBlockType ParameterBlock::Type() const { return type_; }
 /**Returns true if the parameter block comprises a single value of any of
-  * the types BOOLEAN, FLOAT, STRING, INTEGER.*/
+ * the types BOOLEAN, FLOAT, STRING, INTEGER.*/
 bool ParameterBlock::IsScalar() const
 {
   return (type_ >= ParameterBlockType::BOOLEAN and
@@ -344,6 +345,8 @@ void ParameterBlock::RecursiveDumpToString(std::string& outstr,
   outstr += offset + this->Name() + " = \n";
   outstr += offset + "{\n";
 
+  if (HasValue()) outstr += value_ptr_->PrintStr();
+
   for (const auto& param : parameters_)
   {
 
@@ -389,6 +392,65 @@ void ParameterBlock::RecursiveDumpToString(std::string& outstr,
   } // for parameter
 
   outstr += offset + "}\n";
+}
+// NOLINTEND(misc-no-recursion)
+
+// #################################################################
+//  NOLINTBEGIN(misc-no-recursion)
+/**Print the block tree structure into a designated string.*/
+void ParameterBlock::RecursiveDumpToJSON(std::string& outstr) const
+{
+  if (HasValue())
+  {
+    outstr += value_ptr_->PrintStr(/*with_type=*/false);
+    return;
+  }
+
+  outstr += (this->Type() == ParameterBlockType::ARRAY ? "[" : "{");
+  for (const auto& param : parameters_)
+  {
+
+    switch (param.Type())
+    {
+      case ParameterBlockType::BOOLEAN:
+      {
+        outstr += "\"" + param.Name() + "\" = ";
+        const bool value = param.Value().BoolValue();
+        outstr += std::string(value ? "true" : "false") + ",\n";
+        break;
+      }
+      case ParameterBlockType::FLOAT:
+      {
+        outstr += "\"" + param.Name() + "\" = ";
+        const double value = param.Value().FloatValue();
+        outstr += std::to_string(value) + ",\n";
+        break;
+      }
+      case ParameterBlockType::STRING:
+      {
+        outstr += "\"" + param.Name() + "\" = ";
+        const auto& value = param.Value().StringValue();
+        outstr += "\"" + value + "\",\n";
+        break;
+      }
+      case ParameterBlockType::INTEGER:
+      {
+        outstr += "\"" + param.Name() + "\" = ";
+        const int64_t value = param.Value().IntegerValue();
+        outstr += std::to_string(value) + ",\n";
+        break;
+      }
+      case ParameterBlockType::ARRAY:
+      case ParameterBlockType::BLOCK:
+      {
+        param.RecursiveDumpToJSON(outstr);
+        break;
+      }
+      default:
+        break;
+    }
+  } // for parameter
+  outstr += (this->Type() == ParameterBlockType::ARRAY ? "]" : "}");
 }
 // NOLINTEND(misc-no-recursion)
 

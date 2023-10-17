@@ -18,13 +18,12 @@ GridBasedFieldFunctionInterface::GridBasedFieldFunctionInterface(
 {
 }
 
-const FieldFunctionGridBased*
+FieldFunctionGridBased*
 GridBasedFieldFunctionInterface::GetGridBasedFieldFunction() const
 {
-  const auto* ff_ptr = GetFieldFunction();
+  auto* ff_ptr = GetFieldFunction();
 
-  const auto* grid_based_ff_ptr =
-    dynamic_cast<const FieldFunctionGridBased*>(ff_ptr);
+  auto* grid_based_ff_ptr = dynamic_cast<FieldFunctionGridBased*>(ff_ptr);
 
   return grid_based_ff_ptr ? grid_based_ff_ptr : nullptr;
 }

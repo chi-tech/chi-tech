@@ -19,7 +19,7 @@ protected:
 
   explicit FieldFunctionInterface(const chi::InputParameters& params);
 
-  const FieldFunction* GetFieldFunction() const;
+  FieldFunction* GetFieldFunction() const;
 
 private:
   chi::ParameterBlock field_function_param_;

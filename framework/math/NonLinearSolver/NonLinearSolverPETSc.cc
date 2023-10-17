@@ -88,7 +88,8 @@ void NonLinearSolverPETSc::Setup()
   SNESSetOptionsPrefix(nl_solver_, solver_name_.c_str());
 
   SNESSetType(nl_solver_, options_.petsc_snes_type_.c_str());
-  SNESLineSearch    linesearch;
+  if (options_.nl_method_ == "LINEAR") SNESSetType(nl_solver_, SNESKSPONLY);
+  SNESLineSearch linesearch;
   SNESGetLineSearch(nl_solver_, &linesearch);
   SNESLineSearchSetType(linesearch, SNESLINESEARCHBT);
 

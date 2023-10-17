@@ -53,10 +53,10 @@ void chi::Console::PostMPIInfo(int location_id,
 {
   lua_State* L = this->console_state_;
 
-  lua_pushnumber(L, location_id);
+  lua_pushinteger(L, location_id);
   lua_setglobal(L, "chi_location_id");
 
-  lua_pushnumber(L, number_of_processes);
+  lua_pushinteger(L, number_of_processes);
   lua_setglobal(L, "chi_number_of_processes");
 }
 
