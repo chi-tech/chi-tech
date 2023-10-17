@@ -24,7 +24,8 @@ class SurfaceQuadraturePointData;
 namespace chi_math
 {
 // ################################################################### Class def
-/**Base class for all cell mappings.*/
+/**Base class for all cell mappings.
+* \ingroup doc_CellMappings*/
 class CellMapping
 {
 public:
