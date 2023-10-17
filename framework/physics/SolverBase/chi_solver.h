@@ -15,10 +15,9 @@ namespace chi_physics
 class FieldFunctionGridBased;
 class TimeStepper;
 
-/**\defgroup LuaSolver Solvers
- * \ingroup LuaPhysics*/
-
 // ######################################################### Solver parent class
+/**\defgroup SolverBase Base class for all solvers
+* \ingroup doc_PhysicsSolver*/
 class Solver : public ChiObject
 {
 public:
@@ -49,6 +48,7 @@ public:
 
   /**Generalized query for information supporting varying returns.*/
   virtual chi::ParameterBlock GetInfo(const chi::ParameterBlock& params) const;
+  virtual void SetProperties(const chi::ParameterBlock& params);
   /**PreCheck call to GetInfo.*/
   chi::ParameterBlock
   GetInfoWithPreCheck(const chi::ParameterBlock& params) const;

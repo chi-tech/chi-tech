@@ -1,5 +1,7 @@
 #include "chi_solver.h"
 
+#include "utils/chi_utils.h"
+
 #include "chi_runtime.h"
 #include "chi_log.h"
 
@@ -101,6 +103,8 @@ Solver::InitTimeStepper(const chi::InputParameters& params)
       custom_params.AddParameter(params.GetParam("max_time_steps"));
     }
 
+    valid_params.AssignParameters(custom_params);
+
     auto stepper = std::make_shared<ConstantTimeStepper>(valid_params);
     Chi::object_stack.push_back(stepper);
     stepper->SetStackID(Chi::object_stack.size() - 1);
@@ -174,6 +178,39 @@ Solver::GetInfoWithPreCheck(const chi::ParameterBlock& params) const
     return chi::ParameterBlock{};
   }
   return GetInfo(params);
+}
+
+/**\addtogroup SolverBase
+*
+* \section Properties Properties that can be set
+* The following properties can be set via the lua call
+* `chi_lua::chiSolverSetProperties`
+* \copydoc chi_physics::Solver::SetProperties*/
+
+/**
+Base solver settable properties:
+* - `dt`, Timestep size
+* - `time`, Current time
+* */
+void Solver::SetProperties(const chi::ParameterBlock& params)
+{
+  for (const auto& param : params)
+  {
+    const std::string param_name = param.Name();
+
+    if (param_name == "dt")
+      timestepper_->SetTimeStepSize(param.GetValue<double>());
+    if (param_name == "time")
+      timestepper_->SetTime(param.GetValue<double>());
+    if (param_name == "start_time")
+      timestepper_->SetStartTime(param.GetValue<double>());
+    if (param_name == "end_time")
+      timestepper_->SetEndTime(param.GetValue<double>());
+    if (param_name == "max_time_steps")
+      timestepper_->SetMaxTimeSteps(param.GetValue<int>());
+    if (param_name == "dt_min")
+      timestepper_->SetMinimumTimeStepSize(param.GetValue<int>());
+  }
 }
 
 } // namespace chi_physics

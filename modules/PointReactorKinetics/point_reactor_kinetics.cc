@@ -278,4 +278,28 @@ std::vector<double> TransientSolver::SolutionNew() const
 /**Sets the value of rho.*/
 void TransientSolver::SetRho(double value) { rho_ = value; }
 
+/**\addtogroup prk
+ *
+ * \section Properties Properties that can be set
+ * The following properties can be set via the lua call
+ * `chi_lua::chiSolverSetProperties`
+ * \copydoc prk::TransientSolver::SetProperties
+ * */
+
+ /** PRK Transient solver settable properties:
+ * - `rho`, The current reactivity
+
+Parents:
+\copydoc chi_physics::Solver::SetProperties*/
+void TransientSolver::SetProperties(const chi::ParameterBlock& params)
+{
+  chi_physics::Solver::SetProperties(params);
+
+  for (const auto& param : params)
+  {
+    const std::string& param_name = param.Name();
+    if (param_name == "rho") SetRho(param.GetValue<double>());
+  }
+}
+
 } // namespace prk

@@ -17,6 +17,9 @@ public:
 
   std::vector<double>
   Evaluate(const std::vector<double>& vals) const override;
+
+  bool HasSlope() const override {return false;}
+  bool HasCurvature() const override {return false;}
 };
 
 }

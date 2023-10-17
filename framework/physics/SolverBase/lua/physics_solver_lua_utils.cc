@@ -10,9 +10,6 @@
 #include "chi_log.h"
 #include "console/chi_console.h"
 
-/** \defgroup LuaSolver Solvers
- * \ingroup LuaPhysics*/
-
 namespace chi_physics::lua_utils
 {
 RegisterLuaFunctionAsIs(chiSolverCreate);
@@ -25,6 +22,7 @@ RegisterLuaFunctionAsIs(chiSolverSetBasicOption);
 RegisterLuaFunctionAsIs(chiSolverGetName);
 RegisterLuaFunctionAsIs(chiSolverGetFieldFunctionList);
 RegisterLuaFunctionAsIs(chiSolverGetInfo);
+RegisterLuaFunctionAsIs(chiSolverSetProperties);
 
 // #############################################################################
 /**Generic lua routine for the creation of solvers.
@@ -35,7 +33,11 @@ RegisterLuaFunctionAsIs(chiSolverGetInfo);
  * Example:
 \code
 chiSolverCreate({type=cfem_diffusion.Solver})
-\endcode*/
+\endcode
+
+\ingroup doc_PhysicsSolver
+\deprecated This function is deprecated and will be removed soon.
+*/
 int chiSolverCreate(lua_State* L)
 {
   const std::string fname = __FUNCTION__;
@@ -58,7 +60,7 @@ int chiSolverCreate(lua_State* L)
 
 \param solver_handle int Handle to the solver.
 
-\ingroup LuaSolver
+\ingroup doc_PhysicsSolver
 \author Jan*/
 int chiSolverInitialize(lua_State* L)
 {
@@ -84,7 +86,7 @@ int chiSolverInitialize(lua_State* L)
 
 \param solver_handle int Handle to the solver.
 
-\ingroup LuaSolver
+\ingroup doc_PhysicsSolver
 \author Jan*/
 int chiSolverExecute(lua_State* L)
 {
@@ -110,7 +112,7 @@ int chiSolverExecute(lua_State* L)
 
 \param solver_handle int Handle to the solver.
 
-\ingroup LuaSolver
+\ingroup doc_PhysicsSolver
 \author Jan*/
 int chiSolverStep(lua_State* L)
 {
@@ -136,7 +138,7 @@ int chiSolverStep(lua_State* L)
 
 \param solver_handle int Handle to the solver.
 
-\ingroup LuaSolver
+\ingroup doc_PhysicsSolver
 \author Jan*/
 int chiSolverAdvance(lua_State* L)
 {
@@ -164,7 +166,8 @@ int chiSolverAdvance(lua_State* L)
 \param option_name   string String-name of the option.
 \param option_value  varying The value to assign to the option.
 
-\ingroup LuaSolver
+\ingroup doc_PhysicsSolver
+\deprecated This function is deprecated and will be removed soon.
 \author Jan*/
 int chiSolverSetBasicOption(lua_State* L)
 {
@@ -241,7 +244,7 @@ int chiSolverSetBasicOption(lua_State* L)
 
 \param solver_handle int Handle to the solver.
 
-\ingroup LuaSolver
+\ingroup doc_PhysicsSolver
 \author Jan*/
 int chiSolverGetName(lua_State* L)
 {
@@ -267,7 +270,7 @@ int chiSolverGetName(lua_State* L)
 
 \param SolverHandle int A handle to the reference solver.
 
-\ingroup LuaSolver */
+\ingroup doc_PhysicsSolver */
 int chiSolverGetFieldFunctionList(lua_State* L)
 {
   const std::string fname = __FUNCTION__;
@@ -319,7 +322,7 @@ int chiSolverGetFieldFunctionList(lua_State* L)
 \param info varying A single string or a table of values to call the solver
 with.
 
-\ingroup LuaSolver
+\ingroup doc_PhysicsSolver
 \author Jan*/
 int chiSolverGetInfo(lua_State* L)
 {
@@ -350,6 +353,34 @@ int chiSolverGetInfo(lua_State* L)
   const int num_sub_params = static_cast<int>(output_params.NumParameters());
 
   return output_params.IsScalar() ? 1 : num_sub_params;
+}
+
+/**Sets a property of a solver.
+\param handle int Solver handle.
+\param property_table Table Table of properties to set. See solver specific
+documentation.
+*
+\ingroup doc_PhysicsSolver*/
+int chiSolverSetProperties(lua_State* L)
+{
+  const std::string fname = "chiSolverSetProperties";
+  const int num_args = lua_gettop(L);
+  if (num_args != 2) LuaPostArgAmountError(fname, 2, num_args);
+
+  LuaCheckNilValue(fname, L, 1);
+  LuaCheckIntegerValue(fname, L, 1);
+
+  const size_t solver_handle = lua_tointeger(L, 1);
+
+  const auto& solver = Chi::GetStackItem<chi_physics::Solver>(
+    Chi::object_stack, solver_handle, fname);
+
+  LuaCheckTableValue(fname, L, 2);
+  auto property_block = chi_lua::TableParserAsParameterBlock::ParseTable(L, 2);
+
+  solver.SetProperties(property_block);
+
+  return 0;
 }
 
 } // namespace chi_physics::lua_utils
