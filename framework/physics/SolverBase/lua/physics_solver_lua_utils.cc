@@ -372,7 +372,7 @@ int chiSolverSetProperties(lua_State* L)
 
   const size_t solver_handle = lua_tointeger(L, 1);
 
-  const auto& solver = Chi::GetStackItem<chi_physics::Solver>(
+  auto& solver = Chi::GetStackItem<chi_physics::Solver>(
     Chi::object_stack, solver_handle, fname);
 
   LuaCheckTableValue(fname, L, 2);
