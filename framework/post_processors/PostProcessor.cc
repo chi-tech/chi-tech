@@ -128,7 +128,8 @@ void PostProcessor::PushOntoStack(std::shared_ptr<ChiObject>& new_object)
   auto new_subscriber = std::dynamic_pointer_cast<chi::EventSubscriber>(pp_ptr);
 
   ChiLogicalErrorIf(
-    not pp_ptr, "Failure to cast chi::PostProcessor to chi::EventSubscriber");
+    not new_subscriber,
+    "Failure to cast chi::PostProcessor to chi::EventSubscriber");
 
   auto& publisher = chi_physics::PhysicsEventPublisher::GetInstance();
   publisher.AddSubscriber(new_subscriber);

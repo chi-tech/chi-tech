@@ -55,6 +55,9 @@ public:
 * this check.*/
   void SetMaxTimeSteps(int n);
 
+  /**Manually sets the minimum time step size.*/
+  void SetMinimumTimeStepSize(double dt_min);
+
   /**Advances the controller's state. The most basic action here is to
   * advance time and the time index.*/
   virtual void Advance();
@@ -77,8 +80,11 @@ protected:
   double start_time_;
   double end_time_;
   int max_time_steps_;
+  double dt_min_;
 
   const double general_tolerance_;
+  /**Last dt before finishing.*/
+  double last_dt_;
 };
 
 }

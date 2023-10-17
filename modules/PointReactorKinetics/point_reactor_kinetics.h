@@ -47,6 +47,8 @@ public:
   std::vector<double> SolutionPrev() const;
   std::vector<double> SolutionNew() const;
 
+  void SetProperties(const chi::ParameterBlock& params) override;
+
   void SetRho(double value);
 };
 } // namespace prk
