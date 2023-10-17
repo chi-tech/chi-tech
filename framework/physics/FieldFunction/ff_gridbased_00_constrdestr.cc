@@ -3,6 +3,8 @@
 #include "math/SpatialDiscretization/FiniteVolume/FiniteVolume.h"
 #include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/PieceWiseLinearContinuous.h"
 #include "math/SpatialDiscretization/FiniteElement/PiecewiseLinear/PieceWiseLinearDiscontinuous.h"
+#include "math/SpatialDiscretization/FiniteElement/Lagrange/LagrangeContinuous.h"
+#include "math/SpatialDiscretization/FiniteElement/Lagrange/LagrangeDiscontinuous.h"
 
 #include "mesh/MeshHandler/chi_meshhandler.h"
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
@@ -38,7 +40,8 @@ chi::InputParameters FieldFunctionGridBased::GetInputParameters()
 
   using namespace chi_data_types;
   params.ConstrainParameterRange(
-    "sdm_type", AllowableRangeList::New({"FV", "PWLC", "PWLD"}));
+    "sdm_type",
+    AllowableRangeList::New({"FV", "PWLC", "PWLD", "LagrangeC", "LagrangeD"}));
   params.ConstrainParameterRange(
     "coordinate_system",
     AllowableRangeList::New({"cartesian", "rz", "1d_spherical"}));
@@ -134,12 +137,25 @@ chi_math::SDMPtr FieldFunctionGridBased::MakeSpatialDiscretization(
   typedef chi_math::spatial_discretization::FiniteVolume FV;
   typedef chi_math::spatial_discretization::PieceWiseLinearContinuous PWLC;
   typedef chi_math::spatial_discretization::PieceWiseLinearDiscontinuous PWLD;
+  typedef chi_math::spatial_discretization::LagrangeContinuous LagC;
+  typedef chi_math::spatial_discretization::LagrangeDiscontinuous LagD;
 
-  if (sdm_type == "FiniteVolume") return FV::New(*grid_ptr);
+  if (sdm_type == "FV") return FV::New(*grid_ptr);
+
+  chi_math::CoordinateSystemType cs_type =
+    chi_math::CoordinateSystemType::CARTESIAN;
+  std::string cs = "cartesian";
+  if (user_params.Has("coordinate_system"))
+  {
+    cs = params.GetParamValue<std::string>("coordinate_system");
+
+    using namespace chi_math;
+    if (cs == "cartesian") cs_type = CoordinateSystemType::CARTESIAN;
+    if (cs == "rz") cs_type = CoordinateSystemType::CYLINDRICAL;
+    if (cs == "1d_spherical") cs_type = CoordinateSystemType::SPHERICAL;
+  }
 
   chi_math::QuadratureOrder q_order = chi_math::QuadratureOrder::SECOND;
-  chi_math::CoordinateSystemType coordinate_system_type =
-    chi_math::CoordinateSystemType::CARTESIAN;
 
   if (user_params.Has("quadrature_order"))
   {
@@ -152,23 +168,20 @@ chi_math::SDMPtr FieldFunctionGridBased::MakeSpatialDiscretization(
                            std::to_string(q_order_int));
     q_order = static_cast<chi_math::QuadratureOrder>(q_order_int);
   }
-
-  if (user_params.Has("coordinate_system"))
+  else // Defaulted
   {
-    const auto cs = params.GetParamValue<std::string>("coordinate_system");
-
-    if (cs == "cartesian")
-      coordinate_system_type = chi_math::CoordinateSystemType::CARTESIAN;
-    if (cs == "rz")
-      coordinate_system_type = chi_math::CoordinateSystemType::CYLINDRICAL;
-    if (cs == "1d_spherical")
-      coordinate_system_type = chi_math::CoordinateSystemType::SPHERICAL;
+    if (cs == "cartesian") q_order = chi_math::QuadratureOrder::SECOND;
+    if (cs == "rz") q_order = chi_math::QuadratureOrder::THIRD;
+    if (cs == "1d_spherical") q_order = chi_math::QuadratureOrder::FOURTH;
   }
 
-  if (sdm_type == "PWLC")
-    return PWLC::New(*grid_ptr, q_order, coordinate_system_type);
-  if (sdm_type == "PWLD")
-    return PWLD::New(*grid_ptr, q_order, coordinate_system_type);
+  if (sdm_type == "PWLC") return PWLC::New(*grid_ptr, q_order, cs_type);
+  else if (sdm_type == "PWLD")
+    return PWLD::New(*grid_ptr, q_order, cs_type);
+  else if (sdm_type == "LagrangeC")
+    return LagC::New(*grid_ptr, q_order, cs_type);
+  else if (sdm_type == "LagrangeD")
+    return LagD::New(*grid_ptr, q_order, cs_type);
 
   // If not returned by now
   ChiInvalidArgument("Unsupported sdm_type \"" + sdm_type + "\"");

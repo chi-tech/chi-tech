@@ -97,6 +97,8 @@ void CellVolumeIntegralPostProcessor::Execute(const Event& event_context)
 
   const auto field_data = ref_ff.GetGhostedFieldVector();
 
+  auto coord = sdm.GetSpatialWeightingFunction();
+
   double local_integral = 0.0;
   double local_volume = 0.0;
   for (const uint64_t cell_local_id : cell_local_ids_)
@@ -118,10 +120,11 @@ void CellVolumeIntegralPostProcessor::Execute(const Event& event_context)
       // phi_h = sum_j b_j phi_j
       double ff_value = 0.0;
       for (size_t j = 0; j < num_nodes; ++j)
-        ff_value += qp_data.ShapeValue(j, qp) * node_dof_values[j];
+        ff_value += qp_data.ShapeValue(j, qp) *
+                    node_dof_values[j];
 
-      local_integral += ff_value * qp_data.JxW(qp);
-      local_volume += qp_data.JxW(qp);
+      local_integral += ff_value * coord(qp_data.QPointXYZ(qp)) * qp_data.JxW(qp);
+      local_volume += coord(qp_data.QPointXYZ(qp)) * qp_data.JxW(qp);
     } // for qp
   }   // for cell-id
 

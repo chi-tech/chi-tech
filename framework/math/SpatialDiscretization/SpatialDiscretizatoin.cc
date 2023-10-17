@@ -310,14 +310,14 @@ double SpatialDiscretization::CartesianSpatialWeightFunction(
 double SpatialDiscretization::CylindricalRZSpatialWeightFunction(
   const chi_mesh::Vector3& point)
 {
-  return point[0];
+  return 2.0 * M_PI * point[0];
 }
 
 double SpatialDiscretization::Spherical1DSpatialWeightFunction(
   const chi_mesh::Vector3& point)
 {
   const double r = point[2];
-  return r * r;
+  return 4.0 * M_PI * r * r;
 }
 
 SpatialDiscretization::SpatialWeightFunction
