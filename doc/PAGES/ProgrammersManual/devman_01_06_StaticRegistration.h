@@ -137,19 +137,22 @@ function. We call the static singleton `ObjectMaker` and `RegisterObject` to
 create registry entries for a `Parent` and a `Child`. In the main function we
 then construct some of these statically registered objects.
 
-\subsection DevManParametersSec1_2 Implementation in ChiTech
-In ChiTech we have to, of course, enhance the functionality by a lot. Firstly,
-we ought not to use raw pointers, therefore we use shared pointers
-to a base class object for which we use the base class `ChiObject` for all
+\section DevManParametersSec2 2 Implementation in ChiTech: ChiObject and ChiObjectFactory
+In ChiTech we have to, of course, enhance the functionality by a lot, to this
+end we have the base object, `ChiObject`, and the factory, `ChiObjectFactory`.
+Also, instead of using raw pointers, we use shared pointers for all
 objects that can be statically registered.
-Secondly, it is very rare for an object to be created with no parameters
-(i.e., empty constructors). We developed a separate system to
-control object construction parameters (more on this later). Additionally,
-we do not want developers to come up with unique dummy variable names, i.e.,
-`static int abc12345` or `static int abc12346`, to make use of the
-`ChiObjectMaker`.
 
-In order to register an object within the `ChiObjectMaker` we created a macro
+\image html "DeveloperManual/StaticRegistration/StaticRegistration.png" "The factory pattern" width=900px
+
+We developed a separate system to
+control object construction parameters (more on this later). Additionally,
+we do not want developers to come up with unique dummy variable names for the
+static registration, i.e.,
+`static int abc12345` or `static int abc12346`, just to make use of the
+`ChiObjectFactory`, therefore, we use a macro. That works as follows.
+
+In order to register an object within the `ChiObjectFactory` we created a macro
 called `RegisterChiObject(namespace_name, obj_name)`. The arguments to this
 macro, `namespace_name` and `obj_name`, then get used to construct the following
 \code
@@ -158,11 +161,12 @@ RegisterChiObject(namespace_name, ObjectName);
 // becomes:
 //
 static char unique_var_name_object_ObjectName_0 =
-  ChiObjectMaker::AddObjectToRegistry<ObjectName, ChiObject>("namespace_name",
+  ChiObjectFactory::AddObjectToRegistry<ObjectName, ChiObject>("namespace_name",
                                                              "ObjectName")
 \endcode
 which allows us to abuse static initialization to register the object with
-text-name `"namespace_name::ObjectName"`.
+text-name `"namespace_name::ObjectName"`. Note that nested namespaces are
+allowed, e.g., `"space1::space1b::space1bc"`, is allowed.
 
 We also implemented a number of "tricks". For example we created a
 behind-the-scenes connection to the lua console so that registered objects can
@@ -170,9 +174,9 @@ be created from the lua input system. We also created a "RegistryDump" where
 each registered object can dump its input arguments specification so we can use
 it to build documentation (lessening the burden on the developer).
 
-\section DevManParametersSec2 2 The InputParameters system
+\section DevManParametersSec3 3 The InputParameters system
 All statically registered objects have a common input parameters interface
-implemented in the general class `chi_objects::InputParameters`. This allows
+implemented in the general class `chi::InputParameters`. This allows
 us to fully support static registration if an object has the following basic
 structure
 \code
@@ -187,8 +191,8 @@ class CoolObject : public ChiObject
   const double b_;
   //Misc. members
 public:
-  static chi_objects::InputParameters GetInputParameters();
-  CoolObject(const chi_objects::InputParameters& params);
+  static chi::InputParameters GetInputParameters();
+  CoolObject(const chi::InputParameters& params);
 
   //Misc. methods
 };
@@ -196,8 +200,8 @@ public:
 }
 \endcode
 Here we have the static member method `GetInputParameters` which returns a
-`chi_objects::InputParameters` object used to assign parameters from user input,
-and the constructor `CoolObject(const chi_objects::InputParameters& params);`
+`chi::InputParameters` object used to assign parameters from user input,
+and the constructor `CoolObject(const chi::InputParameters& params);`
 which uses such an object.
 
 In the definition (`.cc`) file we then have
@@ -211,9 +215,12 @@ namespace zorba
 
 RegisterChiObject(chi_unit_tests, CoolObject);
 
-chi_objects::InputParameters CoolObject::GetInputParameters()
+chi::InputParameters CoolObject::GetInputParameters()
 {
-  chi_objects::InputParameters params = ChiObject::GetInputParameters();
+  chi::InputParameters params = ChiObject::GetInputParameters();
+
+  params.SetGeneralDescription("A Cool object to play with");
+  params.SetDocGroup("doc_Coolstuff"); // Documentation link
 
   params.AddRequiredParameter<int>("a", "Coolness factor a");
   params.AddOptionalParameter("b", 1.0, "Coolness factor b");
@@ -221,7 +228,7 @@ chi_objects::InputParameters CoolObject::GetInputParameters()
   return params;
 }
 
-CoolObject::CoolObject(const chi_objects::InputParameters& params) :
+CoolObject::CoolObject(const chi::InputParameters& params) :
   ChiObject(params),
   a_(params.GetParamValue<int>("a")),
   b_(params.GetParamValue<double>("b"))
@@ -256,18 +263,8 @@ params.SetGeneralDescription("General test object");
 By default the object's documentation will be posted to a group that is
 reference-able via doxygen as `<namespace_name>__<ObjectName>` (note the double
 underscore is a replacement for the namespace scope clarifiers `::`). You can
-change this behavior by adding doxygen code to `SetGeneralDescription`. For
-example the code below
-\code
-params.SetGeneralDescription(
-"\\defgroup lbs__OptionsBlock lbs.OptionsBlock \n"
-"\\ingroup LuaLBS\n"
-"Set options from a large list of parameters");
-\endcode
-will set the documentation to the group `lbs__OptionsBlock`, visible as
-`"lbs.OptionsBlock"` and will be grouped under the group `LuaLBS`.
-
-This functionality allows you to customize your documentation according to your
+link the documentation to other groups by using the `SetDocGroup()`
+method. This functionality allows you to customize your documentation according to your
 needs.
 
 <B>Note:</B> The block of text supplied to `SetGeneralDescription` is pasted
@@ -281,7 +278,7 @@ supplied,
 the `InputParameters` object has the interface method `ParametersAtAssignment`
 which returns the parameters used at assignment. It is used as follows:
 \code
-CoolObject::CoolObject(const chi_objects::InputParameters& params) :
+CoolObject::CoolObject(const chi::InputParameters& params) :
   ChiObject(params),
   a_(params.GetParamValue<int>("a")),
   b_(0.0)
@@ -296,15 +293,16 @@ CoolObject::CoolObject(const chi_objects::InputParameters& params) :
 Input parameters can be inherited from parents in the `GetInputParameters`
 method call. For example
 \code
-chi_objects::InputParameters LBSSolver::GetInputParameters()
+chi::InputParameters LBSSolver::GetInputParameters()
 {
-  chi_objects::InputParameters params =
+  chi::InputParameters params =
     chi_physics::Solver::GetInputParameters();
+  params += chi::SecondParent::GetInputParameters();
     //
     //etc.
 \endcode
-Gets all the parameters from the parent object `chi_physics::Solver` allowing
-us to change or add to these parameters.
+Gets all the parameters from the parent object `chi_physics::Solver` and then
+`chi::SecondParent`, allowing us to change or add to these parameters.
 
 In fact, a pretty slick move here is that we are not bound by classical
 inheritance. The input parameters of any statically registered object can be
@@ -314,9 +312,9 @@ snatched and used by simply calling its static `GetInputParameters` method.
 If a required parameter is to be changed to optional we can do this using the
 interface `ChangeExistingParamToOptional`, e.g.,
 \code
-chi_objects::InputParameters LBSSolver::GetInputParameters()
+chi::InputParameters LBSSolver::GetInputParameters()
 {
-  chi_objects::InputParameters params =
+  chi::InputParameters params =
     chi_physics::Solver::GetInputParameters();
 
   params.ChangeExistingParamToOptional("name", "LBSDatablock");
@@ -345,4 +343,19 @@ Parameters in an input parameters block can be constrained to the following
   a smaller than comparison.
 - `chi_data_types::AllowableRangeLowHighLimit` combination of both a high and
   a low limit range.
+
+Example:
+\code
+chi::InputParameters StrangeSolver::GetInputParameters()
+{
+  chi::InputParameters params =
+    chi_physics::Solver::GetInputParameters();
+  params.AddRequiredParameter<std::string>(
+  "sdm_type", "The spatial discretization type to be used");
+
+  using namespace chi_data_types;
+  params.ConstrainParameterRange(
+    "sdm_type", AllowableRangeList::New({"FV", "PWLC", "PWLD"}));
+  // etc.
+\endcode
 */
