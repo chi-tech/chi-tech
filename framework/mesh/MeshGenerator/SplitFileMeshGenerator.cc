@@ -53,7 +53,11 @@ chi::InputParameters SplitFileMeshGenerator::GetInputParameters()
     false,
     "Controls whether the split mesh is recreated or just read.");
 
-  params.AddOptionalParameter("verbose", true, "Verbose progress output.");
+  params.AddOptionalParameter(
+    "verbosity_level",
+    1,
+    "Verbosity level. 1 will report each 10% complete. 2 will print each part "
+    "and the number of local cells it wrote.");
 
   return params;
 }
@@ -67,7 +71,7 @@ SplitFileMeshGenerator::SplitFileMeshGenerator(
       params.GetParamValue<std::string>("split_mesh_dir_path")),
     split_file_prefix_(params.GetParamValue<std::string>("split_file_prefix")),
     read_only_(params.GetParamValue<bool>("read_only")),
-    verbose_(params.GetParamValue<bool>("verbose"))
+    verbosity_level_(params.GetParamValue<int>("verbosity_level"))
 {
 }
 
@@ -221,6 +225,10 @@ void SplitFileMeshGenerator::WriteSplitMesh(
     }
     t_sorting.TimeSectionEnd();
 
+    if (verbosity_level_ >= 2)
+      Chi::log.Log() << "Writing part " << pid
+                     << " num_local_cells=" << local_cells_needed.size();
+
     //================================================ Write mesh attributes
     //                                                 and general info
     const auto& mesh_options = umesh.GetMeshOptions();
@@ -306,7 +314,7 @@ void SplitFileMeshGenerator::WriteSplitMesh(
       static_cast<double>(pid) / static_cast<double>(num_parts);
     if (fraction_complete >= static_cast<double>(aux_counter + 1) * 0.1)
     {
-      if (verbose_)
+      if (verbosity_level_ >= 1)
         Chi::log.Log() << Chi::program_timer.GetTimeString()
                        << " Surpassing part " << pid << " of " << num_parts
                        << " (" << (aux_counter + 1) * 10 << "%)";

@@ -49,7 +49,7 @@ protected:
   const std::string split_mesh_dir_path_;
   const std::string split_file_prefix_;
   const bool read_only_;
-  const bool verbose_;
+  const int verbosity_level_;
 };
 
 } // namespace chi_mesh
