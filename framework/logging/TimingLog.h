@@ -64,6 +64,9 @@ public:
   /**Returns the last computed time differential.*/
   double LastDelta() const;
 
+  /**Resets the timing info to accumulate a new average.*/
+  void Reset();
+
   /**Makes a string table of the timing block and all its children.*/
   std::string MakeGraphString();
 
