@@ -45,6 +45,24 @@ MeshGenerator::PartitionMesh(const UnpartitionedMesh& input_umesh,
   std::vector<int64_t> cell_pids =
     partitioner_->Partition(cell_graph, cell_centroids, num_partitions);
 
+  std::vector<size_t> partI_num_cells(num_partitions, 0);
+  for (int64_t pid : cell_pids)
+    partI_num_cells[pid] += 1;
+
+  size_t max_num_cells = partI_num_cells.front();
+  size_t min_num_cells = partI_num_cells.front();
+  size_t avg_num_cells = 0;
+  for (size_t count : partI_num_cells)
+  {
+    max_num_cells = std::max(max_num_cells, count);
+    min_num_cells = std::min(min_num_cells, count);
+    avg_num_cells += count;
+  }
+  avg_num_cells /= num_partitions;
+
+  Chi::log.Log() << "Partitioner num_cells allocated max,min,avg = "
+    << max_num_cells << "," << min_num_cells << "," << avg_num_cells;
+
   return cell_pids;
 }
 

@@ -123,7 +123,7 @@ KBAGraphPartitioner::Partition(const std::vector<std::vector<uint64_t>>& graph,
     const int64_t j = static_cast<int64_t>(p_vals[1]);
     const int64_t k = static_cast<int64_t>(p_vals[2]);
 
-    pids[c] = nx * ny * k + ny * j + i;
+    pids[c] = nx * ny * k + nx * j + i;
   } // for cell c
 
   if ((nx_ * ny_ * nz_) != number_of_parts)
