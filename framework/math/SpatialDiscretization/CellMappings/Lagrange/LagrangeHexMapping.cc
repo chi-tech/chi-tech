@@ -35,10 +35,10 @@ double LagrangeHexMapping::RefShape(uint32_t i, const Vec3& qpoint) const
   if (i == 5) {a =  1.0; b=-1.0; c= 1.0;}
   if (i == 6) {a =  1.0; b= 1.0; c= 1.0;}
   if (i == 7) {a = -1.0; b= 1.0; c= 1.0;}
-  // clang-format on
 
-  return 0.125 * (1.0 + a * qpoint.x) * (1.0 + b * qpoint.y) *
-         (1.0 + c * qpoint.z);
+  return 0.125 *
+    (1.0 + a * qpoint.x) * (1.0 + b * qpoint.y) * (1.0 + c * qpoint.z);
+  // clang-format on
 }
 
 chi_mesh::Vector3 LagrangeHexMapping::RefGradShape(uint32_t i,
@@ -63,13 +63,9 @@ chi_mesh::Vector3 LagrangeHexMapping::RefGradShape(uint32_t i,
   const double y = qpoint.y;
   const double z = qpoint.z;
 
-  const double ab = a * b;
-  const double ac = a * c;
-  const double bc = b * c;
-  const double abc = a * bc;
-  return Vec3(0.125 * (a + ab * y + ac * z + abc * y * z),
-              0.125 * (b + ab * x + bc * z + abc * x * z),
-              0.125 * (c + bc * y + ac * x + abc * x * y));
+  return Vec3(0.125 * a * (1.0 + b * y) * (1.0 + c * z),
+              0.125 * b * (1.0 + a * x) * (1.0 + c * z),
+              0.125 * c * (1.0 + a * x) * (1.0 + b * y));
 }
 
 LagrangeBaseMapping::MatDbl
@@ -133,7 +129,7 @@ LagrangeHexMapping::RefFaceJacobianDeterminantAndNormal(
   const auto cross = dx_dxbar.Cross(dx_dybar);
   const double detJ = cross.Norm();
 
-  return {detJ, cross/detJ};
+  return {detJ, cross / detJ};
 }
 
 LagrangeBaseMapping::Vec3
