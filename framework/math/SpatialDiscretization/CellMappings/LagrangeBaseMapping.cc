@@ -88,7 +88,7 @@ LagrangeBaseMapping::GetVertexLocations(const chi_mesh::MeshContinuum& grid,
 chi_mesh::Vector3
 LagrangeBaseMapping::MapWorldXYZToNaturalXYZ(const Vec3& world_xyz) const
 {
-  LagrangeWorldXYZToNaturalMappingHelper helper(*this, world_xyz);
+  WorldXYZToNaturalMappingHelper helper(*this, world_xyz);
 
   auto nat_xyz = chi_math::NewtonIteration(helper, {0.0, 0.0, 0.0}, 20, 1.0e-8);
 
@@ -142,7 +142,6 @@ LagrangeBaseMapping::MakeVolumetricQuadraturePointData() const
   std::vector<VecDbl> shape_value;
   std::vector<VecVec3> shape_grad;
   VecDbl JxW;
-  size_t num_nodes;
 
   quadrature_point_indices.reserve(num_qpoints);
   for (unsigned int qp = 0; qp < num_qpoints; ++qp)
@@ -179,15 +178,13 @@ LagrangeBaseMapping::MakeVolumetricQuadraturePointData() const
     } // for i
   }   // for qp
 
-  num_nodes = num_nodes_;
-
   return finite_element::VolumetricQuadraturePointData(quadrature_point_indices,
                                                      qpoints_xyz,
                                                      shape_value,
                                                      shape_grad,
                                                      JxW,
                                                      face_node_mappings_,
-                                                     num_nodes);
+                                                     num_nodes_);
 }
 
 const Quadrature&
@@ -211,7 +208,6 @@ LagrangeBaseMapping::MakeSurfaceQuadraturePointData(size_t face_index) const
   std::vector<VecVec3> shape_grad;
   VecDbl JxW;
   VecVec3 normals;
-  size_t num_nodes;
 
   quadrature_point_indices.reserve(num_qpoints);
   for (unsigned int qp = 0; qp < num_qpoints; ++qp)
@@ -255,8 +251,6 @@ LagrangeBaseMapping::MakeSurfaceQuadraturePointData(size_t face_index) const
     } // for i
   }   // for qp
 
-  num_nodes = num_nodes_;
-
   return finite_element::SurfaceQuadraturePointData(quadrature_point_indices,
                                                  qpoints_xyz,
                                                  shape_value,
@@ -264,7 +258,7 @@ LagrangeBaseMapping::MakeSurfaceQuadraturePointData(size_t face_index) const
                                                  JxW,
                                                  normals,
                                                  face_node_mappings_,
-                                                 num_nodes);
+                                                 num_nodes_);
 }
 
 std::pair<double, LagrangeBaseMapping::Vec3>
@@ -274,7 +268,7 @@ LagrangeBaseMapping::RefFaceJacobianDeterminantAndNormal(size_t face_index,
   ChiLogicalError("Method not implemented");
 }
 
-LagrangeWorldXYZToNaturalMappingHelper::LagrangeWorldXYZToNaturalMappingHelper(
+WorldXYZToNaturalMappingHelper::WorldXYZToNaturalMappingHelper(
   const LagrangeBaseMapping& cell_mapping, const Vec3& world_x)
   : cell_mapping_(cell_mapping), world_x_(world_x)
 {
@@ -289,7 +283,7 @@ LagrangeWorldXYZToNaturalMappingHelper::LagrangeWorldXYZToNaturalMappingHelper(
     ChiLogicalError("Unsupported cell type.");
 }
 
-VecDbl LagrangeWorldXYZToNaturalMappingHelper::F(const VecDbl& x) const
+VecDbl WorldXYZToNaturalMappingHelper::F(const VecDbl& x) const
 {
   const size_t num_nodes = cell_mapping_.NumNodes();
   const auto& node_x = cell_mapping_.GetNodeLocations();
@@ -315,7 +309,7 @@ VecDbl LagrangeWorldXYZToNaturalMappingHelper::F(const VecDbl& x) const
   return {result_vec3.x, result_vec3.y, result_vec3.z};
 }
 
-MatDbl LagrangeWorldXYZToNaturalMappingHelper::J(const VecDbl& x) const
+MatDbl WorldXYZToNaturalMappingHelper::J(const VecDbl& x) const
 {
   return cell_mapping_.RefJacobian({x[0], x[1], x[2]});
 }

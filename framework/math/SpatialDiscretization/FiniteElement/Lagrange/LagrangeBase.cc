@@ -36,7 +36,7 @@ LagrangeBase::LagrangeBase(const chi_mesh::MeshContinuum& grid,
 
 void LagrangeBase::CreateCellMappings()
 {
-  typedef cell_mapping::LagrangeSlabMapping SlabSlab;
+  typedef cell_mapping::LagrangeSlabMapping Slab;
   typedef cell_mapping::LagrangeQuadMapping Quad;
   typedef cell_mapping::LagrangeTriangleMapping Triangle;
   typedef cell_mapping::LagrangeHexMapping Hex;
@@ -59,7 +59,7 @@ void LagrangeBase::CreateCellMappings()
         const auto& vol_quad = line_quad_order_arbitrary_;
         const auto& area_quad = point_quadrature_;
 
-        mapping = make_unique<SlabSlab>(ref_grid_, cell, vol_quad, area_quad);
+        mapping = make_unique<Slab>(ref_grid_, cell, vol_quad, area_quad);
         break;
       }
       case chi_mesh::CellType::POLYGON:

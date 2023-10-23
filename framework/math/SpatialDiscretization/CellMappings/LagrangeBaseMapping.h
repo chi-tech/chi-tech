@@ -35,7 +35,7 @@ public:
   MakeSurfaceQuadraturePointData(size_t face_index) const override;
 
 protected:
-  friend class LagrangeWorldXYZToNaturalMappingHelper;
+  friend class WorldXYZToNaturalMappingHelper;
   typedef chi_mesh::Vector3 Vec3;
   typedef std::vector<double> VecDbl;
   typedef std::vector<VecDbl> MatDbl;
@@ -95,11 +95,11 @@ protected:
 
 /**Helper class to apply Newton's method to map world coordinates to
  * reference element coordinates.*/
-class LagrangeWorldXYZToNaturalMappingHelper : public NonLinearFunction
+class WorldXYZToNaturalMappingHelper : public NonLinearFunction
 {
 public:
   typedef chi_mesh::Vector3 Vec3;
-  LagrangeWorldXYZToNaturalMappingHelper(
+  WorldXYZToNaturalMappingHelper(
     const LagrangeBaseMapping& cell_mapping, const Vec3& world_x);
 
   VecDbl F(const VecDbl& x) const override;
