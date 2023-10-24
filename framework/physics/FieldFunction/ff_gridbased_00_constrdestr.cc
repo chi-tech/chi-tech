@@ -44,7 +44,7 @@ chi::InputParameters FieldFunctionGridBased::GetInputParameters()
     AllowableRangeList::New({"FV", "PWLC", "PWLD", "LagrangeC", "LagrangeD"}));
   params.ConstrainParameterRange(
     "coordinate_system",
-    AllowableRangeList::New({"cartesian", "rz", "1d_spherical"}));
+    AllowableRangeList::New({"cartesian", "cylindrical", "spherical"}));
 
   return params;
 }
@@ -151,8 +151,8 @@ chi_math::SDMPtr FieldFunctionGridBased::MakeSpatialDiscretization(
 
     using namespace chi_math;
     if (cs == "cartesian") cs_type = CoordinateSystemType::CARTESIAN;
-    if (cs == "rz") cs_type = CoordinateSystemType::CYLINDRICAL;
-    if (cs == "1d_spherical") cs_type = CoordinateSystemType::SPHERICAL;
+    if (cs == "cylindrical") cs_type = CoordinateSystemType::CYLINDRICAL;
+    if (cs == "spherical") cs_type = CoordinateSystemType::SPHERICAL;
   }
 
   chi_math::QuadratureOrder q_order = chi_math::QuadratureOrder::SECOND;
@@ -164,15 +164,15 @@ chi_math::SDMPtr FieldFunctionGridBased::MakeSpatialDiscretization(
     const uint32_t q_order_int =
       params.GetParamValue<uint32_t>("quadrature_order");
     ChiInvalidArgumentIf(q_order_int > max_order,
-                         "Invalid quadature point order " +
+                         "Invalid quadrature point order " +
                            std::to_string(q_order_int));
     q_order = static_cast<chi_math::QuadratureOrder>(q_order_int);
   }
   else // Defaulted
   {
     if (cs == "cartesian") q_order = chi_math::QuadratureOrder::SECOND;
-    if (cs == "rz") q_order = chi_math::QuadratureOrder::THIRD;
-    if (cs == "1d_spherical") q_order = chi_math::QuadratureOrder::FOURTH;
+    if (cs == "cylindrical") q_order = chi_math::QuadratureOrder::THIRD;
+    if (cs == "spherical") q_order = chi_math::QuadratureOrder::FOURTH;
   }
 
   if (sdm_type == "PWLC") return PWLC::New(*grid_ptr, q_order, cs_type);
