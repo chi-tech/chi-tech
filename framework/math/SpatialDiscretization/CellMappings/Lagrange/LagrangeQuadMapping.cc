@@ -11,13 +11,15 @@ namespace chi_math::cell_mapping
 LagrangeQuadMapping::LagrangeQuadMapping(const chi_mesh::MeshContinuum& grid,
                                          const chi_mesh::Cell& cell,
                                          const Quadrature& volume_quadrature,
-                                         const Quadrature& surface_quadrature)
+                                         const Quadrature& surface_quadrature,
+                                         CoordinateSystemType coordinate_system_type)
   : LagrangeBaseMapping(grid,
                         cell,
                         4,
                         MakeFaceNodeMapping(cell),
                         volume_quadrature,
-                        surface_quadrature)
+                        surface_quadrature,
+                        coordinate_system_type)
 {
 }
 

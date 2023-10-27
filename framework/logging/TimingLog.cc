@@ -104,6 +104,14 @@ double TimingBlock::LastDelta() const
   return last_delta_time_;
 }
 
+void TimingBlock::Reset()
+{
+  num_occurences_ = 0;
+  total_time_ = 0.0;
+  reference_time_ = 0.0;
+  last_delta_time_ = 0.0;
+}
+
 void TimingBlock::AddChild(const TimingBlock& child_block)
 {
   children_.push_back(&child_block);

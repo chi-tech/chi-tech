@@ -1,7 +1,11 @@
 #include "PieceWiseLinearPolygonMapping.h"
 
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
+
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
 #include "math/SpatialDiscretization/CellMappings/PieceWiseLinearBaseMapping.h"
+
+#include "chi_log.h"
 
 namespace chi_math::cell_mapping
 {
@@ -12,11 +16,13 @@ PieceWiseLinearPolygonMapping::PieceWiseLinearPolygonMapping(
   const chi_mesh::Cell& poly_cell,
   const chi_mesh::MeshContinuum& ref_grid,
   const chi_math::QuadratureTriangle& volume_quadrature,
-  const chi_math::QuadratureLine& surface_quadrature)
+  const chi_math::QuadratureLine& surface_quadrature,
+  CoordinateSystemType coordinate_system_type)
   : PieceWiseLinearBaseMapping(ref_grid,
-                        poly_cell,
-                        poly_cell.vertex_ids_.size(), // num_nodes
-                        MakeFaceNodeMapping(poly_cell)),
+                               poly_cell,
+                               poly_cell.vertex_ids_.size(), // num_nodes
+                               MakeFaceNodeMapping(poly_cell),
+                               coordinate_system_type),
     volume_quadrature_(volume_quadrature),
     surface_quadrature_(surface_quadrature)
 {
@@ -91,6 +97,60 @@ PieceWiseLinearPolygonMapping::PieceWiseLinearPolygonMapping(
     }
     node_to_side_map_.push_back(side_mapping);
   }
+}
+
+void PieceWiseLinearPolygonMapping::ComputeCellVolumeAndAreas(
+  const chi_mesh::MeshContinuum& grid,
+  const chi_mesh::Cell& cell,
+  double& volume,
+  std::vector<double>& areas)
+{
+  std::function<double(const chi_mesh::Vector3&)> swf;
+  if (coordinate_system_type_ == CoordinateSystemType::CARTESIAN)
+    swf = SpatialDiscretization::CartesianSpatialWeightFunction;
+  else if (coordinate_system_type_ == CoordinateSystemType::CYLINDRICAL)
+    swf = SpatialDiscretization::CylindricalRZSpatialWeightFunction;
+  else
+    ChiInvalidArgument("Unsupported coordinate system encountered");
+
+  typedef chi_mesh::Vector3 Vec3;
+
+  volume = 0.0;
+  for (const auto& side : sides_)
+  {
+    const size_t num_qpoints = volume_quadrature_.qpoints_.size();
+
+    for (size_t qp = 0; qp < num_qpoints; ++qp)
+    {
+      const Vec3& qpoint = volume_quadrature_.qpoints_[qp];
+      const double detJ = side.detJ;
+
+      const Vec3 qpoint_xyz = side.v0 + side.J * qpoint;
+
+      volume += swf(qpoint_xyz) * detJ * volume_quadrature_.weights_[qp];
+    }
+  } // for side s
+
+  areas.clear();
+  {
+    const size_t num_faces = cell.faces_.size();
+    for (size_t f = 0; f < num_faces; ++f)
+    {
+      const size_t num_qpoints = surface_quadrature_.qpoints_.size();
+
+      double area = 0.0;
+      for (size_t qp = 0; qp < num_qpoints; ++qp)
+      {
+        const Vec3& qpoint_face = surface_quadrature_.qpoints_[qp];
+        const double detJ = sides_[f].detJ_surf;
+
+        const Vec3 qpoint_xyz = sides_[f].v0 + sides_[f].J * qpoint_face;
+
+        area += swf(qpoint_xyz) * detJ * surface_quadrature_.weights_[qp];
+      }
+      areas.push_back(area);
+    } // for face
+  }   // areas
 }
 
 } // namespace chi_math::cell_mapping

@@ -13,6 +13,10 @@ RegisterLuaFunctionAsIs(chiLogSetVerbosity);
 RegisterLuaFunctionAsIs(chiLog);
 RegisterLuaFunctionAsIs(chiLogProcessEvent);
 RegisterLuaFunctionAsIs(chiLogPrintTimingGraph);
+RegisterLuaFunctionAsIs(chiTimingSectionBegin);
+RegisterLuaFunctionAsIs(chiTimingSectionEnd);
+RegisterLuaFunctionAsIs(chiTimingSectionValues);
+RegisterLuaFunctionAsIs(chiTimingSectionReset);
 
 RegisterLuaConstantAsIs(LOG_0, chi_data_types::Varying(1));
 RegisterLuaConstantAsIs(LOG_0WARNING, chi_data_types::Varying(2));
@@ -172,6 +176,131 @@ int chiLogPrintTimingGraph(lua_State* L)
   if (Chi::mpi.location_id == rank)
     Chi::log.LogAll() << "\nPerformance Graph:\n"
                       << chitech_timing.MakeGraphString();
+
+  return 0;
+}
+
+/**Begins a named timing section.
+* \param name string Name of the timing section.
+* \param parent_name string (Optional) Name of the parent timing section. If
+*                    "" is passed then the parent defaults to the main system
+*                    timer.
+*
+* \ingroup LuaLogging*/
+int chiTimingSectionBegin(lua_State* L)
+{
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
+  if (num_args < 1)
+    LuaPostArgAmountError(fname, 1, num_args);
+
+  LuaCheckStringValue(fname, L, 1);
+  const std::string name = lua_tostring(L,1);
+
+  std::string parent_name;
+  if (num_args >= 2)
+  {
+    LuaCheckStringValue(fname, L, 2);
+    parent_name = lua_tostring(L, 2);
+  }
+
+  auto& t_block = Chi::log.CreateOrGetTimingBlock(name, parent_name);
+  t_block.TimeSectionBegin();
+
+  return 0;
+}
+
+/**Ends a named timing section.
+* \param name string Name of the timing section.
+* \param parent_name string (Optional) Name of the parent timing section.
+*
+* \ingroup LuaLogging*/
+int chiTimingSectionEnd(lua_State* L)
+{
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
+  if (num_args < 1)
+    LuaPostArgAmountError(fname, 1, num_args);
+
+  LuaCheckStringValue(fname, L, 1);
+  const std::string name = lua_tostring(L,1);
+
+  std::string parent_name;
+  if (num_args >= 2)
+  {
+    LuaCheckStringValue(fname, L, 2);
+    parent_name = lua_tostring(L, 2);
+  }
+
+  auto& t_block = Chi::log.CreateOrGetTimingBlock(name, parent_name);
+  t_block.TimeSectionEnd();
+
+  return 0;
+}
+
+/**Retrieves timing values for timing block.
+* \param name string Name of the timing section.
+* \param parent_name string (Optional) Name of the parent timing section.
+*
+* \return multi Returns 3 values, total #calls, total time, avg time
+*
+* \ingroup LuaLogging*/
+int chiTimingSectionValues(lua_State* L)
+{
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
+  if (num_args < 1)
+    LuaPostArgAmountError(fname, 1, num_args);
+
+  LuaCheckStringValue(fname, L, 1);
+  const std::string name = lua_tostring(L,1);
+
+  std::string parent_name;
+  if (num_args >= 2)
+  {
+    LuaCheckStringValue(fname, L, 2);
+    parent_name = lua_tostring(L, 2);
+  }
+
+  auto& t_block = Chi::log.CreateOrGetTimingBlock(name, parent_name);
+
+  const size_t count = t_block.NumberOfOccurences();
+  const double total = t_block.TotalTime();
+  const double average = t_block.AverageTime();
+
+  lua_pushinteger(L, static_cast<lua_Integer>(count));
+  lua_pushnumber(L, total);
+  lua_pushnumber(L, average);
+
+  return 3;
+}
+
+/**Resets the #counts and timing info that are used to accumulate an average.
+* \param name string Name of the timing section.
+* \param parent_name string (Optional) Name of the parent timing section. If
+*                    "" is passed then the parent defaults to the main system
+*                    timer.
+*
+* \ingroup LuaLogging*/
+int chiTimingSectionReset(lua_State* L)
+{
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
+  if (num_args < 1)
+    LuaPostArgAmountError(fname, 1, num_args);
+
+  LuaCheckStringValue(fname, L, 1);
+  const std::string name = lua_tostring(L,1);
+
+  std::string parent_name;
+  if (num_args >= 2)
+  {
+    LuaCheckStringValue(fname, L, 2);
+    parent_name = lua_tostring(L, 2);
+  }
+
+  auto& t_block = Chi::log.CreateOrGetTimingBlock(name, parent_name);
+  t_block.Reset();
 
   return 0;
 }

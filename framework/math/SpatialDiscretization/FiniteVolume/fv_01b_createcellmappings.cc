@@ -27,8 +27,9 @@ void FiniteVolume::CreateCellMappings()
         mapping = make_unique<cell_mapping::FiniteVolumeMapping>(
           ref_grid_,
           cell,
-          cell.centroid_,
-          FaceDofMapping(cell.faces_.size(), {-1}));
+          FaceDofMapping(cell.faces_.size(), {-1}),
+          coord_sys_type_);
+        mapping->Initialize();
         break;
       }
       default:

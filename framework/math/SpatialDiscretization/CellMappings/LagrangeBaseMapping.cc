@@ -2,6 +2,7 @@
 
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
 
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
 #include "math/SpatialDiscretization/FiniteElement/QuadraturePointData.h"
 
 #include "chi_runtime.h"
@@ -16,13 +17,14 @@ LagrangeBaseMapping::LagrangeBaseMapping(
   size_t num_nodes,
   std::vector<std::vector<int>> face_node_mappings,
   const Quadrature& volume_quadrature,
-  const Quadrature& surface_quadrature)
+  const Quadrature& surface_quadrature,
+  CoordinateSystemType coordinate_system_type)
   : CellMapping(grid,
                 cell,
                 num_nodes,
                 GetVertexLocations(grid, cell),
                 std::move(face_node_mappings),
-                &CellMapping::ComputeCellVolumeAndAreas),
+                coordinate_system_type),
     volume_quadrature_(volume_quadrature),
     surface_quadrature_(surface_quadrature)
 {
@@ -179,12 +181,12 @@ LagrangeBaseMapping::MakeVolumetricQuadraturePointData() const
   }   // for qp
 
   return finite_element::VolumetricQuadraturePointData(quadrature_point_indices,
-                                                     qpoints_xyz,
-                                                     shape_value,
-                                                     shape_grad,
-                                                     JxW,
-                                                     face_node_mappings_,
-                                                     num_nodes_);
+                                                       qpoints_xyz,
+                                                       shape_value,
+                                                       shape_grad,
+                                                       JxW,
+                                                       face_node_mappings_,
+                                                       num_nodes_);
 }
 
 const Quadrature&
@@ -252,22 +254,85 @@ LagrangeBaseMapping::MakeSurfaceQuadraturePointData(size_t face_index) const
   }   // for qp
 
   return finite_element::SurfaceQuadraturePointData(quadrature_point_indices,
-                                                 qpoints_xyz,
-                                                 shape_value,
-                                                 shape_grad,
-                                                 JxW,
-                                                 normals,
-                                                 face_node_mappings_,
-                                                 num_nodes_);
+                                                    qpoints_xyz,
+                                                    shape_value,
+                                                    shape_grad,
+                                                    JxW,
+                                                    normals,
+                                                    face_node_mappings_,
+                                                    num_nodes_);
 }
 
 std::pair<double, LagrangeBaseMapping::Vec3>
-LagrangeBaseMapping::RefFaceJacobianDeterminantAndNormal(size_t face_index,
-                                                const Vec3& qpoint_face) const
+LagrangeBaseMapping::RefFaceJacobianDeterminantAndNormal(
+  size_t face_index, const Vec3& qpoint_face) const
 {
   ChiLogicalError("Method not implemented");
 }
 
+void LagrangeBaseMapping::ComputeCellVolumeAndAreas(
+  const chi_mesh::MeshContinuum& grid,
+  const chi_mesh::Cell& cell,
+  double& volume,
+  std::vector<double>& areas)
+{
+  std::function<double(const chi_mesh::Vector3&)> swf;
+  if (coordinate_system_type_ == CoordinateSystemType::CARTESIAN)
+    swf = SpatialDiscretization::CartesianSpatialWeightFunction;
+  else if (coordinate_system_type_ == CoordinateSystemType::CYLINDRICAL)
+    swf = SpatialDiscretization::CylindricalRZSpatialWeightFunction;
+  else if (coordinate_system_type_ == CoordinateSystemType::SPHERICAL)
+    swf = SpatialDiscretization::Spherical1DSpatialWeightFunction;
+  else
+    ChiInvalidArgument("Unsupported coordinate system encountered");
+
+  volume = 0.0;
+  {
+    const size_t num_qpoints = volume_quadrature_.qpoints_.size();
+
+    for (size_t qp = 0; qp < num_qpoints; ++qp)
+    {
+      const Vec3& qpoint = volume_quadrature_.qpoints_[qp];
+      const auto J = RefJacobian(qpoint);
+      const double detJ = Determinant(J);
+
+      Vec3 qpoint_xyz = {0.0, 0.0, 0.0};
+      for (size_t i = 0; i < num_nodes_; ++i)
+        qpoint_xyz += RefShape(i, qpoint) * node_locations_[i];
+
+      volume += swf(qpoint_xyz) * detJ * volume_quadrature_.weights_[qp];
+    }
+  } // volume
+
+  areas.clear();
+  {
+    const size_t num_faces = cell.faces_.size();
+    for (size_t f = 0; f < num_faces; ++f)
+    {
+      const auto& face_quadrature = GetSurfaceQuadrature(f);
+      const size_t num_qpoints = face_quadrature.qpoints_.size();
+
+      double area = 0.0;
+      for (size_t qp = 0; qp < num_qpoints; ++qp)
+      {
+        const Vec3& qpoint_face = face_quadrature.qpoints_[qp];
+        const auto qpoint = FaceToElementQPointConversion(f, qpoint_face);
+        const auto J = RefJacobian(qpoint);
+        const auto [detJ, qp_normal] =
+          RefFaceJacobianDeterminantAndNormal(f, qpoint_face);
+
+        Vec3 qpoint_xyz = {0.0, 0.0, 0.0};
+        for (size_t i = 0; i < num_nodes_; ++i)
+          qpoint_xyz += RefShape(i, qpoint) * node_locations_[i];
+
+        area += swf(qpoint_xyz) * detJ * face_quadrature.weights_[qp];
+      }
+      areas.push_back(area);
+    } // for face
+  }   // areas
+}
+
+// ##################################################################
 WorldXYZToNaturalMappingHelper::WorldXYZToNaturalMappingHelper(
   const LagrangeBaseMapping& cell_mapping, const Vec3& world_x)
   : cell_mapping_(cell_mapping), world_x_(world_x)

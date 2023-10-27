@@ -30,6 +30,7 @@ public:
   SpatialDiscretizationType Type() const;
   /**Returns the reference grid on which this discretization is based.*/
   const chi_mesh::MeshContinuum& Grid() const;
+  /**Returns the coordinate system type.*/
   CoordinateSystemType GetCoordinateSystemType() const;
 
   // 02 OrderNodes

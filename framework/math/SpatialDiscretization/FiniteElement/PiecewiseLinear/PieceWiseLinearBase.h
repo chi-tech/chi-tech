@@ -3,11 +3,6 @@
 
 #include "math/SpatialDiscretization/FiniteElement/FiniteElementBase.h"
 
-#include "math/Quadratures/quadrature_line.h"
-#include "math/Quadratures/quadrature_triangle.h"
-#include "math/Quadratures/quadrature_quadrilateral.h"
-#include "math/Quadratures/quadrature_tetrahedron.h"
-
 namespace chi_math::spatial_discretization
 {
 
@@ -20,11 +15,6 @@ protected:
                                QuadratureOrder q_order,
                                SDMType sdm_type,
                                CoordinateSystemType cs_type);
-
-  QuadratureLine line_quad_order_arbitrary_;
-  QuadratureTriangle tri_quad_order_arbitrary_;
-  QuadratureQuadrilateral quad_quad_order_arbitrary_;
-  QuadratureTetrahedron tet_quad_order_arbitrary_;
 
   void CreateCellMappings();
 };

@@ -12,6 +12,16 @@
 #include "math/SpatialDiscretization/CellMappings/PieceWiseLinear/PieceWiseLinearPolygonMapping.h"
 #include "math/SpatialDiscretization/CellMappings/PieceWiseLinear/PieceWiseLinearPolyhedronMapping.h"
 
+#include "math/Quadratures/point_quadrature.h"
+#include "math/Quadratures/quadrature_line.h"
+#include "math/Quadratures/quadrature_triangle.h"
+#include "math/Quadratures/quadrature_quadrilateral.h"
+#include "math/Quadratures/quadrature_tetrahedron.h"
+#include "math/Quadratures/quadrature_hexahedron.h"
+#include "math/Quadratures/quadrature_wedge.h"
+
+#include "math/Quadratures/QuadratureWarehouse.h"
+
 #include "chi_log_exceptions.h"
 
 namespace chi_math::spatial_discretization
@@ -21,16 +31,8 @@ LagrangeBase::LagrangeBase(const chi_mesh::MeshContinuum& grid,
                            QuadratureOrder q_order,
                            SDMType sdm_type,
                            CoordinateSystemType cs_type)
-  : FiniteElementBase(grid, cs_type, sdm_type, q_order),
-    line_quad_order_arbitrary_(q_order),
-    tri_quad_order_arbitrary_(q_order),
-    quad_quad_order_arbitrary_(q_order),
-    tet_quad_order_arbitrary_(q_order),
-    hex_quad_order_arbitrary_(q_order),
-    wedge_quad_order_arbitrary_(q_order)
+  : FiniteElementBase(grid, cs_type, sdm_type, q_order)
 {
-  line_quad_order_arbitrary_.SetRange({-1.0, 1.0});
-
   CreateCellMappings();
 }
 
@@ -46,7 +48,9 @@ void LagrangeBase::CreateCellMappings()
   typedef cell_mapping::PieceWiseLinearPolygonMapping Polygon;
   typedef cell_mapping::PieceWiseLinearPolyhedronMapping Polyhedron;
 
-  auto MakeCellMapping = [this](const chi_mesh::Cell& cell)
+  auto& q_warehouse = QuadratureWarehouse::GetInstance();
+
+  auto MakeCellMapping = [this, &q_warehouse](const chi_mesh::Cell& cell)
   {
     using namespace std;
     using namespace chi_math;
@@ -56,36 +60,57 @@ void LagrangeBase::CreateCellMappings()
     {
       case chi_mesh::CellType::SLAB:
       {
-        const auto& vol_quad = line_quad_order_arbitrary_;
-        const auto& area_quad = point_quadrature_;
+        const auto& vol_quad =
+          q_warehouse.GetQuadrature<chi_math::QuadratureLine>(q_order_,
+                                                              {-1.0, 1.0});
+        const auto& area_quad =
+          q_warehouse.GetQuadrature<chi_math::PointQuadrature>(q_order_);
 
-        mapping = make_unique<Slab>(ref_grid_, cell, vol_quad, area_quad);
+        mapping = make_unique<Slab>(
+          ref_grid_, cell, vol_quad, area_quad, coord_sys_type_);
+        mapping->Initialize();
         break;
       }
       case chi_mesh::CellType::POLYGON:
       {
         if (cell.SubType() == chi_mesh::CellType::QUADRILATERAL)
         {
-          const auto& vol_quad = quad_quad_order_arbitrary_;
-          const auto& area_quad = line_quad_order_arbitrary_;
+          const auto& vol_quad =
+            q_warehouse.GetQuadrature<QuadratureQuadrilateral>(q_order_);
+          const auto& area_quad =
+            q_warehouse.GetQuadrature<QuadratureLine>(q_order_, {-1.0, 1.0});
 
-          mapping = make_unique<Quad>(ref_grid_, cell, vol_quad, area_quad);
+          mapping = make_unique<Quad>(
+            ref_grid_, cell, vol_quad, area_quad, coord_sys_type_);
+          mapping->Initialize();
           break;
         }
         else if (cell.SubType() == chi_mesh::CellType::TRIANGLE)
         {
-          const auto& vol_quad = tri_quad_order_arbitrary_;
-          const auto& area_quad = line_quad_order_arbitrary_;
+          const auto& vol_quad =
+            q_warehouse.GetQuadrature<QuadratureTriangle>(q_order_);
+          const auto& area_quad =
+            q_warehouse.GetQuadrature<QuadratureLine>(q_order_, {-1.0, 1.0});
 
-          mapping = make_unique<Triangle>(ref_grid_, cell, vol_quad, area_quad);
+          mapping = make_unique<Triangle>(
+            ref_grid_, cell, vol_quad, area_quad, coord_sys_type_);
+          mapping->Initialize();
           break;
         }
         else
         {
-          const auto& vol_quad = tri_quad_order_arbitrary_;
-          const auto& area_quad = line_quad_order_arbitrary_;
+          const auto& vol_quad =
+            q_warehouse.GetQuadrature<QuadratureTriangle>(q_order_);
+          const auto& area_quad =
+            q_warehouse.GetQuadrature<QuadratureLine>(q_order_, {-1.0, 1.0});
 
-          mapping = make_unique<Polygon>(cell, ref_grid_, vol_quad, area_quad);
+          mapping = make_unique<Polygon>(
+            cell,
+            ref_grid_,
+            dynamic_cast<const QuadratureTriangle&>(vol_quad),
+            dynamic_cast<const QuadratureLine&>(area_quad),
+            coord_sys_type_);
+          mapping->Initialize();
           break;
         }
       }
@@ -93,38 +118,58 @@ void LagrangeBase::CreateCellMappings()
       {
         if (cell.SubType() == chi_mesh::CellType::HEXAHEDRON)
         {
-          const auto& vol_quad = hex_quad_order_arbitrary_;
-          const auto& area_quad = quad_quad_order_arbitrary_;
+          const auto& vol_quad =
+            q_warehouse.GetQuadrature<QuadratureHexahedron>(q_order_);
+          const auto& area_quad =
+            q_warehouse.GetQuadrature<QuadratureQuadrilateral>(q_order_);
 
-          mapping = make_unique<Hex>(ref_grid_, cell, vol_quad, area_quad);
+          mapping = make_unique<Hex>(ref_grid_, cell, vol_quad, area_quad,
+                                     coord_sys_type_);
+          mapping->Initialize();
           break;
         }
         else if (cell.SubType() == chi_mesh::CellType::WEDGE)
         {
-          const auto& vol_quad = wedge_quad_order_arbitrary_;
-          const auto& area_quad1 = quad_quad_order_arbitrary_;
-          const auto& area_quad2 = tri_quad_order_arbitrary_;
+          const auto& vol_quad =
+            q_warehouse.GetQuadrature<QuadratureWedge>(q_order_);
+          const auto& area_quad1 =
+            q_warehouse.GetQuadrature<QuadratureQuadrilateral>(q_order_);
+          const auto& area_quad2 =
+            q_warehouse.GetQuadrature<QuadratureTriangle>(q_order_);
 
           mapping = make_unique<Wedge>(
-            ref_grid_, cell, vol_quad, area_quad1, area_quad2);
+            ref_grid_, cell, vol_quad, area_quad1, area_quad2,
+            coord_sys_type_);
+          mapping->Initialize();
           break;
         }
         else if (cell.SubType() == chi_mesh::CellType::TETRAHEDRON)
         {
-          const auto& vol_quad = tet_quad_order_arbitrary_;
-          const auto& area_quad = tri_quad_order_arbitrary_;
+          const auto& vol_quad =
+            q_warehouse.GetQuadrature<QuadratureTetrahedron>(q_order_);
+          const auto& area_quad =
+            q_warehouse.GetQuadrature<QuadratureTriangle>(q_order_);
 
-          mapping = make_unique<Tetrahedron>(
-            ref_grid_, cell, vol_quad, area_quad);
+          mapping =
+            make_unique<Tetrahedron>(ref_grid_, cell, vol_quad, area_quad,
+                                     coord_sys_type_);
+          mapping->Initialize();
           break;
         }
         else
         {
-          const auto& vol_quad = tet_quad_order_arbitrary_;
-          const auto& area_quad = tri_quad_order_arbitrary_;
+          const auto& vol_quad =
+            q_warehouse.GetQuadrature<QuadratureTetrahedron>(q_order_);
+          const auto& area_quad =
+            q_warehouse.GetQuadrature<QuadratureTriangle>(q_order_);
 
-          mapping =
-            make_unique<Polyhedron>(cell, ref_grid_, vol_quad, area_quad);
+          mapping = make_unique<Polyhedron>(
+            cell,
+            ref_grid_,
+            dynamic_cast<const QuadratureTetrahedron&>(vol_quad),
+            dynamic_cast<const QuadratureTriangle&>(area_quad),
+            coord_sys_type_);
+          mapping->Initialize();
           break;
         }
       }
