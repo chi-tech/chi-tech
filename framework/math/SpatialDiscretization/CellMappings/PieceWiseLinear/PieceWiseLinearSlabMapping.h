@@ -11,14 +11,15 @@ namespace chi_math::cell_mapping
 {
 
 /**Object for handling slab shaped piecewise linear shape functions.
-* \ingroup doc_CellMappings*/
+ * \ingroup doc_CellMappings*/
 class PieceWiseLinearSlabMapping : public PieceWiseLinearBaseMapping
 {
 public:
   /**Constructor for a slab view.*/
   PieceWiseLinearSlabMapping(const chi_mesh::Cell& slab_cell,
-                      const chi_mesh::MeshContinuum& ref_grid,
-                      const QuadratureLine& volume_quadrature);
+                             const chi_mesh::MeshContinuum& ref_grid,
+                             const QuadratureLine& volume_quadrature,
+                             CoordinateSystemType coordinate_system_type);
 
   finite_element::VolumetricQuadraturePointData
   MakeVolumetricQuadraturePointData() const override;
@@ -51,8 +52,14 @@ public:
     const chi_mesh::Vector3& xyz,
     std::vector<chi_mesh::Vector3>& gradshape_values) const override;
 
+  void ComputeCellVolumeAndAreas(
+    const chi_mesh::MeshContinuum& grid,
+    const chi_mesh::Cell& cell,
+    double& volume,
+    std::vector<double>& areas) override;
+
 private:
-  chi_mesh::Vector3 v0_;
+  chi_mesh::Vector3 v0_, v1_;
   uint64_t v0i_;
   uint64_t v1i_;
   std::array<chi_mesh::Normal, 2> normals_;

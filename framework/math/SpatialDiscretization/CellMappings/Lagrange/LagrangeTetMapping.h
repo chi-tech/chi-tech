@@ -7,14 +7,15 @@ namespace chi_math::cell_mapping
 {
 
 /**Lagrange element mapping for a tetrahedron.
-* \ingroup doc_CellMappings*/
+ * \ingroup doc_CellMappings*/
 class LagrangeTetMapping : public LagrangeBaseMapping
 {
 public:
   LagrangeTetMapping(const chi_mesh::MeshContinuum& grid,
-                       const chi_mesh::Cell& cell,
-                       const Quadrature& volume_quadrature,
-                       const Quadrature& surface_quadrature);
+                     const chi_mesh::Cell& cell,
+                     const Quadrature& volume_quadrature,
+                     const Quadrature& surface_quadrature,
+                     CoordinateSystemType coordinate_system_type);
 
 protected:
   double RefShape(uint32_t i, const Vec3& qpoint) const override;

@@ -6,6 +6,12 @@
 #include "math/SpatialDiscretization/CellMappings/PieceWiseLinear/PieceWiseLinearPolygonMapping.h"
 #include "math/SpatialDiscretization/CellMappings/PieceWiseLinear/PieceWiseLinearPolyhedronMapping.h"
 
+#include "math/Quadratures/quadrature_line.h"
+#include "math/Quadratures/quadrature_triangle.h"
+#include "math/Quadratures/quadrature_tetrahedron.h"
+
+#include "math/Quadratures/QuadratureWarehouse.h"
+
 #define UnsupportedCellType(fname)                                             \
   std::invalid_argument((fname) +                                              \
                         ": Unsupported cell type encountered. type_id=" +      \
@@ -19,11 +25,7 @@ PieceWiseLinearBase::PieceWiseLinearBase(const chi_mesh::MeshContinuum& grid,
                                          QuadratureOrder q_order,
                                          SDMType sdm_type,
                                          CoordinateSystemType cs_type)
-  : FiniteElementBase(grid, cs_type, sdm_type, q_order),
-    line_quad_order_arbitrary_(q_order),
-    tri_quad_order_arbitrary_(q_order),
-    quad_quad_order_arbitrary_(q_order),
-    tet_quad_order_arbitrary_(q_order)
+  : FiniteElementBase(grid, cs_type, sdm_type, q_order)
 {
 }
 
@@ -35,7 +37,9 @@ void PieceWiseLinearBase::CreateCellMappings()
   typedef cell_mapping::PieceWiseLinearPolygonMapping Polygon;
   typedef cell_mapping::PieceWiseLinearPolyhedronMapping Polyhedron;
 
-  auto MakeCellMapping = [this, fname](const chi_mesh::Cell& cell)
+  auto& q_warehouse = QuadratureWarehouse::GetInstance();
+
+  auto MakeCellMapping = [this, fname, &q_warehouse](const chi_mesh::Cell& cell)
   {
     using namespace std;
     using namespace chi_math;
@@ -45,25 +49,47 @@ void PieceWiseLinearBase::CreateCellMappings()
     {
       case chi_mesh::CellType::SLAB:
       {
-        const auto& vol_quad = line_quad_order_arbitrary_;
+        const auto& vol_quad =
+          q_warehouse.GetQuadrature<chi_math::QuadratureLine>(q_order_,
+                                                              {0.0, 1.0});
 
-        mapping = make_unique<SlabSlab>(cell, ref_grid_, vol_quad);
+        mapping = make_unique<SlabSlab>(
+          cell, ref_grid_, dynamic_cast<const QuadratureLine&>(vol_quad),
+                                coord_sys_type_);
+        mapping->Initialize();
         break;
       }
       case chi_mesh::CellType::POLYGON:
       {
-        const auto& vol_quad = tri_quad_order_arbitrary_;
-        const auto& area_quad = line_quad_order_arbitrary_;
+        const auto& vol_quad =
+          q_warehouse.GetQuadrature<QuadratureTriangle>(q_order_);
+        const auto& area_quad =
+          q_warehouse.GetQuadrature<chi_math::QuadratureLine>(q_order_,
+                                                              {0.0, 1.0});
 
-        mapping = make_unique<Polygon>(cell, ref_grid_, vol_quad, area_quad);
+        mapping = make_unique<Polygon>(
+          cell,
+          ref_grid_,
+          dynamic_cast<const QuadratureTriangle&>(vol_quad),
+          dynamic_cast<const QuadratureLine&>(area_quad),
+          coord_sys_type_);
+        mapping->Initialize();
         break;
       }
       case chi_mesh::CellType::POLYHEDRON:
       {
-        const auto& vol_quad = tet_quad_order_arbitrary_;
-        const auto& area_quad = tri_quad_order_arbitrary_;
+        const auto& vol_quad =
+          q_warehouse.GetQuadrature<QuadratureTetrahedron>(q_order_);
+        const auto& area_quad =
+          q_warehouse.GetQuadrature<QuadratureTriangle>(q_order_);
 
-        mapping = make_unique<Polyhedron>(cell, ref_grid_, vol_quad, area_quad);
+        mapping = make_unique<Polyhedron>(
+          cell,
+          ref_grid_,
+          dynamic_cast<const QuadratureTetrahedron&>(vol_quad),
+          dynamic_cast<const QuadratureTriangle&>(area_quad),
+          coord_sys_type_);
+        mapping->Initialize();
         break;
       }
       default:

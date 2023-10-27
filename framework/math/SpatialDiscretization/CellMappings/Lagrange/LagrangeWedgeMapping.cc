@@ -12,13 +12,15 @@ LagrangeWedgeMapping::LagrangeWedgeMapping(
   const chi_mesh::Cell& cell,
   const Quadrature& volume_quadrature,
   const Quadrature& surface_quadrature,
-  const Quadrature& aux_surface_quadrature)
+  const Quadrature& aux_surface_quadrature,
+  CoordinateSystemType coordinate_system_type)
   : LagrangeBaseMapping(grid,
                         cell,
                         6,
                         MakeFaceNodeMapping(cell),
                         volume_quadrature,
-                        surface_quadrature),
+                        surface_quadrature,
+                        coordinate_system_type),
     aux_surface_quadrature_(aux_surface_quadrature)
 {
 }
@@ -152,7 +154,7 @@ LagrangeWedgeMapping::RefFaceJacobianDeterminantAndNormal(
     const auto cross = dx_dxbar.Cross(dx_dybar);
     const double detJ = cross.Norm();
 
-    return {detJ, cross/detJ};
+    return {detJ, cross / detJ};
   }
 }
 
@@ -162,7 +164,7 @@ LagrangeBaseMapping::Vec3 LagrangeWedgeMapping::FaceToElementQPointConversion(
   if (face_index <= 2)
   {
 
-    const double x = 0.5*(qpoint_face.x + 1.0);
+    const double x = 0.5 * (qpoint_face.x + 1.0);
     const double y = qpoint_face.y + 1.0;
 
     // clang-format off

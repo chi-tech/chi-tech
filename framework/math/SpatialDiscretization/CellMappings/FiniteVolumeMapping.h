@@ -14,22 +14,14 @@ namespace chi_math::cell_mapping
 {
 
 /**Cell mapping for a finite volume representation of a cell.
-* \ingroup doc_CellMappings*/
+ * \ingroup doc_CellMappings*/
 class FiniteVolumeMapping : public CellMapping
 {
 public:
   explicit FiniteVolumeMapping(const chi_mesh::MeshContinuum& grid,
-                        const chi_mesh::Cell& cell,
-                        const chi_mesh::Vector3& cc,
-                        std::vector<std::vector<int>> face_node_mappings)
-    : CellMapping(grid,
-                  cell,
-                  1,
-                  {cell.centroid_},
-                  std::move(face_node_mappings),
-                  &CellMapping::ComputeCellVolumeAndAreas)
-  {
-  }
+                               const chi_mesh::Cell& cell,
+                               std::vector<std::vector<int>> face_node_mappings,
+                               CoordinateSystemType coordinate_system_type);
 
   // 02 Shapefuncs
   double ShapeValue(int i, const chi_mesh::Vector3& xyz) const override
@@ -64,6 +56,12 @@ public:
 
   finite_element::SurfaceQuadraturePointData
   MakeSurfaceQuadraturePointData(size_t face_index) const override;
+
+  void ComputeCellVolumeAndAreas(
+    const chi_mesh::MeshContinuum& grid,
+    const chi_mesh::Cell& cell,
+    double& volume,
+    std::vector<double>& areas) override;
 };
 
 } // namespace chi_math::cell_mapping

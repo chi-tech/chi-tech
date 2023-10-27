@@ -17,11 +17,13 @@ PieceWiseLinearPolyhedronMapping::PieceWiseLinearPolyhedronMapping(
   const chi_mesh::Cell& polyh_cell,
   const chi_mesh::MeshContinuum& ref_grid,
   const chi_math::QuadratureTetrahedron& volume_quadrature,
-  const chi_math::QuadratureTriangle& surface_quadrature)
+  const chi_math::QuadratureTriangle& surface_quadrature,
+  CoordinateSystemType coordinate_system_type)
   : PieceWiseLinearBaseMapping(ref_grid,
-                        polyh_cell,
-                        polyh_cell.vertex_ids_.size(), // num_nodes
-                        MakeFaceNodeMapping(polyh_cell)),
+                               polyh_cell,
+                               polyh_cell.vertex_ids_.size(), // num_nodes
+                               MakeFaceNodeMapping(polyh_cell),
+                               coordinate_system_type),
     volume_quadrature_(volume_quadrature),
     surface_quadrature_(surface_quadrature)
 {

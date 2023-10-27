@@ -9,17 +9,19 @@
 // ###################################################################
 namespace chi_math::cell_mapping
 {
- /**Object for handling piecewise linear
-   * shape functions on polyhedron shaped 3D cells.
-   * \ingroup doc_CellMappings*/
+/**Object for handling piecewise linear
+ * shape functions on polyhedron shaped 3D cells.
+ * \ingroup doc_CellMappings*/
 class PieceWiseLinearPolyhedronMapping : public PieceWiseLinearBaseMapping
 {
 public:
   // 00_constrdestr.cc
-  PieceWiseLinearPolyhedronMapping(const chi_mesh::Cell& polyh_cell,
-                          const chi_mesh::MeshContinuum& ref_grid,
-                          const QuadratureTetrahedron& volume_quadrature,
-                          const QuadratureTriangle& surface_quadrature);
+  PieceWiseLinearPolyhedronMapping(
+    const chi_mesh::Cell& polyh_cell,
+    const chi_mesh::MeshContinuum& ref_grid,
+    const QuadratureTetrahedron& volume_quadrature,
+    const QuadratureTriangle& surface_quadrature,
+    CoordinateSystemType coordinate_system_type);
 
   finite_element::VolumetricQuadraturePointData
   MakeVolumetricQuadraturePointData() const override;
@@ -129,6 +131,6 @@ private:
   const QuadratureTriangle& surface_quadrature_;
 };
 
-} // namespace chi_math
+} // namespace chi_math::cell_mapping
 
 #endif

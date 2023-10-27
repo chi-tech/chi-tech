@@ -19,5 +19,18 @@
         "type" : "GoldFile", "skiplines_top" : 6
       }
     ]
+  },
+  {
+    "file": "volume_integral_01.lua",
+    "num_procs": 3,
+    "checks": [
+      {
+        "type" : "FloatCompare",
+        "key" : "unit_pp_volume(latest)",
+        "wordnum" : 4,
+        "gold" : 50.265482,
+        "tol" : 1.0e-6
+      }
+    ]
   }
 ]

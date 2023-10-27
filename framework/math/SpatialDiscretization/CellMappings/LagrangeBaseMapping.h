@@ -34,6 +34,12 @@ public:
   finite_element::SurfaceQuadraturePointData
   MakeSurfaceQuadraturePointData(size_t face_index) const override;
 
+  void ComputeCellVolumeAndAreas(
+    const chi_mesh::MeshContinuum& grid,
+    const chi_mesh::Cell& cell,
+    double& volume,
+    std::vector<double>& areas) override;
+
 protected:
   friend class WorldXYZToNaturalMappingHelper;
   typedef chi_mesh::Vector3 Vec3;
@@ -45,7 +51,8 @@ protected:
                       size_t num_nodes,
                       std::vector<std::vector<int>> face_node_mappings,
                       const Quadrature& volume_quadrature,
-                      const Quadrature& surface_quadrature);
+                      const Quadrature& surface_quadrature,
+                      CoordinateSystemType coordinate_system_type);
 
   /**Function using newton iteration to convert a world_xyz coordinate to
    * a quadrature point coordinate.*/
@@ -99,8 +106,8 @@ class WorldXYZToNaturalMappingHelper : public NonLinearFunction
 {
 public:
   typedef chi_mesh::Vector3 Vec3;
-  WorldXYZToNaturalMappingHelper(
-    const LagrangeBaseMapping& cell_mapping, const Vec3& world_x);
+  WorldXYZToNaturalMappingHelper(const LagrangeBaseMapping& cell_mapping,
+                                 const Vec3& world_x);
 
   VecDbl F(const VecDbl& x) const override;
   MatDbl J(const VecDbl& x) const override;

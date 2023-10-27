@@ -7,16 +7,19 @@
 namespace chi_math::cell_mapping
 {
 
-LagrangeTetMapping::LagrangeTetMapping(const chi_mesh::MeshContinuum& grid,
-                                       const chi_mesh::Cell& cell,
-                                       const Quadrature& volume_quadrature,
-                                       const Quadrature& surface_quadrature)
+LagrangeTetMapping::LagrangeTetMapping(
+  const chi_mesh::MeshContinuum& grid,
+  const chi_mesh::Cell& cell,
+  const Quadrature& volume_quadrature,
+  const Quadrature& surface_quadrature,
+  CoordinateSystemType coordinate_system_type)
   : LagrangeBaseMapping(grid,
                         cell,
                         4,
                         MakeFaceNodeMapping(cell),
                         volume_quadrature,
-                        surface_quadrature)
+                        surface_quadrature,
+                        coordinate_system_type)
 {
 }
 
@@ -105,7 +108,7 @@ LagrangeTetMapping::RefFaceJacobianDeterminantAndNormal(
   const auto cross = dx_dxbar.Cross(dx_dybar);
   const double detJ = cross.Norm();
 
-  return {detJ, cross/detJ};
+  return {detJ, cross / detJ};
 }
 
 LagrangeBaseMapping::Vec3

@@ -1,6 +1,8 @@
 #ifndef CHITECH_CELLMAPPING_H
 #define CHITECH_CELLMAPPING_H
 
+#include "math/chi_math.h"
+
 #include <memory>
 #include <utility>
 #include <vector>
@@ -25,7 +27,7 @@ namespace chi_math
 {
 // ################################################################### Class def
 /**Base class for all cell mappings.
-* \ingroup doc_CellMappings*/
+ * \ingroup doc_CellMappings*/
 class CellMapping
 {
 public:
@@ -57,7 +59,7 @@ public:
   virtual double ShapeValue(int i, const chi_mesh::Vector3& xyz) const = 0;
 
   /**Populates all the shape function values at the given world xyz point. This
-  * method is optimized to minimize reallocation of shape_values.*/
+   * method is optimized to minimize reallocation of shape_values.*/
   virtual void ShapeValues(const chi_mesh::Vector3& xyz,
                            std::vector<double>& shape_values) const = 0;
 
@@ -67,8 +69,8 @@ public:
   GradShapeValue(int i, const chi_mesh::Vector3& xyz) const = 0;
 
   /**Populates all the shape function gradient values at the given world xyz
-  * point. This method is optimized to minimize reallocation of
-  * gradshape_values.*/
+   * point. This method is optimized to minimize reallocation of
+   * gradshape_values.*/
   virtual void
   GradShapeValues(const chi_mesh::Vector3& xyz,
                   std::vector<chi_mesh::Vector3>& gradshape_values) const = 0;
@@ -86,7 +88,26 @@ public:
   virtual finite_element::SurfaceQuadraturePointData
   MakeSurfaceQuadraturePointData(size_t face_index) const = 0;
 
+  /**Initializes cell volume, face-areas and weighted centroids.*/
+  void Initialize();
+
   virtual ~CellMapping() = default;
+
+  /**Static method that all child elements can use as a default.*/
+  virtual void
+  ComputeCellVolumeAndAreas(const chi_mesh::MeshContinuum& grid,
+                            const chi_mesh::Cell& cell,
+                            double& volume,
+                            std::vector<double>& areas);
+
+  /**Returns the coordinate system type.*/
+  CoordinateSystemType GetCoordinateSystemType() const;
+
+  typedef std::function<double(const chi_mesh::Vector3&)> SpatialWeightFunction;
+
+  /**Returns the spatial weighting function appropriate to the discretization's
+   * coordinate system.*/
+  SpatialWeightFunction GetSpatialWeightingFunction() const;
 
 protected:
   /**This function gets called to compute the cell-volume and
@@ -106,13 +127,7 @@ protected:
               size_t num_nodes,
               std::vector<chi_mesh::Vector3> node_locations,
               std::vector<std::vector<int>> face_node_mappings,
-              const VandAFunction& volume_area_function);
-
-  /**Static method that all child elements can use as a default.*/
-  static void ComputeCellVolumeAndAreas(const chi_mesh::MeshContinuum& grid,
-                                        const chi_mesh::Cell& cell,
-                                        double& volume,
-                                        std::vector<double>& areas);
+              CoordinateSystemType coordinate_system_type);
 
   const chi_mesh::MeshContinuum& ref_grid_;
   const chi_mesh::Cell& cell_;
@@ -128,6 +143,8 @@ protected:
    *  \p fi the face node index of the face identified by face index \p f,
    *  contains the corresponding cell node index. */
   const std::vector<std::vector<int>> face_node_mappings_;
+
+  const CoordinateSystemType coordinate_system_type_;
 };
 } // namespace chi_math
 

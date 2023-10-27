@@ -24,7 +24,8 @@ public:
   PieceWiseLinearBaseMapping(const chi_mesh::MeshContinuum& grid,
                              const chi_mesh::Cell& cell,
                              size_t num_nodes,
-                             std::vector<std::vector<int>> face_node_mappings);
+                             std::vector<std::vector<int>> face_node_mappings,
+                             CoordinateSystemType coordinate_system_type);
 
 protected:
   static std::vector<chi_mesh::Vector3>

@@ -140,7 +140,6 @@ chi_math::SDMPtr FieldFunctionGridBased::MakeSpatialDiscretization(
   typedef chi_math::spatial_discretization::LagrangeContinuous LagC;
   typedef chi_math::spatial_discretization::LagrangeDiscontinuous LagD;
 
-  if (sdm_type == "FV") return FV::New(*grid_ptr);
 
   chi_math::CoordinateSystemType cs_type =
     chi_math::CoordinateSystemType::CARTESIAN;
@@ -154,6 +153,8 @@ chi_math::SDMPtr FieldFunctionGridBased::MakeSpatialDiscretization(
     if (cs == "cylindrical") cs_type = CoordinateSystemType::CYLINDRICAL;
     if (cs == "spherical") cs_type = CoordinateSystemType::SPHERICAL;
   }
+
+  if (sdm_type == "FV") return FV::New(*grid_ptr, cs_type);
 
   chi_math::QuadratureOrder q_order = chi_math::QuadratureOrder::SECOND;
 

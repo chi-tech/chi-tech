@@ -12,13 +12,14 @@ PieceWiseLinearBaseMapping::PieceWiseLinearBaseMapping(
   const chi_mesh::MeshContinuum& grid,
   const chi_mesh::Cell& cell,
   size_t num_nodes,
-  std::vector<std::vector<int>> face_node_mappings)
+  std::vector<std::vector<int>> face_node_mappings,
+  CoordinateSystemType coordinate_system_type)
   : CellMapping(grid,
                 cell,
                 num_nodes,
                 GetVertexLocations(grid, cell),
                 std::move(face_node_mappings),
-                &CellMapping::ComputeCellVolumeAndAreas)
+                coordinate_system_type)
 {
 }
 

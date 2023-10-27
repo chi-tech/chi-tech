@@ -3,7 +3,8 @@
 namespace chi_math
 {
 
-PointQuadrature::PointQuadrature() : Quadrature(QuadratureOrder::CONSTANT)
+PointQuadrature::PointQuadrature(QuadratureOrder)
+  : Quadrature(QuadratureOrder::CONSTANT)
 {
   qpoints_ = {{0.0, 0.0, 0.0}};
   weights_ = {1.0};

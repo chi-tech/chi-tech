@@ -11,7 +11,8 @@ namespace chi_math
 class PointQuadrature : public Quadrature
 {
 public:
-  PointQuadrature();
+  /**Quadrature order is not used and will always default to constant.*/
+  explicit PointQuadrature(QuadratureOrder order = QuadratureOrder::CONSTANT);
 };
 
 }

@@ -1,10 +1,13 @@
 #include "math/SpatialDiscretization/CellMappings/CellMapping.h"
 
-#include <utility>
-
+#include "math/SpatialDiscretization/SpatialDiscretization.h"
 #include "math/SpatialDiscretization/FiniteElement/QuadraturePointData.h"
 
 #include "mesh/MeshContinuum/chi_meshcontinuum.h"
+
+#include <utility>
+
+#include "chi_log.h"
 
 namespace chi_math
 {
@@ -14,14 +17,14 @@ CellMapping::CellMapping(const chi_mesh::MeshContinuum& grid,
                          size_t num_nodes,
                          std::vector<chi_mesh::Vector3> node_locations,
                          std::vector<std::vector<int>> face_node_mappings,
-                         const VandAFunction& volume_area_function)
+                         CoordinateSystemType coordinate_system_type)
   : ref_grid_(grid),
     cell_(cell),
     num_nodes_(num_nodes),
     node_locations_(std::move(node_locations)),
-    face_node_mappings_(std::move(face_node_mappings))
+    face_node_mappings_(std::move(face_node_mappings)),
+    coordinate_system_type_(coordinate_system_type)
 {
-  volume_area_function(ref_grid_, cell, volume_, areas_);
 }
 
 const chi_mesh::Cell& CellMapping::ReferenceCell() const { return cell_; }
@@ -47,6 +50,10 @@ double CellMapping::CellVolume() const { return volume_; }
 
 double CellMapping::FaceArea(size_t face_index) const
 {
+  ChiInvalidArgumentIf(face_index >= areas_.size(),
+                       "Invalid face index " + std::to_string(face_index) +
+                         " for area-list of size " +
+                         std::to_string(areas_.size()));
   return areas_[face_index];
 }
 
@@ -62,6 +69,12 @@ int CellMapping::MapFaceNode(size_t face_index, size_t face_node_index) const
       "chi_math::CellMapping::MapFaceNode: "
       "Either face_index or face_node_index is out of range");
   }
+}
+
+void CellMapping::Initialize()
+{
+  ComputeCellVolumeAndAreas(ref_grid_, cell_, volume_, areas_);
+  //TODO: Compute element-centroid
 }
 
 void CellMapping::ComputeCellVolumeAndAreas(const chi_mesh::MeshContinuum& grid,
@@ -153,10 +166,30 @@ void CellMapping::ComputeCellVolumeAndAreas(const chi_mesh::MeshContinuum& grid,
   }
 }
 
+CoordinateSystemType CellMapping::GetCoordinateSystemType() const
+{
+  return coordinate_system_type_;
+}
+
+std::function<double(const chi_mesh::Vector3&)>
+CellMapping::GetSpatialWeightingFunction() const
+{
+  std::function<double(const chi_mesh::Vector3&)> swf;
+  if (coordinate_system_type_ == CoordinateSystemType::CARTESIAN)
+    swf = SpatialDiscretization::CartesianSpatialWeightFunction;
+  else if (coordinate_system_type_ == CoordinateSystemType::CYLINDRICAL)
+    swf = SpatialDiscretization::CylindricalRZSpatialWeightFunction;
+  else if (coordinate_system_type_ == CoordinateSystemType::SPHERICAL)
+    swf = SpatialDiscretization::Spherical1DSpatialWeightFunction;
+  else
+    ChiInvalidArgument("Unsupported coordinate system encountered");
+
+  return swf;
+}
+
 const std::vector<chi_mesh::Vector3>& CellMapping::GetNodeLocations() const
 {
   return node_locations_;
 }
-
 
 } // namespace chi_math

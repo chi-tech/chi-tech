@@ -15,7 +15,8 @@ public:
                        const chi_mesh::Cell& cell,
                        const Quadrature& volume_quadrature,
                        const Quadrature& surface_quadrature,
-                       const Quadrature& aux_surface_quadrature);
+                       const Quadrature& aux_surface_quadrature,
+                       CoordinateSystemType coordinate_system_type);
 
 protected:
   double RefShape(uint32_t i, const Vec3& qpoint) const override;
